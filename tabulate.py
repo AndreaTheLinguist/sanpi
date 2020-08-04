@@ -30,16 +30,13 @@ def __main__():
     jsonDir1 = baseDir / f'{args.sentences}.{args.pattern1}'
     jsonDir2 = baseDir / f'{args.sentences}.{args.pattern2}'
 
-    if not (jsonDir1.is_dir() and jsonDir2.is_dir()):
-
-        sys.exit('Error: specified son directories do not '
-                 'exist in the base directory.')
-
     dirs = [jsonDir1, jsonDir2]
+
+    checkDirs(dirs)
 
     counters = fillCounters(dirs, args)
 
-    print('Finished processing all json files.\nWriting output file...')
+    print('\nFinished processing all json files.\nWriting output file...')
 
     createCsv(counters, outputDir, args)
 
@@ -79,42 +76,62 @@ def parseArgs():
     return parser.parse_args()
 
 
+def checkDirs(dirList):
+
+    dir1 = dirList[0]
+    dir2 = dirList[1]
+
+    if not (dir1.is_dir() and dir2.is_dir()):
+
+        sys.exit('Error: Specified json directories do not '
+                 'exist in the base directory.')
+
+    sizeDir1 = len([name for name in os.listdir(dir1)
+                    if not name.endswith('raw.json')])
+
+    sizeDir2 = len([name for name in os.listdir(dir2)
+                    if not name.endswith('raw.json')])
+
+    if sizeDir1 != sizeDir2:
+
+        sys.exit('Error: Specified data directories do not have the same '
+                 'number of processed json files. Check directories and try '
+                 'again.')
+
+    return
+
+
+
 def fillCounters(dirs, args):
 
     counters = [Counter(), Counter()]
 
     for i, jsonDir in enumerate(dirs):
 
+        startTime = time.perf_counter()
+        fileCount = 0
+
         for jsonFile in os.scandir(path=jsonDir):
 
             if (jsonFile.name.endswith('raw.json')
                 or not jsonFile.name.endswith('json')): continue
 
-            startTime = time.perf_counter()
+            fileCount += 1
+
             if args.verbose:
-                print(f'Processing {jsonFile.name}...')
+                print(f'\nProcessing {jsonFile.name}...')
 
             counters[i] = countTokenPairs(counters[i], jsonFile.path, args)
 
-            finishTime = time.perf_counter()
-
-            # print(f'\t{i} hit results filled from {c} total original '
-            #       f'sentences in {round(finishTime - startTime, 2)} seconds')
-
-            # with open(f'{jsonDirPath}{pref}.json', 'w') as o:
-            #     print('\tWriting output file...')
-            #     json.dump(hits, o, indent=2)
-
-            # After all counts are finalized, dict can be sorted
-            # then use csv.writer (or dictWriter?)
-
         if args.verbose:
-            print(f'Top 10 collocations for entire {jsonDir.name} directory:')
+            print(f'\nTop 10 collocations for entire {jsonDir.name} directory:')
             pprint.pprint(counters[i].most_common(10))
-            # counters[i] = sorted(counters[i].items(),
-            #                      key=lambda x: x[1], reverse=True)
 
-        print(f'\tFinished {jsonDir.name}.')
+        finishTime = time.perf_counter()
+
+        print(f'\nFinished counting {jsonDir.name}.')
+        print(f'Collocations from {fileCount} total files counted '
+              f'in {round(finishTime - startTime, 2)} seconds')
 
     return counters
 
@@ -155,9 +172,10 @@ def countTokenPairs(countDict, jsonFile, args):
                 ## use (named)tuple as key in dictionary.
                 # e.g. [(word1=x, word2=y): count, (word1=a, word2=b): count, ...]
 
+    print('\tfinished.')
     if args.verbose:
-        print('Top 5 (running totals):')
-        pprint.pprint(countDict.most_common(5))
+        print('Top 3 (running totals):')
+        pprint.pprint(countDict.most_common(3))
 
     return countDict
 
