@@ -1,0 +1,2996 @@
+# sent_id = nyt_eng_20000429_0250_92
+# text = -LRB- Fireside\/S & S ,
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Fireside\/S	Fireside\/S	_	NNP	_	0	root	0:root	_
+3	&	&	_	CC	_	2	cc	2:cc	_
+4	S	S	_	NNP	_	2	conj	2:conj	_
+5	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_93
+# text = $ 12 . -RRB-
+1	$	$	_	$	_	0	root	0:root	_
+2	12	12	_	CD	_	1	num	1:num	_
+3	.	.	_	.	_	0	-	0:-	_
+4	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_94
+# text = How daily activities can be enhanced by feelings
+1	how	how	_	WRB	_	6	advmod	6:advmod	_
+2	daily	daily	_	JJ	_	3	amod	3:amod	_
+3	activities	activity	_	NNS	_	6	nsubjpass	6:nsubjpass	_
+4	can	can	_	MD	_	6	aux	6:aux	_
+5	be	be	_	AUXB	_	6	auxpass	6:auxpass	_
+6	enhanced	enhance	_	VBN	_	0	root	0:root	_
+7	by	by	_	IN	_	6	prep	6:prep	_
+8	feelings	feeling	_	NNS	_	7	pobj	7:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_95
+# text = of meaning and purpose .
+1	of	of	_	IN	_	0	root	0:root	_
+2	meaning	meaning	_	NN	_	1	pobj	1:pobj	_
+3	and	and	_	CC	_	2	cc	2:cc	_
+4	purpose	purpose	_	NN	_	2	conj	2:conj	_
+5	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_96
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_97
+# text = 2 .
+1	2	2	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_98
+# text = GIRL , INTERRUPTED , by Susanna Kaysen .
+1	GIRL	GIRL	_	NNP	_	0	root	0:root	_
+2	,	,	_	,	_	0	-	0:-	_
+3	INTERRUPTED	INTERRUPTED	_	NNP	_	1	appos	1:appos	_
+4	,	,	_	,	_	0	-	0:-	_
+5	by	by	_	IN	_	1	prep	1:prep	_
+6	Susanna	Susanna	_	NNP	_	7	nn	7:nn	_
+7	Kaysen	Kaysen	_	NNP	_	5	pobj	5:pobj	_
+8	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_99
+# text = -LRB- Vintage , $ 12 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Vintage	Vintage	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	12	12	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_100
+# text = A memoir of mental illness .
+1	a	a	_	DT	_	2	det	2:det	_
+2	memoir	memoir	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	mental	mental	_	JJ	_	5	amod	5:amod	_
+5	illness	illness	_	NN	_	3	pobj	3:pobj	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_101
+# text = 3 .
+1	3	3	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_102
+# text = ANGELA 'S ASHES , by Frank McCourt .
+1	ANGELA	ANGELA	_	NNP	_	3	nsubj	3:nsubj	_
+2	'S	be	_	VBZ	_	3	cop	3:cop	_
+3	ASHES	ASHES	_	NNP	_	0	root	0:root	_
+4	,	,	_	,	_	0	-	0:-	_
+5	by	by	_	IN	_	3	prep	3:prep	_
+6	Frank	Frank	_	NNP	_	7	nn	7:nn	_
+7	McCourt	McCourt	_	NNP	_	5	pobj	5:pobj	_
+8	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_103
+# text = -LRB- Touchstone\/S & S ,
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Touchstone\/S	Touchstone\/S	_	NNP	_	0	root	0:root	_
+3	&	&	_	CC	_	2	cc	2:cc	_
+4	S	S	_	NNP	_	2	conj	2:conj	_
+5	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_104
+# text = $ 14 and $ 7.99 . -RRB-
+1	$	$	_	$	_	2	dep	2:dep	_
+2	14	14	_	CD	_	0	root	0:root	_
+3	and	and	_	CC	_	2	cc	2:cc	_
+4	$	$	_	$	_	2	conj	2:conj	_
+5	7.99	7.99	_	CD	_	2	number	2:number	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_105
+# text = An Irish-American writer recalls his
+1	an	a	_	DT	_	3	det	3:det	_
+2	Irish-American	irish-american	_	JJ	_	3	amod	3:amod	_
+3	writer	writer	_	NN	_	4	nsubj	4:nsubj	_
+4	recalls	recall	_	VBZ	_	0	root	0:root	_
+5	his	he	_	PRP$	_	4	dobj	4:dobj	_
+
+# sent_id = nyt_eng_20000429_0250_106
+# text = childhood amid the miseries of Limerick .
+1	childhood	childhood	_	NN	_	0	root	0:root	_
+2	amid	amid	_	IN	_	1	prep	1:prep	_
+3	the	the	_	DT	_	4	det	4:det	_
+4	miseries	misery	_	NNS	_	2	pobj	2:pobj	_
+5	of	of	_	IN	_	4	prep	4:prep	_
+6	Limerick	Limerick	_	NNP	_	5	pobj	5:pobj	_
+7	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_107
+# text = 4 .
+1	4	4	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_108
+# text = A CHILD CALLED  -LBQ-  IT ,  -RDQ-  by Dave Pelzer .
+1	a	a	_	DT	_	2	det	2:det	_
+2	CHILD	CHILD	_	NNP	_	3	nsubj	3:nsubj	_
+3	CALLED	call	_	VBN	_	0	root	0:root	_
+4	``	``	_	``	_	0	-	0:-	_
+5	IT	it	_	PRP	_	3	dobj	3:dobj	_
+6	,	,	_	,	_	0	-	0:-	_
+7	''	''	_	''	_	0	-	0:-	_
+8	by	by	_	IN	_	5	prep	5:prep	_
+9	Dave	Dave	_	NNP	_	10	nn	10:nn	_
+10	Pelzer	Pelzer	_	NNP	_	8	pobj	8:pobj	_
+11	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_109
+# text = -LRB- Health
+1	-LRB-	-LRB-	_	NNP	_	0	-	0:-	_
+2	Health	Health	_	NNP	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_110
+# text = Communications , $ 9.95 . -RRB-
+1	Communications	Communications	_	NNP	_	0	root	0:root	_
+2	,	,	_	,	_	0	-	0:-	_
+3	$	$	_	$	_	1	dep	1:dep	_
+4	9.95	9.95	_	CD	_	3	num	3:num	_
+5	.	.	_	.	_	0	-	0:-	_
+6	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_111
+# text = The autobiography of a man
+1	the	the	_	DT	_	2	det	2:det	_
+2	autobiography	autobiography	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	a	a	_	DT	_	5	det	5:det	_
+5	man	man	_	NN	_	3	pobj	3:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_112
+# text = who survived his mother 's abuse .
+1	who	who	_	WP	_	2	nsubj	2:nsubj	_
+2	survived	survive	_	VBD	_	6	csubj	6:csubj	_
+3	his	he	_	PRP$	_	4	poss	4:poss	_
+4	mother	mother	_	NN	_	2	dobj	2:dobj	_
+5	's	be	_	VBZ	_	6	cop	6:cop	_
+6	abuse	abuse	_	NN	_	0	root	0:root	_
+7	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_113
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_114
+# text = 5 .
+1	5	5	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_115
+# text = THE ELEGANT UNIVERSE , by Brian Greene .
+1	the	the	_	DT	_	3	det	3:det	_
+2	ELEGANT	ELEGANT	_	NNP	_	3	nn	3:nn	_
+3	UNIVERSE	UNIVERSE	_	NNP	_	0	root	0:root	_
+4	,	,	_	,	_	0	-	0:-	_
+5	by	by	_	IN	_	3	prep	3:prep	_
+6	Brian	Brian	_	NNP	_	7	nn	7:nn	_
+7	Greene	Greene	_	NNP	_	5	pobj	5:pobj	_
+8	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_116
+# text = -LRB- Vintage , $ 15 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Vintage	Vintage	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	15	15	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_117
+# text = A presentation of superstring
+1	a	a	_	DT	_	2	det	2:det	_
+2	presentation	presentation	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	superstring	superstr	_	VBG	_	3	pobj	3:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_118
+# text = theory , which attempts to mediate between
+1	theory	theory	_	NN	_	0	root	0:root	_
+2	,	,	_	,	_	0	-	0:-	_
+3	which	which	_	WDT	_	4	nsubj	4:nsubj	_
+4	attempts	attempt	_	VBZ	_	1	rcmod	1:rcmod	_
+5	to	to	_	TO	_	6	aux	6:aux	_
+6	mediate	mediate	_	VB	_	4	xcomp	4:xcomp	_
+7	between	between	_	IN	_	6	prep	6:prep	_
+
+# sent_id = nyt_eng_20000429_0250_119
+# text = quantum mechanics and general relativity .
+1	quantum	quantum	_	NN	_	2	nn	2:nn	_
+2	mechanics	mechanic	_	NNS	_	0	root	0:root	_
+3	and	and	_	CC	_	2	cc	2:cc	_
+4	general	general	_	JJ	_	5	amod	5:amod	_
+5	relativity	relativity	_	NN	_	2	conj	2:conj	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_120
+# text = 6 . -LRB- x -RRB- BELLA TUSCANY , by Frances Mayes .
+1	6	6	_	LS	_	6	dep	6:dep	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	6	dep	6:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	BELLA	bella	_	VB	_	0	root	0:root	_
+7	TUSCANY	TUSCANY	_	NNP	_	6	dobj	6:dobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	by	by	_	IN	_	7	prep	7:prep	_
+10	Frances	Frances	_	NNP	_	11	nn	11:nn	_
+11	Mayes	Mayes	_	NNP	_	9	pobj	9:pobj	_
+12	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_121
+# text = -LRB- Broadway , $ 15 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Broadway	Broadway	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	15	15	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_122
+# text = An American remembers a spring and summer spent in the
+1	an	a	_	DT	_	2	det	2:det	_
+2	American	American	_	NNP	_	3	nsubj	3:nsubj	_
+3	remembers	remember	_	VBZ	_	0	root	0:root	_
+4	a	a	_	DT	_	5	det	5:det	_
+5	spring	spring	_	NN	_	3	dobj	3:dobj	_
+6	and	and	_	CC	_	5	cc	5:cc	_
+7	summer	summer	_	NN	_	5	conj	5:conj	_
+8	spent	spend	_	VBN	_	5	partmod	5:partmod	_
+9	in	in	_	IN	_	8	prep	8:prep	_
+10	the	the	_	DT	_	9	pobj	9:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_123
+# text = romantic sections of Italy .
+1	romantic	romantic	_	JJ	_	2	amod	2:amod	_
+2	sections	section	_	NNS	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	Italy	Italy	_	NNP	_	3	pobj	3:pobj	_
+5	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_124
+# text = 7 .
+1	7	7	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_125
+# text = THE LOST BOY , by Dave Pelzer .
+1	the	the	_	DT	_	3	det	3:det	_
+2	LOST	LOST	_	NNP	_	3	nn	3:nn	_
+3	BOY	BOY	_	NNP	_	0	root	0:root	_
+4	,	,	_	,	_	0	-	0:-	_
+5	by	by	_	IN	_	3	prep	3:prep	_
+6	Dave	Dave	_	NNP	_	7	nn	7:nn	_
+7	Pelzer	Pelzer	_	NNP	_	5	pobj	5:pobj	_
+8	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_126
+# text = -LRB- Health
+1	-LRB-	-LRB-	_	NNP	_	0	-	0:-	_
+2	Health	Health	_	NNP	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_127
+# text = Communications , $ 10.95 . -RRB-
+1	Communications	Communications	_	NNP	_	0	root	0:root	_
+2	,	,	_	,	_	0	-	0:-	_
+3	$	$	_	$	_	1	dep	1:dep	_
+4	10.95	10.95	_	CD	_	3	num	3:num	_
+5	.	.	_	.	_	0	-	0:-	_
+6	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_128
+# text = The author of  -LBQ-  A Child
+1	the	the	_	DT	_	2	det	2:det	_
+2	author	author	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	``	``	_	``	_	0	-	0:-	_
+5	A	a	_	DT	_	6	det	6:det	_
+6	Child	child	_	NN	_	3	pobj	3:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_129
+# text = Called ` It  -RDQ-  ' recalls his life in foster homes .
+1	called	call	_	VBN	_	0	root	0:root	_
+2	`	`	_	``	_	0	-	0:-	_
+3	It	it	_	PRP	_	1	dep	1:dep	_
+4	''	''	_	''	_	0	-	0:-	_
+5	'	'	_	:	_	0	-	0:-	_
+6	recalls	recall	_	VBZ	_	1	dep	1:dep	_
+7	his	he	_	PRP$	_	8	poss	8:poss	_
+8	life	life	_	NN	_	6	dobj	6:dobj	_
+9	in	in	_	IN	_	8	prep	8:prep	_
+10	foster	foster	_	JJ	_	11	amod	11:amod	_
+11	homes	home	_	NNS	_	9	pobj	9:pobj	_
+12	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_130
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_131
+# text = 8 .
+1	8	8	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_132
+# text = THE ONION 'S FINEST NEWS REPORTING , edited by
+1	the	the	_	DT	_	2	det	2:det	_
+2	ONION	ONION	_	NNP	_	6	nsubj	6:nsubj	_
+3	'S	be	_	VBZ	_	6	cop	6:cop	_
+4	FINEST	FINEST	_	NNP	_	6	nn	6:nn	_
+5	NEWS	NEWS	_	NNP	_	6	nn	6:nn	_
+6	REPORTING	REPORTING	_	NNP	_	0	root	0:root	_
+7	,	,	_	,	_	0	-	0:-	_
+8	edited	edit	_	VBN	_	6	partmod	6:partmod	_
+9	by	by	_	IN	_	8	prep	8:prep	_
+
+# sent_id = nyt_eng_20000429_0250_133
+# text = Scott Dikkers and Robert Siegel .
+1	Scott	Scott	_	NNP	_	2	nn	2:nn	_
+2	Dikkers	Dikkers	_	NNP	_	0	root	0:root	_
+3	and	and	_	CC	_	2	cc	2:cc	_
+4	Robert	Robert	_	NNP	_	5	nn	5:nn	_
+5	Siegel	Siegel	_	NNP	_	2	conj	2:conj	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_134
+# text = -LRB- Three Rivers , $ 16 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Three	Three	_	NNP	_	3	nn	3:nn	_
+3	Rivers	Rivers	_	NNP	_	0	root	0:root	_
+4	,	,	_	,	_	0	-	0:-	_
+5	$	$	_	$	_	3	dep	3:dep	_
+6	16	16	_	CD	_	5	num	5:num	_
+7	.	.	_	.	_	0	-	0:-	_
+8	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_135
+# text = A collection of humor pieces .
+1	a	a	_	DT	_	2	det	2:det	_
+2	collection	collection	_	NN	_	5	nsubj	5:nsubj	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	humor	humor	_	NN	_	3	pobj	3:pobj	_
+5	pieces	piece	_	NNS	_	0	root	0:root	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_136
+# text = 9 . -LRB- x -RRB- YESTERDAY , I CRIED , by Iyanla Vanzant .
+1	9	9	_	CD	_	6	nsubj	6:nsubj	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	6	dep	6:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	YESTERDAY	yesterday	_	VB	_	0	root	0:root	_
+7	,	,	_	,	_	0	-	0:-	_
+8	I	I	_	PRP	_	9	nsubj	9:nsubj	_
+9	CRIED	cry	_	VBD	_	6	parataxis	6:parataxis	_
+10	,	,	_	,	_	0	-	0:-	_
+11	by	by	_	IN	_	6	prep	6:prep	_
+12	Iyanla	Iyanla	_	NNP	_	13	nn	13:nn	_
+13	Vanzant	Vanzant	_	NNP	_	11	pobj	11:pobj	_
+14	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_137
+# text = -LRB- Fireside\/S & S ,
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Fireside\/S	Fireside\/S	_	NNP	_	0	root	0:root	_
+3	&	&	_	CC	_	2	cc	2:cc	_
+4	S	S	_	NNP	_	2	conj	2:conj	_
+5	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_138
+# text = $ 13 . -RRB-
+1	$	$	_	$	_	0	root	0:root	_
+2	13	13	_	CD	_	1	num	1:num	_
+3	.	.	_	.	_	0	-	0:-	_
+4	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_139
+# text = A counselor tells how she turned painful
+1	a	a	_	DT	_	2	det	2:det	_
+2	counselor	counselor	_	NN	_	3	nsubj	3:nsubj	_
+3	tells	tell	_	VBZ	_	0	root	0:root	_
+4	how	how	_	WRB	_	6	advmod	6:advmod	_
+5	she	she	_	PRP	_	6	nsubj	6:nsubj	_
+6	turned	turn	_	VBD	_	3	ccomp	3:ccomp	_
+7	painful	painful	_	JJ	_	6	acomp	6:acomp	_
+
+# sent_id = nyt_eng_20000429_0250_140
+# text = experiences into hope .
+1	experiences	experience	_	NNS	_	0	root	0:root	_
+2	into	into	_	IN	_	1	prep	1:prep	_
+3	hope	hope	_	NN	_	2	pobj	2:pobj	_
+4	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_141
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_142
+# text = 10 . -LRB- x -RRB- THE PERFECT STORM , by Sebastian Junger .
+1	10	10	_	CD	_	0	root	0:root	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	8	dep	8:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	THE	the	_	DT	_	8	det	8:det	_
+7	PERFECT	PERFECT	_	NNP	_	8	nn	8:nn	_
+8	STORM	STORM	_	NNP	_	1	dep	1:dep	_
+9	,	,	_	,	_	0	-	0:-	_
+10	by	by	_	IN	_	8	prep	8:prep	_
+11	Sebastian	Sebastian	_	NNP	_	12	nn	12:nn	_
+12	Junger	Junger	_	NNP	_	10	pobj	10:pobj	_
+13	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_143
+# text = -LRB- HarperPerennial , $ 14 ; HarperPaperbacks , $ 6.99 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	HarperPerennial	HarperPerennial	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	14	14	_	CD	_	4	num	4:num	_
+6	;	;	_	:	_	0	-	0:-	_
+7	HarperPaperbacks	HarperPaperbacks	_	NNP	_	2	dep	2:dep	_
+8	,	,	_	,	_	0	-	0:-	_
+9	$	$	_	$	_	2	dep	2:dep	_
+10	6.99	6.99	_	CD	_	9	num	9:num	_
+11	.	.	_	.	_	0	-	0:-	_
+12	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_144
+# text = The story of the nor'easter of 1991 , focusing on a
+1	the	the	_	DT	_	2	det	2:det	_
+2	story	story	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	the	the	_	DT	_	5	det	5:det	_
+5	nor'easter	nor'easter	_	NN	_	3	pobj	3:pobj	_
+6	of	of	_	IN	_	5	prep	5:prep	_
+7	1991	1991	_	CD	_	6	pobj	6:pobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	focusing	focus	_	VBG	_	5	partmod	5:partmod	_
+10	on	on	_	IN	_	9	prep	9:prep	_
+11	a	a	_	DT	_	10	pobj	10:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_145
+# text = single crew .
+1	single	single	_	JJ	_	2	amod	2:amod	_
+2	crew	crew	_	NN	_	0	root	0:root	_
+3	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_146
+# text = 11 . -LRB- x -RRB- TRAVELING MERCIES , by Anne Lamott .
+1	11	11	_	CD	_	0	root	0:root	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	7	dep	7:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	TRAVELING	TRAVELING	_	NNP	_	7	nn	7:nn	_
+7	MERCIES	mercy	_	NNS	_	1	dep	1:dep	_
+8	,	,	_	,	_	0	-	0:-	_
+9	by	by	_	IN	_	7	prep	7:prep	_
+10	Anne	Anne	_	NNP	_	11	nn	11:nn	_
+11	Lamott	Lamott	_	NNP	_	9	pobj	9:pobj	_
+12	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_147
+# text = -LRB- Anchor , $ 13 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Anchor	Anchor	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	13	13	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_148
+# text = A chronicle of the author 's journey toward faith .
+1	a	a	_	DT	_	2	det	2:det	_
+2	chronicle	chronicle	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	the	the	_	DT	_	5	det	5:det	_
+5	author	author	_	NN	_	7	poss	7:poss	_
+6	's	's	_	POS	_	5	possessive	5:possessive	_
+7	journey	journey	_	NN	_	3	pobj	3:pobj	_
+8	toward	toward	_	IN	_	2	prep	2:prep	_
+9	faith	faith	_	NN	_	8	pobj	8:pobj	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_149
+# text = 12 .
+1	12	12	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_150
+# text = THE PROFESSOR AND THE MADMAN , by Simon Winchester .
+1	the	the	_	DT	_	2	dep	2:dep	_
+2	PROFESSOR	PROFESSOR	_	NNP	_	0	root	0:root	_
+3	AND	and	_	CC	_	2	cc	2:cc	_
+4	THE	THE	_	NNP	_	5	nn	5:nn	_
+5	MADMAN	MADMAN	_	NNP	_	2	conj	2:conj	_
+6	,	,	_	,	_	0	-	0:-	_
+7	by	by	_	IN	_	2	conj	2:conj	_
+8	Simon	Simon	_	NNP	_	9	nn	9:nn	_
+9	Winchester	Winchester	_	NNP	_	7	pobj	7:pobj	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_151
+# text = -LRB- HarperPerennial , $ 13 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	HarperPerennial	HarperPerennial	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	13	13	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_152
+# text = How a murderer helped James
+1	how	how	_	WRB	_	4	advmod	4:advmod	_
+2	a	a	_	DT	_	3	det	3:det	_
+3	murderer	murderer	_	NN	_	4	nsubj	4:nsubj	_
+4	helped	help	_	VBD	_	0	root	0:root	_
+5	James	James	_	NNP	_	4	dep	4:dep	_
+
+# sent_id = nyt_eng_20000429_0250_153
+# text = Murray compile the Oxford English Dictionary .
+1	Murray	Murray	_	NNP	_	2	nsubj	2:nsubj	_
+2	compile	compile	_	VB	_	0	root	0:root	_
+3	the	the	_	DT	_	6	det	6:det	_
+4	Oxford	Oxford	_	NNP	_	6	nn	6:nn	_
+5	English	English	_	NNP	_	6	nn	6:nn	_
+6	Dictionary	Dictionary	_	NNP	_	2	dobj	2:dobj	_
+7	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_154
+# text = 13 .
+1	13	13	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_155
+# text = THE MILLIONAIRE NEXT DOOR , by Thomas J. Stanley
+1	the	the	_	DT	_	4	det	4:det	_
+2	MILLIONAIRE	MILLIONAIRE	_	NNP	_	4	nn	4:nn	_
+3	NEXT	NEXT	_	NNP	_	4	nn	4:nn	_
+4	DOOR	DOOR	_	NNP	_	0	root	0:root	_
+5	,	,	_	,	_	0	-	0:-	_
+6	by	by	_	IN	_	4	prep	4:prep	_
+7	Thomas	Thomas	_	NNP	_	9	nn	9:nn	_
+8	J.	J.	_	NNP	_	9	nn	9:nn	_
+9	Stanley	Stanley	_	NNP	_	6	pobj	6:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_156
+# text = and William D. Danko .
+1	and	and	_	CC	_	4	dep	4:dep	_
+2	William	William	_	NNP	_	4	nn	4:nn	_
+3	D.	D.	_	NNP	_	4	nn	4:nn	_
+4	Danko	Danko	_	NNP	_	0	root	0:root	_
+5	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_157
+# text = -LRB- Pocket , $ 14 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Pocket	Pocket	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	14	14	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_158
+# text = An analysis
+1	an	a	_	DT	_	2	det	2:det	_
+2	analysis	analysis	_	NN	_	0	root	0:root	_
+
+# sent_id = nyt_eng_20000429_0250_159
+# text = of the lives of wealthy Americans .
+1	of	of	_	IN	_	0	root	0:root	_
+2	the	the	_	DT	_	3	det	3:det	_
+3	lives	life	_	NNS	_	1	pobj	1:pobj	_
+4	of	of	_	IN	_	3	prep	3:prep	_
+5	wealthy	wealthy	_	JJ	_	6	amod	6:amod	_
+6	Americans	Americans	_	NNPS	_	4	pobj	4:pobj	_
+7	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_160
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_161
+# text = 14 . -LRB- x -RRB- GUNS , GERMS , AND STEEL , by Jared Diamond .
+1	14	14	_	CD	_	0	root	0:root	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	6	dep	6:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	GUNS	GUNS	_	NNP	_	1	dep	1:dep	_
+7	,	,	_	,	_	0	-	0:-	_
+8	GERMS	GERMS	_	NNP	_	6	conj	6:conj	_
+9	,	,	_	,	_	0	-	0:-	_
+10	AND	and	_	CC	_	6	cc	6:cc	_
+11	STEEL	STEEL	_	NNP	_	6	conj	6:conj	_
+12	,	,	_	,	_	0	-	0:-	_
+13	by	by	_	IN	_	6	prep	6:prep	_
+14	Jared	Jared	_	NNP	_	15	nn	15:nn	_
+15	Diamond	Diamond	_	NNP	_	13	pobj	13:pobj	_
+16	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_162
+# text = -LRB- Norton ,
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Norton	Norton	_	NNP	_	0	-	0:-	_
+3	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_163
+# text = $ 14.95 . -RRB-
+1	$	$	_	$	_	0	root	0:root	_
+2	14.95	14.95	_	CD	_	1	num	1:num	_
+3	.	.	_	.	_	0	-	0:-	_
+4	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_164
+# text = A physiologist attributes Western dominance to
+1	a	a	_	DT	_	2	det	2:det	_
+2	physiologist	physiologist	_	NN	_	3	nsubj	3:nsubj	_
+3	attributes	attribute	_	VBZ	_	0	root	0:root	_
+4	Western	western	_	JJ	_	5	amod	5:amod	_
+5	dominance	dominance	_	NN	_	3	dobj	3:dobj	_
+6	to	to	_	TO	_	3	prep	3:prep	_
+
+# sent_id = nyt_eng_20000429_0250_165
+# text = geographical advantages .
+1	geographical	geographical	_	JJ	_	2	dep	2:dep	_
+2	advantages	advantage	_	NNS	_	0	root	0:root	_
+3	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_166
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_167
+# text = 15 . -LRB- x -RRB- THE ORCHID THIEF , by Susan Orlean .
+1	15	15	_	CD	_	0	root	0:root	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	8	dep	8:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	THE	the	_	DT	_	8	det	8:det	_
+7	ORCHID	ORCHID	_	NNP	_	8	nn	8:nn	_
+8	THIEF	THIEF	_	NNP	_	1	dep	1:dep	_
+9	,	,	_	,	_	0	-	0:-	_
+10	by	by	_	IN	_	8	prep	8:prep	_
+11	Susan	Susan	_	NNP	_	12	nn	12:nn	_
+12	Orlean	Orlean	_	NNP	_	10	pobj	10:pobj	_
+13	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_168
+# text = -LRB- Ballantine ,
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Ballantine	Ballantine	_	NNP	_	0	-	0:-	_
+3	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_169
+# text = $ 14 . -RRB-
+1	$	$	_	$	_	0	root	0:root	_
+2	14	14	_	CD	_	1	num	1:num	_
+3	.	.	_	.	_	0	-	0:-	_
+4	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_170
+# text = A journalist 's account of a man who was caught
+1	a	a	_	DT	_	2	det	2:det	_
+2	journalist	journalist	_	NN	_	4	poss	4:poss	_
+3	's	's	_	POS	_	2	possessive	2:possessive	_
+4	account	account	_	NN	_	0	root	0:root	_
+5	of	of	_	IN	_	4	prep	4:prep	_
+6	a	a	_	DT	_	7	det	7:det	_
+7	man	man	_	NN	_	5	pobj	5:pobj	_
+8	who	who	_	WP	_	10	nsubjpass	10:nsubjpass	_
+9	was	was	_	AUXD	_	10	auxpass	10:auxpass	_
+10	caught	catch	_	VBN	_	7	rcmod	7:rcmod	_
+
+# sent_id = nyt_eng_20000429_0250_171
+# text = pilfering 200 rare orchids .
+1	pilfering	pilfer	_	VB	_	0	root	0:root	_
+2	200	200	_	CD	_	4	num	4:num	_
+3	rare	rare	_	JJ	_	4	amod	4:amod	_
+4	orchids	orchid	_	NNS	_	1	dobj	1:dobj	_
+5	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_172
+# text = 16 . -LRB- x -RRB- RAISING CAIN , by Dan Kindlon and Michael Thompson
+1	16	16	_	CD	_	0	root	0:root	_
+2	.	.	_	.	_	0	-	0:-	_
+3	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+4	x	x	_	LS	_	7	dep	7:dep	_
+5	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+6	RAISING	RAISING	_	NNP	_	7	nn	7:nn	_
+7	CAIN	CAIN	_	NNP	_	1	dep	1:dep	_
+8	,	,	_	,	_	0	-	0:-	_
+9	by	by	_	IN	_	7	prep	7:prep	_
+10	Dan	Dan	_	NNP	_	11	nn	11:nn	_
+11	Kindlon	Kindlon	_	NNP	_	9	pobj	9:pobj	_
+12	and	and	_	CC	_	11	cc	11:cc	_
+13	Michael	Michael	_	NNP	_	14	nn	14:nn	_
+14	Thompson	Thompson	_	NNP	_	11	conj	11:conj	_
+
+# sent_id = nyt_eng_20000429_0250_173
+# text = with Teresa Baker .
+1	with	with	_	IN	_	0	root	0:root	_
+2	Teresa	Teresa	_	NNP	_	3	nn	3:nn	_
+3	Baker	Baker	_	NNP	_	1	pobj	1:pobj	_
+4	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_174
+# text = -LRB- Living\/Planet\/Ballantine , $ 14 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Living\/Planet\/Ballantine	Living\/Planet\/Ballantine	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	dep	2:dep	_
+5	14	14	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+7	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_175
+# text = The emotional life of boys .
+1	the	the	_	DT	_	3	det	3:det	_
+2	emotional	emotional	_	JJ	_	3	amod	3:amod	_
+3	life	life	_	NN	_	0	root	0:root	_
+4	of	of	_	IN	_	3	prep	3:prep	_
+5	boys	boy	_	NNS	_	4	pobj	4:pobj	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_176
+# text = ADVICE , HOW-TO AND MISCELLANEOUS
+1	ADVICE	ADVICE	_	NNP	_	0	root	0:root	_
+2	,	,	_	,	_	0	-	0:-	_
+3	HOW-TO	HOW-TO	_	NNP	_	1	conj	1:conj	_
+4	AND	and	_	CC	_	1	cc	1:cc	_
+5	MISCELLANEOUS	MISCELLANEOUS	_	NNP	_	1	conj	1:conj	_
+
+# sent_id = nyt_eng_20000429_0250_177
+# text = 1 .
+1	1	1	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_178
+# text = CHICKEN SOUP FOR THE TEENAGE SOUL III , compiled by
+1	CHICKEN	CHICKEN	_	NNP	_	2	nn	2:nn	_
+2	SOUP	SOUP	_	NNP	_	0	root	0:root	_
+3	FOR	for	_	IN	_	2	prep	2:prep	_
+4	THE	the	_	DT	_	7	det	7:det	_
+5	TEENAGE	TEENAGE	_	NNP	_	7	nn	7:nn	_
+6	SOUL	SOUL	_	NNP	_	7	nn	7:nn	_
+7	III	III	_	NNP	_	3	pobj	3:pobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	compiled	compile	_	VBN	_	7	partmod	7:partmod	_
+10	by	by	_	IN	_	9	prep	9:prep	_
+
+# sent_id = nyt_eng_20000429_0250_179
+# text = Jack Canfield , Mark Victor Hansen and Kimberly Kirberger .
+1	Jack	Jack	_	NNP	_	2	nn	2:nn	_
+2	Canfield	Canfield	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	Mark	Mark	_	NNP	_	6	nn	6:nn	_
+5	Victor	Victor	_	NNP	_	6	nn	6:nn	_
+6	Hansen	Hansen	_	NNP	_	2	conj	2:conj	_
+7	and	and	_	CC	_	2	cc	2:cc	_
+8	Kimberly	Kimberly	_	NNP	_	9	nn	9:nn	_
+9	Kirberger	Kirberger	_	NNP	_	2	conj	2:conj	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_180
+# text = -LRB- Health Communications , $ 12.95 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Health	Health	_	NNP	_	3	nn	3:nn	_
+3	Communications	Communications	_	NNPS	_	0	root	0:root	_
+4	,	,	_	,	_	0	-	0:-	_
+5	$	$	_	$	_	3	dep	3:dep	_
+6	12.95	12.95	_	CD	_	5	num	5:num	_
+7	.	.	_	.	_	0	-	0:-	_
+8	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_181
+# text = Inspirational stories .
+1	inspirational	inspirational	_	JJ	_	2	amod	2:amod	_
+2	stories	story	_	NNS	_	0	root	0:root	_
+3	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_182
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_183
+# text = 2 .
+1	2	2	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_184
+# text = DR. ATKINS ' NEW DIET REVOLUTION , by Robert C. Atkins .
+1	DR.	DR.	_	NNP	_	2	nn	2:nn	_
+2	ATKINS	ATKINS	_	NNP	_	0	root	0:root	_
+3	'	'	_	:	_	0	-	0:-	_
+4	NEW	NEW	_	NNP	_	6	nn	6:nn	_
+5	DIET	DIET	_	NNP	_	6	nn	6:nn	_
+6	REVOLUTION	REVOLUTION	_	NNP	_	2	dep	2:dep	_
+7	,	,	_	,	_	0	-	0:-	_
+8	by	by	_	IN	_	2	prep	2:prep	_
+9	Robert	Robert	_	NNP	_	11	nn	11:nn	_
+10	C.	C.	_	NNP	_	11	nn	11:nn	_
+11	Atkins	Atkins	_	NNP	_	8	pobj	8:pobj	_
+12	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_185
+# text = -LRB- Avon , $ 14 and $ 6.99 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Avon	Avon	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	5	dep	5:dep	_
+5	14	14	_	CD	_	2	dep	2:dep	_
+6	and	and	_	CC	_	5	cc	5:cc	_
+7	$	$	_	$	_	5	conj	5:conj	_
+8	6.99	6.99	_	CD	_	5	number	5:number	_
+9	.	.	_	.	_	0	-	0:-	_
+10	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_186
+# text = A physician recommends ways
+1	a	a	_	DT	_	2	det	2:det	_
+2	physician	physician	_	NN	_	3	nsubj	3:nsubj	_
+3	recommends	recommend	_	VBZ	_	0	root	0:root	_
+4	ways	way	_	NNS	_	3	dobj	3:dobj	_
+
+# sent_id = nyt_eng_20000429_0250_187
+# text = to lose weight and achieve a healthy body .
+1	to	to	_	TO	_	2	aux	2:aux	_
+2	lose	lose	_	VB	_	0	root	0:root	_
+3	weight	weight	_	NN	_	2	dobj	2:dobj	_
+4	and	and	_	CC	_	2	cc	2:cc	_
+5	achieve	achieve	_	VB	_	2	conj	2:conj	_
+6	a	a	_	DT	_	8	det	8:det	_
+7	healthy	healthy	_	JJ	_	8	amod	8:amod	_
+8	body	body	_	NN	_	5	dobj	5:dobj	_
+9	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_188
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_189
+# text = 3 .
+1	3	3	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_190
+# text = LIFE STRATEGIES , by Phillip C. McGraw .
+1	LIFE	LIFE	_	NNP	_	2	nn	2:nn	_
+2	STRATEGIES	STRATEGIES	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	by	by	_	IN	_	2	prep	2:prep	_
+5	Phillip	Phillip	_	NNP	_	7	nn	7:nn	_
+6	C.	C.	_	NNP	_	7	nn	7:nn	_
+7	McGraw	McGraw	_	NNP	_	4	pobj	4:pobj	_
+8	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_191
+# text = -LRB- Hyperion ,
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Hyperion	Hyperion	_	NNP	_	0	-	0:-	_
+3	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_192
+# text = $ 11.95 . -RRB-
+1	$	$	_	$	_	0	root	0:root	_
+2	11.95	11.95	_	CD	_	1	num	1:num	_
+3	.	.	_	.	_	0	-	0:-	_
+4	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_193
+# text = How to find what matters in your life and
+1	how	how	_	WRB	_	3	advmod	3:advmod	_
+2	to	to	_	TO	_	3	aux	3:aux	_
+3	find	find	_	VB	_	0	root	0:root	_
+4	what	what	_	WP	_	5	nsubj	5:nsubj	_
+5	matters	matter	_	VBZ	_	3	ccomp	3:ccomp	_
+6	in	in	_	IN	_	5	prep	5:prep	_
+7	your	you	_	PRP$	_	9	poss	9:poss	_
+8	life	life	_	NN	_	9	nn	9:nn	_
+9	and	and	_	NNP	_	6	pobj	6:pobj	_
+
+# sent_id = nyt_eng_20000429_0250_194
+# text = what to do about it .
+1	what	what	_	WP	_	3	nsubj	3:nsubj	_
+2	to	to	_	TO	_	3	aux	3:aux	_
+3	do	do	_	VB	_	0	root	0:root	_
+4	about	about	_	IN	_	3	prep	3:prep	_
+5	it	it	_	PRP	_	4	pobj	4:pobj	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_195
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_196
+# text = 4 .
+1	4	4	_	CD	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_197
+# text = CHICKEN SOUP FOR THE CHRISTIAN FAMILY SOUL , compiled
+1	CHICKEN	CHICKEN	_	NNP	_	2	nn	2:nn	_
+2	SOUP	SOUP	_	NNP	_	0	root	0:root	_
+3	FOR	for	_	IN	_	2	prep	2:prep	_
+4	THE	the	_	DT	_	7	det	7:det	_
+5	CHRISTIAN	CHRISTIAN	_	NNP	_	7	nn	7:nn	_
+6	FAMILY	FAMILY	_	NNP	_	7	nn	7:nn	_
+7	SOUL	SOUL	_	NNP	_	3	pobj	3:pobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	compiled	compiled	_	NNP	_	2	appos	2:appos	_
+
+# sent_id = nyt_eng_20000429_0250_198
+# text = by Jack Canfield , Mark Victor Hansen , Patty Aubery and
+1	by	by	_	IN	_	0	root	0:root	_
+2	Jack	Jack	_	NNP	_	3	nn	3:nn	_
+3	Canfield	Canfield	_	NNP	_	1	pobj	1:pobj	_
+4	,	,	_	,	_	0	-	0:-	_
+5	Mark	Mark	_	NNP	_	7	nn	7:nn	_
+6	Victor	Victor	_	NNP	_	7	nn	7:nn	_
+7	Hansen	Hansen	_	NNP	_	3	appos	3:appos	_
+8	,	,	_	,	_	0	-	0:-	_
+9	Patty	Patty	_	NNP	_	11	nn	11:nn	_
+10	Aubery	Aubery	_	NNP	_	11	nn	11:nn	_
+11	and	and	_	NNP	_	7	appos	7:appos	_
+
+# sent_id = nyt_eng_20000429_0250_199
+# text = Nancy Mitchell Autio .
+1	Nancy	Nancy	_	NNP	_	3	nn	3:nn	_
+2	Mitchell	Mitchell	_	NNP	_	3	nn	3:nn	_
+3	Autio	Autio	_	NNP	_	0	root	0:root	_
+4	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_200
+# text = -LRB- Health Communications , $ 12.95 . -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	Health	Health	_	NNP	_	3	nn	3:nn	_
+3	Communications	Communications	_	NNPS	_	0	root	0:root	_
+4	,	,	_	,	_	0	-	0:-	_
+5	$	$	_	$	_	3	dep	3:dep	_
+6	12.95	12.95	_	CD	_	5	num	5:num	_
+7	.	.	_	.	_	0	-	0:-	_
+8	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_201
+# text = Inspiration .
+1	inspiration	inspiration	_	NN	_	0	-	0:-	_
+2	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0250_202
+# text = -LRB- b -RRB-
+1	-lrb-	-lrb-	_	-LRB-	_	0	-	0:-	_
+2	b	b	_	SYM	_	0	-	0:-	_
+3	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+
+# newdoc id = nyt_eng_20000429_0251
+# sent_id = nyt_eng_20000429_0251_1
+# text = In 1996 , a truck carrying nuclear warheads skidded off an icy road in Nebraska and crashed .
+1	in	in	_	IN	_	9	prep	9:prep	_
+2	1996	1996	_	CD	_	1	pobj	1:pobj	_
+3	,	,	_	,	_	0	-	0:-	_
+4	a	a	_	DT	_	5	det	5:det	_
+5	truck	truck	_	NN	_	9	nsubj	9:nsubj	_
+6	carrying	carry	_	VBG	_	5	partmod	5:partmod	_
+7	nuclear	nuclear	_	JJ	_	8	amod	8:amod	_
+8	warheads	warhead	_	NNS	_	6	dobj	6:dobj	_
+9	skidded	skid	_	VBD	_	0	root	0:root	_
+10	off	off	_	RP	_	9	prt	9:prt	_
+11	an	a	_	DT	_	13	det	13:det	_
+12	icy	icy	_	JJ	_	13	amod	13:amod	_
+13	road	road	_	NN	_	9	dobj	9:dobj	_
+14	in	in	_	IN	_	13	prep	13:prep	_
+15	Nebraska	Nebraska	_	NNP	_	14	pobj	14:pobj	_
+16	and	and	_	CC	_	9	cc	9:cc	_
+17	crashed	crash	_	VBD	_	9	conj	9:conj	_
+18	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_2
+# text = For half a day , no one in government , including the president and his cabinet , knew the degree of danger , or if any nuclear material had escaped into the environment , because radiation monitors on the government 's fleet of weapons trucks had been removed after complaints from drivers .
+1	for	for	_	IN	_	18	prep	18:prep	_
+2	half	half	_	PDT	_	4	predet	4:predet	_
+3	a	a	_	DT	_	4	det	4:det	_
+4	day	day	_	NN	_	1	pobj	1:pobj	_
+5	,	,	_	,	_	0	-	0:-	_
+6	no	no	_	DT	_	7	det	7:det	_
+7	one	one	_	CD	_	18	nsubj	18:nsubj	_
+8	in	in	_	IN	_	7	prep	7:prep	_
+9	government	government	_	NN	_	8	pobj	8:pobj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	including	include	_	VBG	_	7	prep	7:prep	_
+12	the	the	_	DT	_	13	det	13:det	_
+13	president	president	_	NN	_	11	pobj	11:pobj	_
+14	and	and	_	CC	_	13	cc	13:cc	_
+15	his	he	_	PRP$	_	16	poss	16:poss	_
+16	cabinet	cabinet	_	NN	_	13	conj	13:conj	_
+17	,	,	_	,	_	0	-	0:-	_
+18	knew	know	_	VBD	_	0	root	0:root	_
+19	the	the	_	DT	_	20	det	20:det	_
+20	degree	degree	_	NN	_	18	dobj	18:dobj	_
+21	of	of	_	IN	_	20	prep	20:prep	_
+22	danger	danger	_	NN	_	21	pobj	21:pobj	_
+23	,	,	_	,	_	0	-	0:-	_
+24	or	or	_	CC	_	20	cc	20:cc	_
+25	if	if	_	IN	_	30	mark	30:mark	_
+26	any	any	_	DT	_	28	det	28:det	_
+27	nuclear	nuclear	_	JJ	_	28	amod	28:amod	_
+28	material	material	_	NN	_	30	nsubj	30:nsubj	_
+29	had	had	_	AUXD	_	30	dep	30:dep	_
+30	escaped	escape	_	VBN	_	20	conj	20:conj	_
+31	into	into	_	IN	_	30	prep	30:prep	_
+32	the	the	_	DT	_	33	det	33:det	_
+33	environment	environment	_	NN	_	31	pobj	31:pobj	_
+34	,	,	_	,	_	0	-	0:-	_
+35	because	because	_	IN	_	48	mark	48:mark	_
+36	radiation	radiation	_	NN	_	37	nn	37:nn	_
+37	monitors	monitor	_	NNS	_	48	nsubjpass	48:nsubjpass	_
+38	on	on	_	IN	_	37	prep	37:prep	_
+39	the	the	_	DT	_	40	det	40:det	_
+40	government	government	_	NN	_	42	poss	42:poss	_
+41	's	's	_	POS	_	40	possessive	40:possessive	_
+42	fleet	fleet	_	NN	_	38	pobj	38:pobj	_
+43	of	of	_	IN	_	42	prep	42:prep	_
+44	weapons	weapon	_	NNS	_	45	nn	45:nn	_
+45	trucks	truck	_	NNS	_	43	pobj	43:pobj	_
+46	had	had	_	AUXD	_	48	dep	48:dep	_
+47	been	been	_	AUXN	_	48	auxpass	48:auxpass	_
+48	removed	remove	_	VBN	_	30	advcl	30:advcl	_
+49	after	after	_	IN	_	48	prep	48:prep	_
+50	complaints	complaint	_	NNS	_	49	pobj	49:pobj	_
+51	from	from	_	IN	_	50	prep	50:prep	_
+52	drivers	driver	_	NNS	_	51	pobj	51:pobj	_
+53	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_3
+# text = The drivers had said the monitors showed that they were facing potential health risks from their cargoes .
+1	the	the	_	DT	_	2	det	2:det	_
+2	drivers	driver	_	NNS	_	4	nsubj	4:nsubj	_
+3	had	had	_	AUXD	_	4	dep	4:dep	_
+4	said	say	_	VBD	_	0	root	0:root	_
+5	the	the	_	DT	_	6	det	6:det	_
+6	monitors	monitor	_	NNS	_	7	nsubj	7:nsubj	_
+7	showed	show	_	VBD	_	4	ccomp	4:ccomp	_
+8	that	that	_	IN	_	11	complm	11:complm	_
+9	they	they	_	PRP	_	11	nsubj	11:nsubj	_
+10	were	were	_	AUXD	_	11	dep	11:dep	_
+11	facing	face	_	VBG	_	7	ccomp	7:ccomp	_
+12	potential	potential	_	JJ	_	14	amod	14:amod	_
+13	health	health	_	NN	_	14	nn	14:nn	_
+14	risks	risk	_	NNS	_	11	dobj	11:dobj	_
+15	from	from	_	IN	_	14	prep	14:prep	_
+16	their	they	_	PRP$	_	17	poss	17:poss	_
+17	cargoes	cargo	_	NNS	_	15	pobj	15:pobj	_
+18	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_4
+# text = These accusations have been made by Robert Alvarez , who from 1993 to 1999 was a policy adviser in the Department of Energy , which runs the nation 's nuclear complex .
+1	these	these	_	DT	_	2	det	2:det	_
+2	accusations	accusation	_	NNS	_	5	nsubjpass	5:nsubjpass	_
+3	have	have	_	AUXP	_	5	dep	5:dep	_
+4	been	been	_	AUXN	_	5	auxpass	5:auxpass	_
+5	made	make	_	VBN	_	0	root	0:root	_
+6	by	by	_	IN	_	5	prep	5:prep	_
+7	Robert	Robert	_	NNP	_	8	nn	8:nn	_
+8	Alvarez	Alvarez	_	NNP	_	6	pobj	6:pobj	_
+9	,	,	_	,	_	0	-	0:-	_
+10	who	who	_	WP	_	18	nsubj	18:nsubj	_
+11	from	from	_	IN	_	18	prep	18:prep	_
+12	1993	1993	_	CD	_	11	pobj	11:pobj	_
+13	to	to	_	TO	_	11	prep	11:prep	_
+14	1999	1999	_	CD	_	13	pobj	13:pobj	_
+15	was	be	_	VBD	_	18	cop	18:cop	_
+16	a	a	_	DT	_	18	det	18:det	_
+17	policy	policy	_	NN	_	18	nn	18:nn	_
+18	adviser	adviser	_	NN	_	8	rcmod	8:rcmod	_
+19	in	in	_	IN	_	18	prep	18:prep	_
+20	the	the	_	DT	_	21	det	21:det	_
+21	Department	Department	_	NNP	_	19	pobj	19:pobj	_
+22	of	of	_	IN	_	21	prep	21:prep	_
+23	Energy	Energy	_	NNP	_	22	pobj	22:pobj	_
+24	,	,	_	,	_	0	-	0:-	_
+25	which	which	_	WDT	_	26	nsubj	26:nsubj	_
+26	runs	run	_	VBZ	_	21	rcmod	21:rcmod	_
+27	the	the	_	DT	_	28	det	28:det	_
+28	nation	nation	_	NN	_	31	poss	31:poss	_
+29	's	's	_	POS	_	28	possessive	28:possessive	_
+30	nuclear	nuclear	_	JJ	_	31	amod	31:amod	_
+31	complex	complex	_	NN	_	26	dobj	26:dobj	_
+32	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_5
+# text = Before that , as a Senate aide , he specialized in helping oversee the department .
+1	before	before	_	IN	_	10	prep	10:prep	_
+2	that	that	_	DT	_	1	pobj	1:pobj	_
+3	,	,	_	,	_	0	-	0:-	_
+4	as	as	_	IN	_	10	prep	10:prep	_
+5	a	a	_	DT	_	7	det	7:det	_
+6	Senate	Senate	_	NNP	_	7	nn	7:nn	_
+7	aide	aide	_	NN	_	4	pobj	4:pobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	he	he	_	PRP	_	10	nsubj	10:nsubj	_
+10	specialized	specialize	_	VBN	_	0	root	0:root	_
+11	in	in	_	IN	_	10	prep	10:prep	_
+12	helping	help	_	VBG	_	11	pcomp	11:pcomp	_
+13	oversee	oversee	_	VB	_	12	ccomp	12:ccomp	_
+14	the	the	_	DT	_	15	det	15:det	_
+15	department	department	_	NN	_	13	dobj	13:dobj	_
+16	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_6
+# text = In an article for a journal , Alvarez calls problems with the atomic fleet  -LBQ-  emblematic of the department 's inept and often arrogant management culture .  -RDQ- 
+1	in	in	_	IN	_	9	prep	9:prep	_
+2	an	a	_	DT	_	3	det	3:det	_
+3	article	article	_	NN	_	1	pobj	1:pobj	_
+4	for	for	_	IN	_	3	prep	3:prep	_
+5	a	a	_	DT	_	6	det	6:det	_
+6	journal	journal	_	NN	_	4	pobj	4:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	Alvarez	Alvarez	_	NNP	_	9	nsubj	9:nsubj	_
+9	calls	call	_	VBZ	_	0	root	0:root	_
+10	problems	problem	_	NNS	_	16	dep	16:dep	_
+11	with	with	_	IN	_	10	prep	10:prep	_
+12	the	the	_	DT	_	14	det	14:det	_
+13	atomic	atomic	_	JJ	_	14	amod	14:amod	_
+14	fleet	fleet	_	NN	_	11	pobj	11:pobj	_
+15	``	``	_	``	_	0	-	0:-	_
+16	emblematic	emblematic	_	JJ	_	9	dep	9:dep	_
+17	of	of	_	IN	_	16	prep	16:prep	_
+18	the	the	_	DT	_	19	det	19:det	_
+19	department	department	_	NN	_	26	poss	26:poss	_
+20	's	's	_	POS	_	19	possessive	19:possessive	_
+21	inept	inept	_	JJ	_	26	amod	26:amod	_
+22	and	and	_	CC	_	23	cc	23:cc	_
+23	often	often	_	RB	_	21	cc	21:cc	_
+24	arrogant	arrogant	_	JJ	_	21	conj	21:conj	_
+25	management	management	_	NN	_	26	nn	26:nn	_
+26	culture	culture	_	NN	_	17	pobj	17:pobj	_
+27	.	.	_	.	_	0	-	0:-	_
+28	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_7
+# text = The mind-set has become so backward , he says , that the complex is now basically a ticking time bomb waiting to go off in a serious accident or an inadvertent nuclear blast .
+1	the	the	_	DT	_	2	det	2:det	_
+2	mind-set	mind-set	_	NN	_	6	nsubj	6:nsubj	_
+3	has	has	_	AUXZ	_	6	dep	6:dep	_
+4	become	become	_	VBN	_	6	cop	6:cop	_
+5	so	so	_	RB	_	6	advmod	6:advmod	_
+6	backward	backward	_	JJ	_	0	root	0:root	_
+7	,	,	_	,	_	0	-	0:-	_
+8	he	he	_	PRP	_	9	nsubj	9:nsubj	_
+9	says	say	_	VBZ	_	6	dep	6:dep	_
+10	,	,	_	,	_	0	-	0:-	_
+11	that	that	_	IN	_	20	complm	20:complm	_
+12	the	the	_	DT	_	13	det	13:det	_
+13	complex	complex	_	NN	_	20	nsubj	20:nsubj	_
+14	is	be	_	VBZ	_	20	cop	20:cop	_
+15	now	now	_	RB	_	20	advmod	20:advmod	_
+16	basically	basically	_	RB	_	20	advmod	20:advmod	_
+17	a	a	_	DT	_	20	det	20:det	_
+18	ticking	ticking	_	JJ	_	20	amod	20:amod	_
+19	time	time	_	NN	_	20	nn	20:nn	_
+20	bomb	bomb	_	NN	_	6	ccomp	6:ccomp	_
+21	waiting	wait	_	VBG	_	20	partmod	20:partmod	_
+22	to	to	_	TO	_	23	aux	23:aux	_
+23	go	go	_	VB	_	21	xcomp	21:xcomp	_
+24	off	off	_	RP	_	23	prt	23:prt	_
+25	in	in	_	IN	_	23	prep	23:prep	_
+26	a	a	_	DT	_	28	det	28:det	_
+27	serious	serious	_	JJ	_	28	amod	28:amod	_
+28	accident	accident	_	NN	_	25	pobj	25:pobj	_
+29	or	or	_	CC	_	28	cc	28:cc	_
+30	an	a	_	DT	_	33	det	33:det	_
+31	inadvertent	inadvertent	_	JJ	_	33	amod	33:amod	_
+32	nuclear	nuclear	_	JJ	_	33	amod	33:amod	_
+33	blast	blast	_	NN	_	28	conj	28:conj	_
+34	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_8
+# text = His 12-page analysis appears in the May\/June issue of The Bulletin of the Atomic Scientists , which was posted over the weekend on the group 's Web site , www.thebulletin.org .
+1	his	he	_	PRP$	_	3	poss	3:poss	_
+2	12-page	12-page	_	JJ	_	3	amod	3:amod	_
+3	analysis	analysis	_	NN	_	4	nsubj	4:nsubj	_
+4	appears	appear	_	VBZ	_	0	root	0:root	_
+5	in	in	_	IN	_	4	prep	4:prep	_
+6	the	the	_	DT	_	8	det	8:det	_
+7	May\/June	May\/June	_	NNP	_	8	nn	8:nn	_
+8	issue	issue	_	NN	_	5	pobj	5:pobj	_
+9	of	of	_	IN	_	8	prep	8:prep	_
+10	The	the	_	DT	_	11	det	11:det	_
+11	Bulletin	bulletin	_	NN	_	9	pobj	9:pobj	_
+12	of	of	_	IN	_	11	prep	11:prep	_
+13	the	the	_	DT	_	15	det	15:det	_
+14	Atomic	Atomic	_	NNP	_	15	nn	15:nn	_
+15	Scientists	scientist	_	NNS	_	12	pobj	12:pobj	_
+16	,	,	_	,	_	0	-	0:-	_
+17	which	which	_	WDT	_	19	nsubjpass	19:nsubjpass	_
+18	was	was	_	AUXD	_	19	auxpass	19:auxpass	_
+19	posted	post	_	VBN	_	11	rcmod	11:rcmod	_
+20	over	over	_	IN	_	19	prep	19:prep	_
+21	the	the	_	DT	_	22	det	22:det	_
+22	weekend	weekend	_	NN	_	20	pobj	20:pobj	_
+23	on	on	_	IN	_	4	prep	4:prep	_
+24	the	the	_	DT	_	25	det	25:det	_
+25	group	group	_	NN	_	28	poss	28:poss	_
+26	's	's	_	POS	_	25	possessive	25:possessive	_
+27	Web	Web	_	NNP	_	28	nn	28:nn	_
+28	site	site	_	NN	_	23	pobj	23:pobj	_
+29	,	,	_	,	_	0	-	0:-	_
+30	www.thebulletin.org	www.thebulletin.org	_	RB	_	4	advmod	4:advmod	_
+31	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_9
+# text = In interviews , Energy Department officials said that although the department 's handling of weapons had problems , Alvarez was blowing them out of proportion .
+1	in	in	_	IN	_	7	prep	7:prep	_
+2	interviews	interview	_	NNS	_	1	pobj	1:pobj	_
+3	,	,	_	,	_	0	-	0:-	_
+4	Energy	Energy	_	NNP	_	6	nn	6:nn	_
+5	Department	Department	_	NNP	_	6	nn	6:nn	_
+6	officials	official	_	NNS	_	7	nsubj	7:nsubj	_
+7	said	say	_	VBD	_	0	root	0:root	_
+8	that	that	_	IN	_	21	complm	21:complm	_
+9	although	although	_	IN	_	16	mark	16:mark	_
+10	the	the	_	DT	_	11	det	11:det	_
+11	department	department	_	NN	_	13	poss	13:poss	_
+12	's	's	_	POS	_	11	possessive	11:possessive	_
+13	handling	handling	_	NN	_	16	nsubj	16:nsubj	_
+14	of	of	_	IN	_	13	prep	13:prep	_
+15	weapons	weapon	_	NNS	_	14	pobj	14:pobj	_
+16	had	have	_	VBD	_	21	advcl	21:advcl	_
+17	problems	problem	_	NNS	_	16	dobj	16:dobj	_
+18	,	,	_	,	_	0	-	0:-	_
+19	Alvarez	Alvarez	_	NNP	_	21	nsubj	21:nsubj	_
+20	was	was	_	AUXD	_	21	dep	21:dep	_
+21	blowing	blow	_	VBG	_	7	ccomp	7:ccomp	_
+22	them	they	_	PRP	_	21	dobj	21:dobj	_
+23	out	out	_	IN	_	21	prep	21:prep	_
+24	of	of	_	IN	_	23	pcomp	23:pcomp	_
+25	proportion	proportion	_	NN	_	24	pobj	24:pobj	_
+26	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_10
+# text = In his article , Alvarez said the uncertainty in the Nebraska incident was cleared up after a federal crisis team arrived and found no danger .
+1	in	in	_	IN	_	6	prep	6:prep	_
+2	his	he	_	PRP$	_	3	poss	3:poss	_
+3	article	article	_	NN	_	1	pobj	1:pobj	_
+4	,	,	_	,	_	0	-	0:-	_
+5	Alvarez	Alvarez	_	NNP	_	6	nsubj	6:nsubj	_
+6	said	say	_	VBD	_	0	root	0:root	_
+7	the	the	_	DT	_	8	det	8:det	_
+8	uncertainty	uncertainty	_	NN	_	14	nsubjpass	14:nsubjpass	_
+9	in	in	_	IN	_	8	prep	8:prep	_
+10	the	the	_	DT	_	12	det	12:det	_
+11	Nebraska	Nebraska	_	NNP	_	12	nn	12:nn	_
+12	incident	incident	_	NN	_	9	pobj	9:pobj	_
+13	was	was	_	AUXD	_	14	auxpass	14:auxpass	_
+14	cleared	clear	_	VBN	_	6	ccomp	6:ccomp	_
+15	up	up	_	RP	_	14	prt	14:prt	_
+16	after	after	_	IN	_	21	mark	21:mark	_
+17	a	a	_	DT	_	20	det	20:det	_
+18	federal	federal	_	JJ	_	20	amod	20:amod	_
+19	crisis	crisis	_	NN	_	20	nn	20:nn	_
+20	team	team	_	NN	_	21	nsubj	21:nsubj	_
+21	arrived	arrive	_	VBD	_	14	advcl	14:advcl	_
+22	and	and	_	CC	_	14	cc	14:cc	_
+23	found	find	_	VBD	_	14	conj	14:conj	_
+24	no	no	_	DT	_	25	det	25:det	_
+25	danger	danger	_	NN	_	23	dobj	23:dobj	_
+26	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_11
+# text = But the underlying woes persisted .
+1	but	but	_	CC	_	5	cc	5:cc	_
+2	the	the	_	DT	_	4	det	4:det	_
+3	underlying	underlying	_	JJ	_	4	amod	4:amod	_
+4	woes	woe	_	NNS	_	5	nsubj	5:nsubj	_
+5	persisted	persist	_	VBD	_	0	root	0:root	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_12
+# text = Today , he said , the drivers are still disgruntled and the trucks still have no radiation monitors .
+1	today	today	_	NN	_	10	dep	10:dep	_
+2	,	,	_	,	_	0	-	0:-	_
+3	he	he	_	PRP	_	4	nsubj	4:nsubj	_
+4	said	say	_	VBD	_	10	dep	10:dep	_
+5	,	,	_	,	_	0	-	0:-	_
+6	the	the	_	DT	_	7	det	7:det	_
+7	drivers	driver	_	NNS	_	10	nsubjpass	10:nsubjpass	_
+8	are	are	_	AUXP	_	10	auxpass	10:auxpass	_
+9	still	still	_	RB	_	10	advmod	10:advmod	_
+10	disgruntled	disgruntle	_	VBN	_	0	root	0:root	_
+11	and	and	_	CC	_	10	cc	10:cc	_
+12	the	the	_	DT	_	13	det	13:det	_
+13	trucks	truck	_	NNS	_	15	nsubj	15:nsubj	_
+14	still	still	_	RB	_	15	advmod	15:advmod	_
+15	have	have	_	VBP	_	10	conj	10:conj	_
+16	no	no	_	DT	_	18	det	18:det	_
+17	radiation	radiation	_	NN	_	18	nn	18:nn	_
+18	monitors	monitor	_	NNS	_	15	dobj	15:dobj	_
+19	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_13
+# text = Until their salaries were raised recently , he added , atomic truckers were paid less than those who haul vegetables .
+1	until	until	_	IN	_	5	mark	5:mark	_
+2	their	they	_	PRP$	_	3	poss	3:poss	_
+3	salaries	salary	_	NNS	_	5	nsubjpass	5:nsubjpass	_
+4	were	were	_	AUXD	_	5	auxpass	5:auxpass	_
+5	raised	raise	_	VBN	_	14	advcl	14:advcl	_
+6	recently	recently	_	RB	_	5	advmod	5:advmod	_
+7	,	,	_	,	_	0	-	0:-	_
+8	he	he	_	PRP	_	9	nsubj	9:nsubj	_
+9	added	add	_	VBD	_	14	parataxis	14:parataxis	_
+10	,	,	_	,	_	0	-	0:-	_
+11	atomic	atomic	_	JJ	_	12	amod	12:amod	_
+12	truckers	trucker	_	NNS	_	14	nsubjpass	14:nsubjpass	_
+13	were	were	_	AUXD	_	14	auxpass	14:auxpass	_
+14	paid	pay	_	VBN	_	0	root	0:root	_
+15	less	less	_	RBR	_	14	advmod	14:advmod	_
+16	than	than	_	IN	_	15	prep	15:prep	_
+17	those	those	_	DT	_	16	pobj	16:pobj	_
+18	who	who	_	WP	_	19	nsubj	19:nsubj	_
+19	haul	haul	_	VB	_	17	rcmod	17:rcmod	_
+20	vegetables	vegetable	_	NNS	_	19	dobj	19:dobj	_
+21	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_14
+# text = Energy officials and outside experts agree that the department has serious problems , with roots in the vast responsibilities and liabilities incurred during the Cold War in making 70,000 nuclear arms .
+1	energy	energy	_	NN	_	2	nn	2:nn	_
+2	officials	official	_	NNS	_	6	nsubj	6:nsubj	_
+3	and	and	_	CC	_	2	cc	2:cc	_
+4	outside	outside	_	JJ	_	5	amod	5:amod	_
+5	experts	expert	_	NNS	_	2	conj	2:conj	_
+6	agree	agree	_	VBP	_	0	root	0:root	_
+7	that	that	_	IN	_	10	complm	10:complm	_
+8	the	the	_	DT	_	9	det	9:det	_
+9	department	department	_	NN	_	10	nsubj	10:nsubj	_
+10	has	have	_	VBZ	_	6	ccomp	6:ccomp	_
+11	serious	serious	_	JJ	_	12	amod	12:amod	_
+12	problems	problem	_	NNS	_	10	dobj	10:dobj	_
+13	,	,	_	,	_	0	-	0:-	_
+14	with	with	_	IN	_	10	prep	10:prep	_
+15	roots	root	_	NNS	_	14	pobj	14:pobj	_
+16	in	in	_	IN	_	15	prep	15:prep	_
+17	the	the	_	DT	_	19	det	19:det	_
+18	vast	vast	_	JJ	_	19	amod	19:amod	_
+19	responsibilities	responsibility	_	NNS	_	16	pobj	16:pobj	_
+20	and	and	_	CC	_	15	cc	15:cc	_
+21	liabilities	liability	_	NNS	_	15	conj	15:conj	_
+22	incurred	incur	_	VBN	_	21	partmod	21:partmod	_
+23	during	during	_	IN	_	22	prep	22:prep	_
+24	the	the	_	DT	_	26	det	26:det	_
+25	Cold	Cold	_	NNP	_	26	nn	26:nn	_
+26	War	War	_	NNP	_	23	pobj	23:pobj	_
+27	in	in	_	IN	_	22	prep	22:prep	_
+28	making	make	_	VBG	_	27	pcomp	27:pcomp	_
+29	70,000	70,000	_	CD	_	31	num	31:num	_
+30	nuclear	nuclear	_	JJ	_	31	amod	31:amod	_
+31	arms	arm	_	NNS	_	28	dobj	28:dobj	_
+32	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_15
+# text = The challenges now lie in old age and downsizing .
+1	the	the	_	DT	_	2	det	2:det	_
+2	challenges	challenge	_	NNS	_	4	nsubj	4:nsubj	_
+3	now	now	_	RB	_	4	advmod	4:advmod	_
+4	lie	lie	_	VBP	_	0	root	0:root	_
+5	in	in	_	IN	_	4	prep	4:prep	_
+6	old	old	_	JJ	_	7	amod	7:amod	_
+7	age	age	_	NN	_	5	pobj	5:pobj	_
+8	and	and	_	CC	_	7	cc	7:cc	_
+9	downsizing	downsizing	_	NN	_	7	conj	7:conj	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_16
+# text = The department owns more than 20,700 facilities and buildings , including 89 nuclear reactors .
+1	the	the	_	DT	_	2	det	2:det	_
+2	department	department	_	NN	_	3	nsubj	3:nsubj	_
+3	owns	own	_	VBZ	_	0	root	0:root	_
+4	more	more	_	JJR	_	5	mwe	5:mwe	_
+5	than	than	_	IN	_	6	quantmod	6:quantmod	_
+6	20,700	20,700	_	CD	_	7	num	7:num	_
+7	facilities	facility	_	NNS	_	3	dobj	3:dobj	_
+8	and	and	_	CC	_	7	cc	7:cc	_
+9	buildings	building	_	NNS	_	7	conj	7:conj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	including	include	_	VBG	_	7	prep	7:prep	_
+12	89	89	_	CD	_	14	num	14:num	_
+13	nuclear	nuclear	_	JJ	_	14	amod	14:amod	_
+14	reactors	reactor	_	NNS	_	11	pobj	11:pobj	_
+15	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_17
+# text =  -LBQ-  Major elements of Energy 's complex are closing down ,  -RDQ-  Alvarez said in the article ,  -LBQ-  leaving a huge unfunded and dangerous mess .  -RDQ- 
+1	``	``	_	``	_	0	-	0:-	_
+2	Major	major	_	JJ	_	3	amod	3:amod	_
+3	elements	element	_	NNS	_	9	nsubj	9:nsubj	_
+4	of	of	_	IN	_	3	prep	3:prep	_
+5	Energy	Energy	_	NNP	_	7	poss	7:poss	_
+6	's	's	_	POS	_	5	possessive	5:possessive	_
+7	complex	complex	_	NN	_	4	pobj	4:pobj	_
+8	are	are	_	AUXP	_	9	dep	9:dep	_
+9	closing	close	_	VBG	_	14	ccomp	14:ccomp	_
+10	down	down	_	RP	_	9	prt	9:prt	_
+11	,	,	_	,	_	0	-	0:-	_
+12	''	''	_	''	_	0	-	0:-	_
+13	Alvarez	Alvarez	_	NNP	_	14	nsubj	14:nsubj	_
+14	said	say	_	VBD	_	0	root	0:root	_
+15	in	in	_	IN	_	14	prep	14:prep	_
+16	the	the	_	DT	_	17	det	17:det	_
+17	article	article	_	NN	_	15	pobj	15:pobj	_
+18	,	,	_	,	_	0	-	0:-	_
+19	``	``	_	``	_	0	-	0:-	_
+20	leaving	leave	_	VBG	_	14	xcomp	14:xcomp	_
+21	a	a	_	DT	_	26	det	26:det	_
+22	huge	huge	_	JJ	_	26	amod	26:amod	_
+23	unfunded	unfunded	_	JJ	_	26	amod	26:amod	_
+24	and	and	_	CC	_	23	cc	23:cc	_
+25	dangerous	dangerous	_	JJ	_	23	conj	23:conj	_
+26	mess	mess	_	NN	_	20	dobj	20:dobj	_
+27	.	.	_	.	_	0	-	0:-	_
+28	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_18
+# text = Reacting to Alvarez 's overall accusations , Ellen Livingston , the department 's senior adviser for environmental affairs , said ,  -LBQ-  We 've gone to great lengths to develop safety and training programs to limit the hazards because we recognize the handling of nuclear materials is a risky business .  -RDQ- 
+1	reacting	react	_	VBG	_	20	prep	20:prep	_
+2	to	to	_	TO	_	1	pcomp	1:pcomp	_
+3	Alvarez	Alvarez	_	NNP	_	6	poss	6:poss	_
+4	's	's	_	POS	_	3	possessive	3:possessive	_
+5	overall	overall	_	JJ	_	6	amod	6:amod	_
+6	accusations	accusation	_	NNS	_	2	pobj	2:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	Ellen	Ellen	_	NNP	_	9	nn	9:nn	_
+9	Livingston	Livingston	_	NNP	_	20	nsubj	20:nsubj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	the	the	_	DT	_	12	det	12:det	_
+12	department	department	_	NN	_	15	poss	15:poss	_
+13	's	's	_	POS	_	12	possessive	12:possessive	_
+14	senior	senior	_	JJ	_	15	amod	15:amod	_
+15	adviser	adviser	_	NN	_	9	appos	9:appos	_
+16	for	for	_	IN	_	15	prep	15:prep	_
+17	environmental	environmental	_	JJ	_	18	amod	18:amod	_
+18	affairs	affair	_	NNS	_	16	pobj	16:pobj	_
+19	,	,	_	,	_	0	-	0:-	_
+20	said	say	_	VBD	_	0	root	0:root	_
+21	,	,	_	,	_	0	-	0:-	_
+22	``	``	_	``	_	0	-	0:-	_
+23	We	we	_	PRP	_	25	nsubj	25:nsubj	_
+24	've	've	_	AUXP	_	25	dep	25:dep	_
+25	gone	go	_	VBN	_	20	ccomp	20:ccomp	_
+26	to	to	_	TO	_	25	prep	25:prep	_
+27	great	great	_	JJ	_	28	amod	28:amod	_
+28	lengths	length	_	NNS	_	26	pobj	26:pobj	_
+29	to	to	_	TO	_	30	aux	30:aux	_
+30	develop	develop	_	VB	_	25	xcomp	25:xcomp	_
+31	safety	safety	_	NN	_	34	nn	34:nn	_
+32	and	and	_	CC	_	31	cc	31:cc	_
+33	training	training	_	NN	_	31	conj	31:conj	_
+34	programs	program	_	NNS	_	30	dobj	30:dobj	_
+35	to	to	_	TO	_	36	aux	36:aux	_
+36	limit	limit	_	VB	_	30	xcomp	30:xcomp	_
+37	the	the	_	DT	_	38	det	38:det	_
+38	hazards	hazard	_	NNS	_	36	dobj	36:dobj	_
+39	because	because	_	IN	_	41	mark	41:mark	_
+40	we	we	_	PRP	_	41	nsubj	41:nsubj	_
+41	recognize	recognize	_	VBP	_	36	advcl	36:advcl	_
+42	the	the	_	DT	_	43	det	43:det	_
+43	handling	handling	_	NN	_	50	nsubj	50:nsubj	_
+44	of	of	_	IN	_	43	prep	43:prep	_
+45	nuclear	nuclear	_	JJ	_	46	amod	46:amod	_
+46	materials	material	_	NNS	_	44	pobj	44:pobj	_
+47	is	be	_	VBZ	_	50	cop	50:cop	_
+48	a	a	_	DT	_	50	det	50:det	_
+49	risky	risky	_	JJ	_	50	amod	50:amod	_
+50	business	business	_	NN	_	41	ccomp	41:ccomp	_
+51	.	.	_	.	_	0	-	0:-	_
+52	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_19
+# text = Alvarez , who is now a consultant to antinuclear groups , said the department was wrong in playing down his charges but right in calling him an antagonist .
+1	Alvarez	Alvarez	_	NNP	_	12	nsubj	12:nsubj	_
+2	,	,	_	,	_	0	-	0:-	_
+3	who	who	_	WP	_	7	nsubj	7:nsubj	_
+4	is	be	_	VBZ	_	7	cop	7:cop	_
+5	now	now	_	RB	_	7	advmod	7:advmod	_
+6	a	a	_	DT	_	7	det	7:det	_
+7	consultant	consultant	_	NN	_	1	rcmod	1:rcmod	_
+8	to	to	_	TO	_	7	prep	7:prep	_
+9	antinuclear	antinuclear	_	JJ	_	10	amod	10:amod	_
+10	groups	group	_	NNS	_	8	pobj	8:pobj	_
+11	,	,	_	,	_	0	-	0:-	_
+12	said	say	_	VBD	_	0	root	0:root	_
+13	the	the	_	DT	_	14	det	14:det	_
+14	department	department	_	NN	_	16	nsubj	16:nsubj	_
+15	was	be	_	VBD	_	16	cop	16:cop	_
+16	wrong	wrong	_	JJ	_	12	ccomp	12:ccomp	_
+17	in	in	_	IN	_	16	prep	16:prep	_
+18	playing	play	_	VBG	_	17	pcomp	17:pcomp	_
+19	down	down	_	RP	_	18	prt	18:prt	_
+20	his	he	_	PRP$	_	21	poss	21:poss	_
+21	charges	charge	_	NNS	_	18	dobj	18:dobj	_
+22	but	but	_	CC	_	23	cc	23:cc	_
+23	right	right	_	RB	_	17	cc	17:cc	_
+24	in	in	_	IN	_	17	conj	17:conj	_
+25	calling	call	_	VBG	_	24	pcomp	24:pcomp	_
+26	him	he	_	PRP	_	28	nsubj	28:nsubj	_
+27	an	a	_	DT	_	28	det	28:det	_
+28	antagonist	antagonist	_	NN	_	25	xcomp	25:xcomp	_
+29	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_20
+# text =  -LBQ-  It 's not like I was their golden boy and they booted me out and now it 's sour grapes ,  -RDQ-  he said in an interview .
+1	``	``	_	``	_	0	-	0:-	_
+2	It	it	_	PRP	_	3	nsubj	3:nsubj	_
+3	's	be	_	VBZ	_	25	ccomp	25:ccomp	_
+4	not	not	_	RB	_	3	neg	3:neg	_
+5	like	like	_	IN	_	10	mark	10:mark	_
+6	I	I	_	PRP	_	10	nsubj	10:nsubj	_
+7	was	be	_	VBD	_	10	cop	10:cop	_
+8	their	they	_	PRP$	_	10	poss	10:poss	_
+9	golden	golden	_	JJ	_	10	amod	10:amod	_
+10	boy	boy	_	NN	_	3	advcl	3:advcl	_
+11	and	and	_	CC	_	3	cc	3:cc	_
+12	they	they	_	PRP	_	13	nsubj	13:nsubj	_
+13	booted	boot	_	VBN	_	3	conj	3:conj	_
+14	me	I	_	PRP	_	13	dobj	13:dobj	_
+15	out	out	_	RP	_	13	prt	13:prt	_
+16	and	and	_	CC	_	13	cc	13:cc	_
+17	now	now	_	RB	_	13	advmod	13:advmod	_
+18	it	it	_	PRP	_	21	nsubj	21:nsubj	_
+19	's	be	_	VBZ	_	21	cop	21:cop	_
+20	sour	sour	_	JJ	_	21	amod	21:amod	_
+21	grapes	grape	_	NNS	_	13	conj	13:conj	_
+22	,	,	_	,	_	0	-	0:-	_
+23	''	''	_	''	_	0	-	0:-	_
+24	he	he	_	PRP	_	25	nsubj	25:nsubj	_
+25	said	say	_	VBD	_	0	root	0:root	_
+26	in	in	_	IN	_	25	prep	25:prep	_
+27	an	a	_	DT	_	28	det	28:det	_
+28	interview	interview	_	NN	_	26	pobj	26:pobj	_
+29	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_21
+# text =  -LBQ-  They used me as an internal critic .
+1	``	``	_	``	_	0	-	0:-	_
+2	They	they	_	PRP	_	3	nsubj	3:nsubj	_
+3	used	use	_	VBD	_	0	root	0:root	_
+4	me	I	_	PRP	_	3	dobj	3:dobj	_
+5	as	as	_	IN	_	3	prep	3:prep	_
+6	an	a	_	DT	_	8	det	8:det	_
+7	internal	internal	_	JJ	_	8	amod	8:amod	_
+8	critic	critic	_	NN	_	5	pobj	5:pobj	_
+9	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0251_22
+# text = If I 've got an ax , it 's one I 've been grinding for 25 years .  -RDQ- 
+1	if	if	_	IN	_	4	mark	4:mark	_
+2	I	I	_	PRP	_	4	nsubj	4:nsubj	_
+3	've	've	_	AUXP	_	4	dep	4:dep	_
+4	got	get	_	VBN	_	10	advcl	10:advcl	_
+5	an	a	_	DT	_	6	det	6:det	_
+6	ax	ax	_	NN	_	4	dobj	4:dobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	it	it	_	PRP	_	10	nsubj	10:nsubj	_
+9	's	be	_	VBZ	_	10	cop	10:cop	_
+10	one	one	_	CD	_	0	root	0:root	_
+11	I	I	_	PRP	_	14	nsubj	14:nsubj	_
+12	've	've	_	AUXP	_	14	dep	14:dep	_
+13	been	been	_	AUXN	_	14	dep	14:dep	_
+14	grinding	grind	_	VBG	_	10	rcmod	10:rcmod	_
+15	for	for	_	IN	_	14	prep	14:prep	_
+16	25	25	_	CD	_	17	num	17:num	_
+17	years	year	_	NNS	_	15	pobj	15:pobj	_
+18	.	.	_	.	_	0	-	0:-	_
+19	''	''	_	''	_	0	-	0:-	_
+
+# newdoc id = nyt_eng_20000429_0252
+# sent_id = nyt_eng_20000429_0252_1
+# text = NEW & NOTEWORTHY PAPERBACKS -LRB- For release Sunday , May 7 -RRB- c. 2000 N.Y.
+1	NEW	NEW	_	NNP	_	4	nn	4:nn	_
+2	&	&	_	CC	_	1	cc	1:cc	_
+3	NOTEWORTHY	NOTEWORTHY	_	NNP	_	1	conj	1:conj	_
+4	PAPERBACKS	PAPERBACKS	_	NNP	_	0	root	0:root	_
+5	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+6	For	for	_	IN	_	10	dep	10:dep	_
+7	release	release	_	NN	_	6	pobj	6:pobj	_
+8	Sunday	Sunday	_	NNP	_	7	dep	7:dep	_
+9	,	,	_	,	_	0	-	0:-	_
+10	May	May	_	NNP	_	4	appos	4:appos	_
+11	7	7	_	CD	_	10	num	10:num	_
+12	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+13	c.	c.	_	NN	_	4	dep	4:dep	_
+14	2000	2000	_	CD	_	13	num	13:num	_
+15	N.Y.	N.Y.	_	NNP	_	13	dep	13:dep	_
+
+# sent_id = nyt_eng_20000429_0252_2
+# text = Times News Service
+1	Times	Times	_	NNP	_	3	nn	3:nn	_
+2	News	News	_	NNP	_	3	nn	3:nn	_
+3	Service	Service	_	NNP	_	0	root	0:root	_
+
+# sent_id = nyt_eng_20000429_0252_3
+# text = THE WONDERS OF THE INVISIBLE WORLD  -COL-  Stories By David Gates .
+1	the	the	_	DT	_	2	det	2:det	_
+2	WONDERS	WONDERS	_	NNP	_	0	root	0:root	_
+3	OF	of	_	IN	_	2	prep	2:prep	_
+4	THE	the	_	DT	_	6	det	6:det	_
+5	INVISIBLE	INVISIBLE	_	NNP	_	6	nn	6:nn	_
+6	WORLD	WORLD	_	NNP	_	3	pobj	3:pobj	_
+7	:	:	_	:	_	0	-	0:-	_
+8	Stories	story	_	NNS	_	2	dep	2:dep	_
+9	By	by	_	IN	_	8	prep	8:prep	_
+10	David	David	_	NNP	_	11	nn	11:nn	_
+11	Gates	Gates	_	NNP	_	9	pobj	9:pobj	_
+12	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_4
+# text = Vintage Contemporaries , $ 12 .
+1	Vintage	Vintage	_	NNP	_	2	nn	2:nn	_
+2	Contemporaries	Contemporaries	_	NNP	_	0	root	0:root	_
+3	,	,	_	,	_	0	-	0:-	_
+4	$	$	_	$	_	2	appos	2:appos	_
+5	12	12	_	CD	_	4	num	4:num	_
+6	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_5
+# text = These mordant tales are filled with aging male hipsters whose ironic detachment and heightened self-awareness leave them unable to connect with the real world .
+1	these	these	_	DT	_	3	det	3:det	_
+2	mordant	mordant	_	JJ	_	3	amod	3:amod	_
+3	tales	tale	_	NNS	_	5	nsubjpass	5:nsubjpass	_
+4	are	are	_	AUXP	_	5	auxpass	5:auxpass	_
+5	filled	fill	_	VBN	_	0	root	0:root	_
+6	with	with	_	IN	_	5	prep	5:prep	_
+7	aging	age	_	VBG	_	9	amod	9:amod	_
+8	male	male	_	NN	_	9	nn	9:nn	_
+9	hipsters	hipster	_	NNS	_	6	pobj	6:pobj	_
+10	whose	whose	_	WP$	_	12	poss	12:poss	_
+11	ironic	ironic	_	JJ	_	12	amod	12:amod	_
+12	detachment	detachment	_	NN	_	16	nsubj	16:nsubj	_
+13	and	and	_	CC	_	12	cc	12:cc	_
+14	heightened	heightened	_	JJ	_	15	amod	15:amod	_
+15	self-awareness	self-awareness	_	NN	_	12	conj	12:conj	_
+16	leave	leave	_	VBP	_	9	rcmod	9:rcmod	_
+17	them	they	_	PRP	_	18	nsubj	18:nsubj	_
+18	unable	unable	_	JJ	_	16	xcomp	16:xcomp	_
+19	to	to	_	TO	_	20	aux	20:aux	_
+20	connect	connect	_	VB	_	18	xcomp	18:xcomp	_
+21	with	with	_	IN	_	20	prep	20:prep	_
+22	the	the	_	DT	_	24	det	24:det	_
+23	real	real	_	JJ	_	24	amod	24:amod	_
+24	world	world	_	NN	_	21	pobj	21:pobj	_
+25	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_6
+# text =  -LBQ-  Gates can be very funny ,  -RDQ-  Gerald Marzorati wrote in The New York Times Book Review last year , but mostly he  -LBQ-  is concerned with creating characters you have n't met in fiction before , getting just right the words they use to disengagedly engage their women and their friends and even their inner selves .  -RDQ- 
+1	``	``	_	``	_	0	-	0:-	_
+2	Gates	Gates	_	NNP	_	6	nsubj	6:nsubj	_
+3	can	can	_	MD	_	6	aux	6:aux	_
+4	be	be	_	VB	_	6	cop	6:cop	_
+5	very	very	_	RB	_	6	advmod	6:advmod	_
+6	funny	funny	_	JJ	_	11	ccomp	11:ccomp	_
+7	,	,	_	,	_	0	-	0:-	_
+8	''	''	_	''	_	0	-	0:-	_
+9	Gerald	Gerald	_	NNP	_	10	nn	10:nn	_
+10	Marzorati	Marzorati	_	NNP	_	11	nsubj	11:nsubj	_
+11	wrote	write	_	VBD	_	0	root	0:root	_
+12	in	in	_	IN	_	11	prep	11:prep	_
+13	The	the	_	DT	_	18	det	18:det	_
+14	New	New	_	NNP	_	18	nn	18:nn	_
+15	York	York	_	NNP	_	18	nn	18:nn	_
+16	Times	Times	_	NNP	_	18	nn	18:nn	_
+17	Book	Book	_	NNP	_	18	nn	18:nn	_
+18	Review	Review	_	NNP	_	12	pobj	12:pobj	_
+19	last	last	_	JJ	_	20	amod	20:amod	_
+20	year	year	_	NN	_	11	tmod	11:tmod	_
+21	,	,	_	,	_	0	-	0:-	_
+22	but	but	_	CC	_	11	cc	11:cc	_
+23	mostly	mostly	_	RB	_	27	advmod	27:advmod	_
+24	he	he	_	PRP	_	27	nsubj	27:nsubj	_
+25	``	``	_	``	_	0	-	0:-	_
+26	is	be	_	VBZ	_	27	cop	27:cop	_
+27	concerned	concerned	_	JJ	_	11	conj	11:conj	_
+28	with	with	_	IN	_	27	prep	27:prep	_
+29	creating	create	_	VBG	_	28	pcomp	28:pcomp	_
+30	characters	character	_	NNS	_	29	dobj	29:dobj	_
+31	you	you	_	PRP	_	34	nsubj	34:nsubj	_
+32	have	have	_	AUXP	_	34	dep	34:dep	_
+33	n't	not	_	RB	_	34	neg	34:neg	_
+34	met	meet	_	VBN	_	30	rcmod	30:rcmod	_
+35	in	in	_	IN	_	34	prep	34:prep	_
+36	fiction	fiction	_	NN	_	35	pobj	35:pobj	_
+37	before	before	_	RB	_	34	advmod	34:advmod	_
+38	,	,	_	,	_	0	-	0:-	_
+39	getting	get	_	VBG	_	27	xcomp	27:xcomp	_
+40	just	just	_	RB	_	41	advmod	41:advmod	_
+41	right	right	_	RB	_	39	advmod	39:advmod	_
+42	the	the	_	DT	_	43	det	43:det	_
+43	words	word	_	NNS	_	39	dobj	39:dobj	_
+44	they	they	_	PRP	_	45	nsubj	45:nsubj	_
+45	use	use	_	VBP	_	43	rcmod	43:rcmod	_
+46	to	to	_	TO	_	48	aux	48:aux	_
+47	disengagedly	disengagedly	_	RB	_	48	advmod	48:advmod	_
+48	engage	engage	_	VB	_	45	xcomp	45:xcomp	_
+49	their	they	_	PRP$	_	50	poss	50:poss	_
+50	women	woman	_	NNS	_	48	dobj	48:dobj	_
+51	and	and	_	CC	_	50	cc	50:cc	_
+52	their	they	_	PRP$	_	53	poss	53:poss	_
+53	friends	friend	_	NNS	_	50	conj	50:conj	_
+54	and	and	_	CC	_	53	cc	53:cc	_
+55	even	even	_	RB	_	53	advmod	53:advmod	_
+56	their	they	_	PRP$	_	58	poss	58:poss	_
+57	inner	inner	_	JJ	_	58	amod	58:amod	_
+58	selves	self	_	NNS	_	53	dep	53:dep	_
+59	.	.	_	.	_	0	-	0:-	_
+60	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_7
+# text = Clear Springs  -COL-  A Family Story
+1	Clear	Clear	_	NNP	_	2	nn	2:nn	_
+2	Springs	Springs	_	NNP	_	0	root	0:root	_
+3	:	:	_	:	_	0	-	0:-	_
+4	A	a	_	DT	_	6	det	6:det	_
+5	Family	Family	_	NNP	_	6	nn	6:nn	_
+6	Story	Story	_	NNP	_	2	dep	2:dep	_
+
+# sent_id = nyt_eng_20000429_0252_8
+# text = By Bobbie Ann Mason . HarperPerennial , $ 14 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	Bobbie	Bobbie	_	NNP	_	6	nn	6:nn	_
+3	Ann	Ann	_	NNP	_	6	nn	6:nn	_
+4	Mason	Mason	_	NNP	_	6	nn	6:nn	_
+5	.	.	_	.	_	0	-	0:-	_
+6	HarperPerennial	HarperPerennial	_	NNP	_	1	pobj	1:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	$	$	_	$	_	6	appos	6:appos	_
+9	14	14	_	CD	_	8	num	8:num	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_9
+# text = The author revisits her old Kentucky home , and in recounting the
+1	the	the	_	DT	_	2	det	2:det	_
+2	author	author	_	NN	_	3	nsubj	3:nsubj	_
+3	revisits	revisit	_	VBZ	_	0	root	0:root	_
+4	her	she	_	PRP$	_	7	poss	7:poss	_
+5	old	old	_	JJ	_	7	amod	7:amod	_
+6	Kentucky	Kentucky	_	NNP	_	7	nn	7:nn	_
+7	home	home	_	NN	_	3	dobj	3:dobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	and	and	_	CC	_	7	cc	7:cc	_
+10	in	in	_	IN	_	7	conj	7:conj	_
+11	recounting	recount	_	VBG	_	10	pcomp	10:pcomp	_
+12	the	the	_	DT	_	11	dobj	11:dobj	_
+
+# sent_id = nyt_eng_20000429_0252_10
+# text = details and Southern traditions of her upbringing sheds light on the inspiration for much of her fiction .
+1	details	detail	_	NNS	_	8	nsubj	8:nsubj	_
+2	and	and	_	CC	_	1	cc	1:cc	_
+3	Southern	southern	_	JJ	_	4	amod	4:amod	_
+4	traditions	tradition	_	NNS	_	1	conj	1:conj	_
+5	of	of	_	IN	_	4	prep	4:prep	_
+6	her	she	_	PRP$	_	7	poss	7:poss	_
+7	upbringing	upbringing	_	NN	_	5	pobj	5:pobj	_
+8	sheds	shed	_	VBZ	_	0	root	0:root	_
+9	light	light	_	NN	_	8	dobj	8:dobj	_
+10	on	on	_	IN	_	8	prep	8:prep	_
+11	the	the	_	DT	_	12	det	12:det	_
+12	inspiration	inspiration	_	NN	_	10	pobj	10:pobj	_
+13	for	for	_	IN	_	12	prep	12:prep	_
+14	much	much	_	JJ	_	13	pobj	13:pobj	_
+15	of	of	_	IN	_	14	prep	14:prep	_
+16	her	she	_	PRP$	_	17	poss	17:poss	_
+17	fiction	fiction	_	NN	_	15	pobj	15:pobj	_
+18	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_11
+# text =  -LBQ-  Mason gets to the heart of a whole generation ,  -RDQ-  Josephine Humphreys wrote here last year .
+1	``	``	_	``	_	0	-	0:-	_
+2	Mason	Mason	_	NNP	_	3	nsubj	3:nsubj	_
+3	gets	get	_	VBZ	_	15	ccomp	15:ccomp	_
+4	to	to	_	TO	_	3	prep	3:prep	_
+5	the	the	_	DT	_	6	det	6:det	_
+6	heart	heart	_	NN	_	4	pobj	4:pobj	_
+7	of	of	_	IN	_	6	prep	6:prep	_
+8	a	a	_	DT	_	10	det	10:det	_
+9	whole	whole	_	JJ	_	10	amod	10:amod	_
+10	generation	generation	_	NN	_	7	pobj	7:pobj	_
+11	,	,	_	,	_	0	-	0:-	_
+12	''	''	_	''	_	0	-	0:-	_
+13	Josephine	Josephine	_	NNP	_	14	nn	14:nn	_
+14	Humphreys	Humphreys	_	NNP	_	15	nsubj	15:nsubj	_
+15	wrote	write	_	VBD	_	0	root	0:root	_
+16	here	here	_	RB	_	15	advmod	15:advmod	_
+17	last	last	_	JJ	_	18	amod	18:amod	_
+18	year	year	_	NN	_	15	tmod	15:tmod	_
+19	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_12
+# text =  -LBQ-  She can write the hard truth about home , love , loss and the terrifying passage of time .  -RDQ- 
+1	``	``	_	``	_	0	-	0:-	_
+2	She	she	_	PRP	_	4	nsubj	4:nsubj	_
+3	can	can	_	MD	_	4	aux	4:aux	_
+4	write	write	_	VB	_	0	root	0:root	_
+5	the	the	_	DT	_	7	det	7:det	_
+6	hard	hard	_	JJ	_	7	amod	7:amod	_
+7	truth	truth	_	NN	_	4	dobj	4:dobj	_
+8	about	about	_	IN	_	7	prep	7:prep	_
+9	home	home	_	NN	_	8	pobj	8:pobj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	love	love	_	NN	_	9	conj	9:conj	_
+12	,	,	_	,	_	0	-	0:-	_
+13	loss	loss	_	NN	_	9	conj	9:conj	_
+14	and	and	_	CC	_	9	cc	9:cc	_
+15	the	the	_	DT	_	17	det	17:det	_
+16	terrifying	terrifying	_	JJ	_	17	amod	17:amod	_
+17	passage	passage	_	NN	_	9	conj	9:conj	_
+18	of	of	_	IN	_	17	prep	17:prep	_
+19	time	time	_	NN	_	18	pobj	18:pobj	_
+20	.	.	_	.	_	0	-	0:-	_
+21	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_13
+# text = Italian Fever
+1	italian	italian	_	JJ	_	2	amod	2:amod	_
+2	Fever	Fever	_	NNP	_	0	root	0:root	_
+
+# sent_id = nyt_eng_20000429_0252_14
+# text = By Valerie Martin . Vintage Contemporaries , $ 12 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	Valerie	Valerie	_	NNP	_	6	nn	6:nn	_
+3	Martin	Martin	_	NNP	_	6	nn	6:nn	_
+4	.	.	_	.	_	0	-	0:-	_
+5	Vintage	Vintage	_	NNP	_	6	nn	6:nn	_
+6	Contemporaries	Contemporaries	_	NNP	_	1	pobj	1:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	$	$	_	$	_	6	appos	6:appos	_
+9	12	12	_	CD	_	8	num	8:num	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_15
+# text = The author 's sixth novel , about a young divorcee who travels to
+1	the	the	_	DT	_	2	det	2:det	_
+2	author	author	_	NN	_	5	poss	5:poss	_
+3	's	's	_	POS	_	2	possessive	2:possessive	_
+4	sixth	sixth	_	JJ	_	5	amod	5:amod	_
+5	novel	novel	_	NN	_	0	root	0:root	_
+6	,	,	_	,	_	0	-	0:-	_
+7	about	about	_	IN	_	10	amod	10:amod	_
+8	a	a	_	DT	_	10	det	10:det	_
+9	young	young	_	JJ	_	10	amod	10:amod	_
+10	divorcee	divorcee	_	NN	_	5	appos	5:appos	_
+11	who	who	_	WP	_	12	nsubj	12:nsubj	_
+12	travels	travel	_	VBZ	_	10	rcmod	10:rcmod	_
+13	to	to	_	TO	_	12	prep	12:prep	_
+
+# sent_id = nyt_eng_20000429_0252_16
+# text = Tuscany to settle the affairs of an American writer who has died and left behind the manuscript of his final book , has more to do with the development of consciousness than plot .
+1	Tuscany	Tuscany	_	NNP	_	3	nsubj	3:nsubj	_
+2	to	to	_	TO	_	3	aux	3:aux	_
+3	settle	settle	_	VB	_	0	root	0:root	_
+4	the	the	_	DT	_	5	det	5:det	_
+5	affairs	affair	_	NNS	_	3	dobj	3:dobj	_
+6	of	of	_	IN	_	5	prep	5:prep	_
+7	an	a	_	DT	_	9	det	9:det	_
+8	American	american	_	JJ	_	9	amod	9:amod	_
+9	writer	writer	_	NN	_	6	pobj	6:pobj	_
+10	who	who	_	WP	_	12	nsubj	12:nsubj	_
+11	has	has	_	AUXZ	_	12	dep	12:dep	_
+12	died	die	_	VBN	_	9	rcmod	9:rcmod	_
+13	and	and	_	CC	_	3	cc	3:cc	_
+14	left	leave	_	VBN	_	3	conj	3:conj	_
+15	behind	behind	_	IN	_	14	prep	14:prep	_
+16	the	the	_	DT	_	17	det	17:det	_
+17	manuscript	manuscript	_	NN	_	15	pobj	15:pobj	_
+18	of	of	_	IN	_	17	prep	17:prep	_
+19	his	he	_	PRP$	_	21	poss	21:poss	_
+20	final	final	_	JJ	_	21	amod	21:amod	_
+21	book	book	_	NN	_	18	pobj	18:pobj	_
+22	,	,	_	,	_	0	-	0:-	_
+23	has	have	_	VBZ	_	24	dep	24:dep	_
+24	more	more	_	JJR	_	3	dep	3:dep	_
+25	to	to	_	TO	_	26	aux	26:aux	_
+26	do	do	_	VB	_	24	xcomp	24:xcomp	_
+27	with	with	_	IN	_	26	prep	26:prep	_
+28	the	the	_	DT	_	29	det	29:det	_
+29	development	development	_	NN	_	27	pobj	27:pobj	_
+30	of	of	_	IN	_	29	prep	29:prep	_
+31	consciousness	consciousness	_	NN	_	30	pobj	30:pobj	_
+32	than	than	_	IN	_	24	prep	24:prep	_
+33	plot	plot	_	NN	_	32	pobj	32:pobj	_
+34	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_17
+# text = The heroine 's adventures among the locals , particularly her sexual awakening at the hands of her charming cicerone , make this  -LBQ-  a study of the complications of lovemaking and its effects on women ,  -RDQ-  Craig Seligman wrote here in 1999 .
+1	the	the	_	DT	_	2	det	2:det	_
+2	heroine	heroine	_	NN	_	4	poss	4:poss	_
+3	's	's	_	POS	_	2	possessive	2:possessive	_
+4	adventures	adventure	_	NNS	_	21	nsubj	21:nsubj	_
+5	among	among	_	IN	_	4	prep	4:prep	_
+6	the	the	_	DT	_	7	det	7:det	_
+7	locals	local	_	NNS	_	5	pobj	5:pobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	particularly	particularly	_	RB	_	4	advmod	4:advmod	_
+10	her	she	_	PRP$	_	12	poss	12:poss	_
+11	sexual	sexual	_	JJ	_	12	amod	12:amod	_
+12	awakening	awakening	_	NN	_	4	dep	4:dep	_
+13	at	at	_	IN	_	12	prep	12:prep	_
+14	the	the	_	DT	_	15	det	15:det	_
+15	hands	hand	_	NNS	_	13	pobj	13:pobj	_
+16	of	of	_	IN	_	15	prep	15:prep	_
+17	her	she	_	PRP$	_	19	poss	19:poss	_
+18	charming	charming	_	JJ	_	19	amod	19:amod	_
+19	cicerone	cicerone	_	NN	_	16	pobj	16:pobj	_
+20	,	,	_	,	_	0	-	0:-	_
+21	make	make	_	VBP	_	40	ccomp	40:ccomp	_
+22	this	this	_	DT	_	25	dep	25:dep	_
+23	``	``	_	``	_	0	-	0:-	_
+24	a	a	_	DT	_	25	det	25:det	_
+25	study	study	_	NN	_	21	dep	21:dep	_
+26	of	of	_	IN	_	25	prep	25:prep	_
+27	the	the	_	DT	_	28	det	28:det	_
+28	complications	complication	_	NNS	_	26	pobj	26:pobj	_
+29	of	of	_	IN	_	28	prep	28:prep	_
+30	lovemaking	lovemaking	_	NN	_	29	pobj	29:pobj	_
+31	and	and	_	CC	_	28	cc	28:cc	_
+32	its	its	_	PRP$	_	33	poss	33:poss	_
+33	effects	effect	_	NNS	_	28	conj	28:conj	_
+34	on	on	_	IN	_	33	prep	33:prep	_
+35	women	woman	_	NNS	_	34	pobj	34:pobj	_
+36	,	,	_	,	_	0	-	0:-	_
+37	''	''	_	''	_	0	-	0:-	_
+38	Craig	Craig	_	NNP	_	39	nn	39:nn	_
+39	Seligman	Seligman	_	NNP	_	40	nsubj	40:nsubj	_
+40	wrote	write	_	VBD	_	0	root	0:root	_
+41	here	here	_	RB	_	40	advmod	40:advmod	_
+42	in	in	_	IN	_	40	prep	40:prep	_
+43	1999	1999	_	CD	_	42	pobj	42:pobj	_
+44	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_18
+# text =  -LBQ-  Martin 's sureness of phrasing is one of the great pleasures of her recent fiction . ...
+1	``	``	_	``	_	0	-	0:-	_
+2	Martin	Martin	_	NNP	_	4	poss	4:poss	_
+3	's	's	_	POS	_	2	possessive	2:possessive	_
+4	sureness	sureness	_	NN	_	8	nsubj	8:nsubj	_
+5	of	of	_	IN	_	4	prep	4:prep	_
+6	phrasing	phrasing	_	NN	_	5	pobj	5:pobj	_
+7	is	be	_	VBZ	_	8	cop	8:cop	_
+8	one	one	_	CD	_	0	root	0:root	_
+9	of	of	_	IN	_	8	prep	8:prep	_
+10	the	the	_	DT	_	12	det	12:det	_
+11	great	great	_	JJ	_	12	amod	12:amod	_
+12	pleasures	pleasure	_	NNS	_	9	pobj	9:pobj	_
+13	of	of	_	IN	_	12	prep	12:prep	_
+14	her	she	_	PRP$	_	16	poss	16:poss	_
+15	recent	recent	_	JJ	_	16	amod	16:amod	_
+16	fiction	fiction	_	NN	_	13	pobj	13:pobj	_
+17	.	.	_	.	_	0	-	0:-	_
+18	...	...	_	:	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_19
+# text = Her cool , remote voice has mellowed , and her competence has kindled into brilliance .  -RDQ- 
+1	her	she	_	PRP$	_	5	poss	5:poss	_
+2	cool	cool	_	JJ	_	4	amod	4:amod	_
+3	,	,	_	,	_	0	-	0:-	_
+4	remote	remote	_	JJ	_	5	amod	5:amod	_
+5	voice	voice	_	NN	_	7	nsubj	7:nsubj	_
+6	has	has	_	AUXZ	_	7	dep	7:dep	_
+7	mellowed	mellow	_	VBN	_	0	root	0:root	_
+8	,	,	_	,	_	0	-	0:-	_
+9	and	and	_	CC	_	7	cc	7:cc	_
+10	her	she	_	PRP$	_	11	poss	11:poss	_
+11	competence	competence	_	NN	_	13	nsubj	13:nsubj	_
+12	has	has	_	AUXZ	_	13	dep	13:dep	_
+13	kindled	kindle	_	VBN	_	7	conj	7:conj	_
+14	into	into	_	IN	_	13	prep	13:prep	_
+15	brilliance	brilliance	_	NN	_	14	pobj	14:pobj	_
+16	.	.	_	.	_	0	-	0:-	_
+17	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_20
+# text = In September , the Light Changes  -COL-  Stories
+1	in	in	_	IN	_	6	dep	6:dep	_
+2	September	September	_	NNP	_	1	pobj	1:pobj	_
+3	,	,	_	,	_	0	-	0:-	_
+4	the	the	_	DT	_	6	det	6:det	_
+5	Light	Light	_	NNP	_	6	nn	6:nn	_
+6	Changes	change	_	NNS	_	0	root	0:root	_
+7	:	:	_	:	_	0	-	0:-	_
+8	Stories	Stories	_	NNP	_	6	dep	6:dep	_
+
+# sent_id = nyt_eng_20000429_0252_21
+# text = By Andrew Holleran . Plume , $ 12.95 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	Andrew	Andrew	_	NNP	_	5	nn	5:nn	_
+3	Holleran	Holleran	_	NNP	_	5	nn	5:nn	_
+4	.	.	_	.	_	0	-	0:-	_
+5	Plume	Plume	_	NNP	_	1	pobj	1:pobj	_
+6	,	,	_	,	_	0	-	0:-	_
+7	$	$	_	$	_	5	appos	5:appos	_
+8	12.95	12.95	_	CD	_	7	num	7:num	_
+9	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_22
+# text = These carefully built tales are steeped in the cadences ,
+1	these	these	_	DT	_	4	det	4:det	_
+2	carefully	carefully	_	RB	_	3	advmod	3:advmod	_
+3	built	build	_	VBN	_	4	amod	4:amod	_
+4	tales	tale	_	NNS	_	6	nsubjpass	6:nsubjpass	_
+5	are	are	_	AUXP	_	6	auxpass	6:auxpass	_
+6	steeped	steep	_	VBN	_	0	root	0:root	_
+7	in	in	_	IN	_	6	prep	6:prep	_
+8	the	the	_	DT	_	9	det	9:det	_
+9	cadences	cadence	_	NNS	_	7	pobj	7:pobj	_
+10	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_23
+# text = vocabulary and concerns of gay life in the late 20th century , and reveal an obsessive awareness of the loss of friends , health and youth .
+1	vocabulary	vocabulary	_	NN	_	14	nsubj	14:nsubj	_
+2	and	and	_	CC	_	1	cc	1:cc	_
+3	concerns	concern	_	NNS	_	1	conj	1:conj	_
+4	of	of	_	IN	_	1	prep	1:prep	_
+5	gay	gay	_	JJ	_	6	amod	6:amod	_
+6	life	life	_	NN	_	4	pobj	4:pobj	_
+7	in	in	_	IN	_	14	prep	14:prep	_
+8	the	the	_	DT	_	11	det	11:det	_
+9	late	late	_	JJ	_	11	amod	11:amod	_
+10	20th	20th	_	JJ	_	11	amod	11:amod	_
+11	century	century	_	NN	_	7	pobj	7:pobj	_
+12	,	,	_	,	_	0	-	0:-	_
+13	and	and	_	CC	_	14	cc	14:cc	_
+14	reveal	reveal	_	VBP	_	0	root	0:root	_
+15	an	a	_	DT	_	17	det	17:det	_
+16	obsessive	obsessive	_	JJ	_	17	amod	17:amod	_
+17	awareness	awareness	_	NN	_	14	dobj	14:dobj	_
+18	of	of	_	IN	_	17	prep	17:prep	_
+19	the	the	_	DT	_	20	det	20:det	_
+20	loss	loss	_	NN	_	18	pobj	18:pobj	_
+21	of	of	_	IN	_	20	prep	20:prep	_
+22	friends	friend	_	NNS	_	21	pobj	21:pobj	_
+23	,	,	_	,	_	0	-	0:-	_
+24	health	health	_	NN	_	22	conj	22:conj	_
+25	and	and	_	CC	_	22	cc	22:cc	_
+26	youth	youth	_	NN	_	22	conj	22:conj	_
+27	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_24
+# text = The result is a  -LBQ-  beautifully observed  -RDQ-  collection that is  -LBQ-  unflinching , provocative , witty and shrewd ,  -RDQ-  Peter Parker said here in 1999 .
+1	the	the	_	DT	_	2	det	2:det	_
+2	result	result	_	NN	_	9	nsubj	9:nsubj	_
+3	is	be	_	VBZ	_	9	cop	9:cop	_
+4	a	a	_	DT	_	9	det	9:det	_
+5	``	``	_	``	_	0	-	0:-	_
+6	beautifully	beautifully	_	RB	_	7	advmod	7:advmod	_
+7	observed	observed	_	JJ	_	9	amod	9:amod	_
+8	''	''	_	''	_	0	-	0:-	_
+9	collection	collection	_	NN	_	24	ccomp	24:ccomp	_
+10	that	that	_	WDT	_	13	nsubj	13:nsubj	_
+11	is	be	_	VBZ	_	13	cop	13:cop	_
+12	``	``	_	``	_	0	-	0:-	_
+13	unflinching	unflinching	_	JJ	_	9	rcmod	9:rcmod	_
+14	,	,	_	,	_	0	-	0:-	_
+15	provocative	provocative	_	JJ	_	13	conj	13:conj	_
+16	,	,	_	,	_	0	-	0:-	_
+17	witty	witty	_	JJ	_	13	conj	13:conj	_
+18	and	and	_	CC	_	13	cc	13:cc	_
+19	shrewd	shrewd	_	JJ	_	13	conj	13:conj	_
+20	,	,	_	,	_	0	-	0:-	_
+21	''	''	_	''	_	0	-	0:-	_
+22	Peter	Peter	_	NNP	_	23	nn	23:nn	_
+23	Parker	Parker	_	NNP	_	24	nsubj	24:nsubj	_
+24	said	say	_	VBD	_	0	root	0:root	_
+25	here	here	_	RB	_	24	advmod	24:advmod	_
+26	in	in	_	IN	_	25	prep	25:prep	_
+27	1999	1999	_	CD	_	26	pobj	26:pobj	_
+28	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_25
+# text = The Diary of Vaslav Nijinsky  -COL-  Unexpurgated Edition
+1	the	the	_	DT	_	2	det	2:det	_
+2	Diary	Diary	_	NNP	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	Vaslav	Vaslav	_	NNP	_	5	nn	5:nn	_
+5	Nijinsky	Nijinsky	_	NNP	_	3	pobj	3:pobj	_
+6	:	:	_	:	_	0	-	0:-	_
+7	Unexpurgated	Unexpurgated	_	NNP	_	8	nn	8:nn	_
+8	Edition	Edition	_	NNP	_	2	dep	2:dep	_
+
+# sent_id = nyt_eng_20000429_0252_26
+# text = Edited by Joan Acocella . Farrar , Straus & Giroux , $ 15 .
+1	edited	edit	_	VBN	_	0	root	0:root	_
+2	by	by	_	IN	_	1	prep	1:prep	_
+3	Joan	Joan	_	NNP	_	6	nn	6:nn	_
+4	Acocella	Acocella	_	NNP	_	6	nn	6:nn	_
+5	.	.	_	.	_	0	-	0:-	_
+6	Farrar	Farrar	_	NNP	_	2	pobj	2:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	Straus	Straus	_	NNP	_	6	appos	6:appos	_
+9	&	&	_	CC	_	8	cc	8:cc	_
+10	Giroux	Giroux	_	NNP	_	8	conj	8:conj	_
+11	,	,	_	,	_	0	-	0:-	_
+12	$	$	_	$	_	6	appos	6:appos	_
+13	15	15	_	CD	_	12	num	12:num	_
+14	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_27
+# text = The legendary Russian dancer 's diary , originally published by
+1	the	the	_	DT	_	4	det	4:det	_
+2	legendary	legendary	_	JJ	_	4	amod	4:amod	_
+3	Russian	russian	_	JJ	_	4	amod	4:amod	_
+4	dancer	dancer	_	NN	_	6	poss	6:poss	_
+5	's	's	_	POS	_	4	possessive	4:possessive	_
+6	diary	diary	_	NN	_	0	root	0:root	_
+7	,	,	_	,	_	0	-	0:-	_
+8	originally	originally	_	RB	_	9	advmod	9:advmod	_
+9	published	publish	_	VBN	_	6	partmod	6:partmod	_
+10	by	by	_	IN	_	9	prep	9:prep	_
+
+# sent_id = nyt_eng_20000429_0252_28
+# text = his wife in a sanitized , scaled-back version in 1936 , chronicles his long , anguished struggle with insanity .
+1	his	he	_	PRP$	_	2	poss	2:poss	_
+2	wife	wife	_	NN	_	12	nsubj	12:nsubj	_
+3	in	in	_	IN	_	2	prep	2:prep	_
+4	a	a	_	DT	_	8	det	8:det	_
+5	sanitized	sanitize	_	VBN	_	8	amod	8:amod	_
+6	,	,	_	,	_	0	-	0:-	_
+7	scaled-back	scaled-back	_	JJ	_	8	amod	8:amod	_
+8	version	version	_	NN	_	3	pobj	3:pobj	_
+9	in	in	_	IN	_	8	prep	8:prep	_
+10	1936	1936	_	CD	_	9	pobj	9:pobj	_
+11	,	,	_	,	_	0	-	0:-	_
+12	chronicles	chronicle	_	VBZ	_	0	root	0:root	_
+13	his	he	_	PRP$	_	17	poss	17:poss	_
+14	long	long	_	JJ	_	17	amod	17:amod	_
+15	,	,	_	,	_	0	-	0:-	_
+16	anguished	anguished	_	JJ	_	17	amod	17:amod	_
+17	struggle	struggle	_	NN	_	12	dobj	12:dobj	_
+18	with	with	_	IN	_	17	prep	17:prep	_
+19	insanity	insanity	_	NN	_	18	pobj	18:pobj	_
+20	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_29
+# text =  -LBQ-  In displaying its author in all his terrifying particularity , it allows us to glimpse in his madness , not the apotheosis , but at least the ruins , of his genius ,  -LBQ-  William Deresiewicz wrote here in 1999 .
+1	``	``	_	``	_	0	-	0:-	_
+2	In	in	_	IN	_	13	prep	13:prep	_
+3	displaying	display	_	VBG	_	2	pcomp	2:pcomp	_
+4	its	its	_	PRP$	_	5	poss	5:poss	_
+5	author	author	_	NN	_	3	dobj	3:dobj	_
+6	in	in	_	IN	_	5	prep	5:prep	_
+7	all	all	_	DT	_	10	det	10:det	_
+8	his	he	_	PRP$	_	10	poss	10:poss	_
+9	terrifying	terrifying	_	JJ	_	10	amod	10:amod	_
+10	particularity	particularity	_	NN	_	6	pobj	6:pobj	_
+11	,	,	_	,	_	0	-	0:-	_
+12	it	it	_	PRP	_	13	nsubj	13:nsubj	_
+13	allows	allow	_	VBZ	_	0	root	0:root	_
+14	us	we	_	PRP	_	16	nsubj	16:nsubj	_
+15	to	to	_	TO	_	16	aux	16:aux	_
+16	glimpse	glimpse	_	NN	_	13	xcomp	13:xcomp	_
+17	in	in	_	IN	_	16	prep	16:prep	_
+18	his	he	_	PRP$	_	19	poss	19:poss	_
+19	madness	madness	_	NN	_	17	pobj	17:pobj	_
+20	,	,	_	,	_	0	-	0:-	_
+21	not	not	_	RB	_	19	neg	19:neg	_
+22	the	the	_	DT	_	23	det	23:det	_
+23	apotheosis	apotheosis	_	NN	_	19	dep	19:dep	_
+24	,	,	_	,	_	0	-	0:-	_
+25	but	but	_	CC	_	13	cc	13:cc	_
+26	at	at	_	IN	_	38	advmod	38:advmod	_
+27	least	least	_	JJS	_	26	pobj	26:pobj	_
+28	the	the	_	DT	_	29	det	29:det	_
+29	ruins	ruin	_	NNS	_	38	nsubj	38:nsubj	_
+30	,	,	_	,	_	0	-	0:-	_
+31	of	of	_	IN	_	29	prep	29:prep	_
+32	his	he	_	PRP$	_	33	poss	33:poss	_
+33	genius	genius	_	NN	_	31	pobj	31:pobj	_
+34	,	,	_	,	_	0	-	0:-	_
+35	``	``	_	``	_	0	-	0:-	_
+36	William	William	_	NNP	_	37	nn	37:nn	_
+37	Deresiewicz	Deresiewicz	_	NNP	_	33	dep	33:dep	_
+38	wrote	write	_	VBD	_	13	conj	13:conj	_
+39	here	here	_	RB	_	38	advmod	38:advmod	_
+40	in	in	_	IN	_	38	prep	38:prep	_
+41	1999	1999	_	CD	_	40	pobj	40:pobj	_
+42	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_30
+# text = No IntermissionS  -COL-  The Life of Agnes de Mille , by Carol Easton -LRB- Da Capo , $ 18 -RRB- , is a portrait of the combative American dancer , choreographer , author and lecturer who labored mightily to be taken seriously in the male-dominated genre of musical comedy .
+1	no	no	_	DT	_	2	det	2:det	_
+2	IntermissionS	intermission	_	NNS	_	24	nsubj	24:nsubj	_
+3	:	:	_	:	_	0	-	0:-	_
+4	The	the	_	DT	_	5	det	5:det	_
+5	Life	life	_	NN	_	2	dep	2:dep	_
+6	of	of	_	IN	_	5	prep	5:prep	_
+7	Agnes	Agnes	_	NNP	_	9	nn	9:nn	_
+8	de	de	_	NNP	_	9	nn	9:nn	_
+9	Mille	Mille	_	NNP	_	6	pobj	6:pobj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	by	by	_	IN	_	5	prep	5:prep	_
+12	Carol	Carol	_	NNP	_	13	nn	13:nn	_
+13	Easton	Easton	_	NNP	_	11	pobj	11:pobj	_
+14	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+15	Da	Da	_	NNP	_	16	nn	16:nn	_
+16	Capo	Capo	_	NNP	_	13	appos	13:appos	_
+17	,	,	_	,	_	0	-	0:-	_
+18	$	$	_	$	_	16	dep	16:dep	_
+19	18	18	_	CD	_	18	num	18:num	_
+20	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+21	,	,	_	,	_	0	-	0:-	_
+22	is	be	_	VBZ	_	24	cop	24:cop	_
+23	a	a	_	DT	_	24	det	24:det	_
+24	portrait	portrait	_	NN	_	0	root	0:root	_
+25	of	of	_	IN	_	24	prep	24:prep	_
+26	the	the	_	DT	_	29	det	29:det	_
+27	combative	combative	_	JJ	_	29	amod	29:amod	_
+28	American	american	_	JJ	_	29	amod	29:amod	_
+29	dancer	dancer	_	NN	_	25	pobj	25:pobj	_
+30	,	,	_	,	_	0	-	0:-	_
+31	choreographer	choreographer	_	NN	_	29	appos	29:appos	_
+32	,	,	_	,	_	0	-	0:-	_
+33	author	author	_	NN	_	31	appos	31:appos	_
+34	and	and	_	CC	_	33	cc	33:cc	_
+35	lecturer	lecturer	_	NN	_	33	conj	33:conj	_
+36	who	who	_	WP	_	37	nsubj	37:nsubj	_
+37	labored	labor	_	VBD	_	33	rcmod	33:rcmod	_
+38	mightily	mightily	_	RB	_	37	advmod	37:advmod	_
+39	to	to	_	TO	_	41	aux	41:aux	_
+40	be	be	_	AUXB	_	41	auxpass	41:auxpass	_
+41	taken	take	_	VBN	_	37	xcomp	37:xcomp	_
+42	seriously	seriously	_	RB	_	41	advmod	41:advmod	_
+43	in	in	_	IN	_	41	prep	41:prep	_
+44	the	the	_	DT	_	46	det	46:det	_
+45	male-dominated	male-dominated	_	JJ	_	46	amod	46:amod	_
+46	genre	genre	_	NN	_	43	pobj	43:pobj	_
+47	of	of	_	IN	_	46	prep	46:prep	_
+48	musical	musical	_	JJ	_	49	amod	49:amod	_
+49	comedy	comedy	_	NN	_	47	pobj	47:pobj	_
+50	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_31
+# text =  -LBQ-  Easton tracks de Mille 's struggles with the limits of her gift ,  -RDQ-  Joan Acocella said here in 1996 .
+1	``	``	_	``	_	0	-	0:-	_
+2	Easton	Easton	_	NNP	_	3	nsubj	3:nsubj	_
+3	tracks	track	_	VBZ	_	18	ccomp	18:ccomp	_
+4	de	de	_	NNP	_	5	nn	5:nn	_
+5	Mille	Mille	_	NNP	_	7	poss	7:poss	_
+6	's	's	_	POS	_	5	possessive	5:possessive	_
+7	struggles	struggle	_	NNS	_	3	dobj	3:dobj	_
+8	with	with	_	IN	_	3	prep	3:prep	_
+9	the	the	_	DT	_	10	det	10:det	_
+10	limits	limit	_	NNS	_	8	pobj	8:pobj	_
+11	of	of	_	IN	_	10	prep	10:prep	_
+12	her	she	_	PRP$	_	13	poss	13:poss	_
+13	gift	gift	_	NN	_	11	pobj	11:pobj	_
+14	,	,	_	,	_	0	-	0:-	_
+15	''	''	_	''	_	0	-	0:-	_
+16	Joan	Joan	_	NNP	_	17	nn	17:nn	_
+17	Acocella	Acocella	_	NNP	_	18	nsubj	18:nsubj	_
+18	said	say	_	VBD	_	0	root	0:root	_
+19	here	here	_	RB	_	18	advmod	18:advmod	_
+20	in	in	_	IN	_	19	prep	19:prep	_
+21	1996	1996	_	CD	_	20	pobj	20:pobj	_
+22	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_32
+# text =  -LBQ-  De Mille fans will want to read the book .  -RDQ- 
+1	``	``	_	``	_	0	-	0:-	_
+2	De	De	_	NNP	_	4	nn	4:nn	_
+3	Mille	Mille	_	NNP	_	4	nn	4:nn	_
+4	fans	fan	_	NNS	_	6	nsubj	6:nsubj	_
+5	will	will	_	MD	_	6	aux	6:aux	_
+6	want	want	_	VB	_	0	root	0:root	_
+7	to	to	_	TO	_	8	aux	8:aux	_
+8	read	read	_	VB	_	6	xcomp	6:xcomp	_
+9	the	the	_	DT	_	10	det	10:det	_
+10	book	book	_	NN	_	8	dobj	8:dobj	_
+11	.	.	_	.	_	0	-	0:-	_
+12	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_33
+# text = A Journey to the End of the Millennium  -COL-  A Novel of the Middle
+1	a	a	_	DT	_	2	det	2:det	_
+2	Journey	Journey	_	NNP	_	0	root	0:root	_
+3	to	to	_	TO	_	2	prep	2:prep	_
+4	the	the	_	DT	_	5	det	5:det	_
+5	End	end	_	NN	_	3	pobj	3:pobj	_
+6	of	of	_	IN	_	5	prep	5:prep	_
+7	the	the	_	DT	_	8	det	8:det	_
+8	Millennium	Millennium	_	NNP	_	6	pobj	6:pobj	_
+9	:	:	_	:	_	0	-	0:-	_
+10	A	a	_	DT	_	11	det	11:det	_
+11	Novel	Novel	_	NNP	_	2	dep	2:dep	_
+12	of	of	_	IN	_	11	prep	11:prep	_
+13	the	the	_	DT	_	14	det	14:det	_
+14	Middle	Middle	_	NNP	_	12	pobj	12:pobj	_
+
+# sent_id = nyt_eng_20000429_0252_34
+# text = Ages
+1	ages	age	_	NNS	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_35
+# text = By A.B. Yehoshua . Harvest\/Harcourt , $ 14 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	A.B.	A.B.	_	NNP	_	5	nn	5:nn	_
+3	Yehoshua	Yehoshua	_	NNP	_	5	nn	5:nn	_
+4	.	.	_	.	_	0	-	0:-	_
+5	Harvest\/Harcourt	Harvest\/Harcourt	_	NNP	_	1	pobj	1:pobj	_
+6	,	,	_	,	_	0	-	0:-	_
+7	$	$	_	$	_	5	appos	5:appos	_
+8	14	14	_	CD	_	7	num	7:num	_
+9	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_36
+# text = This novel about a North African Jewish merchant who travels to
+1	this	this	_	DT	_	2	det	2:det	_
+2	novel	novel	_	NN	_	0	root	0:root	_
+3	about	about	_	IN	_	2	prep	2:prep	_
+4	a	a	_	DT	_	8	det	8:det	_
+5	North	north	_	JJ	_	6	amod	6:amod	_
+6	African	african	_	JJ	_	8	amod	8:amod	_
+7	Jewish	jewish	_	JJ	_	8	amod	8:amod	_
+8	merchant	merchant	_	NN	_	3	pobj	3:pobj	_
+9	who	who	_	WP	_	10	nsubj	10:nsubj	_
+10	travels	travel	_	VBZ	_	8	rcmod	8:rcmod	_
+11	to	to	_	TO	_	10	prep	10:prep	_
+
+# sent_id = nyt_eng_20000429_0252_37
+# text = Europe with his two wives and his Muslim partner in the year 999 explores the gaps between Jews and Christians , Jews and Muslims and men and women .
+1	Europe	Europe	_	NNP	_	14	nsubj	14:nsubj	_
+2	with	with	_	IN	_	1	prep	1:prep	_
+3	his	he	_	PRP$	_	5	poss	5:poss	_
+4	two	two	_	CD	_	5	num	5:num	_
+5	wives	wife	_	NNS	_	2	pobj	2:pobj	_
+6	and	and	_	CC	_	5	cc	5:cc	_
+7	his	he	_	PRP$	_	9	poss	9:poss	_
+8	Muslim	muslim	_	JJ	_	9	amod	9:amod	_
+9	partner	partner	_	NN	_	5	conj	5:conj	_
+10	in	in	_	IN	_	9	prep	9:prep	_
+11	the	the	_	DT	_	12	det	12:det	_
+12	year	year	_	NN	_	10	pobj	10:pobj	_
+13	999	999	_	CD	_	12	num	12:num	_
+14	explores	explore	_	VBZ	_	0	root	0:root	_
+15	the	the	_	DT	_	16	det	16:det	_
+16	gaps	gap	_	NNS	_	14	dobj	14:dobj	_
+17	between	between	_	IN	_	16	prep	16:prep	_
+18	Jews	Jews	_	NNPS	_	17	pobj	17:pobj	_
+19	and	and	_	CC	_	18	cc	18:cc	_
+20	Christians	christian	_	NNS	_	18	conj	18:conj	_
+21	,	,	_	,	_	0	-	0:-	_
+22	Jews	Jews	_	NNPS	_	18	conj	18:conj	_
+23	and	and	_	CC	_	22	cc	22:cc	_
+24	Muslims	Muslims	_	NNPS	_	22	conj	22:conj	_
+25	and	and	_	CC	_	18	cc	18:cc	_
+26	men	man	_	NNS	_	18	conj	18:conj	_
+27	and	and	_	CC	_	26	cc	26:cc	_
+28	women	woman	_	NNS	_	26	conj	26:conj	_
+29	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_38
+# text =  -LBQ-  Yehoshua is so graceful and eloquent that his work 's timeliness also succeeds , paradoxically , in making it timeless ,  -RDQ-  James E. Young wrote here last year .
+1	``	``	_	``	_	0	-	0:-	_
+2	Yehoshua	Yehoshua	_	NNP	_	5	nsubj	5:nsubj	_
+3	is	be	_	VBZ	_	5	cop	5:cop	_
+4	so	so	_	RB	_	5	advmod	5:advmod	_
+5	graceful	graceful	_	JJ	_	27	ccomp	27:ccomp	_
+6	and	and	_	CC	_	5	cc	5:cc	_
+7	eloquent	eloquent	_	JJ	_	5	conj	5:conj	_
+8	that	that	_	IN	_	14	complm	14:complm	_
+9	his	he	_	PRP$	_	10	poss	10:poss	_
+10	work	work	_	NN	_	12	poss	12:poss	_
+11	's	's	_	POS	_	10	possessive	10:possessive	_
+12	timeliness	timeliness	_	NN	_	14	nsubj	14:nsubj	_
+13	also	also	_	RB	_	14	advmod	14:advmod	_
+14	succeeds	succeed	_	VBZ	_	5	ccomp	5:ccomp	_
+15	,	,	_	,	_	0	-	0:-	_
+16	paradoxically	paradoxically	_	RB	_	14	dep	14:dep	_
+17	,	,	_	,	_	0	-	0:-	_
+18	in	in	_	IN	_	14	prep	14:prep	_
+19	making	make	_	VBG	_	18	pcomp	18:pcomp	_
+20	it	it	_	PRP	_	21	nsubj	21:nsubj	_
+21	timeless	timeless	_	JJ	_	19	xcomp	19:xcomp	_
+22	,	,	_	,	_	0	-	0:-	_
+23	''	''	_	''	_	0	-	0:-	_
+24	James	James	_	NNP	_	26	nn	26:nn	_
+25	E.	E.	_	NNP	_	26	nn	26:nn	_
+26	Young	Young	_	NNP	_	27	nsubj	27:nsubj	_
+27	wrote	write	_	VBD	_	0	root	0:root	_
+28	here	here	_	RB	_	27	advmod	27:advmod	_
+29	last	last	_	JJ	_	30	amod	30:amod	_
+30	year	year	_	NN	_	27	tmod	27:tmod	_
+31	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_39
+# text = Someone to Watch Over Me  -COL-  Stories
+1	someone	someone	_	NN	_	0	root	0:root	_
+2	to	to	_	TO	_	1	prep	1:prep	_
+3	Watch	Watch	_	NNP	_	2	pobj	2:pobj	_
+4	Over	over	_	IN	_	3	prep	3:prep	_
+5	Me	I	_	PRP	_	4	pobj	4:pobj	_
+6	:	:	_	:	_	0	-	0:-	_
+7	Stories	stories	_	CD	_	1	dep	1:dep	_
+
+# sent_id = nyt_eng_20000429_0252_40
+# text = By Richard Bausch . HarperPerennial , $ 13 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	Richard	Richard	_	NNP	_	5	nn	5:nn	_
+3	Bausch	Bausch	_	NNP	_	5	nn	5:nn	_
+4	.	.	_	.	_	0	-	0:-	_
+5	HarperPerennial	HarperPerennial	_	NNP	_	1	pobj	1:pobj	_
+6	,	,	_	,	_	0	-	0:-	_
+7	$	$	_	$	_	5	appos	5:appos	_
+8	13	13	_	CD	_	7	num	7:num	_
+9	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_41
+# text = These tales eavesdrop on couples bantering in bars , in
+1	these	these	_	DT	_	2	det	2:det	_
+2	tales	tale	_	NNS	_	3	nsubj	3:nsubj	_
+3	eavesdrop	eavesdrop	_	VB	_	0	root	0:root	_
+4	on	on	_	IN	_	3	prep	3:prep	_
+5	couples	couple	_	NNS	_	4	pobj	4:pobj	_
+6	bantering	banter	_	VBG	_	5	partmod	5:partmod	_
+7	in	in	_	IN	_	6	prep	6:prep	_
+8	bars	bar	_	NNS	_	7	pobj	7:pobj	_
+9	,	,	_	,	_	0	-	0:-	_
+10	in	in	_	IN	_	3	prep	3:prep	_
+
+# sent_id = nyt_eng_20000429_0252_42
+# text = restaurants and in bed , and examine the human desire for solicitude and tenderness .
+1	restaurants	restaurant	_	NNS	_	7	nsubj	7:nsubj	_
+2	and	and	_	CC	_	1	cc	1:cc	_
+3	in	in	_	IN	_	1	conj	1:conj	_
+4	bed	bed	_	NN	_	3	pobj	3:pobj	_
+5	,	,	_	,	_	0	-	0:-	_
+6	and	and	_	CC	_	7	cc	7:cc	_
+7	examine	examine	_	VB	_	0	root	0:root	_
+8	the	the	_	DT	_	10	det	10:det	_
+9	human	human	_	JJ	_	10	amod	10:amod	_
+10	desire	desire	_	NN	_	7	dobj	7:dobj	_
+11	for	for	_	IN	_	10	prep	10:prep	_
+12	solicitude	solicitude	_	NN	_	11	pobj	11:pobj	_
+13	and	and	_	CC	_	12	cc	12:cc	_
+14	tenderness	tenderness	_	NN	_	12	conj	12:conj	_
+15	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_43
+# text =  -LBQ-  Bausch hovers over his characters like the guardian angel they all seek ,  -RDQ-  Lisa Zeidner wrote here in 1999 .
+1	``	``	_	``	_	0	-	0:-	_
+2	Bausch	Bausch	_	NNP	_	3	nsubj	3:nsubj	_
+3	hovers	hover	_	VBZ	_	18	ccomp	18:ccomp	_
+4	over	over	_	IN	_	3	prep	3:prep	_
+5	his	he	_	PRP$	_	6	poss	6:poss	_
+6	characters	character	_	NNS	_	4	pobj	4:pobj	_
+7	like	like	_	IN	_	3	prep	3:prep	_
+8	the	the	_	DT	_	10	det	10:det	_
+9	guardian	guardian	_	NN	_	10	nn	10:nn	_
+10	angel	angel	_	NN	_	7	pobj	7:pobj	_
+11	they	they	_	PRP	_	13	nsubj	13:nsubj	_
+12	all	all	_	DT	_	11	det	11:det	_
+13	seek	seek	_	VBP	_	10	rcmod	10:rcmod	_
+14	,	,	_	,	_	0	-	0:-	_
+15	''	''	_	''	_	0	-	0:-	_
+16	Lisa	Lisa	_	NNP	_	17	nn	17:nn	_
+17	Zeidner	Zeidner	_	NNP	_	18	nsubj	18:nsubj	_
+18	wrote	write	_	VBD	_	0	root	0:root	_
+19	here	here	_	RB	_	18	advmod	18:advmod	_
+20	in	in	_	IN	_	18	prep	18:prep	_
+21	1999	1999	_	CD	_	20	pobj	20:pobj	_
+22	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_44
+# text =  -LBQ-  His stories illuminate the charged stillness in which emotional changes happen .  -RDQ- 
+1	``	``	_	``	_	0	-	0:-	_
+2	His	he	_	PRP$	_	3	poss	3:poss	_
+3	stories	story	_	NNS	_	4	nsubj	4:nsubj	_
+4	illuminate	illuminate	_	VB	_	0	root	0:root	_
+5	the	the	_	DT	_	7	det	7:det	_
+6	charged	charge	_	VBN	_	7	amod	7:amod	_
+7	stillness	stillness	_	NN	_	4	dobj	4:dobj	_
+8	in	in	_	IN	_	12	rel	12:rel	_
+9	which	which	_	WDT	_	8	pobj	8:pobj	_
+10	emotional	emotional	_	JJ	_	11	amod	11:amod	_
+11	changes	change	_	NNS	_	12	nsubj	12:nsubj	_
+12	happen	happen	_	VB	_	7	rcmod	7:rcmod	_
+13	.	.	_	.	_	0	-	0:-	_
+14	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_45
+# text = Weird and Tragic Shores  -COL-  The Story of Charles Francis Hall ,
+1	Weird	Weird	_	NNP	_	4	nn	4:nn	_
+2	and	and	_	CC	_	1	cc	1:cc	_
+3	Tragic	Tragic	_	NNP	_	1	conj	1:conj	_
+4	Shores	Shores	_	NNP	_	0	root	0:root	_
+5	:	:	_	:	_	0	-	0:-	_
+6	The	the	_	DT	_	7	det	7:det	_
+7	Story	Story	_	NNP	_	4	dep	4:dep	_
+8	of	of	_	IN	_	7	prep	7:prep	_
+9	Charles	Charles	_	NNP	_	11	nn	11:nn	_
+10	Francis	Francis	_	NNP	_	11	nn	11:nn	_
+11	Hall	Hall	_	NNP	_	8	pobj	8:pobj	_
+12	,	,	_	,	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_46
+# text = Explorer
+1	Explorer	Explorer	_	NNP	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_47
+# text = By Chauncey C. Loomis . Modern Library , $ 14.95 .
+1	by	by	_	IN	_	7	dep	7:dep	_
+2	Chauncey	Chauncey	_	NNP	_	4	nn	4:nn	_
+3	C.	C.	_	NNP	_	4	nn	4:nn	_
+4	Loomis	Loomis	_	NNP	_	1	pobj	1:pobj	_
+5	.	.	_	.	_	0	-	0:-	_
+6	Modern	Modern	_	NNP	_	7	nn	7:nn	_
+7	Library	Library	_	NNP	_	0	root	0:root	_
+8	,	,	_	,	_	0	-	0:-	_
+9	$	$	_	$	_	7	appos	7:appos	_
+10	14.95	14.95	_	CD	_	9	num	9:num	_
+11	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_48
+# text = In 1968 , the author exhumed the body of Charles Francis Hall , a
+1	in	in	_	IN	_	6	prep	6:prep	_
+2	1968	1968	_	CD	_	1	pobj	1:pobj	_
+3	,	,	_	,	_	0	-	0:-	_
+4	the	the	_	DT	_	5	det	5:det	_
+5	author	author	_	NN	_	6	nsubj	6:nsubj	_
+6	exhumed	exhume	_	VBD	_	0	root	0:root	_
+7	the	the	_	DT	_	8	det	8:det	_
+8	body	body	_	NN	_	6	dobj	6:dobj	_
+9	of	of	_	IN	_	8	prep	8:prep	_
+10	Charles	Charles	_	NNP	_	12	nn	12:nn	_
+11	Francis	Francis	_	NNP	_	12	nn	12:nn	_
+12	Hall	Hall	_	NNP	_	9	pobj	9:pobj	_
+13	,	,	_	,	_	0	-	0:-	_
+14	a	a	_	SYM	_	12	appos	12:appos	_
+
+# sent_id = nyt_eng_20000429_0252_49
+# text = 19th-century amateur explorer who made three Arctic voyages in search of survivors of Sir John Franklin 's disastrous expedition of 1845 , and he discovered traces of arsenic .
+1	19th-century	19th-century	_	JJ	_	3	amod	3:amod	_
+2	amateur	amateur	_	JJ	_	3	amod	3:amod	_
+3	explorer	explorer	_	NN	_	0	root	0:root	_
+4	who	who	_	WP	_	5	nsubj	5:nsubj	_
+5	made	make	_	VBD	_	3	rcmod	3:rcmod	_
+6	three	three	_	CD	_	8	num	8:num	_
+7	Arctic	Arctic	_	NNP	_	8	nn	8:nn	_
+8	voyages	voyage	_	NNS	_	5	dobj	5:dobj	_
+9	in	in	_	IN	_	5	prep	5:prep	_
+10	search	search	_	NN	_	9	pobj	9:pobj	_
+11	of	of	_	IN	_	10	prep	10:prep	_
+12	survivors	survivor	_	NNS	_	11	pobj	11:pobj	_
+13	of	of	_	IN	_	12	prep	12:prep	_
+14	Sir	Sir	_	NNP	_	16	nn	16:nn	_
+15	John	John	_	NNP	_	16	nn	16:nn	_
+16	Franklin	Franklin	_	NNP	_	19	poss	19:poss	_
+17	's	's	_	POS	_	16	possessive	16:possessive	_
+18	disastrous	disastrous	_	JJ	_	19	amod	19:amod	_
+19	expedition	expedition	_	NN	_	13	pobj	13:pobj	_
+20	of	of	_	IN	_	19	prep	19:prep	_
+21	1845	1845	_	CD	_	20	pobj	20:pobj	_
+22	,	,	_	,	_	0	-	0:-	_
+23	and	and	_	CC	_	3	cc	3:cc	_
+24	he	he	_	PRP	_	25	nsubj	25:nsubj	_
+25	discovered	discover	_	VBD	_	3	conj	3:conj	_
+26	traces	trace	_	NNS	_	25	dobj	25:dobj	_
+27	of	of	_	IN	_	26	prep	26:prep	_
+28	arsenic	arsenic	_	NN	_	27	pobj	27:pobj	_
+29	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_50
+# text = This biography  -LBQ-  suggests who may have killed him ,  -RDQ-  Edmund Carpenter wrote here in 1971 .
+1	this	this	_	DT	_	2	det	2:det	_
+2	biography	biography	_	NN	_	4	nsubj	4:nsubj	_
+3	``	``	_	``	_	0	-	0:-	_
+4	suggests	suggest	_	VBZ	_	14	ccomp	14:ccomp	_
+5	who	who	_	WP	_	8	nsubj	8:nsubj	_
+6	may	may	_	MD	_	8	aux	8:aux	_
+7	have	have	_	AUXB	_	8	dep	8:dep	_
+8	killed	kill	_	VBN	_	4	ccomp	4:ccomp	_
+9	him	he	_	PRP	_	8	dobj	8:dobj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	''	''	_	''	_	0	-	0:-	_
+12	Edmund	Edmund	_	NNP	_	13	nn	13:nn	_
+13	Carpenter	Carpenter	_	NNP	_	14	nsubj	14:nsubj	_
+14	wrote	write	_	VBD	_	0	root	0:root	_
+15	here	here	_	RB	_	14	advmod	14:advmod	_
+16	in	in	_	IN	_	14	prep	14:prep	_
+17	1971	1971	_	CD	_	16	pobj	16:pobj	_
+18	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_51
+# text =  -LBQ-  It is both a first-rate detective story and a very scholarly work .  -RDQ- 
+1	``	``	_	``	_	0	-	0:-	_
+2	It	it	_	PRP	_	8	nsubj	8:nsubj	_
+3	is	be	_	VBZ	_	8	cop	8:cop	_
+4	both	both	_	DT	_	8	preconj	8:preconj	_
+5	a	a	_	DT	_	8	det	8:det	_
+6	first-rate	first-rate	_	JJ	_	8	amod	8:amod	_
+7	detective	detective	_	NN	_	8	nn	8:nn	_
+8	story	story	_	NN	_	0	root	0:root	_
+9	and	and	_	CC	_	8	cc	8:cc	_
+10	a	a	_	DT	_	13	det	13:det	_
+11	very	very	_	RB	_	12	advmod	12:advmod	_
+12	scholarly	scholarly	_	JJ	_	13	amod	13:amod	_
+13	work	work	_	NN	_	8	conj	8:conj	_
+14	.	.	_	.	_	0	-	0:-	_
+15	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_52
+# text = Modern Library has also reissued The Brendan Voyage , by Tim Severin -LRB- $ 14.95 -RRB- , a chronicle of Severin 's trip across the North Atlantic in a small oxhide boat like the ones reputed to have been used by Irish monks on their way to the New World in the sixth century .
+1	Modern	Modern	_	NNP	_	2	nn	2:nn	_
+2	Library	Library	_	NNP	_	5	nsubj	5:nsubj	_
+3	has	has	_	AUXZ	_	5	dep	5:dep	_
+4	also	also	_	RB	_	5	advmod	5:advmod	_
+5	reissued	reissue	_	VBN	_	0	root	0:root	_
+6	The	the	_	DT	_	8	det	8:det	_
+7	Brendan	Brendan	_	NNP	_	8	nn	8:nn	_
+8	Voyage	Voyage	_	NNP	_	5	dobj	5:dobj	_
+9	,	,	_	,	_	0	-	0:-	_
+10	by	by	_	IN	_	8	prep	8:prep	_
+11	Tim	Tim	_	NNP	_	12	nn	12:nn	_
+12	Severin	Severin	_	NNP	_	10	pobj	10:pobj	_
+13	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+14	$	$	_	$	_	12	appos	12:appos	_
+15	14.95	14.95	_	CD	_	14	num	14:num	_
+16	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+17	,	,	_	,	_	0	-	0:-	_
+18	a	a	_	DT	_	19	det	19:det	_
+19	chronicle	chronicle	_	NN	_	12	appos	12:appos	_
+20	of	of	_	IN	_	19	prep	19:prep	_
+21	Severin	Severin	_	NNP	_	23	poss	23:poss	_
+22	's	's	_	POS	_	21	possessive	21:possessive	_
+23	trip	trip	_	NN	_	20	pobj	20:pobj	_
+24	across	across	_	IN	_	23	prep	23:prep	_
+25	the	the	_	DT	_	27	det	27:det	_
+26	North	North	_	NNP	_	27	nn	27:nn	_
+27	Atlantic	Atlantic	_	NNP	_	24	pobj	24:pobj	_
+28	in	in	_	IN	_	5	prep	5:prep	_
+29	a	a	_	DT	_	32	det	32:det	_
+30	small	small	_	JJ	_	32	amod	32:amod	_
+31	oxhide	oxhide	_	NN	_	32	nn	32:nn	_
+32	boat	boat	_	NN	_	28	pobj	28:pobj	_
+33	like	like	_	IN	_	32	prep	32:prep	_
+34	the	the	_	DT	_	35	det	35:det	_
+35	ones	one	_	NNS	_	33	pobj	33:pobj	_
+36	reputed	repute	_	VBN	_	35	partmod	35:partmod	_
+37	to	to	_	TO	_	40	aux	40:aux	_
+38	have	have	_	AUXB	_	40	dep	40:dep	_
+39	been	been	_	AUXN	_	40	auxpass	40:auxpass	_
+40	used	use	_	VBN	_	36	xcomp	36:xcomp	_
+41	by	by	_	IN	_	40	prep	40:prep	_
+42	Irish	irish	_	JJ	_	43	amod	43:amod	_
+43	monks	monk	_	NNS	_	41	pobj	41:pobj	_
+44	on	on	_	IN	_	40	prep	40:prep	_
+45	their	they	_	PRP$	_	46	poss	46:poss	_
+46	way	way	_	NN	_	44	pobj	44:pobj	_
+47	to	to	_	TO	_	46	prep	46:prep	_
+48	the	the	_	DT	_	50	det	50:det	_
+49	New	New	_	NNP	_	50	nn	50:nn	_
+50	World	World	_	NNP	_	47	pobj	47:pobj	_
+51	in	in	_	IN	_	46	prep	46:prep	_
+52	the	the	_	DT	_	54	det	54:det	_
+53	sixth	sixth	_	JJ	_	54	amod	54:amod	_
+54	century	century	_	NN	_	51	pobj	51:pobj	_
+55	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_53
+# text =  -LBQ-  His account of the adventure is a sailor 's delight ,  -RDQ-  one critic said in 1978 .
+1	``	``	_	``	_	0	-	0:-	_
+2	His	he	_	PRP$	_	3	poss	3:poss	_
+3	account	account	_	NN	_	11	nsubj	11:nsubj	_
+4	of	of	_	IN	_	3	prep	3:prep	_
+5	the	the	_	DT	_	6	det	6:det	_
+6	adventure	adventure	_	NN	_	4	pobj	4:pobj	_
+7	is	be	_	VBZ	_	11	cop	11:cop	_
+8	a	a	_	DT	_	9	det	9:det	_
+9	sailor	sailor	_	NN	_	11	poss	11:poss	_
+10	's	's	_	POS	_	9	possessive	9:possessive	_
+11	delight	delight	_	NN	_	16	ccomp	16:ccomp	_
+12	,	,	_	,	_	0	-	0:-	_
+13	''	''	_	''	_	0	-	0:-	_
+14	one	one	_	CD	_	15	num	15:num	_
+15	critic	critic	_	NN	_	16	nsubj	16:nsubj	_
+16	said	say	_	VBD	_	0	root	0:root	_
+17	in	in	_	IN	_	16	prep	16:prep	_
+18	1978	1978	_	CD	_	17	pobj	17:pobj	_
+19	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_54
+# text = In Voyaging  -COL-  Southward From the Strait of Magellan , by Rockwell Kent -LRB- Wesleyan University , $ 16.95 -RRB- , the artist recounts in rousing fashion his journey to Tierra del Fuego in a small sailboat .
+1	in	in	_	IN	_	24	prep	24:prep	_
+2	Voyaging	Voyaging	_	NNP	_	1	pobj	1:pobj	_
+3	:	:	_	:	_	0	-	0:-	_
+4	Southward	Southward	_	NNP	_	2	dep	2:dep	_
+5	From	from	_	IN	_	4	prep	4:prep	_
+6	the	the	_	DT	_	7	det	7:det	_
+7	Strait	Strait	_	NNP	_	5	pobj	5:pobj	_
+8	of	of	_	IN	_	7	prep	7:prep	_
+9	Magellan	Magellan	_	NNP	_	8	pobj	8:pobj	_
+10	,	,	_	,	_	0	-	0:-	_
+11	by	by	_	IN	_	4	prep	4:prep	_
+12	Rockwell	Rockwell	_	NNP	_	13	nn	13:nn	_
+13	Kent	Kent	_	NNP	_	11	pobj	11:pobj	_
+14	-LRB-	-lrb-	_	-LRB-	_	0	-	0:-	_
+15	Wesleyan	Wesleyan	_	NNP	_	16	nn	16:nn	_
+16	University	University	_	NNP	_	2	appos	2:appos	_
+17	,	,	_	,	_	0	-	0:-	_
+18	$	$	_	$	_	16	dep	16:dep	_
+19	16.95	16.95	_	CD	_	18	num	18:num	_
+20	-RRB-	-rrb-	_	-RRB-	_	0	-	0:-	_
+21	,	,	_	,	_	0	-	0:-	_
+22	the	the	_	DT	_	23	det	23:det	_
+23	artist	artist	_	NN	_	24	nsubj	24:nsubj	_
+24	recounts	recount	_	VBZ	_	0	root	0:root	_
+25	in	in	_	IN	_	24	prep	24:prep	_
+26	rousing	rousing	_	JJ	_	27	amod	27:amod	_
+27	fashion	fashion	_	NN	_	25	pobj	25:pobj	_
+28	his	he	_	PRP$	_	29	poss	29:poss	_
+29	journey	journey	_	NN	_	24	dobj	24:dobj	_
+30	to	to	_	TO	_	29	prep	29:prep	_
+31	Tierra	Tierra	_	NNP	_	33	nn	33:nn	_
+32	del	del	_	FW	_	33	nn	33:nn	_
+33	Fuego	Fuego	_	NNP	_	30	pobj	30:pobj	_
+34	in	in	_	IN	_	29	prep	29:prep	_
+35	a	a	_	DT	_	37	det	37:det	_
+36	small	small	_	JJ	_	37	amod	37:amod	_
+37	sailboat	sailboat	_	NN	_	34	pobj	34:pobj	_
+38	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_55
+# text =  -LBQ-  The strength and menace and majesty of the Cape Horn region proved admirable material for Kent 's black-and-white drawings ,  -RDQ-  the Book Review said in 1924 .
+1	``	``	_	``	_	0	-	0:-	_
+2	The	the	_	DT	_	3	det	3:det	_
+3	strength	strength	_	NN	_	13	nsubj	13:nsubj	_
+4	and	and	_	CC	_	3	cc	3:cc	_
+5	menace	menace	_	NN	_	3	conj	3:conj	_
+6	and	and	_	CC	_	3	cc	3:cc	_
+7	majesty	majesty	_	NN	_	3	conj	3:conj	_
+8	of	of	_	IN	_	3	prep	3:prep	_
+9	the	the	_	DT	_	12	det	12:det	_
+10	Cape	Cape	_	NNP	_	12	nn	12:nn	_
+11	Horn	Horn	_	NNP	_	12	nn	12:nn	_
+12	region	region	_	NN	_	8	pobj	8:pobj	_
+13	proved	prove	_	VBD	_	26	ccomp	26:ccomp	_
+14	admirable	admirable	_	JJ	_	15	amod	15:amod	_
+15	material	material	_	NN	_	13	dobj	13:dobj	_
+16	for	for	_	IN	_	15	prep	15:prep	_
+17	Kent	Kent	_	NNP	_	20	poss	20:poss	_
+18	's	's	_	POS	_	17	possessive	17:possessive	_
+19	black-and-white	black-and-white	_	JJ	_	20	amod	20:amod	_
+20	drawings	drawing	_	NNS	_	16	pobj	16:pobj	_
+21	,	,	_	,	_	0	-	0:-	_
+22	''	''	_	''	_	0	-	0:-	_
+23	the	the	_	DT	_	25	det	25:det	_
+24	Book	Book	_	NNP	_	25	nn	25:nn	_
+25	Review	Review	_	NNP	_	26	nsubj	26:nsubj	_
+26	said	say	_	VBD	_	0	root	0:root	_
+27	in	in	_	IN	_	26	prep	26:prep	_
+28	1924	1924	_	CD	_	27	pobj	27:pobj	_
+29	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_56
+# text = The Tree of Life
+1	the	the	_	DT	_	2	det	2:det	_
+2	Tree	tree	_	NN	_	0	root	0:root	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	Life	Life	_	NNP	_	3	pobj	3:pobj	_
+
+# sent_id = nyt_eng_20000429_0252_57
+# text = By Hugh Nissenson . Paul Dry , $ 14.95 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	Hugh	Hugh	_	NNP	_	6	nn	6:nn	_
+3	Nissenson	Nissenson	_	NNP	_	6	nn	6:nn	_
+4	.	.	_	.	_	0	-	0:-	_
+5	Paul	Paul	_	NNP	_	6	nn	6:nn	_
+6	Dry	Dry	_	NNP	_	1	pobj	1:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	$	$	_	$	_	6	appos	6:appos	_
+9	14.95	14.95	_	CD	_	8	num	8:num	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_58
+# text = In this novel as pioneer journal , a former minister abandons New
+1	in	in	_	IN	_	11	prep	11:prep	_
+2	this	this	_	DT	_	3	det	3:det	_
+3	novel	novel	_	NN	_	1	pobj	1:pobj	_
+4	as	as	_	IN	_	3	prep	3:prep	_
+5	pioneer	pioneer	_	NN	_	6	nn	6:nn	_
+6	journal	journal	_	NN	_	4	pobj	4:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	a	a	_	DT	_	10	det	10:det	_
+9	former	former	_	JJ	_	10	amod	10:amod	_
+10	minister	minister	_	NN	_	11	nsubj	11:nsubj	_
+11	abandons	abandon	_	VBZ	_	0	root	0:root	_
+12	New	New	_	NNP	_	11	dobj	11:dobj	_
+
+# sent_id = nyt_eng_20000429_0252_59
+# text = England for a rugged life on the Ohio frontier in 1811 .
+1	England	England	_	NNP	_	0	root	0:root	_
+2	for	for	_	IN	_	1	prep	1:prep	_
+3	a	a	_	DT	_	5	det	5:det	_
+4	rugged	rugged	_	JJ	_	5	amod	5:amod	_
+5	life	life	_	NN	_	2	pobj	2:pobj	_
+6	on	on	_	IN	_	5	prep	5:prep	_
+7	the	the	_	DT	_	9	det	9:det	_
+8	Ohio	Ohio	_	NNP	_	9	nn	9:nn	_
+9	frontier	frontier	_	NN	_	6	pobj	6:pobj	_
+10	in	in	_	IN	_	5	prep	5:prep	_
+11	1811	1811	_	CD	_	10	pobj	10:pobj	_
+12	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_60
+# text = The book contains  -LBQ-  numerous small glories ,  -RDQ-  Ivan Doig said here in 1985 , and the author  -LBQ-  toils like a stump farmer to create verisimilitude .  -RDQ- 
+1	the	the	_	DT	_	2	det	2:det	_
+2	book	book	_	NN	_	3	nsubj	3:nsubj	_
+3	contains	contain	_	VBZ	_	0	root	0:root	_
+4	``	``	_	``	_	0	-	0:-	_
+5	numerous	numerous	_	JJ	_	7	amod	7:amod	_
+6	small	small	_	JJ	_	7	amod	7:amod	_
+7	glories	glory	_	NNS	_	3	dobj	3:dobj	_
+8	,	,	_	,	_	0	-	0:-	_
+9	''	''	_	''	_	0	-	0:-	_
+10	Ivan	Ivan	_	NNP	_	11	nn	11:nn	_
+11	Doig	Doig	_	NNP	_	12	nsubj	12:nsubj	_
+12	said	say	_	VBD	_	7	dep	7:dep	_
+13	here	here	_	RB	_	12	advmod	12:advmod	_
+14	in	in	_	IN	_	12	prep	12:prep	_
+15	1985	1985	_	CD	_	14	pobj	14:pobj	_
+16	,	,	_	,	_	0	-	0:-	_
+17	and	and	_	CC	_	12	cc	12:cc	_
+18	the	the	_	DT	_	19	det	19:det	_
+19	author	author	_	NN	_	21	nsubj	21:nsubj	_
+20	``	``	_	``	_	0	-	0:-	_
+21	toils	toil	_	VBZ	_	12	conj	12:conj	_
+22	like	like	_	IN	_	21	prep	21:prep	_
+23	a	a	_	DT	_	25	det	25:det	_
+24	stump	stump	_	NN	_	25	nn	25:nn	_
+25	farmer	farmer	_	NN	_	22	pobj	22:pobj	_
+26	to	to	_	TO	_	27	aux	27:aux	_
+27	create	create	_	VB	_	25	infmod	25:infmod	_
+28	verisimilitude	verisimilitude	_	NN	_	27	dobj	27:dobj	_
+29	.	.	_	.	_	0	-	0:-	_
+30	''	''	_	''	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_61
+# text = Geographies of Home
+1	geographies	geography	_	NNS	_	0	root	0:root	_
+2	of	of	_	IN	_	1	prep	1:prep	_
+3	Home	Home	_	NNP	_	2	pobj	2:pobj	_
+
+# sent_id = nyt_eng_20000429_0252_62
+# text = By Loida Maritza Perez . Penguin , $ 12.95 .
+1	by	by	_	IN	_	0	root	0:root	_
+2	Loida	Loida	_	NNP	_	6	nn	6:nn	_
+3	Maritza	Maritza	_	NNP	_	6	nn	6:nn	_
+4	Perez	Perez	_	NNP	_	6	nn	6:nn	_
+5	.	.	_	.	_	0	-	0:-	_
+6	Penguin	Penguin	_	NNP	_	1	pobj	1:pobj	_
+7	,	,	_	,	_	0	-	0:-	_
+8	$	$	_	$	_	6	appos	6:appos	_
+9	12.95	12.95	_	CD	_	8	num	8:num	_
+10	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_63
+# text = The heroine of this first novel is torn between memories of her
+1	the	the	_	DT	_	2	det	2:det	_
+2	heroine	heroine	_	NN	_	8	nsubjpass	8:nsubjpass	_
+3	of	of	_	IN	_	2	prep	2:prep	_
+4	this	this	_	DT	_	6	det	6:det	_
+5	first	first	_	JJ	_	6	amod	6:amod	_
+6	novel	novel	_	NN	_	3	pobj	3:pobj	_
+7	is	is	_	AUXZ	_	8	auxpass	8:auxpass	_
+8	torn	tear	_	VBN	_	0	root	0:root	_
+9	between	between	_	IN	_	8	prep	8:prep	_
+10	memories	memory	_	NNS	_	9	pobj	9:pobj	_
+11	of	of	_	IN	_	10	prep	10:prep	_
+12	her	she	_	PRP	_	11	pobj	11:pobj	_
+
+# sent_id = nyt_eng_20000429_0252_64
+# text = lush homeland in the Dominican Republic and concern for her impoverished family , which is losing its strength and identity in Brooklyn .
+1	lush	lush	_	JJ	_	2	amod	2:amod	_
+2	homeland	homeland	_	NN	_	0	root	0:root	_
+3	in	in	_	IN	_	2	prep	2:prep	_
+4	the	the	_	DT	_	6	det	6:det	_
+5	Dominican	Dominican	_	NNP	_	6	nn	6:nn	_
+6	Republic	Republic	_	NNP	_	3	pobj	3:pobj	_
+7	and	and	_	CC	_	6	cc	6:cc	_
+8	concern	concern	_	NN	_	6	conj	6:conj	_
+9	for	for	_	IN	_	2	prep	2:prep	_
+10	her	she	_	PRP$	_	12	poss	12:poss	_
+11	impoverished	impoverished	_	JJ	_	12	amod	12:amod	_
+12	family	family	_	NN	_	9	pobj	9:pobj	_
+13	,	,	_	,	_	0	-	0:-	_
+14	which	which	_	WDT	_	16	nsubj	16:nsubj	_
+15	is	is	_	AUXZ	_	16	dep	16:dep	_
+16	losing	lose	_	VBG	_	12	rcmod	12:rcmod	_
+17	its	its	_	PRP$	_	18	poss	18:poss	_
+18	strength	strength	_	NN	_	16	dobj	16:dobj	_
+19	and	and	_	CC	_	18	cc	18:cc	_
+20	identity	identity	_	NN	_	18	conj	18:conj	_
+21	in	in	_	IN	_	16	prep	16:prep	_
+22	Brooklyn	Brooklyn	_	NNP	_	21	pobj	21:pobj	_
+23	.	.	_	.	_	0	-	0:-	_
+
+# sent_id = nyt_eng_20000429_0252_65
+# text =  -LBQ-  The result is a deluge of intense imagery where the magical and the real occupy the same awful and sometimes sensual space ,  -RDQ-  Erica Sanders said here last year .
+1	``	``	_	``	_	0	-	0:-	_
+2	The	the	_	DT	_	3	det	3:det	_
+3	result	result	_	NN	_	6	nsubj	6:nsubj	_
+4	is	be	_	VBZ	_	6	cop	6:cop	_
+5	a	a	_	DT	_	6	det	6:det	_
+6	deluge	deluge	_	NN	_	28	ccomp	28:ccomp	_
+7	of	of	_	IN	_	6	prep	6:prep	_
+8	intense	intense	_	JJ	_	9	amod	9:amod	_
+9	imagery	imagery	_	NN	_	7	pobj	7:pobj	_
+10	where	where	_	WRB	_	16	advmod	16:advmod	_
+11	the	the	_	DT	_	12	det	12:det	_
+12	magical	magical	_	JJ	_	16	nsubj	16:nsubj	_
+13	and	and	_	CC	_	12	cc	12:cc	_
+14	the	the	_	DT	_	15	det	15:det	_
+15	real	real	_	JJ	_	12	conj	12:conj	_
+16	occupy	occupy	_	VB	_	6	rcmod	6:rcmod	_
+17	the	the	_	DT	_	23	det	23:det	_
+18	same	same	_	JJ	_	23	amod	23:amod	_
+19	awful	awful	_	JJ	_	23	amod	23:amod	_
+20	and	and	_	CC	_	21	cc	21:cc	_
+21	sometimes	sometimes	_	RB	_	19	cc	19:cc	_
+22	sensual	sensual	_	JJ	_	19	conj	19:conj	_
+23	space	space	_	NN	_	16	dobj	16:dobj	_
+24	,	,	_	,	_	0	-	0:-	_
+25	''	''	_	''	_	0	-	0:-	_
+26	Erica	Erica	_	NNP	_	27	nn	27:nn	_
+27	Sanders	Sanders	_	NNP	_	28	nsubj	28:nsubj	_
+28	said	say	_	VBD	_	0	root	0:root	_
+29	here	here	_	RB	_	28	advmod	28:advmod	_
+30	last	last	_	JJ	_	31	amod	31:amod	_
+31	year	year	_	NN	_	28	tmod	28:tmod	_
+32	.	.	_	.	_	0	-	0:-	_
+
