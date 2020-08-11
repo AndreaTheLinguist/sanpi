@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="tabulate" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+  <configuration default="false" name="tabulate_extra" type="PythonConfigurationType" factoryName="Python">
     <module name="litotes" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -12,7 +12,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tabulate.py" />
-    <option name="PARAMETERS" value="-s Nyt1 -p1 p1 -p2 p2 -n1 ADV -n2 ADJ -v" />
+    <option name="PARAMETERS" value="-s Nyt1 -p1 p1 -p2 p2 -n1 ADV -n2 ADJ -v -e" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

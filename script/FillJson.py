@@ -46,7 +46,7 @@ def __main__():
 
         # create generator object from conllu file
         sourceGenerator = pyconll.load.iter_from_file(
-                conllDirPath / f'{pref}.conllu')
+            conllDirPath / f'{pref}.conllu')
 
         # load json object
         # note that ordering of sentence ids in json file are reverse of conllu
@@ -86,7 +86,7 @@ def __main__():
 
                         fillers[k] = (token.lemma
                                       if args.tokenFillerType == 'lemma'
-                                else token.form)
+                                      else token.form)
 
                     hit['matching']['fillers'] = fillers
 
@@ -99,7 +99,7 @@ def __main__():
         print(f'\t{i} hit results filled from {c} total original '
               f'sentences in {round(finishTime - startTime, 2)} seconds')
 
-        with open(f'{jsonDirPath}{pref}.json', 'w') as o:
+        with open(jsonDirPath / f'{pref}.json', 'w') as o:
             print('\tWriting output file...')
             json.dump(hits, o, indent=2)
 
@@ -110,25 +110,23 @@ def __main__():
 
 def parseArgs():
     parser = argparse.ArgumentParser(
-            description='script to loop over all files in a given directory '
-                        'or a specified pair of files within the directory, '
-                        'and output a new json file with info filled in from '
-                        'the corresponding .conllu file')
+        description='script to loop over all files in a given directory '
+                    'or a specified pair of files within the directory, '
+                    'and output a new json file with info filled in from '
+                    'the corresponding .conllu file')
 
     parser.add_argument('-d', '--baseDir', type=Path,
-                        default=Path(__file__).absolute().parent,
+                        default=Path.cwd(),
                         help='directory with subdirectories containing files '
-                             'to be processed. Default directory is same as '
-                             'this script.')
+                             'to be processed. Default directory is current '
+                             'directory.')
 
     parser.add_argument('-s', '--sentences',
                         help='prefix for sentence content to be processed, '
                              'e.g. Nyt1')
 
     parser.add_argument('-p', '--pattern',
-                        help='single file prefix to process. If not specified, '
-                             'script will lopp all patterns for given conllu '
-                             'Files')
+                        help='single pattern set to process')
 
     parser.add_argument('-r', '--rewriteFiles',
                         choices=['yes', 'no', 'check'],
@@ -146,7 +144,7 @@ def parseArgs():
                         choices=['lemma', 'form'],
                         default='lemma',
                         help='set type for fillers. options are lemma or form. '
-                             'Lemma will be used if argument is not specified.')
+                             'Lemma is used by default.')
 
     return parser.parse_args()
 
@@ -169,7 +167,7 @@ def skipFiles(prefix, directory, rewrite):
 
     outputFile = directory / f'{prefix}.json'
 
-    if outputFile.exists():
+    if outputFile.exist():
 
         if rewrite == 'no':
             return True

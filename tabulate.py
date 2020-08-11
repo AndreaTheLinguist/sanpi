@@ -73,6 +73,9 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
 
+    parser.add_argument('-e', '--extraInfo', action='store_true',
+                        help='Option to add ratio and totals to csv output file')
+
     return parser.parse_args()
 
 
@@ -92,14 +95,13 @@ def checkDirs(dirList):
     sizeDir2 = len([name for name in os.listdir(dir2)
                     if not name.endswith('raw.json')])
 
-    if sizeDir1 != sizeDir2:
-
-        sys.exit('Error: Specified data directories do not have the same '
-                 'number of processed json files. Check directories and try '
-                 'again.')
+    # if sizeDir1 != sizeDir2:
+    #
+    #     sys.exit('Error: Specified data directories do not have the same '
+    #              'number of processed json files. Check directories and try '
+    #              'again.')
 
     return
-
 
 
 def fillCounters(dirs, args):
@@ -187,9 +189,9 @@ def createCsv(counters, dir, args):
 
     outputFilename = f'{args.sentences}_{p1}-{p2}_counts.csv'
 
-    fields = [args.node1,args.node2,
-              f'{p1}_counts', f'{p1}_counts', f'ratio_{p1}', f'ratio_{p2}',
-              'total']
+    fields = ([args.node1, args.node2, f'{p1}_counts', f'{p2}_counts',
+               f'ratio_{p1}', f'ratio_{p2}', 'total'] if args.extraInfo
+              else [args.node1, args.node2, f'{p1}_counts', f'{p2}_counts'])
 
     p1counts = counters[0]
     p2counts = counters[1]
@@ -217,7 +219,9 @@ def createCsv(counters, dir, args):
         p1ratio = p1count/total
         p2ratio = p2count/total
 
-        row = [c[0], c[1], p1count, p2count, p1ratio, p2ratio, total]
+        row = ([c[0], c[1], p1count, p2count, p1ratio, p2ratio, total]
+               if args.extraInfo
+               else [c[0], c[1], p1count, p2count])
 
         rows.append(row)
 
@@ -228,7 +232,6 @@ def createCsv(counters, dir, args):
         csvWriter.writerow(fields)
 
         csvWriter.writerows(rows)
-
 
 
 if __name__ == '__main__':

@@ -126,9 +126,9 @@ def parseArgs():
                              'e.g. Nyt1')
 
     parser.add_argument('-p', '--pattern',
-                        help='single file prefix to process. If not specified, '
-                             'script will lopp all patterns for given conllu '
-                             'Files')
+                        help='single pattern set to process. If not specified, '
+                             'script will loop all patterns for given '
+                             'sentences/conllu files')
 
     parser.add_argument('-r', '--rewriteFiles',
                         choices=['yes', 'no', 'check'],
