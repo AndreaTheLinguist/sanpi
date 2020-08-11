@@ -11,7 +11,7 @@ from pathlib import Path
 '''
 Notes:
 -take in 2 json data with hit info for 2 searches on the same corpus data.
--output table (csv?) with frequencies for each unique adv-adj pair in each dir
+-output table (csv?) with frequencies for each unique adv-adj pair in each outputDir
 -do not need to keep files with same ID linked if counting by directory 
 (and by specific file would not be informative anyway)
 but that's gonna be a whole lot of json files to go through
@@ -49,10 +49,10 @@ def parseArgs():
                         'the corresponding .conllu file')
 
     parser.add_argument('-d', '--baseDir', type=Path,
-                        default=Path(__file__).absolute().parent,
+                        default=Path.cwd(),
                         help='directory with subdirectories containing files '
-                             'to be processed. Default directory is same as '
-                             'this script.')
+                             'to be processed. Default directory is current '
+                             'directory.')
 
     parser.add_argument('-s', '--sentences', required=True,
                         help='prefix for sentence content to be processed, '
@@ -182,7 +182,7 @@ def countTokenPairs(countDict, jsonFile, args):
     return countDict
 
 
-def createCsv(counters, dir, args):
+def createCsv(counters, outputDir, args):
 
     p1 = args.pattern1
     p2 = args.pattern2
@@ -225,7 +225,7 @@ def createCsv(counters, dir, args):
 
         rows.append(row)
 
-    with open(dir / outputFilename, 'w') as out:
+    with open(outputDir / outputFilename, 'w') as out:
 
         csvWriter = csv.writer(out)
 
