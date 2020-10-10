@@ -8,13 +8,21 @@ from pathlib import Path
 
 # TODO: Add option to loop over entire base directory if pattern or sentences
 #  are not specified.
+# TODO: For the filling, this command seems to be working, for filling the raw files in Nyt1.if using conll files in Nyt1 and putting them in Nyt1.if
+#   python3 FillJson.py -d. -s Nyt1 -p if
+# However it clumsy when there are multiple versions around.  I would prefer this
+#   python3 -c Nyt1 -r Nyt1.if -f Nyt1.if
+# where
+#   -c location of conllu files
+#   -r location of raw files
+#   -f place to put filled files
+
 
 def __main__():
 
     args = parseArgs()
-    baseDir = args.baseDir
-    jsonDirPath = baseDir / f'{args.sentences}.{args.pattern}'
-    conllDirPath = baseDir / f'{args.sentences}.conll'
+    jsonDirPath = args.raw_dir
+    conllDirPath = args.conllu_dir
 
     if not (jsonDirPath.is_dir() and conllDirPath.is_dir()):
 
@@ -26,6 +34,11 @@ def __main__():
 
     else:
         sys.exit('Error: specified data directories are empty')
+
+    outputDirPath = args.output_dir if args.output_dir else jsonDirPath
+
+    testDirStr = f'if [ ! -d {outputDirPath} ]; then mkdir {outputDirPath}; fi'
+    os.system(testDirStr)
 
     rewrite = args.rewriteFiles
 
@@ -71,7 +84,8 @@ def __main__():
                 # list and for loop required to ensure all hit info will be
                 # filled in the case of a single sentence having more than 1
                 # search hit
-                hitIndexList = [x for x, y in enumerate(hitIds) if y == info.id]
+                hitIndexList = [x for x, y in enumerate(
+                    hitIds) if y == info.id]
 
                 for hitIndex in hitIndexList:
 
@@ -99,7 +113,7 @@ def __main__():
         print(f'\t{i} hit results filled from {c} total original '
               f'sentences in {round(finishTime - startTime, 2)} seconds')
 
-        with open(jsonDirPath / f'{pref}.json', 'w') as o:
+        with open(outputDirPath / f'{pref}.json', 'w') as o:
             print('\tWriting output file...')
             json.dump(hits, o, indent=2)
 
@@ -110,25 +124,32 @@ def __main__():
 
 def parseArgs():
     parser = argparse.ArgumentParser(
-        description='script to loop over all files in a given directory '
-                    'or a specified pair of files within the directory, '
-                    'and output a new json file with info filled in from '
-                    'the corresponding .conllu file')
+        description=(
+            'This is a script to loop over all \'.raw.json\' (grew-match result) files in a given directory and output new json files with info filled in from the corresponding .conllu (corpus info) files'))
 
-    parser.add_argument('-d', '--baseDir', type=Path,
-                        default=Path.cwd(),
-                        help='directory with subdirectories containing files '
-                             'to be processed. Default directory is current '
-                             'directory.')
+    parser.add_argument('-c', '--conllu_dir', required=True, type=Path,
+                        help='path to directory containing sentences .conllu files. e.g. Nyt1.conll')
 
-    parser.add_argument('-s', '--sentences',
-                        help='prefix for sentence content to be processed, '
-                             'e.g. Nyt1')
+    parser.add_argument('-r', '--raw_dir', type=Path, required=True,
+                        help='path to directory containing unprocessed/raw .json search result files to be processed of form \'<sentenceSetID>.raw.json\'. e.g. Nyt1.if')
 
-    parser.add_argument('-p', '--pattern',
-                        help='single pattern set to process')
+    parser.add_argument('-o', '--output_dir', type=Path, default=None,
+                        help='path to director to write filled output json files to. If not specified, the raw_dir path will be used (output/filled json files lose the \'.raw\' in the filename.)')
 
-    parser.add_argument('-r', '--rewriteFiles',
+    # parser.add_argument('-d', '--baseDir', type=Path,
+    #                     default=Path.cwd(),
+    #                     help='directory with subdirectories containing files '
+    #                          'to be processed. Default directory is current '
+    #                          'directory.')
+
+    # parser.add_argument('-s', '--sentences',
+    #                     help='prefix for sentence content to be processed, '
+    #                          'e.g. Nyt1')
+
+    # parser.add_argument('-p', '--pattern',
+    #                     help='single pattern set to process')
+
+    parser.add_argument('-w', '--rewriteFiles',
                         choices=['yes', 'no', 'check'],
                         default='yes',
                         help='Indicate whether to skip file pairs which '
