@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "tabulate.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/tabulate.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-p1",
+                "Nyt1.none",
+                "-p2",
+                "Nyt1.if",
+                "-o",
+                "Nyt1_none-if_adv-adj"
+            ]
+        },
+        {
+            "name": "tabulate.py extra",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/tabulate.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-p1",
+                "Nyt1.none",
+                "-p2",
+                "Nyt1.if",
+                "-o",
+                "Nyt1_none-if_adv-adj",
+                "-e",
+                "-v"
+            ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        }
+    ]
+}

@@ -18,17 +18,13 @@ but that's gonna be a whole lot of json files to go through
 -will need to combine tables from different corpus chunks later--csv better?
 '''
 
+
 def __main__():
 
     args = parseArgs()
-    baseDir = args.baseDir
-    try:
-        os.mkdir(baseDir / 'freq')
-    except OSError:
-        pass
-    outputDir = baseDir / 'freq'
-    jsonDir1 = baseDir / f'{args.sentences}.{args.pattern1}'
-    jsonDir2 = baseDir / f'{args.sentences}.{args.pattern2}'
+
+    jsonDir1 = args.pattern1
+    jsonDir2 = args.pattern2
 
     dirs = [jsonDir1, jsonDir2]
 
@@ -38,37 +34,39 @@ def __main__():
 
     print('\nFinished processing all json files.\nWriting output file...')
 
-    createCsv(counters, outputDir, args)
+    createCsv(counters, args)
 
 
 def parseArgs():
     parser = argparse.ArgumentParser(
-            description='script to loop over all files in a given directory '
-                        'or a specified pair of files within the directory, '
-                        'and output a new json file with info filled in from '
-                        'the corresponding .conllu file')
+        description='script to count hits for particular words filling particular nodes for 2 different patterns (e.g. different upward or downward entailing) run on the same corpus data.')
 
-    parser.add_argument('-d', '--baseDir', type=Path,
-                        default=Path.cwd(),
-                        help='directory with subdirectories containing files '
-                             'to be processed. Default directory is current '
-                             'directory.')
+    parser.add_argument('-p1', '--pattern1', type=Path, required=True,
+                        help='path to directory containing filled json files for first pattern.')
 
-    parser.add_argument('-s', '--sentences', required=True,
-                        help='prefix for sentence content to be processed, '
-                             'e.g. Nyt1')
+    parser.add_argument('-p2', '--pattern2', type=Path, required=True,
+                        help='path to directory containing filled json files for second pattern')
 
-    parser.add_argument('-p1', '--pattern1', required=True,
-                        help='pattern for first directory to count, e.g. p1')
+    # parser.add_argument('-d', '--baseDir', type=Path,
+    #                     default=Path.cwd(),
+    #                     help='directory with subdirectories containing files '
+    #                          'to be processed. Default directory is current '
+    #                          'directory.')
 
-    parser.add_argument('-p2', '--pattern2', required=True,
-                        help='pattern for second directory to count, e.g. p2')
+    parser.add_argument('-o', '--outputPrefix', type=str, required=True,
+                        help='prefix for output \'..._counts.csv\' file to be written to the \'freq\' subdirectory (created if necessary) found in the directory the script is run from. This should be a string which contains info about the patterns, corpus data set, and nodes counted; e.g. \'Nyt1_p1-n1_adv-adj\' which would result in the output file \'freq/Nyt1_p1-n1_adv-adj_counts.csv\'.')
+
+    # parser.add_argument('-p1', '--pattern1', required=True,
+    #                     help='pattern for first directory to count, e.g. p1')
+
+    # parser.add_argument('-p2', '--pattern2', required=True,
+    #                     help='pattern for second directory to count, e.g. p2')
 
     parser.add_argument('-n1', '--node1', default='ADV',
-                        help='search label for first node, default is \'ADV\'')
+                        help='search label for first node, default is \'ADV\'. Both patterns being compared must have a single node with this label.')
 
     parser.add_argument('-n2', '--node2', default='ADJ',
-                        help='search label for second node, default is \'ADJ\'')
+                        help='search label for second node, default is \'ADJ\'. Both patterns being compared must have a single node with this label.')
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
@@ -95,11 +93,11 @@ def checkDirs(dirList):
     sizeDir2 = len([name for name in os.listdir(dir2)
                     if not name.endswith('raw.json')])
 
-    # if sizeDir1 != sizeDir2:
-    #
-    #     sys.exit('Error: Specified data directories do not have the same '
-    #              'number of processed json files. Check directories and try '
-    #              'again.')
+    if sizeDir1 != sizeDir2:
+
+        sys.exit('Error: Specified data directories do not have the same '
+                 'number of processed json files. Check directories and try '
+                 'again.')
 
     return
 
@@ -116,7 +114,8 @@ def fillCounters(dirs, args):
         for jsonFile in os.scandir(path=jsonDir):
 
             if (jsonFile.name.endswith('raw.json')
-                or not jsonFile.name.endswith('json')): continue
+                    or not jsonFile.name.endswith('json')):
+                continue
 
             fileCount += 1
 
@@ -126,7 +125,8 @@ def fillCounters(dirs, args):
             counters[i] = countTokenPairs(counters[i], jsonFile.path, args)
 
         if args.verbose:
-            print(f'\nTop 10 collocations for entire {jsonDir.name} directory:')
+            print(
+                f'\nTop 10 collocations for entire {jsonDir.name} directory:')
             pprint.pprint(counters[i].most_common(10))
 
         finishTime = time.perf_counter()
@@ -171,10 +171,9 @@ def countTokenPairs(countDict, jsonFile, args):
 
                     countDict[tupleKey] += 1
 
-                ## use (named)tuple as key in dictionary.
+                # use (named)tuple as key in dictionary.
                 # e.g. [(word1=x, word2=y): count, (word1=a, word2=b): count, ...]
 
-    print('\tfinished.')
     if args.verbose:
         print('Top 3 (running totals):')
         pprint.pprint(countDict.most_common(3))
@@ -182,12 +181,18 @@ def countTokenPairs(countDict, jsonFile, args):
     return countDict
 
 
-def createCsv(counters, outputDir, args):
+def createCsv(counters, args):
 
-    p1 = args.pattern1
-    p2 = args.pattern2
+    try:
+        os.mkdir(Path.cwd() / 'freq')
+    except OSError:
+        pass
+    outputDir = Path.cwd() / 'freq'
 
-    outputFilename = f'{args.sentences}_{p1}-{p2}_counts.csv'
+    p1, __ = args.pattern1.name.rsplit('.', 1)
+    p2, __ = args.pattern2.name.rsplit('.', 1)
+
+    outputFilename = f'{args.outputPrefix}_counts.csv'
 
     fields = ([args.node1, args.node2, f'{p1}_counts', f'{p2}_counts',
                f'ratio_{p1}', f'ratio_{p2}', 'total'] if args.extraInfo
