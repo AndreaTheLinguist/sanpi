@@ -23,29 +23,28 @@ def __main__():
 
     args = parseArgs()
 
-    jsonDir1 = args.pattern1
-    jsonDir2 = args.pattern2
+    json_dir = args.pattern
+    if not json_dir.is_dir():
 
-    dirs = [jsonDir1, jsonDir2]
+        sys.exit('Error: Specified json directory does not '
+                 'exist.')
 
-    checkDirs(dirs)
-
-    counters = fillCounters(dirs, args)
+    counter = fillCounter(json_dir, args)
 
     print('\nFinished processing all json files.\nWriting output file...')
 
-    createCsv(counters, args)
+    createCsv(counter, args)
 
 
 def parseArgs():
     parser = argparse.ArgumentParser(
-        description='script to count hits for particular words filling particular nodes for 2 different patterns (e.g. different upward or downward entailing) run on the same corpus data.')
+        description='script to count hits for particular words filling particular nodes for a pattern run on corpus data.')
 
-    parser.add_argument('-p1', '--pattern1', type=Path, required=True,
-                        help='path to directory containing filled json files for first pattern.')
+    parser.add_argument('-p', '--pattern', type=Path, required=True,
+                        help='path to directory containing filled json files for pattern.')
 
-    parser.add_argument('-p2', '--pattern2', type=Path, required=True,
-                        help='path to directory containing filled json files for second pattern')
+    # parser.add_argument('-p2', '--pattern2', type=Path, required=True,
+    #                     help='path to directory containing filled json files for second pattern')
 
     # parser.add_argument('-d', '--baseDir', type=Path,
     #                     default=Path.cwd(),
@@ -77,65 +76,38 @@ def parseArgs():
     return parser.parse_args()
 
 
-def checkDirs(dirList):
+def fillCounter(json_dir, args):
 
-    dir1 = dirList[0]
-    dir2 = dirList[1]
+    counter = Counter()
 
-    if not (dir1.is_dir() and dir2.is_dir()):
+    startTime = time.perf_counter()
+    fileCount = 0
 
-        sys.exit('Error: Specified json directories do not '
-                 'exist in the base directory.')
+    for jsonFile in os.scandir(json_dir):
 
-    sizeDir1 = len([name for name in os.listdir(dir1)
-                    if not name.endswith('raw.json')])
+        if (jsonFile.name.endswith('raw.json')
+                or not jsonFile.name.endswith('json')):
+            continue
 
-    sizeDir2 = len([name for name in os.listdir(dir2)
-                    if not name.endswith('raw.json')])
-
-    if sizeDir1 != sizeDir2:
-
-        sys.exit('Error: Specified data directories do not have the same '
-                 'number of processed json files. Check directories and try '
-                 'again.')
-
-    return
-
-
-def fillCounters(dirs, args):
-
-    counters = [Counter(), Counter()]
-
-    for i, jsonDir in enumerate(dirs):
-
-        startTime = time.perf_counter()
-        fileCount = 0
-
-        for jsonFile in os.scandir(path=jsonDir):
-
-            if (jsonFile.name.endswith('raw.json')
-                    or not jsonFile.name.endswith('json')):
-                continue
-
-            fileCount += 1
-
-            if args.verbose:
-                print(f'\nProcessing {jsonFile.name}...')
-
-            counters[i] = countTokenPairs(counters[i], jsonFile.path, args)
+        fileCount += 1
 
         if args.verbose:
-            print(
-                f'\nTop 10 collocations for entire {jsonDir.name} directory:')
-            pprint.pprint(counters[i].most_common(10))
+            print(f'\nProcessing {jsonFile.name}...')
 
-        finishTime = time.perf_counter()
+        counter = countTokenPairs(counter, jsonFile.path, args)
 
-        print(f'\nFinished counting {jsonDir.name}.')
-        print(f'Collocations from {fileCount} total files counted '
-              f'in {round(finishTime - startTime, 2)} seconds')
+    if args.verbose:
+        print(
+            f'\nTop 10 collocations for entire {json_dir.name} directory:')
+        pprint.pprint(counter.most_common(10))
 
-    return counters
+    finishTime = time.perf_counter()
+
+    print(f'\nFinished counting {json_dir.name}.')
+    print(f'Collocations from {fileCount} total files counted '
+          f'in {round(finishTime - startTime, 2)} seconds')
+
+    return counter
 
 
 def countTokenPairs(countDict, jsonFile, args):
@@ -181,7 +153,7 @@ def countTokenPairs(countDict, jsonFile, args):
     return countDict
 
 
-def createCsv(counters, args):
+def createCsv(counts, args):
 
     try:
         os.mkdir(Path.cwd() / 'freq')
@@ -189,44 +161,25 @@ def createCsv(counters, args):
         pass
     outputDir = Path.cwd() / 'freq'
 
-    p1, __ = args.pattern1.name.rsplit('.', 1)
-    p2, __ = args.pattern2.name.rsplit('.', 1)
+    __, patkey = args.pattern.name.rsplit('.', 1)
 
     outputFilename = f'{args.outputPrefix}_counts.csv'
 
-    fields = ([args.node1, args.node2, f'{p1}_counts', f'{p2}_counts',
-               f'ratio_{p1}', f'ratio_{p2}', 'total'] if args.extraInfo
-              else [args.node1, args.node2, f'{p1}_counts', f'{p2}_counts'])
-
-    p1counts = counters[0]
-    p2counts = counters[1]
-    totalCounts = p1counts + p2counts
-
-    collocations = set(p1counts.keys()).union(p2counts.keys())
+    fields = ([args.node1, args.node2, f'{patkey}_counts',
+               f'{patkey}_ratio'] if args.extraInfo
+              else [args.node1, args.node2, f'{patkey}_counts'])
 
     rows = []
+    total_hits = len(counts)
 
-    for c in collocations:
+    for colloc in counts.keys():
 
-        try:
-            p1count = p1counts[c]
+        collcount = counts[colloc]
+        collratio = collcount/total_hits
 
-        except KeyError:
-            p1count = 0
-
-        try:
-            p2count = p2counts[c]
-
-        except KeyError:
-            p2count = 0
-
-        total = totalCounts[c]
-        p1ratio = p1count/total
-        p2ratio = p2count/total
-
-        row = ([c[0], c[1], p1count, p2count, p1ratio, p2ratio, total]
+        row = ([colloc[0], colloc[1], collcount, collratio]
                if args.extraInfo
-               else [c[0], c[1], p1count, p2count])
+               else [colloc[0], colloc[1], collcount])
 
         rows.append(row)
 
