@@ -175,7 +175,7 @@ def createCsv(counts, args):
     for colloc in counts.keys():
 
         collcount = counts[colloc]
-        collratio = collcount/total_hits
+        collratio = round(collcount/total_hits, 4)
 
         row = ([colloc[0], colloc[1], collcount, collratio]
                if args.extraInfo
