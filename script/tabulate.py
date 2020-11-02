@@ -1,22 +1,14 @@
-import json
+# coding=utf-8
+
 import argparse
+import csv
+import json
 import os
 import pprint
-import csv
 import sys
 import time
-from collections import namedtuple, Counter
+from collections import Counter, namedtuple
 from pathlib import Path
-
-'''
-Notes:
--take in 2 json data with hit info for 2 searches on the same corpus data.
--output table (csv?) with frequencies for each unique adv-adj pair in each outputDir
--do not need to keep files with same ID linked if counting by directory 
-(and by specific file would not be informative anyway)
-but that's gonna be a whole lot of json files to go through
--will need to combine tables from different corpus chunks later--csv better?
-'''
 
 
 def __main__():
@@ -24,6 +16,7 @@ def __main__():
     args = parseArgs()
 
     json_dir = args.pattern
+    print(f'\nTabulating hit counts for json files in {json_dir.name}...\n')
     if not json_dir.is_dir():
 
         sys.exit('Error: Specified json directory does not '
@@ -43,23 +36,8 @@ def parseArgs():
     parser.add_argument('-p', '--pattern', type=Path, required=True,
                         help='path to directory containing filled json files for pattern.')
 
-    # parser.add_argument('-p2', '--pattern2', type=Path, required=True,
-    #                     help='path to directory containing filled json files for second pattern')
-
-    # parser.add_argument('-d', '--baseDir', type=Path,
-    #                     default=Path.cwd(),
-    #                     help='directory with subdirectories containing files '
-    #                          'to be processed. Default directory is current '
-    #                          'directory.')
-
     parser.add_argument('-o', '--outputPrefix', type=str, required=True,
                         help='prefix for output \'..._counts.csv\' file to be written to the \'freq\' subdirectory (created if necessary) found in the directory the script is run from. This should be a string which contains info about the patterns, corpus data set, and nodes counted; e.g. \'Nyt1_p1-n1_adv-adj\' which would result in the output file \'freq/Nyt1_p1-n1_adv-adj_counts.csv\'.')
-
-    # parser.add_argument('-p1', '--pattern1', required=True,
-    #                     help='pattern for first directory to count, e.g. p1')
-
-    # parser.add_argument('-p2', '--pattern2', required=True,
-    #                     help='pattern for second directory to count, e.g. p2')
 
     parser.add_argument('-n1', '--node1', default='ADV',
                         help='search label for first node, default is \'ADV\'. Both patterns being compared must have a single node with this label.')
@@ -133,7 +111,9 @@ def countTokenPairs(countDict, jsonFile, args):
 
             else:
 
-                tupleKey = colloc(nodes[wordType1], nodes[wordType2])
+                tupleKey = colloc(
+                    nodes[wordType1].encode('utf8'),
+                    nodes[wordType2].encode('utf8'))
 
                 if tupleKey not in countDict.keys():
 
@@ -174,12 +154,14 @@ def createCsv(counts, args):
 
     for colloc in counts.keys():
 
+        word1 = colloc[0]
+        word2 = colloc[1]
         collcount = counts[colloc]
         collratio = round(collcount/total_hits, 4)
 
-        row = ([colloc[0], colloc[1], collcount, collratio]
+        row = ([word1, word2, collcount, collratio]
                if args.extraInfo
-               else [colloc[0], colloc[1], collcount])
+               else [word1, word2, collcount])
 
         rows.append(row)
 

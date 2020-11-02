@@ -24,6 +24,9 @@ def __main__():
     jsonDirPath = args.raw_dir
     conllDirPath = args.conllu_dir
 
+    print(
+        f'\nRunning FillJson.py script on json files in {jsonDirPath.name} from conll files in {conllDirPath.name}...\n')
+
     if not (jsonDirPath.is_dir() and conllDirPath.is_dir()):
 
         sys.exit('Error: specified conll directory and json directory do not '
@@ -65,7 +68,13 @@ def __main__():
         # note that ordering of sentence ids in json file are reverse of conllu
         with open(jsonDirPath / f'{pref}.raw.json', 'r') as j:
 
-            hits = json.load(j)
+            try: 
+                
+                hits = json.load(j)
+
+            except json.decoder.JSONDecodeError: 
+
+                print('json file is empty. Skipping.')
 
         hitIds = [h['sent_id'] for h in hits]
 

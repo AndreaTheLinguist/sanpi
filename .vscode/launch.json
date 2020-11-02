@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "print pairs",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "Nyt1.none"
+            ]
+        },
+        {
             "name": "tabulate.py",
             "type": "python",
             "request": "launch",
@@ -12,12 +22,10 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-p1",
+                "-p",
                 "Nyt1.none",
-                "-p2",
-                "Nyt1.if",
                 "-o",
-                "Nyt1_none-if_adv-adj"
+                "Nyt1_none"
             ]
         },
         {

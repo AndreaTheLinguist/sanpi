@@ -6,7 +6,8 @@ pattern{
   e1: ADJ -[cop]-> V;
   e2: ADJ -[mark]-> IF; 
   e3: ADJ -[advmod]-> ADV;
-  IF << V; V < ADV; 
+  IF << V; 
+  V < ADV; 
   ADV < ADJ; 
   ADV.lemma <> "not";
 }

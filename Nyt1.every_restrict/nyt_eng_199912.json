@@ -1,0 +1,289 @@
+[
+  {
+    "sent_id": "nyt_eng_19991230_0155_47",
+    "matching": {
+      "nodes": {
+        "N": "6",
+        "EVERY": "5",
+        "ADV": "7",
+        "ADJ": "8"
+      },
+      "edges": {
+        "e3": {
+          "source": "8",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "7"
+        },
+        "e2": {
+          "source": "6",
+          "label": {
+            "1": "amod"
+          },
+          "target": "8"
+        },
+        "e1": {
+          "source": "6",
+          "label": {
+            "1": "det"
+          },
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "N": "bit",
+        "EVERY": "every",
+        "ADV": "as",
+        "ADJ": "millennialist"
+      }
+    },
+    "text": "Cole 's scenario is every bit as millennialist as Blake 's , but with a downward trajectory ."
+  },
+  {
+    "sent_id": "nyt_eng_19991230_0071_10",
+    "matching": {
+      "nodes": {
+        "N": "23",
+        "EVERY": "22",
+        "ADV": "24",
+        "ADJ": "25"
+      },
+      "edges": {
+        "e3": {
+          "source": "25",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "24"
+        },
+        "e2": {
+          "source": "23",
+          "label": {
+            "1": "amod"
+          },
+          "target": "25"
+        },
+        "e1": {
+          "source": "23",
+          "label": {
+            "1": "det"
+          },
+          "target": "22"
+        }
+      },
+      "fillers": {
+        "N": "bit",
+        "EVERY": "every",
+        "ADV": "as",
+        "ADJ": "bright"
+      }
+    },
+    "text": "I saw the light gleaming in his eyes and reflecting off his face so that in the quiet house he shone every bit as bright as the candle ."
+  },
+  {
+    "sent_id": "nyt_eng_19991223_0221_35",
+    "matching": {
+      "nodes": {
+        "N": "16",
+        "EVERY": "15",
+        "ADV": "17",
+        "ADJ": "18"
+      },
+      "edges": {
+        "e3": {
+          "source": "18",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "17"
+        },
+        "e2": {
+          "source": "16",
+          "label": {
+            "1": "amod"
+          },
+          "target": "18"
+        },
+        "e1": {
+          "source": "16",
+          "label": {
+            "1": "det"
+          },
+          "target": "15"
+        }
+      },
+      "fillers": {
+        "N": "bit",
+        "EVERY": "every",
+        "ADV": "as",
+        "ADJ": "legitimate"
+      }
+    },
+    "text": "The low-tech site , with its pictures of cherubs and multicolored typefaces , is every bit as legitimate as the established churches with the niceties of pews , stained glass and formal gathering , Virdell says ."
+  },
+  {
+    "sent_id": "nyt_eng_19991219_0023_14",
+    "matching": {
+      "nodes": {
+        "N": "9",
+        "EVERY": "4",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "e3": {
+          "source": "6",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "5"
+        },
+        "e2": {
+          "source": "9",
+          "label": {
+            "1": "amod"
+          },
+          "target": "6"
+        },
+        "e1": {
+          "source": "9",
+          "label": {
+            "1": "det"
+          },
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "N": "bump",
+        "EVERY": "every",
+        "ADV": "slam",
+        "ADJ": "dunk"
+      }
+    },
+    "text": "You can see every slam dunk and chest bump from the NBA and every tackle and touchdown from the NFL and every strikeout and double play from MLB , but the NHL is often relegated to scores only ."
+  },
+  {
+    "sent_id": "nyt_eng_19991218_0064_5",
+    "matching": {
+      "nodes": {
+        "N": "9",
+        "EVERY": "8",
+        "ADV": "10",
+        "ADJ": "11"
+      },
+      "edges": {
+        "e3": {
+          "source": "11",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "10"
+        },
+        "e2": {
+          "source": "9",
+          "label": {
+            "1": "amod"
+          },
+          "target": "11"
+        },
+        "e1": {
+          "source": "9",
+          "label": {
+            "1": "det"
+          },
+          "target": "8"
+        }
+      },
+      "fillers": {
+        "N": "bit",
+        "EVERY": "every",
+        "ADV": "as",
+        "ADJ": "compelling"
+      }
+    },
+    "text": "In a scheduled NBA event that was every bit as compelling as a spitball fight between Third World nations , the Clippers rang up a 92-91 victory in front of 11,217 at Staples Center ."
+  },
+  {
+    "sent_id": "nyt_eng_19991213_0258_12",
+    "matching": {
+      "nodes": {
+        "N": "17",
+        "EVERY": "16",
+        "ADV": "18",
+        "ADJ": "19"
+      },
+      "edges": {
+        "e3": {
+          "source": "19",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "18"
+        },
+        "e2": {
+          "source": "17",
+          "label": {
+            "1": "amod"
+          },
+          "target": "19"
+        },
+        "e1": {
+          "source": "17",
+          "label": {
+            "1": "det"
+          },
+          "target": "16"
+        }
+      },
+      "fillers": {
+        "N": "bit",
+        "EVERY": "every",
+        "ADV": "as",
+        "ADJ": "delicious"
+      }
+    },
+    "text": "Spam _ the canned luncheon meat that is so often derogated but which I found every bit as delicious as C rations _ had its name lifted in 1970 by Monty Python 's Flying Circus ."
+  },
+  {
+    "sent_id": "nyt_eng_19991201_0080_16",
+    "matching": {
+      "nodes": {
+        "N": "27",
+        "EVERY": "26",
+        "ADV": "28",
+        "ADJ": "29"
+      },
+      "edges": {
+        "e3": {
+          "source": "29",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "28"
+        },
+        "e2": {
+          "source": "27",
+          "label": {
+            "1": "amod"
+          },
+          "target": "29"
+        },
+        "e1": {
+          "source": "27",
+          "label": {
+            "1": "det"
+          },
+          "target": "26"
+        }
+      },
+      "fillers": {
+        "N": "bit",
+        "EVERY": "every",
+        "ADV": "as",
+        "ADJ": "good"
+      }
+    },
+    "text": "If you 're lucky , you might find a few bottles of the Lot 23 around , perhaps for $ 12.99 , and it 's every bit as good as the Lot 24 ."
+  }
+]

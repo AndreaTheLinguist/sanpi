@@ -1,0 +1,512 @@
+[
+  {
+    "sent_id": "nyt_eng_19991230_0212_28",
+    "matching": {
+      "nodes": {
+        "V": "17",
+        "NONE": "6",
+        "ADV": "18",
+        "ADJ": "19"
+      },
+      "edges": {
+        "e3": {
+          "source": "19",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "18"
+        },
+        "e1": {
+          "source": "19",
+          "label": {
+            "1": "cop"
+          },
+          "target": "17"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "so",
+        "ADJ": "important"
+      }
+    },
+    "text": "If we were winning , none of this stuff would come up and it would n't be so important to everybody ."
+  },
+  {
+    "sent_id": "nyt_eng_19991230_0210_11",
+    "matching": {
+      "nodes": {
+        "V": "12",
+        "NONE": "11",
+        "ADV": "13",
+        "ADJ": "14"
+      },
+      "edges": {
+        "e3": {
+          "source": "14",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "13"
+        },
+        "e1": {
+          "source": "14",
+          "label": {
+            "1": "cop"
+          },
+          "target": "12"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "as",
+        "ADJ": "difficult"
+      }
+    },
+    "text": "_ www.dickclark.com _ Traditions are hard to break , and none are as difficult as prying yourself away from the anti-aging phenomenon that calls itself Dick Clark on New Year 's Eve ."
+  },
+  {
+    "sent_id": "nyt_eng_19991228_0085_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991228_0084_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991224_0037_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991224_0034_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991222_0048_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991222_0047_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991219_0015_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991219_0014_13",
+    "matching": {
+      "nodes": {
+        "V": "11",
+        "NONE": "10",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "e3": {
+          "source": "13",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "12"
+        },
+        "e1": {
+          "source": "13",
+          "label": {
+            "1": "cop"
+          },
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "evenly",
+        "ADJ": "balanced"
+      }
+    },
+    "text": "Overall , those expecting some trouble and those expecting none are evenly balanced ."
+  },
+  {
+    "sent_id": "nyt_eng_19991214_0185_8",
+    "matching": {
+      "nodes": {
+        "V": "16",
+        "NONE": "13",
+        "ADV": "17",
+        "ADJ": "18"
+      },
+      "edges": {
+        "e3": {
+          "source": "18",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "17"
+        },
+        "e1": {
+          "source": "18",
+          "label": {
+            "1": "cop"
+          },
+          "target": "16"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "very",
+        "ADJ": "efficient"
+      }
+    },
+    "text": "The seven nutcrackers I tried were wildly different in appearance , and none of them were very efficient ."
+  },
+  {
+    "sent_id": "nyt_eng_19991214_0181_8",
+    "matching": {
+      "nodes": {
+        "V": "16",
+        "NONE": "13",
+        "ADV": "17",
+        "ADJ": "18"
+      },
+      "edges": {
+        "e3": {
+          "source": "18",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "17"
+        },
+        "e1": {
+          "source": "18",
+          "label": {
+            "1": "cop"
+          },
+          "target": "16"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "very",
+        "ADJ": "efficient"
+      }
+    },
+    "text": "The seven nutcrackers I tried were wildly different in appearance , and none of them were very efficient ."
+  },
+  {
+    "sent_id": "nyt_eng_19991209_0408_27",
+    "matching": {
+      "nodes": {
+        "V": "20",
+        "NONE": "10",
+        "ADV": "21",
+        "ADJ": "22"
+      },
+      "edges": {
+        "e3": {
+          "source": "22",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "21"
+        },
+        "e1": {
+          "source": "22",
+          "label": {
+            "1": "cop"
+          },
+          "target": "20"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "clearly",
+        "ADJ": "impressed"
+      }
+    },
+    "text": "By midday Thursday , though , Merloni had sold none of its machines , though some people who browsed were clearly impressed ."
+  },
+  {
+    "sent_id": "nyt_eng_19991209_0107_25",
+    "matching": {
+      "nodes": {
+        "V": "15",
+        "NONE": "13",
+        "ADV": "16",
+        "ADJ": "17"
+      },
+      "edges": {
+        "e3": {
+          "source": "17",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "16"
+        },
+        "e1": {
+          "source": "17",
+          "label": {
+            "1": "cop"
+          },
+          "target": "15"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "particularly",
+        "ADJ": "successful"
+      }
+    },
+    "text": "Although some states have passed laws that attempt to regulate spam , none have been particularly successful ."
+  },
+  {
+    "sent_id": "nyt_eng_19991208_0210_7",
+    "matching": {
+      "nodes": {
+        "V": "52",
+        "NONE": "23",
+        "ADV": "53",
+        "ADJ": "54"
+      },
+      "edges": {
+        "e3": {
+          "source": "54",
+          "label": {
+            "1": "advmod"
+          },
+          "target": "53"
+        },
+        "e1": {
+          "source": "54",
+          "label": {
+            "1": "cop"
+          },
+          "target": "52"
+        }
+      },
+      "fillers": {
+        "V": "be",
+        "NONE": "none",
+        "ADV": "practically",
+        "ADJ": "unknown"
+      }
+    },
+    "text": "On the Web site , an index allows readers to quickly scan through 1,500 subjects like  -LBQ-  Have Silver That Shines or None  -RDQ-  and  -LBQ-  The ` Cut Direct ,  -RDQ-  ' which Mrs. Post explains as ignoring someone standing directly in front of you on purpose , which  -LBQ-  is practically unknown in polite society .  -RDQ-"
+  }
+]

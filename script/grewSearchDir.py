@@ -9,11 +9,14 @@ def __main__():
 
     args = parseArgs()
 
-    checkArgs(args)
-
     dirPath = args.dir
     patPath = args.pat
     outputDir = args.output
+
+    print(f'\nRunning grew search on conll files in {dirPath.name}...\n')
+
+    checkArgs(args)
+
     testDirStr = f'if [ ! -d {outputDir} ]; then mkdir {outputDir}; fi'
     os.system(testDirStr)
 
