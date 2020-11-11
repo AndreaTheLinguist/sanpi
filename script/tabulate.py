@@ -26,7 +26,7 @@ def __main__():
 
     print('\nFinished processing all json files.\nWriting output file...')
 
-    createCsv(counter, args)
+    createOutput(counter, args)
 
 
 def parseArgs():
@@ -44,6 +44,9 @@ def parseArgs():
 
     parser.add_argument('-n2', '--node2', default='ADJ',
                         help='search label for second node, default is \'ADJ\'. Both patterns being compared must have a single node with this label.')
+
+    parser.add_argument('-m', '--minimal', action='store_true',
+                        help='Option produce minimal output. If used, output will not have a header row and will be a tab delimited .txt file instead of the default comma delimted .csv.')
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
@@ -133,7 +136,7 @@ def countTokenPairs(countDict, jsonFile, args):
     return countDict
 
 
-def createCsv(counts, args):
+def createOutput(counts, args):
 
     try:
         os.mkdir(Path.cwd() / 'freq')
@@ -143,7 +146,8 @@ def createCsv(counts, args):
 
     __, patkey = args.pattern.name.rsplit('.', 1)
 
-    outputFilename = f'{args.outputPrefix}_counts.csv'
+    outputFilename = (f'{args.outputPrefix}_counts.txt' if args.minimal
+                      else f'{args.outputPrefix}_counts.csv')
 
     fields = ([args.node1, args.node2, f'{patkey}_counts',
                f'{patkey}_ratio'] if args.extraInfo
@@ -167,11 +171,16 @@ def createCsv(counts, args):
 
     with open(outputDir / outputFilename, 'w') as out:
 
-        csvWriter = csv.writer(out)
+        if args.minimal:
 
-        csvWriter.writerow(fields)
+            writer = csv.writer(out, delimiter='\t')
 
-        csvWriter.writerows(rows)
+        else:
+
+            writer = csv.writer(out)
+            writer.writerow(fields)
+
+        writer.writerows(rows)
 
 
 if __name__ == '__main__':
