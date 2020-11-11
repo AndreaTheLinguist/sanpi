@@ -114,9 +114,7 @@ def countTokenPairs(countDict, jsonFile, args):
 
             else:
 
-                tupleKey = colloc(
-                    nodes[wordType1].encode('utf8'),
-                    nodes[wordType2].encode('utf8'))
+                tupleKey = colloc(nodes[wordType1], nodes[wordType2])
 
                 if tupleKey not in countDict.keys():
 
@@ -180,7 +178,18 @@ def createOutput(counts, args):
             writer = csv.writer(out)
             writer.writerow(fields)
 
-        writer.writerows(rows)
+        for row in rows:
+
+            try:
+
+                writer.writerow(row)
+
+            except UnicodeEncodeError:
+
+                print(
+                    f"Row for {word1.encode(encoding='UTF-8')} {word2.encode(encoding='UTF-8')} could not be written due to encoding error. Excluded from frequency table.")
+
+        # writer.writerows(rows)
 
 
 if __name__ == '__main__':

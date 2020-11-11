@@ -7,6 +7,7 @@
 - [ ] run patterns
 - [ ] write scipt to compare new simplified count csv's
 - [ ] determine naming schema for contexts-- create all contexts/patterns before naming?
+- [ ] figure out how data works with Evert dissertation
 
 
 # start with:
