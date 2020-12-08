@@ -10,6 +10,87 @@ pattern {
 }
 ```
 
+# bigrams minus not
+```
+pattern { 
+  ADV [xpos=RB];
+  ADJ [xpos=JJ]; 
+  ADV < ADJ; 
+  e: ADJ -[advmod]-> ADV; 
+  ADV.lemma <> "not"
+}
+
+without{
+  NOT[lemma="not"];
+  e1: V -[advmod]-> NOT;
+}
+```
+
+# be adv adj excluding not and other negative adverbs
+This pattern specifies a empty subject, a verb of any form with lemma 'be' (i.e. any inflection), an adverb excluding those of negative quality specified, and a predicate adjective. 
+The subject must precede the 'be' form (no inverting/questions), the be-form must be the adjective's copula, and the adverb must modify the adjective and immediately precede it (excludes more "sentential" adverbs, but also adverbs that can come after the adj, as in "He's not happy exactly.") It also excludes any other additional negative adverbs that might be modifying the adjective (It does *not* exclude negative adverbs from modifying the original adverb immediately preceding the adjective.)
+```
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  BE.xpos = re"VB.";
+  ADV < ADJ;
+  e1: ADJ -[advmod]-> ADV;
+  e2: ADJ -[cop]-> BE;
+  S  []; 
+  e3: ADJ -[nsubj]-> S;
+  S << BE
+}
+
+without {
+  NEG [lemma = "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  e4: ADJ -[advmod]-> NEG;
+}
+```
+
+# be adv adj excluding only not adv (as collocate adv and also preceding)
+file name: be-adv-adj_without-not.pat
+```
+pattern {
+  ADV [xpos=RB, lemma <> "not"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  BE.xpos = re"VB.";
+  ADV < ADJ;
+  e1: ADJ -[advmod]-> ADV;
+  e2: ADJ -[cop]-> BE;
+  S  []; 
+  e3: ADJ -[nsubj]-> S;
+  S << BE
+}
+
+without {
+  NEG [lemma = "not"];
+  e4: ADJ -[advmod]-> NEG;
+}
+```
+
+# be not adv adj
+be-adv-adj_with-not.pat
+```
+pattern {
+  ADV [xpos=RB, lemma <> "not"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  BE.xpos = re"VB.";
+  ADV < ADJ;
+  e1: ADJ -[advmod]-> ADV;
+  e2: ADJ -[cop]-> BE;
+  S  []; 
+  e3: ADJ -[nsubj]-> S;
+  S << BE;
+  NEG [lemma = "not"];
+  e4: ADJ -[advmod]-> NEG;
+}
+```
+
+
 # neg -- n1? 
 ```
 pattern {

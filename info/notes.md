@@ -11,9 +11,18 @@
 
 
 # start with:
-- [ ] http://www.collocations.de/UCS/tron-one-minute-guide.html  try ucs tables
+- [ ] determine how to format data to use with ucs
+- [ ] revise output for make-tables to have lines like `<context> \t <adv, adj>` for each instance
+    - [ ] create new grew patterns to get right sets of json files: need positive context to be basic pattern with relevant trigger filtered out (use `without:` clause)
+    - [ ] need to update printing script to concatonate json pairs (with and without relevant trigger)
+- [ ] settle on initial set of contexts/searches
+- [x] read German NPI papers that use scp
+    - manual verification of NPIs still required
+    - exact specification of known downward entailing operators 
+    - use ucs to get t-score, log likelihood, chi-squared, poisson, and z-score
+    - some ling processing, but only percentage of neg contexts occurred in is releveant for this project (i.e. no translation data)
+- [x] http://www.collocations.de/UCS/tron-one-minute-guide.html  try ucs tables
     - [x] get all pair-hits of ADV ADJ for pattern 
     - [x] pipe `ADV \t ADJ \n` output to `ucs-make-tables -v`
-    - [ ] alternatively, make own joint and marginal freq (frequency signature) tables script?
 - [x] look at corpus study stats paper file:///C:/Users/Andrea/Downloads/cantos-2018-lexical.pdf
 - [x] fixing encoding error in tabulate for p1 outputs! (remember server tabulate.py has print() statement)
