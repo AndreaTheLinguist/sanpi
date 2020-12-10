@@ -20,9 +20,7 @@ def __main__():
     testDirStr = f'if [ ! -d {outputDir} ]; then mkdir {outputDir}; fi'
     os.system(testDirStr)
 
-    limit = 1 if args.limit else -1
-
-    for file in os.listdir(dirPath)[0:limit]:
+    for file in os.listdir(dirPath):
 
         filePref, _ = file.split('.')
         filePathName = f'{dirPath}/{file}'
@@ -48,13 +46,7 @@ def checkArgs(args):
     if len(os.listdir(dirPath)) < 1:
         sys.exit('Error: specified search directory is empty.')
 
-    elif args.limit:
-
-        print(
-            f'File limit is enabled. Only first 2 files in {dirPath.name} will be searched.')
-
-    else:
-        print(f'{len(os.listdir(dirPath))} total files to be searched.')
+    print(f'{len(os.listdir(dirPath))} total files to be searched.')
 
     return
 
@@ -73,9 +65,6 @@ def parseArgs():
     parser.add_argument(
         'output', type=str, help='output directory name for. Should correspond to sentence data source and pattern like so: "<data set>.<pattern name>", e.g. "Nyt1.p1"')
 
-    parser.add_argument('-l', '--limit', default=False, action='store_true',
-                        help='Option to limit search to only the first 2 files in directory.')
-
     return parser.parse_args()
 
 
@@ -84,4 +73,4 @@ if __name__ == '__main__':
     absStart = time.perf_counter()
     __main__()
     absFinish = time.perf_counter()
-    print(f'Total time: {round(absFinish - absStart, 2)} seconds')
+    print(f'Total time: {round((absFinish - absStart)/60, 2)} minutes')
