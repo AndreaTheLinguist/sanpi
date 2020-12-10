@@ -6,7 +6,7 @@ echo "Arguments provided:" "$@"
 if [ "$1" == "-h" ]; then
   echo "Script to run all scripts for single AdvAdj pattern and single corpus chunk."
   echo "Usage: `basename $0` [conlldir=path patternfile=path jsondir=path outputprefix=string]"
-  echo "Note: script `basename $0` intended to be run from level above 'script/' directory."
+  echo "Note: script `basename $0` intended to be run from level above 'script/' directory. jsondir also expects form of <sentence data>.<pattern key>"
   exit 0
 fi
 

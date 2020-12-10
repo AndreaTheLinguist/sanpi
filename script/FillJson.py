@@ -224,4 +224,4 @@ if __name__ == '__main__':
     absStart = time.perf_counter()
     __main__()
     absFinish = time.perf_counter()
-    print(f'Total time: {round(absFinish - absStart, 2)} seconds')
+    print(f'Total time: {round((absFinish - absStart)/60, 2)} minutes')
