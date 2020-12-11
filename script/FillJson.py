@@ -47,15 +47,13 @@ def __main__():
 
     for pref in prefixes:
 
-        if rewrite != 'yes':
+        if rewrite != 'yes' and skipFiles(pref, jsonDirPath, rewrite):
 
-            if skipFiles(pref, jsonDirPath, rewrite):
+            print(f'Files with prefix {pref} have prior processing. File '
+                    f'{jsonDirPath}{pref}.json (from prior run) '
+                    f'was not replaced.')
 
-                print(f'Files with prefix {pref} have prior processing. File '
-                      f'{jsonDirPath}{pref}.json (from prior run) '
-                      f'was not replaced.')
-
-                continue
+            continue
 
         startTime = time.perf_counter()
         print(f'Processing {pref}...')
@@ -197,7 +195,7 @@ def skipFiles(prefix, directory, rewrite):
 
     outputFile = directory / f'{prefix}.json'
 
-    if outputFile.exist():
+    if outputFile.exists():
 
         if rewrite == 'no':
             return True
