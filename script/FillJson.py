@@ -6,17 +6,6 @@ import sys
 import time
 from pathlib import Path
 
-# TODO: Add option to loop over entire base directory if pattern or sentences
-#  are not specified.
-# TODO: For the filling, this command seems to be working, for filling the raw files in Nyt1.if using conll files in Nyt1 and putting them in Nyt1.if
-#   python3 FillJson.py -d. -s Nyt1 -p if
-# However it clumsy when there are multiple versions around.  I would prefer this
-#   python3 -c Nyt1 -r Nyt1.if -f Nyt1.if
-# where
-#   -c location of conllu files
-#   -r location of raw files
-#   -f place to put filled files
-
 
 def __main__():
 
@@ -50,8 +39,8 @@ def __main__():
         if rewrite != 'yes' and skipFiles(pref, jsonDirPath, rewrite):
 
             print(f'Files with prefix {pref} have prior processing. File '
-                    f'{jsonDirPath}{pref}.json (from prior run) '
-                    f'was not replaced.')
+                  f'{jsonDirPath}{pref}.json (from prior run) '
+                  f'was not replaced.')
 
             continue
 
@@ -66,11 +55,11 @@ def __main__():
         # note that ordering of sentence ids in json file are reverse of conllu
         with open(jsonDirPath / f'{pref}.raw.json', 'r') as j:
 
-            try: 
-                
+            try:
+
                 hits = json.load(j)
 
-            except json.decoder.JSONDecodeError: 
+            except json.decoder.JSONDecodeError:
 
                 print('json file is empty. Skipping.')
 
@@ -142,19 +131,6 @@ def parseArgs():
 
     parser.add_argument('-o', '--output_dir', type=Path, default=None,
                         help='path to director to write filled output json files to. If not specified, the raw_dir path will be used (output/filled json files lose the \'.raw\' in the filename.)')
-
-    # parser.add_argument('-d', '--baseDir', type=Path,
-    #                     default=Path.cwd(),
-    #                     help='directory with subdirectories containing files '
-    #                          'to be processed. Default directory is current '
-    #                          'directory.')
-
-    # parser.add_argument('-s', '--sentences',
-    #                     help='prefix for sentence content to be processed, '
-    #                          'e.g. Nyt1')
-
-    # parser.add_argument('-p', '--pattern',
-    #                     help='single pattern set to process')
 
     parser.add_argument('-w', '--rewriteFiles',
                         choices=['yes', 'no', 'check'],
