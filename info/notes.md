@@ -11,6 +11,7 @@
 
 
 # start with:
+- [ ] figure out R ucs toolkit and get plots of initial dataset
 - [ ] determine how to format data to use with ucs
 - [ ] revise output for make-tables to have lines like `<context> \t <adv, adj>` for each instance
     - [ ] create new grew patterns to get right sets of json files: need positive context to be basic pattern with relevant trigger filtered out (use `without:` clause)
@@ -19,7 +20,7 @@
 - [x] read German NPI papers that use scp
     - manual verification of NPIs still required
     - exact specification of known downward entailing operators 
-    - use ucs to get t-score, log likelihood, chi-squared, poisson, and z-score
+    - use ucs to get **t-score, log likelihood, chi-squared, poisson, and z-score**
     - some ling processing, but only percentage of neg contexts occurred in is releveant for this project (i.e. no translation data)
 - [x] http://www.collocations.de/UCS/tron-one-minute-guide.html  try ucs tables
     - [x] get all pair-hits of ADV ADJ for pattern 

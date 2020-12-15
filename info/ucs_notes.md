@@ -1,6 +1,12 @@
 I had some issues with installation, but essentially followed this: 
 http://www.collocations.de/UCS/tron-one-minute-guide.html
 
+**Add the following lines to ~/.bashrc to keep UCS tools on your PATH:**
+```shell
+export UCS=`System/bin/ucs-config --base-dir`
+export PATH=$PATH:$UCS/bin
+```
+
 To use `ucs-make-tables` I wrote a quick script to print out all the pairs from a directory of filled json files and then pipe it into the UCS tool.
 
 The script is `script/print_adv_adj.py` and is as follows: 
@@ -144,3 +150,40 @@ r.t.score  r.log.likelihood     id                    l1  l2                    
 17                27   3506                pretty  good                  2281  19277  19810  751655
 18                34   4321                   too  small                 1953  62682   5224  751655
 ```
+
+# Adding all association measures: 
+
+command: 
+```
+andrea@Delilah:~/litotes$ ucs-add -v am.Poisson.Stirling am.Poisson.pv am.frequency am.z.score am.z.score.corr am.chi.squared am.chi.squared.corr am.Fisher.pv am.Dice am.Jaccard am.MI am.MI2 am.MI3 am.MS am.average.MI am.gmean am.local.MI am.random am.odds.ratio am.odds.ratio.disc am.relative.risk am.simple.ll am.t.score am.log.likelihood TO not-combined_thresh3.ds.gz INTO not-combined_thresh3_ALLscores.ds.gz
+```
+
+output: 
+```Variables: id, l1, l2, f, f1, f2, N
+Adding: am.Poisson.Stirling, am.Poisson.pv, am.frequency, am.z.score, am.z.score.corr, am.chi.squared, am.chi.squared.corr, am.Fisher.pv, am.Dice, am.Jaccard, am.MI, am.MI2, am.MI3, am.MS, am.average.MI, am.gmean, am.local.MI, am.random, am.odds.ratio, am.odds.ratio.disc, am.relative.risk, am.simple.ll, am.t.score, am.log.likelihood
+Processing complete (39016 rows).
+```
+
+
+# Association Measures
+To view list of association measures, use ``ucsdoc UCS::AM``
+
+
+# Running R utilities
+- prepare tutorial: ``ucs-tool prepare-tutorial``
+
+- start R: *Be sure to start R from UCS base directory to make sure everything works smoothly: This should be* ``...UCS/System/R$ R``
+
+
+- initialize ucs library: ``source("lib/ucs.R")``
+- list all modules: ``ucs.library()``
+- load specific module: ``ucs.library("plots")``
+- load all modules: ``ucs.library(all=TRUE)``
+- read in data set and name it: ``LI <- read.ds.gz("/home/andrea/litotes/not-combined_thresh3_scores.ds.gz")``
+
+- view dimensions of data set: ``dim(LI)``
+- view column names:  ``colnames(LI)``
+- view association measures (AM) included in data: ``ds.find.am(LI)``
+- add ranks for all included AM: ``LI <-add.ranks(LI)``
+- export to csv: ``write.csv(LI, file = "/home/andrea/litotes/not-combined_thresh3_ALLranks_Rexport.csv")``
+

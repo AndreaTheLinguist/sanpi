@@ -34,22 +34,21 @@ pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
-  BE.xpos = re"VB.";
   ADV < ADJ;
-  e1: ADJ -[advmod]-> ADV;
-  e2: ADJ -[cop]-> BE;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
   S  []; 
-  e3: ADJ -[nsubj]-> S;
+  sub: ADJ -[nsubj]-> S;
   S << BE
 }
 
 without {
   NEG [lemma = "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
-  e4: ADJ -[advmod]-> NEG;
+  e4: ADJ -[neg]-> NEG;
 }
 ```
 
-# be adv adj excluding only not adv (as collocate adv and also preceding)
+# be adv adj excluding only "not" adv (as collocate adv and also preceding)
 file name: be-adv-adj_without-not.pat
 ```
 pattern {
@@ -71,7 +70,7 @@ without {
 ```
 
 # be not adv adj
-be-adv-adj_with-not.pat
+filename: be-adv-adj_with-not.pat
 ```
 pattern {
   ADV [xpos=RB, lemma <> "not"];
