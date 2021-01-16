@@ -11,11 +11,22 @@
 
 
 # start with:
-- [ ] figure out R ucs toolkit and get plots of initial dataset
+- [ ] too many hits to just start annoating at random. Need to sort/filter in some way
+    - sort by total collocate frequency (f2) or by association measure ranks?
+    - should collocates only in one context be ignored?
+    - should I only do first x for any mod pair in each context? would that create incomplete values for ucs/R table?
+    - create new json files with hits for all of mod pair? <-- separate script to run on every json directory? and create index file to more easily and reliably pull up correct data for specfic mod pair?
+    
+- [ ] run some simplified searches with bare adjective predicates, rather than adverbially modified cases (too much data??)
+- [x] figure out R ucs toolkit and get plots of initial dataset
+- [ ] clean up workspace on kay (only relevant files/folders)
+- [ ] needs annotation data for plots: get annotations
+    - [ ] write script to add annotations to colloc tokens in json files
+    - [ ] run script on with-/without-not data from kay
 - [ ] determine how to format data to use with ucs
-- [ ] revise output for make-tables to have lines like `<context> \t <adv, adj>` for each instance
-    - [ ] create new grew patterns to get right sets of json files: need positive context to be basic pattern with relevant trigger filtered out (use `without:` clause)
-    - [ ] need to update printing script to concatonate json pairs (with and without relevant trigger)
+- [x] revise output for make-tables to have lines like `<context> \t <adv, adj>` for each instance
+    - [x] create new grew patterns to get right sets of json files: need positive context to be basic pattern with relevant trigger filtered out (use `without:` clause)
+    - [x] need to update printing script to concatonate json pairs (with and without relevant trigger)
 - [ ] settle on initial set of contexts/searches
 - [x] read German NPI papers that use scp
     - manual verification of NPIs still required
