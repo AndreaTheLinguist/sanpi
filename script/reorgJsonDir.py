@@ -12,14 +12,15 @@ def __main__():
 
     check_dir(json_dir)
 
-    # get list base file names (strings; use set to avoid duplicates)
-    file_ids = set([f.split('.')[0] for f in os.listdir(json_dir)])
+    # get list base file names (strings; use set to avoid duplicates/ignore 'raw')
+    file_ids = set([f.split('.')[0]
+                    for f in os.listdir(json_dir) if f.split('.')[-1] == 'json' and f.split('.')[0] != 'duplicates'])
 
     # new org will be dict of json obj/lists
     # where key = "[adv]_[adj]" and value = json obj/list (of numbered dicts?)
     reorg_data = {}
 
-    for i, file_id in enumerate(file_ids):
+    for file_id in file_ids:
 
         # load data (json object) from given file
         # json obj (i.e. list)
@@ -27,80 +28,92 @@ def __main__():
 
         if data:
 
-            reorg_data = reorg(file_id, data, reorg_data)
+            reorg_data = reorg(file_id, data, reorg_data, json_dir)
 
-        # name files like in ucs tables? adv_adj ?
-    #     output_file_name = file_id + '.json'
+    
 
-    #     with open(json_dir / 'by_type' / output_file_name, 'r') as output:
+    output_dir_path = json_dir / 'by_adverb'
+    os.system(
+        f'if [ ! -d {output_dir_path} ]; then mkdir {output_dir_path}; fi')
 
-    #         json.dump(data, output, indent=2)
+    print(f'data successfully reorganized by modification pairs.\nWriting files to adverb subdirectories in {output_dir_path}...')
 
-    #     print(
-    #         f'Annotations for {file_id} saved to {json_dir.name}/{output_file_name}')
-    #     print(f'File {i+1} of {len(files)} completed.')
+    x = 0
+    total_files = len(reorg_data)
+    print(f'{total_files} total files to be written...')
+    for type_label, tokens_list in reorg_data.items():
 
-    #     while i + 1 != len(files):
+        # type_label goes into new json filename
+        # tokens_dict becomes content of json file
 
-    #         pause = input('Take a break? y/n\n')
+        # sort by adverb (first half of label)
+        subdir_path = output_dir_path / type_label.split('_')[0]
+        os.system(f'if [ ! -d {subdir_path} ]; then mkdir {subdir_path}; fi')
 
-    #         if pause.lower() == 'y':
+        output_file_name = type_label + '.json'
+        with open(subdir_path / output_file_name, 'w') as output:
 
-    #             sys.exit(
-    #                 'Quitting program without finishing: Unannotated files remain in directory.')
+            json.dump(tokens_list, output, indent=2)
 
-    #         elif pause.lower() == 'n':
+        x += 1
+        if x in [round(total_files*y) for y in [0.25, 0.5, 0.75, .9]]:
 
-    #             print('Continuing to next file...')
-    #             break
+            print(
+                f'{x} ({round(x / total_files * 100)}%) completed...')
 
-    # print('Finished.')
+    print('finished.')
 
 
-def reorg(file_id, data, reorg_data):
+def reorg(file_id, data, reorg_data, json_dir):
 
+    duplicates = []
+    print(f'reorganizing hits in {file_id}.json')
     for i, hit in enumerate(data):
 
         sentence_id = hit['sent_id']
-        index_in_doc = sentence_id.split('_')[-1]
+        doc_id, index_in_doc = sentence_id.rsplit('_', 1)
         sentence_text = hit['text']
-        adv = hit['matching']['fillers']['ADV']
-        adj = hit['matching']['fillers']['ADJ']
+        adv = hit['matching']['fillers']['ADV'].split(
+            '\\')[0].strip('\'\"').replace('.', '')
+        adj = hit['matching']['fillers']['ADJ'].split(
+            '\\')[0].strip('\'\"').replace('.', '')
         key_name = f'{adv}_{adj}'
+        token_index = (int(hit['matching']['nodes']['ADV']),
+                       int(hit['matching']['nodes']['ADJ']))
 
-        hit_dict = {'file_id': file_id, 'sent_id': sentence_id,
-                    'sent_index': index_in_doc,
-                    'sent_text': sentence_text, 'adv': adv, 'adj': adj, 'key_name': key_name}
+        new_dict = {'orig_file': {'file_id': file_id, 'file_index': i - 1},
+                    'sent_id': sentence_id, 'doc_id': doc_id,
+                    'sent_index': index_in_doc, 'sent_text': sentence_text,
+                    'adv': adv, 'adj': adj, 'token_index': token_index, 'key_name': key_name}
 
         if key_name not in reorg_data.keys():
+
             reorg_data[key_name] = []
 
-        reorg_data[key_name].append(hit_dict)
+        elif sentence_id in [t['sent_id'] for t in reorg_data[key_name]]:
 
-        # print(f'{i} of {len(collocations)}')
+            if token_index in [t['token_index'] for t in reorg_data[key_name]]:
 
-        # while True:
+                print(
+                    f'Duplicate: {key_name} at {i-1} in sentence {sentence_id}')
 
-        #     decision = input(
-        #         f'\n\"{adv} {adj}\" : \"{sentence}\":\nlitotes? y/n\n')
+                duplicates.append({'mod_pair': key_name,
+                                   'orig_file': file_id,
+                                   'orig_index': i-1,
+                                   'sentence_id': sentence_id,
+                                   'sentence': sentence_text})
+                continue
 
-        #     if decision.lower() == 'y':
+        reorg_data[key_name].append(new_dict)
 
-        #         litotes = True
+    print(f'\n{len(duplicates)} duplicated hits found in {file_id}')
+    if len(duplicates) > 0:
+        with open(json_dir / 'duplicates.json', 'a') as d:
+            json.dump(duplicates, d, indent=2)
+        print(
+            f'Duplicates were excluded from reorganized data. Additional info saved to {json_dir}/duplicates.json\n')
 
-        #     elif decision.lower() == 'n':
-
-        #         litotes = False
-        #         break
-
-        # comment = input('Enter any comment code(s). If other, specify:\n'
-        #                 'r = neg-raising verb\n'
-        #                 't = unexpected trigger\n'
-        #                 's = not in scope\n'
-        #                 'o [...] = other\n')
-
-        # c['litotes'] = litotes
-        # c['comment'] = comment
+    return reorg_data
 
 
 def load_data(json_dir, file_id):
