@@ -15,23 +15,46 @@ def __main__():
 
     args = parseArgs()
 
+    # do table by default if no output type option specified.
+    if not (args.table or args.count):
+        args.table = True
+        print(
+            'Warning: No output type specified. Output will be table of hits, not counts.')
+
     json_dir = args.pattern
-    print(f'\nTabulating hit counts for json files in {json_dir.name}...\n')
+    print(
+        f'Collecting specified data for json files in {json_dir.name}...')
     if not json_dir.is_dir():
 
         sys.exit('Error: Specified json directory does not '
                  'exist.')
 
-    counter = fillCounter(json_dir, args)
+    colloc_counter = None
+    hit_data = None
 
-    print('\nFinished processing all json files.\nWriting output file...')
+    if args.count:
 
-    createOutput(counter, args)
+        colloc_counter = fillCounter(json_dir, args)
+
+        print('    Finished counting collocations in all json files.')
+
+    if args.table:
+
+        hit_data = getHitData(json_dir, args)
+
+        print('    Finished collecting sentence data in all json files.')
+
+    colloc_str = 'collocation counts' if colloc_counter else ''
+    hit_str = 'hits table' if hit_data else ''
+    conj = ' and ' if colloc_counter and hit_data else ''
+    print(f'Writing {colloc_str}{conj}{hit_str} to file.')
+
+    createOutput(colloc_counter, hit_data, args)
 
 
 def parseArgs():
     parser = argparse.ArgumentParser(
-        description='script to count hits for particular words filling particular nodes for a pattern run on corpus data.')
+        description='script to count hits for particular words filling particular nodes for a pattern run on corpus data. If no output option is specified, -t/--table will be used.')
 
     parser.add_argument('-p', '--pattern', type=Path, required=True,
                         help='path to directory containing filled json files for pattern.')
@@ -51,8 +74,14 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
 
+    parser.add_argument('-t', '--table', action='store_true',
+                        help='Option to create a table output with following fields: Adv, Adj, SentenceID, WordIndex, SentenceText')
+
+    parser.add_argument('-c', '--count', action='store_true',
+                        help='Option to create an output of counts with following fields (minimally): Adv, Adj, hit_counts')
+
     parser.add_argument('-e', '--extraInfo', action='store_true',
-                        help='Option to add ratio and totals to csv output file')
+                        help='Option to add ratio and totals to count output file. **This option will do nothing if --count/-c flag is not used.**')
 
     return parser.parse_args()
 
@@ -107,10 +136,8 @@ def countTokenPairs(countDict, jsonFile, args):
                 nodes = hit['matching']['fillers']
 
             except KeyError:
-                print(f'Warning: Node labels have not been filled from conllu '
-                      f'file for {jsonFile}. Proceeding to next file without '
-                      f'updating counts...')
-                return countDict
+                sys.exit(
+                    f'Node labels have not been filled from conllu file for {jsonFile}. Quitting script without generating output.')
 
             else:
 
@@ -134,42 +161,122 @@ def countTokenPairs(countDict, jsonFile, args):
     return countDict
 
 
-def createOutput(counts, args):
+def getHitData(json_dir, args):
+    # pull out sentence info and create dictionary of hit_id : namedTuple
+    fileCount = 0
+    hit_tuple = namedtuple(
+        'hit_tuple', ['adv', 'adj', 'sent_id', 'adv_index', 'sent_text'])
+    hits_dict = {}
 
-    try:
-        os.mkdir(Path.cwd() / 'freq')
-    except OSError:
-        pass
-    outputDir = Path.cwd() / 'freq'
+    for jsonFile in os.scandir(json_dir):
 
-    __, patkey = args.pattern.name.rsplit('.', 1)
+        if (jsonFile.name.endswith('raw.json')
+                or not jsonFile.name.endswith('json')):
+            continue
 
-    outputFilename = (f'{args.outputPrefix}_counts.txt' if args.minimal
-                      else f'{args.outputPrefix}_counts.csv')
+        fileCount += 1
 
-    fields = ([args.node1, args.node2, f'{patkey}_counts',
-               f'{patkey}_ratio'] if args.extraInfo
-              else [args.node1, args.node2, f'{patkey}_counts'])
+        if args.verbose:
+            print(f'\nProcessing {jsonFile.name}...')
 
-    rows = []
-    total_hits = len(counts)
+        with open(jsonFile, 'r') as j:
 
-    for colloc in counts.keys():
+            hits = json.load(j)
 
-        word1 = colloc[0]
-        word2 = colloc[1]
-        collcount = counts[colloc]
-        collratio = round(collcount/total_hits, 4)
+            for hit in hits:
+                try:
 
-        row = ([word1, word2, collcount, collratio]
-               if args.extraInfo
-               else [word1, word2, collcount])
+                    fillers = hit['matching']['fillers']
 
-        rows.append(row)
+                except KeyError:
+                    sys.exit(
+                        f'Node labels have not been filled from conllu file for {jsonFile}. Quitting script without generating output.')
+
+                node1_word = fillers[args.node1]
+                node2_word = fillers[args.node2]
+
+                sent_id = hit['sent_id']
+                sent_text = hit['text']
+                node1_index = hit['matching']['nodes'][args.node1]
+
+                hit_info = hit_tuple(node1_word, node2_word,
+                                     sent_id, node1_index, sent_text)
+
+                hit_id = ':'.join((sent_id, node1_index))
+
+                if hit_id in hits_dict.keys():
+                    print(
+                        f'Warning: hit {hit_id} already in hit_info dictionary. Overwriting previous info (for \"{hits_dict[hit_id].adv} {hits_dict[hit_id].adj}\"  in \"{hits_dict[hit_id].text}\") with info for \"{hit_info.adv} {hit_info.adj} in \"{hit_info.sent_text}\".')
+
+                hits_dict[hit_id] = hit_info
+
+    return hits_dict
+
+
+def createOutput(counts, hits, args):
+
+    txt = args.minimal
+
+    if counts:
+
+        rows = []
+
+        try:
+            os.mkdir(Path.cwd() / 'colloc_freq')
+        except OSError:
+            pass
+        outputDir = Path.cwd() / 'colloc_freq'
+
+        __, patkey = args.pattern.name.rsplit('.', 1)
+
+        outputFilename = (f'{args.outputPrefix}_counts.txt' if txt
+                          else f'{args.outputPrefix}_counts.csv')
+
+        fields = ([args.node1, args.node2, f'{patkey}_counts',
+                   f'{patkey}_ratio'] if args.extraInfo
+                  else [args.node1, args.node2, f'{patkey}_counts'])
+
+        for colloc in counts.keys():
+
+            word1 = colloc[0]
+            word2 = colloc[1]
+            collcount = counts[colloc]
+            collratio = round(collcount/len(counts), 4)
+
+            row = ([word1, word2, collcount, collratio]
+                   if args.extraInfo
+                   else [word1, word2, collcount])
+
+            rows.append(row)
+
+        write_file(outputDir, outputFilename, fields, rows, txt)
+
+    if hits:
+
+        try:
+            os.mkdir(Path.cwd() / 'hits')
+        except OSError:
+            pass
+        outputDir = Path.cwd() / 'hits'
+
+        outputFilename = (f'{args.outputPrefix}_hits.txt' if txt
+                          else f'{args.outputPrefix}_hits.csv')
+        # set fields
+        hits_keys = list(hits.keys())
+        fields = hits[hits_keys[0]]._fields
+
+        # fill rows
+        rows = list(hits.values())
+
+        # write rows to csv
+        write_file(outputDir, outputFilename, fields, rows, txt)
+
+
+def write_file(outputDir, outputFilename, fields, rows, txt):
 
     with open(outputDir / outputFilename, 'w') as out:
 
-        if args.minimal:
+        if txt:
 
             writer = csv.writer(out, delimiter='\t')
 
