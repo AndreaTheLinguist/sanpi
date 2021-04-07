@@ -1,10 +1,17 @@
+#!/usr/bin/env python3
+
 import argparse
-import conllu
 import os
 import sys
 import time
 from io import open
 from pprint import pprint
+
+try:
+    import conllu
+except:
+    print('conllu module required. installing...')
+    os.system("pip3 install conllu")
 
 
 def __main__():
@@ -72,8 +79,15 @@ def __main__():
                         all_sentences_dict.update(doc_dict)
 
                         # write novel doc to clean file
-                        output.writelines([s.serialize()
-                                           for s in doc_dict.values()])
+                        for s in doc_dict.values():
+
+                            try:
+                                output.write(s.serialize())
+                            except UnicodeDecodeError:
+                                stext = s.metadata['text']
+                                print(
+                                    f'Warning: Unicode decoding error. Skipping {stext}')
+
                         if args.verbose:
                             print(
                                 f'...Doc {prev_doc_id} successfully written to file.')
@@ -87,7 +101,7 @@ def __main__():
                         # reset doc dictionary
                         doc_dict = {}
 
-                sent_text = sent_obj.metadata['text']
+                sent_text = sent_obj.metadata['text'].encode()
 
                 # if novel, do nothing
                 if sent_text not in all_sentences_dict.keys():
