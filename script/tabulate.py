@@ -294,7 +294,7 @@ def write_file(outputDir, outputFilename, fields, rows, txt):
             except UnicodeEncodeError:
 
                 print(
-                    f"Row for {word1.encode(encoding='UTF-8')} {word2.encode(encoding='UTF-8')} could not be written due to encoding error. Excluded from frequency table.")
+                    f"Row for {row[0].encode(encoding='UTF-8')} {row[1].encode(encoding='UTF-8')} could not be written due to encoding error. Excluded from frequency table.")
 
         # writer.writerows(rows)
 

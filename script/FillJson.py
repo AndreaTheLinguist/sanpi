@@ -130,7 +130,7 @@ def parseArgs():
                         help='path to directory containing unprocessed/raw .json search result files to be processed of form \'<sentenceSetID>.raw.json\'. e.g. Nyt1.if')
 
     parser.add_argument('-o', '--output_dir', type=Path, default=None,
-                        help='path to director to write filled output json files to. If not specified, the raw_dir path will be used (output/filled json files lose the \'.raw\' in the filename.)')
+                        help='path to directory to write filled output json files to. If not specified, the raw_dir path will be used (output/filled json files lose the \'.raw\' in the filename.)')
 
     parser.add_argument('-w', '--rewriteFiles',
                         choices=['yes', 'no', 'check'],

@@ -7,8 +7,10 @@ import sys
 
 def simpleReadConllu(file):
 
+    # save generator object for iterating over conllu file
     conlluReader = pyconll.load.iter_from_file(file)
 
+    # define named tuples for documents and sentences
     doc_form = namedtuple('document', ['id', 'sentences'])
     sent_form = namedtuple('sentence', ['id', 'text', 'doc_id', 'line_number'])
 
