@@ -1,20 +1,15 @@
+#!/usr/bin/env python3
+
+import itertools
+import time
+
 from collections import namedtuple
 from pprint import pprint
-import itertools
+
+from wordbank import *
 
 
 def __main__():
-
-    subjects = ['she', 'he', 'it', 'that']
-
-    people_subjects = ['she', 'he']
-
-    # thing_subjects = ['that', 'it']
-
-    neg = [
-        ' not',
-        'n\'t'
-    ]
 
     scaleTup = namedtuple(
         'scaleTup', ['pos', 'sctype', 'end_1', 'end_2', 'maxim', 'minim'])
@@ -22,69 +17,36 @@ def __main__():
     nonGradTup = namedtuple(
         'nongradTup', ['pred', 'pos', 'sub', 'obj', 'past'])
 
-    rel_adj = [('happy', 'sad'),
-               ('short', 'tall'),
-               ('cheap', 'expensive'),
-               ('big', 'small'),
-               ('strong', 'weak'),
-               ('fast', 'slow'),
-               ('smart', 'dumb'),
-               ('brilliant', 'idiotic'),
-               ('interesting', 'boring'),
-               ('rich', 'poor'),
-               ('beautiful', 'ugly'),
-               ('old', 'young'),
-               ('kind', 'cruel'),
-               ('polite', 'rude')
-               ]
-
-    rel_noun = [('hero', 'villian')]
-
-    rel_verb = [('love', 'hate')]
-
+    # relative scales
     rel_adj_scales = [
         scaleTup('adj', 'rel', p[0], p[1],
-                 ['extremely', 'ridiculously'], ['slightly', 'sort of'])
+                 rel_adj_maxmod, rel_adj_minmod)
         for p in rel_adj]
 
     rel_noun_scales = [
         scaleTup('noun', 'rel', p[0], p[1],
-                 ['completely',  'necessarily'], ['sort of',  'somewhat of'])
+                 rel_noun_maxmod, rel_noun_minmod)
         for p in rel_noun]
 
     rel_verb_scales = [
         scaleTup('verb', 'rel', p[0], p[1],
-                 ['completely', 'extremely'], ['sort of', 'partially'])
+                 rel_verb_maxmod, rel_verb_minmod)
         for p in rel_verb]
 
-    # may be some complications with these because different scale points may have different modifier restrictions.
-    # these also will not be litotes in the unmodified cases
-    abs_adj = [('wet', 'dry'),
-               ('straight', 'bent'),
-               ('pure', 'diluted'),
-               ('honest', 'deceitful'),
-               ('open', 'closed')
-               ]
-
+    # absolute scales
     abs_adj_scales = [
         scaleTup('adj', 'abs', p[0], p[1],
-                 ['completely',  'entirely'], ['slightly',  'sort of'])
+                 abs_adj_maxmod, abs_adj_minmod)
         for p in abs_adj]
 
-    # these are simpler than absolute gradables in the sense that they never create litotes
-    non_adj = ['locked', 'unlocked',
-               'dead', 'alive',
-               'married', 'unmarried',
-               'organic', 'inorganic',
-               'known', 'unknown',
-               'present', 'absent']
-
     # 'pred', 'pos', 'sub', 'obj', 'past'
-    nongrad_tuples = [nonGradTup(p, 'adj', '', '', '') for p in non_adj]
+    nongrad_tuples = [nonGradTup(p, 'adj', '', '', '') for p in nongrad_adj]
 
-    nongrad_verbs1 = [nonGradTup(v, 'verb', 'the students', 'the exam', v+'ed') for v in ['pass', 'fail']]
+    nongrad_verbs1 = [nonGradTup(
+        v, 'verb', 'the students', 'the exam', v+'ed') for v in ['pass', 'fail']]
 
-    nongrad_verbs2 = [nonGradTup(v, 'verb', 'the judges', 'the application', v+'ed') for v in ['accept', 'reject']]
+    nongrad_verbs2 = [nonGradTup(
+        v, 'verb', 'the judges', 'the application', v+'ed') for v in ['accept', 'reject']]
 
     nongrad_tuples = nongrad_tuples + nongrad_verbs1 + nongrad_verbs2
 
@@ -173,7 +135,7 @@ def generate_quant_sent(neg, predTuples):
                     yield f'{some_did} {s}'
                     yield f'{none_did} {s}'
 
-                for sub in ['She', 'He']: 
+                for sub in ['She', 'He']:
 
                     # yield f'All of {pl_sub} did{n} {inf_verb} {s_obj}.'
                     # yield f'{pl_sub.capitalize()} did{n} all {inf_verb} {s_obj}.'
@@ -186,7 +148,6 @@ def generate_quant_sent(neg, predTuples):
                     yield f'{didnt_verb_all} {none_sent}'
                     yield f'{some_sent} {didnt_verb_all}'
                     yield f'{none_sent} {didnt_verb_all}'
-
 
 
 def generate_data(subjects, scales_list, neg_types):
@@ -238,7 +199,6 @@ def generate_sentence(scale, sub, neg):
                     n_sent = f'{sub} did{neg}{neg_mod} {order[0]} it.'
                     p_sent = f'{sub} {pos_mod} {order[1]}d it.'
 
-
                 yield f'{n_sent.capitalize()} {p_sent.capitalize()}'
                 yield f'{p_sent.capitalize()} {n_sent.capitalize()}'
 
@@ -264,7 +224,6 @@ def generate_sentence(scale, sub, neg):
 
                     n1_sent = f'{sub} did{neg}{neg_mod} {order[0]} it.'
                     n2_sent = f'{sub} did{neg}{neg_mod2} {order[0]} it.'
-
 
                 yield f'{n1_sent.capitalize()} {n2_sent.capitalize()}'
 
@@ -317,4 +276,7 @@ def generate_sentence(scale, sub, neg):
 
 if __name__ == '__main__':
 
+    absStart = time.perf_counter()
     __main__()
+    absFinish = time.perf_counter()
+    print(f'Total time: {round((absFinish - absStart)/60, 2)} minutes')
