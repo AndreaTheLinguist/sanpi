@@ -6,7 +6,7 @@ import time
 from collections import namedtuple
 from pprint import pprint
 
-from wordbank import *
+from wordbank import subjects, neg, modifiers, pred_specs
 
 
 def __main__():
