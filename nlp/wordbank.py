@@ -4,35 +4,42 @@ from collections import namedtuple
 
 people_subjects = [
     'she',
-    # 'he'
+    'he',
 ]
 
 thing_subjects = [
-    # 'that',
+    'that',
     'it'
 ]
 
-subjects = people_subjects + thing_subjects
+subjects = {"people": people_subjects, 'things': thing_subjects}
 
-neg = [
-    ' not',
-    # 'n\'t'
-]
+neg = tuple(n+'_n'
+            for n in (
+                ' not',
+                # 'n\'t'
+            ))
 
 modifiers = {
-    'closed_max': (
-        'completely', 'totally', 'absolutely', 'entirely'
-    ),
-    'open_max': (
-        'extremely', 'ridiculously', 'incredibly', 'unbelievably', 'amazingly', ''
-    ),
-    'closed_min': (
-        'slightly', 'partially'
-    ),
-    'open_min': (
-        'kind of', 'sort of', 'somewhat'
-    )
+    'closed_max': tuple(
+        m+'_m' for m in ('completely',
+                         'totally',
+                         'absolutely',
+                         'entirely')),
+    'open_max': tuple(
+        m+'_m' for m in ('extremely',
+                         'ridiculously',
+                         'incredibly',
+                         'terribly')),
+    'closed_min': tuple(
+        m+'_m' for m in ('slightly',
+                         'partially')),
+    'open_min': tuple(
+        m+'_m' for m in ('kinda',
+                         'sorta',
+                         'somewhat'))
 }
+
 person = 'person'
 thing = 'thing'
 either = 'either'
@@ -79,8 +86,6 @@ abs_adj = [
     ('certain', 'uncertain', either, True, False),
     ('safe', 'dangerous', either, True, False),
     ('accurate', 'inaccurate', either, True, False),
-
-    ('worried', 'unworried', person, False, True)
 
 ]
 
@@ -203,7 +208,7 @@ def set_adj_specs(word_info, sctype):
                 closed2 = w[4]
 
         word_list.append(
-            adj_tup(w[0], w[1], w[2], rel, vague, closed1, closed2))
+            adj_tup(w[0]+'_p', w[1]+'_p', w[2], rel, vague, closed1, closed2))
 
     return word_list
 
@@ -234,7 +239,7 @@ def set_verb_specs(word_info, sctype):
             closed2 = w.closed2
 
         word_list.append(
-            verb_tup(w.end1, w.end2, w.past1, w.past2,
+            verb_tup(w.end1+'_p', w.end2+'_p', w.past1+'_p', w.past2+'_p',
                      w.subj, w.obj, w.subject_type, w.object_type,
                      closed1, closed2, rel, vague))
 
@@ -267,49 +272,49 @@ def set_noun_specs(word_info, sctype):
             closed2 = n[5]
 
         word_list.append(
-            noun_tup(n[0], n[1], n[2], n[3], rel, vague, closed1, closed2))
+            noun_tup(n[0]+'_p', n[1]+'_p', n[2], n[3], rel, vague, closed1, closed2))
 
     return word_list
 
 
-rel_adj_maxmod = [
-    'extremely',
-    # 'ridiculously'
-]
-rel_noun_maxmod = [
-    'completely',
-    # 'necessarily'
-]
-rel_verb_maxmod = [
-    # 'completely',
-    'extremely'
-]
+# rel_adj_maxmod = [
+#     'extremely',
+#     # 'ridiculously'
+# ]
+# rel_noun_maxmod = [
+#     'completely',
+#     # 'necessarily'
+# ]
+# rel_verb_maxmod = [
+#     # 'completely',
+#     'extremely'
+# ]
 
-rel_adj_minmod = [
-    'slightly',
-    # 'sort of'
-]
+# rel_adj_minmod = [
+#     'slightly',
+#     # 'sort of'
+# ]
 
-rel_noun_minmod = [
-    # 'slightly',
-    'sort of'
-]
+# rel_noun_minmod = [
+#     # 'slightly',
+#     'sort of'
+# ]
 
-rel_verb_minmod = [
-    # 'sort of',
-    'kinda'
-]
+# rel_verb_minmod = [
+#     # 'sort of',
+#     'kinda'
+# ]
 
 
-abs_adj_maxmod = [
-    # 'completely',
-    'entirely'
-]
+# abs_adj_maxmod = [
+#     # 'completely',
+#     'entirely'
+# ]
 
-abs_adj_minmod = [
-    # 'slightly',
-    'sort of'
-]
+# abs_adj_minmod = [
+#     # 'slightly',
+#     'sort of'
+# ]
 
 
 nongrad_verbs = []
