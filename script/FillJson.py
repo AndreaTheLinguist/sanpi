@@ -62,6 +62,14 @@ def __main__():
             except json.decoder.JSONDecodeError:
 
                 print('json file is empty. Skipping.')
+                continue
+
+            else:
+
+                if len(j.readlines()) == 1:
+
+                    print(f'\tNo hits in {pref} file. Skipping.')
+                    continue
 
         hitIds = [h['sent_id'] for h in hits]
 
