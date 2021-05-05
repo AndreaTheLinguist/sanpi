@@ -16,7 +16,7 @@ fi
 # jsondir = "$3"
 # outputprefix = "$4"
 
-echo "directory of connll files... $1"
+echo "directory of conllu files... $1"
 echo "path to pattern file... $2"
 echo "directory of grew corpus hits in json format... $3"
 echo "string to prefix to final freq/<>_counts.csv table... $4"
@@ -30,5 +30,5 @@ then
     [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
 fi
 
-python3 ./script/grewSearchDir.py $1 $2 $3 && python3 ./script/FillJson.py -c $1 -r $3 && python3 script/tabulate.py -p $3 -o $4
+python3 ./script/grewSearchDir.py $1 $2 $3 && python3 ./script/FillJson.py -c $1 -r $3 && python3 script/tabulate.py -t -p $3 -o $4
 
