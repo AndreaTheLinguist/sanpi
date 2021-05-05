@@ -7,51 +7,14 @@ from collections import namedtuple
 from itertools import chain, product
 from pprint import pprint
 
-from wordbank import subjects, neg, modifiers, pred_specs
+from wordbank import modifiers, neg, pred_specs, subjects
+
+pred_template = namedtuple(
+    'pred_forms', ['neg_name', 'pos_min_phrases', 'neg_max_phrases',
+                   'pos_phrases', 'neg_phrases'])
 
 
 def __main__():
-
-    # scaleTup = namedtuple(
-    #     'scaleTup', ['pos', 'sctype', 'end_1', 'end_2', 'maxim', 'minim'])
-
-    # nonGradTup = namedtuple(
-    #     'nongradTup', ['pred', 'pos', 'sub', 'obj', 'past'])
-
-    # # relative scales
-    # rel_adj_scales = [
-    #     scaleTup('adj', 'rel', p[0], p[1],
-    #              rel_adj_maxmod, rel_adj_minmod)
-    #     for p in rel_adj]
-
-    # rel_noun_scales = [
-    #     scaleTup('noun', 'rel', p[0], p[1],
-    #              rel_noun_maxmod, rel_noun_minmod)
-    #     for p in rel_noun]
-
-    # rel_verb_scales = [
-    #     scaleTup('verb', 'rel', p[0], p[1],
-    #              rel_verb_maxmod, rel_verb_minmod)
-    #     for p in rel_verb]
-
-    # # absolute scales
-    # abs_adj_scales = [
-    #     scaleTup('adj', 'abs', p[0], p[1],
-    #              abs_adj_maxmod, abs_adj_minmod)
-    #     for p in abs_adj]
-
-    # # 'pred', 'pos', 'sub', 'obj', 'past'
-    # nongrad_tuples = [nonGradTup(p, 'adj', '', '', '') for p in nongrad_adj]
-
-    # nongrad_verbs1 = [nonGradTup(
-    #     v, 'verb', 'the students', 'the exam', v+'ed') for v in ['pass', 'fail']]
-
-    # nongrad_verbs2 = [nonGradTup(
-    #     v, 'verb', 'the judges', 'the application', v+'ed') for v in ['accept', 'reject']]
-
-    # nongrad_tuples = nongrad_tuples + nongrad_verbs1 + nongrad_verbs2
-
-    # adj_scale_list = rel_adj_scales + abs_adj_scales
 
     nongrad_dict = dict(
         filter(lambda item: '_non' in item[0], pred_specs.items()))
@@ -61,260 +24,173 @@ def __main__():
 
     adj_dict = dict(filter(lambda item: 'adj' in item[0], grad_dict.items()))
 
-    pred_data_gen = generate_pred_data(subjects,
-                                       adj_dict,  # grad_dict,
-                                       modifiers, neg)
+    pred_data_gen = generate_pred_data(
+        adj_dict
+        # grad_dict,
+    )
 
-    # quant_data_gen = generate_quant(neg, nongrad_dict)
+    quant_data_gen = generate_quant(nongrad_dict)
 
     # data_generator = chain(pred_data_gen, quant_data_gen)
 
     with open('/home/andrea/litotes/nlp/generated.csv', 'w') as out:
 
-        out.write('sentences, pos, scale_type\n')
+        out.write('sentences,pos, scale_type\n')
 
         for d in pred_data_gen:
+            # for d in quant_data_gen:
             # for d in data_generator:
-            out.write(f'{d[0]}, {d[1]}, {d[2]}\n')
+            out.write(f'{d[0]},{d[1]},{d[2]}\n')
 
         print(d)
 
 
-def generate_quant(neg, nongrad_tuples):
+def generate_quant(nongrad_dict):
 
-    for sent in generate_quant_sent(neg, nongrad_tuples):
+    for sent in generate_quant_data(nongrad_dict):
 
         yield (sent, 'det', 'quant')
 
 
-def generate_quant_sent(neg, predTuples):
+def generate_quant_data(specs_dict):
 
-    for predTup in predTuples:
+    for category in specs_dict.keys():
 
-        if predTup.pos == 'adj':
+        pos, __ = category.split('_')
 
-            nongrad_adj = predTup.pred
-            some_sent = f'Some were {nongrad_adj}.'
-            none_sent = f'None were {nongrad_adj}.'
+        if pos == 'adj':
 
-            # yield f'Not all of {pl_sub} were {nongrad_adj}.'
-            yield f'Not all of them were {nongrad_adj}. {some_sent}'
-            yield f'Not all of them were {nongrad_adj}. {none_sent}'
+            for pred_info in specs_dict[category]:
 
-            for n in neg:
-                # yield f'All of {pl_sub} were{n} {nongrad_adj}.'
-                # yield f'{pl_sub.capitalize()} were{n} all {nongrad_adj}.'
-                yield f'All of them were{n} {nongrad_adj}. {some_sent}'
-                yield f'They were{n} all {nongrad_adj}. {some_sent}'
+                yield from generate_quant_adj(pred_info)
 
-                yield f'All of them were{n} {nongrad_adj}. {none_sent}'
-                yield f'They were{n} all {nongrad_adj}. {none_sent}'
+        # elif predTup.pos == 'verb':
 
-        elif predTup.pos == 'verb':
+        #     s_obj = predTup.obj
+        #     pl_obj = s_obj+'s'
 
-            s_obj = predTup.obj
-            pl_obj = s_obj+'s'
+        #     inf_verb = predTup.pred
+        #     past_verb = predTup.past
 
-            inf_verb = predTup.pred
-            past_verb = predTup.past
+        #     some_did = f'Some of them  {past_verb} {s_obj}.'
+        #     none_did = f'None of them  {past_verb} {s_obj}.'
 
-            some_did = f'Some of them  {past_verb} {s_obj}.'
-            none_did = f'None of them  {past_verb} {s_obj}.'
+        #     # yield f'Not all of {pl_sub} {past_verb} {s_obj}.'
+        #     not_all = f'Not all of them {past_verb} {s_obj}.'
+        #     yield f'{not_all} {some_did}'
+        #     yield f'{not_all} {none_did}'
+        #     yield f'{some_did} {not_all}'
+        #     yield f'{none_did} {not_all}'
 
-            # yield f'Not all of {pl_sub} {past_verb} {s_obj}.'
-            not_all = f'Not all of them {past_verb} {s_obj}.'
-            yield f'{not_all} {some_did}'
-            yield f'{not_all} {none_did}'
-            yield f'{some_did} {not_all}'
-            yield f'{none_did} {not_all}'
+        #     for n in neg:
 
-            for n in neg:
+        #         all_didnt = f'All of them did{n} {inf_verb} {s_obj}.'
+        #         didnt_all = f'They did{n} all {inf_verb} {s_obj}.'
 
-                all_didnt = f'All of them did{n} {inf_verb} {s_obj}.'
-                didnt_all = f'They did{n} all {inf_verb} {s_obj}.'
+        #         for s in [all_didnt, didnt_all]:
 
-                for s in [all_didnt, didnt_all]:
+        #             yield f'{s} {some_did}'
+        #             yield f'{s} {none_did}'
+        #             yield f'{some_did} {s}'
+        #             yield f'{none_did} {s}'
 
-                    yield f'{s} {some_did}'
-                    yield f'{s} {none_did}'
-                    yield f'{some_did} {s}'
-                    yield f'{none_did} {s}'
+        #         for sub in ['She', 'He']:
 
-                for sub in ['She', 'He']:
+        #             # yield f'All of {pl_sub} did{n} {inf_verb} {s_obj}.'
+        #             # yield f'{pl_sub.capitalize()} did{n} all {inf_verb} {s_obj}.'
+        #             # yield f'{s_sub.capitalize()} did{n} {inf_verb} all of {pl_obj}.'
+        #             some_sent = f'{sub} {past_verb} some of {pl_obj}.'
+        #             none_sent = f'{sub} {past_verb} none of {pl_obj}.'
+        #             didnt_verb_all = f'{sub} did{n} {inf_verb} all of {pl_obj}.'
 
-                    # yield f'All of {pl_sub} did{n} {inf_verb} {s_obj}.'
-                    # yield f'{pl_sub.capitalize()} did{n} all {inf_verb} {s_obj}.'
-                    # yield f'{s_sub.capitalize()} did{n} {inf_verb} all of {pl_obj}.'
-                    some_sent = f'{sub} {past_verb} some of {pl_obj}.'
-                    none_sent = f'{sub} {past_verb} none of {pl_obj}.'
-                    didnt_verb_all = f'{sub} did{n} {inf_verb} all of {pl_obj}.'
-
-                    yield f'{didnt_verb_all} {some_sent}'
-                    yield f'{didnt_verb_all} {none_sent}'
-                    yield f'{some_sent} {didnt_verb_all}'
-                    yield f'{none_sent} {didnt_verb_all}'
+        #             yield f'{didnt_verb_all} {some_sent}'
+        #             yield f'{didnt_verb_all} {none_sent}'
+        #             yield f'{some_sent} {didnt_verb_all}'
+        #             yield f'{none_sent} {didnt_verb_all}'
 
 
-def generate_pred_data(subjects, specs_dict, modifiers, neg_forms):
+def generate_quant_adj(pred_info):
+
+    adj_a = pred_info.end1
+    adj_b = pred_info.end2
+    adj_pair = (adj_a, adj_b)
+
+    pos_exist_sents = [f'some of them were {adj}'
+                       for adj in adj_pair]
+
+    neg_exist_sents = [f'none of them were {adj}'
+                       for adj in adj_pair]
+
+    exist_sents = pos_exist_sents + neg_exist_sents
+
+    not_all_sents = [f'not all of them were {adj}'
+                     for adj in adj_pair]
+
+    # note: product() requires iterables, even for singletons
+    all_not_parts = product(('all of them were',), neg, adj_pair)
+    all_not_sents = [' '.join(parts) for parts in all_not_parts]
+
+    were_n_all_parts = product(('they were',), neg, ('all',), adj_pair)
+    were_n_all_sents = [' '.join(parts) for parts in were_n_all_parts]
+
+    neg_univ_sents = not_all_sents + all_not_sents + were_n_all_sents
+
+    for sent_pair in sent_pairs_gen(neg_univ_sents, exist_sents, flip=False):
+
+        # print(sent_pair)
+        yield sent_pair
+
+
+def generate_pred_data(specs_dict):
 
     for category in specs_dict.keys():
 
         pos, sctype = category.split('_')
 
+        specs = specs_dict[category]
+
         if pos == 'adj':
 
             sent_gen = generate_adj_sentences(
-                specs_dict[category], subjects, modifiers, neg_forms)
+                specs)
 
         elif pos == 'verb':
 
             sent_gen = generate_verb_sentences(
-                specs_dict[category], subjects, modifiers, neg_forms)
+                specs)
 
         elif pos == 'noun':
 
-            sent_gen = generate_verb_sentences(
-                specs_dict[category], subjects, modifiers, neg_forms)
+            sent_gen = generate_noun_sentences(
+                specs)
 
         for sent in sent_gen:
 
             yield (sent, pos, sctype)
 
 
-def generate_sentence(scale, sub, neg):
-
-    min_mods = [f' {w}' for w in scale.minim]
-    max_mods = [f' {w}' for w in scale.maxim]
-    no_mod = ['']
-
-    for order in [(scale.end_1, scale.end_2),
-                  (scale.end_2, scale.end_1)
-                  ]:
-
-        for neg_mod in max_mods + no_mod:
-
-            for pos_mod in min_mods + max_mods + no_mod:
-
-                # neg - pos, pos - neg
-                # John wasn't (extremely) happy. John was (slightly, extremely) sad
-                if scale.pos == 'adj':
-
-                    n_sent = f'{sub} was{neg}{neg_mod} {order[0]}.'
-                    p_sent = f'{sub} was{pos_mod} {order[1]}.'
-
-                # taking adv-DP approach, rather than det-AdjP
-                # John wasn't (totally) a villain. John was (somewhat of) a hero.
-                # NOT: wasn't a total villain, etc.
-                elif scale.pos == 'noun':
-
-                    n_sent = f'{sub} was{neg}{neg_mod} a {order[0]}.'
-                    p_sent = f'{sub} was{pos_mod} a {order[1]}'
-
-                # John didn't (completely) love it. John (kind of) hated it.
-                # todo: will need to include past tense conjugation info
-                elif scale.pos == 'verb':
-
-                    n_sent = f'{sub} did{neg}{neg_mod} {order[0]} it.'
-                    p_sent = f'{sub} {pos_mod} {order[1]}d it.'
-
-                yield f'{n_sent.capitalize()} {p_sent.capitalize()}'
-                yield f'{p_sent.capitalize()} {n_sent.capitalize()}'
-
-            # neg - neg
-            for neg_mod2 in max_mods + no_mod:
-
-                # e.g. John wasn't (extremely) happy. John wasn't (extremely) sad.
-                if scale.pos == 'adj':
-
-                    n1_sent = f'{sub} was{neg}{neg_mod} {order[0]}.'
-                    n2_sent = f'{sub} was{neg}{neg_mod2} {order[1]}.'
-
-                # e.g. John wasn't a (complete) hero. John wasn't a (complete) villian.
-                # or??
-                # John wasn't totally a hero. John wasn't totally a villian.
-                elif scale.pos == 'noun':
-
-                    n1_sent = f'{sub} was{neg}{neg_mod} a {order[0]}.'
-                    n2_sent = f'{sub} was{neg}{neg_mod2} a {order[1]}.'
-
-                # John didn't (completely) love it. John didn't (completely) hate it.
-                elif scale.pos == 'verb':
-
-                    n1_sent = f'{sub} did{neg}{neg_mod} {order[0]} it.'
-                    n2_sent = f'{sub} did{neg}{neg_mod2} {order[0]} it.'
-
-                yield f'{n1_sent.capitalize()} {n2_sent.capitalize()}'
-
-        # intense clafification
-        for max_mod in max_mods:
-
-            for min_mod in min_mods:
-
-                # John wasn't extremely happy. John was slightly happy.
-                if scale.pos == 'adj':
-
-                    neg_max_sent = f'{sub} was{neg}{max_mod} {order[0]}.'
-                    pos_min_sent = f'{sub} was{min_mod} {order[0]}.'
-
-                    pos_precise_span = f'{sub} was{min_mod} {order[0]}.'
-                    neg_maxbase = f'{sub} was{neg}{max_mod} {order[0]}'
-                    neg_contrary = f'{sub} was{neg} {order[1]}'
-
-                # John wasn't completely a hero. John was sort of a hero.
-                elif scale.pos == 'noun':
-
-                    neg_max_sent = f'{sub} was{neg}{max_mod} a {order[0]}.'
-                    pos_min_sent = f'{sub} was{min_mod} a {order[0]}.'
-
-                    pos_precise_span = f'{sub} was{min_mod} a {order[0]}.'
-                    neg_maxbase = f'{sub} was{neg}{max_mod} a {order[0]}'
-                    neg_contrary = f'{sub} was{neg} a {order[1]}'
-
-                # John didn't totlly love it. John sort of loved it.
-                elif scale.pos == 'verb':
-
-                    neg_max_sent = f'{sub} did{neg}{max_mod} {order[0]} it.'
-                    pos_min_sent = f'{sub} {min_mod} {order[0]}d it.'
-
-                    pos_precise_span = f'{sub} {min_mod} {order[0]} it.'
-                    neg_maxbase = f'{sub} did{neg}{max_mod} {order[0]} it.'
-                    neg_contrary = f'{sub} did{neg} {order[1]} it.'
-
-                yield f'{neg_max_sent.capitalize()} {pos_min_sent.capitalize()}'
-                yield f'{pos_min_sent.capitalize()} {neg_max_sent.capitalize()}'
-
-                neg_conj_1 = f'{neg_maxbase} but {neg_contrary} either.'
-                neg_conj_2 = f'{neg_contrary} but {neg_maxbase} either.'
-
-                yield f'{pos_precise_span.capitalize()} {neg_conj_1.capitalize()}'
-                yield f'{pos_precise_span.capitalize()} {neg_conj_2.capitalize()}'
-                yield f'{neg_conj_1.capitalize()} {pos_precise_span.capitalize()}'
-                yield f'{neg_conj_2.capitalize()} {pos_precise_span.capitalize()}'
-
-
-def generate_adj_sentences(specs, pro_dict, modifiers, neg):
+def generate_adj_sentences(specs):
 
     for scale in specs:
 
         end1 = scale.end1
         end2 = scale.end2
 
-        pos_contexts = [f'{p} was'
-                        for p in get_pronouns(scale.subj_type, pro_dict)]
-
-        neg_contexts = [''.join(c) for c in product(pos_contexts, neg)]
-
         # get_mod() returns relevant modifiers for scale type
-        minim1, minim2, maxim1, maxim2 = get_mod(scale, modifiers)
+        minim1, minim2, maxim1, maxim2 = get_mod(scale)
 
-        min_pred1 = [' '.join((adv, end1)) for adv in minim1]
-        max_pred1 = [' '.join((adv, end1)) for adv in maxim1]
+        # just use adv for adjectives
+        min_pred1 = [' '.join((m.adv, end1)) for m in minim1]
+        max_pred1 = [' '.join((m.adv, end1)) for m in maxim1]
 
-        min_pred2 = [' '.join((adv, end2)) for adv in minim2]
-        max_pred2 = [' '.join((adv, end2)) for adv in maxim2]
+        min_pred2 = [' '.join((m.adv, end2)) for m in minim2]
+        max_pred2 = [' '.join((m.adv, end2)) for m in maxim2]
 
-        pred_template = namedtuple(
-            'pred_forms', ['name', 'min_phrases', 'max_phrases', 'pos_phrases', 'neg_phrases'])
+        for sub in get_pronouns(scale.subj_type):
+
+            pos_context = f'{sub} was'
+
+            neg_contexts = [f'{pos_context} {n}' for n in neg]
 
         # in order to do both scale directions
         for x in range(2):
@@ -322,168 +198,433 @@ def generate_adj_sentences(specs, pro_dict, modifiers, neg):
             if x == 0:
 
                 A = pred_template([end1], min_pred1, max_pred1,
-                                  min_pred1 + max_pred1,
+                                  min_pred1 + max_pred1 + [end1],
                                   max_pred1 + [end1])
 
                 B = pred_template([end2], min_pred2, max_pred2,
-                                  min_pred2 + max_pred2,
+                                  min_pred2 + max_pred2 + [end2],
                                   max_pred2 + [end2])
 
             else:
 
                 # switch assignment
                 B = pred_template([end1], min_pred1, max_pred1,
-                                  min_pred1 + max_pred1,
+                                  min_pred1 + max_pred1 + [end1],
                                   max_pred1 + [end1])
 
                 A = pred_template([end2], min_pred2, max_pred2,
-                                  min_pred2 + max_pred2,
+                                  min_pred2 + max_pred2 + [end2],
                                   max_pred2 + [end2])
 
-            # neg - pos, pos - neg
-            # John wasn't (extremely) happy. John was (slightly, extremely) sad
-            n_sents = [' '.join(pairing)
-                       for pairing in product(neg_contexts, A.neg_phrases)]
-
-            p_sents = [' '.join(pairing)
-                       for pairing in product(pos_contexts, B.pos_phrases)]
-
-            for sent_pair in sent_pairs_gen(n_sents, p_sents):
-
-                yield sent_pair
-
-            # was:
-            # n_sent = f'{sub} was{neg}{neg_mod} {order[0]}.'
-            # p_sent = f'{sub} was{pos_mod} {order[1]}.'
-            #
-            # yield f'{n_sent.capitalize()} {p_sent.capitalize()}'
-            # yield f'{p_sent.capitalize()} {n_sent.capitalize()}'
-
-            # neg - neg
-            # John wasn't (extremely) happy. John wasn't (extremely) sad.
-            n1_sents = [' '.join(pairing)
-                        for pairing in product(neg_contexts, A.neg_phrases)]
-
-            n2_sents = [' '.join(pairing)
-                        for pairing in product(neg_contexts, B.neg_phrases)]
-
-            for sent_pair in sent_pairs_gen(n1_sents, n2_sents, flip=False):
-
-                yield sent_pair
-
-            # was:
-            # n1_sent = f'{sub} was{neg}{neg_mod} {order[0]}.'
-            # n2_sent = f'{sub} was{neg}{neg_mod2} {order[1]}.'
-
-            # not-max base, mitigated base
-            # John wasn't extremely happy. John was slightly happy.
-            neg_max_sents = [
-                ' '.join(pairing)
-                for pairing in product(neg_contexts, A.max_phrases)]
-
-            pos_min_sents = [
-                ' '.join(pairing)
-                for pairing in product(pos_contexts, A.min_phrases)]
-
-            for sent_pair in sent_pairs_gen(neg_max_sents, pos_min_sents):
-
-                yield sent_pair
-
-            # was:
-            # neg_max_sent = f'{sub} was{neg}{max_mod} {order[0]}.'
-            # pos_min_sent = f'{sub} was{min_mod} {order[0]}.'
-
-            # precise span conjunctions
-            # She was slightly happy.
-            # She wasn't extremely happy, but she wasn't sad either.
-            pos_precise_spans = [
-                ' '.join(pairing)
-                for pairing in product(pos_contexts, A.min_phrases)]
-
-            neg_maxbases = [
-                ' '.join(pairing)
-                for pairing in product(neg_contexts, A.max_phrases)]
-
-            neg_contraries = [' '.join(pairing)
-                              for pairing in product(neg_contexts, B.name)]
-
-            max_cont_neithers = [
-                ' but '.join(pairing) + ' either'
-                for pairing in product(neg_maxbases, neg_contraries)]
-
-            cont_max_neithers = [
-                ' but '.join(pairing) + ' either'
-                for pairing in product(neg_contraries, neg_maxbases)]
-
-            for sent_pair in sent_pairs_gen(
-                    pos_precise_spans,
-                    max_cont_neithers + cont_max_neithers):
-
-                yield sent_pair
-
-            # was:
-            # pos_precise_span = f'{sub} was{min_mod} {order[0]}.'
-            # neg_maxbase = f'{sub} was{neg}{max_mod} {order[0]}'
-            # neg_contrary = f'{sub} was{neg} {order[1]}'
-
-            # neg_conj_1 = f'{neg_maxbase} but {neg_contrary} either.'
-            # neg_conj_2 = f'{neg_contrary} but {neg_maxbase} either.'
-
-        # yield f'{n1_sent.capitalize()} {n2_sent.capitalize()}'
-
-        # yield f'{neg_max_sent.capitalize()} {pos_min_sent.capitalize()}'
-        # yield f'{pos_min_sent.capitalize()} {neg_max_sent.capitalize()}'
-
-        # yield f'{pos_precise_span.capitalize()} {neg_conj_1.capitalize()}'
-        # yield f'{pos_precise_span.capitalize()} {neg_conj_2.capitalize()}'
-
-        # yield f'{neg_conj_1.capitalize()} {pos_precise_span.capitalize()}'
-        # yield f'{neg_conj_2.capitalize()} {pos_precise_span.capitalize()}'
+            yield from gen_basic(A, B, neg_contexts, pos_context)
+            yield from gen_2negated(A, B, neg_contexts)
+            yield from gen_mitigated_contrary(A, neg_contexts, pos_context)
+            yield from gen_precise_spans(A, B, neg_contexts, pos_context)
 
 
-def get_pronouns(s_type, subjects):
+def generate_verb_sentences(specs):
 
-    if s_type == 'person':
+    # generate sentences like:
+    # She loved it. She didn't love it.
+    # She absolutely loved it. She did not absolutely love it.
 
-        s_pronouns = subjects['people']
+    for scale in specs:
 
-    elif s_type == 'thing':
+        verb_tense = namedtuple('verb_forms', ['past', 'inf'])
+        verb_a = verb_tense(scale.past1, scale.end1)
+        verb_b = verb_tense(scale.past2, scale.end2)
 
-        s_pronouns = subjects['things']
+        subs = get_pronouns(scale.subj_type)
+        if scale.subject:
+            subs.append(scale.subject)
 
-    elif s_type == 'either':
+        objs = get_pronouns(scale.obj_type)
+        if scale.object:
+            objs.append(scale.object)
 
-        s_pronouns = subjects['people'] + subjects['things']
+        min_a, min_b, max_a, max_b = get_mod(scale)
 
-    return s_pronouns
+        # pull out just the adv for verbs
+        min_a = [m.adv for m in min_a]
+        min_b = [m.adv for m in min_b]
+        max_a = [m.adv for m in max_a]
+        max_b = [m.adv for m in max_b]
+
+        # loved it
+        bare_pos_a = [f'{verb_a.past} {o}' for o in objs]
+        bare_pos_b = [f'{verb_b.past} {o}' for o in objs]
+
+        # love it
+        bare_neg_a = [f'{verb_a.inf} {o}' for o in objs]
+        bare_neg_b = [f'{verb_b.inf} {o}' for o in objs]
+
+        # absolutely loved it
+        pos_min_a = [' '.join(p)
+                     for p in product(min_a, bare_pos_a)]
+        pos_max_a = [' '.join(p)
+                     for p in product(max_a, bare_pos_a)]
+
+        pos_min_b = [' '.join(p)
+                     for p in product(min_b, bare_pos_b)]
+        pos_max_b = [' '.join(p)
+                     for p in product(max_b, bare_pos_b)]
+
+        # absolutely love it
+        # note: negated minimizers are ungrammatical = no neg_min_a/b
+        neg_max_a = [' '.join(p)
+                     for p in product(max_a, bare_neg_a)]
+
+        neg_max_b = [' '.join(p)
+                     for p in product(max_b, bare_neg_b)]
+
+        for s in subs:
+
+            pos_contexts = s
+            # "she did n't", "she did not"
+            neg_contexts = [f'{s} did {n}' for n in neg]
+
+            # in order to do both scale directions
+            for x in range(2):
+
+                if x == 0:
+
+                    A = pred_template(bare_neg_a,
+                                      pos_min_a, neg_max_a,
+                                      bare_pos_a + pos_min_a + pos_max_a,
+                                      bare_neg_a + neg_max_a)
+
+                    B = pred_template(bare_neg_b,
+                                      pos_min_b, neg_max_b,
+                                      bare_pos_b + pos_min_b + pos_max_b,
+                                      bare_neg_b + neg_max_b)
+
+                else:
+
+                    # switch assignment
+                    B = pred_template(bare_neg_a,
+                                      pos_min_a, neg_max_a,
+                                      bare_pos_a + pos_min_a + pos_max_a,
+                                      bare_neg_a + neg_max_a)
+
+                    A = pred_template(bare_neg_b,
+                                      pos_min_b, neg_max_b,
+                                      bare_pos_b + pos_min_b + pos_max_b,
+                                      bare_neg_b + neg_max_b)
+
+        yield from gen_basic(A, B, neg_contexts, pos_contexts)
+        yield from gen_2negated(A, B, neg_contexts)
+        yield from gen_mitigated_contrary(A, neg_contexts, pos_contexts)
+        yield from gen_precise_spans(A, B, neg_contexts, pos_contexts)
 
 
-def get_mod(scale, modifiers):
+def generate_noun_sentences(specs):
 
-    minim1 = minim2 = modifiers['open_min']
-    maxim1 = maxim2 = modifiers['open_max']
+    for scale in specs:
 
-    if scale.closed1:
+        bases, min_phrases, max_phrases = get_noun_phrases(scale)
 
-        minim1 += modifiers['closed_min']
-        maxim1 += modifiers['closed_max']
+        sub_list = get_pronouns(scale.subj_type)
+        for s in sub_list:
 
-    if scale.closed2:
+            pos_context = f'{s} was'
+            neg_contexts = [f'{pos_context} {n}' for n in neg]
 
-        minim2 += modifiers['closed_min']
-        maxim2 += modifiers['closed_max']
+            for cycle in range(2):
+
+                if cycle == 0:
+
+                    A = pred_template(
+                        [bases[0]],
+                        min_phrases[0], max_phrases[0],
+                        min_phrases[0] + max_phrases[0] + [bases[0]],
+                        max_phrases[0] + [bases[0]]
+                    )
+
+                    B = pred_template(
+                        [bases[1]],
+                        min_phrases[1], max_phrases[1],
+                        min_phrases[1] + max_phrases[1] + [bases[1]],
+                        max_phrases[1] + [bases[1]]
+                    )
+
+                else:
+
+                    # switch assignment
+                    B = pred_template(
+                        [bases[0]],
+                        min_phrases[0], max_phrases[0],
+                        min_phrases[0] + max_phrases[0] + [bases[0]],
+                        max_phrases[0] + [bases[0]]
+                    )
+
+                    A = pred_template(
+                        [bases[1]],
+                        min_phrases[1], max_phrases[1],
+                        min_phrases[1] + max_phrases[1] + [bases[1]],
+                        max_phrases[1] + [bases[1]]
+                    )
+
+            yield from gen_basic(A, B, neg_contexts, pos_context)
+            yield from gen_2negated(A, B, neg_contexts)
+            yield from gen_mitigated_contrary(A, neg_contexts, pos_context)
+            yield from gen_precise_spans(A, B, neg_contexts, pos_context)
+
+
+def get_noun_phrases(scale):
+
+    noun_1 = scale.end1
+    noun_2 = scale.end2
+
+    min_1, min_2, max_1, max_2 = get_mod(scale)
+
+    min_1_adj_nouns = [f'{m.adj} {noun_1}' for m in min_1]
+    max_1_adj_nouns = [f'{m.adj} {noun_1}' for m in max_1]
+
+    min_2_adj_nouns = [f'{m.adj} {noun_2}' for m in min_2]
+    max_2_adj_nouns = [f'{m.adj} {noun_2}' for m in max_2]
+
+    if scale.measure == 'count':
+
+        article_1 = 'an' if noun_1[0] in 'aeiou' else 'a'
+        article_2 = 'an' if noun_2[0] in 'aeiou' else 'a'
+
+        np_1 = f'{article_1} {noun_1}'
+        np_2 = f'{article_2} {noun_2}'
+
+        # completely a hero
+        min_1_aps = [f'{m.adv} {np_1}' for m in min_1]
+        max_1_aps = [f'{m.adv} {np_1}' for m in max_1]
+
+        min_2_aps = [f'{m.adv} {np_2}' for m in min_2]
+        max_2_aps = [f'{m.adv} {np_2}' for m in max_2]
+
+        art_an = 'an'
+        art_a = 'a'
+        vowels = 'aeiou'
+
+        # a complete hero, an absolute villian
+        min_1_nps = [f'{art_an if a_n[0] in vowels else art_a} {a_n}'
+                     for a_n in min_1_adj_nouns]
+        max_1_nps = [f'{art_an if a_n[0] in vowels else art_a} {a_n}'
+                     for a_n in max_1_adj_nouns]
+
+        min_2_nps = [f'{art_an if a_n[0] in vowels else art_a} {a_n}'
+                     for a_n in min_2_adj_nouns]
+        max_2_nps = [f'{art_an if a_n[0] in vowels else art_a} {a_n}'
+                     for a_n in max_2_adj_nouns]
+
+        min_1_phrases = min_1_aps + min_1_nps
+        max_1_phrases = max_1_aps + max_1_nps
+
+        min_2_phrases = min_2_aps + min_2_nps
+        max_2_phrases = max_2_aps + max_2_nps
+
+    # (complete) safety
+    else:
+
+        np_1 = noun_1
+        np_2 = noun_2
+
+        min_1_phrases = min_1_adj_nouns
+        max_1_phrases = max_1_adj_nouns
+
+        min_2_phrases = min_2_adj_nouns
+        max_2_phrases = max_2_adj_nouns
+
+    return ((np_1, np_2),
+            (min_1_phrases, min_2_phrases),
+            (max_1_phrases, max_2_phrases))
+
+
+def get_pronouns(entity_type):
+
+    pronouns = []
+
+    if not entity_type:
+        return ['']
+
+    if entity_type == 'person':
+
+        pronouns += subjects['people']
+
+    elif entity_type == 'thing':
+
+        pronouns += subjects['things']
+
+    elif entity_type == 'either':
+
+        pronouns += subjects['people']
+        pronouns += subjects['things']
+
+    return pronouns
+
+
+def get_mod(scale):
+
+    closed_max = modifiers['closed_max']
+    closed_min = modifiers['closed_min']
+
+    open_max = modifiers['open_max']
+    open_min = modifiers['open_min']
+
+    if scale.pos == 'adj':
+
+        minim1 = minim2 = open_min
+        maxim1 = maxim2 = open_max
+
+        if scale.closed1:
+
+            minim1 += closed_min
+            maxim1 += closed_max
+
+        if scale.closed2:
+
+            minim2 += closed_min
+            maxim2 += closed_max
+
+    else:
+
+        minim1 = minim2 = open_min
+
+        # relative verbs and nouns do not seem to work with open_max
+        # e.g. ?John was extremely a hero. ?He was an extreme hero.
+        #      ?He extremely loved the dish.
+        # but they do work with closed_max
+        # e.g. John was completely a hero. He was a total hero.
+        #      He completely loved the dish.
+        if scale.relative:
+
+            maxim1 = maxim2 = closed_max
+
+        else:
+
+            maxim1 = maxim2 = open_max
+
+            if scale.closed1:
+
+                minim1 += closed_min
+                maxim1 += closed_max
+
+            if scale.closed2:
+
+                minim2 += closed_min
+                maxim2 += closed_max
 
     return minim1, minim2, maxim1, maxim2
 
 
+def gen_basic(A, B, neg_contexts, pos_context):
+
+    # neg - pos, pos - neg
+    # John wasn't (extremely) happy. John was (slightly, extremely) sad
+    n_sents = [' '.join(pairing)
+               for pairing in product(neg_contexts, A.neg_phrases)]
+
+    p_sents = [f'{pos_context} {pred}' for pred in B.pos_phrases]
+
+    for sent_pair in sent_pairs_gen(n_sents, p_sents):
+
+        yield sent_pair
+
+    # was:
+    # n_sent = f'{sub} was{neg}{neg_mod} {order[0]}.'
+    # p_sent = f'{sub} was{pos_mod} {order[1]}.'
+    #
+    # yield f'{n_sent.capitalize()} {p_sent.capitalize()}'
+    # yield f'{p_sent.capitalize()} {n_sent.capitalize()}'
+
+
+def gen_2negated(A, B, neg_contexts):
+
+    # neg - neg
+    # John wasn't (extremely) happy. John wasn't (extremely) sad.
+    n1_sents = [' '.join(pairing)
+                for pairing in product(neg_contexts, A.neg_phrases)]
+
+    n2_sents = [' '.join(pairing)
+                for pairing in product(neg_contexts, B.neg_phrases)]
+
+    for sent_pair in sent_pairs_gen(n1_sents, n2_sents, flip=False):
+
+        yield sent_pair
+
+
+def gen_precise_spans(A, B, neg_contexts, pos_context):
+
+    # precise span conjunctions
+    # She was slightly happy.
+    # She wasn't extremely happy, but she wasn't sad either.
+    pos_precise_spans = [f'{pos_context} {pred}'
+                         for pred in A.pos_min_phrases]
+
+    neg_maxbases = [
+        ' '.join(pairing)
+        for pairing in product(neg_contexts, A.neg_max_phrases)]
+
+    neg_contraries = [' '.join(pairing)
+                      for pairing in product(neg_contexts, B.neg_name)]
+
+    max_cont_neithers = [
+        ' but '.join(pairing) + ' either'
+        for pairing in product(neg_maxbases, neg_contraries)]
+
+    cont_max_neithers = [
+        ' but '.join(pairing) + ' either'
+        for pairing in product(neg_contraries, neg_maxbases)]
+
+    for sent_pair in sent_pairs_gen(
+            pos_precise_spans,
+            max_cont_neithers + cont_max_neithers):
+
+        yield sent_pair
+
+    # was:
+    # pos_precise_span = f'{sub} was{min_mod} {order[0]}.'
+    # neg_maxbase = f'{sub} was{neg}{max_mod} {order[0]}'
+    # neg_contrary = f'{sub} was{neg} {order[1]}'
+
+    # neg_conj_1 = f'{neg_maxbase} but {neg_contrary} either.'
+    # neg_conj_2 = f'{neg_contrary} but {neg_maxbase} either.'
+
+    # yield f'{pos_precise_span.capitalize()} {neg_conj_1.capitalize()}'
+    # yield f'{pos_precise_span.capitalize()} {neg_conj_2.capitalize()}'
+
+    # yield f'{neg_conj_1.capitalize()} {pos_precise_span.capitalize()}'
+    # yield f'{neg_conj_2.capitalize()} {pos_precise_span.capitalize()}'
+
+
+def gen_mitigated_contrary(A, neg_contexts, pos_context):
+
+    # not-max base, mitigated base
+    # John wasn't extremely happy. John was slightly happy.
+    neg_max_sents = [
+        ' '.join(pairing)
+        for pairing in product(neg_contexts, A.neg_max_phrases)]
+
+    pos_min_sents = [f'{pos_context} {pred}' for pred in A.pos_min_phrases]
+
+    for sent_pair in sent_pairs_gen(neg_max_sents, pos_min_sents):
+
+        yield sent_pair
+
+    # was:
+    # neg_max_sent = f'{sub} was{neg}{max_mod} {order[0]}.'
+    # pos_min_sent = f'{sub} was{min_mod} {order[0]}.'
+
+    # yield f'{neg_max_sent.capitalize()} {pos_min_sent.capitalize()}'
+    # yield f'{pos_min_sent.capitalize()} {neg_max_sent.capitalize()}'
+
+
 def sent_pairs_gen(sentlist1, sentlist2, flip=True):
 
+    # final touches on sentences
     sentlist1 = [s.capitalize()+'.' for s in sentlist1]
 
     sentlist2 = [s.capitalize()+'.' for s in sentlist2]
 
     sentlist_orders = [(sentlist1, sentlist2)]
 
+    # for everything but the negative-negative sentence pairs
     if flip:
 
         sentlist_orders.append((sentlist2, sentlist1))
@@ -493,16 +634,6 @@ def sent_pairs_gen(sentlist1, sentlist2, flip=True):
         for sent_pair in product(*order):
 
             yield ' '.join(sent_pair)
-
-
-def generate_verb_sentences(specs, subjects, modifiers, n):
-
-    yield []
-
-
-def generate_noun_sentences(specs, subjects, modifiers, n):
-
-    yield []
 
 
 if __name__ == '__main__':

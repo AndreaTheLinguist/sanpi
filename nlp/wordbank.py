@@ -8,37 +8,56 @@ people_subjects = [
 ]
 
 thing_subjects = [
-    'that',
     'it'
 ]
 
 subjects = {"people": people_subjects, 'things': thing_subjects}
 
-neg = tuple(n+'_n'
-            for n in (
-                ' not',
-                # 'n\'t'
-            ))
+neg = (
+    'not_n',
+    'n\'t_n'
+)
 
+# neg = tuple(n+'_n'
+#             for n in (
+#                 'not',
+#                 'n\'t'
+#             ))
+
+mod_forms = namedtuple('mod_forms', ['adv', 'adj'])
 modifiers = {
-    'closed_max': tuple(
-        m+'_m' for m in ('completely',
-                         'totally',
-                         'absolutely',
-                         'entirely')),
-    'open_max': tuple(
-        m+'_m' for m in ('extremely',
-                         'ridiculously',
-                         'incredibly',
-                         'terribly')),
-    'closed_min': tuple(
-        m+'_m' for m in ('slightly',
-                         'partially')),
-    'open_min': tuple(
-        m+'_m' for m in ('kinda',
-                         'sorta',
-                         'somewhat'))
+    'closed_max': [
+        ['completely', 'complete'],
+        ['totally', 'total'],
+        # ['absolutely', 'absolute'],
+        # ['fully', 'full']
+
+    ],
+    'open_max': [
+        ['extremely', 'extreme'],
+        ['ridiculously', 'ridiculous'],
+        # ['incredibly', 'incredible'],
+        # ['terribly', 'terrible']
+    ],
+    'closed_min': [
+        ['slightly', 'slight'],
+        ['partially', 'partial'],
+    ],
+    'open_min': [
+        ['kinda', 'kinda'],
+        ['sorta', 'sorta'],
+        # ['somewhat', 'semi']
+    ]
 }
+
+for cat, mods_list in modifiers.items():
+
+    mods_list = [[f'{m[0]}_m', f'{m[1]}_m'] for m in mods_list]
+
+    mod_tups_list = [mod_forms(*mod) for mod in mods_list]
+
+    modifiers[cat] = mod_tups_list
+
 
 person = 'person'
 thing = 'thing'
@@ -48,24 +67,24 @@ either = 'either'
 rel_adj = [
     # end1, end2, entity type
     ('happy', 'sad', person),
-    ('tall', 'short', either),
-    ('expensive', 'inexpensive', thing),
-    ('big', 'small', either),
-    ('strong', 'weak', either),
-    ('fast', 'slow', either),
-    ('smart', 'dumb', either),
-    ('brilliant', 'idiotic', either),
-    ('interesting', 'boring', either),
-    ('rich', 'poor', person),
-    ('beautiful', 'ugly', either),
-    ('old', 'young', either),
-    ('kind', 'cruel', either),
-    ('polite', 'rude', either),
-    ('deep', 'shallow', either),
-    ('likely', 'unlikely', thing),
-    ('energetic', 'lethargic', person),
-    ('tight', 'loose', thing),
-    ('hot', 'cold', either)
+    # ('tall', 'short', either),
+    # ('expensive', 'inexpensive', thing),
+    # ('big', 'small', either),
+    # ('strong', 'weak', either),
+    # ('fast', 'slow', either),
+    # ('smart', 'dumb', either),
+    # ('brilliant', 'idiotic', either),
+    # ('interesting', 'boring', either),
+    # ('rich', 'poor', person),
+    # ('beautiful', 'ugly', either),
+    # ('old', 'young', either),
+    # ('kind', 'cruel', either),
+    # ('polite', 'rude', either),
+    # ('deep', 'shallow', either),
+    # ('likely', 'unlikely', thing),
+    # ('energetic', 'lethargic', person),
+    # ('tight', 'loose', thing),
+    # ('hot', 'cold', either)
 ]
 
 # may be some complications with these because different scale points may have different modifier restrictions.
@@ -74,18 +93,18 @@ rel_adj = [
 abs_adj = [
     # end1, end2, entity type, closed1, closed2
     ('wet', 'dry', thing, True, True),
-    ('full', 'empty', thing, True, True),
-    ('opaque', 'transparent', thing, True, True),
-    ('open', 'closed', thing, True, True),
+    # ('full', 'empty', thing, True, True),
+    # ('opaque', 'transparent', thing, True, True),
+    # ('open', 'closed', thing, True, True),
 
-    ('straight', 'bent', thing, True, False),
-    ('pure', 'diluted', thing, True, False),
-    ('honest', 'deceitful', person, True, False),
-    ('smooth', 'bumpy', thing, True, False),
-    ('clean', 'dirty', either, True, False),
-    ('certain', 'uncertain', either, True, False),
-    ('safe', 'dangerous', either, True, False),
-    ('accurate', 'inaccurate', either, True, False),
+    # ('straight', 'bent', thing, True, False),
+    # ('pure', 'diluted', thing, True, False),
+    # ('honest', 'deceitful', person, True, False),
+    # ('smooth', 'bumpy', thing, True, False),
+    # ('clean', 'dirty', either, True, False),
+    # ('certain', 'uncertain', either, True, False),
+    # ('safe', 'dangerous', either, True, False),
+    # ('accurate', 'inaccurate', either, True, False),
 
 ]
 
@@ -93,11 +112,11 @@ abs_adj = [
 nongrad_adj = [
     # pred1, pred2, entity type
     ('locked', 'unlocked', thing),
-    ('dead', 'alive', person),
-    ('married', 'unmarried', person),
-    ('organic', 'inorganic', thing),
-    ('known', 'unknown', either),
-    ('present', 'absent', either),
+    # ('dead', 'alive', person),
+    # ('married', 'unmarried', person),
+    # ('organic', 'inorganic', thing),
+    # ('known', 'unknown', either),
+    # ('present', 'absent', either),
 ]
 
 
@@ -111,18 +130,18 @@ rel_verb = [
                   'loved', 'hated', 'the dish', None, None, None),
     verb_info_tup('like', 'dislike', person, either, 'liked',
                   'disliked', 'the candidate', None, None, None),
-    verb_info_tup('rise', 'fall', thing, None, 'rose',
-                  'fell', None, None, None, None),
-    verb_info_tup('warm up', 'cool down', either, None,
-                  'warmed up', 'cooled down', None, None, None, None)
+    # verb_info_tup('rise', 'fall', either, None, 'rose',
+    #               'fell', None, None, None, None),
+    verb_info_tup('warm_up', 'cool_down', either, None,
+                  'warmed_up', 'cooled_down', None, None, None, None)
 ]
 
 abs_verb = [
     # end1, end2, subject type, object type, past1, past2, object, closed1, closed2
     verb_info_tup('open', 'close', person, thing, 'opened',
                   'closed', 'the window', None, True, True),
-    verb_info_tup('bend', 'straighten', person, thing, 'bent',
-                  'straightened', 'the rod', None, False, True)
+    # verb_info_tup('bend', 'straighten', person, thing, 'bent',
+    #               'straightened', 'the rod', None, False, True)
 ]
 
 nongrad_verb = [
@@ -142,20 +161,20 @@ nongrad_verb = [
 rel_noun = [
     ('hero', 'villian', person, 'count'),
     # is this more absolute? middle gound may not exist for all people in all cases
-    ('optimist', 'pessimist', person, 'count')
+    # ('optimist', 'pessimist', person, 'count')
 ]
 
 abs_noun = [
     ('safety', 'danger', thing, 'mass', True, False),
-    ('certainty', 'uncertainty', thing, 'mass', True, False)
+    # ('certainty', 'uncertainty', thing, 'mass', True, False)
 ]
 
 # do these need to be in pairs? if there is no relevant scale?
 nongrad_noun = [
     ('boat', 'airplane', thing, 'count'),
-    ('teacher', 'student', person, 'count'),
-    ('buyer', 'seller', person, 'count'),
-    ('christian', 'atheist', person, 'count')
+    # ('teacher', 'student', person, 'count'),
+    # ('buyer', 'seller', person, 'count'),
+    # ('christian', 'atheist', person, 'count')
 ]
 
 
@@ -183,7 +202,7 @@ def set_adj_specs(word_info, sctype):
 
     word_list = []
     adj_tup = namedtuple('adj_specs',
-                         ['end1', 'end2', 'subj_type', 'relative', 'vague', 'closed1', 'closed2'])
+                         ['pos', 'end1', 'end2', 'subj_type', 'relative', 'vague', 'closed1', 'closed2'])
 
     for w in word_info:
 
@@ -208,7 +227,7 @@ def set_adj_specs(word_info, sctype):
                 closed2 = w[4]
 
         word_list.append(
-            adj_tup(w[0]+'_p', w[1]+'_p', w[2], rel, vague, closed1, closed2))
+            adj_tup('adj', w[0]+'_p', w[1]+'_p', w[2], rel, vague, closed1, closed2))
 
     return word_list
 
@@ -217,7 +236,7 @@ def set_verb_specs(word_info, sctype):
 
     word_list = []
     verb_tup = namedtuple('verb_specs',
-                          ['end1', 'end2', 'past1', 'past2', 'subject', 'object', 'subj_type', 'obj_type', 'closed1', 'closed2', 'relative', 'vague'])
+                          ['pos', 'end1', 'end2', 'past1', 'past2', 'subject', 'object', 'subj_type', 'obj_type', 'closed1', 'closed2', 'relative', 'vague'])
 
     for w in word_info:
 
@@ -239,9 +258,13 @@ def set_verb_specs(word_info, sctype):
             closed2 = w.closed2
 
         word_list.append(
-            verb_tup(w.end1+'_p', w.end2+'_p', w.past1+'_p', w.past2+'_p',
-                     w.subj, w.obj, w.subject_type, w.object_type,
-                     closed1, closed2, rel, vague))
+            verb_tup(
+                'verb', w.end1+'_p', w.end2+'_p',
+                w.past1+'_p', w.past2+'_p',
+                w.subj, w.obj,
+                w.subject_type, w.object_type,
+                closed1, closed2,
+                rel, vague))
 
     return word_list
 
@@ -249,8 +272,8 @@ def set_verb_specs(word_info, sctype):
 def set_noun_specs(word_info, sctype):
     word_list = []
 
-    noun_tup = namedtuple('noun_specs', [
-                          'end1', 'end2', 'subj_type', 'measure', 'relative', 'vague', 'closed1', 'closed2'])
+    noun_tup = namedtuple('noun_specs', ['pos',
+                                         'end1', 'end2', 'subj_type', 'measure', 'relative', 'vague', 'closed1', 'closed2'])
 
     for n in word_info:
 
@@ -272,7 +295,7 @@ def set_noun_specs(word_info, sctype):
             closed2 = n[5]
 
         word_list.append(
-            noun_tup(n[0]+'_p', n[1]+'_p', n[2], n[3], rel, vague, closed1, closed2))
+            noun_tup('noun', n[0]+'_p', n[1]+'_p', n[2], n[3], rel, vague, closed1, closed2))
 
     return word_list
 
