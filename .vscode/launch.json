@@ -5,6 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "mask_data.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/nlp/mask_data.py",
+            "console": "integratedTerminal",
+            "args": [
+                "nlp/generated_adj.csv",
+                "both"
+            ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "print pairs",
             "type": "python",
             "request": "launch",
@@ -15,7 +33,7 @@
             ]
         },
         {
-            "name": "tabulate.py",
+            "name": "tabulate.py count",
             "type": "python",
             "request": "launch",
             "program": "/home/andrea/litotes/script/tabulate.py",
@@ -25,7 +43,23 @@
                 "-p",
                 "Nyt1.none",
                 "-o",
-                "Nyt1_none"
+                "Nyt1_none",
+                "-c"
+            ]
+        },
+        {
+            "name": "tabulate.py table",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/tabulate.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-p",
+                "Nyt1.none",
+                "-o",
+                "Nyt1_none",
+                "-t"
             ]
         },
         {
@@ -36,12 +70,11 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-p1",
+                "-p",
                 "Nyt1.none",
-                "-p2",
-                "Nyt1.if",
                 "-o",
-                "Nyt1_none-if_adv-adj",
+                "Nyt1_none",
+                "-c",
                 "-e",
                 "-v"
             ]
@@ -52,6 +85,79 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "annotateJson.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/annotateJson.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-d",
+                "Nyt1.without-not_from-kay/",
+            ]
+        },
+        {
+            "name": "reorgJsonDir.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/reorgJsonDir.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-d",
+                "test_json_dir/",
+            ]
+        },
+        {
+            "name": "simpleReadConllu.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/simpleReadConllu.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "/home/andrea/litotes/Nyt1.conll/nyt_eng_199407.conllu",
+            ]
+        },
+        {
+            "name": "cleanConlls.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/cleanConlls.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "/home/andrea/litotes/Nyt1.conll/",
+            ]
+        },
+        {
+            "name": "grewSearchDir.py",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/grewSearchDir.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "/home/andrea/litotes/Nyt1.conll_clean/",
+                "/home/andrea/litotes/Pat/try.pat",
+                "/home/andrea/litotes/testing"
+            ]
+        },
+        {
+            "name": "makeTable.sh",
+            "type": "bashdb",
+            "request": "launch",
+            "program": "/home/andrea/litotes/script/makeTable.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "/home/andrea/litotes/Nyt1.conll_clean/",
+                "/home/andrea/litotes/Pat/try.pat",
+                "/home/andrea/litotes/conll_clean.try",
+                "try"
+            ]
+        },
     ]
 }
