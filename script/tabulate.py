@@ -205,10 +205,17 @@ def getHitData(json_dir, args):
                 hit_id = ':'.join((sent_id, node1_index))
 
                 if hit_id in hits_dict.keys():
-                    print(
-                        f'Warning: hit {hit_id} already in hit_info dictionary. Overwriting previous info (for \"{hits_dict[hit_id].adv} {hits_dict[hit_id].adj}\"  in \"{hits_dict[hit_id].text}\") with info for \"{hit_info.adv} {hit_info.adj} in \"{hit_info.sent_text}\".')
+                    
+                    if hit_info != hits_dict[hit_id]: 
 
-                hits_dict[hit_id] = hit_info
+                        print(
+                        f'Warning: hit {hit_id} already in hit_info dictionary and info differs.\n\t...Overwriting previous info (for \"{hits_dict[hit_id].adv} {hits_dict[hit_id].adj}\" in \"{hits_dict[hit_id].sent_text}\") with info for \"{hit_info.adv} {hit_info.adj}\" in \"{hit_info.sent_text}\".')
+
+                    else: 
+                        print(f'Warning: hit {hit_id} (\"{hits_dict[hit_id].adv} {hits_dict[hit_id].adj}\") already in hit_info dictionary.\n\t...Skipping.')
+                        continue
+
+                    hits_dict[hit_id] = hit_info
 
     return hits_dict
 
