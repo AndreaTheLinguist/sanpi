@@ -20,10 +20,12 @@ def __main__():
     testDirStr = f'if [ ! -d {outputDir} ]; then mkdir {outputDir}; fi'
     os.system(testDirStr)
 
-    for file in os.listdir(dirPath):
+    for f in os.listdir(dirPath):
 
-        filePref, _ = file.split('.')
-        filePathName = f'{dirPath}/{file}'
+        filePref, ext = f.split('.')
+        if ext != 'conllu':
+            continue
+        filePathName = f'{dirPath}/{f}'
         outputFilename = f'{filePref}.raw.json'
 
         # do not run grew search if output (raw) json file already exists
