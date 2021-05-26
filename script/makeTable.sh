@@ -19,7 +19,7 @@ fi
 echo "directory of conllu files... $1"
 echo "path to pattern file... $2"
 echo "directory of grew corpus hits in json format... $3"
-echo "string to prefix to final freq/<>_counts.csv table... $4"
+echo "string to prefix to final freq/<>_hits.csv table... $4"
 echo
 
 read -p "Are all arguments correct? y/n " -r -n 1

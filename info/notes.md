@@ -7,10 +7,17 @@
 - [ ] run patterns
 - [ ] write scipt to compare new simplified count csv's
 - [ ] determine naming schema for contexts-- create all contexts/patterns before naming?
-- [ ] figure out how data works with Evert dissertation
+- [x] figure out how data works with Evert dissertation
+- [ ] repeated documents in conll files!!!
+- [x] alter tabulate.py output
+- [ ] clean conllu files
+
 
 
 # start with:
+- [ ] use simpleConllRead function to either output and read in or call from other scripts? want to use it for:
+    - [ ] adding preceding and following sentences to the reorganized json files
+    - [ ] filter out repeated/duplicated documents in conll files and either skip when processing or rewrite files? (making conll smaller would help with future searches, both in processing time and data accuracy)
 - [ ] too many hits to just start annoating at random. Need to sort/filter in some way
     - sort by total collocate frequency (f2) or by association measure ranks?
     - should collocates only in one context be ignored?
