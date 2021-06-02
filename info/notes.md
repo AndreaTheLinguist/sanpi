@@ -10,9 +10,11 @@
 - [x] figure out how data works with Evert dissertation
 - [ ] repeated documents in conll files!!!
 - [x] alter tabulate.py output
-- [ ] clean conllu files
-
-
+- [x] clean conllu files
+- [ ] edits to tabulate output:
+    - [ ] add field for combined `hit_id` (sent_id + adv_id)
+    - [ ] add field for `pattern` filename? 
+    - [ ] remove extra whitespace characters from `sent_text`
 
 # start with:
 - [ ] use simpleConllRead function to either output and read in or call from other scripts? want to use it for:

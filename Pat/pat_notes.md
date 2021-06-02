@@ -38,6 +38,7 @@ pattern {
 - negation of predicate adjective
 - *John is not extremely happy*
 - *John wasn't extremely happy*
+- currently `nc0.pat`
 
 ```
 pattern {
@@ -109,6 +110,7 @@ pattern {
 - DP: `no one`
 - *No one was extremely happy*
 - more frequent than `nobody`
+- currenty `nc1.pat`
 
 ```
 pattern {
@@ -391,6 +393,7 @@ pattern {
 - `almost no one`
 - *Almost no one was entirely pleased.*
 - ought to work but currently gets no hits in sample files
+- currently `nc2.pat`
 
 ```
 pattern {
@@ -460,6 +463,7 @@ pattern {
 
 - `without being`
 - semi-restrictive right now, but not catching things that should be excluded
+- currently `nc3.pat`
 
 ```
 pattern {
