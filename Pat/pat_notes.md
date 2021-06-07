@@ -1,6 +1,6 @@
 # Grew-match Patterns
 
-## Base Context: base
+### Context `be ADV ADJ` basic
 
 - 'be' lemma
 - predicate adjective
@@ -33,7 +33,7 @@ pattern {
 
 ## VP Context Restrictions 
 
-### Context `not` VP adv: nc0
+### Context `not` VP adv
 
 - negation of predicate adjective
 - *John is not extremely happy*
@@ -78,11 +78,11 @@ pattern {
 }
 ```
 
-### Context `doubt` matrix VP
+<!-- ### Context `doubt` matrix VP -->
 
 ## Subject Restriction Contexts
 
-### Context `nobody` subject: 
+### Context `nobody` subj
 
 - negative subject 
 - negated existential
@@ -103,7 +103,7 @@ pattern {
 }
 ```
 
-### Context `no one` subject: nc1
+### Context `no one` subj
 
 - negative subject 
 - negated existential
@@ -128,7 +128,7 @@ pattern {
 }
 ```
 
-### Context `no` determinter on subject N
+### Context `no` det of subj N
 
 - negative subject 
 - negated existential
@@ -152,7 +152,7 @@ pattern {
 }
 ```
 
-### Context `none` subject
+### Context `none` subj
 
 - negative subject
 - negated existential
@@ -174,7 +174,7 @@ pattern {
 }
 ```
 
-### Context `neither` determiner on subject
+### Context `neither` det of subj
 
 - negative subject
 - negated existential (of set with cardinality of 2)
@@ -197,7 +197,7 @@ pattern{
 }
 ```
 
-### Context `neither` subject
+### Context `neither` subj
 
 - negative subject
 - negated existential (of set with cardinality of 2)
@@ -219,7 +219,7 @@ pattern{
 }
 ```
 
-### Context `not one` determiner on subject
+### Context `not one` det of subj
 
 - negated subject
 - negated existential
@@ -246,7 +246,7 @@ pattern{
 }
 ```
 
-### Context `not a single` determiner on subject
+### Context `not a single` det of subj
 
 - negated subject
 - negated existential
@@ -275,7 +275,7 @@ pattern{
 }
 ```
 
-### Context `not one` subject
+### Context `not one` subj
 
 - negated subject
 - negated existential
@@ -300,7 +300,7 @@ pattern{
 }
 ```
 
-### Context `nothing` subject
+### Context `nothing` subj
 
 - `nothing` subject
 - existential negation
@@ -324,7 +324,7 @@ pattern {
 
 ## Mitigated Negated Existentials
 
-### Context `few` determiner on subject
+### Context `few` det of subj
 
 - mitigated existential negation
 - `few` determiner 
@@ -346,7 +346,7 @@ pattern {
 }
 ```
 
-### Context `few` subject
+### Context `few` subj
 
 - mitigated existential negation
 - `few` as elided subject
@@ -366,7 +366,7 @@ pattern {
 }
 ```
 
-### Context `almost nobody` subject
+### Context `almost nobody` subj
 
 - `almost nobody`
 - *Almost nobody was entirely pleased.*
@@ -388,7 +388,7 @@ pattern {
 }
 ```
 
-### Context `almost no one` subject
+### Context `almost no one` subj
 
 - `almost no one`
 - *Almost no one was entirely pleased.*
@@ -413,7 +413,7 @@ pattern {
 }
 ```
 
-### Context `almost no` determiner on subject
+### Context `almost no` det of subj
 
 - `almost no` N
 - *Almost no member was entirely thrilled.*
@@ -437,7 +437,7 @@ pattern{
 }
 ```
 
-### Context `almost none` subject
+### Context `almost none` subj
 
 - `almost none` with optional `of` PP
 
@@ -477,7 +477,7 @@ pattern {
 }
 ```
 
-## Notes and To do list
+## Notes and TODOs
 
 ### ambiguity producing contexts
   - [x] almost nobody
@@ -512,6 +512,18 @@ pattern {
   - [ ] not wish that? **does this allow for neg-raising?**
   - [ ] not intend (inf-sub, for inf-sub) to
   - [ ] not plan (for inf-sub) to 
+
+### Questionable Contexts
+
+  - [ ] every N subj
+  - [ ] everyone subj
+  - [ ] everything subj
+  - [ ] if antecedent
+  - [ ] if consequent
+  - [ ] questions
+  - [ ] all N subj
+  - [ ] none restriction
+  - [ ] no restriction 
 
 
 - `almost` + any of the negated existentials 
