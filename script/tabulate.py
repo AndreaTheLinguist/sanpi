@@ -13,6 +13,7 @@ from pathlib import Path
 
 def __main__():
 
+    print("Tabulating hits via tabulate.py...")
     args = parseArgs()
 
     # do table by default if no output type option specified.
@@ -36,13 +37,13 @@ def __main__():
 
         colloc_counter = fillCounter(json_dir, args)
 
-        print('    Finished counting collocations in all json files.')
+        print('^_^ Finished counting collocations in all json files.')
 
     if args.table:
 
-        hit_data = getHitData(json_dir, args)
+        hit_data, duplicates = getHitData(json_dir, args)
 
-        print('    Finished collecting sentence data in all json files.')
+        print('^_^ Finished collecting sentence data in all json files.')
 
     colloc_str = 'collocation counts' if colloc_counter else ''
     hit_str = 'hits table' if hit_data else ''
@@ -50,6 +51,7 @@ def __main__():
     print(f'Writing {colloc_str}{conj}{hit_str} to file.')
 
     createOutput(colloc_counter, hit_data, args)
+    createOutput(colloc_counter, duplicates, args, write_duplicates=True)
 
 
 def parseArgs():
@@ -60,7 +62,7 @@ def parseArgs():
                         help='path to directory containing filled json files for pattern.')
 
     parser.add_argument('-o', '--outputPrefix', type=str, required=True,
-                        help='prefix for output \'..._counts.csv\' file to be written to the \'freq\' subdirectory (created if necessary) found in the directory the script is run from. This should be a string which contains info about the patterns, corpus data set, and nodes counted; e.g. \'Nyt1_p1-n1_adv-adj\' which would result in the output file \'freq/Nyt1_p1-n1_adv-adj_counts.csv\'.')
+                        help='prefix for output \'..._counts.tsv\' file to be written to the \'freq\' subdirectory (created if necessary) found in the directory the script is run from. This should be a string which contains info about the patterns, corpus data set, and nodes counted; e.g. \'Nyt1_p1-n1_adv-adj\' which would result in the output file \'freq/Nyt1_p1-n1_adv-adj_counts.csv\'.')
 
     parser.add_argument('-n1', '--node1', default='ADV',
                         help='search label for first node, default is \'ADV\'. Both patterns being compared must have a single node with this label.')
@@ -69,13 +71,13 @@ def parseArgs():
                         help='search label for second node, default is \'ADJ\'. Both patterns being compared must have a single node with this label.')
 
     parser.add_argument('-m', '--minimal', action='store_true',
-                        help='Option produce minimal output. If used, output will not have a header row and will be a tab delimited .txt file instead of the default comma delimted .csv.')
+                        help='Option produce minimal output. If used, output will not have a header row and will have .txt extension')
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
 
     parser.add_argument('-t', '--table', action='store_true',
-                        help='Option to create a table output with following fields: Adv, Adj, SentenceID, WordIndex, SentenceText')
+                        help='Option to create a table output with following fields: hit_id, adv, adj, colloc, sent_text, sent_id, adv_index, ')
 
     parser.add_argument('-c', '--count', action='store_true',
                         help='Option to create an output of counts with following fields (minimally): Adv, Adj, hit_counts')
@@ -162,11 +164,13 @@ def countTokenPairs(countDict, jsonFile, args):
 
 
 def getHitData(json_dir, args):
+
     # pull out sentence info and create dictionary of hit_id : namedTuple
     fileCount = 0
     hit_tuple = namedtuple(
-        'hit_tuple', ['adv', 'adj', 'sent_id', 'adv_index', 'sent_text'])
+        'hit_tuple', ['adv', 'adj', 'sent_text', 'sent_id', 'adv_index'])
     hits_dict = {}
+    duplicates = {}
 
     for jsonFile in os.scandir(json_dir):
 
@@ -176,7 +180,7 @@ def getHitData(json_dir, args):
 
         with open(jsonFile, 'r') as j:
             if len(j.readlines()) == 1:
-                print(f'\t{jsonFile.path} is empty. Skipping.')
+                print(f'--> {jsonFile.path} is empty. Skipping.')
                 continue
 
         fileCount += 1
@@ -184,7 +188,7 @@ def getHitData(json_dir, args):
         if args.verbose:
             print(f'\nProcessing {jsonFile.name}...')
 
-        with open(jsonFile, 'r') as j:
+        with open(jsonFile, 'r', encoding='utf-8') as j:
 
             hits = json.load(j)
 
@@ -195,40 +199,64 @@ def getHitData(json_dir, args):
 
                 except KeyError:
                     sys.exit(
-                        f'Node labels have not been filled from conllu file for {jsonFile}. Quitting script without generating output.')
+                        f'Node labels have not been filled from conllu file for {jsonFile}. Quitting script without generating output. Run FillJson.py and then try again.')
 
-                node1_word = fillers[args.node1]
-                node2_word = fillers[args.node2]
+                node1_word = fillers[args.node1].lower()
+                node2_word = fillers[args.node2].lower()
 
                 sent_id = hit['sent_id']
-                sent_text = hit['text']
+                sent_text = hit['text'].strip()
                 node1_index = hit['matching']['nodes'][args.node1]
 
-                hit_info = hit_tuple(node1_word, node2_word,
-                                     sent_id, node1_index, sent_text)
+                hit_info = hit_tuple(node1_word, node2_word, sent_text,
+                                     sent_id, node1_index)
 
                 hit_id = ':'.join((sent_id, node1_index))
 
                 if hit_id in hits_dict.keys():
 
-                    if hit_info == hits_dict[hit_id]:
+                    existing_info = hits_dict[hit_id]
+
+                    # exact same--nothing added
+                    if hit_info == existing_info:
 
                         print(
-                            f'Warning: hit {hit_id} (\"{hits_dict[hit_id].adv} {hits_dict[hit_id].adj}\") already in hit_info dictionary. Skipping...')
+                            f'|---> Entry not added: hit {hit_id} (\"{existing_info.adv} {existing_info.adj}\") already in hit_info dictionary.')
 
-                        continue
+                        duplicates[f'{hit_id}_discard'] = hit_info
+                        duplicates[f'{hit_id}_keep'] = existing_info
 
+                    # something differs--record both, but with altered IDs
+                    # this is included for the possibility of adverbs that are paired with different adjectives somehow
+                    # with the pattern specified linearly, this will never happen, but keeping it in case the pattern spec changes to allow this kind of overlap (perhaps for conjoined predicate adjectives? see pattern notes file)
                     else:
+                        id1 = hit_id+"_a"
+                        id2 = hit_id+"_b"
 
                         print(
-                            f'Warning: hit {hit_id} already in hit_info dictionary and info differs.\n\t...Overwriting previous info (for \"{hits_dict[hit_id].adv} {hits_dict[hit_id].adj}\" in \"{hits_dict[hit_id].sent_text}\") with info for \"{hit_info.adv} {hit_info.adj}\" in \"{hit_info.sent_text}\".')
+                            f'|---> hit {hit_id} already in hit_info dictionary and new info differs --> Modifying previous record and adding second hit.\n=== New entries ===\n+ {id1}:\t{existing_info.adv}\t{existing_info.adj}\t{existing_info.sent_text}\n+ {id2}:\t{hit_info.adv}\t{hit_info.adj}\t{hit_info.sent_text}')
 
-                hits_dict[hit_id] = hit_info
+                        duplicates[f'{id1}_keep'] = existing_info
+                        duplicates[f'{id2}_keep'] = hit_info
 
-    return hits_dict
+                        # keep both entries with modified ids
+                        hits_dict[id1] = existing_info
+                        hits_dict[id2] = hit_info
+
+                        # remove initial entry with original id from hits (already replaced with id1 entry above)
+                        hits_dict.pop(hit_id)
+
+                else:
+
+                    hits_dict[hit_id] = hit_info
+
+        # hits_dict = OrderedDict(sorted(hits_dict.items()))
+        # duplicates = OrderedDict(sorted(duplicates.items()))
+
+    return hits_dict, duplicates
 
 
-def createOutput(counts, hits, args):
+def createOutput(counts, hits, args, write_duplicates=False):
 
     txt = args.minimal
 
@@ -274,17 +302,45 @@ def createOutput(counts, hits, args):
             pass
         outputDir = Path.cwd() / 'hits'
 
-        outputFilename = (f'{args.outputPrefix}_hits.txt' if txt
-                          else f'{args.outputPrefix}_hits.csv')
+        ext = '.txt' if txt else '.csv'
+
+        fname = (f'{args.outputPrefix}_duplicates{ext}'
+                 if write_duplicates
+                 else f'{args.outputPrefix}_hits{ext}')
+
         # set fields
         hits_keys = list(hits.keys())
-        fields = hits[hits_keys[0]]._fields
+
+        prefix_fields = (('hit_id', 'status', 'colloc') if write_duplicates
+                         else
+                         ('hit_id', 'colloc'))
+
+        fields = prefix_fields + hits[hits_keys[0]]._fields
 
         # fill rows
-        rows = list(hits.values())
+        rows = []
 
-        # write rows to csv
-        write_file(outputDir, outputFilename, fields, rows, txt)
+        for k, v in hits.items():
+
+            if write_duplicates:
+                hit_id, status = k.rsplit('_', 1)
+
+            else:
+                hit_id = k
+
+            colloc = f'{v.adv}_{v.adj}'
+
+            row = ((hit_id, status, colloc) + v if write_duplicates
+                   else
+                   (hit_id, colloc) + v)
+
+            rows.append(row)
+
+        rows.sort(key=lambda r: r[0])
+        # sort rows by hit id
+
+        # write rows to tsv
+        write_file(outputDir, fname, fields, rows, txt)
 
 
 def write_file(outputDir, outputFilename, fields, rows, txt):
@@ -300,6 +356,8 @@ def write_file(outputDir, outputFilename, fields, rows, txt):
             writer = csv.writer(out)
             writer.writerow(fields)
 
+        print(f'-> {len(rows)} rows to be recorded in {outputFilename}')
+
         for row in rows:
 
             try:
@@ -311,12 +369,10 @@ def write_file(outputDir, outputFilename, fields, rows, txt):
                 print(
                     f"Row for {row[0].encode(encoding='UTF-8')} {row[1].encode(encoding='UTF-8')} could not be written due to encoding error. Excluded from frequency table.")
 
-        # writer.writerows(rows)
-
 
 if __name__ == '__main__':
 
     absStart = time.perf_counter()
     __main__()
     absFinish = time.perf_counter()
-    print(f'Total time: {round(absFinish - absStart, 2)} seconds')
+    print(f'Time elapsed: {round(absFinish - absStart, 3)} seconds')

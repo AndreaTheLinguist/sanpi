@@ -61,7 +61,7 @@ def __main__():
 
             except json.decoder.JSONDecodeError:
 
-                print('json file is empty. Skipping.')
+                print('__x__ json file is empty. Skipping.')
                 continue
 
             else:
@@ -206,4 +206,4 @@ if __name__ == '__main__':
     absStart = time.perf_counter()
     __main__()
     absFinish = time.perf_counter()
-    print(f'Total time: {round((absFinish - absStart)/60, 2)} minutes')
+    print(f'Time elapsed: {round((absFinish - absStart)/60, 2)} minutes\n')
