@@ -78,8 +78,6 @@ pattern {
 }
 ```
 
-<!-- ### Context `doubt` matrix VP -->
-
 ## Subject Restriction Contexts
 
 ### Context `nobody` subj
@@ -193,7 +191,7 @@ pattern{
   S [];
   det: S -[det]-> N; 
   sub: ADJ -[nsubj|nsubjpass]-> S;
-  S << BE    
+  S << BE
 }
 ```
 
@@ -215,7 +213,7 @@ pattern{
   cop: ADJ -[cop]-> BE;
   N [lemma="neither"]; 
   sub: ADJ -[nsubj|nsubjpass]-> N;
-  N << BE    
+  N << BE
 }
 ```
 
@@ -241,7 +239,7 @@ pattern{
   S << BE; 
   N [lemma="not"]; 
   O [lemma="one"]; 
-  N < O; 
+  N < O;
   S -> O
 }
 ```
@@ -477,6 +475,77 @@ pattern {
 }
 ```
 
+---
+
+## Test Context Set
+
+### Context `everyone` subj
+
+- `everyone is ADV ADJ` subject position
+- Positive context
+- does not licencse NPIs
+  - **Everyone has any money.*
+
+```
+pattern {
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  advmod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  NS [lemma="everyone"]; 
+  subj: ADJ -[nsubj|nsubjpass]-> NS;
+  NS << BE;
+}
+```
+
+### Context `everybody` subj
+
+- `everybody is ADV ADJ` subject position
+- Positive context
+- does not licencse NPIs
+  - **Everybody has any money.*
+
+```
+pattern {
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  advmod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  NS [lemma="everybody"]; 
+  subj: ADJ -[nsubj|nsubjpass]-> NS;
+  NS << BE;
+}
+```
+
+### Context `every` det of subj
+
+- `every` as determinter of subj noun
+- positive context
+- does not license NPIs
+- **Every student has any money.*
+
+```
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  S [lemma <> "one"]; 
+  E [lemma="every"];
+  det: S -[det]-> E;
+  sub: ADJ -[nsubj|nsubjpass]-> S;
+  S << BE
+}
+```
+
+---
+
 ## Notes and TODOs
 
 ### ambiguity producing contexts
@@ -514,10 +583,9 @@ pattern {
   - [ ] not plan (for inf-sub) to 
 
 ### Questionable Contexts
-
-  - [ ] every N subj
-  - [ ] everyone subj
-  - [ ] everything subj
+  - [x] every N subj
+  - [x] everyone subj
+  - [x] everything subj
   - [ ] if antecedent
   - [ ] if consequent
   - [ ] questions

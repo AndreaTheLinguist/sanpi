@@ -1,9 +1,11 @@
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
   ADJ [xpos=JJ]; 
-  W [lemma="without"];
-  B [lemma="be"];
-  advmod: ADJ -[advmod]-> ADV; 
-  W < B; 
-  ADJ -> B
+  BE [lemma="be"];
+  ADV < ADJ;
+  advmod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  NS [lemma="nothing"]; 
+  subj: ADJ -[nsubj|nsubjpass]-> NS;
+  NS << BE;
 }

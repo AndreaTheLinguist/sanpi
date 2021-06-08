@@ -1,13 +1,13 @@
-pattern{
+pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
   mod: ADJ -[advmod]-> ADV;
   cop: ADJ -[cop]-> BE;
-  N [lemma="not"]; 
-  S [lemma="one"]; 
-  N < S; 
+  S [lemma="none"]; 
+  ALMOST [lemma="almost"];
+  ALMOST < S;
   sub: ADJ -[nsubj|nsubjpass]-> S;
-  S << BE    
+  S << BE
 }

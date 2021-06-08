@@ -5,9 +5,11 @@ pattern{
   ADV < ADJ;
   mod: ADJ -[advmod]-> ADV;
   cop: ADJ -[cop]-> BE;
-  N [lemma="not"]; 
-  S [lemma="one"]; 
-  N < S; 
+  S [lemma <> "one"]; 
+  N [lemma="no"];
+  ALMOST [lemma="almost"];
+  ALMOST < N;
+  det: S -[det]-> N;
   sub: ADJ -[nsubj|nsubjpass]-> S;
-  S << BE    
+  S << BE
 }

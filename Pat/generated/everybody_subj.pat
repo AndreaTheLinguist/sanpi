@@ -5,7 +5,7 @@ pattern {
   ADV < ADJ;
   advmod: ADJ -[advmod]-> ADV;
   cop: ADJ -[cop]-> BE;
-  NS [lemma="nobody"]; 
+  NS [lemma="everybody"]; 
   subj: ADJ -[nsubj|nsubjpass]-> NS;
   NS << BE;
 }
