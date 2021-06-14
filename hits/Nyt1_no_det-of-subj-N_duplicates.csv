@@ -1,0 +1,3 @@
+hit_id,status,colloc,adv,adj,sent_text,sent_id,adv_index
+nyt_eng_19940820_0177_63:8,discard,that_powerful,that,powerful,"No leader , no government should be that powerful ,  -RDQ-  said xxxxxx .",nyt_eng_19940820_0177_63,8
+nyt_eng_19940820_0177_63:8,keep,that_powerful,that,powerful,"No leader , no government should be that powerful ,  -RDQ-  said xxxxxx .",nyt_eng_19940820_0177_63,8

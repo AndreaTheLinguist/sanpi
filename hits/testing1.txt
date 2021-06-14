@@ -1,6 +1,0 @@
-a
-b
-c
-only in file 1
-d
-e
