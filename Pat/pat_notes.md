@@ -1,9 +1,9 @@
 # Grew-match Patterns
 
+## Basic ADV ADJ hits
+
 ### Context `be ADV ADJ` basic
 
-- 'be' lemma
-- predicate adjective
 - adverbial modification of adjective
 - adverb restricted to immediately preceding adjective 
     to prevent sentential scopes
@@ -17,6 +17,24 @@
     - rarely
     - seldom
 
+- **Note:** _will need to make sure this doesn't return things with the wrong relationships, but should capture the "with(out) being" cases_
+
+```
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+}
+```
+
+
+### Context `SUB be ADV ADJ` basic
+
+- same as preceding, but requires subject as an insurance of relationship
+
 ```
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
@@ -28,6 +46,25 @@ pattern {
   S  []; 
   sub: ADJ -[nsubj|nsubjpass]-> S;
   S << BE
+}
+```
+
+### Context `ADV ADJ` prefilter
+
+- this would be used to:
+  - create corpora subsets: 
+    - sentences without adverbial modification of an adjective would be ignored
+    - if run once on all corpus chunks, could create a smaller sample to do full searches on
+    - would need to consider if preceding and following sentences would need to be accessed for evaluation of interpretation
+  - get a more inclusive count of adj adv collocations
+    - this may not be wanted if none of the contexts would consider pre-nominal APs
+
+```
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADJ [xpos=JJ];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
 }
 ```
 
