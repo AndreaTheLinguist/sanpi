@@ -56,6 +56,13 @@ def __main__():
     combined_contexts = pd.concat(context_dfs, ignore_index=True)
     combined_contexts.loc[:, 'polarity'] = 'negative'
 
+    # cannot do the following unless script is modified to deal with subdirs...
+    #  but if it is, polarity should just be set based on subdir in the generate_dataframes()
+    # combined_contexts.loc[
+    #     combined_contexts.context_word.isin(
+    #         ['every', 'everyone', 'everybody', 'few'])
+    # ].loc[:, 'polarity'] = 'uncertain'
+
     # reset categories
     combined_contexts.loc[
         :, cat_columns

@@ -14,6 +14,14 @@ def __main__():
     no_overlap = pd.read_pickle("no_overlap_data.pkl.gz")
     data = no_overlap.loc[:, ['colloc', 'context', 'adv', 'adj', 'polarity']]
 
+    # temp fix til processTables does this based on subdir
+    # mixed boolean indexing works bc only width differs, not height
+    data.loc[:,'polarity'] = data.polarity.cat.add_categories(['uncertain'])
+    data.loc[
+        no_overlap.context_word.isin(
+            ['every', 'everyone', 'everybody', 'few']),
+        'polarity'] = 'uncertain'
+
     positive_contexts = data[data.polarity ==
                              'positive'].context.unique()
 
@@ -24,11 +32,13 @@ def __main__():
         data.colloc, data.context)
 
     collocs_by_context.to_pickle("freq_table.pkl.gz")
+    collocs_by_context.sample(n=500).sort_index().to_csv(
+        'freq_sample500.csv')
 
     # +1 smoothing
     counts_plus_one = collocs_by_context.add(1)
-    counts_plus_one.sample(n=1000).sort_index().to_csv(
-        'freq_plus-one_sample.csv')
+    counts_plus_one.sample(n=500).sort_index().to_csv(
+        'freq_plus-one_sample500.csv')
 
     # # shows what proportion of the colloc falls in each context
     # proportion_of_colloc = pd.crosstab(
