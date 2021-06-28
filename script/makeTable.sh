@@ -11,7 +11,7 @@ if [ "$1" == "-h" ]; then
   
   exit 0
 fi
-
+  
 # conll dir (path) = "$1"
 # pattern file dir (path) = "$2"
 # log option = "$5"
@@ -54,7 +54,7 @@ do
   echo "json output dir: $jsondir"
   echo "hits file prefix: $hitslabel"
 
-  python3 ./script/grewSearchDir.py $1 $pat $jsondir && python3 ./script/FillJson.py -c $1 -r $jsondir && python3 script/tabulate.py -t -p $jsondir -o $hitslabel
+  python3 ./script/grewSearchDir.py $1 $pat $jsondir && python3 ./script/FillJson.py -c $1 -r $jsondir && python3 script/tabulateHits.py -t -p $jsondir -o $hitslabel
 done 
 
 echo
