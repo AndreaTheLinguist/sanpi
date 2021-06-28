@@ -73,7 +73,8 @@ def __main__():
 
     simplified = simplified.sort_values(by="negative_skew", ascending=False)
 
-    simplified.to_csv('prelim_summary_table.csv')
+    simplified.to_pickle('prelim_summary_table.pkl.gz')
+    simplified.iloc[:500, :].to_csv('prelim_summary_top500.csv')
 
     # counts_df = sample_data.value_counts()
     # # .to_frame().reset_index().rename(columns={0: 'counts'})
