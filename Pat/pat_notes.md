@@ -79,7 +79,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -101,7 +101,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -126,7 +126,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -149,7 +149,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -173,7 +173,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -197,7 +197,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -218,7 +218,7 @@ pattern {
 
 ```
 pattern{
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -242,7 +242,7 @@ pattern{
 
 ```
 pattern{
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -265,7 +265,7 @@ pattern{
 
 ```
 pattern{
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -292,7 +292,7 @@ pattern{
 
 ```
 pattern{
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -321,7 +321,7 @@ pattern{
 
 ```
 pattern{
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -344,7 +344,7 @@ pattern{
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -367,7 +367,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -389,7 +389,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -409,7 +409,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -432,7 +432,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -456,7 +456,7 @@ pattern {
 
 ```
 pattern{
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -478,7 +478,7 @@ pattern{
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -502,7 +502,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   W [lemma="without"];
   B [lemma="be"];
@@ -525,7 +525,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -546,7 +546,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -567,7 +567,7 @@ pattern {
 
 ```
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
   BE [lemma="be"];
   ADV < ADJ;
@@ -783,5 +783,6 @@ pattern {
   - currently only `useless` is recorded as ADJ
   - Is it possible to specify the context such that `irritating` is captured in an additional hit? 
   - Or would it be best to record the ADJ as conjoined `useless and irritating`? 
+  - cases with `no` as determiner on modified noun, e.g `no small thing`, `no big deal`
 
 
