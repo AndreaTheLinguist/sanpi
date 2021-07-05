@@ -1,3 +1,11 @@
+'''
+    This script loads a dataframe of all non-overlapping collocation tokens. All tokens that matched more than a single *informative* context (e.g. not basic, unrestricted pattern matches) are excluded from these data.
+
+    This script outputs various "samples" of data for quick illustration, as well as 2 full frequency table dataframes (pickled and compressed) generated via `pandas.crosstab`: 
+        1. 
+'''
+
+
 import os
 import sys
 import time
@@ -16,7 +24,7 @@ def __main__():
 
     # temp fix til processTables does this based on subdir
     # mixed boolean indexing works bc only width differs, not height
-    data.loc[:,'polarity'] = data.polarity.cat.add_categories(['uncertain'])
+    data.loc[:, 'polarity'] = data.polarity.cat.add_categories(['uncertain'])
     data.loc[
         no_overlap.context_word.isin(
             ['every', 'everyone', 'everybody', 'few']),
@@ -31,7 +39,9 @@ def __main__():
     collocs_by_context = pd.crosstab(
         data.colloc, data.context)
 
-    collocs_by_context.to_pickle("freq_table.pkl.gz")
+    # write full frequency table to file (compressed pickle format)
+    collocs_by_context.to_pickle("individual-contexts_freq-table.pkl.gz")
+    # write sample csv for easy illustration
     collocs_by_context.sample(n=500).sort_index().to_csv(
         'freq_sample500.csv')
 
@@ -51,15 +61,21 @@ def __main__():
     # proportion_of_colloc_sorted = proportion_of_colloc.sort_values(
     #     by="positive")
 
-    negative_counts = collocs_by_context[
-        negative_contexts].sum(axis=1)
+    # select rows via list of context (column) labels and get sum by row
+    negative_counts = collocs_by_context[negative_contexts
+                                         ].sum(axis=1)
+    positive_counts = collocs_by_context[positive_contexts
+                                         ].sum(axis=1)
 
-    positive_counts = collocs_by_context[
-        positive_contexts].sum(axis=1)
-
-    simplified = pd.DataFrame(
+    counts_raw = pd.DataFrame(
         {'positive_raw': positive_counts,
-         "negative_raw": negative_counts}).add(1)
+         "negative_raw": negative_counts})
+
+    counts_plus1 = pd.DataFrame(
+        {'positive_plus1': positive_counts,
+         "negative_plus1": negative_counts}).add(1)
+
+    simplified = counts_raw.join(counts_plus1)
 
     # simplified["positive_percent"
     #            ] = simplified.positive_raw / sum(positive_counts) * 100
@@ -81,10 +97,13 @@ def __main__():
     simplified["negative_skew"] = round(
         simplified.negative_ratio/negative_skew, 4)
 
-    simplified = simplified.sort_values(by="negative_skew", ascending=False)
+    simplified = simplified.sort_values(by="positive_skew").sort_values(
+        by="negative_skew", ascending=False)
 
-    simplified.to_pickle('prelim_summary_table.pkl.gz')
-    simplified.iloc[:500, :].to_csv('prelim_summary_top500.csv')
+    simplified.to_pickle('grouped-contexts_freq-table.pkl.gz')
+    simplified.iloc[:500, :].to_csv('prelim_summary_top500neg.csv')
+    simplified.sort_values(
+        by="positive_skew", ascending=False).iloc[:500, :].to_csv('prelim_summary_top500pos.csv')
 
     # counts_df = sample_data.value_counts()
     # # .to_frame().reset_index().rename(columns={0: 'counts'})
