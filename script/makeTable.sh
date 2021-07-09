@@ -7,7 +7,7 @@ echo "Arguments provided:" "$@"
 if [ "$1" == "-h" ]; then
   echo "Script to run all scripts for pattern directory and single corpus chunk."
   echo "Usage: `basename $0` [conlldir=path patternsdir=path (--log)]"
-  echo "if --log is included, script creates a log file of the form make_[context].log"
+  echo "if --log is included, script creates a log file of the form logs/make_[context].log"
   
   exit 0
 fi
@@ -28,6 +28,11 @@ then
     [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
 fi
 
+if [[! -d "/logs/"] && [! -L "/logs/"]]
+then
+  mkdir logs
+fi
+
 corpus=$(echo "$1" | cut -f 1 -d '.' | cut -f 1 -d '/')
 echo "Corpus segment: $corpus"
 
@@ -35,7 +40,6 @@ patterns=$(echo "$2*")
 # echo $patterns
 for pat in $patterns
 do
-  
   context=$(echo "$pat" | cut -f 1 -d '.' | cut -f 3 -d '/')
   jsondir=$(echo "data/$corpus.$context")
   hitslabel=$(echo $corpus"_"$context)
@@ -46,7 +50,7 @@ do
     exec 19> make_$context.log
     export BASH_XTRACEFD="19"
     set -x
-    echo "Log will be saved to make_$context.log"
+    echo "Log will be saved to logs/make_$context.log"
   fi
 
   echo "Pattern file path: $pat"

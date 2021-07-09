@@ -3,43 +3,62 @@ import sys
 import time
 from collections import namedtuple
 from itertools import repeat
+from pathlib import Path
 from pprint import pprint
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from tabulate import tabulate
 
 
 def __main__():
 
-    data_dir = "/home/andrea/litotes/hits"  # sys.argv[1]
+    try:
+        data_dir = Path.cwd() / "hits"
+    except OSError:
+        exit('/hits/ directory not found. Run the script from the level above your hits directory (i.e. directory containing hit info for all contexts, 1 file per context/pattern match)')
 
-    # TODO replace path with argument variable
-    files = pd.DataFrame(([f.name, f.path]
-                          for f in os.scandir(data_dir)),
-                         columns=['name', 'path'])
+    try:
+        os.mkdir(Path.cwd() / 'data_samples')
+    except OSError:
+        pass
+    sample_dir = Path.cwd() / 'data_samples'
 
-    hits_files = files[files.name.str.contains('hits')]
+    files = pd.DataFrame()
+    for pol_dir in data_dir.iterdir():
 
-    hits_files.loc[:, 'context'] = (
-        hits_files.name
-        .str.rsplit('_', 1).str.get(0)
-        .str.split('_', 1).str.get(1)).astype('string')
-    hits_files.loc[
-        :, 'context_word'] = hits_files.context.str.split('_').str.get(0)
-    hits_files.loc[
-        :, 'context_type'] = hits_files.context.str.split('_').str.get(1)
+        polarity = pol_dir.name
+
+        file_info_list = [[f.stem, f, polarity,
+                           f.stem.rsplit('_', 1)[0].split('_', 1)[1]]
+                          for f in pol_dir.iterdir()
+                          if f.stem.endswith('hits')]
+
+        pol_df = pd.DataFrame(file_info_list,
+                              columns=['name', 'path', 'polarity', 'context'])
+
+        files = files.append(pol_df, ignore_index=True)
+
+    files.loc[
+        :, 'context_word'] = files.context.str.split('_').str.get(0)
+    files.loc[
+        :, 'context_type'] = files.context.str.split('_').str.get(1)
 
     categories_dict = {
-        'context': tuple(hits_files.context.unique()),
-        'context_word': tuple(hits_files.context_word.unique()),
-        'context_type': tuple(hits_files.context_type.unique())
+        'context': tuple(files.context.unique()),
+        'context_word': tuple(files.context_word.unique()),
+        'context_type': tuple(files.context_type.unique()),
+        'polarity': tuple(files.polarity.unique())
     }
 
+    for k, v in categories_dict.items():
+        try:
+            categories_dict[k] = pd.CategoricalDtype(v)
+        except TypeError:
+            pass
+
     # process basic pattern results first
-    basic_dfs = list(generate_dataframes(hits_files, categories_dict,
-                                         basic=True))
+    basic_dfs = list(generate_dataframes(files, categories_dict, basic=True))
 
     baseline_hits = pd.concat(basic_dfs, ignore_index=True)
 
@@ -47,21 +66,13 @@ def __main__():
 
     # process context pattern results
     context_dfs = list(
-        generate_dataframes(hits_files, categories_dict, base_ids=base_hit_ids))
+        generate_dataframes(files, categories_dict, base_ids=base_hit_ids))
 
-    cat_columns = ['colloc', 'adv', 'adj',
+    cat_columns = ['colloc', 'adv', 'adj', 'polarity',
                    'context', 'context_word', 'context_type']
 
     # combine dataframes for each individual context's results
     combined_contexts = pd.concat(context_dfs, ignore_index=True)
-    combined_contexts.loc[:, 'polarity'] = 'negative'
-
-    # cannot do the following unless script is modified to deal with subdirs...
-    #  but if it is, polarity should just be set based on subdir in the generate_dataframes()
-    # combined_contexts.loc[
-    #     combined_contexts.context_word.isin(
-    #         ['every', 'everyone', 'everybody', 'few'])
-    # ].loc[:, 'polarity'] = 'uncertain'
 
     # reset categories
     combined_contexts.loc[
@@ -80,36 +91,33 @@ def __main__():
     all_contexts = pd.concat([combined_contexts, positive_df],
                              ignore_index=True)
 
+    # if more than one element in any "hit_id" group,
+    # this means the hit_id matched more than 1 pattern/context;
+    # set 'context_overlap' to True for hit
     all_contexts['context_overlap'] = (
         all_contexts.groupby('hit_id').hit_id.transform('count') > 1)
 
+    # (for now) ignore hits with any context overlap
     no_overlap = all_contexts[~all_contexts.context_overlap]
 
     print(f'{len(all_contexts) - len(no_overlap)} overlapping hits excluded')
 
-    cat_columns.append('polarity')
+    # reset categories again
+    no_overlap.loc[:, cat_columns
+                   ] = no_overlap.loc[:, cat_columns].astype("category")
 
-    no_overlap.loc[
-        :, cat_columns
-    ] = no_overlap.loc[:, cat_columns].astype("category")
-
-    # save dataframe
-
+    # save dataframe to file
     no_overlap.to_pickle("no_overlap_data.pkl.gz")
 
-    no_overlap.sample(n=5000).sort_values(by="colloc").to_csv(
-        'processed_data_sample.csv', index=False)
+    # create sample for easy viewing on github
+    no_overlap.sample(n=1000).sort_values(by="colloc").to_csv(
+        sample_dir / 'no-overlap-data_1000rows.csv', index=False)
 
 
-def generate_dataframes(files_df, categories, basic=False, base_ids=None):
-
-    for k, v in categories.items():
-
-        try:
-            categories[k] = pd.CategoricalDtype(v)
-
-        except TypeError:
-            pass
+def generate_dataframes(files_df: pd.DataFrame,
+                        categories: dict,
+                        basic: bool = False,
+                        base_ids: list = None):
 
     dtype_dict = {
         'hit_id': 'string',
@@ -123,16 +131,11 @@ def generate_dataframes(files_df, categories, basic=False, base_ids=None):
 
     if basic:
 
-        files_df = files_df[files_df.name.str.contains('basic')]
+        files_df = files_df[files_df.polarity == 'basic']
 
     else:
 
-        files_df = files_df[~files_df.name.str.contains('basic')]
-
-        # assumes these are defined in categories dict for non-basic case
-        # dtype_dict['colloc'] = categories['colloc']
-        # dtype_dict['adv'] = categories['adv']
-        # dtype_dict['adj'] = categories['adj']
+        files_df = files_df[files_df.polarity != 'basic']
 
     for i in files_df.index:
 
@@ -144,17 +147,19 @@ def generate_dataframes(files_df, categories, basic=False, base_ids=None):
         df.loc[:, 'date'] = pd.to_datetime(df.date, format='%Y%m%d')
         df.loc[:, 'year'] = pd.to_numeric(df.date.dt.year, downcast='unsigned')
 
+        df.loc[:, 'polarity'] = files_df.at[i, 'polarity']
+        df.loc[:, 'polarity'] = df.polarity.astype(categories['polarity'])
+
         df.loc[:, 'context'] = files_df.at[i, 'context']
-        df.context = df.context.astype(categories['context'])
+        df.loc[:, 'context'] = df.context.astype(categories['context'])
 
         df.loc[:, 'context_word'] = files_df.at[i, 'context_word']
-        df.context_word = df.context_word.astype(categories['context_word'])
+        df.loc[:, 'context_word'] = df.context_word.astype(
+            categories['context_word'])
 
         df.loc[:, 'context_type'] = files_df.at[i, 'context_type']
-        df.context_type = df.context_type.astype(categories['context_type'])
-
-        # df.loc[:, 'raw_colloc_count'] = df.groupby(
-        #     'colloc')['colloc'].transform('count').apply(pd.to_numeric, downcast='unsigned')
+        df.loc[:, 'context_type'] = df.context_type.astype(
+            categories['context_type'])
 
         df.loc[:, "in_basic"] = True if basic else df.hit_id.isin(base_ids)
 
@@ -163,8 +168,6 @@ def generate_dataframes(files_df, categories, basic=False, base_ids=None):
 
         colloc_sorted_df['line_in_source'] = pd.to_numeric(
             colloc_sorted_df.line_in_source + 1, downcast='unsigned')
-
-        # print(df.info())
 
         yield colloc_sorted_df
 

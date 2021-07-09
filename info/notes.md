@@ -1,18 +1,24 @@
 # start with:
 - [ ] calculate divergence between simplest distinctions
-  - [ ] write script to process pandas.Series as probability distributions
+  - [x]  ~~write script to process pandas.Series as probability distributions~~ uneccessary with `entropy()` (below)
   - [ ] read up on KL divergence more
-  - [ ] write/find KL divergence function
+  - [x] write/find KL divergence function
+    --> __*bingo!*__ `scipy.stats.entropy(p, q, base=2)`
+- [x] separate uncertain-polarity contexts from others for testing purposes
 - [ ] update scripts on Kay
 - [ ] calculate divergence between test contexts and known contexts
 
 # Up next: 
 
-- [ ] read `The Pile` corpus paper (in `zotero_files/`)
+- [ ] read *The Pile* corpus paper (in `zotero_files/`)
+- [ ] revisit other distance/divergence metrics in `scipy`
+- [ ] check out `scikit` as well
+- [ ] plot some data using `matplotlib` or `pandas.plot`
 - [ ] adapt `tabulateHits.py` to output subdirs
 - [ ] adapt `generatePatFiles.py` to output subdirs
-- [ ] adapt `processTables.py` to expect subdirectories
+- [x] adapt `processTables.py` to expect subdirectories
 - [ ] run less restrictive basic patterns on kay
+- [ ] make jupyter notebook (or at least markdown file) for pipeline? e.g. how to run all the scripts with some sample data?
 
 - [ ] write more test context patterns
 - [ ] determine contexts to run and discuss in syntax chapter: include locality constraints
@@ -29,9 +35,9 @@
 - [x] add full time spent output to shell script
 - [x] figure out how data works with Evert dissertation
 - [x] repeated documents in conll files!!!
-- [x] alter tabulate.py output
+- [x] alter `tabulate.py` output
 - [x] clean conllu files
-- [x] edits to tabulate.py output:
+- [x] edits to `tabulate.py` output:
     - [x] add field for combined `hit_id` (sent_id + adv_id)
     - [x] ~~add field for `pattern` filename?~~
     - [x] ~~remove extra whitespace characters from `sent_text`~~
@@ -55,7 +61,7 @@
     - [x] get all pair-hits of ADV ADJ for pattern 
     - [x] pipe `ADV \t ADJ \n` output to `ucs-make-tables -v`
 - [x] look at corpus study stats paper file:///C:/Users/Andrea/Downloads/cantos-2018-lexical.pdf
-- [x] fixing encoding error in tabulate for p1 outputs! (remember server tabulate.py has print() statement)
+- [x] fixing encoding error in tabulate for p1 outputs! (remember server `tabulate.py` has `print()` statement)
 
 # tabled
 - [ ] ucs needs annotation data for plots: get annotations
