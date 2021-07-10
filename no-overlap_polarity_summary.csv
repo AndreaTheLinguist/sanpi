@@ -1,0 +1,6 @@
+,colloc,colloc,colloc,colloc,context,context,context,context,adv,adv,adv,adv,adj,adj,adj,adj
+,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq
+polarity,,,,,,,,,,,,,,,,
+negative,51083,12264,immediately_available,2335,51083,13,not_VP-adv,47229,51083,763,as,12007,51083,3948,available,2823
+positive,388964,80650,too_early,2790,388964,1,be-ADV-ADJ_positive,388964,388964,3186,very,52733,388962,12814,good,10872
+uncertain,1706,1156,so_sure,24,1706,5,everyone_subj,602,1706,213,so,404,1706,659,excited,53
