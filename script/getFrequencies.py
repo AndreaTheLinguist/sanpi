@@ -20,6 +20,7 @@ from pprint import pprint
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.stats import zscore
 
 
 def __main__():
@@ -34,6 +35,11 @@ def __main__():
     no_overlap = pd.read_pickle("no_overlap_data.pkl.gz")
     data = no_overlap.loc[:, ['colloc', 'context', 'adv', 'adj', 'polarity']]
 
+    polarity_descrip = data.groupby("polarity").describe()
+
+    pprint(polarity_descrip)
+    polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
+
     positive_contexts = data[
         data.polarity == 'positive'].context.unique()
 
@@ -43,23 +49,31 @@ def __main__():
     test_contexts = data[
         data.polarity == 'uncertain'].context.unique()
 
-    data.describe()
-
-    # writes samples files to sample_dir and returns frequency table dataframe(s)
+    # write sample files to sample_dir and returns frequency table dataframe(s)
     collocs_by_context = basic_freq_table(data, sample_dir)
-    prop_of_colloc, prop_of_context = calc_proportions(data, sample_dir)
+    # collocs_by_context = pd.read_pickle(
+    #     "individual-contexts_freq-table.pkl.gz")
 
-    # select rows via list of context (column) labels and get sum by row
-    negative_counts = collocs_by_context[negative_contexts
-                                         ].sum(axis=1)
-    positive_counts = collocs_by_context[positive_contexts
-                                         ].sum(axis=1)
+    pprint(collocs_by_context.describe().sort_values("max", axis=1).round(3))
+    print("")
 
-    summarize_pos_neg(negative_counts, positive_counts, sample_dir)
+    prop_of_colloc, prop_of_context = get_proportions(data, sample_dir)
+
+    context_zscores, colloc_zscores = calc_zscores(collocs_by_context,
+                                                   sample_dir)
+
+    # select columns via list of context labels and sum by row
+    negative_counts = collocs_by_context[negative_contexts].sum(axis=1)
+    positive_counts = collocs_by_context[positive_contexts].sum(axis=1)
+
+    pos_neg_df = summarize_pos_neg(
+        negative_counts, positive_counts, sample_dir)
+
+    pprint(pos_neg_df.round(3))
 
     test_data = collocs_by_context[test_contexts]
     test_data.to_pickle("test-contexts_freq-table.pkl.gz")
-    test_data.sample(n=500).to_csv(
+    test_data.sample(n=500).sort_values("colloc").to_csv(
         sample_dir / 'test-contexts-freq_500rows.csv')
 
 
@@ -67,7 +81,7 @@ def basic_freq_table(data: pd.DataFrame, sample_dir=Path.cwd()):
 
     # get frequency table
     collocs_by_context = pd.crosstab(
-        data.colloc, data.context)
+        data.colloc, data.context).apply(pd.to_numeric, downcast="unsigned")
 
     # write full frequency table to file (compressed pickle format)
     collocs_by_context.to_pickle("individual-contexts_freq-table.pkl.gz")
@@ -83,13 +97,21 @@ def basic_freq_table(data: pd.DataFrame, sample_dir=Path.cwd()):
     return collocs_by_context
 
 
-def calc_proportions(data: pd.DataFrame, sample_dir=Path.cwd()):
+def get_proportions(data: pd.DataFrame, sample_dir=Path.cwd()):
 
     # shows what proportion of the colloc falls in each context
     proportion_of_colloc = pd.crosstab(
-        data.colloc, data.context, margins=True, margins_name='all_collocs', normalize='index')
+        data.colloc, data.context,
+        margins=True, margins_name='all_collocs', normalize='index'
+    ).round(3).apply(pd.to_numeric, downcast="float")
+
+    # make sample
     colloc_prop_sample = proportion_of_colloc.sample(
         n=500).append(proportion_of_colloc.loc["all_collocs", :])
+
+    colloc_prop_sample = (
+        colloc_prop_sample.sort_index()
+        .sort_values("all_collocs", axis=1, ascending=False))
 
     # write sample file
     colloc_prop_sample.to_csv(
@@ -97,15 +119,35 @@ def calc_proportions(data: pd.DataFrame, sample_dir=Path.cwd()):
 
     # shows what proportion of the context falls in each colloc
     proportion_of_context = pd.crosstab(
-        data.colloc, data.context, margins=True, margins_name='all_contexts', normalize='columns')
-    context_prop_sample = proportion_of_context.sample(
-        n=500)
+        data.colloc, data.context,
+        margins=True, margins_name='all_contexts', normalize='columns'
+    ).round(3).apply(pd.to_numeric, downcast="float")
+
+    # make sample
+    context_prop_sample = (
+        proportion_of_context.sample(n=500)
+        .sort_index()
+        .sort_values("all_contexts", ascending=False))
 
     # write sample file
     context_prop_sample.to_csv(
         sample_dir / "contextProportion_500rows.csv")
 
     return proportion_of_colloc, proportion_of_context
+
+
+def calc_zscores(freq_df: pd.DataFrame, sample_dir=Path.cwd()):
+
+    column_z = freq_df.apply(zscore, raw=True
+                             ).round(4).apply(pd.to_numeric, downcast="float")
+
+    row_z = freq_df.apply(zscore, axis=1, result_type="expand", raw=True
+                          ).round(4).apply(pd.to_numeric, downcast="float")
+
+    column_z.sample(500).to_csv(sample_dir / "context-zscores_500rows.csv")
+    row_z.sample(500).to_csv(sample_dir / "colloc-zscores_500rows.csv")
+
+    return column_z, row_z
 
 
 def summarize_pos_neg(negative, positive, sample_dir=Path.cwd()):
@@ -115,16 +157,21 @@ def summarize_pos_neg(negative, positive, sample_dir=Path.cwd()):
         {'positive_raw': positive,
          "negative_raw": negative})
 
+    z_counts = counts_raw.apply(zscore).rename(columns={
+        "positive_raw": "positive_z",
+        "negative_raw": "negative_z"}
+    ).round(4).apply(pd.to_numeric, downcast="float")
+
+    # +1 smoothing counts dataframe
+    counts_plus1 = counts_raw.add(1).rename(columns={
+        "positive_raw": "positive_plus1",
+        "negative_raw": "negative_plus1"})
+
     # add "total" column (cannot add row due to category type limitations)
     counts_raw["total_raw"] = counts_raw.sum(axis=1)
 
-    # +1 smoothing counts dataframe
-    counts_plus1 = pd.DataFrame(
-        {'positive_plus1': positive,
-         "negative_plus1": negative}).add(1)
-
-    # combined raw and +1 smoothed counts dataframe
-    simplified = counts_raw.join(counts_plus1)
+    # combined raw, z-scored, and +1 smoothed counts dataframe
+    simplified = counts_raw.join(z_counts).join(counts_plus1)
 
     simplified["positive_ratio"] = round(
         simplified.positive_raw / simplified.total_raw, 4)
@@ -148,6 +195,8 @@ def summarize_pos_neg(negative, positive, sample_dir=Path.cwd()):
     simplified.sort_values(
         by="positive_skew", ascending=False).iloc[:500, :].to_csv(
             sample_dir / 'pos-neg-split_top500pos.csv')
+
+    return simplified
 
 
 if __name__ == '__main__':
