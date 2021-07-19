@@ -4,6 +4,7 @@
 script to read pat_notes.md and pull out all literal blocks specifying a pattern then write each pattern to a .pat file and create a reference file connecting the heading label for a given pattern and its filename. 
 
 to be run from dir containing both Pat/ and script/
+Cannot be run from local dir
 '''
 
 import os
@@ -15,13 +16,13 @@ from pathlib import Path
 
 pat_tup = namedtuple('pat_info', ['text', 'start', 'end'])
 
-with open(f'{Path.cwd()}/Pat/pat_notes.md', 'r') as N:
-    notes = N.read().strip()
+with open(f'{Path.cwd()}/Pat/pat_notes.md', 'r') as notesfile:
+    notes = notesfile.read().strip()
     heading = re.compile(r'### Context (`[\w ]*`) ([ \w`]*)')
     # pprint(heading.findall(notes))
     heading_iter = heading.finditer(notes)
 
-    pat = re.compile(r'```\s+(pattern[^`]+)```')
+    pat = re.compile(r'```java\s+(pattern[^`]+)```')
     # pprint(pat.findall(notes))
     pattern_iter = pat.finditer(notes)
 

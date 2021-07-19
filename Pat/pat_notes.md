@@ -5,21 +5,21 @@
 ### Context `be ADV ADJ` basic
 
 - adverbial modification of adjective
-- adverb restricted to immediately preceding adjective 
+- adverb restricted to immediately preceding adjective
     to prevent sentential scopes
 - must have at least 1 adverb that isn't inherently negative. Excludes (lemmas):
 
-    - not
-    - never
-    - scarcely
-    - hardly
-    - barely
-    - rarely
-    - seldom
+  - not
+  - never
+  - scarcely
+  - hardly
+  - barely
+  - rarely
+  - seldom
 
 - **Note:** _will need to make sure this doesn't return things with the wrong relationships, but should capture the "with(out) being" cases_
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
   ADJ [xpos=JJ]; 
@@ -30,12 +30,11 @@ pattern {
 }
 ```
 
-
 ### Context `SUB be ADV ADJ` basic
 
 - same as preceding, but requires subject as an insurance of relationship
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
   ADJ [xpos=JJ]; 
@@ -52,14 +51,14 @@ pattern {
 ### Context `ADV ADJ` prefilter
 
 - this would be used to:
-  - create corpora subsets: 
+  - create corpora subsets:
     - sentences without adverbial modification of an adjective would be ignored
     - if run once on all corpus chunks, could create a smaller sample to do full searches on
     - would need to consider if preceding and following sentences would need to be accessed for evaluation of interpretation
   - get a more inclusive count of adj adv collocations
     - this may not be wanted if none of the contexts would consider pre-nominal APs
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"];
   ADJ [xpos=JJ];
@@ -68,7 +67,7 @@ pattern {
 }
 ```
 
-## VP Context Restrictions 
+## VP Context Restrictions
 
 ### Context `not` VP adv
 
@@ -77,7 +76,7 @@ pattern {
 - *John wasn't extremely happy*
 - currently `nc0.pat`
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -99,7 +98,7 @@ pattern {
 - `never`
 - *John was never extremely happy*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -119,12 +118,12 @@ pattern {
 
 ### Context `nobody` subj
 
-- negative subject 
+- negative subject
 - negated existential
 - NN: `nobody`
 - *Nobody's extremely happy*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -140,14 +139,14 @@ pattern {
 
 ### Context `no one` subj
 
-- negative subject 
+- negative subject
 - negated existential
 - DP: `no one`
 - *No one was extremely happy*
 - more frequent than `nobody`
 - currenty `nc1.pat`
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -165,13 +164,13 @@ pattern {
 
 ### Context `no` det of subj N
 
-- negative subject 
+- negative subject
 - negated existential
 - unspecified subject `NOUN` with determiner `no`
 - *No teacher was extremely happy*
 - ? *No students were extremely happy*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -195,7 +194,7 @@ pattern {
 - *None were extremely happy*
 - *None of the students were extremely happy*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -216,7 +215,7 @@ pattern {
 - Determiner/Quantifier `neither NN`
 - *Neither restaurant was incredibly good*
 
-```
+```java
 pattern{
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -240,7 +239,7 @@ pattern{
 - *Neither's totally amazing*
 - *Neither of the boys is super excited*
 
-```
+```java
 pattern{
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -263,7 +262,7 @@ pattern{
 - ? *Not one option was exactly good.*
 - **no hits found while debugging**
 
-```
+```java
 pattern{
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -290,7 +289,7 @@ pattern{
 - ? *Not a single option was super enticing.*
 - **no hits found while debugging**
 
-```
+```java
 pattern{
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -319,7 +318,7 @@ pattern{
 - ? *Not one was exactly good.*
 - **no hits found while debugging**
 
-```
+```java
 pattern{
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -342,7 +341,7 @@ pattern{
 - *Nothing was super cheap.*
 - *Nothing's entirely certain.*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -356,16 +355,15 @@ pattern {
 }
 ```
 
-
 ## Mitigated Negated Existentials
 
 ### Context `few` det of subj
 
 - mitigated existential negation
-- `few` determiner 
+- `few` determiner
 - **need to disambiguate the *very few* cases from the *a few* cases**
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -387,7 +385,7 @@ pattern {
 - `few` as elided subject
 - **need to disambiguate the *very few* cases from the *a few* cases**
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -407,7 +405,7 @@ pattern {
 - *Almost nobody was entirely pleased.*
 - ought to work but currently gets no hits in sample files
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -430,7 +428,7 @@ pattern {
 - ought to work but currently gets no hits in sample files
 - currently `nc2.pat`
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -454,7 +452,7 @@ pattern {
 - *Almost no member was entirely thrilled.*
 - ought to work but currently gets no hits in sample files
 
-```
+```java
 pattern{
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -476,7 +474,7 @@ pattern{
 
 - `almost none` with optional `of` PP
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -500,7 +498,7 @@ pattern {
 - semi-restrictive right now, but not catching things that should be excluded
 - currently `nc3.pat`
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -523,7 +521,7 @@ pattern {
 - does not licencse NPIs
   - **Everyone has any money.*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -544,7 +542,7 @@ pattern {
 - does not licencse NPIs
   - **Everybody has any money.*
 
-```
+```java
 pattern {
   ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -565,7 +563,7 @@ pattern {
 - does not license NPIs
 - **Every student has any money.*
 
-```
+```java
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ]; 
@@ -586,52 +584,53 @@ pattern {
 ## Notes and TODOs
 
 ### ambiguity producing contexts
-  - [x] almost nobody
-  - [x] almost no one
-  - [x] almost no NN
-  - [x] almost none
-  - [ ] almost never
-  - [ ] almost not
-  - [x] without being
-  - [ ] scarcely any (~very few)
-  - [ ] scarcely 
-  - [ ] rarely
-  - [ ] barely
-  - [ ] hardly
-  - [ ] seldom
-  - [ ] doubt (essentially lexicalized neg-raising conext `not believe`)
-  - [ ] deny? --> weak NPI only
-  - [ ] prevent? --> weak NPI only
-  - [ ] not think 
-  - [ ] not believe 
-  - [ ] not suppose 
-  - [ ] not expect
-  - [ ] not imagine
-  - [ ] not suppose 
-  - [ ] not look like
-  - [ ] not seem (like, that)
-  - [ ] not appear (that)
-  - [ ] not likely (that)
-  - [ ] not probable (that)
-  - [ ] not want (inf-sub) to
-  - [ ] not wish (inf-sub, for inf-sub) to
-  - [ ] not wish that? **does this allow for neg-raising?**
-  - [ ] not intend (inf-sub, for inf-sub) to
-  - [ ] not plan (for inf-sub) to 
+
+- [x] almost nobody
+- [x] almost no one
+- [x] almost no NN
+- [x] almost none
+- [ ] almost never
+- [ ] almost not
+- [x] without being
+- [ ] scarcely any (~very few)
+- [ ] scarcely
+- [ ] rarely
+- [ ] barely
+- [ ] hardly
+- [ ] seldom
+- [ ] doubt (essentially lexicalized neg-raising conext `not believe`)
+- [ ] deny? --> weak NPI only
+- [ ] prevent? --> weak NPI only
+- [ ] not think
+- [ ] not believe
+- [ ] not suppose
+- [ ] not expect
+- [ ] not imagine
+- [ ] not suppose
+- [ ] not look like
+- [ ] not seem (like, that)
+- [ ] not appear (that)
+- [ ] not likely (that)
+- [ ] not probable (that)
+- [ ] not want (inf-sub) to
+- [ ] not wish (inf-sub, for inf-sub) to
+- [ ] not wish that? **does this allow for neg-raising?**
+- [ ] not intend (inf-sub, for inf-sub) to
+- [ ] not plan (for inf-sub) to
 
 ### Questionable Contexts
-  - [x] every N subj
-  - [x] everyone subj
-  - [x] everything subj
-  - [ ] if antecedent
-  - [ ] if consequent
-  - [ ] questions
-  - [ ] all N subj
-  - [ ] none restriction
-  - [ ] no restriction 
 
+- [x] every N subj
+- [x] everyone subj
+- [x] everything subj
+- [ ] if antecedent
+- [ ] if consequent
+- [ ] questions
+- [ ] all N subj
+- [ ] none restriction
+- [ ] no restriction
 
-- `almost` + any of the negated existentials 
+- `almost` + any of the negated existentials
   - `almost` will have `advmod` dependency
   - `neg-quant -[advmod]-> almost`
   - actually, better to just use linear relationship, I think...
@@ -639,14 +638,14 @@ pattern {
   - `almost` context will be subset of more basic restriction, so should be peeled off first
 
 - neg-raising interveners
-  - need to check on whether these cases are included by default in c0 or if the delineation of the copula and subject, etc. prevent it? 
+  - need to check on whether these cases are included by default in c0 or if the delineation of the copula and subject, etc. prevent it?
   - list from Horn Neg-Raising chapter in Oxford Handbook of Negation
     - believe, suppose, think
-    - expect, imagine    
+    - expect, imagine
     - be likely, probable
     - seem, appear, look like
     - intend, choose, plan to
-    - want, wish, 
+    - want, wish,
     - suggest, advise
 
     - advisable, desirable
@@ -662,7 +661,7 @@ pattern {
 
     - I don't __ they have any money, either.
       - think
-        - I don't think they have any money, either. 
+        - I don't think they have any money, either.
           - [low] ~ I think that they have no money
           - [high] ~ It is not the case that I think they have money.
         - \*I think they have any money, either.
@@ -670,15 +669,15 @@ pattern {
         - I don't believe they have any money, either.
         - \*I believe they have any money, either.
       - suppose
-        - I don't suppose they have any money, either. 
+        - I don't suppose they have any money, either.
         - \*I suppose they have any money, either.
       - expect
-        - I don't expect they have any money, either. 
+        - I don't expect they have any money, either.
         - \*I expect they have any money, either.
       - imagine
-        - I don't imagine they have any money, either. 
+        - I don't imagine they have any money, either.
         - \*I imagine they have any money, either.
-    
+
     - It isn't __ (that) they have any money, either.
       - likely
         - It isn't likely they have any money, either.
@@ -703,43 +702,41 @@ pattern {
       - want
         - I didn't want to give them any money, either.
         - \*I wanted to give them any money (either).
-        - I wanted to give them ({the, some}) money, too. 
+        - I wanted to give them ({the, some}) money, too.
       - wish
         - I didn't wish to give them any money, either.
         - \*I wished to give them any money (either).
-        - I wished to give them money. 
-      - intend 
-        - I didn't intend to give them any money, either. 
-        - I intended to give them money. 
-        - \*I intended to give them any money. 
-      - plan 
-        - I didn't plan to give them any money, either. 
-        - I planned to give them money. 
+        - I wished to give them money.
+      - intend
+        - I didn't intend to give them any money, either.
+        - I intended to give them money.
+        - \*I intended to give them any money.
+      - plan
+        - I didn't plan to give them any money, either.
+        - I planned to give them money.
         - I planned to give them some money, too.
         - \*I planned to give them any money (either).
       - choose
-        - I didn't choose to give them any money, either. 
+        - I didn't choose to give them any money, either.
         - I chose to give them (some) money (too)
         - \*I chose to give them any money (either)
 
     - I don't __ (that) you give them any money (either)
       - advise
-        - I don't advise that you give them any money, either. 
-        - I advise that you give them money. 
-        - I advise that you give them some money, too. 
+        - I don't advise that you give them any money, either.
+        - I advise that you give them money.
+        - I advise that you give them some money, too.
         - *I advise that you give them any money, either.
       - suggest
-        - I don't suggest that you give them any money, either. 
-        - I suggest that you give them money. 
+        - I don't suggest that you give them any money, either.
+        - I suggest that you give them money.
         - I suggest that you give them some money.
         - *I suggest that you give them any money.
       - recommend
-        - I don't recommend that you give them any money, either. 
-        - I recommend that you give them money. 
+        - I don't recommend that you give them any money, either.
+        - I recommend that you give them money.
         - I recommend that you give them some money.
         - *I recommend that you give them any money.
-
-
 
 - mitigated negative adverbs: scarcely, rarely, barely, hardly, etc.
 
@@ -777,12 +774,16 @@ pattern {
 
     - I didn't {acknowledge, deny} having the keys, either.
 
-
-- what to do with conjoined predicates like this? 
+- what to do with conjoined predicates like this?
   - _**Nothing is more unequivocally useless and irritating** than to listen to someone rattle off his Top 10 anything..._
   - currently only `useless` is recorded as ADJ
-  - Is it possible to specify the context such that `irritating` is captured in an additional hit? 
-  - Or would it be best to record the ADJ as conjoined `useless and irritating`? 
+  - Is it possible to specify the context such that `irritating` is captured in an additional hit?
+  - Or would it be best to record the ADJ as conjoined `useless and irritating`?
   - cases with `no` as determiner on modified noun, e.g `no small thing`, `no big deal`
-
-
+  
+- What's going on with `because` here?
+  - *He didn't leave because he was particularly upset*
+  - does this license NPIs?
+  - Is it litotes?
+  - does `because` block negation?
+  
