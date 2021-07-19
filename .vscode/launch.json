@@ -56,9 +56,9 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "-p",
-                "Nyt1.none",
+                "Nyt1clean.try",
                 "-o",
-                "Nyt1_none",
+                "Nyt1clean_try",
                 "-t"
             ]
         },
@@ -150,7 +150,6 @@
             "type": "bashdb",
             "request": "launch",
             "program": "/home/andrea/litotes/script/makeTable.py",
-            "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "args": [
                 "/home/andrea/litotes/Nyt1.conll_clean/",

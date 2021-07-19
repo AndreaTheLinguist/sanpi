@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import zscore
 
+# TODO: create argument input structure: file names, load previously created data, verbose, exclusion threshold, etc.
+
 
 def __main__():
 
@@ -31,14 +33,13 @@ def __main__():
         pass
     sample_dir = Path.cwd() / 'data_samples'
 
-    # TODO: make this path an argument instead of fixed?
     no_overlap = pd.read_pickle("no_overlap_data.pkl.gz")
     data = no_overlap.loc[:, ['colloc', 'context', 'adv', 'adj', 'polarity']]
 
-    polarity_descrip = data.groupby("polarity").describe()
+    # polarity_descrip = data.groupby("polarity").describe()
 
-    pprint(polarity_descrip)
-    polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
+    # pprint(polarity_descrip)
+    # polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
 
     positive_contexts = data[
         data.polarity == 'positive'].context.unique()
@@ -66,10 +67,15 @@ def __main__():
     negative_counts = collocs_by_context[negative_contexts].sum(axis=1)
     positive_counts = collocs_by_context[positive_contexts].sum(axis=1)
 
-    pos_neg_df = summarize_pos_neg(
-        negative_counts, positive_counts, sample_dir)
+    # default threshold of 3 will be used
+    compare_2_count_series(positive_counts, negative_counts,
+                           'positive', 'negative',
+                           sample_dir)
 
-    pprint(pos_neg_df.round(3))
+    # also create dataframe/samples with no min threshold of occurences
+    compare_2_count_series(positive_counts, negative_counts,
+                           'positive', 'negative',
+                           sample_dir, threshold=0)
 
     test_data = collocs_by_context[test_contexts]
     test_data.to_pickle("test-contexts_freq-table.pkl.gz")
@@ -115,7 +121,7 @@ def get_proportions(data: pd.DataFrame, sample_dir=Path.cwd()):
 
     # write sample file
     colloc_prop_sample.to_csv(
-        sample_dir / "collocProportion_500plusTotalRow.csv")
+        sample_dir / "colloc-proportion_500plusTotalRow.csv")
 
     # shows what proportion of the context falls in each colloc
     proportion_of_context = pd.crosstab(
@@ -144,59 +150,83 @@ def calc_zscores(freq_df: pd.DataFrame, sample_dir=Path.cwd()):
     row_z = freq_df.apply(zscore, axis=1, result_type="expand", raw=True
                           ).round(4).apply(pd.to_numeric, downcast="float")
 
-    column_z.sample(500).to_csv(sample_dir / "context-zscores_500rows.csv")
-    row_z.sample(500).to_csv(sample_dir / "colloc-zscores_500rows.csv")
+    column_z.sample(500).to_csv(sample_dir / "contextZscores_500rows.csv")
+    row_z.sample(500).to_csv(sample_dir / "collocZscores_500rows.csv")
 
     return column_z, row_z
 
 
-def summarize_pos_neg(negative, positive, sample_dir=Path.cwd()):
+def compare_2_count_series(counts1: pd.Series, counts2: pd.Series,
+                           name1='positive', name2='negative',
+                           sample_dir=Path.cwd(),
+                           threshold=3, precision=5):
+
+    fileprefix = f'{name1}-{name2}'
 
     # raw counts seed dataframe
     counts_raw = pd.DataFrame(
-        {'positive_raw': positive,
-         "negative_raw": negative})
-
-    z_counts = counts_raw.apply(zscore).rename(columns={
-        "positive_raw": "positive_z",
-        "negative_raw": "negative_z"}
-    ).round(4).apply(pd.to_numeric, downcast="float")
-
-    # +1 smoothing counts dataframe
-    counts_plus1 = counts_raw.add(1).rename(columns={
-        "positive_raw": "positive_plus1",
-        "negative_raw": "negative_plus1"})
+        {f'{name1}_raw': counts1,
+         f'{name2}_raw': counts2})
 
     # add "total" column (cannot add row due to category type limitations)
-    counts_raw["total_raw"] = counts_raw.sum(axis=1)
+    counts_raw.loc[:, 'total_raw'] = counts_raw.sum(axis=1)
+
+    # filter out low frequency collocations
+    # (default: at least 3 total ocurrences)
+    orig_num_colloc = len(counts_raw)
+    counts_raw = counts_raw[counts_raw.total_raw >= threshold].apply(
+        pd.to_numeric, downcast='unsigned')
+    rawtotal = counts_raw.total_raw
+    filtered_num_colloc = len(counts_raw)
+    print(
+        f'Minimum combined token threshold of {threshold} applied --> {orig_num_colloc - filtered_num_colloc} rare collocations removed. {filtered_num_colloc} unique collocation pairs remain.')
+
+    z_counts = counts_raw.apply(zscore)
+    z_counts.columns = z_counts.columns.str.replace('raw', 'z')
+
+    # calculate simple ratios of hits per context out of total hits
+    # (for each collocation)
+    ratios = counts_raw.iloc[:, :2].apply(lambda x: x / rawtotal)
+    ratios.fillna(0, inplace=True)
+    ratios.columns = ratios.columns.str.replace('raw', 'ratio')
+
+    simplified = counts_raw.join(z_counts).join(ratios)
+
+    baseline_freq_ratios = counts_raw.iloc[:, :2].sum()/rawtotal.sum()
+
+    simplified.loc[:, f"{name1}_skew"] = (
+        ratios.iloc[:, 0] / baseline_freq_ratios[0])
+    simplified.loc[:, f"{name2}_skew"] = (
+        ratios.iloc[:, 1] / baseline_freq_ratios[1])
+
+    is_continuous = simplified.columns.str.endswith(('z', 'ratio', 'skew'))
+    simplified.loc[:, is_continuous] = simplified.loc[
+        :, is_continuous].round(precision).apply(pd.to_numeric, downcast='float')
+
+    simplified = simplified.sort_values(
+        ["negative_skew", "total_z", "negative_z"],
+        ascending=[False]*3)
+
+    pprint(simplified.head(10))
+
+    # +1 smoothing counts dataframe
+    counts_plus1 = simplified.iloc[:, :2].add(1)
+    counts_plus1.columns = counts_plus1.columns.str.replace("raw", "plus1")
 
     # combined raw, z-scored, and +1 smoothed counts dataframe
-    simplified = counts_raw.join(z_counts).join(counts_plus1)
+    simplified = simplified.join(counts_plus1)
 
-    simplified["positive_ratio"] = round(
-        simplified.positive_raw / simplified.total_raw, 4)
-    simplified["negative_ratio"] = round(
-        simplified.negative_raw / simplified.total_raw, 4)
-
-    positive_skew = sum(positive)/sum(simplified.total_raw)
-    negative_skew = sum(negative)/sum(simplified.total_raw)
-
-    simplified["positive_skew"] = round(
-        simplified.positive_ratio/positive_skew, 4)
-    simplified["negative_skew"] = round(
-        simplified.negative_ratio/negative_skew, 4)
-
-    simplified = simplified.sort_values(by="positive_skew").sort_values(
-        by="negative_skew", ascending=False)
-
-    simplified.to_pickle('pos-neg-split_freq-table.pkl.gz')
+    simplified.to_pickle(f'{fileprefix}_thresh{threshold}_freq-table.pkl.gz')
     simplified.iloc[:500, :].to_csv(
-        sample_dir / 'pos-neg-split_top500neg.csv')
+        sample_dir / f'{fileprefix}_thresh{threshold}_top500neg.csv')
     simplified.sort_values(
         by="positive_skew", ascending=False).iloc[:500, :].to_csv(
-            sample_dir / 'pos-neg-split_top500pos.csv')
+            sample_dir / f'{fileprefix}_thresh{threshold}_top500pos.csv')
 
-    return simplified
+    simplified.sort_values("total_raw", ascending=False).iloc[:500, :].to_csv(
+        sample_dir / f'{fileprefix}_thresh{threshold}_500-most-common.csv')
+
+    pprint(simplified.round(3))
 
 
 if __name__ == '__main__':
