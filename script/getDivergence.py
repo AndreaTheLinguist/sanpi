@@ -43,6 +43,8 @@ divergence = pd.concat({'div_from_pos': pos_divs,
 divergence.loc[:, "difference"] = pos_divs - neg_divs
 
 print(divergence.round(3))
+
+divergence.round(4).to_csv('data_samples/preliminary_KLdiv_table.csv')
 # neg_every_div = entropy(neg_dist, every_combined_dist, base=2)
 # pos_every_div = entropy(pos_dist, every_combined_dist, base=2)
 
