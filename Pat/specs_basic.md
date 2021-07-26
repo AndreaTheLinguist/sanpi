@@ -2,7 +2,7 @@
 
 - can have bulleted list here for general info on pattern category
 
-## `ADV ADJ` prefilter TEST
+## `ADV ADJ` prefilter
 
 - this would be used to:
   - create corpora subsets:
@@ -47,7 +47,7 @@ pattern {
 }
 ```
 
-## `SUBJ be ADV ADJ` subj restriction
+## `S be ADV ADJ` subj control
 
 - same as preceding, but requires subject as an insurance of relationship
   

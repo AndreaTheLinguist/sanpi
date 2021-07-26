@@ -23485,3 +23485,15 @@ playground/scratch.ipynb
 playground/simpleReadConllu.py
 test_json_dir/duplicates_notes.md
 
+try_conllu/nyt_eng_199912.conllu
+data/Nyt1.Nyt1clean/nyt_eng_199407.raw.json
+data/Nyt1.Nyt1clean/nyt_eng_199805.raw.json
+data/Nyt1.Nyt1clean/nyt_eng_199912.raw.json
+data/Nyt1.try/nyt_eng_199407.raw.json
+data/Nyt1.try/nyt_eng_199805.raw.json
+data/Nyt1.try/nyt_eng_199912.json
+data/Nyt1.try/nyt_eng_199912.raw.json
+data/try_conllu.try/nyt_eng_199912.json
+data/try_conllu.try/nyt_eng_199912.raw.json
+old/Nyt1.conll/nyt_eng_199407.conllu
+old/Nyt1.conll/nyt_eng_199912.conllu

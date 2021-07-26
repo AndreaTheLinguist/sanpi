@@ -23,6 +23,8 @@ pattern {
 }
 ```
 
+---
+
 ## `never` VP adv
 
 - negative adverb on VP
@@ -45,9 +47,9 @@ pattern {
 }
 ```
 
-## VP Context Restrictions
+---
 
-### Context `not` VP adv
+## `not` VP adv
 
 - negation of predicate adjective
 - *John is not extremely happy*
@@ -70,7 +72,9 @@ pattern {
 }
 ```
 
-### Context `never` VP adv
+---
+
+## `never` VP adv
 
 - negative adverb on VP
 - `never`
@@ -92,7 +96,9 @@ pattern {
 }
 ```
 
-### Context `without being` PP
+---
+
+## `without being` PP
 
 - `without being`
 - semi-restrictive right now, but not catching things that should be excluded
@@ -109,5 +115,3 @@ pattern {
   ADJ -> B
 }
 ```
-
----
