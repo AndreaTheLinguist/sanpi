@@ -3,23 +3,37 @@
 ## start with
 
 - [x] debug dataframe NaN calculated cells
-- [ ] calculate divergence between simplest distinctions
-  - [x]  ~~write script to process pandas.Series as probability distributions~~ uneccessary with `entropy()` (below)
+- [x] calculate divergence between simplest distinctions
+  - [x]  ~~write script to process pandas.Series as probability distributions~~ 
+    uneccessary with `entropy()` (below)
   - [ ] read up on KL divergence more
-  - [ ] positive || negative, "test" || positive/negative
+  - [x] positive || negative, "test" || positive/negative
   - [ ] coding cost, information theory KL divergence
   - [x] write/find KL divergence function
     --> __*bingo!*__ `scipy.stats.entropy(p, q, base=2)`
 - [x] separate uncertain-polarity contexts from others for testing purposes
 - [x] add sample files with minimum count threshold (=5?)
 - [ ] update scripts on Kay
-- [ ] calculate divergence between test contexts and known contexts
+- [x] calculate divergence between test contexts and known contexts
 - [ ] write more test context patterns
 
 ## meeting notes
 
-multinomial stats to augment actual occurence of data
-should be large effect size
+- multinomial stats to augment actual occurence of data
+- should be large effect size
+
+## idea notes
+
++ How to organize patterns and data:
+
+  - patterns specify polarity in context heading (of `pat_notes.md`)
+  - to speed up data gathering, could:
+    1. split each of the new polarity subdirectories into arbitrary chunks
+    2. split subdirs into non-arbitrary chunks also specified in `pat_notes.md`
+  - Option 1 would be simplest, though the split would have to be either predetermined (size) 
+    or calculated based on number of patterns in subdir
+  - Option 2 would be extra work on the front end, but would be more meaningful
+    and then could also be used in processing and analysis
 
 ## Up next
 
