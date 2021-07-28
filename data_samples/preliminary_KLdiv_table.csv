@@ -1,8 +1,8 @@
-,div_from_pos,div_from_neg,difference
-every_det-of-subj,2.0693,1.2899,0.7794
-everybody_subj,2.0722,1.2918,0.7804
-everyone_subj,2.0738,1.2941,0.7797
-few_det-of-subj,2.0686,1.2872,0.7814
-few_subj,2.0665,1.2876,0.7789
-every_combined,2.0785,1.2985,0.78
-few_combined,2.0668,1.2861,0.7807
+,div_from_pos,div_from_neg,lean_toward_pos
+every_det-of-subj,3.8301,4.0887,0.2587
+everybody_subj,3.9126,4.1724,0.2599
+everyone_subj,3.5938,3.8361,0.2423
+few_det-of-subj,3.3277,3.4391,0.1113
+few_subj,3.9143,4.0677,0.1534
+every_combined,3.1583,3.4086,0.2502
+few_combined,3.1169,3.2397,0.1228
