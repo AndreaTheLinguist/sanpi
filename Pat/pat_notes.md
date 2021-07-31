@@ -1,6 +1,11 @@
 # Pattern Notes and TODOs
 
-## ambiguity producing contexts
+## Unambiguous contexts
+
+- [ ] simple sentence with no elements included in the next to sections... 
+- [ ] context above a "blocking" verb (or whatever it's called), e.g. *know*, *discover* (factives?)
+
+## Ambiguity producing contexts
 
 - [x] almost nobody
 - [x] almost no one
@@ -35,7 +40,7 @@
 - [ ] not intend (inf-sub, for inf-sub) to
 - [ ] not plan (for inf-sub) to
 
-## Questionable Contexts
+## Questionable contexts
 
 - [x] every N subj
 - [x] everyone subj
