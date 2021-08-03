@@ -54,6 +54,12 @@ contextgrp=$(echo "$(basename $patdir)")
 
 if [[ $logdir ]]
 then   
+
+  if [[ ! -d $logdir ]]
+  then 
+    mkdir $logdir
+  fi
+  
   corplogdir=$(echo $logdir/$corpus)
 
   if [[ ! -d $corplogdir ]]
@@ -72,6 +78,25 @@ then
 fi
 
 echo "# Running \`$(dirname $0)/$(basename $0)\`"
+
+echo "_Checking for required packages..._"
+echo "\`\`\`"
+if [[ $(echo "`which pyconll`" ) == "" ]]
+then 
+  echo "pyconll package not found:"
+  echo "pip3 install pyconll"
+  pip3 install pyconll
+  echo " "
+fi
+
+if [[ $(echo "`which pandas`" ) == "" ]]
+then
+  echo "pandas package not found:"
+  echo "pip3 install pandas"
+  pip3 install pandas
+fi
+echo "\`\`\`"
+
 echo "## >> Searching \`$corpusdir\` for \`$contextgrp\` patterns"
 echo " "
 echo "- started by: \`$(whoami)\`"

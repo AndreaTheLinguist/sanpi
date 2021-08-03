@@ -265,4 +265,5 @@ if __name__ == '__main__':
     __main__()
     absFinish = time.perf_counter()
     print(
-        f'Time elapsed: {round((absFinish - absStart)/60, 2)} minutes')
+        f'\nTime elapsed: {round((absFinish - absStart)/60, 2)} minutes\n'
+          '====================================\n')

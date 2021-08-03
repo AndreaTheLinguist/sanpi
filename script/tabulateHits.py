@@ -1,10 +1,7 @@
 # coding=utf-8
 
 import argparse
-
 import json
-
-
 import sys
 import time
 from collections import namedtuple
@@ -440,9 +437,16 @@ def createOutput(hits, args, write_duplicates=False):
 
     view_sample_size = min(5, len(hits_df))
     label = 'Duplicates' if write_duplicates else 'Data'
-    print(f'```\n#### {label} Sample\n')
-    print(hits_df[['colloc', 'sent_text']].sample(
-        view_sample_size).to_markdown())
+    
+    try: 
+        print_table = hits_df[['colloc', 'sent_text']].sample(
+            view_sample_size).to_markdown()
+    except ImportError:
+        pass
+    else:
+        print(f'```\n#### {label} Sample\n')
+        print(print_table)
+        
     print('```')
     # write_file(outputDir, fname, fields, rows, txt)
 
@@ -481,4 +485,5 @@ if __name__ == '__main__':
     absStart = time.perf_counter()
     __main__()
     absFinish = time.perf_counter()
-    print(f'Time elapsed: {round(absFinish - absStart, 3)} seconds')
+    print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
+          '====================================\n')

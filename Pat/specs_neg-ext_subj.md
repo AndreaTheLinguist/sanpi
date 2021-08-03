@@ -1,4 +1,4 @@
-# Neg Subj
+# Neg Ext Subj
 
 - This document describes `GREW-match` patterns for contexts that have the negation as part of the subject noun phrase. There are 2 formulations of this: 
   1. negative determiners on a noun/noun phrase

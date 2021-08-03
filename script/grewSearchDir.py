@@ -1,8 +1,8 @@
-from pathlib import Path
-import time
-import sys
-import os
 import argparse
+import os
+import sys
+import time
+from pathlib import Path
 
 
 def __main__():
@@ -111,5 +111,6 @@ if __name__ == '__main__':
     absStart = time.perf_counter()
     __main__()
     absFinish = time.perf_counter()
-    print(f'Total grew search time: '
-          f'{round((absFinish - absStart)/60, 2)} minutes')
+    print(f'\nTotal grew search time: '
+          f'{round((absFinish - absStart)/60, 2)} minutes\n'
+          '==============================================\n')
