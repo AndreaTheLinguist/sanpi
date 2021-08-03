@@ -13,31 +13,35 @@ from tabulate import tabulate
 
 def __main__():
 
-    try:
-        data_dir = Path.cwd() / "hits"
-    except OSError:
-        exit('/hits/ directory not found. Run the script from the level above your hits directory (i.e. directory containing hit info for all contexts, 1 file per context/pattern match)')
+    data_dir = Path( Path.cwd() / "hits" ) 
+    if not data_dir.exists(): 
+        sys.exit('/hits/ directory not found. *Be sure to run this script from '
+                 'the level above your hits directory')
 
-    try:
-        os.mkdir(Path.cwd() / 'data_samples')
-    except OSError:
-        pass
     sample_dir = Path.cwd() / 'data_samples'
+    if not sample_dir.exists(): 
+        sample_dir.mkdir()
 
     files = pd.DataFrame()
-    for pol_dir in data_dir.iterdir():
+    for grp_dir in data_dir.iterdir():
 
-        polarity = pol_dir.name
+        contextgrp = grp_dir.name
+        if contextgrp.startswith('neg'):
+            polarity = 'negative'
+        elif contextgrp.startswith('unk'): 
+            polarity = 'unknown'
+        else: 
+            polarity = ''
 
-        file_info_list = [[f.stem, f, polarity,
+        file_info_list = [[f.stem, f, contextgrp, polarity,
                            f.stem.rsplit('_', 1)[0].split('_', 1)[1]]
-                          for f in pol_dir.iterdir()
-                          if f.stem.endswith('hits')]
+                          for f in grp_dir.glob('*_hits.*')]
 
-        pol_df = pd.DataFrame(file_info_list,
-                              columns=['name', 'path', 'polarity', 'context'])
+        grp_df = pd.DataFrame(file_info_list,
+                              columns=['name', 'path', 'context_group',
+                                       'polarity', 'context'])
 
-        files = files.append(pol_df, ignore_index=True)
+        files = files.append(grp_df, ignore_index=True)
 
     files.loc[
         :, 'context_word'] = files.context.str.split('_').str.get(0)
@@ -45,6 +49,7 @@ def __main__():
         :, 'context_type'] = files.context.str.split('_').str.get(1)
 
     categories_dict = {
+        'context_group': tuple(files.context_group.unique()),
         'context': tuple(files.context.unique()),
         'context_word': tuple(files.context_word.unique()),
         'context_type': tuple(files.context_type.unique()),
@@ -68,7 +73,7 @@ def __main__():
     context_dfs = list(
         generate_dataframes(files, categories_dict, base_ids=base_hit_ids))
 
-    cat_columns = ['colloc', 'adv', 'adj', 'polarity',
+    cat_columns = ['colloc', 'adv', 'adj', 'polarity', 'context_group',
                    'context', 'context_word', 'context_type']
 
     # combine dataframes for each individual context's results

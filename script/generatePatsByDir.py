@@ -34,8 +34,8 @@ def __main__():
         prep_output_dir(output_dir)
 
         specs = info_df.loc[info_df.level == 2, ['type', 'ix', 'keep']]
-        print(
-            f'\n==> Writing files to {output_dir} for the following contexts:\n')
+        print(f'\n==> Writing files to {output_dir} for the following '
+              f'contexts:\n')
         pprint(specs.loc[specs.type == 'Header', :].reset_index().keep)
 
         write_files(specs, output_dir)
@@ -121,7 +121,9 @@ def write_files(specs: pd.DataFrame, output_dir):
 
         if spec_orig.value_counts('type').CodeBlock > 1:
             pprint(
-                f'Warning: Too many pattern strings found for {label}. Pattern file will not be written.\n(Hint: make sure each pattern in specs markdown file has its own level 2/## header)')
+                f'Warning: Too many pattern strings found for {label}. Pattern '
+                f'file will not be written.\n(Hint: make sure each pattern in '
+                f'specs markdown file has its own level 2/## header)')
 
         fpath = output_dir / f'{label}.pat'
 

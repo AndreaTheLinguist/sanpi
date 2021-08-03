@@ -1,4 +1,4 @@
-# Mit Neg
+# Neg Mit
 
 - This document describes `grew-match` patterns for mitigated negation contexts. 
   - The mitigated negation can be in any position (i.e. subject N, subject D, predicate Adv, etc.). 

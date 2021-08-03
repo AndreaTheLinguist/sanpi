@@ -1,20 +1,23 @@
 '''
-    This script loads a dataframe of all non-overlapping collocation tokens. All tokens that matched more than a single *informative* context (e.g. not basic, unrestricted pattern matches) are excluded from these data.
+    This script loads a dataframe of all non-overlapping collocation tokens.
+    All tokens that matched more than a single *informative* context
+    (e.g. not basic, unrestricted pattern matches) are excluded from these data.
 
-    This script outputs various "samples" of data for quick illustration, as well as various frequency table dataframes (pickled and compressed) generated via `pandas.crosstab`:
+    This script outputs various "samples" of data for quick illustration, as
+    well as various frequency table dataframes (pickled and compressed)
+    generated via `pandas.crosstab`:
         1. all contexts, raw counts
         2. all contexts, what proportion of colloc each context accounts for
         3. all contexts, what proportion of context each colloc accounts for
         4. text cases (contexts with uncertain polarity), raw counts
-        5. counts and various normalized metrics for 2 defined polarity context groups: positive and negative
+        5. counts and various normalized metrics for 2 defined polarity context
+            groups: positive and negative
 '''
 
 
 import os
-import sys
 import time
-from collections import namedtuple
-from itertools import repeat
+
 from pathlib import Path
 from pprint import pprint
 
@@ -22,7 +25,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import zscore
 
-# TODO: create argument input structure: file names, load previously created data, verbose, exclusion threshold, etc.
+# TODO: create argument input structure: file names, load previously created
+#  data, verbose, exclusion threshold, etc.
 
 
 def __main__():
