@@ -1,0 +1,114 @@
+[
+  {
+    "sent_id": "nyt_eng_19940726_0211_6",
+    "matching": {
+      "nodes": {
+        "W": "18",
+        "B": "19",
+        "ADV": "20",
+        "ADJ": "21"
+      },
+      "edges": {
+        "advmod": {
+          "source": "21",
+          "label": "advmod",
+          "target": "20"
+        }
+      },
+      "fillers": {
+        "W": "without",
+        "B": "be",
+        "ADV": "especially",
+        "ADJ": "exhilarating"
+      }
+    },
+    "prev_sent": "As the show goes on , the dancing becomes more and more , well , subdued .",
+    "next_sent": "-LBQ-  Kiss of the Spider Woman  -RDQ-  is a show that demands a lot of singing and dancing at the same time , which takes stamina , breath control , muscles I 've never heard of and probably as much energy as a winning run in the New York Marathon .",
+    "text": "There 's less lifting of alternate feet than wagging of tail feathers , which can be amusing without being especially exhilarating .",
+    "doc": "nyt_eng_19940726_0211"
+  },
+  {
+    "sent_id": "nyt_eng_19940726_0211_6",
+    "matching": {
+      "nodes": {
+        "W": "18",
+        "B": "19",
+        "ADV": "20",
+        "ADJ": "21"
+      },
+      "edges": {
+        "advmod": {
+          "source": "21",
+          "label": "advmod",
+          "target": "20"
+        }
+      },
+      "fillers": {
+        "W": "without",
+        "B": "be",
+        "ADV": "especially",
+        "ADJ": "exhilarating"
+      }
+    },
+    "prev_sent": "As the show goes on , the dancing becomes more and more , well , subdued .",
+    "next_sent": "-LBQ-  Kiss of the Spider Woman  -RDQ-  is a show that demands a lot of singing and dancing at the same time , which takes stamina , breath control , muscles I 've never heard of and probably as much energy as a winning run in the New York Marathon .",
+    "text": "There 's less lifting of alternate feet than wagging of tail feathers , which can be amusing without being especially exhilarating .",
+    "doc": "nyt_eng_19940726_0211"
+  },
+  {
+    "sent_id": "nyt_eng_19940726_0209_24",
+    "matching": {
+      "nodes": {
+        "W": "7",
+        "B": "8",
+        "ADV": "9",
+        "ADJ": "10"
+      },
+      "edges": {
+        "advmod": {
+          "source": "10",
+          "label": "advmod",
+          "target": "9"
+        }
+      },
+      "fillers": {
+        "W": "without",
+        "B": "be",
+        "ADV": "tiresomely",
+        "ADJ": "crude"
+      }
+    },
+    "prev_sent": "The comedians on  -LBQ-  Comic Justice  -RDQ-  are hardly stuffy .",
+    "next_sent": "Darryl Heath does a clever routine about a remote-control device that allows life to be put in reverse so disasters can be avoided .",
+    "text": "They can get funky , but without being tiresomely crude .",
+    "doc": "nyt_eng_19940726_0209"
+  },
+  {
+    "sent_id": "nyt_eng_19940726_0209_24",
+    "matching": {
+      "nodes": {
+        "W": "7",
+        "B": "8",
+        "ADV": "9",
+        "ADJ": "10"
+      },
+      "edges": {
+        "advmod": {
+          "source": "10",
+          "label": "advmod",
+          "target": "9"
+        }
+      },
+      "fillers": {
+        "W": "without",
+        "B": "be",
+        "ADV": "tiresomely",
+        "ADJ": "crude"
+      }
+    },
+    "prev_sent": "The comedians on  -LBQ-  Comic Justice  -RDQ-  are hardly stuffy .",
+    "next_sent": "Darryl Heath does a clever routine about a remote-control device that allows life to be put in reverse so disasters can be avoided .",
+    "text": "They can get funky , but without being tiresomely crude .",
+    "doc": "nyt_eng_19940726_0209"
+  }
+]

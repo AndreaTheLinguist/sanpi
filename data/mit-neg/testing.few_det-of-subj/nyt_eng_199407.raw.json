@@ -1,0 +1,24 @@
+[
+  {
+    "sent_id": "nyt_eng_19940708_0203_39",
+    "matching": {
+      "nodes": { "S": "5", "FEW": "4", "BE": "6", "ADV": "7", "ADJ": "8" },
+      "edges": {
+        "sub": { "source": "8", "label": "nsubj", "target": "5" },
+        "mod": { "source": "8", "label": "advmod", "target": "7" },
+        "cop": { "source": "8", "label": "cop", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19940701_0292_36",
+    "matching": {
+      "nodes": { "S": "3", "FEW": "2", "BE": "4", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "sub": { "source": "7", "label": "nsubj", "target": "3" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" },
+        "cop": { "source": "7", "label": "cop", "target": "4" }
+      }
+    }
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "sent_id": "nyt_eng_19991206_0047_4",
+    "matching": {
+      "nodes": { "S": "3", "E": "2", "BE": "6", "ADV": "7", "ADJ": "8" },
+      "edges": {
+        "sub": { "source": "8", "label": "nsubj", "target": "3" },
+        "mod": { "source": "8", "label": "advmod", "target": "7" },
+        "det": { "source": "3", "label": "det", "target": "2" },
+        "cop": { "source": "8", "label": "cop", "target": "6" }
+      }
+    }
+  }
+]

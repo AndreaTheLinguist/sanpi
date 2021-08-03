@@ -1,0 +1,306 @@
+[
+  {
+    "sent_id": "nyt_eng_19980520_0426_15",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "4",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "subj": {
+          "source": "6",
+          "label": "nsubjpass",
+          "target": "2"
+        },
+        "cop": {
+          "source": "6",
+          "label": "cop",
+          "target": "4"
+        },
+        "advmod": {
+          "source": "6",
+          "label": "advmod",
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "real",
+        "ADJ": "nice"
+      }
+    },
+    "prev_sent": "They were still smiling at the end of a two-hour wait .",
+    "next_sent": "-LBQ-  Everybody gets to know everybody else while we 're in line .  -RDQ-",
+    "text": "-LBQ-  Everybody 's been real nice ,  -RDQ-  Mrs. Patton said .",
+    "doc": "nyt_eng_19980520_0426"
+  },
+  {
+    "sent_id": "nyt_eng_19980520_0007_35",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "3",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "real",
+        "ADJ": "excited"
+      }
+    },
+    "prev_sent": "Suddenly , his overall ERA has climbed from 1.96 to 5.26 , highest among healthy Sox starters -LRB- Brian Rose , the rookie on the disabled list , is at 6.93 ERA -RRB- .",
+    "next_sent": "-LBQ-  But there will be bumps in the road here and there .",
+    "text": "-LBQ-  Everybody 's real excited , and I 'll try to keep them excited ,  -RDQ-  Saberhagen said .",
+    "doc": "nyt_eng_19980520_0007"
+  },
+  {
+    "sent_id": "nyt_eng_19980515_0020_12",
+    "matching": {
+      "nodes": {
+        "NS": "4",
+        "BE": "5",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "4"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "5"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "just",
+        "ADJ": "stunned"
+      }
+    },
+    "prev_sent": "Conductor John Giordano turned to reassure the audience , which was sitting in dazed silence .",
+    "next_sent": "It was very , very quiet ,  -RDQ-  audience member Carol Holley said .",
+    "text": "-LBQ-  I think everybody was just stunned .",
+    "doc": "nyt_eng_19980515_0020"
+  },
+  {
+    "sent_id": "nyt_eng_19980513_0360_7",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "6",
+        "ADV": "7",
+        "ADJ": "8"
+      },
+      "edges": {
+        "subj": {
+          "source": "8",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "8",
+          "label": "cop",
+          "target": "6"
+        },
+        "advmod": {
+          "source": "8",
+          "label": "advmod",
+          "target": "7"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "very",
+        "ADJ": "concerned"
+      }
+    },
+    "prev_sent": "-LBQ-  I 've only known him a couple of months , but this is not like him ,  -RDQ-  said Bill Dean , circulation director of the Gazette .",
+    "next_sent": "Contacted by telephone Wednesday at her Florida home , Hogan 's mother , Pat Scoones , could barely speak .",
+    "text": "-LBQ-  Everybody in the building is very concerned .  -RDQ-",
+    "doc": "nyt_eng_19980513_0360"
+  },
+  {
+    "sent_id": "nyt_eng_19980507_0403_7",
+    "matching": {
+      "nodes": {
+        "NS": "24",
+        "BE": "25",
+        "ADV": "26",
+        "ADJ": "27"
+      },
+      "edges": {
+        "subj": {
+          "source": "27",
+          "label": "nsubj",
+          "target": "24"
+        },
+        "cop": {
+          "source": "27",
+          "label": "cop",
+          "target": "25"
+        },
+        "advmod": {
+          "source": "27",
+          "label": "advmod",
+          "target": "26"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "highly",
+        "ADJ": "motivated"
+      }
+    },
+    "prev_sent": "Chrysler and Daimler-Benz executives preparing for merger take heed  -COL-  As German and American engineers at the year-old Mercedes plant in Vance , Ala. , found , it is the little things that can heat up cultural melting pots .",
+    "next_sent": "So far , plant officials and their management consultants say the plant is a success .",
+    "text": "-LBQ-  There was a lot of conflict in the team because everybody thinks they know the best way to build a car and everybody was highly motivated ,  -RDQ-  said Emmett Meyer , a New Orleans native who is the plant 's vice president of human resources .",
+    "doc": "nyt_eng_19980507_0403"
+  },
+  {
+    "sent_id": "nyt_eng_19980505_0292_21",
+    "matching": {
+      "nodes": {
+        "NS": "20",
+        "BE": "21",
+        "ADV": "22",
+        "ADJ": "23"
+      },
+      "edges": {
+        "subj": {
+          "source": "23",
+          "label": "nsubj",
+          "target": "20"
+        },
+        "cop": {
+          "source": "23",
+          "label": "cop",
+          "target": "21"
+        },
+        "advmod": {
+          "source": "23",
+          "label": "advmod",
+          "target": "22"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "pretty",
+        "ADJ": "calm"
+      }
+    },
+    "prev_sent": "-LBQ-  He was taking gasps of air ,  -RDQ-  she said .",
+    "next_sent": "Apparently following instructions from the train 's 13-member crew , scores of uninjured passengers stayed on board until school buses arrived to ferry them two miles to Palm Valley Lutheran Church , where they were assisted by victim service personnel from the American Red Cross .",
+    "text": "As rescuers arrived to help the injured and others , Waldrop said ,  -LBQ-  for the most part , everybody was pretty calm .  -RDQ-",
+    "doc": "nyt_eng_19980505_0292"
+  },
+  {
+    "sent_id": "nyt_eng_19980503_0159_12",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "3",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "really",
+        "ADJ": "upset"
+      }
+    },
+    "prev_sent": "The treatment of Garrick , which has become a prominent issue since his resignation , has provoked widespread criticism from Notre Dame students , especially from gay students , who considered him a hero .",
+    "next_sent": "-LBQ-  He gave a sense of peace to a lot of people .  -RDQ-",
+    "text": "-LBQ-  Everybody 's really upset ,  -RDQ-  said Karl Eichelberger , a third-year law student and a leader for gay men and lesbians at Notre Dame and its sister institution , St. Mary 's College .",
+    "doc": "nyt_eng_19980503_0159"
+  },
+  {
+    "sent_id": "nyt_eng_19980501_0083_27",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "3",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "NS": "everybody",
+        "BE": "be",
+        "ADV": "very",
+        "ADJ": "upset"
+      }
+    },
+    "prev_sent": "-LBQ-  The guys saw all the articles today and all that -LRB- stuff -RRB- ,  -RDQ-  O'Neal said before tipoff .",
+    "next_sent": "The Lakers clearly set out to right their wrongs from the outset Thursday night , fighting hard for every rebound and contesting every shot .",
+    "text": "-LBQ-  Everybody 's very upset .  -RDQ-",
+    "doc": "nyt_eng_19980501_0083"
+  }
+]

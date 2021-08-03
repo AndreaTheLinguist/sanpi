@@ -1,0 +1,344 @@
+[
+  {
+    "sent_id": "nyt_eng_19940722_0163_34",
+    "matching": {
+      "nodes": {
+        "NS": "20",
+        "BE": "21",
+        "ADV": "22",
+        "ADJ": "23"
+      },
+      "edges": {
+        "subj": {
+          "source": "23",
+          "label": "nsubj",
+          "target": "20"
+        },
+        "cop": {
+          "source": "23",
+          "label": "cop",
+          "target": "21"
+        },
+        "advmod": {
+          "source": "23",
+          "label": "advmod",
+          "target": "22"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "impressed"
+      }
+    },
+    "prev_sent": "CBS was going to do its very first four-camera shoot , with Sam Rayburn , then the Speaker of the House , and the producer was concerned that Rayburn 's bald head would shine from perspiration when shot from behind .",
+    "next_sent": "Later she became chief makeup artist for the network .",
+    "text": "Would Ms. Brown come in and do Rayburn 's makeup , for $ 14 ? She did , and everyone was so impressed that CBS asked her to stay on .",
+    "doc": "nyt_eng_19940722_0163"
+  },
+  {
+    "sent_id": "nyt_eng_19940722_0151_20",
+    "matching": {
+      "nodes": {
+        "NS": "29",
+        "BE": "30",
+        "ADV": "31",
+        "ADJ": "32"
+      },
+      "edges": {
+        "subj": {
+          "source": "32",
+          "label": "nsubj",
+          "target": "29"
+        },
+        "cop": {
+          "source": "32",
+          "label": "cop",
+          "target": "30"
+        },
+        "advmod": {
+          "source": "32",
+          "label": "advmod",
+          "target": "31"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "concerned"
+      }
+    },
+    "prev_sent": "-LBQ-  What was it that the American public lost ?  -RDQ-  he asked a group of the country 's TV critics .",
+    "next_sent": "Koppel also defended his own show 's decision to cover the Simpson case five nights in a row .",
+    "text": "-LBQ-  What were they deprived of ? The soaps ? Is that what we 're in this sort of righteous snit about ? I do n't know what everyone is so concerned about .  -RDQ-",
+    "doc": "nyt_eng_19940722_0151"
+  },
+  {
+    "sent_id": "nyt_eng_19940719_0289_31",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "9",
+        "ADV": "10",
+        "ADJ": "11"
+      },
+      "edges": {
+        "subj": {
+          "source": "11",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "11",
+          "label": "cop",
+          "target": "9"
+        },
+        "advmod": {
+          "source": "11",
+          "label": "advmod",
+          "target": "10"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "certain"
+      }
+    },
+    "prev_sent": "And as part of the overall job cuts previously announced by Digital , Pesatori said he planned to cut 14,000 workers from the computer systems division 's 35,000 within 12 months .",
+    "next_sent": "-LBQ-  The new concept worked in PCs , but that 's not to say that when you start reproducing that model in every unit , you have an incredibly effective whole ,  -RDQ-  said Adriana Stadecker , who was Digital 's vice president of executive operations and Palmer 's top lieutenant until last month , when she abruptly left the company .",
+    "text": "Not everyone familiar with Digital 's matrix tradition is so certain that scrapping it is the answer to the company 's fundamental problems .",
+    "doc": "nyt_eng_19940719_0289"
+  },
+  {
+    "sent_id": "nyt_eng_19940718_0399_5",
+    "matching": {
+      "nodes": {
+        "NS": "37",
+        "BE": "39",
+        "ADV": "40",
+        "ADJ": "41"
+      },
+      "edges": {
+        "subj": {
+          "source": "41",
+          "label": "nsubj",
+          "target": "37"
+        },
+        "cop": {
+          "source": "41",
+          "label": "cop",
+          "target": "39"
+        },
+        "advmod": {
+          "source": "41",
+          "label": "advmod",
+          "target": "40"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "bearish"
+      }
+    },
+    "prev_sent": "True , the rally has been around the corner since Memorial Day .",
+    "next_sent": "Indeed , a few analysts say the rally is already here .",
+    "text": "But bears have dominated market sentiment for so long since the Federal Reserve Board raised interest rates last February , that traders feel the market is headed for a major tectonic shift toward bullishness simply because everyone has been so bearish .",
+    "doc": "nyt_eng_19940718_0399"
+  },
+  {
+    "sent_id": "nyt_eng_19940718_0285_13",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "3",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "careful"
+      }
+    },
+    "prev_sent": "The network 's new motto  -COL-   -LBQ-  Now More Than Ever .  -RDQ-",
+    "next_sent": "anything that really kind of drives you crazy , makes you mad , gets you excited . ...",
+    "text": "-LBQ-  Everyone is so careful , you rarely read anything or see",
+    "doc": "nyt_eng_19940718_0285"
+  },
+  {
+    "sent_id": "nyt_eng_19940714_0394_20",
+    "matching": {
+      "nodes": {
+        "NS": "3",
+        "BE": "16",
+        "ADV": "17",
+        "ADJ": "18"
+      },
+      "edges": {
+        "subj": {
+          "source": "18",
+          "label": "nsubj",
+          "target": "3"
+        },
+        "cop": {
+          "source": "18",
+          "label": "cop",
+          "target": "16"
+        },
+        "advmod": {
+          "source": "18",
+          "label": "advmod",
+          "target": "17"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "sure"
+      }
+    },
+    "prev_sent": "OPTIONAL MATERIAL FOLLOWS -RRB-",
+    "next_sent": "-LBQ-  It 's a bad idea ,  -RDQ-  Jennifer Sun , a medical researcher from North Woodmere , N.Y. , said of the merger .",
+    "text": "But not everyone who whirled through the revolving doors at Macy 's and A&S Thursday was so sure .",
+    "doc": "nyt_eng_19940714_0394"
+  },
+  {
+    "sent_id": "nyt_eng_19940713_0119_17",
+    "matching": {
+      "nodes": {
+        "NS": "23",
+        "BE": "25",
+        "ADV": "26",
+        "ADJ": "27"
+      },
+      "edges": {
+        "subj": {
+          "source": "27",
+          "label": "nsubj",
+          "target": "23"
+        },
+        "cop": {
+          "source": "27",
+          "label": "cop",
+          "target": "25"
+        },
+        "advmod": {
+          "source": "27",
+          "label": "advmod",
+          "target": "26"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "clearly",
+        "ADJ": "american"
+      }
+    },
+    "prev_sent": "Falstaff -LRB- Brian Murray -RRB- is now apparently a down-at-the-heels traveling lecturer from England , which explains his accent and the vaguely Cockney accents of his three attendants .",
+    "next_sent": "Accents are not the problem ; it 's the lack of any dominant performance style .",
+    "text": "With the exception of the French doctor Caius -LRB- Rocco Sisto -RRB- , who communicates in an Elizabethan kind of Franglais , everyone else is clearly American .",
+    "doc": "nyt_eng_19940713_0119"
+  },
+  {
+    "sent_id": "nyt_eng_19940712_0312_17",
+    "matching": {
+      "nodes": {
+        "NS": "8",
+        "BE": "9",
+        "ADV": "10",
+        "ADJ": "11"
+      },
+      "edges": {
+        "subj": {
+          "source": "11",
+          "label": "nsubj",
+          "target": "8"
+        },
+        "cop": {
+          "source": "11",
+          "label": "cop",
+          "target": "9"
+        },
+        "advmod": {
+          "source": "11",
+          "label": "advmod",
+          "target": "10"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "uncertain"
+      }
+    },
+    "prev_sent": "People are talking in the corridors and walking around with downcast faces .",
+    "next_sent": "You can see everyone fears for his position .  -RDQ-",
+    "text": "No one 's saying it , but everyone is so uncertain inside .",
+    "doc": "nyt_eng_19940712_0312"
+  },
+  {
+    "sent_id": "nyt_eng_19940701_0239_7",
+    "matching": {
+      "nodes": {
+        "NS": "2",
+        "BE": "3",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "NS": "everyone",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "enthusiastic"
+      }
+    },
+    "prev_sent": "-LBQ-  He 's the defining artist of the late '80s and early '90s ,  -RDQ-  raved Elisabeth Sussman , a curator at New York 's Whitney Museum , which organized  -LBQ-  Mike Kelley .  -RDQ-",
+    "next_sent": "In 1990 , the National Endowment for the Arts overturned recommendations of two review panels to give a grant to the Boston museum that originally wanted to mount the Kelley survey , citing  -LBQ-  an issue of artistic quality .  -RDQ-",
+    "text": "Not everyone is so enthusiastic about the artist whose art bears such stomach-churning titles as  -LBQ-  Eviscerated Corpse  -RDQ-  and  -LBQ-  Phlegm  -RDQ-  and who once planted a swastika on Lincoln 's forehead .",
+    "doc": "nyt_eng_19940701_0239"
+  }
+]

@@ -1,0 +1,1307 @@
+[
+  {
+    "sent_id": "nyt_eng_19940727_0377_1",
+    "matching": {
+      "nodes": {
+        "S": "1",
+        "N": "3",
+        "BE": "2",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "1"
+        },
+        "neg": {
+          "source": "5",
+          "label": "neg",
+          "target": "3"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "2"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "S": "it",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "late"
+      }
+    },
+    "prev_sent": null,
+    "next_sent": "Ernie Cazis of Reseda spent 34 years with Lockheed , retired last year and has been working ever since .",
+    "text": "It 's never too late to start your career .",
+    "doc": "nyt_eng_19940727_0377"
+  },
+  {
+    "sent_id": "nyt_eng_19940727_0271_22",
+    "matching": {
+      "nodes": {
+        "S": "3",
+        "N": "5",
+        "BE": "4",
+        "ADV": "7",
+        "ADJ": "8"
+      },
+      "edges": {
+        "subj": {
+          "source": "8",
+          "label": "nsubj",
+          "target": "3"
+        },
+        "neg": {
+          "source": "8",
+          "label": "neg",
+          "target": "5"
+        },
+        "cop": {
+          "source": "8",
+          "label": "cop",
+          "target": "4"
+        },
+        "advmod": {
+          "source": "8",
+          "label": "advmod",
+          "target": "7"
+        }
+      },
+      "fillers": {
+        "S": "economy",
+        "N": "never",
+        "BE": "be",
+        "ADV": "as",
+        "ADJ": "strong"
+      }
+    },
+    "prev_sent": "-LBQ-  The economy is growing steadily and solidly ,  -RDQ-  said Donald Fine , chief market analyst for Chase Securities .",
+    "next_sent": "The cause of the stock market drop was more subtle .",
+    "text": "-LBQ-  The economy is never quite as strong as the people who are afraid that it is strong say it is and it is never quite as weak as the people who are afraid that it is weak .  -RDQ-",
+    "doc": "nyt_eng_19940727_0271"
+  },
+  {
+    "sent_id": "nyt_eng_19940727_0271_22",
+    "matching": {
+      "nodes": {
+        "S": "23",
+        "N": "25",
+        "BE": "24",
+        "ADV": "27",
+        "ADJ": "28"
+      },
+      "edges": {
+        "subj": {
+          "source": "28",
+          "label": "nsubj",
+          "target": "23"
+        },
+        "neg": {
+          "source": "28",
+          "label": "neg",
+          "target": "25"
+        },
+        "cop": {
+          "source": "28",
+          "label": "cop",
+          "target": "24"
+        },
+        "advmod": {
+          "source": "28",
+          "label": "advmod",
+          "target": "27"
+        }
+      },
+      "fillers": {
+        "S": "it",
+        "N": "never",
+        "BE": "be",
+        "ADV": "as",
+        "ADJ": "weak"
+      }
+    },
+    "prev_sent": "-LBQ-  The economy is growing steadily and solidly ,  -RDQ-  said Donald Fine , chief market analyst for Chase Securities .",
+    "next_sent": "The cause of the stock market drop was more subtle .",
+    "text": "-LBQ-  The economy is never quite as strong as the people who are afraid that it is strong say it is and it is never quite as weak as the people who are afraid that it is weak .  -RDQ-",
+    "doc": "nyt_eng_19940727_0271"
+  },
+  {
+    "sent_id": "nyt_eng_19940727_0166_12",
+    "matching": {
+      "nodes": {
+        "S": "13",
+        "N": "15",
+        "BE": "14",
+        "ADV": "16",
+        "ADJ": "17"
+      },
+      "edges": {
+        "subj": {
+          "source": "17",
+          "label": "nsubj",
+          "target": "13"
+        },
+        "neg": {
+          "source": "17",
+          "label": "neg",
+          "target": "15"
+        },
+        "cop": {
+          "source": "17",
+          "label": "cop",
+          "target": "14"
+        },
+        "advmod": {
+          "source": "17",
+          "label": "advmod",
+          "target": "16"
+        }
+      },
+      "fillers": {
+        "S": "stock",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "high"
+      }
+    },
+    "prev_sent": "The book is filled with charmingly pithy remarks like the one above about being rewarded for being right .",
+    "next_sent": "Or  -COL-   -LBQ-  Obviously the thing to do was to be bullish in a bull market and bearish in a bear market .",
+    "text": "Many are even famous , or should be  -COL-   -LBQ-  Remember that stocks are never too high for you to begin buying or too low to begin selling .  -RDQ-",
+    "doc": "nyt_eng_19940727_0166"
+  },
+  {
+    "sent_id": "nyt_eng_19940726_0165_41",
+    "matching": {
+      "nodes": {
+        "S": "25",
+        "N": "27",
+        "BE": "26",
+        "ADV": "28",
+        "ADJ": "29"
+      },
+      "edges": {
+        "subj": {
+          "source": "29",
+          "label": "nsubj",
+          "target": "25"
+        },
+        "neg": {
+          "source": "29",
+          "label": "neg",
+          "target": "27"
+        },
+        "cop": {
+          "source": "29",
+          "label": "cop",
+          "target": "26"
+        },
+        "advmod": {
+          "source": "29",
+          "label": "advmod",
+          "target": "28"
+        }
+      },
+      "fillers": {
+        "S": "SHE",
+        "N": "never",
+        "BE": "be",
+        "ADV": "that",
+        "ADJ": "sentimental"
+      }
+    },
+    "prev_sent": "She seems like the heroine of Jane Austen 's last novel ,  -LBQ-  Persuasion ,  -RDQ-  who had learned prudence in her youth and learned romance as she grew older  -COL-   -LBQ-  the natural sequence of an unnatural beginning .  -RDQ-",
+    "next_sent": "The styles she set have held .",
+    "text": "She spent the last five years of her life working hard for Unicef , -LRB- Harris calls her an angel of mercy , but SHE was never that sentimental -RRB- , and she died of colon cancer in 1993 .",
+    "doc": "nyt_eng_19940726_0165"
+  },
+  {
+    "sent_id": "nyt_eng_19940726_0135_17",
+    "matching": {
+      "nodes": {
+        "S": "3",
+        "N": "5",
+        "BE": "4",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "3"
+        },
+        "neg": {
+          "source": "7",
+          "label": "neg",
+          "target": "5"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "4"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "S": "it",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "late"
+      }
+    },
+    "prev_sent": "If your high schooler has n't liked any book since  -LBQ-  The Cat in the Hat ,  -RDQ-  do n't despair .",
+    "next_sent": "Her advice  -COL-",
+    "text": "Leonhardt says it 's never too late to create a reader .",
+    "doc": "nyt_eng_19940726_0135"
+  },
+  {
+    "sent_id": "nyt_eng_19940725_0441_2",
+    "matching": {
+      "nodes": {
+        "S": "3",
+        "N": "5",
+        "BE": "6",
+        "ADV": "7",
+        "ADJ": "8"
+      },
+      "edges": {
+        "subj": {
+          "source": "8",
+          "label": "nsubj",
+          "target": "3"
+        },
+        "neg": {
+          "source": "8",
+          "label": "neg",
+          "target": "5"
+        },
+        "cop": {
+          "source": "8",
+          "label": "cop",
+          "target": "6"
+        },
+        "advmod": {
+          "source": "8",
+          "label": "advmod",
+          "target": "7"
+        }
+      },
+      "fillers": {
+        "S": "spiel",
+        "N": "never",
+        "BE": "be",
+        "ADV": "terribly",
+        "ADJ": "complicated"
+      }
+    },
+    "prev_sent": "The magazine 's advertising pitch is , quite evidently , a double-whammy .",
+    "next_sent": "-LBQ-  We simply tell advertisers that they 're reaching the heaviest-buying parents they possibly can reach , because they have to buy two of everything ,  -RDQ-  said the magazine 's co-founder and editor in chief , Barbara C. Unell .",
+    "text": "But the spiel has never been terribly complicated .",
+    "doc": "nyt_eng_19940725_0441"
+  },
+  {
+    "sent_id": "nyt_eng_19940725_0280_16",
+    "matching": {
+      "nodes": {
+        "S": "5",
+        "N": "7",
+        "BE": "8",
+        "ADV": "9",
+        "ADJ": "10"
+      },
+      "edges": {
+        "subj": {
+          "source": "10",
+          "label": "nsubj",
+          "target": "5"
+        },
+        "neg": {
+          "source": "10",
+          "label": "neg",
+          "target": "7"
+        },
+        "cop": {
+          "source": "10",
+          "label": "cop",
+          "target": "8"
+        },
+        "advmod": {
+          "source": "10",
+          "label": "advmod",
+          "target": "9"
+        }
+      },
+      "fillers": {
+        "S": "who",
+        "N": "never",
+        "BE": "be",
+        "ADV": "overly",
+        "ADJ": "concerned"
+      }
+    },
+    "prev_sent": "With Lagerfeld in the forefront , the fall couture collections shown in Paris last week introduced a major change in the shape of clothes .",
+    "next_sent": "Shapelessness is out , he said .",
+    "text": "Even Christian Lacroix , who has never been overly concerned with illuminating curves , spoke eagerly of his new  -LBQ-  hourglass look .  -RDQ-",
+    "doc": "nyt_eng_19940725_0280"
+  },
+  {
+    "sent_id": "nyt_eng_19940724_0181_7",
+    "matching": {
+      "nodes": {
+        "S": "1",
+        "N": "3",
+        "BE": "2",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "1"
+        },
+        "neg": {
+          "source": "5",
+          "label": "neg",
+          "target": "3"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "2"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "S": "I",
+        "N": "never",
+        "BE": "be",
+        "ADV": "really",
+        "ADJ": "worried"
+      }
+    },
+    "prev_sent": "-LBQ-  It does n't hurt .",
+    "next_sent": "Perranoski , however , has alerted slumping Pedro Astacio to be prepared to enter Tuesday 's game early if needed .",
+    "text": "I was never really worried .  -RDQ-",
+    "doc": "nyt_eng_19940724_0181"
+  },
+  {
+    "sent_id": "nyt_eng_19940723_0212_73",
+    "matching": {
+      "nodes": {
+        "S": "8",
+        "N": "10",
+        "BE": "9",
+        "ADV": "11",
+        "ADJ": "12"
+      },
+      "edges": {
+        "subj": {
+          "source": "12",
+          "label": "nsubj",
+          "target": "8"
+        },
+        "neg": {
+          "source": "12",
+          "label": "neg",
+          "target": "10"
+        },
+        "cop": {
+          "source": "12",
+          "label": "cop",
+          "target": "9"
+        },
+        "advmod": {
+          "source": "12",
+          "label": "advmod",
+          "target": "11"
+        }
+      },
+      "fillers": {
+        "S": "you",
+        "N": "never",
+        "BE": "be",
+        "ADV": "as",
+        "ADJ": "bad"
+      }
+    },
+    "prev_sent": "He joined the Bills as a free agent in 1992 .",
+    "next_sent": "I know I 've got big shoes to fill .",
+    "text": "-LBQ-  I always try to remember that you 're never as bad as people might say you are and you 're never as good as some think you are .",
+    "doc": "nyt_eng_19940723_0212"
+  },
+  {
+    "sent_id": "nyt_eng_19940723_0212_73",
+    "matching": {
+      "nodes": {
+        "S": "20",
+        "N": "22",
+        "BE": "21",
+        "ADV": "23",
+        "ADJ": "24"
+      },
+      "edges": {
+        "subj": {
+          "source": "24",
+          "label": "nsubj",
+          "target": "20"
+        },
+        "neg": {
+          "source": "24",
+          "label": "neg",
+          "target": "22"
+        },
+        "cop": {
+          "source": "24",
+          "label": "cop",
+          "target": "21"
+        },
+        "advmod": {
+          "source": "24",
+          "label": "advmod",
+          "target": "23"
+        }
+      },
+      "fillers": {
+        "S": "you",
+        "N": "never",
+        "BE": "be",
+        "ADV": "as",
+        "ADJ": "good"
+      }
+    },
+    "prev_sent": "He joined the Bills as a free agent in 1992 .",
+    "next_sent": "I know I 've got big shoes to fill .",
+    "text": "-LBQ-  I always try to remember that you 're never as bad as people might say you are and you 're never as good as some think you are .",
+    "doc": "nyt_eng_19940723_0212"
+  },
+  {
+    "sent_id": "nyt_eng_19940722_0335_35",
+    "matching": {
+      "nodes": {
+        "S": "21",
+        "N": "23",
+        "BE": "24",
+        "ADV": "25",
+        "ADJ": "26"
+      },
+      "edges": {
+        "subj": {
+          "source": "26",
+          "label": "nsubj",
+          "target": "21"
+        },
+        "neg": {
+          "source": "26",
+          "label": "neg",
+          "target": "23"
+        },
+        "cop": {
+          "source": "26",
+          "label": "cop",
+          "target": "24"
+        },
+        "advmod": {
+          "source": "26",
+          "label": "advmod",
+          "target": "25"
+        }
+      },
+      "fillers": {
+        "S": "he",
+        "N": "never",
+        "BE": "be",
+        "ADV": "directly",
+        "ADJ": "responsible"
+      }
+    },
+    "prev_sent": "There are other questions raised about Dolgen as well .",
+    "next_sent": "Second , his new job requires a diplomat 's skill in balancing the demands of movie stars and directors with corporate financial goals .",
+    "text": "First , he has never run so large an operation , where so many decisions hinge on creative issues that he has never been directly responsible for .",
+    "doc": "nyt_eng_19940722_0335"
+  },
+  {
+    "sent_id": "nyt_eng_19940720_0176_15",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "3",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "subj": {
+          "source": "6",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "6",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "6",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "6",
+          "label": "advmod",
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "S": "Goldwater",
+        "N": "never",
+        "BE": "be",
+        "ADV": "as",
+        "ADJ": "reactionary"
+      }
+    },
+    "prev_sent": "They confirmed the fears of Goldwater 's foes that the rugged westerner and his followers were right-wing fanatics who could not be trusted to run the country .",
+    "next_sent": "By his own admission , he is  -LBQ-  stubborn and hardheaded .  -RDQ-",
+    "text": "But Goldwater was never as reactionary as his foes claimed .",
+    "doc": "nyt_eng_19940720_0176"
+  },
+  {
+    "sent_id": "nyt_eng_19940719_0042_33",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "3",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "subj": {
+          "source": "6",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "6",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "6",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "6",
+          "label": "advmod",
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "S": "I",
+        "N": "never",
+        "BE": "be",
+        "ADV": "really",
+        "ADJ": "afraid"
+      }
+    },
+    "prev_sent": "The rescue squad was called , and Williams was sent to the hospital .",
+    "next_sent": "I felt he would n't hurt me , but I was afraid he would hurt himself .",
+    "text": "-LBQ-  I was never really afraid of him .",
+    "doc": "nyt_eng_19940719_0042"
+  },
+  {
+    "sent_id": "nyt_eng_19940719_0009_4",
+    "matching": {
+      "nodes": {
+        "S": "27",
+        "N": "29",
+        "BE": "30",
+        "ADV": "31",
+        "ADJ": "32"
+      },
+      "edges": {
+        "subj": {
+          "source": "32",
+          "label": "nsubj",
+          "target": "27"
+        },
+        "neg": {
+          "source": "32",
+          "label": "neg",
+          "target": "29"
+        },
+        "cop": {
+          "source": "32",
+          "label": "cop",
+          "target": "30"
+        },
+        "advmod": {
+          "source": "32",
+          "label": "advmod",
+          "target": "31"
+        }
+      },
+      "fillers": {
+        "S": "it",
+        "N": "never",
+        "BE": "be",
+        "ADV": "quite",
+        "ADJ": "talented"
+      }
+    },
+    "prev_sent": "Switzer spent much of last night sequestered in a St. Edward 's University dorm room , scanning National Football League rosters for bodies that might eventually become available to his Cowboys .",
+    "next_sent": "-LBQ-  We 're trying to evaluate not only the waiver wire , but also every player on every team in the league ,  -RDQ-  the rookie NFL coach said .",
+    "text": "The new Cowboys coach has done enough cramming for this occupational test that , while he believes his team is the NFL 's most talented , it can never be quite talented enough .",
+    "doc": "nyt_eng_19940719_0009"
+  },
+  {
+    "sent_id": "nyt_eng_19940717_0172_1",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "5",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "7",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "5"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "S": "city",
+        "N": "never",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "silent"
+      }
+    },
+    "prev_sent": null,
+    "next_sent": "You could hear the dogs bark , but nothing else .",
+    "text": "The city had never been so silent .",
+    "doc": "nyt_eng_19940717_0172"
+  },
+  {
+    "sent_id": "nyt_eng_19940717_0092_26",
+    "matching": {
+      "nodes": {
+        "S": "28",
+        "N": "30",
+        "BE": "29",
+        "ADV": "31",
+        "ADJ": "32"
+      },
+      "edges": {
+        "subj": {
+          "source": "32",
+          "label": "nsubj",
+          "target": "28"
+        },
+        "neg": {
+          "source": "32",
+          "label": "neg",
+          "target": "30"
+        },
+        "cop": {
+          "source": "32",
+          "label": "cop",
+          "target": "29"
+        },
+        "advmod": {
+          "source": "32",
+          "label": "advmod",
+          "target": "31"
+        }
+      },
+      "fillers": {
+        "S": "PBS",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "embarrassed"
+      }
+    },
+    "prev_sent": "-LBQ-  We are scoring goals , left and right ,  -RDQ-  he later noted .",
+    "next_sent": "Presumably , the video of this event , to be released next month , will be stripped of this paraphernalia and will show the event in its raw form , which may give some idea about why this singing triumvirate has achieved such dominance .",
+    "text": "There were plugs as well  -COL-  Whoopi Goldberg , corralled for a pregame interview , mentioned her next movie , Perlman showed his latest CD , and PBS was never too embarrassed to let itself be promoted in comment after comment by its hosts .",
+    "doc": "nyt_eng_19940717_0092"
+  },
+  {
+    "sent_id": "nyt_eng_19940715_0158_35",
+    "matching": {
+      "nodes": {
+        "S": "3",
+        "N": "5",
+        "BE": "4",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "3"
+        },
+        "neg": {
+          "source": "7",
+          "label": "neg",
+          "target": "5"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "4"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "S": "adult",
+        "N": "never",
+        "BE": "be",
+        "ADV": "that",
+        "ADJ": "happy"
+      }
+    },
+    "prev_sent": "So do happy kids .",
+    "next_sent": "More than any other team sport , soccer still seems to be a celebration of the human body , not the formidable regimentation of it .",
+    "text": "-LRB- Most adults are never that happy . -RRB-",
+    "doc": "nyt_eng_19940715_0158"
+  },
+  {
+    "sent_id": "nyt_eng_19940712_0270_18",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "3",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "subj": {
+          "source": "6",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "6",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "6",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "6",
+          "label": "advmod",
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "S": "I",
+        "N": "never",
+        "BE": "be",
+        "ADV": "incredibly",
+        "ADJ": "aggressive"
+      }
+    },
+    "prev_sent": "Ms. Sarandon , on the other hand , does not see in her career a grand design to change Hollywood 's perception of women .",
+    "next_sent": "-LBQ-  I always thought it was kind of a lark .",
+    "text": "-LBQ-  I was never incredibly aggressive about my career , I must admit ,  -RDQ-  she says .",
+    "doc": "nyt_eng_19940712_0270"
+  },
+  {
+    "sent_id": "nyt_eng_19940707_0208_22",
+    "matching": {
+      "nodes": {
+        "S": "27",
+        "N": "29",
+        "BE": "28",
+        "ADV": "30",
+        "ADJ": "31"
+      },
+      "edges": {
+        "subj": {
+          "source": "31",
+          "label": "nsubj",
+          "target": "27"
+        },
+        "neg": {
+          "source": "31",
+          "label": "neg",
+          "target": "29"
+        },
+        "cop": {
+          "source": "31",
+          "label": "cop",
+          "target": "28"
+        },
+        "advmod": {
+          "source": "31",
+          "label": "advmod",
+          "target": "30"
+        }
+      },
+      "fillers": {
+        "S": "motivation",
+        "N": "never",
+        "BE": "be",
+        "ADV": "particularly",
+        "ADJ": "doctrinaire"
+      }
+    },
+    "prev_sent": "-LRB- Clearly , if  -LBQ-  Will  -RDQ-  and  -LBQ-  Olympia  -RDQ-  were not great films , there would be no interest in condemning them -- or Riefenstahl . -RRB-",
+    "next_sent": "-LBQ-  The Wonderful Horrible Life of Leni Riefenstahl .  -RDQ-",
+    "text": "In the end , the film lets us make up our own minds , but it certainly leaves us with the impression that Leni Riefenstahl 's motivations were never particularly doctrinaire , and her attraction to Nazis , athletes and Nubians was a lot more sexual than it was political .",
+    "doc": "nyt_eng_19940707_0208"
+  },
+  {
+    "sent_id": "nyt_eng_19940706_0242_5",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "3",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "subj": {
+          "source": "6",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "6",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "6",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "6",
+          "label": "advmod",
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "S": "it",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "early"
+      }
+    },
+    "prev_sent": "Thursday there will be a reception for the students and their employers",
+    "next_sent": "law ,  -RDQ-  said Mrs. Marshall , who will offer a few words of encouragement to welcome them .",
+    "text": "-LBQ-  It 's never too early to begin interesting young people in the",
+    "doc": "nyt_eng_19940706_0242"
+  },
+  {
+    "sent_id": "nyt_eng_19940706_0075_12",
+    "matching": {
+      "nodes": {
+        "S": "6",
+        "N": "8",
+        "BE": "7",
+        "ADV": "9",
+        "ADJ": "10"
+      },
+      "edges": {
+        "subj": {
+          "source": "10",
+          "label": "nsubj",
+          "target": "6"
+        },
+        "neg": {
+          "source": "10",
+          "label": "neg",
+          "target": "8"
+        },
+        "cop": {
+          "source": "10",
+          "label": "cop",
+          "target": "7"
+        },
+        "advmod": {
+          "source": "10",
+          "label": "advmod",
+          "target": "9"
+        }
+      },
+      "fillers": {
+        "S": "movie",
+        "N": "never",
+        "BE": "be",
+        "ADV": "as",
+        "ADJ": "addictive"
+      }
+    },
+    "prev_sent": "The boobs in power today have a control undreamed of in the past .",
+    "next_sent": "Contemporary television meets the demand for instant gratification in all-encompassing , astonishing ways that would have prompted the kings of old Hollywood to drool in envy .",
+    "text": "Even in their heyday , movies were never as addictive nor as immediately influential .",
+    "doc": "nyt_eng_19940706_0075"
+  },
+  {
+    "sent_id": "nyt_eng_19940706_0060_13",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "3",
+        "ADV": "5",
+        "ADJ": "6"
+      },
+      "edges": {
+        "subj": {
+          "source": "6",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "6",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "6",
+          "label": "cop",
+          "target": "3"
+        },
+        "advmod": {
+          "source": "6",
+          "label": "advmod",
+          "target": "5"
+        }
+      },
+      "fillers": {
+        "S": "predicament",
+        "N": "never",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "perilous"
+      }
+    },
+    "prev_sent": "The clear implication is that if it were left to him , we 'd still be in the Mesozoic era , with mammals in a losing battle with dinosaurs .",
+    "next_sent": "Undaunted by an arrow that has pierced her shoulder , she launches a  -LBQ-  Why are you mad at me ?  -RDQ-  romantic offensive of her own .",
+    "text": "The predicament is never so perilous that it ca n't yield to the comic incursions of the mating game , as when Joanne Dru , in the Indian attack in  -LBQ-  Red River ,  -RDQ-  realizes the cowboy beside her -LRB- Montgomery Clift -RRB- , shooting at the Indians , is the man for her .",
+    "doc": "nyt_eng_19940706_0060"
+  },
+  {
+    "sent_id": "nyt_eng_19940706_0048_37",
+    "matching": {
+      "nodes": {
+        "S": "59",
+        "N": "61",
+        "BE": "62",
+        "ADV": "63",
+        "ADJ": "64"
+      },
+      "edges": {
+        "subj": {
+          "source": "64",
+          "label": "nsubj",
+          "target": "59"
+        },
+        "neg": {
+          "source": "64",
+          "label": "neg",
+          "target": "61"
+        },
+        "cop": {
+          "source": "64",
+          "label": "cop",
+          "target": "62"
+        },
+        "advmod": {
+          "source": "64",
+          "label": "advmod",
+          "target": "63"
+        }
+      },
+      "fillers": {
+        "S": "which",
+        "N": "never",
+        "BE": "be",
+        "ADV": "legally",
+        "ADJ": "available"
+      }
+    },
+    "prev_sent": "Since the Bulger murder , things have toughened up .",
+    "next_sent": "-LRB- STORY CAN END HERE .",
+    "text": "Several videos have been denied any classification at all while the government prepares new guidelines , so  -LBQ-  Reservoir Dogs ,  -RDQ-   -LBQ-  Dirty Weekend ,  -RDQ-   -LBQ-  Bad Lieutenant  -RDQ-  and  -LBQ-  Mikey  -RDQ-  have joined a list headed by  -LBQ-  Straw Dogs ,  -RDQ-   -LBQ-  The Texas Chainsaw Massacre  -RDQ-  and  -LBQ-  The Exorcist ,  -RDQ-  which have never been legally available on video in Britain .",
+    "doc": "nyt_eng_19940706_0048"
+  },
+  {
+    "sent_id": "nyt_eng_19940706_0018_5",
+    "matching": {
+      "nodes": {
+        "S": "5",
+        "N": "7",
+        "BE": "8",
+        "ADV": "9",
+        "ADJ": "10"
+      },
+      "edges": {
+        "subj": {
+          "source": "10",
+          "label": "nsubj",
+          "target": "5"
+        },
+        "neg": {
+          "source": "10",
+          "label": "neg",
+          "target": "7"
+        },
+        "cop": {
+          "source": "10",
+          "label": "cop",
+          "target": "8"
+        },
+        "advmod": {
+          "source": "10",
+          "label": "advmod",
+          "target": "9"
+        }
+      },
+      "fillers": {
+        "S": "public",
+        "N": "never",
+        "BE": "be",
+        "ADV": "entirely",
+        "ADJ": "pleased"
+      }
+    },
+    "prev_sent": "-LBQ-  The district offers a unique way of providing one of the most incredible transit systems in the world ,  -RDQ-  says Marin County Supervisor Gary Giacomini , one of the most powerful members of the bridge board .",
+    "next_sent": "-LBQ-  We are a highly visible public agency that has attracted some negative feelings because of the tolls ,  -RDQ-  said Campion .",
+    "text": "District officials say the public will never be entirely pleased -- largely because of the tolls .",
+    "doc": "nyt_eng_19940706_0018"
+  },
+  {
+    "sent_id": "nyt_eng_19940705_0031_9",
+    "matching": {
+      "nodes": {
+        "S": "1",
+        "N": "3",
+        "BE": "2",
+        "ADV": "4",
+        "ADJ": "5"
+      },
+      "edges": {
+        "subj": {
+          "source": "5",
+          "label": "nsubj",
+          "target": "1"
+        },
+        "neg": {
+          "source": "5",
+          "label": "neg",
+          "target": "3"
+        },
+        "cop": {
+          "source": "5",
+          "label": "cop",
+          "target": "2"
+        },
+        "advmod": {
+          "source": "5",
+          "label": "advmod",
+          "target": "4"
+        }
+      },
+      "fillers": {
+        "S": "I",
+        "N": "never",
+        "BE": "be",
+        "ADV": "so",
+        "ADJ": "patriotic"
+      }
+    },
+    "prev_sent": "Next thing you know we 're liable to forget what America stands for .",
+    "next_sent": "I spent a memorable Fourth of July , 1990 , in what was still then the Soviet Union .",
+    "text": "I was never so patriotic until I started traveling to other countries .",
+    "doc": "nyt_eng_19940705_0031"
+  },
+  {
+    "sent_id": "nyt_eng_19940704_0169_3",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "5",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "7",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "5"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "S": "Webber",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "popular"
+      }
+    },
+    "prev_sent": "The musical of  -LBQ-  Sunset  -RDQ-  opened last July in London , with Lloyd Webber saying he was committed to keeping Ms. LuPone when the show moved to New York , where it is expected to cost $ 12 million to put on .",
+    "next_sent": "Several reviewers said Ms. LuPone seemed too young and invulnerable for the part of a fragile , hallucinating former movie star .",
+    "text": "Lloyd Webber has never been too popular with critics -LRB- only audiences -RRB- , and the reviews in London were mixed .",
+    "doc": "nyt_eng_19940704_0169"
+  },
+  {
+    "sent_id": "nyt_eng_19940702_0251_23",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "4",
+        "BE": "5",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "7",
+          "label": "neg",
+          "target": "4"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "5"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "S": "you",
+        "N": "never",
+        "BE": "be",
+        "ADV": "too",
+        "ADJ": "old"
+      }
+    },
+    "prev_sent": "Through Friday , Butler was fourth in the National League in on-base percentage -LRB- .425 -RRB- , second in walks -LRB- 53 -RRB- and tied for first in triples -LRB- seven -RRB- .",
+    "next_sent": "-LBQ-  I have to continually try to challenge myself , to keep trying to get better .",
+    "text": "-LBQ-  You can never be too old to learn ,  -RDQ-  Butler said recently .",
+    "doc": "nyt_eng_19940702_0251"
+  },
+  {
+    "sent_id": "nyt_eng_19940701_0008_4",
+    "matching": {
+      "nodes": {
+        "S": "2",
+        "N": "3",
+        "BE": "4",
+        "ADV": "6",
+        "ADJ": "7"
+      },
+      "edges": {
+        "subj": {
+          "source": "7",
+          "label": "nsubj",
+          "target": "2"
+        },
+        "neg": {
+          "source": "7",
+          "label": "neg",
+          "target": "3"
+        },
+        "cop": {
+          "source": "7",
+          "label": "cop",
+          "target": "4"
+        },
+        "advmod": {
+          "source": "7",
+          "label": "advmod",
+          "target": "6"
+        }
+      },
+      "fillers": {
+        "S": "I",
+        "N": "never",
+        "BE": "be",
+        "ADV": "much",
+        "ADJ": "concerned"
+      }
+    },
+    "prev_sent": "But Lambert looked as uncomfortable as a man can look in his favorite boots , jeans , western shirt and cowboy straw hat .",
+    "next_sent": "Also , as much as he enjoys reminiscing about Native Diver , he 's not about to call it a career .",
+    "text": "-LBQ-  I never was too much concerned about the glory ,  -RDQ-  he said between drags on a cigarette .",
+    "doc": "nyt_eng_19940701_0008"
+  }
+]

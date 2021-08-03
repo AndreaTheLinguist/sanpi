@@ -1,0 +1,14 @@
+[
+  {
+    "sent_id": "nyt_eng_19991201_0051_11",
+    "matching": {
+      "nodes": { "S": "1", "N": "3", "BE": "2", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "subj": { "source": "5", "label": "nsubj", "target": "1" },
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "cop": { "source": "5", "label": "cop", "target": "2" },
+        "advmod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  }
+]

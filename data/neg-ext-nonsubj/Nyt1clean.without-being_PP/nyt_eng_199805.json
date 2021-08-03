@@ -1,0 +1,58 @@
+[
+  {
+    "sent_id": "nyt_eng_19980505_0388_4",
+    "matching": {
+      "nodes": {
+        "W": "10",
+        "B": "11",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "advmod": {
+          "source": "13",
+          "label": "advmod",
+          "target": "12"
+        }
+      },
+      "fillers": {
+        "W": "without",
+        "B": "be",
+        "ADV": "especially",
+        "ADJ": "serious"
+      }
+    },
+    "prev_sent": "-LBQ-  The Invention of Love ,  -RDQ-  which was also directed by Eyre , is no less serious for being exceptionally funny .",
+    "next_sent": "Hare 's Oscar is an interesting construct , but resolutely anti-dramatic .",
+    "text": "-LBQ-  The Judas Kiss ,  -RDQ-  which is solemn without being especially serious , is a transfer of the Almeida Theater 's London production that opened in the West End in March .",
+    "doc": "nyt_eng_19980505_0388"
+  },
+  {
+    "sent_id": "nyt_eng_19980505_0388_4",
+    "matching": {
+      "nodes": {
+        "W": "10",
+        "B": "11",
+        "ADV": "12",
+        "ADJ": "13"
+      },
+      "edges": {
+        "advmod": {
+          "source": "13",
+          "label": "advmod",
+          "target": "12"
+        }
+      },
+      "fillers": {
+        "W": "without",
+        "B": "be",
+        "ADV": "especially",
+        "ADJ": "serious"
+      }
+    },
+    "prev_sent": "-LBQ-  The Invention of Love ,  -RDQ-  which was also directed by Eyre , is no less serious for being exceptionally funny .",
+    "next_sent": "Hare 's Oscar is an interesting construct , but resolutely anti-dramatic .",
+    "text": "-LBQ-  The Judas Kiss ,  -RDQ-  which is solemn without being especially serious , is a transfer of the Almeida Theater 's London production that opened in the West End in March .",
+    "doc": "nyt_eng_19980505_0388"
+  }
+]
