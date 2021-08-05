@@ -13,43 +13,45 @@ from tabulate import tabulate
 
 def __main__():
 
-    data_dir = Path( Path.cwd() / "hits" ) 
-    if not data_dir.exists(): 
+    data_dir = Path(Path.cwd() / "hits")
+    if not data_dir.exists():
         sys.exit('/hits/ directory not found. *Be sure to run this script from '
                  'the level above your hits directory')
 
     sample_dir = Path.cwd() / 'data_samples'
-    if not sample_dir.exists(): 
+    if not sample_dir.exists():
         sample_dir.mkdir()
 
     files = pd.DataFrame()
+    file_info = namedtuple('file_info', ['name', 'path', 'context_group',
+                                         'polarity', 'corpus', 'context_word', 'context_type'])
     for grp_dir in data_dir.iterdir():
 
         contextgrp = grp_dir.name
         if contextgrp.startswith('neg'):
             polarity = 'negative'
-        elif contextgrp.startswith('unk'): 
+        elif contextgrp.startswith('unk'):
             polarity = 'unknown'
-        else: 
-            polarity = ''
+        elif contextgrp.startswith('bas'):
+            polarity = 'mixed'
+        # if not designated category type, skip (e.g. testing dirs)
+        else:
+            continue
 
-        file_info_list = [[f.stem, f, contextgrp, polarity,
-                           f.stem.rsplit('_', 1)[0].split('_', 1)[1]]
-                          for f in grp_dir.glob('*_hits.*')]
+        file_info_list = []
+        #exluding duplicates and test/quicktest files
+        for f in grp_dir.glob('[AN][py]*_hits.csv'):
 
-        grp_df = pd.DataFrame(file_info_list,
-                              columns=['name', 'path', 'context_group',
-                                       'polarity', 'context'])
+            name_parts = f.stem.split('_', )[:-1]
+            file_info_list.append(file_info(f.stem, f, contextgrp,
+                                            polarity, *name_parts))
 
-        files = files.append(grp_df, ignore_index=True)
-
-    files.loc[
-        :, 'context_word'] = files.context.str.split('_').str.get(0)
-    files.loc[
-        :, 'context_type'] = files.context.str.split('_').str.get(1)
+        files = files.append(pd.DataFrame(file_info_list),
+                             ignore_index=True)
+        files = files.assign(context=(files.context_word +
+                                      '_' + files.context_type))
 
     categories_dict = {
-        'context_group': tuple(files.context_group.unique()),
         'context': tuple(files.context.unique()),
         'context_word': tuple(files.context_word.unique()),
         'context_type': tuple(files.context_type.unique()),
@@ -62,19 +64,20 @@ def __main__():
         except TypeError:
             pass
 
+    # TODO Fix this. Needs to be adjusted still for data reorganization.
     # process basic pattern results first
-    basic_dfs = list(generate_dataframes(files, categories_dict, basic=True))
+    basic_gen = generate_dataframes(files, categories_dict, basic=True)
 
-    baseline_hits = pd.concat(basic_dfs, ignore_index=True)
+    baseline_hits = pd.concat(list(basic_gen), ignore_index=True)
 
     base_hit_ids = baseline_hits.hit_id.unique()
 
     # process context pattern results
-    context_dfs = list(
-        generate_dataframes(files, categories_dict, base_ids=base_hit_ids))
+    context_dfs = list(generate_dataframes(files, categories_dict,
+                                           base_ids=base_hit_ids))
 
     cat_columns = ['colloc', 'adv', 'adj', 'polarity', 'context_group',
-                   'context', 'context_word', 'context_type']
+                   'context', 'context_word', 'context_type', 'corpus']
 
     # combine dataframes for each individual context's results
     combined_contexts = pd.concat(context_dfs, ignore_index=True)
@@ -115,8 +118,8 @@ def __main__():
     no_overlap.to_pickle("no_overlap_data.pkl.gz")
 
     # create sample for easy viewing on github
-    no_overlap.sample(n=1000).sort_values(by="colloc").to_csv(
-        sample_dir / 'no-overlap-data_1000rows.csv', index=False)
+    no_overlap.sample(n=500).sort_values(by="colloc").to_csv(
+        sample_dir / 'no-overlap-data_500rows.csv', index=False)
 
 
 def generate_dataframes(files_df: pd.DataFrame,
@@ -129,6 +132,7 @@ def generate_dataframes(files_df: pd.DataFrame,
         'colloc': 'category',
         'adv': 'category',
         'adj': 'category',
+        'context_group': 'category',
         'sent_text': 'string',
         'sent_id': 'string',
         'adv_index': 'uint8'
@@ -136,43 +140,46 @@ def generate_dataframes(files_df: pd.DataFrame,
 
     if basic:
 
-        files_df = files_df[files_df.polarity == 'basic']
+        files_df = files_df[files_df.context_group == 'basic']
 
     else:
 
-        files_df = files_df[files_df.polarity != 'basic']
+        files_df = files_df[files_df.context_group != 'basic']
 
     for i in files_df.index:
 
-        df = pd.read_csv(files_df.at[i, 'path'], dtype=dtype_dict)
+        df = (pd.read_csv(files_df.at[i, 'path'], dtype=dtype_dict))
+              
+        if 'category' not in df.columns: 
+            df = df.assign(context_group='outdated_input_file')
 
-        df.loc[:, 'corpus_segment'] = df.sent_id.str.rsplit(
-            '_', 2).str.get(0).astype('category')
-        df.loc[:, 'date'] = df.corpus_segment.str.rsplit('_', 1).str.get(1)
-        df.loc[:, 'date'] = pd.to_datetime(df.date, format='%Y%m%d')
-        df.loc[:, 'year'] = pd.to_numeric(df.date.dt.year, downcast='unsigned')
+        df = df.rename(columns={'category': 'context_group'})
 
-        df.loc[:, 'polarity'] = files_df.at[i, 'polarity']
-        df.loc[:, 'polarity'] = df.polarity.astype(categories['polarity'])
+        df = df.assign(
+            corpus_segment=df.sent_id.str.rsplit(
+                '_', 2).str.get(0).astype('category'),
+        )
 
-        df.loc[:, 'context'] = files_df.at[i, 'context']
-        df.loc[:, 'context'] = df.context.astype(categories['context'])
+        df = df.assign(
+            corpus=files_df.at[i, 'corpus'],
+            date=df.corpus_segment.str.rsplit('_', 1).str.get(1),
+            polarity=files_df.at[i, 'polarity'],
+            context=files_df.at[i, 'context'],
+            context_word=files_df.at[i, 'context_word'],
+            context_type=files_df.at[i, 'context_type'],
+            in_basic=True if basic else df.hit_id.isin(base_ids)
+        )
 
-        df.loc[:, 'context_word'] = files_df.at[i, 'context_word']
-        df.loc[:, 'context_word'] = df.context_word.astype(
-            categories['context_word'])
+        df = df.assign(date=pd.to_datetime(df.date, format='%Y%m%d'))
 
-        df.loc[:, 'context_type'] = files_df.at[i, 'context_type']
-        df.loc[:, 'context_type'] = df.context_type.astype(
-            categories['context_type'])
+        for col, dtype_val in categories.items():
+            df.loc[:, col] = df[col].astype(dtype_val)
 
-        df.loc[:, "in_basic"] = True if basic else df.hit_id.isin(base_ids)
+        df = df.assign(
+            line_in_source=pd.to_numeric(df.index + 1, downcast='unsigned'), year=pd.to_numeric(df.date.dt.year, downcast='unsigned'))
 
-        colloc_sorted_df = df.sort_values(by='colloc').reset_index().rename(
-            columns={'index': 'line_in_source'})
-
-        colloc_sorted_df['line_in_source'] = pd.to_numeric(
-            colloc_sorted_df.line_in_source + 1, downcast='unsigned')
+        colloc_sorted_df = df.sort_values(by='colloc').reset_index()
+        colloc_sorted_df.pop('index')
 
         yield colloc_sorted_df
 

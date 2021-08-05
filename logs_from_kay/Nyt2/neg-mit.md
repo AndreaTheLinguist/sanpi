@@ -1,0 +1,4781 @@
+
+# Running `script/makeTable.sh`
+_Checking for required packages..._
+```
+pyconll package not found:
+pip3 install pyconll
+Requirement already satisfied: pyconll in /home/arh234/.local/lib/python3.8/site-packages (3.1.0)
+ 
+pandas package not found:
+pip3 install pandas
+Requirement already satisfied: pandas in /home/arh234/.local/lib/python3.8/site-packages (1.3.1)
+Requirement already satisfied: pytz>=2017.3 in /home/arh234/.local/lib/python3.8/site-packages (from pandas) (2021.1)
+Requirement already satisfied: python-dateutil>=2.7.3 in /home/arh234/.local/lib/python3.8/site-packages (from pandas) (2.8.2)
+Requirement already satisfied: numpy>=1.17.3 in /home/arh234/.local/lib/python3.8/site-packages (from pandas) (1.21.1)
+Requirement already satisfied: six>=1.5 in /usr/lib/python3/dist-packages (from python-dateutil>=2.7.3->pandas) (1.14.0)
+```
+## >> Searching `Nyt2.conll/` for `neg-mit` patterns
+ 
+- started by: `arh234`
+- run from: `/home/arh234/snpa`
+- timestamp: `Tue Aug  3 15:01:28 EDT 2021`
+ 
+```
+## Starting context: `almost-no-one_subj`
+- time stamp: `Tue Aug  3 15:01:28 EDT 2021`
+- data directory: `data/neg-mit/Nyt2.almost-no-one_subj`
+- hits table: `hits/neg-mit/Nyt2_almost-no-one_subj`
+```{js}
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  S [lemma="one"]; 
+  N [lemma="no"];
+  det: S -[det]-> N;
+  A [lemma="almost"];
+  A < N;
+  sub: ADJ -[nsubj|nsubjpass]-> S;
+  S << BE
+}
+```  
+```  
+```
+### Running grew search on `Nyt2.conll`...
+```
+131 total file(s) to be searched.
+-> searching Nyt2.conll/nyt_eng_200001.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200001.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200001.raw.json
+4.15 minutes on nyt_eng_200001.conllu
+-> searching Nyt2.conll/nyt_eng_200002.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200002.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200002.raw.json
+4.31 minutes on nyt_eng_200002.conllu
+-> searching Nyt2.conll/nyt_eng_200003.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200003.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200003.raw.json
+4.26 minutes on nyt_eng_200003.conllu
+-> searching Nyt2.conll/nyt_eng_200004.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200004.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200004.raw.json
+3.31 minutes on nyt_eng_200004.conllu
+-> searching Nyt2.conll/nyt_eng_200005.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200005.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200005.raw.json
+3.67 minutes on nyt_eng_200005.conllu
+-> searching Nyt2.conll/nyt_eng_200006.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200006.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200006.raw.json
+4.07 minutes on nyt_eng_200006.conllu
+-> searching Nyt2.conll/nyt_eng_200007.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200007.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200007.raw.json
+4.47 minutes on nyt_eng_200007.conllu
+-> searching Nyt2.conll/nyt_eng_200008.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200008.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200008.raw.json
+4.91 minutes on nyt_eng_200008.conllu
+-> searching Nyt2.conll/nyt_eng_200009.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200009.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200009.raw.json
+3.73 minutes on nyt_eng_200009.conllu
+-> searching Nyt2.conll/nyt_eng_200010.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200010.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200010.raw.json
+4.74 minutes on nyt_eng_200010.conllu
+-> searching Nyt2.conll/nyt_eng_200011.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200011.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200011.raw.json
+4.56 minutes on nyt_eng_200011.conllu
+-> searching Nyt2.conll/nyt_eng_200012.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200012.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200012.raw.json
+4.31 minutes on nyt_eng_200012.conllu
+-> searching Nyt2.conll/nyt_eng_200101.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200101.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200101.raw.json
+4.9 minutes on nyt_eng_200101.conllu
+-> searching Nyt2.conll/nyt_eng_200102.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200102.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200102.raw.json
+4.34 minutes on nyt_eng_200102.conllu
+-> searching Nyt2.conll/nyt_eng_200103.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200103.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200103.raw.json
+4.36 minutes on nyt_eng_200103.conllu
+-> searching Nyt2.conll/nyt_eng_200104.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200104.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200104.raw.json
+4.91 minutes on nyt_eng_200104.conllu
+-> searching Nyt2.conll/nyt_eng_200105.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200105.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200105.raw.json
+4.62 minutes on nyt_eng_200105.conllu
+-> searching Nyt2.conll/nyt_eng_200106.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200106.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200106.raw.json
+4.09 minutes on nyt_eng_200106.conllu
+-> searching Nyt2.conll/nyt_eng_200107.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200107.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200107.raw.json
+4.33 minutes on nyt_eng_200107.conllu
+-> searching Nyt2.conll/nyt_eng_200108.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200108.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200108.raw.json
+4.54 minutes on nyt_eng_200108.conllu
+-> searching Nyt2.conll/nyt_eng_200109.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200109.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200109.raw.json
+4.95 minutes on nyt_eng_200109.conllu
+-> searching Nyt2.conll/nyt_eng_200110.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200110.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200110.raw.json
+4.96 minutes on nyt_eng_200110.conllu
+-> searching Nyt2.conll/nyt_eng_200111.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200111.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200111.raw.json
+4.71 minutes on nyt_eng_200111.conllu
+-> searching Nyt2.conll/nyt_eng_200112.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200112.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200112.raw.json
+4.08 minutes on nyt_eng_200112.conllu
+-> searching Nyt2.conll/nyt_eng_200201.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200201.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200201.raw.json
+4.14 minutes on nyt_eng_200201.conllu
+-> searching Nyt2.conll/nyt_eng_200202.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200202.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200202.raw.json
+4.51 minutes on nyt_eng_200202.conllu
+-> searching Nyt2.conll/nyt_eng_200203.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200203.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200203.raw.json
+4.81 minutes on nyt_eng_200203.conllu
+-> searching Nyt2.conll/nyt_eng_200204.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200204.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200204.raw.json
+4.84 minutes on nyt_eng_200204.conllu
+-> searching Nyt2.conll/nyt_eng_200205.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200205.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200205.raw.json
+4.65 minutes on nyt_eng_200205.conllu
+-> searching Nyt2.conll/nyt_eng_200206.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200206.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200206.raw.json
+4.45 minutes on nyt_eng_200206.conllu
+-> searching Nyt2.conll/nyt_eng_200207.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200207.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200207.raw.json
+2.04 minutes on nyt_eng_200207.conllu
+-> searching Nyt2.conll/nyt_eng_200208.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200208.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200208.raw.json
+4.07 minutes on nyt_eng_200208.conllu
+-> searching Nyt2.conll/nyt_eng_200209.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200209.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200209.raw.json
+4.45 minutes on nyt_eng_200209.conllu
+-> searching Nyt2.conll/nyt_eng_200210.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200210.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200210.raw.json
+4.73 minutes on nyt_eng_200210.conllu
+-> searching Nyt2.conll/nyt_eng_200211.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200211.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200211.raw.json
+4.23 minutes on nyt_eng_200211.conllu
+-> searching Nyt2.conll/nyt_eng_200212.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200212.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200212.raw.json
+4.42 minutes on nyt_eng_200212.conllu
+-> searching Nyt2.conll/nyt_eng_200301.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200301.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200301.raw.json
+2.53 minutes on nyt_eng_200301.conllu
+-> searching Nyt2.conll/nyt_eng_200302.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200302.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200302.raw.json
+0.54 minutes on nyt_eng_200302.conllu
+-> searching Nyt2.conll/nyt_eng_200303.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200303.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200303.raw.json
+0.61 minutes on nyt_eng_200303.conllu
+-> searching Nyt2.conll/nyt_eng_200304.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200304.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200304.raw.json
+0.62 minutes on nyt_eng_200304.conllu
+-> searching Nyt2.conll/nyt_eng_200305.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200305.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200305.raw.json
+0.55 minutes on nyt_eng_200305.conllu
+-> searching Nyt2.conll/nyt_eng_200306.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200306.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200306.raw.json
+0.54 minutes on nyt_eng_200306.conllu
+-> searching Nyt2.conll/nyt_eng_200307.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200307.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200307.raw.json
+0.56 minutes on nyt_eng_200307.conllu
+-> searching Nyt2.conll/nyt_eng_200308.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200308.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200308.raw.json
+0.47 minutes on nyt_eng_200308.conllu
+-> searching Nyt2.conll/nyt_eng_200309.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200309.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200309.raw.json
+0.6 minutes on nyt_eng_200309.conllu
+-> searching Nyt2.conll/nyt_eng_200310.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200310.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200310.raw.json
+0.59 minutes on nyt_eng_200310.conllu
+-> searching Nyt2.conll/nyt_eng_200311.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200311.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200311.raw.json
+0.52 minutes on nyt_eng_200311.conllu
+-> searching Nyt2.conll/nyt_eng_200312.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200312.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200312.raw.json
+0.52 minutes on nyt_eng_200312.conllu
+-> searching Nyt2.conll/nyt_eng_200401.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200401.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200401.raw.json
+0.5 minutes on nyt_eng_200401.conllu
+-> searching Nyt2.conll/nyt_eng_200402.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200402.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200402.raw.json
+0.45 minutes on nyt_eng_200402.conllu
+-> searching Nyt2.conll/nyt_eng_200403.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200403.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200403.raw.json
+0.51 minutes on nyt_eng_200403.conllu
+-> searching Nyt2.conll/nyt_eng_200404.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200404.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200404.raw.json
+0.46 minutes on nyt_eng_200404.conllu
+-> searching Nyt2.conll/nyt_eng_200405.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200405.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200405.raw.json
+0.11 minutes on nyt_eng_200405.conllu
+-> searching Nyt2.conll/nyt_eng_200407.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200407.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200407.raw.json
+3.75 minutes on nyt_eng_200407.conllu
+-> searching Nyt2.conll/nyt_eng_200408.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200408.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200408.raw.json
+3.9 minutes on nyt_eng_200408.conllu
+-> searching Nyt2.conll/nyt_eng_200409.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200409.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200409.raw.json
+3.81 minutes on nyt_eng_200409.conllu
+-> searching Nyt2.conll/nyt_eng_200410.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200410.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200410.raw.json
+3.95 minutes on nyt_eng_200410.conllu
+-> searching Nyt2.conll/nyt_eng_200411.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200411.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200411.raw.json
+3.62 minutes on nyt_eng_200411.conllu
+-> searching Nyt2.conll/nyt_eng_200412.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200412.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200412.raw.json
+3.13 minutes on nyt_eng_200412.conllu
+-> searching Nyt2.conll/nyt_eng_200501.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200501.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200501.raw.json
+3.63 minutes on nyt_eng_200501.conllu
+-> searching Nyt2.conll/nyt_eng_200502.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200502.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200502.raw.json
+2.95 minutes on nyt_eng_200502.conllu
+-> searching Nyt2.conll/nyt_eng_200503.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200503.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200503.raw.json
+3.52 minutes on nyt_eng_200503.conllu
+-> searching Nyt2.conll/nyt_eng_200504.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200504.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200504.raw.json
+3.09 minutes on nyt_eng_200504.conllu
+-> searching Nyt2.conll/nyt_eng_200505.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200505.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200505.raw.json
+3.19 minutes on nyt_eng_200505.conllu
+-> searching Nyt2.conll/nyt_eng_200506.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200506.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200506.raw.json
+3.59 minutes on nyt_eng_200506.conllu
+-> searching Nyt2.conll/nyt_eng_200507.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200507.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200507.raw.json
+3.91 minutes on nyt_eng_200507.conllu
+-> searching Nyt2.conll/nyt_eng_200508.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200508.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200508.raw.json
+3.87 minutes on nyt_eng_200508.conllu
+-> searching Nyt2.conll/nyt_eng_200509.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200509.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200509.raw.json
+2.82 minutes on nyt_eng_200509.conllu
+-> searching Nyt2.conll/nyt_eng_200510.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200510.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200510.raw.json
+3.85 minutes on nyt_eng_200510.conllu
+-> searching Nyt2.conll/nyt_eng_200511.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200511.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200511.raw.json
+3.5 minutes on nyt_eng_200511.conllu
+-> searching Nyt2.conll/nyt_eng_200512.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200512.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200512.raw.json
+3.58 minutes on nyt_eng_200512.conllu
+-> searching Nyt2.conll/nyt_eng_200601.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200601.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200601.raw.json
+3.65 minutes on nyt_eng_200601.conllu
+-> searching Nyt2.conll/nyt_eng_200602.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200602.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200602.raw.json
+3.66 minutes on nyt_eng_200602.conllu
+-> searching Nyt2.conll/nyt_eng_200603.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200603.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200603.raw.json
+3.64 minutes on nyt_eng_200603.conllu
+-> searching Nyt2.conll/nyt_eng_200604.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200604.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200604.raw.json
+3.53 minutes on nyt_eng_200604.conllu
+-> searching Nyt2.conll/nyt_eng_200605.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200605.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200605.raw.json
+3.72 minutes on nyt_eng_200605.conllu
+-> searching Nyt2.conll/nyt_eng_200606.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200606.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200606.raw.json
+3.42 minutes on nyt_eng_200606.conllu
+-> searching Nyt2.conll/nyt_eng_200607.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200607.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200607.raw.json
+3.0 minutes on nyt_eng_200607.conllu
+-> searching Nyt2.conll/nyt_eng_200608.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200608.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200608.raw.json
+3.35 minutes on nyt_eng_200608.conllu
+-> searching Nyt2.conll/nyt_eng_200609.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200609.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200609.raw.json
+3.74 minutes on nyt_eng_200609.conllu
+-> searching Nyt2.conll/nyt_eng_200610.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200610.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200610.raw.json
+3.65 minutes on nyt_eng_200610.conllu
+-> searching Nyt2.conll/nyt_eng_200611.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200611.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200611.raw.json
+3.57 minutes on nyt_eng_200611.conllu
+-> searching Nyt2.conll/nyt_eng_200612.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200612.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200612.raw.json
+3.25 minutes on nyt_eng_200612.conllu
+-> searching Nyt2.conll/nyt_eng_200701.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200701.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200701.raw.json
+3.36 minutes on nyt_eng_200701.conllu
+-> searching Nyt2.conll/nyt_eng_200702.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200702.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200702.raw.json
+2.97 minutes on nyt_eng_200702.conllu
+-> searching Nyt2.conll/nyt_eng_200703.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200703.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200703.raw.json
+3.22 minutes on nyt_eng_200703.conllu
+-> searching Nyt2.conll/nyt_eng_200704.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200704.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200704.raw.json
+3.05 minutes on nyt_eng_200704.conllu
+-> searching Nyt2.conll/nyt_eng_200705.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200705.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200705.raw.json
+3.04 minutes on nyt_eng_200705.conllu
+-> searching Nyt2.conll/nyt_eng_200706.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200706.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200706.raw.json
+2.99 minutes on nyt_eng_200706.conllu
+-> searching Nyt2.conll/nyt_eng_200707.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200707.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200707.raw.json
+2.92 minutes on nyt_eng_200707.conllu
+-> searching Nyt2.conll/nyt_eng_200708.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200708.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200708.raw.json
+2.83 minutes on nyt_eng_200708.conllu
+-> searching Nyt2.conll/nyt_eng_200709.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200709.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200709.raw.json
+2.74 minutes on nyt_eng_200709.conllu
+-> searching Nyt2.conll/nyt_eng_200710.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200710.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200710.raw.json
+3.24 minutes on nyt_eng_200710.conllu
+-> searching Nyt2.conll/nyt_eng_200711.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200711.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200711.raw.json
+2.89 minutes on nyt_eng_200711.conllu
+-> searching Nyt2.conll/nyt_eng_200712.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200712.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200712.raw.json
+2.86 minutes on nyt_eng_200712.conllu
+-> searching Nyt2.conll/nyt_eng_200801.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200801.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200801.raw.json
+3.12 minutes on nyt_eng_200801.conllu
+-> searching Nyt2.conll/nyt_eng_200802.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200802.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200802.raw.json
+2.79 minutes on nyt_eng_200802.conllu
+-> searching Nyt2.conll/nyt_eng_200803.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200803.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200803.raw.json
+2.94 minutes on nyt_eng_200803.conllu
+-> searching Nyt2.conll/nyt_eng_200804.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200804.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200804.raw.json
+2.75 minutes on nyt_eng_200804.conllu
+-> searching Nyt2.conll/nyt_eng_200805.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200805.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200805.raw.json
+2.79 minutes on nyt_eng_200805.conllu
+-> searching Nyt2.conll/nyt_eng_200806.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200806.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200806.raw.json
+2.68 minutes on nyt_eng_200806.conllu
+-> searching Nyt2.conll/nyt_eng_200807.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200807.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200807.raw.json
+2.65 minutes on nyt_eng_200807.conllu
+-> searching Nyt2.conll/nyt_eng_200808.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200808.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200808.raw.json
+2.75 minutes on nyt_eng_200808.conllu
+-> searching Nyt2.conll/nyt_eng_200809.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200809.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200809.raw.json
+2.53 minutes on nyt_eng_200809.conllu
+-> searching Nyt2.conll/nyt_eng_200810.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200810.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200810.raw.json
+2.67 minutes on nyt_eng_200810.conllu
+-> searching Nyt2.conll/nyt_eng_200811.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200811.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200811.raw.json
+2.53 minutes on nyt_eng_200811.conllu
+-> searching Nyt2.conll/nyt_eng_200812.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200812.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200812.raw.json
+2.4 minutes on nyt_eng_200812.conllu
+-> searching Nyt2.conll/nyt_eng_200901.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200901.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200901.raw.json
+2.52 minutes on nyt_eng_200901.conllu
+-> searching Nyt2.conll/nyt_eng_200902.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200902.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200902.raw.json
+2.21 minutes on nyt_eng_200902.conllu
+-> searching Nyt2.conll/nyt_eng_200903.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200903.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200903.raw.json
+2.49 minutes on nyt_eng_200903.conllu
+-> searching Nyt2.conll/nyt_eng_200904.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200904.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200904.raw.json
+2.12 minutes on nyt_eng_200904.conllu
+-> searching Nyt2.conll/nyt_eng_200905.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200905.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200905.raw.json
+2.24 minutes on nyt_eng_200905.conllu
+-> searching Nyt2.conll/nyt_eng_200906.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200906.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200906.raw.json
+1.99 minutes on nyt_eng_200906.conllu
+-> searching Nyt2.conll/nyt_eng_200907.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200907.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200907.raw.json
+2.08 minutes on nyt_eng_200907.conllu
+-> searching Nyt2.conll/nyt_eng_200908.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200908.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200908.raw.json
+1.99 minutes on nyt_eng_200908.conllu
+-> searching Nyt2.conll/nyt_eng_200909.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200909.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200909.raw.json
+2.02 minutes on nyt_eng_200909.conllu
+-> searching Nyt2.conll/nyt_eng_200910.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200910.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200910.raw.json
+1.89 minutes on nyt_eng_200910.conllu
+-> searching Nyt2.conll/nyt_eng_200911.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200911.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200911.raw.json
+1.79 minutes on nyt_eng_200911.conllu
+-> searching Nyt2.conll/nyt_eng_200912.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_200912.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_200912.raw.json
+1.8 minutes on nyt_eng_200912.conllu
+-> searching Nyt2.conll/nyt_eng_201001.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201001.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201001.raw.json
+2.01 minutes on nyt_eng_201001.conllu
+-> searching Nyt2.conll/nyt_eng_201002.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201002.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201002.raw.json
+1.77 minutes on nyt_eng_201002.conllu
+-> searching Nyt2.conll/nyt_eng_201003.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201003.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201003.raw.json
+1.88 minutes on nyt_eng_201003.conllu
+-> searching Nyt2.conll/nyt_eng_201004.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201004.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201004.raw.json
+1.98 minutes on nyt_eng_201004.conllu
+-> searching Nyt2.conll/nyt_eng_201005.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201005.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201005.raw.json
+2.35 minutes on nyt_eng_201005.conllu
+-> searching Nyt2.conll/nyt_eng_201006.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201006.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201006.raw.json
+2.18 minutes on nyt_eng_201006.conllu
+-> searching Nyt2.conll/nyt_eng_201007.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201007.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201007.raw.json
+2.16 minutes on nyt_eng_201007.conllu
+-> searching Nyt2.conll/nyt_eng_201008.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201008.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201008.raw.json
+2.21 minutes on nyt_eng_201008.conllu
+-> searching Nyt2.conll/nyt_eng_201009.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201009.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201009.raw.json
+2.22 minutes on nyt_eng_201009.conllu
+-> searching Nyt2.conll/nyt_eng_201010.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201010.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201010.raw.json
+2.31 minutes on nyt_eng_201010.conllu
+-> searching Nyt2.conll/nyt_eng_201011.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201011.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201011.raw.json
+2.34 minutes on nyt_eng_201011.conllu
+-> searching Nyt2.conll/nyt_eng_201012.conllu:
+grew grep -pattern Pat/neg-mit/almost-no-one_subj.pat -i Nyt2.conll/nyt_eng_201012.conllu > data/neg-mit/Nyt2.almost-no-one_subj/nyt_eng_201012.raw.json
+2.23 minutes on nyt_eng_201012.conllu
+
+Total grew search time: 392.58 minutes
+==============================================
+
+```
+### Running `FillJson.py` script on json files in `Nyt2.almost-no-one_subj` from conll files in `Nyt2.conll`...
+```
+-> Processing nyt_eng_200004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200512...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200501...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200610...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200811...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200902...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200101...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200904...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200202...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200511...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200908...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200705...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200211...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200702...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200405...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200507...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200506...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200301...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200204...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200707...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200803...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200809...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200310...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200612...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200912...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200106...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200604...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200304...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200706...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200903...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200804...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200911...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200201...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200303...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200603...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200305...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200607...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200207...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200806...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200107...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200503...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200208...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200309...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200403...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200712...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200509...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200502...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200802...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200203...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200306...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200807...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200308...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200401...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200710...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200409...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200510...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200103...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200302...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200606...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200212...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200408...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200609...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200602...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200411...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200508...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200504...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200109...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200701...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200407...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200805...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200608...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200812...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200907...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200708...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200801...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200209...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200102...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200205...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200410...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200910...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200206...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200404...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200311...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200709...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200611...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200210...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200601...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200605...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200307...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200810...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200905...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200909...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200104...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200412...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200704...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200110...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200402...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200703...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200901...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200111...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200112...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200105...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200108...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200312...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200808...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200906...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200505...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200711...
+-> Skipping. (file is empty)
+Finished processing all corresponding json and conll files.
+
+Time elapsed: 0.0 minutes
+====================================
+
+Error: specified corpus directory does not contain any processed json files.
+```
+### Tabulating hits via `tabulateHits.py`...
+```
+```  
+## Starting context: `almost-no_det-of-subj`
+- time stamp: `Tue Aug  3 21:34:03 EDT 2021`
+- data directory: `data/neg-mit/Nyt2.almost-no_det-of-subj`
+- hits table: `hits/neg-mit/Nyt2_almost-no_det-of-subj`
+```{js}
+pattern{
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  S [lemma <> "one"]; 
+  N [lemma="no"];
+  ALMOST [lemma="almost"];
+  ALMOST < N;
+  det: S -[det]-> N;
+  sub: ADJ -[nsubj|nsubjpass]-> S;
+  S << BE
+}
+```  
+```  
+```
+### Running grew search on `Nyt2.conll`...
+```
+131 total file(s) to be searched.
+-> searching Nyt2.conll/nyt_eng_200001.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200001.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200001.raw.json
+4.56 minutes on nyt_eng_200001.conllu
+-> searching Nyt2.conll/nyt_eng_200002.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200002.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200002.raw.json
+4.42 minutes on nyt_eng_200002.conllu
+-> searching Nyt2.conll/nyt_eng_200003.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200003.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200003.raw.json
+4.32 minutes on nyt_eng_200003.conllu
+-> searching Nyt2.conll/nyt_eng_200004.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200004.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200004.raw.json
+3.34 minutes on nyt_eng_200004.conllu
+-> searching Nyt2.conll/nyt_eng_200005.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200005.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200005.raw.json
+3.73 minutes on nyt_eng_200005.conllu
+-> searching Nyt2.conll/nyt_eng_200006.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200006.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200006.raw.json
+3.95 minutes on nyt_eng_200006.conllu
+-> searching Nyt2.conll/nyt_eng_200007.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200007.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200007.raw.json
+4.48 minutes on nyt_eng_200007.conllu
+-> searching Nyt2.conll/nyt_eng_200008.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200008.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200008.raw.json
+4.9 minutes on nyt_eng_200008.conllu
+-> searching Nyt2.conll/nyt_eng_200009.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200009.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200009.raw.json
+3.64 minutes on nyt_eng_200009.conllu
+-> searching Nyt2.conll/nyt_eng_200010.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200010.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200010.raw.json
+4.74 minutes on nyt_eng_200010.conllu
+-> searching Nyt2.conll/nyt_eng_200011.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200011.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200011.raw.json
+4.56 minutes on nyt_eng_200011.conllu
+-> searching Nyt2.conll/nyt_eng_200012.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200012.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200012.raw.json
+4.31 minutes on nyt_eng_200012.conllu
+-> searching Nyt2.conll/nyt_eng_200101.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200101.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200101.raw.json
+4.88 minutes on nyt_eng_200101.conllu
+-> searching Nyt2.conll/nyt_eng_200102.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200102.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200102.raw.json
+4.34 minutes on nyt_eng_200102.conllu
+-> searching Nyt2.conll/nyt_eng_200103.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200103.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200103.raw.json
+4.49 minutes on nyt_eng_200103.conllu
+-> searching Nyt2.conll/nyt_eng_200104.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200104.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200104.raw.json
+4.92 minutes on nyt_eng_200104.conllu
+-> searching Nyt2.conll/nyt_eng_200105.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200105.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200105.raw.json
+4.67 minutes on nyt_eng_200105.conllu
+-> searching Nyt2.conll/nyt_eng_200106.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200106.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200106.raw.json
+4.02 minutes on nyt_eng_200106.conllu
+-> searching Nyt2.conll/nyt_eng_200107.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200107.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200107.raw.json
+4.3 minutes on nyt_eng_200107.conllu
+-> searching Nyt2.conll/nyt_eng_200108.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200108.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200108.raw.json
+4.66 minutes on nyt_eng_200108.conllu
+-> searching Nyt2.conll/nyt_eng_200109.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200109.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200109.raw.json
+5.14 minutes on nyt_eng_200109.conllu
+-> searching Nyt2.conll/nyt_eng_200110.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200110.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200110.raw.json
+5.29 minutes on nyt_eng_200110.conllu
+-> searching Nyt2.conll/nyt_eng_200111.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200111.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200111.raw.json
+4.83 minutes on nyt_eng_200111.conllu
+-> searching Nyt2.conll/nyt_eng_200112.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200112.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200112.raw.json
+4.12 minutes on nyt_eng_200112.conllu
+-> searching Nyt2.conll/nyt_eng_200201.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200201.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200201.raw.json
+4.15 minutes on nyt_eng_200201.conllu
+-> searching Nyt2.conll/nyt_eng_200202.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200202.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200202.raw.json
+4.56 minutes on nyt_eng_200202.conllu
+-> searching Nyt2.conll/nyt_eng_200203.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200203.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200203.raw.json
+4.95 minutes on nyt_eng_200203.conllu
+-> searching Nyt2.conll/nyt_eng_200204.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200204.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200204.raw.json
+4.89 minutes on nyt_eng_200204.conllu
+-> searching Nyt2.conll/nyt_eng_200205.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200205.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200205.raw.json
+4.62 minutes on nyt_eng_200205.conllu
+-> searching Nyt2.conll/nyt_eng_200206.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200206.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200206.raw.json
+4.45 minutes on nyt_eng_200206.conllu
+-> searching Nyt2.conll/nyt_eng_200207.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200207.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200207.raw.json
+2.11 minutes on nyt_eng_200207.conllu
+-> searching Nyt2.conll/nyt_eng_200208.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200208.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200208.raw.json
+4.23 minutes on nyt_eng_200208.conllu
+-> searching Nyt2.conll/nyt_eng_200209.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200209.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200209.raw.json
+4.64 minutes on nyt_eng_200209.conllu
+-> searching Nyt2.conll/nyt_eng_200210.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200210.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200210.raw.json
+4.81 minutes on nyt_eng_200210.conllu
+-> searching Nyt2.conll/nyt_eng_200211.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200211.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200211.raw.json
+4.24 minutes on nyt_eng_200211.conllu
+-> searching Nyt2.conll/nyt_eng_200212.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200212.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200212.raw.json
+4.45 minutes on nyt_eng_200212.conllu
+-> searching Nyt2.conll/nyt_eng_200301.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200301.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200301.raw.json
+2.57 minutes on nyt_eng_200301.conllu
+-> searching Nyt2.conll/nyt_eng_200302.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200302.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200302.raw.json
+0.55 minutes on nyt_eng_200302.conllu
+-> searching Nyt2.conll/nyt_eng_200303.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200303.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200303.raw.json
+0.6 minutes on nyt_eng_200303.conllu
+-> searching Nyt2.conll/nyt_eng_200304.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200304.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200304.raw.json
+0.63 minutes on nyt_eng_200304.conllu
+-> searching Nyt2.conll/nyt_eng_200305.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200305.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200305.raw.json
+0.59 minutes on nyt_eng_200305.conllu
+-> searching Nyt2.conll/nyt_eng_200306.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200306.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200306.raw.json
+0.54 minutes on nyt_eng_200306.conllu
+-> searching Nyt2.conll/nyt_eng_200307.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200307.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200307.raw.json
+0.57 minutes on nyt_eng_200307.conllu
+-> searching Nyt2.conll/nyt_eng_200308.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200308.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200308.raw.json
+0.46 minutes on nyt_eng_200308.conllu
+-> searching Nyt2.conll/nyt_eng_200309.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200309.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200309.raw.json
+0.59 minutes on nyt_eng_200309.conllu
+-> searching Nyt2.conll/nyt_eng_200310.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200310.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200310.raw.json
+0.6 minutes on nyt_eng_200310.conllu
+-> searching Nyt2.conll/nyt_eng_200311.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200311.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200311.raw.json
+0.53 minutes on nyt_eng_200311.conllu
+-> searching Nyt2.conll/nyt_eng_200312.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200312.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200312.raw.json
+0.52 minutes on nyt_eng_200312.conllu
+-> searching Nyt2.conll/nyt_eng_200401.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200401.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200401.raw.json
+0.53 minutes on nyt_eng_200401.conllu
+-> searching Nyt2.conll/nyt_eng_200402.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200402.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200402.raw.json
+0.45 minutes on nyt_eng_200402.conllu
+-> searching Nyt2.conll/nyt_eng_200403.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200403.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200403.raw.json
+0.51 minutes on nyt_eng_200403.conllu
+-> searching Nyt2.conll/nyt_eng_200404.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200404.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200404.raw.json
+0.49 minutes on nyt_eng_200404.conllu
+-> searching Nyt2.conll/nyt_eng_200405.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200405.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200405.raw.json
+0.11 minutes on nyt_eng_200405.conllu
+-> searching Nyt2.conll/nyt_eng_200407.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200407.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200407.raw.json
+3.73 minutes on nyt_eng_200407.conllu
+-> searching Nyt2.conll/nyt_eng_200408.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200408.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200408.raw.json
+3.97 minutes on nyt_eng_200408.conllu
+-> searching Nyt2.conll/nyt_eng_200409.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200409.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200409.raw.json
+3.91 minutes on nyt_eng_200409.conllu
+-> searching Nyt2.conll/nyt_eng_200410.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200410.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200410.raw.json
+4.14 minutes on nyt_eng_200410.conllu
+-> searching Nyt2.conll/nyt_eng_200411.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200411.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200411.raw.json
+3.77 minutes on nyt_eng_200411.conllu
+-> searching Nyt2.conll/nyt_eng_200412.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200412.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200412.raw.json
+3.24 minutes on nyt_eng_200412.conllu
+-> searching Nyt2.conll/nyt_eng_200501.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200501.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200501.raw.json
+3.73 minutes on nyt_eng_200501.conllu
+-> searching Nyt2.conll/nyt_eng_200502.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200502.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200502.raw.json
+3.09 minutes on nyt_eng_200502.conllu
+-> searching Nyt2.conll/nyt_eng_200503.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200503.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200503.raw.json
+3.48 minutes on nyt_eng_200503.conllu
+-> searching Nyt2.conll/nyt_eng_200504.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200504.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200504.raw.json
+3.1 minutes on nyt_eng_200504.conllu
+-> searching Nyt2.conll/nyt_eng_200505.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200505.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200505.raw.json
+3.15 minutes on nyt_eng_200505.conllu
+-> searching Nyt2.conll/nyt_eng_200506.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200506.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200506.raw.json
+3.57 minutes on nyt_eng_200506.conllu
+-> searching Nyt2.conll/nyt_eng_200507.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200507.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200507.raw.json
+3.97 minutes on nyt_eng_200507.conllu
+-> searching Nyt2.conll/nyt_eng_200508.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200508.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200508.raw.json
+3.86 minutes on nyt_eng_200508.conllu
+-> searching Nyt2.conll/nyt_eng_200509.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200509.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200509.raw.json
+2.72 minutes on nyt_eng_200509.conllu
+-> searching Nyt2.conll/nyt_eng_200510.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200510.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200510.raw.json
+3.82 minutes on nyt_eng_200510.conllu
+-> searching Nyt2.conll/nyt_eng_200511.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200511.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200511.raw.json
+3.54 minutes on nyt_eng_200511.conllu
+-> searching Nyt2.conll/nyt_eng_200512.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200512.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200512.raw.json
+3.55 minutes on nyt_eng_200512.conllu
+-> searching Nyt2.conll/nyt_eng_200601.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200601.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200601.raw.json
+3.55 minutes on nyt_eng_200601.conllu
+-> searching Nyt2.conll/nyt_eng_200602.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200602.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200602.raw.json
+3.67 minutes on nyt_eng_200602.conllu
+-> searching Nyt2.conll/nyt_eng_200603.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200603.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200603.raw.json
+3.6 minutes on nyt_eng_200603.conllu
+-> searching Nyt2.conll/nyt_eng_200604.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200604.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200604.raw.json
+3.57 minutes on nyt_eng_200604.conllu
+-> searching Nyt2.conll/nyt_eng_200605.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200605.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200605.raw.json
+3.65 minutes on nyt_eng_200605.conllu
+-> searching Nyt2.conll/nyt_eng_200606.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200606.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200606.raw.json
+3.49 minutes on nyt_eng_200606.conllu
+-> searching Nyt2.conll/nyt_eng_200607.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200607.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200607.raw.json
+2.99 minutes on nyt_eng_200607.conllu
+-> searching Nyt2.conll/nyt_eng_200608.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200608.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200608.raw.json
+3.35 minutes on nyt_eng_200608.conllu
+-> searching Nyt2.conll/nyt_eng_200609.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200609.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200609.raw.json
+3.69 minutes on nyt_eng_200609.conllu
+-> searching Nyt2.conll/nyt_eng_200610.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200610.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200610.raw.json
+3.66 minutes on nyt_eng_200610.conllu
+-> searching Nyt2.conll/nyt_eng_200611.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200611.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200611.raw.json
+3.56 minutes on nyt_eng_200611.conllu
+-> searching Nyt2.conll/nyt_eng_200612.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200612.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200612.raw.json
+3.35 minutes on nyt_eng_200612.conllu
+-> searching Nyt2.conll/nyt_eng_200701.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200701.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200701.raw.json
+3.4 minutes on nyt_eng_200701.conllu
+-> searching Nyt2.conll/nyt_eng_200702.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200702.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200702.raw.json
+2.95 minutes on nyt_eng_200702.conllu
+-> searching Nyt2.conll/nyt_eng_200703.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200703.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200703.raw.json
+3.19 minutes on nyt_eng_200703.conllu
+-> searching Nyt2.conll/nyt_eng_200704.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200704.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200704.raw.json
+3.02 minutes on nyt_eng_200704.conllu
+-> searching Nyt2.conll/nyt_eng_200705.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200705.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200705.raw.json
+3.07 minutes on nyt_eng_200705.conllu
+-> searching Nyt2.conll/nyt_eng_200706.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200706.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200706.raw.json
+3.0 minutes on nyt_eng_200706.conllu
+-> searching Nyt2.conll/nyt_eng_200707.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200707.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200707.raw.json
+2.97 minutes on nyt_eng_200707.conllu
+-> searching Nyt2.conll/nyt_eng_200708.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200708.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200708.raw.json
+2.81 minutes on nyt_eng_200708.conllu
+-> searching Nyt2.conll/nyt_eng_200709.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200709.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200709.raw.json
+2.7 minutes on nyt_eng_200709.conllu
+-> searching Nyt2.conll/nyt_eng_200710.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200710.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200710.raw.json
+3.19 minutes on nyt_eng_200710.conllu
+-> searching Nyt2.conll/nyt_eng_200711.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200711.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200711.raw.json
+2.83 minutes on nyt_eng_200711.conllu
+-> searching Nyt2.conll/nyt_eng_200712.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200712.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200712.raw.json
+2.75 minutes on nyt_eng_200712.conllu
+-> searching Nyt2.conll/nyt_eng_200801.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200801.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200801.raw.json
+3.04 minutes on nyt_eng_200801.conllu
+-> searching Nyt2.conll/nyt_eng_200802.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200802.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200802.raw.json
+2.72 minutes on nyt_eng_200802.conllu
+-> searching Nyt2.conll/nyt_eng_200803.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200803.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200803.raw.json
+2.86 minutes on nyt_eng_200803.conllu
+-> searching Nyt2.conll/nyt_eng_200804.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200804.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200804.raw.json
+2.66 minutes on nyt_eng_200804.conllu
+-> searching Nyt2.conll/nyt_eng_200805.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200805.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200805.raw.json
+2.73 minutes on nyt_eng_200805.conllu
+-> searching Nyt2.conll/nyt_eng_200806.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200806.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200806.raw.json
+2.69 minutes on nyt_eng_200806.conllu
+-> searching Nyt2.conll/nyt_eng_200807.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200807.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200807.raw.json
+2.74 minutes on nyt_eng_200807.conllu
+-> searching Nyt2.conll/nyt_eng_200808.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200808.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200808.raw.json
+2.88 minutes on nyt_eng_200808.conllu
+-> searching Nyt2.conll/nyt_eng_200809.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200809.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200809.raw.json
+2.75 minutes on nyt_eng_200809.conllu
+-> searching Nyt2.conll/nyt_eng_200810.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200810.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200810.raw.json
+2.8 minutes on nyt_eng_200810.conllu
+-> searching Nyt2.conll/nyt_eng_200811.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200811.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200811.raw.json
+2.46 minutes on nyt_eng_200811.conllu
+-> searching Nyt2.conll/nyt_eng_200812.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200812.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200812.raw.json
+2.49 minutes on nyt_eng_200812.conllu
+-> searching Nyt2.conll/nyt_eng_200901.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200901.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200901.raw.json
+2.54 minutes on nyt_eng_200901.conllu
+-> searching Nyt2.conll/nyt_eng_200902.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200902.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200902.raw.json
+2.19 minutes on nyt_eng_200902.conllu
+-> searching Nyt2.conll/nyt_eng_200903.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200903.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200903.raw.json
+2.43 minutes on nyt_eng_200903.conllu
+-> searching Nyt2.conll/nyt_eng_200904.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200904.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200904.raw.json
+2.13 minutes on nyt_eng_200904.conllu
+-> searching Nyt2.conll/nyt_eng_200905.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200905.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200905.raw.json
+2.18 minutes on nyt_eng_200905.conllu
+-> searching Nyt2.conll/nyt_eng_200906.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200906.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200906.raw.json
+1.94 minutes on nyt_eng_200906.conllu
+-> searching Nyt2.conll/nyt_eng_200907.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200907.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200907.raw.json
+2.05 minutes on nyt_eng_200907.conllu
+-> searching Nyt2.conll/nyt_eng_200908.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200908.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200908.raw.json
+1.95 minutes on nyt_eng_200908.conllu
+-> searching Nyt2.conll/nyt_eng_200909.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200909.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200909.raw.json
+2.02 minutes on nyt_eng_200909.conllu
+-> searching Nyt2.conll/nyt_eng_200910.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200910.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200910.raw.json
+1.97 minutes on nyt_eng_200910.conllu
+-> searching Nyt2.conll/nyt_eng_200911.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200911.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200911.raw.json
+1.82 minutes on nyt_eng_200911.conllu
+-> searching Nyt2.conll/nyt_eng_200912.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_200912.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_200912.raw.json
+1.87 minutes on nyt_eng_200912.conllu
+-> searching Nyt2.conll/nyt_eng_201001.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201001.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201001.raw.json
+1.96 minutes on nyt_eng_201001.conllu
+-> searching Nyt2.conll/nyt_eng_201002.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201002.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201002.raw.json
+1.88 minutes on nyt_eng_201002.conllu
+-> searching Nyt2.conll/nyt_eng_201003.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201003.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201003.raw.json
+1.92 minutes on nyt_eng_201003.conllu
+-> searching Nyt2.conll/nyt_eng_201004.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201004.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201004.raw.json
+1.99 minutes on nyt_eng_201004.conllu
+-> searching Nyt2.conll/nyt_eng_201005.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201005.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201005.raw.json
+2.34 minutes on nyt_eng_201005.conllu
+-> searching Nyt2.conll/nyt_eng_201006.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201006.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201006.raw.json
+2.29 minutes on nyt_eng_201006.conllu
+-> searching Nyt2.conll/nyt_eng_201007.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201007.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201007.raw.json
+2.23 minutes on nyt_eng_201007.conllu
+-> searching Nyt2.conll/nyt_eng_201008.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201008.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201008.raw.json
+2.31 minutes on nyt_eng_201008.conllu
+-> searching Nyt2.conll/nyt_eng_201009.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201009.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201009.raw.json
+2.33 minutes on nyt_eng_201009.conllu
+-> searching Nyt2.conll/nyt_eng_201010.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201010.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201010.raw.json
+2.39 minutes on nyt_eng_201010.conllu
+-> searching Nyt2.conll/nyt_eng_201011.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201011.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201011.raw.json
+2.28 minutes on nyt_eng_201011.conllu
+-> searching Nyt2.conll/nyt_eng_201012.conllu:
+grew grep -pattern Pat/neg-mit/almost-no_det-of-subj.pat -i Nyt2.conll/nyt_eng_201012.conllu > data/neg-mit/Nyt2.almost-no_det-of-subj/nyt_eng_201012.raw.json
+2.23 minutes on nyt_eng_201012.conllu
+
+Total grew search time: 395.96 minutes
+==============================================
+
+```
+### Running `FillJson.py` script on json files in `Nyt2.almost-no_det-of-subj` from conll files in `Nyt2.conll`...
+```
+-> Processing nyt_eng_200803...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200109...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200106...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200712...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200409...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200108...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200306...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200207...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200209...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200811...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200503...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200212...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200901...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200610...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200105...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200312...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200711...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200906...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200111...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200809...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200303...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200505...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200511...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200107...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200302...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200411...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200205...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200805...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200202...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200206...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200706...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200508...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200102...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200504...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200612...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200501...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200412...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200502...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200806...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200407...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200305...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200701...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200310...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200104...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200710...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200708...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200912...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200210...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200908...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200403...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200709...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200808...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200907...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200201...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200810...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200510...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200103...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200506...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200512...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200101...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200401...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200807...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200307...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200604...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200905...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200910...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200301...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200203...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200304...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200607...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200603...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200703...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200804...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200309...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200308...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200606...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200410...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200211...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200602...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200611...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200609...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200405...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200903...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200704...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200707...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200208...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200801...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200904...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200311...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200705...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200605...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200509...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200911...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200507...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200902...
+   => 1 hit results filled from 232645 total original sentences in 27.45 seconds
+-> Writing output file...
+-> Processing nyt_eng_200802...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200404...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200110...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200601...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200812...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200608...
+   => 1 hit results filled from 341741 total original sentences in 41.35 seconds
+-> Writing output file...
+-> Processing nyt_eng_200909...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200408...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200112...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200204...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200402...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200702...
+-> Skipping. (file is empty)
+Finished processing all corresponding json and conll files.
+
+Time elapsed: 1.16 minutes
+====================================
+
+```
+### Tabulating hits via `tabulateHits.py`...
+```
+-> Processing nyt_eng_200902.json...
+-> Processing nyt_eng_200608.json...
+
+^_^ Finished collecting sentence data from all json files.
+    -> Writing tables to csv files...
+```
+
+Time elapsed: 0.022 seconds
+====================================
+
+```  
+## Starting context: `almost-nobody_subj`
+- time stamp: `Wed Aug  4 04:11:11 EDT 2021`
+- data directory: `data/neg-mit/Nyt2.almost-nobody_subj`
+- hits table: `hits/neg-mit/Nyt2_almost-nobody_subj`
+```{js}
+pattern {
+  ADV [xpos=RB,  lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  advmod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  NS [lemma="nobody"]; 
+  A [lemma="almost"]; 
+  A < NS;
+  subj: ADJ -[nsubj|nsubjpass]-> NS;
+  NS << BE;
+}
+```  
+```  
+```
+### Running grew search on `Nyt2.conll`...
+```
+131 total file(s) to be searched.
+-> searching Nyt2.conll/nyt_eng_200001.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200001.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200001.raw.json
+4.43 minutes on nyt_eng_200001.conllu
+-> searching Nyt2.conll/nyt_eng_200002.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200002.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200002.raw.json
+4.29 minutes on nyt_eng_200002.conllu
+-> searching Nyt2.conll/nyt_eng_200003.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200003.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200003.raw.json
+4.26 minutes on nyt_eng_200003.conllu
+-> searching Nyt2.conll/nyt_eng_200004.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200004.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200004.raw.json
+3.45 minutes on nyt_eng_200004.conllu
+-> searching Nyt2.conll/nyt_eng_200005.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200005.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200005.raw.json
+3.63 minutes on nyt_eng_200005.conllu
+-> searching Nyt2.conll/nyt_eng_200006.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200006.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200006.raw.json
+4.13 minutes on nyt_eng_200006.conllu
+-> searching Nyt2.conll/nyt_eng_200007.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200007.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200007.raw.json
+4.74 minutes on nyt_eng_200007.conllu
+-> searching Nyt2.conll/nyt_eng_200008.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200008.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200008.raw.json
+4.83 minutes on nyt_eng_200008.conllu
+-> searching Nyt2.conll/nyt_eng_200009.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200009.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200009.raw.json
+3.69 minutes on nyt_eng_200009.conllu
+-> searching Nyt2.conll/nyt_eng_200010.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200010.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200010.raw.json
+4.94 minutes on nyt_eng_200010.conllu
+-> searching Nyt2.conll/nyt_eng_200011.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200011.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200011.raw.json
+4.8 minutes on nyt_eng_200011.conllu
+-> searching Nyt2.conll/nyt_eng_200012.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200012.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200012.raw.json
+4.23 minutes on nyt_eng_200012.conllu
+-> searching Nyt2.conll/nyt_eng_200101.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200101.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200101.raw.json
+4.96 minutes on nyt_eng_200101.conllu
+-> searching Nyt2.conll/nyt_eng_200102.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200102.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200102.raw.json
+4.51 minutes on nyt_eng_200102.conllu
+-> searching Nyt2.conll/nyt_eng_200103.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200103.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200103.raw.json
+4.45 minutes on nyt_eng_200103.conllu
+-> searching Nyt2.conll/nyt_eng_200104.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200104.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200104.raw.json
+5.01 minutes on nyt_eng_200104.conllu
+-> searching Nyt2.conll/nyt_eng_200105.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200105.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200105.raw.json
+4.69 minutes on nyt_eng_200105.conllu
+-> searching Nyt2.conll/nyt_eng_200106.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200106.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200106.raw.json
+4.12 minutes on nyt_eng_200106.conllu
+-> searching Nyt2.conll/nyt_eng_200107.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200107.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200107.raw.json
+4.27 minutes on nyt_eng_200107.conllu
+-> searching Nyt2.conll/nyt_eng_200108.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200108.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200108.raw.json
+4.65 minutes on nyt_eng_200108.conllu
+-> searching Nyt2.conll/nyt_eng_200109.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200109.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200109.raw.json
+5.23 minutes on nyt_eng_200109.conllu
+-> searching Nyt2.conll/nyt_eng_200110.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200110.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200110.raw.json
+5.17 minutes on nyt_eng_200110.conllu
+-> searching Nyt2.conll/nyt_eng_200111.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200111.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200111.raw.json
+4.65 minutes on nyt_eng_200111.conllu
+-> searching Nyt2.conll/nyt_eng_200112.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200112.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200112.raw.json
+4.08 minutes on nyt_eng_200112.conllu
+-> searching Nyt2.conll/nyt_eng_200201.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200201.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200201.raw.json
+4.16 minutes on nyt_eng_200201.conllu
+-> searching Nyt2.conll/nyt_eng_200202.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200202.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200202.raw.json
+4.42 minutes on nyt_eng_200202.conllu
+-> searching Nyt2.conll/nyt_eng_200203.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200203.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200203.raw.json
+4.93 minutes on nyt_eng_200203.conllu
+-> searching Nyt2.conll/nyt_eng_200204.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200204.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200204.raw.json
+4.89 minutes on nyt_eng_200204.conllu
+-> searching Nyt2.conll/nyt_eng_200205.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200205.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200205.raw.json
+4.6 minutes on nyt_eng_200205.conllu
+-> searching Nyt2.conll/nyt_eng_200206.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200206.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200206.raw.json
+4.32 minutes on nyt_eng_200206.conllu
+-> searching Nyt2.conll/nyt_eng_200207.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200207.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200207.raw.json
+2.06 minutes on nyt_eng_200207.conllu
+-> searching Nyt2.conll/nyt_eng_200208.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200208.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200208.raw.json
+4.19 minutes on nyt_eng_200208.conllu
+-> searching Nyt2.conll/nyt_eng_200209.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200209.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200209.raw.json
+4.54 minutes on nyt_eng_200209.conllu
+-> searching Nyt2.conll/nyt_eng_200210.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200210.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200210.raw.json
+4.76 minutes on nyt_eng_200210.conllu
+-> searching Nyt2.conll/nyt_eng_200211.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200211.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200211.raw.json
+4.27 minutes on nyt_eng_200211.conllu
+-> searching Nyt2.conll/nyt_eng_200212.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200212.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200212.raw.json
+4.44 minutes on nyt_eng_200212.conllu
+-> searching Nyt2.conll/nyt_eng_200301.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200301.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200301.raw.json
+2.52 minutes on nyt_eng_200301.conllu
+-> searching Nyt2.conll/nyt_eng_200302.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200302.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200302.raw.json
+0.55 minutes on nyt_eng_200302.conllu
+-> searching Nyt2.conll/nyt_eng_200303.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200303.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200303.raw.json
+0.59 minutes on nyt_eng_200303.conllu
+-> searching Nyt2.conll/nyt_eng_200304.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200304.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200304.raw.json
+0.64 minutes on nyt_eng_200304.conllu
+-> searching Nyt2.conll/nyt_eng_200305.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200305.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200305.raw.json
+0.57 minutes on nyt_eng_200305.conllu
+-> searching Nyt2.conll/nyt_eng_200306.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200306.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200306.raw.json
+0.55 minutes on nyt_eng_200306.conllu
+-> searching Nyt2.conll/nyt_eng_200307.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200307.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200307.raw.json
+0.59 minutes on nyt_eng_200307.conllu
+-> searching Nyt2.conll/nyt_eng_200308.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200308.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200308.raw.json
+0.47 minutes on nyt_eng_200308.conllu
+-> searching Nyt2.conll/nyt_eng_200309.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200309.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200309.raw.json
+0.61 minutes on nyt_eng_200309.conllu
+-> searching Nyt2.conll/nyt_eng_200310.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200310.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200310.raw.json
+0.6 minutes on nyt_eng_200310.conllu
+-> searching Nyt2.conll/nyt_eng_200311.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200311.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200311.raw.json
+0.52 minutes on nyt_eng_200311.conllu
+-> searching Nyt2.conll/nyt_eng_200312.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200312.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200312.raw.json
+0.52 minutes on nyt_eng_200312.conllu
+-> searching Nyt2.conll/nyt_eng_200401.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200401.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200401.raw.json
+0.5 minutes on nyt_eng_200401.conllu
+-> searching Nyt2.conll/nyt_eng_200402.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200402.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200402.raw.json
+0.45 minutes on nyt_eng_200402.conllu
+-> searching Nyt2.conll/nyt_eng_200403.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200403.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200403.raw.json
+0.5 minutes on nyt_eng_200403.conllu
+-> searching Nyt2.conll/nyt_eng_200404.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200404.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200404.raw.json
+0.46 minutes on nyt_eng_200404.conllu
+-> searching Nyt2.conll/nyt_eng_200405.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200405.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200405.raw.json
+0.1 minutes on nyt_eng_200405.conllu
+-> searching Nyt2.conll/nyt_eng_200407.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200407.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200407.raw.json
+3.7 minutes on nyt_eng_200407.conllu
+-> searching Nyt2.conll/nyt_eng_200408.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200408.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200408.raw.json
+3.85 minutes on nyt_eng_200408.conllu
+-> searching Nyt2.conll/nyt_eng_200409.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200409.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200409.raw.json
+3.72 minutes on nyt_eng_200409.conllu
+-> searching Nyt2.conll/nyt_eng_200410.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200410.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200410.raw.json
+4.09 minutes on nyt_eng_200410.conllu
+-> searching Nyt2.conll/nyt_eng_200411.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200411.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200411.raw.json
+3.63 minutes on nyt_eng_200411.conllu
+-> searching Nyt2.conll/nyt_eng_200412.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200412.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200412.raw.json
+3.22 minutes on nyt_eng_200412.conllu
+-> searching Nyt2.conll/nyt_eng_200501.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200501.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200501.raw.json
+3.69 minutes on nyt_eng_200501.conllu
+-> searching Nyt2.conll/nyt_eng_200502.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200502.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200502.raw.json
+3.05 minutes on nyt_eng_200502.conllu
+-> searching Nyt2.conll/nyt_eng_200503.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200503.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200503.raw.json
+3.52 minutes on nyt_eng_200503.conllu
+-> searching Nyt2.conll/nyt_eng_200504.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200504.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200504.raw.json
+3.15 minutes on nyt_eng_200504.conllu
+-> searching Nyt2.conll/nyt_eng_200505.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200505.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200505.raw.json
+3.26 minutes on nyt_eng_200505.conllu
+-> searching Nyt2.conll/nyt_eng_200506.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200506.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200506.raw.json
+3.62 minutes on nyt_eng_200506.conllu
+-> searching Nyt2.conll/nyt_eng_200507.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200507.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200507.raw.json
+4.1 minutes on nyt_eng_200507.conllu
+-> searching Nyt2.conll/nyt_eng_200508.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200508.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200508.raw.json
+4.05 minutes on nyt_eng_200508.conllu
+-> searching Nyt2.conll/nyt_eng_200509.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200509.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200509.raw.json
+2.78 minutes on nyt_eng_200509.conllu
+-> searching Nyt2.conll/nyt_eng_200510.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200510.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200510.raw.json
+3.9 minutes on nyt_eng_200510.conllu
+-> searching Nyt2.conll/nyt_eng_200511.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200511.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200511.raw.json
+3.47 minutes on nyt_eng_200511.conllu
+-> searching Nyt2.conll/nyt_eng_200512.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200512.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200512.raw.json
+3.56 minutes on nyt_eng_200512.conllu
+-> searching Nyt2.conll/nyt_eng_200601.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200601.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200601.raw.json
+3.53 minutes on nyt_eng_200601.conllu
+-> searching Nyt2.conll/nyt_eng_200602.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200602.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200602.raw.json
+3.73 minutes on nyt_eng_200602.conllu
+-> searching Nyt2.conll/nyt_eng_200603.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200603.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200603.raw.json
+3.68 minutes on nyt_eng_200603.conllu
+-> searching Nyt2.conll/nyt_eng_200604.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200604.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200604.raw.json
+3.59 minutes on nyt_eng_200604.conllu
+-> searching Nyt2.conll/nyt_eng_200605.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200605.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200605.raw.json
+3.81 minutes on nyt_eng_200605.conllu
+-> searching Nyt2.conll/nyt_eng_200606.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200606.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200606.raw.json
+3.54 minutes on nyt_eng_200606.conllu
+-> searching Nyt2.conll/nyt_eng_200607.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200607.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200607.raw.json
+3.02 minutes on nyt_eng_200607.conllu
+-> searching Nyt2.conll/nyt_eng_200608.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200608.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200608.raw.json
+3.47 minutes on nyt_eng_200608.conllu
+-> searching Nyt2.conll/nyt_eng_200609.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200609.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200609.raw.json
+3.72 minutes on nyt_eng_200609.conllu
+-> searching Nyt2.conll/nyt_eng_200610.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200610.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200610.raw.json
+3.69 minutes on nyt_eng_200610.conllu
+-> searching Nyt2.conll/nyt_eng_200611.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200611.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200611.raw.json
+3.58 minutes on nyt_eng_200611.conllu
+-> searching Nyt2.conll/nyt_eng_200612.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200612.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200612.raw.json
+3.42 minutes on nyt_eng_200612.conllu
+-> searching Nyt2.conll/nyt_eng_200701.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200701.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200701.raw.json
+3.43 minutes on nyt_eng_200701.conllu
+-> searching Nyt2.conll/nyt_eng_200702.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200702.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200702.raw.json
+2.95 minutes on nyt_eng_200702.conllu
+-> searching Nyt2.conll/nyt_eng_200703.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200703.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200703.raw.json
+3.23 minutes on nyt_eng_200703.conllu
+-> searching Nyt2.conll/nyt_eng_200704.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200704.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200704.raw.json
+3.06 minutes on nyt_eng_200704.conllu
+-> searching Nyt2.conll/nyt_eng_200705.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200705.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200705.raw.json
+3.14 minutes on nyt_eng_200705.conllu
+-> searching Nyt2.conll/nyt_eng_200706.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200706.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200706.raw.json
+3.08 minutes on nyt_eng_200706.conllu
+-> searching Nyt2.conll/nyt_eng_200707.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200707.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200707.raw.json
+3.03 minutes on nyt_eng_200707.conllu
+-> searching Nyt2.conll/nyt_eng_200708.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200708.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200708.raw.json
+2.9 minutes on nyt_eng_200708.conllu
+-> searching Nyt2.conll/nyt_eng_200709.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200709.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200709.raw.json
+2.73 minutes on nyt_eng_200709.conllu
+-> searching Nyt2.conll/nyt_eng_200710.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200710.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200710.raw.json
+3.25 minutes on nyt_eng_200710.conllu
+-> searching Nyt2.conll/nyt_eng_200711.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200711.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200711.raw.json
+2.88 minutes on nyt_eng_200711.conllu
+-> searching Nyt2.conll/nyt_eng_200712.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200712.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200712.raw.json
+2.85 minutes on nyt_eng_200712.conllu
+-> searching Nyt2.conll/nyt_eng_200801.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200801.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200801.raw.json
+3.03 minutes on nyt_eng_200801.conllu
+-> searching Nyt2.conll/nyt_eng_200802.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200802.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200802.raw.json
+2.79 minutes on nyt_eng_200802.conllu
+-> searching Nyt2.conll/nyt_eng_200803.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200803.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200803.raw.json
+2.91 minutes on nyt_eng_200803.conllu
+-> searching Nyt2.conll/nyt_eng_200804.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200804.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200804.raw.json
+2.73 minutes on nyt_eng_200804.conllu
+-> searching Nyt2.conll/nyt_eng_200805.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200805.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200805.raw.json
+2.69 minutes on nyt_eng_200805.conllu
+-> searching Nyt2.conll/nyt_eng_200806.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200806.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200806.raw.json
+2.71 minutes on nyt_eng_200806.conllu
+-> searching Nyt2.conll/nyt_eng_200807.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200807.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200807.raw.json
+2.61 minutes on nyt_eng_200807.conllu
+-> searching Nyt2.conll/nyt_eng_200808.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200808.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200808.raw.json
+2.82 minutes on nyt_eng_200808.conllu
+-> searching Nyt2.conll/nyt_eng_200809.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200809.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200809.raw.json
+2.62 minutes on nyt_eng_200809.conllu
+-> searching Nyt2.conll/nyt_eng_200810.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200810.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200810.raw.json
+2.71 minutes on nyt_eng_200810.conllu
+-> searching Nyt2.conll/nyt_eng_200811.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200811.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200811.raw.json
+2.45 minutes on nyt_eng_200811.conllu
+-> searching Nyt2.conll/nyt_eng_200812.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200812.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200812.raw.json
+2.56 minutes on nyt_eng_200812.conllu
+-> searching Nyt2.conll/nyt_eng_200901.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200901.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200901.raw.json
+2.52 minutes on nyt_eng_200901.conllu
+-> searching Nyt2.conll/nyt_eng_200902.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200902.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200902.raw.json
+2.2 minutes on nyt_eng_200902.conllu
+-> searching Nyt2.conll/nyt_eng_200903.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200903.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200903.raw.json
+2.47 minutes on nyt_eng_200903.conllu
+-> searching Nyt2.conll/nyt_eng_200904.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200904.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200904.raw.json
+2.19 minutes on nyt_eng_200904.conllu
+-> searching Nyt2.conll/nyt_eng_200905.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200905.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200905.raw.json
+2.29 minutes on nyt_eng_200905.conllu
+-> searching Nyt2.conll/nyt_eng_200906.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200906.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200906.raw.json
+2.03 minutes on nyt_eng_200906.conllu
+-> searching Nyt2.conll/nyt_eng_200907.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200907.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200907.raw.json
+2.11 minutes on nyt_eng_200907.conllu
+-> searching Nyt2.conll/nyt_eng_200908.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200908.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200908.raw.json
+2.03 minutes on nyt_eng_200908.conllu
+-> searching Nyt2.conll/nyt_eng_200909.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200909.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200909.raw.json
+2.05 minutes on nyt_eng_200909.conllu
+-> searching Nyt2.conll/nyt_eng_200910.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200910.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200910.raw.json
+1.94 minutes on nyt_eng_200910.conllu
+-> searching Nyt2.conll/nyt_eng_200911.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200911.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200911.raw.json
+1.83 minutes on nyt_eng_200911.conllu
+-> searching Nyt2.conll/nyt_eng_200912.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_200912.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_200912.raw.json
+1.81 minutes on nyt_eng_200912.conllu
+-> searching Nyt2.conll/nyt_eng_201001.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201001.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201001.raw.json
+1.95 minutes on nyt_eng_201001.conllu
+-> searching Nyt2.conll/nyt_eng_201002.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201002.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201002.raw.json
+1.76 minutes on nyt_eng_201002.conllu
+-> searching Nyt2.conll/nyt_eng_201003.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201003.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201003.raw.json
+1.95 minutes on nyt_eng_201003.conllu
+-> searching Nyt2.conll/nyt_eng_201004.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201004.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201004.raw.json
+2.05 minutes on nyt_eng_201004.conllu
+-> searching Nyt2.conll/nyt_eng_201005.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201005.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201005.raw.json
+2.21 minutes on nyt_eng_201005.conllu
+-> searching Nyt2.conll/nyt_eng_201006.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201006.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201006.raw.json
+2.31 minutes on nyt_eng_201006.conllu
+-> searching Nyt2.conll/nyt_eng_201007.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201007.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201007.raw.json
+2.16 minutes on nyt_eng_201007.conllu
+-> searching Nyt2.conll/nyt_eng_201008.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201008.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201008.raw.json
+2.28 minutes on nyt_eng_201008.conllu
+-> searching Nyt2.conll/nyt_eng_201009.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201009.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201009.raw.json
+2.32 minutes on nyt_eng_201009.conllu
+-> searching Nyt2.conll/nyt_eng_201010.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201010.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201010.raw.json
+2.32 minutes on nyt_eng_201010.conllu
+-> searching Nyt2.conll/nyt_eng_201011.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201011.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201011.raw.json
+2.29 minutes on nyt_eng_201011.conllu
+-> searching Nyt2.conll/nyt_eng_201012.conllu:
+grew grep -pattern Pat/neg-mit/almost-nobody_subj.pat -i Nyt2.conll/nyt_eng_201012.conllu > data/neg-mit/Nyt2.almost-nobody_subj/nyt_eng_201012.raw.json
+2.2 minutes on nyt_eng_201012.conllu
+
+Total grew search time: 397.11 minutes
+==============================================
+
+```
+### Running `FillJson.py` script on json files in `Nyt2.almost-nobody_subj` from conll files in `Nyt2.conll`...
+```
+-> Processing nyt_eng_200607...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200601...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200507...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200902...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200102...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200402...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200109...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200911...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200803...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200209...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200502...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200709...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200905...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200312...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200106...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200510...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200702...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200606...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200403...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200205...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200711...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200410...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200104...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200701...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200907...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200904...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200409...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200401...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200412...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200707...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200212...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200801...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200802...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200903...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200605...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200810...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200501...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200303...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200602...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200712...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200503...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200404...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200207...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200808...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200110...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200706...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200612...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200804...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200912...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200201...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200112...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200908...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200809...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200604...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200906...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200309...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200211...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200107...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200901...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200304...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200807...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200108...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200301...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200705...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200408...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200708...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200307...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200511...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200210...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200206...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200610...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200204...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200411...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200608...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200310...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200111...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200611...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200407...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200704...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200505...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200305...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200203...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200512...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200811...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200910...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200105...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200208...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200909...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200805...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200306...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200202...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200308...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200703...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200405...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200103...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200609...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200508...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200302...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200504...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200710...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200509...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200603...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200506...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200812...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200101...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200806...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200311...
+-> Skipping. (file is empty)
+Finished processing all corresponding json and conll files.
+
+Time elapsed: 0.01 minutes
+====================================
+
+```
+### Tabulating hits via `tabulateHits.py`...
+```
+Error: specified corpus directory does not contain any processed json files.
+```  
+## Starting context: `almost-none_subj`
+- time stamp: `Wed Aug  4 10:48:18 EDT 2021`
+- data directory: `data/neg-mit/Nyt2.almost-none_subj`
+- hits table: `hits/neg-mit/Nyt2_almost-none_subj`
+```{js}
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  S [lemma="none"]; 
+  ALMOST [lemma="almost"];
+  ALMOST < S;
+  sub: ADJ -[nsubj|nsubjpass]-> S;
+  S << BE
+}
+```  
+```  
+```
+### Running grew search on `Nyt2.conll`...
+```
+131 total file(s) to be searched.
+-> searching Nyt2.conll/nyt_eng_200001.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200001.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200001.raw.json
+4.44 minutes on nyt_eng_200001.conllu
+-> searching Nyt2.conll/nyt_eng_200002.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200002.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200002.raw.json
+4.31 minutes on nyt_eng_200002.conllu
+-> searching Nyt2.conll/nyt_eng_200003.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200003.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200003.raw.json
+4.29 minutes on nyt_eng_200003.conllu
+-> searching Nyt2.conll/nyt_eng_200004.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200004.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200004.raw.json
+3.4 minutes on nyt_eng_200004.conllu
+-> searching Nyt2.conll/nyt_eng_200005.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200005.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200005.raw.json
+3.7 minutes on nyt_eng_200005.conllu
+-> searching Nyt2.conll/nyt_eng_200006.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200006.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200006.raw.json
+4.01 minutes on nyt_eng_200006.conllu
+-> searching Nyt2.conll/nyt_eng_200007.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200007.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200007.raw.json
+4.48 minutes on nyt_eng_200007.conllu
+-> searching Nyt2.conll/nyt_eng_200008.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200008.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200008.raw.json
+4.79 minutes on nyt_eng_200008.conllu
+-> searching Nyt2.conll/nyt_eng_200009.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200009.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200009.raw.json
+3.64 minutes on nyt_eng_200009.conllu
+-> searching Nyt2.conll/nyt_eng_200010.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200010.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200010.raw.json
+4.61 minutes on nyt_eng_200010.conllu
+-> searching Nyt2.conll/nyt_eng_200011.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200011.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200011.raw.json
+4.51 minutes on nyt_eng_200011.conllu
+-> searching Nyt2.conll/nyt_eng_200012.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200012.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200012.raw.json
+4.21 minutes on nyt_eng_200012.conllu
+-> searching Nyt2.conll/nyt_eng_200101.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200101.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200101.raw.json
+4.67 minutes on nyt_eng_200101.conllu
+-> searching Nyt2.conll/nyt_eng_200102.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200102.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200102.raw.json
+4.19 minutes on nyt_eng_200102.conllu
+-> searching Nyt2.conll/nyt_eng_200103.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200103.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200103.raw.json
+4.35 minutes on nyt_eng_200103.conllu
+-> searching Nyt2.conll/nyt_eng_200104.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200104.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200104.raw.json
+4.88 minutes on nyt_eng_200104.conllu
+-> searching Nyt2.conll/nyt_eng_200105.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200105.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200105.raw.json
+4.48 minutes on nyt_eng_200105.conllu
+-> searching Nyt2.conll/nyt_eng_200106.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200106.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200106.raw.json
+4.04 minutes on nyt_eng_200106.conllu
+-> searching Nyt2.conll/nyt_eng_200107.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200107.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200107.raw.json
+4.27 minutes on nyt_eng_200107.conllu
+-> searching Nyt2.conll/nyt_eng_200108.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200108.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200108.raw.json
+4.58 minutes on nyt_eng_200108.conllu
+-> searching Nyt2.conll/nyt_eng_200109.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200109.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200109.raw.json
+4.96 minutes on nyt_eng_200109.conllu
+-> searching Nyt2.conll/nyt_eng_200110.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200110.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200110.raw.json
+4.95 minutes on nyt_eng_200110.conllu
+-> searching Nyt2.conll/nyt_eng_200111.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200111.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200111.raw.json
+4.65 minutes on nyt_eng_200111.conllu
+-> searching Nyt2.conll/nyt_eng_200112.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200112.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200112.raw.json
+4.03 minutes on nyt_eng_200112.conllu
+-> searching Nyt2.conll/nyt_eng_200201.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200201.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200201.raw.json
+3.97 minutes on nyt_eng_200201.conllu
+-> searching Nyt2.conll/nyt_eng_200202.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200202.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200202.raw.json
+4.33 minutes on nyt_eng_200202.conllu
+-> searching Nyt2.conll/nyt_eng_200203.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200203.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200203.raw.json
+4.72 minutes on nyt_eng_200203.conllu
+-> searching Nyt2.conll/nyt_eng_200204.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200204.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200204.raw.json
+4.7 minutes on nyt_eng_200204.conllu
+-> searching Nyt2.conll/nyt_eng_200205.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200205.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200205.raw.json
+4.43 minutes on nyt_eng_200205.conllu
+-> searching Nyt2.conll/nyt_eng_200206.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200206.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200206.raw.json
+4.19 minutes on nyt_eng_200206.conllu
+-> searching Nyt2.conll/nyt_eng_200207.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200207.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200207.raw.json
+2.0 minutes on nyt_eng_200207.conllu
+-> searching Nyt2.conll/nyt_eng_200208.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200208.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200208.raw.json
+3.97 minutes on nyt_eng_200208.conllu
+-> searching Nyt2.conll/nyt_eng_200209.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200209.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200209.raw.json
+4.42 minutes on nyt_eng_200209.conllu
+-> searching Nyt2.conll/nyt_eng_200210.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200210.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200210.raw.json
+4.51 minutes on nyt_eng_200210.conllu
+-> searching Nyt2.conll/nyt_eng_200211.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200211.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200211.raw.json
+4.05 minutes on nyt_eng_200211.conllu
+-> searching Nyt2.conll/nyt_eng_200212.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200212.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200212.raw.json
+4.16 minutes on nyt_eng_200212.conllu
+-> searching Nyt2.conll/nyt_eng_200301.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200301.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200301.raw.json
+2.4 minutes on nyt_eng_200301.conllu
+-> searching Nyt2.conll/nyt_eng_200302.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200302.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200302.raw.json
+0.52 minutes on nyt_eng_200302.conllu
+-> searching Nyt2.conll/nyt_eng_200303.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200303.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200303.raw.json
+0.56 minutes on nyt_eng_200303.conllu
+-> searching Nyt2.conll/nyt_eng_200304.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200304.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200304.raw.json
+0.61 minutes on nyt_eng_200304.conllu
+-> searching Nyt2.conll/nyt_eng_200305.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200305.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200305.raw.json
+0.53 minutes on nyt_eng_200305.conllu
+-> searching Nyt2.conll/nyt_eng_200306.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200306.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200306.raw.json
+0.51 minutes on nyt_eng_200306.conllu
+-> searching Nyt2.conll/nyt_eng_200307.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200307.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200307.raw.json
+0.55 minutes on nyt_eng_200307.conllu
+-> searching Nyt2.conll/nyt_eng_200308.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200308.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200308.raw.json
+0.43 minutes on nyt_eng_200308.conllu
+-> searching Nyt2.conll/nyt_eng_200309.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200309.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200309.raw.json
+0.56 minutes on nyt_eng_200309.conllu
+-> searching Nyt2.conll/nyt_eng_200310.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200310.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200310.raw.json
+0.55 minutes on nyt_eng_200310.conllu
+-> searching Nyt2.conll/nyt_eng_200311.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200311.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200311.raw.json
+0.51 minutes on nyt_eng_200311.conllu
+-> searching Nyt2.conll/nyt_eng_200312.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200312.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200312.raw.json
+0.48 minutes on nyt_eng_200312.conllu
+-> searching Nyt2.conll/nyt_eng_200401.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200401.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200401.raw.json
+0.49 minutes on nyt_eng_200401.conllu
+-> searching Nyt2.conll/nyt_eng_200402.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200402.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200402.raw.json
+0.42 minutes on nyt_eng_200402.conllu
+-> searching Nyt2.conll/nyt_eng_200403.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200403.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200403.raw.json
+0.47 minutes on nyt_eng_200403.conllu
+-> searching Nyt2.conll/nyt_eng_200404.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200404.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200404.raw.json
+0.44 minutes on nyt_eng_200404.conllu
+-> searching Nyt2.conll/nyt_eng_200405.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200405.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200405.raw.json
+0.1 minutes on nyt_eng_200405.conllu
+-> searching Nyt2.conll/nyt_eng_200407.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200407.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200407.raw.json
+3.61 minutes on nyt_eng_200407.conllu
+-> searching Nyt2.conll/nyt_eng_200408.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200408.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200408.raw.json
+3.87 minutes on nyt_eng_200408.conllu
+-> searching Nyt2.conll/nyt_eng_200409.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200409.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200409.raw.json
+3.58 minutes on nyt_eng_200409.conllu
+-> searching Nyt2.conll/nyt_eng_200410.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200410.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200410.raw.json
+3.81 minutes on nyt_eng_200410.conllu
+-> searching Nyt2.conll/nyt_eng_200411.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200411.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200411.raw.json
+3.52 minutes on nyt_eng_200411.conllu
+-> searching Nyt2.conll/nyt_eng_200412.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200412.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200412.raw.json
+3.1 minutes on nyt_eng_200412.conllu
+-> searching Nyt2.conll/nyt_eng_200501.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200501.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200501.raw.json
+3.45 minutes on nyt_eng_200501.conllu
+-> searching Nyt2.conll/nyt_eng_200502.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200502.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200502.raw.json
+2.86 minutes on nyt_eng_200502.conllu
+-> searching Nyt2.conll/nyt_eng_200503.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200503.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200503.raw.json
+3.37 minutes on nyt_eng_200503.conllu
+-> searching Nyt2.conll/nyt_eng_200504.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200504.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200504.raw.json
+3.0 minutes on nyt_eng_200504.conllu
+-> searching Nyt2.conll/nyt_eng_200505.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200505.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200505.raw.json
+3.1 minutes on nyt_eng_200505.conllu
+-> searching Nyt2.conll/nyt_eng_200506.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200506.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200506.raw.json
+3.43 minutes on nyt_eng_200506.conllu
+-> searching Nyt2.conll/nyt_eng_200507.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200507.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200507.raw.json
+3.79 minutes on nyt_eng_200507.conllu
+-> searching Nyt2.conll/nyt_eng_200508.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200508.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200508.raw.json
+3.78 minutes on nyt_eng_200508.conllu
+-> searching Nyt2.conll/nyt_eng_200509.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200509.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200509.raw.json
+2.74 minutes on nyt_eng_200509.conllu
+-> searching Nyt2.conll/nyt_eng_200510.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200510.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200510.raw.json
+3.72 minutes on nyt_eng_200510.conllu
+-> searching Nyt2.conll/nyt_eng_200511.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200511.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200511.raw.json
+3.38 minutes on nyt_eng_200511.conllu
+-> searching Nyt2.conll/nyt_eng_200512.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200512.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200512.raw.json
+3.42 minutes on nyt_eng_200512.conllu
+-> searching Nyt2.conll/nyt_eng_200601.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200601.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200601.raw.json
+3.43 minutes on nyt_eng_200601.conllu
+-> searching Nyt2.conll/nyt_eng_200602.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200602.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200602.raw.json
+3.51 minutes on nyt_eng_200602.conllu
+-> searching Nyt2.conll/nyt_eng_200603.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200603.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200603.raw.json
+3.48 minutes on nyt_eng_200603.conllu
+-> searching Nyt2.conll/nyt_eng_200604.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200604.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200604.raw.json
+3.41 minutes on nyt_eng_200604.conllu
+-> searching Nyt2.conll/nyt_eng_200605.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200605.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200605.raw.json
+3.5 minutes on nyt_eng_200605.conllu
+-> searching Nyt2.conll/nyt_eng_200606.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200606.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200606.raw.json
+3.3 minutes on nyt_eng_200606.conllu
+-> searching Nyt2.conll/nyt_eng_200607.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200607.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200607.raw.json
+2.9 minutes on nyt_eng_200607.conllu
+-> searching Nyt2.conll/nyt_eng_200608.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200608.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200608.raw.json
+3.23 minutes on nyt_eng_200608.conllu
+-> searching Nyt2.conll/nyt_eng_200609.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200609.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200609.raw.json
+3.52 minutes on nyt_eng_200609.conllu
+-> searching Nyt2.conll/nyt_eng_200610.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200610.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200610.raw.json
+3.44 minutes on nyt_eng_200610.conllu
+-> searching Nyt2.conll/nyt_eng_200611.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200611.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200611.raw.json
+3.34 minutes on nyt_eng_200611.conllu
+-> searching Nyt2.conll/nyt_eng_200612.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200612.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200612.raw.json
+3.22 minutes on nyt_eng_200612.conllu
+-> searching Nyt2.conll/nyt_eng_200701.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200701.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200701.raw.json
+3.2 minutes on nyt_eng_200701.conllu
+-> searching Nyt2.conll/nyt_eng_200702.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200702.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200702.raw.json
+2.78 minutes on nyt_eng_200702.conllu
+-> searching Nyt2.conll/nyt_eng_200703.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200703.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200703.raw.json
+3.13 minutes on nyt_eng_200703.conllu
+-> searching Nyt2.conll/nyt_eng_200704.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200704.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200704.raw.json
+2.83 minutes on nyt_eng_200704.conllu
+-> searching Nyt2.conll/nyt_eng_200705.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200705.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200705.raw.json
+2.85 minutes on nyt_eng_200705.conllu
+-> searching Nyt2.conll/nyt_eng_200706.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200706.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200706.raw.json
+2.86 minutes on nyt_eng_200706.conllu
+-> searching Nyt2.conll/nyt_eng_200707.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200707.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200707.raw.json
+2.79 minutes on nyt_eng_200707.conllu
+-> searching Nyt2.conll/nyt_eng_200708.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200708.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200708.raw.json
+2.67 minutes on nyt_eng_200708.conllu
+-> searching Nyt2.conll/nyt_eng_200709.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200709.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200709.raw.json
+2.59 minutes on nyt_eng_200709.conllu
+-> searching Nyt2.conll/nyt_eng_200710.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200710.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200710.raw.json
+3.07 minutes on nyt_eng_200710.conllu
+-> searching Nyt2.conll/nyt_eng_200711.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200711.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200711.raw.json
+2.75 minutes on nyt_eng_200711.conllu
+-> searching Nyt2.conll/nyt_eng_200712.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200712.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200712.raw.json
+2.67 minutes on nyt_eng_200712.conllu
+-> searching Nyt2.conll/nyt_eng_200801.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200801.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200801.raw.json
+2.92 minutes on nyt_eng_200801.conllu
+-> searching Nyt2.conll/nyt_eng_200802.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200802.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200802.raw.json
+2.61 minutes on nyt_eng_200802.conllu
+-> searching Nyt2.conll/nyt_eng_200803.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200803.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200803.raw.json
+2.7 minutes on nyt_eng_200803.conllu
+-> searching Nyt2.conll/nyt_eng_200804.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200804.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200804.raw.json
+2.54 minutes on nyt_eng_200804.conllu
+-> searching Nyt2.conll/nyt_eng_200805.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200805.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200805.raw.json
+2.62 minutes on nyt_eng_200805.conllu
+-> searching Nyt2.conll/nyt_eng_200806.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200806.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200806.raw.json
+2.56 minutes on nyt_eng_200806.conllu
+-> searching Nyt2.conll/nyt_eng_200807.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200807.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200807.raw.json
+2.5 minutes on nyt_eng_200807.conllu
+-> searching Nyt2.conll/nyt_eng_200808.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200808.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200808.raw.json
+2.59 minutes on nyt_eng_200808.conllu
+-> searching Nyt2.conll/nyt_eng_200809.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200809.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200809.raw.json
+2.45 minutes on nyt_eng_200809.conllu
+-> searching Nyt2.conll/nyt_eng_200810.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200810.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200810.raw.json
+2.63 minutes on nyt_eng_200810.conllu
+-> searching Nyt2.conll/nyt_eng_200811.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200811.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200811.raw.json
+2.36 minutes on nyt_eng_200811.conllu
+-> searching Nyt2.conll/nyt_eng_200812.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200812.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200812.raw.json
+2.36 minutes on nyt_eng_200812.conllu
+-> searching Nyt2.conll/nyt_eng_200901.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200901.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200901.raw.json
+2.41 minutes on nyt_eng_200901.conllu
+-> searching Nyt2.conll/nyt_eng_200902.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200902.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200902.raw.json
+2.08 minutes on nyt_eng_200902.conllu
+-> searching Nyt2.conll/nyt_eng_200903.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200903.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200903.raw.json
+2.34 minutes on nyt_eng_200903.conllu
+-> searching Nyt2.conll/nyt_eng_200904.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200904.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200904.raw.json
+2.04 minutes on nyt_eng_200904.conllu
+-> searching Nyt2.conll/nyt_eng_200905.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200905.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200905.raw.json
+2.12 minutes on nyt_eng_200905.conllu
+-> searching Nyt2.conll/nyt_eng_200906.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200906.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200906.raw.json
+1.89 minutes on nyt_eng_200906.conllu
+-> searching Nyt2.conll/nyt_eng_200907.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200907.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200907.raw.json
+1.95 minutes on nyt_eng_200907.conllu
+-> searching Nyt2.conll/nyt_eng_200908.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200908.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200908.raw.json
+1.89 minutes on nyt_eng_200908.conllu
+-> searching Nyt2.conll/nyt_eng_200909.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200909.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200909.raw.json
+1.9 minutes on nyt_eng_200909.conllu
+-> searching Nyt2.conll/nyt_eng_200910.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200910.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200910.raw.json
+1.86 minutes on nyt_eng_200910.conllu
+-> searching Nyt2.conll/nyt_eng_200911.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200911.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200911.raw.json
+1.77 minutes on nyt_eng_200911.conllu
+-> searching Nyt2.conll/nyt_eng_200912.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_200912.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_200912.raw.json
+1.78 minutes on nyt_eng_200912.conllu
+-> searching Nyt2.conll/nyt_eng_201001.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201001.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201001.raw.json
+1.84 minutes on nyt_eng_201001.conllu
+-> searching Nyt2.conll/nyt_eng_201002.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201002.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201002.raw.json
+1.74 minutes on nyt_eng_201002.conllu
+-> searching Nyt2.conll/nyt_eng_201003.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201003.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201003.raw.json
+1.86 minutes on nyt_eng_201003.conllu
+-> searching Nyt2.conll/nyt_eng_201004.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201004.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201004.raw.json
+1.97 minutes on nyt_eng_201004.conllu
+-> searching Nyt2.conll/nyt_eng_201005.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201005.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201005.raw.json
+2.2 minutes on nyt_eng_201005.conllu
+-> searching Nyt2.conll/nyt_eng_201006.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201006.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201006.raw.json
+2.16 minutes on nyt_eng_201006.conllu
+-> searching Nyt2.conll/nyt_eng_201007.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201007.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201007.raw.json
+2.11 minutes on nyt_eng_201007.conllu
+-> searching Nyt2.conll/nyt_eng_201008.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201008.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201008.raw.json
+2.27 minutes on nyt_eng_201008.conllu
+-> searching Nyt2.conll/nyt_eng_201009.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201009.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201009.raw.json
+2.19 minutes on nyt_eng_201009.conllu
+-> searching Nyt2.conll/nyt_eng_201010.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201010.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201010.raw.json
+2.3 minutes on nyt_eng_201010.conllu
+-> searching Nyt2.conll/nyt_eng_201011.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201011.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201011.raw.json
+2.19 minutes on nyt_eng_201011.conllu
+-> searching Nyt2.conll/nyt_eng_201012.conllu:
+grew grep -pattern Pat/neg-mit/almost-none_subj.pat -i Nyt2.conll/nyt_eng_201012.conllu > data/neg-mit/Nyt2.almost-none_subj/nyt_eng_201012.raw.json
+2.11 minutes on nyt_eng_201012.conllu
+
+Total grew search time: 379.86 minutes
+==============================================
+
+```
+### Running `FillJson.py` script on json files in `Nyt2.almost-none_subj` from conll files in `Nyt2.conll`...
+```
+-> Processing nyt_eng_200603...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200609...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200501...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200611...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200808...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200701...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200304...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200210...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200502...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200205...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200703...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200201...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200710...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200801...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200902...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200806...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200111...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200303...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200711...
+   => 1 hit results filled from 308094 total original sentences in 34.87 seconds
+-> Writing output file...
+-> Processing nyt_eng_200910...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200107...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200805...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200407...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200103...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200604...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200712...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200105...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200104...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200810...
+   => 4 hit results filled from 296037 total original sentences in 33.86 seconds
+-> Writing output file...
+-> Processing nyt_eng_200301...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200309...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200207...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200208...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200312...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200601...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200903...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200904...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200706...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200512...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200305...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200404...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200905...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200112...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200608...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200907...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200802...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200610...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200812...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200106...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200310...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200408...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200307...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200605...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200503...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200004...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200807...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200204...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200311...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200708...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200410...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200308...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200709...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200803...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200302...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200704...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200707...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201011...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200912...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200402...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200102...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200705...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200506...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200809...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200211...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201003...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200101...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200209...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200509...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200602...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200504...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200505...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200109...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200804...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201002...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200202...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200206...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200306...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200405...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200511...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200906...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201009...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200607...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200409...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200508...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200403...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200702...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200911...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200007...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200507...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200908...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200108...
+   => 1 hit results filled from 525849 total original sentences in 57.33 seconds
+-> Writing output file...
+-> Processing nyt_eng_200212...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200909...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200401...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201010...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200411...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200001...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200510...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200006...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200901...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200612...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200110...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200811...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200005...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200412...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200606...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201008...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200012...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200203...
+-> Skipping. (file is empty)
+Finished processing all corresponding json and conll files.
+
+Time elapsed: 2.1 minutes
+====================================
+
+```
+### Tabulating hits via `tabulateHits.py`...
+```
+-> Processing nyt_eng_200711.json...
+-> Processing nyt_eng_200810.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20081026_0112_8:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20081026_0075_30:5 discarded.
+-> Processing nyt_eng_200108.json...
+
+^_^ Finished collecting sentence data from all json files.
+    -> Writing tables to csv files...
+```
+```
+
+Time elapsed: 0.04 seconds
+====================================
+
+```  
+## Starting context: `few_det-of-subj`
+- time stamp: `Wed Aug  4 17:10:17 EDT 2021`
+- data directory: `data/neg-mit/Nyt2.few_det-of-subj`
+- hits table: `hits/neg-mit/Nyt2_few_det-of-subj`
+```{js}
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  S []; 
+  FEW [lemma="few"];
+  S -[amod]-> FEW;
+  sub: ADJ -[nsubj|nsubjpass]-> S;
+  S << BE
+}
+```  
+```  
+```
+### Running grew search on `Nyt2.conll`...
+```
+131 total file(s) to be searched.
+-> searching Nyt2.conll/nyt_eng_200001.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200001.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200001.raw.json
+4.3 minutes on nyt_eng_200001.conllu
+-> searching Nyt2.conll/nyt_eng_200002.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200002.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200002.raw.json
+4.2 minutes on nyt_eng_200002.conllu
+-> searching Nyt2.conll/nyt_eng_200003.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200003.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200003.raw.json
+4.04 minutes on nyt_eng_200003.conllu
+-> searching Nyt2.conll/nyt_eng_200004.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200004.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200004.raw.json
+3.25 minutes on nyt_eng_200004.conllu
+-> searching Nyt2.conll/nyt_eng_200005.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200005.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200005.raw.json
+3.59 minutes on nyt_eng_200005.conllu
+-> searching Nyt2.conll/nyt_eng_200006.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200006.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200006.raw.json
+3.91 minutes on nyt_eng_200006.conllu
+-> searching Nyt2.conll/nyt_eng_200007.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200007.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200007.raw.json
+4.2 minutes on nyt_eng_200007.conllu
+-> searching Nyt2.conll/nyt_eng_200008.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200008.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200008.raw.json
+4.74 minutes on nyt_eng_200008.conllu
+-> searching Nyt2.conll/nyt_eng_200009.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200009.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200009.raw.json
+3.51 minutes on nyt_eng_200009.conllu
+-> searching Nyt2.conll/nyt_eng_200010.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200010.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200010.raw.json
+4.62 minutes on nyt_eng_200010.conllu
+-> searching Nyt2.conll/nyt_eng_200011.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200011.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200011.raw.json
+4.53 minutes on nyt_eng_200011.conllu
+-> searching Nyt2.conll/nyt_eng_200012.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200012.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200012.raw.json
+4.1 minutes on nyt_eng_200012.conllu
+-> searching Nyt2.conll/nyt_eng_200101.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200101.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200101.raw.json
+4.65 minutes on nyt_eng_200101.conllu
+-> searching Nyt2.conll/nyt_eng_200102.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200102.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200102.raw.json
+4.2 minutes on nyt_eng_200102.conllu
+-> searching Nyt2.conll/nyt_eng_200103.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200103.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200103.raw.json
+4.28 minutes on nyt_eng_200103.conllu
+-> searching Nyt2.conll/nyt_eng_200104.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200104.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200104.raw.json
+4.69 minutes on nyt_eng_200104.conllu
+-> searching Nyt2.conll/nyt_eng_200105.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200105.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200105.raw.json
+4.5 minutes on nyt_eng_200105.conllu
+-> searching Nyt2.conll/nyt_eng_200106.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200106.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200106.raw.json
+3.9 minutes on nyt_eng_200106.conllu
+-> searching Nyt2.conll/nyt_eng_200107.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200107.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200107.raw.json
+4.16 minutes on nyt_eng_200107.conllu
+-> searching Nyt2.conll/nyt_eng_200108.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200108.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200108.raw.json
+4.42 minutes on nyt_eng_200108.conllu
+-> searching Nyt2.conll/nyt_eng_200109.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200109.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200109.raw.json
+4.83 minutes on nyt_eng_200109.conllu
+-> searching Nyt2.conll/nyt_eng_200110.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200110.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200110.raw.json
+4.83 minutes on nyt_eng_200110.conllu
+-> searching Nyt2.conll/nyt_eng_200111.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200111.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200111.raw.json
+4.58 minutes on nyt_eng_200111.conllu
+-> searching Nyt2.conll/nyt_eng_200112.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200112.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200112.raw.json
+4.0 minutes on nyt_eng_200112.conllu
+-> searching Nyt2.conll/nyt_eng_200201.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200201.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200201.raw.json
+4.01 minutes on nyt_eng_200201.conllu
+-> searching Nyt2.conll/nyt_eng_200202.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200202.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200202.raw.json
+4.25 minutes on nyt_eng_200202.conllu
+-> searching Nyt2.conll/nyt_eng_200203.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200203.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200203.raw.json
+4.66 minutes on nyt_eng_200203.conllu
+-> searching Nyt2.conll/nyt_eng_200204.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200204.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200204.raw.json
+4.55 minutes on nyt_eng_200204.conllu
+-> searching Nyt2.conll/nyt_eng_200205.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200205.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200205.raw.json
+4.38 minutes on nyt_eng_200205.conllu
+-> searching Nyt2.conll/nyt_eng_200206.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200206.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200206.raw.json
+4.17 minutes on nyt_eng_200206.conllu
+-> searching Nyt2.conll/nyt_eng_200207.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200207.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200207.raw.json
+2.0 minutes on nyt_eng_200207.conllu
+-> searching Nyt2.conll/nyt_eng_200208.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200208.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200208.raw.json
+3.94 minutes on nyt_eng_200208.conllu
+-> searching Nyt2.conll/nyt_eng_200209.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200209.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200209.raw.json
+4.32 minutes on nyt_eng_200209.conllu
+-> searching Nyt2.conll/nyt_eng_200210.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200210.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200210.raw.json
+4.55 minutes on nyt_eng_200210.conllu
+-> searching Nyt2.conll/nyt_eng_200211.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200211.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200211.raw.json
+4.06 minutes on nyt_eng_200211.conllu
+-> searching Nyt2.conll/nyt_eng_200212.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200212.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200212.raw.json
+4.23 minutes on nyt_eng_200212.conllu
+-> searching Nyt2.conll/nyt_eng_200301.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200301.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200301.raw.json
+2.42 minutes on nyt_eng_200301.conllu
+-> searching Nyt2.conll/nyt_eng_200302.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200302.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200302.raw.json
+0.52 minutes on nyt_eng_200302.conllu
+-> searching Nyt2.conll/nyt_eng_200303.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200303.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200303.raw.json
+0.58 minutes on nyt_eng_200303.conllu
+-> searching Nyt2.conll/nyt_eng_200304.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200304.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200304.raw.json
+0.59 minutes on nyt_eng_200304.conllu
+-> searching Nyt2.conll/nyt_eng_200305.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200305.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200305.raw.json
+0.54 minutes on nyt_eng_200305.conllu
+-> searching Nyt2.conll/nyt_eng_200306.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200306.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200306.raw.json
+0.51 minutes on nyt_eng_200306.conllu
+-> searching Nyt2.conll/nyt_eng_200307.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200307.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200307.raw.json
+0.54 minutes on nyt_eng_200307.conllu
+-> searching Nyt2.conll/nyt_eng_200308.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200308.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200308.raw.json
+0.44 minutes on nyt_eng_200308.conllu
+-> searching Nyt2.conll/nyt_eng_200309.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200309.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200309.raw.json
+0.58 minutes on nyt_eng_200309.conllu
+-> searching Nyt2.conll/nyt_eng_200310.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200310.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200310.raw.json
+0.57 minutes on nyt_eng_200310.conllu
+-> searching Nyt2.conll/nyt_eng_200311.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200311.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200311.raw.json
+0.49 minutes on nyt_eng_200311.conllu
+-> searching Nyt2.conll/nyt_eng_200312.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200312.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200312.raw.json
+0.48 minutes on nyt_eng_200312.conllu
+-> searching Nyt2.conll/nyt_eng_200401.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200401.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200401.raw.json
+0.48 minutes on nyt_eng_200401.conllu
+-> searching Nyt2.conll/nyt_eng_200402.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200402.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200402.raw.json
+0.42 minutes on nyt_eng_200402.conllu
+-> searching Nyt2.conll/nyt_eng_200403.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200403.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200403.raw.json
+0.47 minutes on nyt_eng_200403.conllu
+-> searching Nyt2.conll/nyt_eng_200404.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200404.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200404.raw.json
+0.44 minutes on nyt_eng_200404.conllu
+-> searching Nyt2.conll/nyt_eng_200405.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200405.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200405.raw.json
+0.1 minutes on nyt_eng_200405.conllu
+-> searching Nyt2.conll/nyt_eng_200407.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200407.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200407.raw.json
+3.51 minutes on nyt_eng_200407.conllu
+-> searching Nyt2.conll/nyt_eng_200408.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200408.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200408.raw.json
+3.78 minutes on nyt_eng_200408.conllu
+-> searching Nyt2.conll/nyt_eng_200409.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200409.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200409.raw.json
+3.55 minutes on nyt_eng_200409.conllu
+-> searching Nyt2.conll/nyt_eng_200410.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200410.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200410.raw.json
+3.79 minutes on nyt_eng_200410.conllu
+-> searching Nyt2.conll/nyt_eng_200411.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200411.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200411.raw.json
+3.44 minutes on nyt_eng_200411.conllu
+-> searching Nyt2.conll/nyt_eng_200412.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200412.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200412.raw.json
+3.01 minutes on nyt_eng_200412.conllu
+-> searching Nyt2.conll/nyt_eng_200501.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200501.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200501.raw.json
+3.42 minutes on nyt_eng_200501.conllu
+-> searching Nyt2.conll/nyt_eng_200502.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200502.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200502.raw.json
+2.85 minutes on nyt_eng_200502.conllu
+-> searching Nyt2.conll/nyt_eng_200503.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200503.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200503.raw.json
+3.29 minutes on nyt_eng_200503.conllu
+-> searching Nyt2.conll/nyt_eng_200504.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200504.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200504.raw.json
+2.98 minutes on nyt_eng_200504.conllu
+-> searching Nyt2.conll/nyt_eng_200505.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200505.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200505.raw.json
+3.05 minutes on nyt_eng_200505.conllu
+-> searching Nyt2.conll/nyt_eng_200506.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200506.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200506.raw.json
+3.35 minutes on nyt_eng_200506.conllu
+-> searching Nyt2.conll/nyt_eng_200507.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200507.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200507.raw.json
+3.79 minutes on nyt_eng_200507.conllu
+-> searching Nyt2.conll/nyt_eng_200508.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200508.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200508.raw.json
+3.74 minutes on nyt_eng_200508.conllu
+-> searching Nyt2.conll/nyt_eng_200509.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200509.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200509.raw.json
+2.68 minutes on nyt_eng_200509.conllu
+-> searching Nyt2.conll/nyt_eng_200510.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200510.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200510.raw.json
+3.66 minutes on nyt_eng_200510.conllu
+-> searching Nyt2.conll/nyt_eng_200511.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200511.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200511.raw.json
+3.33 minutes on nyt_eng_200511.conllu
+-> searching Nyt2.conll/nyt_eng_200512.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200512.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200512.raw.json
+3.38 minutes on nyt_eng_200512.conllu
+-> searching Nyt2.conll/nyt_eng_200601.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200601.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200601.raw.json
+3.35 minutes on nyt_eng_200601.conllu
+-> searching Nyt2.conll/nyt_eng_200602.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200602.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200602.raw.json
+3.51 minutes on nyt_eng_200602.conllu
+-> searching Nyt2.conll/nyt_eng_200603.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200603.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200603.raw.json
+3.49 minutes on nyt_eng_200603.conllu
+-> searching Nyt2.conll/nyt_eng_200604.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200604.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200604.raw.json
+3.36 minutes on nyt_eng_200604.conllu
+-> searching Nyt2.conll/nyt_eng_200605.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200605.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200605.raw.json
+3.53 minutes on nyt_eng_200605.conllu
+-> searching Nyt2.conll/nyt_eng_200606.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200606.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200606.raw.json
+3.26 minutes on nyt_eng_200606.conllu
+-> searching Nyt2.conll/nyt_eng_200607.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200607.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200607.raw.json
+2.87 minutes on nyt_eng_200607.conllu
+-> searching Nyt2.conll/nyt_eng_200608.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200608.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200608.raw.json
+3.2 minutes on nyt_eng_200608.conllu
+-> searching Nyt2.conll/nyt_eng_200609.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200609.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200609.raw.json
+3.54 minutes on nyt_eng_200609.conllu
+-> searching Nyt2.conll/nyt_eng_200610.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200610.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200610.raw.json
+3.4 minutes on nyt_eng_200610.conllu
+-> searching Nyt2.conll/nyt_eng_200611.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200611.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200611.raw.json
+3.43 minutes on nyt_eng_200611.conllu
+-> searching Nyt2.conll/nyt_eng_200612.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200612.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200612.raw.json
+3.13 minutes on nyt_eng_200612.conllu
+-> searching Nyt2.conll/nyt_eng_200701.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200701.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200701.raw.json
+3.21 minutes on nyt_eng_200701.conllu
+-> searching Nyt2.conll/nyt_eng_200702.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200702.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200702.raw.json
+2.86 minutes on nyt_eng_200702.conllu
+-> searching Nyt2.conll/nyt_eng_200703.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200703.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200703.raw.json
+3.03 minutes on nyt_eng_200703.conllu
+-> searching Nyt2.conll/nyt_eng_200704.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200704.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200704.raw.json
+2.85 minutes on nyt_eng_200704.conllu
+-> searching Nyt2.conll/nyt_eng_200705.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200705.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200705.raw.json
+2.88 minutes on nyt_eng_200705.conllu
+-> searching Nyt2.conll/nyt_eng_200706.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200706.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200706.raw.json
+2.81 minutes on nyt_eng_200706.conllu
+-> searching Nyt2.conll/nyt_eng_200707.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200707.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200707.raw.json
+2.74 minutes on nyt_eng_200707.conllu
+-> searching Nyt2.conll/nyt_eng_200708.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200708.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200708.raw.json
+2.67 minutes on nyt_eng_200708.conllu
+-> searching Nyt2.conll/nyt_eng_200709.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200709.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200709.raw.json
+2.57 minutes on nyt_eng_200709.conllu
+-> searching Nyt2.conll/nyt_eng_200710.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200710.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200710.raw.json
+3.03 minutes on nyt_eng_200710.conllu
+-> searching Nyt2.conll/nyt_eng_200711.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200711.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200711.raw.json
+2.71 minutes on nyt_eng_200711.conllu
+-> searching Nyt2.conll/nyt_eng_200712.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200712.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200712.raw.json
+2.67 minutes on nyt_eng_200712.conllu
+-> searching Nyt2.conll/nyt_eng_200801.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200801.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200801.raw.json
+2.85 minutes on nyt_eng_200801.conllu
+-> searching Nyt2.conll/nyt_eng_200802.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200802.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200802.raw.json
+2.57 minutes on nyt_eng_200802.conllu
+-> searching Nyt2.conll/nyt_eng_200803.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200803.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200803.raw.json
+2.78 minutes on nyt_eng_200803.conllu
+-> searching Nyt2.conll/nyt_eng_200804.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200804.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200804.raw.json
+2.59 minutes on nyt_eng_200804.conllu
+-> searching Nyt2.conll/nyt_eng_200805.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200805.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200805.raw.json
+2.6 minutes on nyt_eng_200805.conllu
+-> searching Nyt2.conll/nyt_eng_200806.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200806.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200806.raw.json
+2.56 minutes on nyt_eng_200806.conllu
+-> searching Nyt2.conll/nyt_eng_200807.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200807.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200807.raw.json
+2.43 minutes on nyt_eng_200807.conllu
+-> searching Nyt2.conll/nyt_eng_200808.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200808.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200808.raw.json
+2.57 minutes on nyt_eng_200808.conllu
+-> searching Nyt2.conll/nyt_eng_200809.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200809.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200809.raw.json
+2.46 minutes on nyt_eng_200809.conllu
+-> searching Nyt2.conll/nyt_eng_200810.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200810.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200810.raw.json
+2.6 minutes on nyt_eng_200810.conllu
+-> searching Nyt2.conll/nyt_eng_200811.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200811.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200811.raw.json
+2.38 minutes on nyt_eng_200811.conllu
+-> searching Nyt2.conll/nyt_eng_200812.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200812.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200812.raw.json
+2.34 minutes on nyt_eng_200812.conllu
+-> searching Nyt2.conll/nyt_eng_200901.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200901.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200901.raw.json
+2.42 minutes on nyt_eng_200901.conllu
+-> searching Nyt2.conll/nyt_eng_200902.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200902.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200902.raw.json
+2.08 minutes on nyt_eng_200902.conllu
+-> searching Nyt2.conll/nyt_eng_200903.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200903.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200903.raw.json
+2.34 minutes on nyt_eng_200903.conllu
+-> searching Nyt2.conll/nyt_eng_200904.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200904.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200904.raw.json
+2.02 minutes on nyt_eng_200904.conllu
+-> searching Nyt2.conll/nyt_eng_200905.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200905.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200905.raw.json
+2.11 minutes on nyt_eng_200905.conllu
+-> searching Nyt2.conll/nyt_eng_200906.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200906.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200906.raw.json
+1.88 minutes on nyt_eng_200906.conllu
+-> searching Nyt2.conll/nyt_eng_200907.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200907.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200907.raw.json
+2.01 minutes on nyt_eng_200907.conllu
+-> searching Nyt2.conll/nyt_eng_200908.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200908.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200908.raw.json
+1.9 minutes on nyt_eng_200908.conllu
+-> searching Nyt2.conll/nyt_eng_200909.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200909.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200909.raw.json
+1.99 minutes on nyt_eng_200909.conllu
+-> searching Nyt2.conll/nyt_eng_200910.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200910.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200910.raw.json
+1.93 minutes on nyt_eng_200910.conllu
+-> searching Nyt2.conll/nyt_eng_200911.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200911.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200911.raw.json
+1.81 minutes on nyt_eng_200911.conllu
+-> searching Nyt2.conll/nyt_eng_200912.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_200912.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_200912.raw.json
+1.83 minutes on nyt_eng_200912.conllu
+-> searching Nyt2.conll/nyt_eng_201001.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201001.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201001.raw.json
+1.91 minutes on nyt_eng_201001.conllu
+-> searching Nyt2.conll/nyt_eng_201002.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201002.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201002.raw.json
+1.76 minutes on nyt_eng_201002.conllu
+-> searching Nyt2.conll/nyt_eng_201003.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201003.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201003.raw.json
+1.94 minutes on nyt_eng_201003.conllu
+-> searching Nyt2.conll/nyt_eng_201004.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201004.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201004.raw.json
+1.95 minutes on nyt_eng_201004.conllu
+-> searching Nyt2.conll/nyt_eng_201005.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201005.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201005.raw.json
+2.16 minutes on nyt_eng_201005.conllu
+-> searching Nyt2.conll/nyt_eng_201006.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201006.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201006.raw.json
+2.2 minutes on nyt_eng_201006.conllu
+-> searching Nyt2.conll/nyt_eng_201007.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201007.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201007.raw.json
+2.09 minutes on nyt_eng_201007.conllu
+-> searching Nyt2.conll/nyt_eng_201008.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201008.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201008.raw.json
+2.19 minutes on nyt_eng_201008.conllu
+-> searching Nyt2.conll/nyt_eng_201009.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201009.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201009.raw.json
+2.21 minutes on nyt_eng_201009.conllu
+-> searching Nyt2.conll/nyt_eng_201010.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201010.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201010.raw.json
+2.31 minutes on nyt_eng_201010.conllu
+-> searching Nyt2.conll/nyt_eng_201011.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201011.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201011.raw.json
+2.2 minutes on nyt_eng_201011.conllu
+-> searching Nyt2.conll/nyt_eng_201012.conllu:
+grew grep -pattern Pat/neg-mit/few_det-of-subj.pat -i Nyt2.conll/nyt_eng_201012.conllu > data/neg-mit/Nyt2.few_det-of-subj/nyt_eng_201012.raw.json
+2.1 minutes on nyt_eng_201012.conllu
+
+Total grew search time: 376.11 minutes
+==============================================
+
+```
+### Running `FillJson.py` script on json files in `Nyt2.few_det-of-subj` from conll files in `Nyt2.conll`...
+```
+-> Processing nyt_eng_200007...
+   => 8 hit results filled from 511911 total original sentences in 55.66 seconds
+-> Writing output file...
+-> Processing nyt_eng_200112...
+   => 12 hit results filled from 469652 total original sentences in 51.81 seconds
+-> Writing output file...
+-> Processing nyt_eng_200402...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200612...
+   => 10 hit results filled from 340204 total original sentences in 40.85 seconds
+-> Writing output file...
+-> Processing nyt_eng_200111...
+   => 17 hit results filled from 532063 total original sentences in 60.19 seconds
+-> Writing output file...
+-> Processing nyt_eng_200301...
+   => 5 hit results filled from 273097 total original sentences in 32.01 seconds
+-> Writing output file...
+-> Processing nyt_eng_200209...
+   => 10 hit results filled from 486726 total original sentences in 56.66 seconds
+-> Writing output file...
+-> Processing nyt_eng_200711...
+   => 4 hit results filled from 308094 total original sentences in 35.79 seconds
+-> Writing output file...
+-> Processing nyt_eng_200609...
+   => 7 hit results filled from 377695 total original sentences in 45.01 seconds
+-> Writing output file...
+-> Processing nyt_eng_200605...
+   => 7 hit results filled from 374918 total original sentences in 44.86 seconds
+-> Writing output file...
+-> Processing nyt_eng_200903...
+   => 2 hit results filled from 261919 total original sentences in 30.03 seconds
+-> Writing output file...
+-> Processing nyt_eng_200802...
+   => 7 hit results filled from 291184 total original sentences in 33.62 seconds
+-> Writing output file...
+-> Processing nyt_eng_201003...
+   => 5 hit results filled from 205897 total original sentences in 24.39 seconds
+-> Writing output file...
+-> Processing nyt_eng_200504...
+   => 5 hit results filled from 313963 total original sentences in 38.65 seconds
+-> Writing output file...
+-> Processing nyt_eng_200511...
+   => 10 hit results filled from 355394 total original sentences in 43.74 seconds
+-> Writing output file...
+-> Processing nyt_eng_200610...
+   => 9 hit results filled from 370456 total original sentences in 44.14 seconds
+-> Writing output file...
+-> Processing nyt_eng_200607...
+   => 6 hit results filled from 302429 total original sentences in 36.78 seconds
+-> Writing output file...
+-> Processing nyt_eng_201012...
+   => 6 hit results filled from 227205 total original sentences in 27.3 seconds
+-> Writing output file...
+-> Processing nyt_eng_200907...
+   => 7 hit results filled from 216175 total original sentences in 25.55 seconds
+-> Writing output file...
+-> Processing nyt_eng_200807...
+   => 9 hit results filled from 272889 total original sentences in 31.94 seconds
+-> Writing output file...
+-> Processing nyt_eng_200004...
+   => 8 hit results filled from 383507 total original sentences in 41.67 seconds
+-> Writing output file...
+-> Processing nyt_eng_200901...
+   => 5 hit results filled from 268522 total original sentences in 31.52 seconds
+-> Writing output file...
+-> Processing nyt_eng_201010...
+   => 8 hit results filled from 245537 total original sentences in 29.75 seconds
+-> Writing output file...
+-> Processing nyt_eng_200805...
+   => 12 hit results filled from 289086 total original sentences in 33.68 seconds
+-> Writing output file...
+-> Processing nyt_eng_200904...
+   => 4 hit results filled from 228398 total original sentences in 26.54 seconds
+-> Writing output file...
+-> Processing nyt_eng_200008...
+   => 14 hit results filled from 552034 total original sentences in 60.53 seconds
+-> Writing output file...
+-> Processing nyt_eng_200106...
+   => 12 hit results filled from 462289 total original sentences in 50.48 seconds
+-> Writing output file...
+-> Processing nyt_eng_200510...
+   => 10 hit results filled from 386755 total original sentences in 47.22 seconds
+-> Writing output file...
+-> Processing nyt_eng_200303...
+   => 1 hit results filled from 65983 total original sentences in 7.46 seconds
+-> Writing output file...
+-> Processing nyt_eng_200010...
+   => 7 hit results filled from 540055 total original sentences in 59.59 seconds
+-> Writing output file...
+-> Processing nyt_eng_200506...
+   => 4 hit results filled from 349983 total original sentences in 43.49 seconds
+-> Writing output file...
+-> Processing nyt_eng_200203...
+   => 2 hit results filled from 544189 total original sentences in 60.03 seconds
+-> Writing output file...
+-> Processing nyt_eng_200710...
+   => 11 hit results filled from 344426 total original sentences in 39.65 seconds
+-> Writing output file...
+-> Processing nyt_eng_200703...
+   => 8 hit results filled from 331059 total original sentences in 39.38 seconds
+-> Writing output file...
+-> Processing nyt_eng_200408...
+   => 10 hit results filled from 400656 total original sentences in 48.65 seconds
+-> Writing output file...
+-> Processing nyt_eng_200312...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200311...
+   => 1 hit results filled from 57195 total original sentences in 6.56 seconds
+-> Writing output file...
+-> Processing nyt_eng_200501...
+   => 4 hit results filled from 366912 total original sentences in 44.52 seconds
+-> Writing output file...
+-> Processing nyt_eng_200101...
+   => 18 hit results filled from 543370 total original sentences in 61.22 seconds
+-> Writing output file...
+-> Processing nyt_eng_200401...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200811...
+   => 7 hit results filled from 264702 total original sentences in 31.66 seconds
+-> Writing output file...
+-> Processing nyt_eng_200210...
+   => 10 hit results filled from 509912 total original sentences in 58.73 seconds
+-> Writing output file...
+-> Processing nyt_eng_200309...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200906...
+   => 3 hit results filled from 208215 total original sentences in 24.48 seconds
+-> Writing output file...
+-> Processing nyt_eng_200410...
+   => 11 hit results filled from 407065 total original sentences in 49.73 seconds
+-> Writing output file...
+-> Processing nyt_eng_200005...
+   => 4 hit results filled from 419523 total original sentences in 46.24 seconds
+-> Writing output file...
+-> Processing nyt_eng_200603...
+   => 14 hit results filled from 372452 total original sentences in 45.56 seconds
+-> Writing output file...
+-> Processing nyt_eng_201007...
+   => 5 hit results filled from 224314 total original sentences in 27.54 seconds
+-> Writing output file...
+-> Processing nyt_eng_200304...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200403...
+   => 1 hit results filled from 56097 total original sentences in 6.4 seconds
+-> Writing output file...
+-> Processing nyt_eng_200006...
+   => 16 hit results filled from 454366 total original sentences in 50.5 seconds
+-> Writing output file...
+-> Processing nyt_eng_200109...
+   => 21 hit results filled from 557746 total original sentences in 62.41 seconds
+-> Writing output file...
+-> Processing nyt_eng_200002...
+   => 3 hit results filled from 509311 total original sentences in 53.86 seconds
+-> Writing output file...
+-> Processing nyt_eng_200305...
+   => 2 hit results filled from 62013 total original sentences in 6.96 seconds
+-> Writing output file...
+-> Processing nyt_eng_200507...
+   => 5 hit results filled from 396462 total original sentences in 49.01 seconds
+-> Writing output file...
+-> Processing nyt_eng_200808...
+   => 7 hit results filled from 291080 total original sentences in 34.15 seconds
+-> Writing output file...
+-> Processing nyt_eng_200009...
+   => 8 hit results filled from 423883 total original sentences in 45.51 seconds
+-> Writing output file...
+-> Processing nyt_eng_200809...
+   => 12 hit results filled from 272629 total original sentences in 31.85 seconds
+-> Writing output file...
+-> Processing nyt_eng_200712...
+   => 5 hit results filled from 302715 total original sentences in 35.0 seconds
+-> Writing output file...
+-> Processing nyt_eng_200001...
+   => 12 hit results filled from 520079 total original sentences in 55.14 seconds
+-> Writing output file...
+-> Processing nyt_eng_200201...
+   => 11 hit results filled from 465601 total original sentences in 50.48 seconds
+-> Writing output file...
+-> Processing nyt_eng_200707...
+   => 12 hit results filled from 310250 total original sentences in 36.03 seconds
+-> Writing output file...
+-> Processing nyt_eng_200407...
+   => 9 hit results filled from 369807 total original sentences in 45.92 seconds
+-> Writing output file...
+-> Processing nyt_eng_200806...
+   => 2 hit results filled from 284369 total original sentences in 32.99 seconds
+-> Writing output file...
+-> Processing nyt_eng_200105...
+   => 14 hit results filled from 524130 total original sentences in 56.93 seconds
+-> Writing output file...
+-> Processing nyt_eng_200212...
+   => 8 hit results filled from 477256 total original sentences in 54.13 seconds
+-> Writing output file...
+-> Processing nyt_eng_200503...
+   => 19 hit results filled from 346506 total original sentences in 42.52 seconds
+-> Writing output file...
+-> Processing nyt_eng_200804...
+   => 5 hit results filled from 287471 total original sentences in 32.84 seconds
+-> Writing output file...
+-> Processing nyt_eng_200708...
+   => 5 hit results filled from 300886 total original sentences in 34.02 seconds
+-> Writing output file...
+-> Processing nyt_eng_200103...
+   => 13 hit results filled from 511668 total original sentences in 54.37 seconds
+-> Writing output file...
+-> Processing nyt_eng_200611...
+   => 7 hit results filled from 362864 total original sentences in 42.59 seconds
+-> Writing output file...
+-> Processing nyt_eng_200206...
+   => 12 hit results filled from 499510 total original sentences in 53.94 seconds
+-> Writing output file...
+-> Processing nyt_eng_200102...
+   => 5 hit results filled from 499901 total original sentences in 53.83 seconds
+-> Writing output file...
+-> Processing nyt_eng_200011...
+   => 13 hit results filled from 527682 total original sentences in 56.71 seconds
+-> Writing output file...
+-> Processing nyt_eng_200110...
+   => 17 hit results filled from 550911 total original sentences in 61.03 seconds
+-> Writing output file...
+-> Processing nyt_eng_200512...
+   => 19 hit results filled from 361989 total original sentences in 43.13 seconds
+-> Writing output file...
+-> Processing nyt_eng_200509...
+   => 5 hit results filled from 283183 total original sentences in 33.5 seconds
+-> Writing output file...
+-> Processing nyt_eng_200502...
+   => 13 hit results filled from 304418 total original sentences in 36.77 seconds
+-> Writing output file...
+-> Processing nyt_eng_200812...
+   => 13 hit results filled from 259704 total original sentences in 29.74 seconds
+-> Writing output file...
+-> Processing nyt_eng_200912...
+   => 6 hit results filled from 195012 total original sentences in 23.25 seconds
+-> Writing output file...
+-> Processing nyt_eng_200606...
+   => 11 hit results filled from 346386 total original sentences in 42.14 seconds
+-> Writing output file...
+-> Processing nyt_eng_200704...
+   => 2 hit results filled from 308812 total original sentences in 37.24 seconds
+-> Writing output file...
+-> Processing nyt_eng_201001...
+   => 6 hit results filled from 204331 total original sentences in 24.44 seconds
+-> Writing output file...
+-> Processing nyt_eng_200208...
+   => 9 hit results filled from 455278 total original sentences in 51.69 seconds
+-> Writing output file...
+-> Processing nyt_eng_200307...
+   => 1 hit results filled from 61723 total original sentences in 7.3 seconds
+-> Writing output file...
+-> Processing nyt_eng_200910...
+   => 3 hit results filled from 207633 total original sentences in 24.23 seconds
+-> Writing output file...
+-> Processing nyt_eng_200409...
+   => 11 hit results filled from 382129 total original sentences in 46.97 seconds
+-> Writing output file...
+-> Processing nyt_eng_200508...
+   => 25 hit results filled from 400151 total original sentences in 49.12 seconds
+-> Writing output file...
+-> Processing nyt_eng_200911...
+   => 8 hit results filled from 199129 total original sentences in 23.53 seconds
+-> Writing output file...
+-> Processing nyt_eng_200810...
+   => 5 hit results filled from 296037 total original sentences in 34.43 seconds
+-> Writing output file...
+-> Processing nyt_eng_200602...
+   => 11 hit results filled from 376515 total original sentences in 46.02 seconds
+-> Writing output file...
+-> Processing nyt_eng_200104...
+   => 20 hit results filled from 557465 total original sentences in 61.28 seconds
+-> Writing output file...
+-> Processing nyt_eng_200412...
+   => 9 hit results filled from 323296 total original sentences in 39.79 seconds
+-> Writing output file...
+-> Processing nyt_eng_201005...
+   => 11 hit results filled from 228995 total original sentences in 28.68 seconds
+-> Writing output file...
+-> Processing nyt_eng_200306...
+   => 1 hit results filled from 59524 total original sentences in 6.81 seconds
+-> Writing output file...
+-> Processing nyt_eng_200302...
+   => 1 hit results filled from 59237 total original sentences in 6.82 seconds
+-> Writing output file...
+-> Processing nyt_eng_200310...
+   => 2 hit results filled from 64986 total original sentences in 7.45 seconds
+-> Writing output file...
+-> Processing nyt_eng_200108...
+   => 12 hit results filled from 525849 total original sentences in 58.24 seconds
+-> Writing output file...
+-> Processing nyt_eng_200706...
+   => 9 hit results filled from 315761 total original sentences in 37.46 seconds
+-> Writing output file...
+-> Processing nyt_eng_201011...
+   => 5 hit results filled from 233068 total original sentences in 28.82 seconds
+-> Writing output file...
+-> Processing nyt_eng_200207...
+   => 6 hit results filled from 227329 total original sentences in 26.25 seconds
+-> Writing output file...
+-> Processing nyt_eng_200107...
+   => 10 hit results filled from 496307 total original sentences in 55.06 seconds
+-> Writing output file...
+-> Processing nyt_eng_200608...
+   => 8 hit results filled from 341741 total original sentences in 40.96 seconds
+-> Writing output file...
+-> Processing nyt_eng_200604...
+   => 6 hit results filled from 364586 total original sentences in 43.76 seconds
+-> Writing output file...
+-> Processing nyt_eng_200404...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_200411...
+   => 5 hit results filled from 369241 total original sentences in 45.17 seconds
+-> Writing output file...
+-> Processing nyt_eng_201002...
+   => 10 hit results filled from 190244 total original sentences in 22.79 seconds
+-> Writing output file...
+-> Processing nyt_eng_200308...
+   => 1 hit results filled from 51286 total original sentences in 5.75 seconds
+-> Writing output file...
+-> Processing nyt_eng_200902...
+   => 13 hit results filled from 232645 total original sentences in 27.3 seconds
+-> Writing output file...
+-> Processing nyt_eng_200803...
+   => 10 hit results filled from 305108 total original sentences in 35.71 seconds
+-> Writing output file...
+-> Processing nyt_eng_200601...
+   => 10 hit results filled from 358276 total original sentences in 43.86 seconds
+-> Writing output file...
+-> Processing nyt_eng_200211...
+   => 9 hit results filled from 458243 total original sentences in 53.11 seconds
+-> Writing output file...
+-> Processing nyt_eng_200908...
+   => 5 hit results filled from 212970 total original sentences in 25.04 seconds
+-> Writing output file...
+-> Processing nyt_eng_200702...
+   => 10 hit results filled from 303668 total original sentences in 36.31 seconds
+-> Writing output file...
+-> Processing nyt_eng_200202...
+   => 8 hit results filled from 496876 total original sentences in 55.9 seconds
+-> Writing output file...
+-> Processing nyt_eng_200709...
+   => 2 hit results filled from 287727 total original sentences in 33.8 seconds
+-> Writing output file...
+-> Processing nyt_eng_200204...
+   => 20 hit results filled from 528809 total original sentences in 60.41 seconds
+-> Writing output file...
+-> Processing nyt_eng_200405...
+-> Skipping. (file is empty)
+-> Processing nyt_eng_201008...
+   => 5 hit results filled from 236523 total original sentences in 29.35 seconds
+-> Writing output file...
+-> Processing nyt_eng_200003...
+   => 5 hit results filled from 488409 total original sentences in 55.19 seconds
+-> Writing output file...
+-> Processing nyt_eng_201009...
+   => 6 hit results filled from 234898 total original sentences in 28.45 seconds
+-> Writing output file...
+-> Processing nyt_eng_201006...
+   => 7 hit results filled from 229533 total original sentences in 27.84 seconds
+-> Writing output file...
+-> Processing nyt_eng_200905...
+   => 3 hit results filled from 233922 total original sentences in 27.22 seconds
+-> Writing output file...
+-> Processing nyt_eng_201004...
+   => 3 hit results filled from 211950 total original sentences in 25.33 seconds
+-> Writing output file...
+-> Processing nyt_eng_200012...
+   => 13 hit results filled from 495548 total original sentences in 53.99 seconds
+-> Writing output file...
+-> Processing nyt_eng_200909...
+   => 2 hit results filled from 214019 total original sentences in 24.96 seconds
+-> Writing output file...
+-> Processing nyt_eng_200205...
+   => 18 hit results filled from 508694 total original sentences in 56.96 seconds
+-> Writing output file...
+-> Processing nyt_eng_200801...
+   => 9 hit results filled from 317520 total original sentences in 38.09 seconds
+-> Writing output file...
+-> Processing nyt_eng_200705...
+   => 9 hit results filled from 321781 total original sentences in 37.77 seconds
+-> Writing output file...
+-> Processing nyt_eng_200701...
+   => 9 hit results filled from 344228 total original sentences in 41.2 seconds
+-> Writing output file...
+-> Processing nyt_eng_200505...
+   => 6 hit results filled from 317322 total original sentences in 39.22 seconds
+-> Writing output file...
+Finished processing all corresponding json and conll files.
+
+Time elapsed: 80.66 minutes
+====================================
+
+```
+### Tabulating hits via `tabulateHits.py`...
+```
+-> Processing nyt_eng_200007.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000730_0038_15:20 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000724_0099_1:4 discarded.
+-> Processing nyt_eng_200112.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011231_0219_56:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011226_0097_100:5 discarded.
+-> Processing nyt_eng_200612.json...
+-> Processing nyt_eng_200111.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011125_0092_7:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011105_0226_22:30 discarded.
+-> Processing nyt_eng_200301.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20030128_0026_20:17 discarded.
+-> Processing nyt_eng_200209.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020930_0282_39:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020930_0140_26:7 discarded.
+-> Processing nyt_eng_200711.json...
+-> Processing nyt_eng_200609.json...
+-> Processing nyt_eng_200605.json...
+-> Processing nyt_eng_200903.json...
+-> Processing nyt_eng_200802.json...
+-> Processing nyt_eng_201003.json...
+-> Processing nyt_eng_200504.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050413_0044_103:11 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050413_0031_17:11 discarded.
+-> Processing nyt_eng_200511.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20051105_0105_82:13 discarded.
+-> Processing nyt_eng_200610.json...
+-> Processing nyt_eng_200607.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060703_0184_54:9 discarded.
+-> Processing nyt_eng_201012.json...
+-> Processing nyt_eng_200907.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090712_0098_38:4 discarded.
+-> Processing nyt_eng_200807.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080722_0093_7:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080713_0180_7:16 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080713_0178_7:16 discarded.
+-> Processing nyt_eng_200004.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000424_0193_29:23 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000424_0179_29:23 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000421_0050_29:23 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000412_0172_42:8 discarded.
+-> Processing nyt_eng_200901.json...
+-> Processing nyt_eng_201010.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20101022_0172_1:20 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20101022_0103_1:20 discarded.
+-> Processing nyt_eng_200805.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080511_0002_17:7 discarded.
+-> Processing nyt_eng_200904.json...
+-> Processing nyt_eng_200008.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000824_0125_21:18 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000824_0123_21:18 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000823_0144_176:18 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000823_0080_95:18 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000823_0074_95:18 discarded.
+-> Processing nyt_eng_200106.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010628_0302_15:20 discarded.
+-> Processing nyt_eng_200510.json...
+-> Processing nyt_eng_200303.json...
+-> Processing nyt_eng_200010.json...
+-> Processing nyt_eng_200506.json...
+-> Processing nyt_eng_200203.json...
+-> Processing nyt_eng_200710.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20071022_0178_22:13 discarded.
+-> Processing nyt_eng_200703.json...
+-> Processing nyt_eng_200408.json...
+-> Processing nyt_eng_200311.json...
+-> Processing nyt_eng_200501.json...
+-> Processing nyt_eng_200101.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010129_0079_15:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010127_0110_43:11 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010127_0109_8:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010124_0392_5:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010108_0350_5:18 discarded.
+-> Processing nyt_eng_200811.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20081104_0134_6:16 discarded.
+-> Processing nyt_eng_200210.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20021002_0062_26:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20021001_0052_26:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20021001_0009_39:5 discarded.
+-> Processing nyt_eng_200906.json...
+-> Processing nyt_eng_200410.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20041027_0145_77:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20041005_0060_74:13 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20041005_0053_2:13 discarded.
+-> Processing nyt_eng_200005.json...
+-> Processing nyt_eng_200603.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060331_0076_40:14 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060327_0164_4:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060327_0107_25:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060319_0194_33:5 discarded.
+-> Processing nyt_eng_201007.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20100705_0119_1:4 discarded.
+-> Processing nyt_eng_200403.json...
+-> Processing nyt_eng_200006.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000622_0203_24:11 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000620_0151_36:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000619_0419_3:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000619_0410_36:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000619_0409_36:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000616_0040_3:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000610_0046_1:7 discarded.
+-> Processing nyt_eng_200109.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010928_0068_46:22 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010925_0053_46:22 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010925_0052_46:22 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010924_0242_46:22 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010924_0241_46:22 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010924_0075_7:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010919_0134_1:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010917_0426_5:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010917_0366_1:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010917_0362_1:4 discarded.
+-> Processing nyt_eng_200002.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000211_0193_22:6 discarded.
+-> Processing nyt_eng_200305.json...
+-> Processing nyt_eng_200507.json...
+-> Processing nyt_eng_200808.json...
+-> Processing nyt_eng_200009.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000913_0079_27:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000911_0108_27:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000911_0107_27:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000909_0246_27:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000909_0245_27:4 discarded.
+-> Processing nyt_eng_200809.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080917_0213_60:10 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080917_0185_2:10 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080917_0178_2:10 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080917_0128_39:10 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080917_0102_30:10 discarded.
+-> Processing nyt_eng_200712.json...
+-> Processing nyt_eng_200001.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000131_0092_1:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20000121_0037_15:15 discarded.
+-> Processing nyt_eng_200201.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020129_0192_8:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020110_0197_7:5 discarded.
+-> Processing nyt_eng_200707.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20070714_0127_12:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20070702_0264_20:31 discarded.
+-> Processing nyt_eng_200407.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20040728_0060_3:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20040706_0263_4:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20040706_0230_4:6 discarded.
+-> Processing nyt_eng_200806.json...
+-> Processing nyt_eng_200105.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010531_0204_65:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010513_0123_28:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010509_0085_29:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010509_0084_29:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010508_0199_29:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010508_0197_29:24 discarded.
+-> Processing nyt_eng_200212.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20021219_0148_10:10 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20021217_0272_3:35 discarded.
+-> Processing nyt_eng_200503.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050329_0100_5:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050329_0070_6:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050329_0062_92:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050309_0349_25:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050304_0104_1:4 discarded.
+-> Processing nyt_eng_200804.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080422_0127_11:28 discarded.
+-> Processing nyt_eng_200708.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20070814_0127_23:19 discarded.
+-> Processing nyt_eng_200103.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010319_0084_1:7 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010314_0301_13:5 discarded.
+-> Processing nyt_eng_200611.json...
+-> Processing nyt_eng_200206.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020606_0386_5:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020604_0308_4:29 discarded.
+-> Processing nyt_eng_200102.json...
+-> Processing nyt_eng_200011.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001128_0284_17:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001110_0455_10:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001103_0352_1:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001102_0402_1:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001102_0400_1:9 discarded.
+-> Processing nyt_eng_200110.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011019_0113_19:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011017_0098_19:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011017_0097_19:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20011004_0439_55:4 discarded.
+-> Processing nyt_eng_200512.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20051217_0081_22:35 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20051215_0182_4:17 discarded.
+-> Processing nyt_eng_200509.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050907_0270_12:5 discarded.
+-> Processing nyt_eng_200502.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050205_0057_1:30 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050205_0056_30:30 discarded.
+-> Processing nyt_eng_200812.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20081230_0162_3:12 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20081230_0131_3:12 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20081225_0023_145:5 discarded.
+-> Processing nyt_eng_200912.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20091217_0092_21:29 discarded.
+-> Processing nyt_eng_200606.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060601_0151_30:5 discarded.
+-> Processing nyt_eng_200704.json...
+-> Processing nyt_eng_201001.json...
+-> Processing nyt_eng_200208.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020826_0116_1:16 discarded.
+-> Processing nyt_eng_200307.json...
+-> Processing nyt_eng_200910.json...
+-> Processing nyt_eng_200409.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20040917_0183_31:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20040917_0036_14:6 discarded.
+-> Processing nyt_eng_200508.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0128_129:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0128_122:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0128_116:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0128_53:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0087_9:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0051_8:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0048_14:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0042_37:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050806_0039_35:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050802_0212_48:12 discarded.
+-> Processing nyt_eng_200911.json...
+-> Processing nyt_eng_200810.json...
+-> Processing nyt_eng_200602.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060228_0221_3:25 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20060201_0028_13:9 discarded.
+-> Processing nyt_eng_200104.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010425_0213_66:18 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010425_0182_22:18 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010409_0182_9:20 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010406_0158_9:20 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010406_0157_9:20 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010403_0443_13:14 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010403_0209_10:10 discarded.
+-> Processing nyt_eng_200412.json...
+-> Processing nyt_eng_201005.json...
+-> Processing nyt_eng_200306.json...
+-> Processing nyt_eng_200302.json...
+-> Processing nyt_eng_200310.json...
+-> Processing nyt_eng_200108.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010811_0147_7:13 discarded.
+-> Processing nyt_eng_200706.json...
+-> Processing nyt_eng_201011.json...
+-> Processing nyt_eng_200207.json...
+-> Processing nyt_eng_200107.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010705_0407_10:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010705_0405_10:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20010705_0404_10:5 discarded.
+-> Processing nyt_eng_200608.json...
+-> Processing nyt_eng_200604.json...
+-> Processing nyt_eng_200411.json...
+-> Processing nyt_eng_201002.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20100207_0059_29:7 discarded.
+-> Processing nyt_eng_200308.json...
+-> Processing nyt_eng_200902.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090227_0174_18:5 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090227_0113_37:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090227_0112_27:4 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090213_0159_6:10 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090213_0158_6:10 discarded.
+-> Processing nyt_eng_200803.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080316_0152_3:5 discarded.
+-> Processing nyt_eng_200601.json...
+-> Processing nyt_eng_200211.json...
+-> Processing nyt_eng_200908.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090810_0125_1:23 discarded.
+-> Processing nyt_eng_200702.json...
+-> Processing nyt_eng_200202.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020213_0182_39:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020211_0090_39:6 discarded.
+-> Processing nyt_eng_200709.json...
+-> Processing nyt_eng_200204.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020420_0136_56:24 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020408_0109_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020408_0108_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020408_0107_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020408_0106_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020408_0105_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020403_0144_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020403_0142_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020403_0140_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020403_0139_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020403_0138_42:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020403_0137_42:6 discarded.
+-> Processing nyt_eng_201008.json...
+-> Processing nyt_eng_200003.json...
+-> Processing nyt_eng_201009.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20100901_0049_15:7 discarded.
+-> Processing nyt_eng_201006.json...
+-> Processing nyt_eng_200905.json...
+-> Processing nyt_eng_201004.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20100405_0049_15:10 discarded.
+-> Processing nyt_eng_200012.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001219_0091_39:17 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001211_0244_3:9 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20001201_0066_20:17 discarded.
+-> Processing nyt_eng_200909.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20090902_0089_5:23 discarded.
+-> Processing nyt_eng_200205.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020513_0128_7:8 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020506_0059_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020506_0058_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020503_0070_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020503_0069_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020503_0068_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020502_0213_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020502_0210_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020502_0209_65:19 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20020501_0281_21:4 discarded.
+-> Processing nyt_eng_200801.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20080122_0186_2:14 discarded.
+-> Processing nyt_eng_200705.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20070509_0255_43:7 discarded.
+-> Processing nyt_eng_200701.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20070131_0190_14:22 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20070108_0235_6:8 discarded.
+-> Processing nyt_eng_200505.json...
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050516_0277_35:6 discarded.
+-> Exact text match to previous records. Checking token word strings...
+   [comparing to previous match 1]
+   + adverb label and index match...
+       and adjective label also matches.
+  + Hit nyt_eng_20050501_0165_22:8 discarded.
+
+^_^ Finished collecting sentence data from all json files.
+    -> Writing tables to csv files...
+```
+```
+
+Time elapsed: 0.102 seconds
+====================================
+
+```  
+## Starting context: `few_subj`
+- time stamp: `Thu Aug  5 00:47:04 EDT 2021`
+- data directory: `data/neg-mit/Nyt2.few_subj`
+- hits table: `hits/neg-mit/Nyt2_few_subj`
+```{js}
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  FEW [lemma="few"];
+  sub: ADJ -[nsubj|nsubjpass]-> FEW;
+  FEW << BE
+}
+```  
+```  

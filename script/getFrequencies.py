@@ -38,7 +38,7 @@ def __main__():
     sample_dir = Path.cwd() / 'data_samples'
 
     no_overlap = pd.read_pickle("no_overlap_data.pkl.gz")
-    data = no_overlap.loc[:, ['colloc', 'context', 'adv', 'adj', 'polarity']]
+    data = no_overlap.loc[:, ['colloc', 'context', 'context_word', 'context_type', 'context_group', 'adv', 'adj', 'polarity']]
 
     # polarity_descrip = data.groupby("polarity").describe()
 
@@ -48,11 +48,13 @@ def __main__():
     positive_contexts = data[
         data.polarity == 'positive'].context.unique()
 
+   
     negative_contexts = data[
         data.polarity == 'negative'].context.unique()
 
+    ##TODO fix this hack once data has been fully gathered
     test_contexts = data[
-        data.polarity == 'uncertain'].context.unique()
+        data.context_word.isin(('every', 'few'))].context.unique()
 
     # write sample files to sample_dir and returns frequency table dataframe(s)
     collocs_by_context = basic_freq_table(data, sample_dir)

@@ -4,6 +4,9 @@ import sys
 import time
 from pathlib import Path
 
+##TODO make default to not overwrite existing (non-empty) raw.json files; 
+# otherwise need to have new pat directories for any added patterns
+# (to avoid needing to redo all the searches already run)
 
 def __main__():
 
