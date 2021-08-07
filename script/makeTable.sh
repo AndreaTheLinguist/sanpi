@@ -6,7 +6,7 @@ echo "Arguments provided:" "$@"
 if [[ $1 == "-h" ]]; then
   echo "Script to run all scripts for a single pattern (terminal) directory on single corpus chunk. Pattern directory must contain .pat files. Should be located in Pat/ and named according to the corresponding 'Pat/specs_....md' file's title (top level heading, not filename, though these may be equivalent). This script can be run simultaneously on different pattern directories."
   echo " "
-  echo "Usage: $(basename $0) [conlldir=path patternsdir=path run_grew=str (logdir=path)]"
+  echo "Usage: $(basename $0) [conlldir=path patternsdir=path (logdir=path)]"
   echo " "
   echo " -> If logdir is included, logs will be saved as [logdir]/[context_group].log. If 'default' is given, following will be used: info/logs/" 
   echo " -> Otherwise, no log file of console output will be saved."
