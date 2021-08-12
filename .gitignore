@@ -28300,3 +28300,6 @@ old/no-overlap-data_500rows.csv
 old/no-overlap-data_1000rows.csv
 old/pos-neg-split_freq-table.pkl.gz
 playground/test_repeats_table.csv
+logs/Apw/basic.md
+logs/Nyt1/basic.md
+logs/Nyt2/basic.md
