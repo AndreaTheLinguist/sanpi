@@ -1,20 +1,19 @@
 import pandas as pd
 from scipy.stats import entropy
-import scipy
-import matplotlib
 
 
-def get_divs(unk: pd.DataFrame, neg: pd.Series, pos: pd.Series, reversed=False):
+def get_divs(df, reversed=False):
 
     base = 2
+    unk = df.iloc[:,:-2]
 
     if reversed:
-        neg_divs = unk.apply(lambda x: entropy(neg, x, base=base))
-        pos_divs = unk.apply(lambda x: entropy(pos, x, base=base))
+        neg_divs = unk.apply(lambda x: entropy(df.neg, x, base=base))
+        pos_divs = unk.apply(lambda x: entropy(df.pos, x, base=base))
 
     else:
-        neg_divs = unk.apply(lambda x: entropy(x, neg, base=base))
-        pos_divs = unk.apply(lambda x: entropy(x, pos, base=base))
+        neg_divs = unk.apply(lambda x: entropy(x, df.neg, base=base))
+        pos_divs = unk.apply(lambda x: entropy(x, df.pos, base=base))
 
     return pd.concat({'div_from_pos': pos_divs,
                       'div_from_neg': neg_divs,
@@ -29,18 +28,16 @@ binary_split_all = pd.read_pickle(
 known = binary_split_all  # trim
 unknown = pd.read_pickle('test-contexts_freq-table.pkl.gz')
 all = pd.read_pickle(
-    '/home/andrea/litotes/individual-contexts_freq-table.pkl.gz')
+    '/home/andrea/litotes/all-contexts_freq-table.pkl.gz')
 
-every_counts = unknown.loc[:, unknown.columns.str.contains('every')]
-every_combined_dist = every_counts.sum(1)
 
-few_counts = unknown.loc[:, unknown.columns.str.contains('few')]
-few_combined_dist = few_counts.sum(1)
+##TODO: add functionality of picking "test" data with a keyword input
+every_counts = unknown.loc[:, unknown.columns.str.contains('every')].sum(1)
 
 unk = unknown.sort_index(1)
-combined = pd.concat({'every_combined': every_combined_dist,
-                      'few_combined': few_combined_dist}, axis=1)
-unk_extended = unk.join(combined)
+# combined = pd.concat({'every_combined': every_combined_dist,
+#                       }, axis=1)
+unk_extended = unk.assign(every_combined=every_counts)
 
 # technically do not have to normalize manually, and,
 # if data threshold > 0, do not need to use plus1 columns
@@ -52,24 +49,25 @@ unk_extended = unk.join(combined)
 num_colloc_types = len(known)
 
 neg_dist = known.negative_raw
-neg_dist += neg_dist.sum()/num_colloc_types
+# neg_dist += neg_dist.sum()/num_colloc_types
 
 pos_dist = known.positive_raw
-pos_dist += pos_dist.sum()/num_colloc_types
+# pos_dist += pos_dist.sum()/num_colloc_types
 
-print('Relative entropy: Positive | | Negative = ',
-      round(entropy(pos_dist, neg_dist, base=2), 4))
-print('Relative entropy: Negative | | Positive = ',
-      round(entropy(neg_dist, pos_dist, base=2), 4))
+# print('Relative entropy: Positive | | Negative = ',
+#       round(entropy(pos_dist, neg_dist, base=2), 4))
+# print('Relative entropy: Negative | | Positive = ',
+#       round(entropy(neg_dist, pos_dist, base=2), 4))
 
-unk_smoothed = unk_extended.apply(lambda x: x + (x.sum()/num_colloc_types))
+df = unk_extended.assign(pos=pos_dist, neg=neg_dist).fillna(0)
+df_smoothed = df.apply(lambda x: x + (x.sum()/num_colloc_types)).apply(pd.to_numeric, downcast='float')
 
-divergence = get_divs(unk_smoothed, neg_dist, pos_dist)
+divergence = get_divs(df_smoothed)
 
 print('\nunknown given to entropy() first:\n', divergence.round(2))
 
 print('\nknown given to entropy() first:\n', get_divs(
-    unk_smoothed, neg_dist, pos_dist, reversed=True).round(2))
+    df_smoothed, reversed=True).round(2))
 
 divergence.round(4).to_csv('data_samples/preliminary_KLdiv_table.csv')
 # neg_every_div = entropy(neg_dist, every_combined_dist, base=2)

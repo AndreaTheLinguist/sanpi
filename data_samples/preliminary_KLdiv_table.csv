@@ -1,6 +1,6 @@
-,div_from_pos,div_from_neg,lean_toward_pos
-every_det-of-subj,3.2207,3.4233,0.2026
-few_det-of-subj,3.0604,3.1359,0.0755
-few_subj,4.1127,4.215,0.1023
-every_combined,3.2207,3.4233,0.2026
-few_combined,2.9727,3.0518,0.0792
+context,div_from_pos,div_from_neg,lean_toward_pos
+every_det-of-subj,3.9286,2.8197,-1.109
+everybody_subj,4.2277,2.4216,-1.8061
+everyone_subj,3.5512,2.4201,-1.1311
+never_VP-adv,1.5718,1.9476,0.3758
+every_combined,2.9788,1.6628,-1.316

@@ -28291,3 +28291,12 @@ old/nlp/masked/generated_adj_masked_predicate.csv
 old/nlp/masked/generated.csv
 old/nlp/masked/masked_modifier
 old/nlp/masked/masked_modifier.csv
+old/individual-contexts_freq-table.pkl.gz
+old/no_overlap_hits.pkl.gz
+.idea/wsl_litotes.iml
+old/freq_500rows.csv
+old/freq_plus-one_500rows.csv
+old/no-overlap-data_500rows.csv
+old/no-overlap-data_1000rows.csv
+old/pos-neg-split_freq-table.pkl.gz
+playground/test_repeats_table.csv

@@ -14,102 +14,104 @@
             groups: positive and negative
 '''
 
-
-import os
 import time
 
 from pathlib import Path
 from pprint import pprint
 
-import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import zscore
 
 # TODO: create argument input structure: file names, load previously created
 #  data, verbose, exclusion threshold, etc.
 
+# create output directory if it doesn't exist
+sample_dir = Path.cwd() / 'data_samples'
+if not (sample_dir.exists() and sample_dir.is_dir()):
+    sample_dir.mkdir()
+
 
 def __main__():
 
-    try:
-        os.mkdir(Path.cwd() / 'data_samples')
-    except OSError:
-        pass
-    sample_dir = Path.cwd() / 'data_samples'
+    # load nonoverlapping hits dataframe
+    compiled = pd.read_pickle("compiled_hits.pkl.gz")
+    hits = compiled.loc[:, ['colloc', 'context', 'context_word',
+                            'context_type', 'context_group', 'adv', 'adj', 'polarity']]
 
-    no_overlap = pd.read_pickle("no_overlap_data.pkl.gz")
-    data = no_overlap.loc[:, ['colloc', 'context', 'context_word', 'context_type', 'context_group', 'adv', 'adj', 'polarity']]
+    # print summary infomation on frequencies
+    polarity_descrip = hits.groupby("polarity").describe()
+    print(polarity_descrip)
+    polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
 
-    # polarity_descrip = data.groupby("polarity").describe()
+    # TODO fix this hack once data has been fully gathered
+    test_contexts = (
+        hits[hits.context_word.isin(
+            ('every', 'everyone', 'everyone' 'if', 'never'))].context
+        .append(hits[hits.polarity == 'unknown'].context)
+        .unique())
 
-    # pprint(polarity_descrip)
-    # polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
-
-    positive_contexts = data[
-        data.polarity == 'positive'].context.unique()
-
-   
-    negative_contexts = data[
-        data.polarity == 'negative'].context.unique()
-
-    ##TODO fix this hack once data has been fully gathered
-    test_contexts = data[
-        data.context_word.isin(('every', 'few'))].context.unique()
+    pos_hits = hits[hits.polarity == 'positive']
+    neg_hits = hits[hits.polarity == 'negative']
+    neg_hits = neg_hits[~neg_hits.context.isin(test_contexts)]
+    test_hits = hits[hits.context.isin(test_contexts)]
 
     # write sample files to sample_dir and returns frequency table dataframe(s)
-    collocs_by_context = basic_freq_table(data, sample_dir)
+    pos_colloc_counts = basic_freq_table(pos_hits, 'positive')
+    neg_colloc_counts = basic_freq_table(neg_hits, 'negative')
+    test_colloc_counts = basic_freq_table(test_hits, 'test')
+    # collocs_by_context = basic_freq_table(hits)
     # collocs_by_context = pd.read_pickle(
     #     "individual-contexts_freq-table.pkl.gz")
 
-    pprint(collocs_by_context.describe().sort_values("max", axis=1).round(3))
+    collocs_by_context = (pos_colloc_counts.join(neg_colloc_counts)
+                          .join(test_colloc_counts)).fillna(0).apply(pd.to_numeric, downcast='unsigned')
+    collocs_by_context.to_pickle('all-contexts_freq-table.pkl.gz')
+    pprint(collocs_by_context.describe().sort_values("max", axis=1, ascending=False).round(3))
     print("")
 
-    prop_of_colloc, prop_of_context = get_proportions(data, sample_dir)
+    prop_of_colloc, prop_of_context = get_proportions(hits)
 
-    context_zscores, colloc_zscores = calc_zscores(collocs_by_context,
-                                                   sample_dir)
+    context_zscores, colloc_zscores = calc_zscores(collocs_by_context)
 
-    # select columns via list of context labels and sum by row
-    negative_counts = collocs_by_context[negative_contexts].sum(axis=1)
-    positive_counts = collocs_by_context[positive_contexts].sum(axis=1)
+    # get sum of counts across polarity categories
+    negative_counts = pos_colloc_counts.sum(axis=1)
+    positive_counts = neg_colloc_counts.sum(axis=1)
 
     # default threshold of 3 will be used
     compare_2_count_series(positive_counts, negative_counts,
-                           'positive', 'negative',
-                           sample_dir)
+                           'positive', 'negative')
 
     # also create dataframe/samples with no min threshold of occurences
     compare_2_count_series(positive_counts, negative_counts,
-                           'positive', 'negative',
-                           sample_dir, threshold=0)
+                           'positive', 'negative', threshold=0)
 
-    test_data = collocs_by_context[test_contexts]
-    test_data.to_pickle("test-contexts_freq-table.pkl.gz")
-    test_data.sample(n=500).sort_values("colloc").to_csv(
+
+    test_colloc_counts.to_pickle("test-contexts_freq-table.pkl.gz")
+    test_colloc_counts.sample(n=500).sort_values("colloc").to_csv(
         sample_dir / 'test-contexts-freq_500rows.csv')
 
 
-def basic_freq_table(data: pd.DataFrame, sample_dir=Path.cwd()):
+def basic_freq_table(data: pd.DataFrame, name:str):
 
     # get frequency table
     collocs_by_context = pd.crosstab(
         data.colloc, data.context).apply(pd.to_numeric, downcast="unsigned")
 
     # write full frequency table to file (compressed pickle format)
-    collocs_by_context.to_pickle("individual-contexts_freq-table.pkl.gz")
+    collocs_by_context.to_pickle(f"{name}-contexts_freq-table.pkl.gz")
     # write sample csv for easy illustration
-    collocs_by_context.sample(n=500).sort_index().to_csv(
-        sample_dir / 'freq_500rows.csv')
+    collocs_by_context.sample(n=300).sort_index().to_csv(
+        sample_dir / f'{name}_freq_300rows.csv')
 
     # +1 smoothing
-    counts_plus_one = collocs_by_context.add(1)
-    counts_plus_one.sample(n=500).sort_index().to_csv(
-        sample_dir / 'freq_plus-one_500rows.csv')
+    # counts_plus_one = collocs_by_context.add(1)
+    # counts_plus_one.sample(n=500).sort_index().to_csv(
+    #     sample_dir / 'freq_plus-one_500rows.csv')
 
     return collocs_by_context
 
 
-def get_proportions(data: pd.DataFrame, sample_dir=Path.cwd()):
+def get_proportions(data: pd.DataFrame):
 
     # shows what proportion of the colloc falls in each context
     proportion_of_colloc = pd.crosstab(
@@ -148,7 +150,7 @@ def get_proportions(data: pd.DataFrame, sample_dir=Path.cwd()):
     return proportion_of_colloc, proportion_of_context
 
 
-def calc_zscores(freq_df: pd.DataFrame, sample_dir=Path.cwd()):
+def calc_zscores(freq_df: pd.DataFrame):
 
     column_z = freq_df.apply(zscore, raw=True
                              ).round(4).apply(pd.to_numeric, downcast="float")
@@ -164,7 +166,6 @@ def calc_zscores(freq_df: pd.DataFrame, sample_dir=Path.cwd()):
 
 def compare_2_count_series(counts1: pd.Series, counts2: pd.Series,
                            name1='positive', name2='negative',
-                           sample_dir=Path.cwd(),
                            threshold=3, precision=5):
 
     fileprefix = f'{name1}-{name2}'
@@ -172,7 +173,7 @@ def compare_2_count_series(counts1: pd.Series, counts2: pd.Series,
     # raw counts seed dataframe
     counts_raw = pd.DataFrame(
         {f'{name1}_raw': counts1,
-         f'{name2}_raw': counts2})
+         f'{name2}_raw': counts2}).fillna(0).apply(pd.to_numeric, downcast="unsigned")
 
     # add "total" column (cannot add row due to category type limitations)
     counts_raw.loc[:, 'total_raw'] = counts_raw.sum(axis=1)

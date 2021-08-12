@@ -268,96 +268,98 @@ def assign_info(hit: hit_tuple,
 
     hit_id = hit.hit_id
 
-    if hit_id in hits_dict.keys():
+    # if hit_id in hits_dict.keys():
 
-        existing_info = hits_dict[hit_id]
+    #     existing_info = hits_dict[hit_id]
 
-        # exact same--nothing differs, so nothing added
-        if hit == existing_info:
+    #     # exact same--nothing differs, so nothing added
+    #     if hit == existing_info:
 
-            print(f'-> Hit {hit_id} discarded:\n   + Token for '
-                  f'"{existing_info.adv} {existing_info.adj}" '
-                  f'(with identical info) already recorded.')
+    #         print(f'-> Hit {hit_id} discarded:\n   + Token for '
+    #               f'"{existing_info.adv} {existing_info.adj}" '
+    #               f'(with identical info) already recorded.')
 
-            duplicates[f'{hit_id}_discard'] = hit  # only in duplicates
-            duplicates[f'{hit_id}_keep'] = existing_info  # in both dicts
+    #         duplicates[f'{hit_id}_discard'] = hit  # only in duplicates
+    #         duplicates[f'{hit_id}_keep'] = existing_info  # in both dicts
 
-        else:
-            '''something differs--record both, but alter IDs. 
+    #     else:
+    #         '''something differs--record both, but alter IDs. 
 
-                this is included for the possibility of adverbs that are 
-                paired with different adjectives somehow with the pattern 
-                specified linearly, this will never happen, but keeping it 
-                in case the pattern spec changes to allow this kind of 
-                overlap (perhaps for conjoined predicate adjectives? see 
-                pattern notes file) 
-                '''
+    #             this is included for the possibility of adverbs that are 
+    #             paired with different adjectives somehow with the pattern 
+    #             specified linearly, this will never happen, but keeping it 
+    #             in case the pattern spec changes to allow this kind of 
+    #             overlap (perhaps for conjoined predicate adjectives? see 
+    #             pattern notes file) 
+    #             '''
 
-            id1 = hit_id+"_a"
-            id2 = hit_id+"_b"
+    #         id1 = hit_id+"_a"
+    #         id2 = hit_id+"_b"
 
-            print(
-                f'-> Alternate hit added:\n  + {hit_id} already recorded, but '
-                f'new info differs\n   + Annotated previous record and adding '
-                f'second hit.')
+    #         print(
+    #             f'-> Alternate hit added:\n  + {hit_id} already recorded, but '
+    #             f'new info differs\n   + Annotated previous record and adding '
+    #             f'second hit.')
 
-            alt_hits = pd.DataFrame([existing_info, hit], index=[id1, id2])
+    #         alt_hits = pd.DataFrame([existing_info, hit], index=[id1, id2])
 
-            # alt_hits = alt_hits.assign(
-            #     sent_text=alt_hits.sent_text.str.replace(' ,', ',')
-            #     # .str[0:75]
-            # )
-            print('```\n#### New entries\n')
-            print(
-                alt_hits[['adv', 'adj', 'sent_text']].to_markdown())
-            print('```')
+    #         # alt_hits = alt_hits.assign(
+    #         #     sent_text=alt_hits.sent_text.str.replace(' ,', ',')
+    #         #     # .str[0:75]
+    #         # )
+    #         print('```\n#### New entries\n')
+    #         print(
+    #             alt_hits[['adv', 'adj', 'sent_text']].to_markdown())
+    #         print('```')
 
-            duplicates[f'{id1}_keep'] = existing_info
-            duplicates[f'{id2}_keep'] = hit
+    #         duplicates[f'{id1}_keep'] = existing_info
+    #         duplicates[f'{id2}_keep'] = hit
 
-            # keep both entries with modified ids
-            hits_dict[id1] = existing_info
-            hits_dict[id2] = hit
+    #         # keep both entries with modified ids
+    #         hits_dict[id1] = existing_info
+    #         hits_dict[id2] = hit
 
-            # remove initial entry with original id from hits
-            # (already replaced with id1 entry above)
-            hits_dict.pop(hit_id)
+    #         # remove initial entry with original id from hits
+    #         # (already replaced with id1 entry above)
+    #         hits_dict.pop(hit_id)
 
-    elif prev_match_ids:
-        print(
-            '-> Exact text match to previous records. Checking token '
-            'word strings...')
+    # elif prev_match_ids:
+    #     print(
+    #         '-> Exact text match to previous records. Checking token '
+    #         'word strings...')
 
-        match_count = 1
-        for prev_hit in (hits_dict[i] for i in prev_match_ids):
-            print(f'   [comparing to previous match {match_count}]')
+    #     match_count = 1
+    #     for prev_hit in (hits_dict[i] for i in prev_match_ids):
+    #         print(f'   [comparing to previous match {match_count}]')
 
-            if prev_hit.adv == hit.adv and prev_hit.adv_index == hit.adv_index:
-                print('   + adverb label and index match...')
+    #         if prev_hit.adv == hit.adv and prev_hit.adv_index == hit.adv_index:
+    #             print('   + adverb label and index match...')
 
-                if prev_hit.adj == hit.adj:
-                    print(
-                        f'       and adjective label also matches.\n'
-                        f'  + Hit {hit_id} discarded.')
+    #             if prev_hit.adj == hit.adj:
+    #                 print(
+    #                     f'       and adjective label also matches.\n'
+    #                     f'  + Hit {hit_id} discarded.')
 
-                    duplicates[f'{hit_id}_discard'] = hit
+    #                 duplicates[f'{hit_id}_discard'] = hit
 
-                else:
-                    print(
-                        f'       but different adjective label.\n'
-                        f'  + Hit {hit_id} recorded as is.')
+    #             else:
+    #                 print(
+    #                     f'       but different adjective label.\n'
+    #                     f'  + Hit {hit_id} recorded as is.')
 
-                    hits_dict[hit_id] = hit
+    #                 hits_dict[hit_id] = hit
             
-            else: 
-                print(f'   Same sentence, but different adverb tokens.\n'
-                      f'  + Hit {hit_id} recorded as is.')
+    #         else: 
+    #             print(f'   Same sentence, but different adverb tokens.\n'
+    #                   f'  + Hit {hit_id} recorded as is.')
 
-            match_count += 1
+    #         match_count += 1
 
-    else:
+    # else:
 
-        hits_dict[hit_id] = hit
+### ^ temporary commenting out to test speed changes if filtering removed
+
+    hits_dict[hit_id] = hit
 
     return hits_dict, duplicates
 

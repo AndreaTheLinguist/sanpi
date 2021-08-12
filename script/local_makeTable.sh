@@ -79,23 +79,23 @@ fi
 
 echo "# Running \`$(dirname $0)/$(basename $0)\`"
 
-echo "_Checking for required packages..._"
-echo "\`\`\`"
-if [[ $(echo "`which pyconll`" ) == "" ]]
-then 
-  echo "pyconll package not found:"
-  echo "pip3 install pyconll"
-  pip3 install pyconll
-  echo " "
-fi
+# echo "_Checking for required packages..._"
+# echo "\`\`\`"
+# if [[ $(echo "`which pyconll`" ) == "" ]]
+# then 
+#   echo "pyconll package not found:"
+#   echo "pip3 install pyconll"
+#   pip3 install pyconll
+#   echo " "
+# fi
 
-if [[ $(echo "`which pandas`" ) == "" ]]
-then
-  echo "pandas package not found:"
-  echo "pip3 install pandas"
-  pip3 install pandas
-fi
-echo "\`\`\`"
+# if [[ $(echo "`which pandas`" ) == "" ]]
+# then
+#   echo "pandas package not found:"
+#   echo "pip3 install pandas"
+#   pip3 install pandas
+# fi
+# echo "\`\`\`"
 
 echo "## >> Searching \`$corpusdir\` for \`$contextgrp\` patterns"
 echo " "
