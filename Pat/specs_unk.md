@@ -100,6 +100,25 @@ pattern {
 }
 ```
 
+## `before` clause
+
+```js
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
+  ADJ [xpos=JJ]; 
+  BE [lemma="be"];
+  ADV < ADJ;
+  mod: ADJ -[advmod]-> ADV;
+  cop: ADJ -[cop]-> BE;
+  S  []; 
+  sub: ADJ -[nsubj|nsubjpass]-> S;
+  S << BE; 
+
+  BEFORE [lemma="before"]; 
+  ADJ -[mark|dep|prep|advmod]-> BEFORE
+}
+```
+
 ## `if` consequent
 
 - CP following `if` clause
@@ -109,6 +128,7 @@ pattern {
 - _If John is enrolled, then he has some money._
 - \* _If John is enrolled, then he has any money._
 
+```js
 pattern {
   ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
   ADJ [xpos=JJ];
@@ -123,6 +143,7 @@ pattern {
   IF [lemma="if"];
   ADJ -[mark|dep|prep|advmod]-> IF
 }
+```
 
 ## `before` clause
 
