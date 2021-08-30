@@ -1,2 +1,0 @@
-hit_id,category,colloc,adv,adj,sent_text,sent_id,adv_index,json_source,prev_sent,next_sent,label,status
-nyt_eng_19991206_0100_1:3,basic,probably_inevitable,probably,inevitable,It was probably inevitable that the World Wide Web would bloom with sites for dieters .,nyt_eng_19991206_0100_1,3,nyt_eng_199912,,"But to the surprise of professional dietitians , many of these sites have turned out to be not only popular but effective .",nyt_eng_19991206_0100_1:3_discard,discard
