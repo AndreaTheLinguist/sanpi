@@ -1,3 +1,0 @@
-hit_id,status,colloc,adv,adj,sent_text,sent_id,adv_index
-nyt_eng_19950731_0024_44:7,discard,so_important,so,important,"Every nine , every hole is so important .",nyt_eng_19950731_0024_44,7
-nyt_eng_19950731_0024_44:7,keep,so_important,so,important,"Every nine , every hole is so important .",nyt_eng_19950731_0024_44,7
