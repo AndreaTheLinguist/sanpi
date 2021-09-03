@@ -5,10 +5,10 @@ pattern {
   ADV < ADJ;
   mod: ADJ -[advmod]-> ADV;
   cop: ADJ -[cop]-> BE;
-  S []; 
+  S  []; 
   sub: ADJ -[nsubj|nsubjpass]-> S;
   S << BE; 
 
-  IF [lemma="if"]; 
-  ADJ -[mark|dep|prep|advmod]-> IF
+  BEFORE [lemma="before"]; 
+  ADJ -[mark|dep|prep|advmod]-> BEFORE
 }

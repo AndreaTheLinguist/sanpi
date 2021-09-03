@@ -145,21 +145,82 @@ pattern {
 }
 ```
 
-## `before` clause
+## `every` restriction
+
+- `every` as determiner
+- AP in its restriction
+- added `without` clause to prevent alternate triggers 
+  - these will not currently be caught by the other negative patterns 
+    because the subject specification will not match
+  - they *would* be caught if the subject were not specified (I think)
+  - **change patterns to not look for subject match unless absolutely necessary?**
 
 ```js
 pattern {
-  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];
-  ADJ [xpos=JJ]; 
-  BE [lemma="be"];
-  ADV < ADJ;
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];  
+  ADJ [xpos=JJ];  
   mod: ADJ -[advmod]-> ADV;
-  cop: ADJ -[cop]-> BE;
-  S  []; 
-  sub: ADJ -[nsubj|nsubjpass]-> S;
-  S << BE; 
+  ADV < ADJ;  
 
-  BEFORE [lemma="before"]; 
-  ADJ -[mark|dep|prep|advmod]-> BEFORE
+  BE [lemma="be"];
+  cop: ADJ -[cop]-> BE;   
+
+  S [];
+  restrict: S -[rcmod]-> ADJ;
+
+  DET [lemma="every"];
+  det: S -[det]-> DET;  
+}  
+
+without {
+  altneg [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"]; 
+  ADJ -> altneg
+}
+```
+
+
+## `no` restriction
+```js
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];  
+  ADJ [xpos=JJ];  
+  mod: ADJ -[advmod]-> ADV;
+  ADV < ADJ;  
+
+  BE [lemma="be"];
+  cop: ADJ -[cop]-> BE;   
+
+  S [];
+  restrict: S -[rcmod]-> ADJ;
+
+  DET [lemma="no"];
+  det: S -[det]-> DET;  
+}  
+
+without {
+  altneg [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"]; 
+  ADJ -[neg|advmod]-> altneg
+}
+```
+
+## `none` restriction
+
+```js
+pattern {
+  ADV [xpos=RB, lemma <> "not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"];  
+  ADJ [xpos=JJ];  
+  mod: ADJ -[advmod]-> ADV;
+  ADV < ADJ;  
+
+  BE [lemma="be"];
+  cop: ADJ -[cop]-> BE;   
+
+  S [lemma="none"];
+  restrict: S -[rcmod]-> ADJ;
+}  
+
+without {
+  altneg [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"]; 
+  ADJ -[neg|advmod]-> altneg
 }
 ```
