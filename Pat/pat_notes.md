@@ -403,7 +403,7 @@ pattern {
 }
 ```
 
-#### examples (from Feb 2020 NYT)
+#### examples (from Feb 2010 NYT)
 
 - Good
 
