@@ -25,16 +25,13 @@ def __main__():
     if not json_dir.is_dir():
         sys.exit('Error: Specified json path is not a directory.')
 
-    hit_data, duplicates = getHitData(json_dir, args)
+    hit_data = getHitData(json_dir, args)
 
-    print('\n^_^ Finished collecting sentence data from all json files.\n'
-          '    -> Writing tables to csv files...')
-
-    if len(hit_data) > 0:
+    hit_count = len(hit_data)
+    if hit_count > 0:
+        print(f'\n^_^ Finished collecting data for {hit_count} sentence(s) from all json files.\n'
+              '    -> Writing tables to csv files...')
         createOutput(hit_data, args)
-
-    if len(duplicates) > 0:
-        createOutput(duplicates, args, write_duplicates=True)
 
 
 def parseArgs():
@@ -86,7 +83,6 @@ def getHitData(json_dir, args):
     # pull out sentence info and create dictionary of hit_id : namedTuple
     fileCount = 0
     hits_dict = {}
-    duplicates = {}
 
     # check if there are any files other than the ...raw.json files
     processed_files = tuple(json_dir.glob('**/*[!w].json'))
@@ -115,7 +111,7 @@ def getHitData(json_dir, args):
                       f'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
                 continue
-            
+
             for hit in hits:
 
                 sent_id = hit['sent_id']
@@ -163,26 +159,9 @@ def getHitData(json_dir, args):
                     hit_id, node1_word, node2_word, sent_text, sent_id,
                     node1_index, jf.stem, prev_sent, next_sent, fillers, deps)
 
-                hits_dict, duplicates = assign_info(hit_info,
-                                                    hits_dict, duplicates)
+                hits_dict[hit_id] = hit_info
 
-    return hits_dict, duplicates
-
-
-def assign_info(hit: hit_tuple,
-                hits_dict: dict,
-                duplicates: dict):
-
-    hit_sent = hit.sent_text
-    prev_match_ids = [v.hit_id for v in hits_dict.values()
-                      if v.sent_text == hit_sent]
-
-    hit_id = hit.hit_id
-
-  
-    hits_dict[hit_id] = hit
-
-    return hits_dict, duplicates
+    return hits_dict
 
 
 def createOutput(hits, args, write_duplicates=False):
