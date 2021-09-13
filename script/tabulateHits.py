@@ -269,7 +269,7 @@ def createOutput(hits_df, args):
     label = 'Data'
 
     try:
-        print_table = hits_df[['colloc', 'sent_text']].sample(
+        print_table = hits_df[['neg_word', 'colloc', 'sent_text']].sample(
             view_sample_size).to_markdown()
     except ImportError:
         pass
