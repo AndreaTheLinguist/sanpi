@@ -9,9 +9,9 @@ from pathlib import Path
 
 import pandas as pd
 
-hit_tuple = namedtuple(
-    'hit_tuple', ['hit_id', 'adv', 'adj', 'sent_text', 'sent_id', 'adv_index',
-                  'json_source', 'prev_sent', 'next_sent', 'all_tags', 'all_edges'])
+# hit_tuple = namedtuple(
+    # 'hit_tuple', ['hit_id', 'adv', 'adj', 'sent_text', 'sent_id', 'adv_index',
+    #               'json_source', 'prev_sent', 'next_sent', 'all_tags', 'all_edges'])
 
 
 def __main__():
@@ -29,8 +29,9 @@ def __main__():
 
     hit_count = len(hit_data)
     if hit_count > 0:
-        print(f'\n^_^ Finished collecting data for {hit_count} sentence(s) from all json files.\n'
-              '    -> Writing tables to csv files...')
+        print(f'\n^_^ Finished collecting data for {hit_count}' 
+              'sentence(s) from all json files.\n'
+              '-> Writing tables to csv files...')
         createOutput(hit_data, args)
 
 
@@ -82,7 +83,7 @@ def getHitData(json_dir, args):
 
     # pull out sentence info and create dictionary of hit_id : namedTuple
     fileCount = 0
-    hits_dict = {}
+    df_from_json = pd.DataFrame()
 
     # check if there are any files other than the ...raw.json files
     processed_files = tuple(json_dir.glob('**/*[!w].json'))
@@ -98,73 +99,135 @@ def getHitData(json_dir, args):
 
         with open(jf, 'r', encoding='utf-8') as j:
 
-            hits = json.load(j)
+            json_dict = json.load(j)
 
-            if len(hits) < 1:
+            if len(json_dict) < 1:
 
                 print(f'--> File is empty. Skipping.')
                 continue
 
-            if not hits[0]['matching']['fillers']:
+            if not json_dict[0]['matching']['fillers']:
                 raw_path = jf.with_suffix('.raw.json')
                 print(f'-> Warning: Node labels have not been filled for {jf}. '
                       f'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
                 continue
+            
+            deps = get_deps(json_dict)
+            tokens = get_tokens(json_dict)
+            match_ix = get_adv_ids(json_dict)
 
-            for hit in hits:
+            match_df = tokens.join(deps).assign(match_ix=match_ix)
 
-                sent_id = hit['sent_id']
+            df = pd.DataFrame(json_dict)
+            raw_minus_matching = df[
+                ['sent_id','doc','text','prev_sent', 'next_sent']].assign(json_source=jf.stem)
+            
+            recombined_df = raw_minus_matching.join(match_df)
+            
+            hit_id = recombined_df.sent_id + ':' + recombined_df.match_ix
+            recombined_df = recombined_df.assign(hit_id=hit_id)
+            
+            df_from_json = pd.concat((df_from_json, recombined_df))
+            
+            # for hit in json_dict:
 
-                try:
-                    fillers = hit['matching']['fillers']
-                except KeyError:
-                    print(f'-> Warning: Word info missing for {sent_id}. '
-                          f'Skipping hit.')
-                    continue
+                # sent_id = hit['sent_id']
 
-                try:
-                    deps = hit['matching']['deps']
-                except KeyError:
-                    deps = {}
-                    continue
+                # try:
+                #     fillers = hit['matching']['fillers']
+                # except KeyError:
+                #     print(f'-> Warning: Word info missing for {sent_id}. '
+                #           f'Skipping hit.')
+                #     continue
 
-                try:
-                    # Adverb -> args.node1 = 'adv' by default
-                    node1_word = fillers[args.node1].lower()
-                except KeyError:
-                    print(f'json entry missing first (ADV) node for '
-                          f'hit {sent_id}. Skipping hit.')
-                    continue
+                # try:
+                #     deps = hit['matching']['deps']
+                # except KeyError:
+                #     deps = {}
+                #     continue
 
-                try:
-                    # Adjective -> args.node2 = 'adj' by default
-                    node2_word = fillers[args.node2].lower()
-                except KeyError:
-                    print(f'json entry missing second (ADJ) node for '
-                          f'hit {sent_id}. Skipping hit.')
-                    continue
+                # try:
+                #     # Adverb -> args.node1 = 'adv' by default
+                #     node1_word = fillers[args.node1].lower()
+                # except KeyError:
+                #     print(f'json entry missing first (ADV) node for '
+                #           f'hit {sent_id}. Skipping hit.')
+                #     continue
 
-                sent_text = hit['text']
-                prev_sent = hit['prev_sent']
-                next_sent = hit['next_sent']
+                # try:
+                #     # Adjective -> args.node2 = 'adj' by default
+                #     node2_word = fillers[args.node2].lower()
+                # except KeyError:
+                #     print(f'json entry missing second (ADJ) node for '
+                #           f'hit {sent_id}. Skipping hit.')
+                #     continue
 
-                # ADV index
-                node1_index = hit['matching']['nodes'][args.node1]
+                # sent_text = hit['text']
+                # prev_sent = hit['prev_sent']
+                # next_sent = hit['next_sent']
 
-                # hit_id = [sentID]:[node index in sentence of adv token]
-                hit_id = ':'.join((sent_id, node1_index))
+                # # ADV index
+                # node1_index = hit['matching']['nodes'][args.node1]
 
-                hit_info = hit_tuple(
-                    hit_id, node1_word, node2_word, sent_text, sent_id,
-                    node1_index, jf.stem, prev_sent, next_sent, fillers, deps)
+                # # hit_id = [sentID]:[node index in sentence of adv token]
+                # hit_id = ':'.join((sent_id, node1_index))
 
-                hits_dict[hit_id] = hit_info
+                # hit_info = hit_tuple(
+                #     hit_id, node1_word, node2_word, sent_text, sent_id,
+                #     node1_index, jf.stem, prev_sent, next_sent, fillers, deps)
 
-    return hits_dict
+                # hits_dict[hit_id] = hit_info
+
+    # return hits_dict     
+           
+    return df_from_json.rename(columns={'doc': 'doc_id', 'text': 'sent_text'})
 
 
-def createOutput(hits, args, write_duplicates=False):
+def get_deps(json_dict: dict):
+    
+    deps = [hit['matching']['deps'] for hit in json_dict]
+    deps_clean = []
+    hit_clean = {}
+    for hit in deps: 
+        for dep_name, dep_info in hit.items(): 
+            if type(dep_info[2]) == dict: 
+                dep_info[2] = dep_info[2]['1']
+
+            dep_name = dep_name+'_dep'
+            hit_clean[dep_name] = dep_info
+
+        deps_clean.append(hit_clean)
+
+    deps = pd.DataFrame(deps_clean)
+    return deps
+     
+     
+def get_tokens(json_dict: dict):
+    
+    tokens = pd.DataFrame([hit['matching']['fillers'] 
+                                   for hit in json_dict])
+    column_names = {}
+    for c in tokens.columns: 
+        column_names[c] = c.lower()+'_word'
+        
+    tokens = (tokens
+              .assign(colloc=tokens.ADV + '_' + tokens.ADJ)
+              .rename(columns=column_names))
+    
+    return tokens    
+       
+
+def get_adv_ids(json_dict: dict):
+    
+    nodes = pd.DataFrame([hit['matching']['nodes']
+                          for hit in json_dict])
+    
+    match_ix = nodes.iloc[:,0] + '_' + nodes.iloc[:,1]
+    return match_ix
+
+
+def createOutput(hits_df, args):
 
     txt = args.minimal
     patPath = args.pattern
@@ -177,30 +240,22 @@ def createOutput(hits, args, write_duplicates=False):
 
     suffix = '.txt' if txt else '.csv'
 
-    fname = (f'{args.outputPrefix}_duplicates{suffix}'
-             if write_duplicates
-             else f'{args.outputPrefix}_hits{suffix}')
+    fname =  f'{args.outputPrefix}_hits{suffix}'
 
-    hits_df = pd.DataFrame.from_dict(
-        {k: v._asdict() for k, v in hits.items()}, orient='index')
-
-    if write_duplicates:
-        hits_df = hits_df.assign(label=hits_df.index)
-        hits_df = hits_df.assign(
-            status=hits_df.label.str.rsplit('_', 1).str.get(1))
-        hits_df = hits_df.assign(status=hits_df.status.astype('category'))
-
+    # hits_df = pd.DataFrame.from_dict(
+        # {k: v._asdict() for k, v in hits.items()}, orient='index')
+        
+    # if write_duplicates:
+        # hits_df = hits_df.assign(label=hits_df.index)
+        # hits_df = hits_df.assign(
+        #     status=hits_df.label.str.rsplit('_', 1).str.get(1))
+        # hits_df = hits_df.assign(status=hits_df.status.astype('category'))
+   
     hits_df = hits_df.set_index('hit_id')
 
-    hits_df = (
-        hits_df
-        .assign(category=patcat)
-        .convert_dtypes()
-        .assign(adv_index=hits_df.adv_index.astype('uint8'))
-        .assign(colloc=(hits_df.adv + '_' + hits_df.adj))
-    )
+    hits_df = (hits_df.assign(category=patcat).convert_dtypes())
 
-    catcols = ['category', 'colloc', 'adv', 'adj', 'json_source']
+    catcols = ['category', 'colloc', 'adv_word', 'adj_word', 'json_source']
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
 
     cols = hits_df.columns.tolist()
@@ -211,7 +266,7 @@ def createOutput(hits, args, write_duplicates=False):
     hits_df.to_csv(outpath)
 
     view_sample_size = min(5, len(hits_df))
-    label = 'Duplicates' if write_duplicates else 'Data'
+    label = 'Data'
 
     try:
         print_table = hits_df[['colloc', 'sent_text']].sample(
