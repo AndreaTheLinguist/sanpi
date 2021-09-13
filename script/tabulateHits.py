@@ -39,8 +39,7 @@ def __main__():
 
 def parseArgs():
     parser = argparse.ArgumentParser(
-        description='script consolidate relevant hit data from filled json files'
-                    ' into csv files')
+        description='script consolidate relevant hit data from filled json files into csv files')
 
     parser.add_argument('-p', '--pattern', type=Path, required=True,
                         help='path to directory containing filled json files '
@@ -74,15 +73,6 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
 
-    # parser.add_argument('-t', '--table', action='store_true',
-    #                     help='Option to create a table output with following
-    #                     fields: hit_id, adv, adj, colloc, sent_text, sent_id,
-    #                     adv_index, ')
-    #
-    # parser.add_argument('-c', '--count', action='store_true',
-    #                     help='Option to create an output of counts with
-    #                     following fields (minimally): Adv, Adj, hit_counts')
-
     parser.add_argument('-e', '--extraInfo', action='store_true',
                         help='Option to add ratio and totals to count output '
                              'file. **This option will do nothing if --count/-c '
@@ -101,7 +91,7 @@ def getHitData(json_dir, args):
     # check if there are any files other than the ...raw.json files
     processed_files = tuple(json_dir.glob('**/*[!w].json'))
     if not processed_files:
-        sys.exit('Error: specified corpus directory does not contain any '
+        sys.exit('Error: specified json directory does not contain any '
                  'processed json files.')
 
     for jf in processed_files:
@@ -125,8 +115,9 @@ def getHitData(json_dir, args):
                       f'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
                 continue
-
+            
             for hit in hits:
+
                 sent_id = hit['sent_id']
 
                 try:
@@ -188,97 +179,7 @@ def assign_info(hit: hit_tuple,
 
     hit_id = hit.hit_id
 
-    # if hit_id in hits_dict.keys():
-
-    #     existing_info = hits_dict[hit_id]
-
-    #     # exact same--nothing differs, so nothing added
-    #     if hit == existing_info:
-
-    #         print(f'-> Hit {hit_id} discarded:\n   + Token for '
-    #               f'"{existing_info.adv} {existing_info.adj}" '
-    #               f'(with identical info) already recorded.')
-
-    #         duplicates[f'{hit_id}_discard'] = hit  # only in duplicates
-    #         duplicates[f'{hit_id}_keep'] = existing_info  # in both dicts
-
-    #     else:
-    #         '''something differs--record both, but alter IDs.
-
-    #             this is included for the possibility of adverbs that are
-    #             paired with different adjectives somehow with the pattern
-    #             specified linearly, this will never happen, but keeping it
-    #             in case the pattern spec changes to allow this kind of
-    #             overlap (perhaps for conjoined predicate adjectives? see
-    #             pattern notes file)
-    #             '''
-
-    #         id1 = hit_id+"_a"
-    #         id2 = hit_id+"_b"
-
-    #         print(
-    #             f'-> Alternate hit added:\n  + {hit_id} already recorded, but '
-    #             f'new info differs\n   + Annotated previous record and adding '
-    #             f'second hit.')
-
-    #         alt_hits = pd.DataFrame([existing_info, hit], index=[id1, id2])
-
-    #         # alt_hits = alt_hits.assign(
-    #         #     sent_text=alt_hits.sent_text.str.replace(' ,', ',')
-    #         #     # .str[0:75]
-    #         # )
-    #         print('```\n#### New entries\n')
-    #         print(
-    #             alt_hits[['adv', 'adj', 'sent_text']].to_markdown())
-    #         print('```')
-
-    #         duplicates[f'{id1}_keep'] = existing_info
-    #         duplicates[f'{id2}_keep'] = hit
-
-    #         # keep both entries with modified ids
-    #         hits_dict[id1] = existing_info
-    #         hits_dict[id2] = hit
-
-    #         # remove initial entry with original id from hits
-    #         # (already replaced with id1 entry above)
-    #         hits_dict.pop(hit_id)
-
-    # elif prev_match_ids:
-    #     print(
-    #         '-> Exact text match to previous records. Checking token '
-    #         'word strings...')
-
-    #     match_count = 1
-    #     for prev_hit in (hits_dict[i] for i in prev_match_ids):
-    #         print(f'   [comparing to previous match {match_count}]')
-
-    #         if prev_hit.adv == hit.adv and prev_hit.adv_index == hit.adv_index:
-    #             print('   + adverb label and index match...')
-
-    #             if prev_hit.adj == hit.adj:
-    #                 print(
-    #                     f'       and adjective label also matches.\n'
-    #                     f'  + Hit {hit_id} discarded.')
-
-    #                 duplicates[f'{hit_id}_discard'] = hit
-
-    #             else:
-    #                 print(
-    #                     f'       but different adjective label.\n'
-    #                     f'  + Hit {hit_id} recorded as is.')
-
-    #                 hits_dict[hit_id] = hit
-
-    #         else:
-    #             print(f'   Same sentence, but different adverb tokens.\n'
-    #                   f'  + Hit {hit_id} recorded as is.')
-
-    #         match_count += 1
-
-    # else:
-
-# ^ temporary commenting out to test speed changes if filtering removed
-
+  
     hits_dict[hit_id] = hit
 
     return hits_dict, duplicates
@@ -289,32 +190,6 @@ def createOutput(hits, args, write_duplicates=False):
     txt = args.minimal
     patPath = args.pattern
     patcat = patPath.parent.stem
-
-    # if counts:
-    # # I think this chunk is broken...
-    # rows = []
-    # try:
-    #     os.mkdir(Path.cwd() / 'colloc_freq')
-    # except OSError:
-    #     pass
-    # outputDir = Path.cwd() / 'colloc_freq'
-    # __, patkey = args.pattern.name.rsplit('_', 1)
-    # outputFilename = (f'{args.outputPrefix}_counts.txt' if txt
-    #                 else f'{args.outputPrefix}_counts.csv')
-    # fields = ([args.node1, args.node2, f'{patkey}_counts',
-    #         f'{patkey}_ratio'] if args.extraInfo
-    #         else [args.node1, args.node2, f'{patkey}_counts'])
-    # for colloc in counts.keys():
-    #     word1 = colloc[0]
-    #     word2 = colloc[1]
-    #     collcount = counts[colloc]
-    #     collratio = round(collcount/len(counts), 4)
-    #     row = ([word1, word2, collcount, collratio]
-    #         if args.extraInfo
-    #         else [word1, word2, collcount])
-    #     rows.append(row)
-    # write_file(outputDir, outputFilename, fields, rows, txt)
-    # if hits:
 
     outputDir = patPath.cwd() / 'hits' / patcat
 
@@ -369,36 +244,6 @@ def createOutput(hits, args, write_duplicates=False):
         print(print_table)
 
     print('```')
-    # write_file(outputDir, fname, fields, rows, txt)
-
-
-# def write_file(outputDir, outputFilename, fields, rows, txt):
-#
-#     with open(outputDir / outputFilename, 'w') as out:
-#
-#         if txt:
-#
-#             writer = csv.writer(out, delimiter='\t')
-#
-#         else:
-#
-#             writer = csv.writer(out)
-#             writer.writerow(fields)
-#
-#         print(f'-> {len(rows)} rows to be recorded in {outputFilename}')
-#
-#         for row in rows:
-#
-#             try:
-#
-#                 writer.writerow(row)
-#
-#             except UnicodeEncodeError:
-#
-#                 print(
-#                     f"Row for {row[0].encode(encoding='UTF-8')} {row[1].encode(
-#                 encoding='UTF-8')} could not be written due to encoding error.
-#                 Excluded from frequency table.")
 
 
 if __name__ == '__main__':
