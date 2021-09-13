@@ -122,33 +122,33 @@ skipgrew=$(echo false )
 if [[ ! -d $patgrp_datadir ]]
 then
   mkdir $patgrp_datadir
-else
+# else
   
-  relevant=$(echo ` find $patgrp_datadir -type d -name "*$corpus*" `)
-  if [[ $relevant ]]
-  then
+#   relevant=$(echo ` find $patgrp_datadir -type d -name "*$corpus*" `)
+#   if [[ $relevant ]]
+#   then
   
-    echo "\`\`\`"
-    echo "Output directory $patgrp_datadir already exists and contains these relevant files:"
-    find $relevant -type f
-    echo " "
+#     echo "\`\`\`"
+#     echo "Output directory $patgrp_datadir already exists and contains these relevant files:"
+#     find $relevant -type f
+#     echo " "
 
-    echo "* If pattern or corpus files have not changed since these files were created, skipping the grew corpus search is recommended (n)."
-    echo " "
+#     echo "* If pattern or corpus files have not changed since these files were created, skipping the grew corpus search is recommended (n)."
+#     echo " "
 
-    read -p  "--> Run grew search on $corpus again and overwrite any corresponding files? y/n " -r -n 1
+#     read -p  "--> Run grew search on $corpus again and overwrite any corresponding files? y/n " -r -n 1
 
-    echo  
-    if [[ ! $REPLY =~ ^[Yy]$ ]]
-    then
-      skipgrew=$(echo true )
-      echo "= New $corpus corpus searches will NOT be run. Current files in $patgrp_datadir will be used."
-    else
-      skipgrew=$(echo false )
-      echo "= Corpus $corpus will be searched again. Corresponding files in $patgrp_datadir will be overwritten."
-    fi
+#     echo  
+#     if [[ ! $REPLY =~ ^[Yy]$ ]]
+#     then
+#       skipgrew=$(echo true )
+#       echo "= New $corpus corpus searches will NOT be run. Current files in $patgrp_datadir will be used."
+#     else
+#       skipgrew=$(echo false )
+#       echo "= Corpus $corpus will be searched again. Corresponding files in $patgrp_datadir will be overwritten."
+#     fi
 
-  fi
+#   fi
 fi
 
 echo "\`\`\`"

@@ -2,6 +2,7 @@
 
 ## start with
 
+- [ ] write more test context patterns
 - [x] debug dataframe NaN calculated cells
 - [x] calculate divergence between simplest distinctions
   - [x]  ~~write script to process pandas.Series as probability distributions~~ 
@@ -13,9 +14,8 @@
     --> __*bingo!*__ `scipy.stats.entropy(p, q, base=2)`
 - [x] separate uncertain-polarity contexts from others for testing purposes
 - [x] add sample files with minimum count threshold (=5?)
-- [ ] update scripts on Kay
+- [x] update scripts on Kay
 - [x] calculate divergence between test contexts and known contexts
-- [ ] write more test context patterns
 
 ## meeting notes
 
@@ -41,15 +41,15 @@
 - [ ] revisit other distance/divergence metrics in `scipy`
 - [ ] check out `scikit` as well
 - [ ] plot some data using `matplotlib` or `pandas.plot`
-- [ ] adapt `tabulateHits.py` to output subdirs
-- [ ] adapt `generatePatFiles.py` to output subdirs
+- [X] adapt `tabulateHits.py` to output subdirs
+- [X] adapt `generatePatFiles.py` to output subdirs
 - [x] adapt `processTables.py` to expect subdirectories
 - [ ] run less restrictive basic patterns on kay
-- [ ] make jupyter notebook (or at least markdown file) for pipeline? e.g. how to run all the scripts with some sample data?
+- ~~[ ] make jupyter notebook (or at least markdown file) for pipeline? e.g. how to run all the scripts with some sample data?~~
 - [ ] determine contexts to run and discuss in syntax chapter: include locality constraints
 - [ ] convert more contexts to grew-match pattern specifications
 - [ ] patterns for NPIs in same contexts
-- [ ] revisit corpus duplicates errors: bug in `cleanConlls.py`?
+- ~~[ ] revisit corpus duplicates errors: bug in `cleanConlls.py`?~~
 - [x] create bash script to run all python code? e.g. grewSearchDir -> fillJson --> tabulate --> future comparison script?
 - [ ] run patterns
 - [x] ~~write scipt to compare new simplified count csv's~~

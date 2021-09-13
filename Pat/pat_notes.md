@@ -278,6 +278,7 @@ be included, because it catches things like:
 
 - _Last week , in perhaps the most striking departure , Egypt 's Mubarak said that if the_
   _Palestinians could **not** achieve progress in Sharon 's time , it would be **very difficult** afterward ._
+- This might be avoidable if additional specifications are made.
 
 Further narrowing/splitting of this grouping may be helpful as well.
 
@@ -287,9 +288,11 @@ ADV and ADJ pairs are restricted to contiguous tokens.
 ```js
 pattern { 
     ADJ [xpos=JJ|JJR|JJS]; 
+    ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"
+        |"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
     mod: ADJ -[advmod]-> ADV;  
     ADV < ADJ;
-    NEG [lemma="hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];  
+    NEG [lemma="hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"];  
     relay: ADJ -> S; 
     neg: S -> NEG;
     NEG << ADV;
@@ -303,9 +306,10 @@ Without a relay, "not" can and should be included:
 ```js
 pattern { 
     ADJ [xpos=JJ|JJR|JJS]; 
+    ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
     mod: ADJ -[advmod]-> ADV;  
     ADV < ADJ;
-    NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];  
+    NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"];  
     neg: ADJ -> NEG;
     NEG << ADV;
 }
@@ -319,6 +323,8 @@ Attempting to get a neg-raising template. Not sure if this is right yet--needs f
 ```js
 pattern { 
     ADJ [xpos=JJ|JJR|JJS]; 
+    ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"
+        |"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
     mod: ADJ -[advmod]-> ADV;  
     ADV < ADJ;
     NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];  
@@ -392,11 +398,8 @@ pattern {
       ADJ [xpos=JJ|JJR|JJS]; 
       mod: ADJ -[advmod]-> ADV;  
       ADV < ADJ;
-      NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"
-        |"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];  
-      NR [lemma="suppose"|"expect"|"imagine"|"likely"|"probable"|"appear"|"look"
-        |"intend"|"choose"|"plan"|"wish"|"suggest"|"advise"|"advisable"
-        |"desirable"|"should"|"ought"|"better"|"most"|"usually"];
+      NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];  
+      NR [lemma="suppose"|"expect"|"imagine"|"likely"|"probable"|"appear"|"look"|"intend"|"choose"|"plan"|"wish"|"suggest"|"advise"|"advisable"|"desirable"|"should"|"ought"|"better"|"most"|"usually"];
       negraise: NR -> ADJ;
       neg: NR -> NEG;
       NEG << ADV;
@@ -448,3 +451,81 @@ pattern {
 
   - `ccomp` case
     - _I am **not suggesting** that Streisand 's sponsoring of the film is in any way traitorous , **just mistaken**_
+
+### pat with all neg-blockers
+
+```js
+  pattern { 
+      ADJ [xpos=JJ|JJR|JJS]; 
+      ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"
+        |"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
+      mod: ADJ -[advmod]-> ADV;  
+      ADV < ADJ;
+      NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"];  
+      NR [lemma="think"|"believe"|"want"|"seem"|"suppose"|"expect"|"imagine"|"likely"|"probable"|"appear"|"look"|"intend"|"choose"|"plan"|"wish"|"suggest"|"advise"|"advisable"|"desirable"|"should"|"ought"|"better"|"most"|"usually"];
+      negraise: NR -> ADJ;
+      neg: NR -> NEG;
+      NEG << ADV;
+}
+```
+
+### pat with neg-blockers
+
+~~_i.e. interveners that are not neg-raisers_~~
+**This does not work**
+
+```js
+  pattern { 
+      ADJ [xpos=JJ|JJR|JJS]; 
+      ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
+      mod: ADJ -[advmod]-> ADV;  
+      ADV < ADJ;
+      NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];  
+      BLOCK [lemma="think"|"believe"|"want"|"seem"|"suppose"|"expect"|"imagine"|"likely"|"probable"|"appear"|"look"|"intend"|"choose"|"plan"|"wish"|"suggest"|"advise"|"advisable"|"desirable"|"should"|"ought"|"better"|"most"|"usually"];
+      block: BLOCK -> ADJ;
+      neg: BLOCK -> NEG;
+      NEG << ADV;
+}
+```
+
+## Adjust pattern templates
+
+Tasks to do this (*tentative*):
+
+- [x] add `nor`   
+  - This got more complicated than expected. Some cases will be caught just by adding "nor" to the NEG lemma list, but the following structure is not captured with those:
+
+    ```js
+      pattern { 
+        ADJ [xpos="JJ"|"JJR"|"JJS"]; 
+        ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"
+            |"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
+        mod: ADJ -[advmod]-> ADV;  
+        ADV < ADJ;
+        NEG [lemma="nor"];  
+        NEG << ADV;
+        C [xpos<>VB];
+        neg: C -> NEG;
+        relay: C -> ADJ; 
+      }
+    ```
+- [ ] exclude `a few` and `the few` (allow `(the) very few`? )
+- [ ] restrict allowances on "relay" action
+  - [ ] dependency relation label 
+  - [ ] part of speech tag
+- [ ] look at the odd cases (`...look-into-these.csv`)
+- [ ] fix `without` cases: 
+  - may not be able to be lumped in with the others
+  - does not work with the alternate structure for `nor` above either.
+- [ ] assess restriction cases
+    - [ ] look at few_sample for how to structure restriction pattern   
+      &rarr; [<sub>S</sub> [<sub>NP</sub> `few` ADV ADJ NOUN ] [<sub>VP</sub> ... ] ]    
+      (use `quickview.py`)
+- [ ] deal with conjunction cases?
+---
+possible additional steps? 
+- [ ] Create new categorization scheme for patterns?
+- [ ] create new fields/info categories for sentence text split at key points: e.g. `pre-NEG`, `post-NEG`, `NEG-to-ADV`, `post-ADJ` ...
+- [ ] specify permitted (or prohibited) dependency labels and/or xpos values for "relayed" negation cases. 
+- [ ] mark prenominal vs. predicate adjectives 
+- [ ] mark adjunct clauses?? (Is this possible?)

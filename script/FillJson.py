@@ -1,4 +1,5 @@
 import argparse
+from collections import namedtuple
 import json
 import sys
 import time
@@ -6,6 +7,7 @@ from pathlib import Path
 
 import pyconll
 
+deptup = namedtuple('dependency', ['source', 'target','relation'])
 
 def __main__():
 
@@ -92,6 +94,7 @@ def __main__():
             hit_dict['next_sent'] = None
             hit_dict['text'] = None
             hit_dict['matching']['fillers'] = None
+            hit_dict['matching']['deps'] = None
             hit_dict['doc'] = None
 
         # initialize json entry count
@@ -101,6 +104,7 @@ def __main__():
         c = 0
 
         # initialize tracker variables
+        doc_id = ''
         curr_id = ''
         sent_text = ''
         hitIndexList = [None]
@@ -152,15 +156,37 @@ def __main__():
 
                     nodes = hit['matching']['nodes']
                     fillers = {}
+                    edges = hit['matching']['edges']
+                    deps = {}
 
-                    for k, v in nodes.items():
-                        token = info._tokens[info._ids_to_indexes[v]]
+                    for k, v in nodes.items():                        
+                        try: 
+                            token = info._tokens[info._ids_to_indexes[v]]
+                        except KeyError: 
+                            token = info._tokens[int(v) - 1]
 
                         fillers[k] = (token.lemma
                                       if args.tokenFillerType == 'lemma'
                                       else token.form)
 
                     hit['matching']['fillers'] = fillers
+
+                    for edge, parts in edges.items(): 
+                        source = parts['source']
+                        target = parts['target']
+                        try: 
+                            source_token = info._tokens[info._ids_to_indexes[source]]
+                        except KeyError: 
+                            source_token = info._tokens[int(source) - 1]
+
+                        try: 
+                            target_token = info._tokens[info._ids_to_indexes[target]]
+                        except KeyError: 
+                            target_token = info._tokens[int(target) - 1]
+                        
+                        deps[edge] = deptup(source_token.lemma, target_token.lemma, parts['label'])
+
+                    hit['matching']['deps'] = deps
 
                     i += 1
 

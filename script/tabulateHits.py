@@ -11,7 +11,7 @@ import pandas as pd
 
 hit_tuple = namedtuple(
     'hit_tuple', ['hit_id', 'adv', 'adj', 'sent_text', 'sent_id', 'adv_index',
-                  'json_source', 'prev_sent', 'next_sent'])
+                  'json_source', 'prev_sent', 'next_sent', 'all_tags', 'all_edges'])
 
 
 def __main__():
@@ -19,29 +19,11 @@ def __main__():
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = parseArgs()
 
-    # do table by default if no output type option specified.
-    # if not (args.table or args.count):
-    #     args.table = True
-    #     print(
-    #         'Warning: No output type specified. Output will be table of hits,
-    #         not counts.')
-
     json_dir = args.pattern
     if not json_dir.exists():
         sys.exit('Error: Specified json directory does not exist.')
     if not json_dir.is_dir():
         sys.exit('Error: Specified json path is not a directory.')
-
-    # colloc_counter = None
-    # hit_data = None
-    #
-    # if args.count:
-    #
-    # colloc_counter = fillCounter(json_dir, args)
-    #
-    # print('^_^ Finished counting collocations in all json files.')
-    #
-    # if args.table:
 
     hit_data, duplicates = getHitData(json_dir, args)
 
@@ -108,81 +90,6 @@ def parseArgs():
 
     return parser.parse_args()
 
-#
-# def fillCounter(json_dir, args):
-#
-#     counter = Counter()
-#
-#     startTime = time.perf_counter()
-#     fileCount = 0
-#
-#     for jsonFile in os.scandir(json_dir):
-#
-#         if (jsonFile.name.endswith('raw.json')
-#                 or not jsonFile.name.endswith('json')):
-#             continue
-#
-#         fileCount += 1
-#
-#         if args.verbose:
-#             print(f'\nProcessing {jsonFile.name}...')
-#
-#         counter = countTokenPairs(counter, jsonFile.path, args)
-#
-#     if args.verbose:
-#         print(
-#             f'\nTop 10 collocations for entire {json_dir.name} directory:')
-#         pprint.pprint(counter.most_common(10))
-#
-#     finishTime = time.perf_counter()
-#
-#     print(f'\nFinished counting {json_dir.name}.')
-#     print(f'Collocations from {fileCount} total files counted '
-#           f'in {round(finishTime - startTime, 2)} seconds')
-#
-#     return counter
-#
-#
-# def countTokenPairs(countDict, jsonFile, args):
-#
-#     wordType1 = args.node1
-#     wordType2 = args.node2
-#     colloc = namedtuple('collocation', [wordType1, wordType2])
-#
-#     with open(jsonFile, 'r') as j:
-#
-#         hits = json.load(j)
-#
-#         for hit in hits:
-#             try:
-#
-#                 nodes = hit['matching']['fillers']
-#
-#             except KeyError:
-#                 sys.exit(
-#                     f'Node labels have not been filled from conllu file for {jsonFile}. Quitting script without generating output.')
-#
-#             else:
-#
-#                 tupleKey = colloc(nodes[wordType1], nodes[wordType2])
-#
-#                 if tupleKey not in countDict.keys():
-#
-#                     countDict[tupleKey] = 1
-#
-#                 else:
-#
-#                     countDict[tupleKey] += 1
-#
-#                 # use (named)tuple as key in dictionary.
-#                 # e.g. [(word1=x, word2=y): count, (word1=a, word2=b): count, ...]
-#
-#     if args.verbose:
-#         print('Top 3 (running totals):')
-#         pprint.pprint(countDict.most_common(3))
-#
-#     return countDict
-#
 
 def getHitData(json_dir, args):
 
@@ -191,7 +98,8 @@ def getHitData(json_dir, args):
     hits_dict = {}
     duplicates = {}
 
-    processed_files = tuple(json_dir.glob('**/*[0-9].json'))
+    # check if there are any files other than the ...raw.json files
+    processed_files = tuple(json_dir.glob('**/*[!w].json'))
     if not processed_files:
         sys.exit('Error: specified corpus directory does not contain any '
                  'processed json files.')
@@ -229,12 +137,24 @@ def getHitData(json_dir, args):
                     continue
 
                 try:
+                    deps = hit['matching']['deps']
+                except KeyError:
+                    deps = {}
+                    continue
+
+                try:
                     # Adverb -> args.node1 = 'adv' by default
                     node1_word = fillers[args.node1].lower()
+                except KeyError:
+                    print(f'json entry missing first (ADV) node for '
+                          f'hit {sent_id}. Skipping hit.')
+                    continue
+
+                try:
                     # Adjective -> args.node2 = 'adj' by default
                     node2_word = fillers[args.node2].lower()
                 except KeyError:
-                    print(f'json entry missing one or both token nodes for '
+                    print(f'json entry missing second (ADJ) node for '
                           f'hit {sent_id}. Skipping hit.')
                     continue
 
@@ -250,7 +170,7 @@ def getHitData(json_dir, args):
 
                 hit_info = hit_tuple(
                     hit_id, node1_word, node2_word, sent_text, sent_id,
-                    node1_index, jf.stem, prev_sent, next_sent)
+                    node1_index, jf.stem, prev_sent, next_sent, fillers, deps)
 
                 hits_dict, duplicates = assign_info(hit_info,
                                                     hits_dict, duplicates)
@@ -283,14 +203,14 @@ def assign_info(hit: hit_tuple,
     #         duplicates[f'{hit_id}_keep'] = existing_info  # in both dicts
 
     #     else:
-    #         '''something differs--record both, but alter IDs. 
+    #         '''something differs--record both, but alter IDs.
 
-    #             this is included for the possibility of adverbs that are 
-    #             paired with different adjectives somehow with the pattern 
-    #             specified linearly, this will never happen, but keeping it 
-    #             in case the pattern spec changes to allow this kind of 
-    #             overlap (perhaps for conjoined predicate adjectives? see 
-    #             pattern notes file) 
+    #             this is included for the possibility of adverbs that are
+    #             paired with different adjectives somehow with the pattern
+    #             specified linearly, this will never happen, but keeping it
+    #             in case the pattern spec changes to allow this kind of
+    #             overlap (perhaps for conjoined predicate adjectives? see
+    #             pattern notes file)
     #             '''
 
     #         id1 = hit_id+"_a"
@@ -348,8 +268,8 @@ def assign_info(hit: hit_tuple,
     #                     f'  + Hit {hit_id} recorded as is.')
 
     #                 hits_dict[hit_id] = hit
-            
-    #         else: 
+
+    #         else:
     #             print(f'   Same sentence, but different adverb tokens.\n'
     #                   f'  + Hit {hit_id} recorded as is.')
 
@@ -357,7 +277,7 @@ def assign_info(hit: hit_tuple,
 
     # else:
 
-### ^ temporary commenting out to test speed changes if filtering removed
+# ^ temporary commenting out to test speed changes if filtering removed
 
     hits_dict[hit_id] = hit
 
@@ -370,31 +290,30 @@ def createOutput(hits, args, write_duplicates=False):
     patPath = args.pattern
     patcat = patPath.parent.stem
 
-
     # if counts:
-        # # I think this chunk is broken...
-        # rows = []
-        # try:
-        #     os.mkdir(Path.cwd() / 'colloc_freq')
-        # except OSError:
-        #     pass
-        # outputDir = Path.cwd() / 'colloc_freq'
-        # __, patkey = args.pattern.name.rsplit('_', 1)
-        # outputFilename = (f'{args.outputPrefix}_counts.txt' if txt
-        #                 else f'{args.outputPrefix}_counts.csv')
-        # fields = ([args.node1, args.node2, f'{patkey}_counts',
-        #         f'{patkey}_ratio'] if args.extraInfo
-        #         else [args.node1, args.node2, f'{patkey}_counts'])
-        # for colloc in counts.keys():
-        #     word1 = colloc[0]
-        #     word2 = colloc[1]
-        #     collcount = counts[colloc]
-        #     collratio = round(collcount/len(counts), 4)
-        #     row = ([word1, word2, collcount, collratio]
-        #         if args.extraInfo
-        #         else [word1, word2, collcount])
-        #     rows.append(row)
-        # write_file(outputDir, outputFilename, fields, rows, txt)
+    # # I think this chunk is broken...
+    # rows = []
+    # try:
+    #     os.mkdir(Path.cwd() / 'colloc_freq')
+    # except OSError:
+    #     pass
+    # outputDir = Path.cwd() / 'colloc_freq'
+    # __, patkey = args.pattern.name.rsplit('_', 1)
+    # outputFilename = (f'{args.outputPrefix}_counts.txt' if txt
+    #                 else f'{args.outputPrefix}_counts.csv')
+    # fields = ([args.node1, args.node2, f'{patkey}_counts',
+    #         f'{patkey}_ratio'] if args.extraInfo
+    #         else [args.node1, args.node2, f'{patkey}_counts'])
+    # for colloc in counts.keys():
+    #     word1 = colloc[0]
+    #     word2 = colloc[1]
+    #     collcount = counts[colloc]
+    #     collratio = round(collcount/len(counts), 4)
+    #     row = ([word1, word2, collcount, collratio]
+    #         if args.extraInfo
+    #         else [word1, word2, collcount])
+    #     rows.append(row)
+    # write_file(outputDir, outputFilename, fields, rows, txt)
     # if hits:
 
     outputDir = patPath.cwd() / 'hits' / patcat
@@ -411,10 +330,10 @@ def createOutput(hits, args, write_duplicates=False):
     hits_df = pd.DataFrame.from_dict(
         {k: v._asdict() for k, v in hits.items()}, orient='index')
 
-
     if write_duplicates:
         hits_df = hits_df.assign(label=hits_df.index)
-        hits_df = hits_df.assign(status=hits_df.label.str.rsplit('_', 1).str.get(1))
+        hits_df = hits_df.assign(
+            status=hits_df.label.str.rsplit('_', 1).str.get(1))
         hits_df = hits_df.assign(status=hits_df.status.astype('category'))
 
     hits_df = hits_df.set_index('hit_id')
@@ -439,8 +358,8 @@ def createOutput(hits, args, write_duplicates=False):
 
     view_sample_size = min(5, len(hits_df))
     label = 'Duplicates' if write_duplicates else 'Data'
-    
-    try: 
+
+    try:
         print_table = hits_df[['colloc', 'sent_text']].sample(
             view_sample_size).to_markdown()
     except ImportError:
@@ -448,7 +367,7 @@ def createOutput(hits, args, write_duplicates=False):
     else:
         print(f'```\n#### {label} Sample\n')
         print(print_table)
-        
+
     print('```')
     # write_file(outputDir, fname, fields, rows, txt)
 
