@@ -28728,3 +28728,13 @@ playground/sample_only.conll/_only_.conllu
 playground/sample_without.conll/_without_.conllu
 quick2.conll/nyt_eng_200402.conllu
 quick2.conll/nyt_eng_200405.conllu
+hits/devel2/quick2_direct-neg_hits.csv
+info/logs/quicktest/basic.md
+info/logs/quicktest/devel.md
+playground/data/devel2/quick2.without_relay/nyt_eng_200402.json
+playground/data/devel2/quick2.without_relay/nyt_eng_200402.raw.json
+playground/data/devel2/quick2.without_relay/nyt_eng_200405.json
+playground/data/devel2/quick2.without_relay/nyt_eng_200405.raw.json
+playground/data/devel2/sample_couple.without_relay/_couple_.json
+playground/data/devel2/sample_couple.without_relay/_couple_.raw.json
+playground/hits/devel2/sample_couple_without_relay_hits.csv
