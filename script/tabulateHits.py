@@ -25,11 +25,11 @@ def __main__():
 
     hit_count = len(hit_data)
     if hit_count > 0:
-        print(f'\n^_^ Finished tabulating data for {hit_count}' 
+        print(f'\n^_^ Finished tabulating data for {hit_count}'
               f' sentence(s) from all json files in {json_dir}.\n'
               '-> Writing tables to csv files...')
         createOutput(hit_data, args)
-    else: 
+    else:
         sys.exit('No valid hits found.')
 
 
@@ -78,7 +78,7 @@ def parseArgs():
 
 
 def getHitData(json_dir, args):
-    
+
     fileCount = 0
     df_from_json = pd.DataFrame()
 
@@ -109,37 +109,40 @@ def getHitData(json_dir, args):
                       f'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
                 continue
-            
+
             deps = get_deps(json_dict)
             tokens = get_tokens(json_dict)
-            match_ix = get_match_ix(json_dict)
+            match_ix, window_start, window_end = get_ix(json_dict)
 
-            match_df = tokens.join(deps).assign(match_ix=match_ix)
+            match_df = tokens.join(deps).assign(
+                match_ix=match_ix,
+                window_start=window_start,
+                window_end=window_end)
 
             df = pd.DataFrame(json_dict)
             raw_minus_matching = df[
-                ['sent_id','doc','text','prev_sent', 'next_sent']].assign(json_source=jf.stem)
-            
+                ['sent_id', 'doc', 'text', 'prev_sent', 'next_sent']].assign(json_source=jf.stem)
+
             recombined_df = raw_minus_matching.join(match_df)
-            
+
             hit_id = recombined_df.sent_id + ':' + recombined_df.match_ix
             recombined_df = recombined_df.assign(hit_id=hit_id)
-            
-            df_from_json = pd.concat((df_from_json, recombined_df)) 
-           
+
+            df_from_json = pd.concat((df_from_json, recombined_df))
+
     return df_from_json.rename(columns={'doc': 'doc_id', 'text': 'sent_text'})
 
 
 def get_deps(json_dict: dict):
-    
+
     deps = [hit['matching']['deps'] for hit in json_dict]
     deps_clean = []
-    hit_clean = {}
-    for hit in deps: 
-        for dep_name, dep_info in hit.items(): 
-            if type(dep_info[2]) == dict: 
+
+    for hit in deps:
+        hit_clean = {}
+        for dep_name, dep_info in hit.items():
+            if type(dep_info[2]) == dict:
                 dep_info[2] = dep_info[2]['1']
-                
 
             dep_name = dep_name+'_dep'
             hit_clean[dep_name] = dep_info
@@ -147,42 +150,51 @@ def get_deps(json_dict: dict):
         deps_clean.append(hit_clean)
 
     deps = pd.DataFrame(deps_clean)
-    # TODO : Add variables here as new dependency relation tags 
+    # TODO : Add variables here as new dependency relation tags
     #   are introduced to/finalized in patterns
     neg_label = relay_label = 'n/a'
     if 'neg_dep' in deps.columns:
         neg_label = [dep_list[2] for dep_list in deps.neg_dep]
     if 'relay_dep' in deps.columns:
-        relay_label = [dep_list[2] for dep_list in deps.relay_dep]   
-        
-    deps = deps.assign(neg_deplabel = neg_label, 
-                       relay_deplabel = relay_label)
+        relay_label = [dep_list[2] for dep_list in deps.relay_dep]
+
+    deps = deps.assign(neg_deplabel=neg_label,
+                       relay_deplabel=relay_label)
 
     return deps
-     
-     
-def get_tokens(json_dict: dict):
-    
-    tokens = pd.DataFrame([hit['matching']['fillers'] 
-                                   for hit in json_dict])
-    column_names = {}
-    for c in tokens.columns: 
-        column_names[c] = c.lower()+'_word'
-        
-    tokens = (tokens
-              .assign(colloc=tokens.ADV + '_' + tokens.ADJ)
-              .rename(columns=column_names))
-    
-    return tokens    
-       
 
-def get_match_ix(json_dict: dict):
-    
+
+def get_tokens(json_dict: dict):
+
+    tokens = pd.DataFrame([hit['matching']['fillers']
+                           for hit in json_dict])
+    column_names = {}
+    for c in tokens.columns:
+        column_names[c] = c.lower()+'_word'
+
+    try:
+        collocs = tokens.ADV + '_' + tokens.ADJ
+    except AttributeError:
+        print('-> data is missing ADV or ADJ tags. No collocations specified.')
+    else:
+        tokens = tokens.assign(colloc=collocs)
+
+    return tokens.rename(columns=column_names)
+
+
+def get_ix(json_dict: dict):
+
     nodes = pd.DataFrame([hit['matching']['nodes']
                           for hit in json_dict])
-    
-    match_ix = nodes.iloc[:,0] + '_' + nodes.iloc[:,1]
-    return match_ix
+    try:
+        match_ix = nodes.ADV + '_' + nodes.ADJ
+    except AttributeError:
+        match_ix = nodes.iloc[:, 0] + '_' + nodes.iloc[:, 1]
+    all_ix = [
+        tuple(int(i) for i in hit['matching']['nodes'].values()) for hit in json_dict]
+    window_start = [min(a) for a in all_ix]
+    window_end = [max(a)+1 for a in all_ix]
+    return match_ix, window_start, window_end
 
 
 def createOutput(hits_df, args):
@@ -198,14 +210,31 @@ def createOutput(hits_df, args):
 
     suffix = '.txt' if txt else '.csv'
 
-    fname =  f'{args.outputPrefix}_hits{suffix}'
-   
+    fname = f'{args.outputPrefix}_hits{suffix}'
+
     hits_df = hits_df.set_index('hit_id')
 
-    hits_df = (hits_df.assign(category=patcat).convert_dtypes())
+    hits_df = hits_df.assign(category=patcat).convert_dtypes()
 
-    catcols = ['category', 'colloc', 'adv_word', 'adj_word', 'json_source']
+    catcols = ['adv_word', 'adj_word', 'category', 'colloc',
+               'json_source', 'neg_word', 'relay_word',
+               # 'mit_word', pos_word, test_word
+               ]
+
+    for col in catcols:
+        if col not in hits_df.columns:
+            hits_df[col] = '?'
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
+    window_text_list = []
+    for i, sent in enumerate(hits_df.sent_text):
+
+        words = sent.split(' ')
+        window_words = words[
+            max(0, hits_df.window_start[i]-2):min(hits_df.window_end[i]+2, len(words))]
+        window_text = ' '.join(window_words)
+        window_text_list.append(window_text)
+
+    hits_df = hits_df.assign(window_text=window_text_list)
 
     cols = hits_df.columns.tolist()
     hits_df = hits_df[cols[-2:] + cols[:-2]]

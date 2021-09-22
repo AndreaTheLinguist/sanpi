@@ -26,6 +26,7 @@
 - `my form is not the best` -> should this be caught? (with adv)
 - `nor` and other(?) negative conjunction cases
 - `few`
+  - `too few`?
   - `a few`, `the few` vs. `(very) few`
   - **NPI in matrix VP with `few` in subject: disallowed if DP?**
 
@@ -88,10 +89,12 @@
 - [ ] specify permitted (or prohibited) dependency labels and/or xpos values for "relayed" negation cases.
 - [ ] mark prenominal vs. predicate adjectives
 - [ ] mark adjunct clauses?? (Is this possible?)
+- [ ] change csv file to pickles and make script to few selection of pickle?
 
 ---
 
 ### Thought connections
+......
 
 negation is used in formal languages to include/cover "undefined" cases, e.g. grew pattern specifications with without clauses and "not" definitions
 
@@ -142,3 +145,178 @@ This one feels a bit odd, since there is a social pressure to not be financially
 - POS tagging in corpora is not 100% accurate; some nouns tagged as adj and adj tagged as verbs
 - new generalized patterns catch prenominal cases
 - `without` does not have the same dependencies/structural configuration in corpus tagging/parsing
+
+---
+
+## `few` reconnaissance
+
+The following pattern might work...
+might be able to be relaxed to use with other negs?
+
+    pattern { 
+        ADJ [xpos=JJ|JJR|JJS]; 
+        ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
+        mod: ADJ -[advmod]-> ADV;  
+        ADV < ADJ;
+        NEG [lemma="few"];  
+        relay: ADJ -> S; 
+        neg: S -> NEG;
+        %neg: NEG -> ADJ;
+        NEG << ADV; 
+    }
+
+    without {
+        S -[det|poss]-> det; 
+        S -[amod]-> NEG; 
+        %TEMP [lemma="next"|"last"|"past"|"following"|"first"|"final"|"previous"]; 
+        %S -[amod]-> TEMP
+    }
+
+The inclusion of the specific adverbs in the without clause definitely lets in things that should not be there.
+
+
+`few` modifiers:
+
+| polarity | a/the _ adverbs | bare adverbs |
+| :------- | :-------------- | :----------- |
+| neg | select, paltry, _very?_, | very,  |
+| pos | dedicated, | |
+---
+
+preceding determiners have to have dependency relations with `few` to count
+
+    [nyt_eng_19980512_0385_14]
+    "a" DT          -[det]->        "company" NN
+    "company" NN    -[appos]->      "Inc." NNP
+    "few" JJ        -[amod]->       "people" NNS
+
+Text:
+_MCI Communications Corp. is in the process of being acquired for $ 37 billion by Worldcom Inc. , a company few people who work somewhere other than Wall Street had even heard of a few years ago_
+
+---
+what to do with `only a very few`?
+  
+Text: _only a very few are chosen to join the president in a huge underground vault_
+
+    "a"     DT    -[det]->        "few" JJ
+    "very"  RB    -[advmod]->     "few" JJ
+    "few"   JJ    -[nsubjpass]->  "chosen" VBN  
+
+---
+
+`few` seems to operate differently when preceding a unit of time
+
+- a busy few months
+- a difficult few weeks
+- the past few years
+
+---
+
+I have difficulty with `a very few` in a lot of cases, but `only a very few` or `one of a very few` seem much better than, e.g., `a very few people can say they have swum the English channel`. Why is this? This last example seems bad to me because it's like the polarity interpretations of "a few" and "very few" are conflicting with each other... Is it a scope thing fundamentally?
+
+ceiling versus floor?
+a small number vs. the smallest number
+redefine scale s.t.
+
+    0% ~ [small number] <|| <--- range ---> ||> [large number] ~ 100%
+
+    [a [[very few] [people]] ] vs. [[[a very] [few people]]]
+
+- She is one of a very few who can say that. 
+- "Shutter Island became one of the few movies to ever flat-out fool me" (nyt_eng_20100217_0107_42)
+
+- There are a very _few_ people who can say that.
+- ~ There is a very _small group/number of_ people who can say that.
+- There are only a very few people who can say that.
+- There are very few people who can say that.
+
+- Only a very few people can say that. (~ Only a very _small group of_ people can say that.)
+- Only a very few people who sculpt daily can say that.
+- A very few people who sculpt daily can say that. 
+- A very few people can say that.
+
+- Very few people (who sculpt daily) can say that. 
+
+Do certain syntactic positions prevent or encourage certain scopes?
+
+In object position, and these mean the same thing to me, excluding for minute differences in how small the number indicated is:
+
+ &rarr; _`few` as noun? with essentially an elided `of` clause?---Second parse option would cause number mismatch since adjective doesn't change number and `couple` as an adjective is an entirely different meaning. E.g. 'couple ideas' as a stand-alone sounds like a matchmaker brainstorming_
+
+    Jo had a few ideas. 
+      [had [[a few] ideas]] ... [had ^[a [few ideas]]]
+    Jo had a couple ideas. 
+      [had [[a couple] ideas]] ... [had ^[a ?[couple ideas]]]
+    ^ number mismatch
+    ? different meaning
+
+    **Jo had a some ideas. 
+      [had [*[a some] ideas]] ... **[had `[a [some ideas]]] 
+    ` type mismatch
+
+    ?Jo had a handful (of) ideas. (maybe works? better with "of")
+
+No alternate scope option in these cases, but these mean different things to me (few case: _Jo had a smaller number of ideas than what may be wanted/expected_.):
+
+&rarr; _`few` as quantifier? or as adjective? As a noun, `few` requires a determiner (count, not mass). The type must be different in this case._
+
+    Jo had some ideas. 
+      [had [some [ideas]]
+    Jo had some.
+    Jo had few ideas.
+      [had [few [ideas]]]
+    Jo had few.
+
+    ** Jo had couple ideas.
+      ** [had [couple [ideas]]]
+      - this must be parsed as the "matchmaking" type reading (or similar) where couple is an adj
+
+Insert `of`? _forces noun interpretation of `few` (and `couple`)?
+
+    Jo had a few of them. 
+      [had [a [few [of them]]]] ... [had [[a few] [of them]]]
+    Jo had a few of ideas. ? more marked I think? why??
+    Jo had a couple of ideas.
+      [had [a [couple [of ideas]]]] ... [had [[a couple]  [of ideas]]]
+
+when you add `very`: _`very` can be an adjective able to modify nouns, but it selects for nouns which are inherently on a scalar endpoint of which have defined antonyms--middling things don't work. [Merriam-Webseter entry for `very`](https://www.merriam-webster.com/dictionary/very). Therefore, the insertion of `very` breaking the sentence indicates the part of speech it would be modifying has either the wrong semantic properties (midpoint scalar) or is the wrong part of speech_
+
+    **Jo had very some ideas. 
+        [had [[very some] ideas]]    
+    Jo had very few ideas. 
+      [had [[very few] ideas]]
+
+    **Jo had very some. 
+    Jo had very few. 
+
+    *Jo had a very couple ideas. 
+    ?Jo had a very few ideas. 
+      [a [[very_adv few_adj] ideas_n]] -- number mismatch of singular det with plural count NP [... ideas]
+      [ a[[very_adj few_n ] ideas_n]] --with covert of??
+
+<!-- Is this^^ a case of adv-adj-noun or adj-nn? The cases above show that when there is a determiner, the few-as-adj parse of very should break due to number mismatch. That suggests this is the more marked usage of `very` as an adj indicating 'in truth'/'actual'/'real' -->
+    *Jo had a very few of ideas.
+    *Jo had a very few of them. 
+    *Jo had a very couple of ideas. 
+
+    *Jo had (very) few of ideas. -- breaks bc "of" forces noun and few-noun is count and cannot be bare?
+    *Jo had some of ideas. -- breaks bc "of" needs an explicit (grouping/container?) noun? not anaphoric reference? 
+      -> *Jo had them of ideas/things/items/etc.
+
+But then through in `only` or `just`: _... who knows?_
+
+    Jo had only a very few ideas. 
+    Jo only had a very few ideas. 
+    Jo had just a few ideas. 
+    Jo just had a few ideas. 
+    Jo merely had a few ideas.
+    ? Jo had--merely a few--ideas.
+
+As subject:
+
+    A few _ideas occurred to me._ 
+    Few _ideas occurred to me._ 
+    Very few _ideas occurred to me. _
+    Only a few _ideas occurred to me. _
+    A very few _ideas occurred to me._ 
+    Only a very few _ideas occurred to me._
