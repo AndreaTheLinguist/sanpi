@@ -132,6 +132,24 @@ This one feels a bit odd, since there is a social pressure to not be financially
 
 ## Corpus parsing info
 
+### Links
+
+[Universal Dependencies Overview](https://direct-mit-edu.proxy.library.cornell.edu/coli/article/47/2/255/98516/Universal-Dependencies)
+
+[ConLL-U online tree viewer](https://universaldependencies.org/conllu_viewer.html)
+
+[CoNLL-U online parse viewer](https://urd2.let.rug.nl/~kleiweg/conllu/)
+
+[UD online manual](https://universaldependencies.org/)
+
+UD github: 
+  - [docs dir](https://github.com/UniversalDependencies/docs)
+  - [tools dir](https://github.com/UniversalDependencies/tools)
+  - [tools readme](https://github.com/UniversalDependencies/docs/blob/pages-source/tools.md)
+  - [dependencies](https://github.com/UniversalDependencies/docs/tree/pages-source/_u-dep)
+
+### Notes
+
 - superlatives & comparatives:
   - adj: `JJR`, `JJS`
   - adv: `RBR`, `RBS`
