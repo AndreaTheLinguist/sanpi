@@ -28720,12 +28720,9 @@ playground/hits/devel2/sample_nor_without_relay_hits.csv
 playground/hits/devel2/sample_only_without_relay_hits.csv
 playground/hits/devel3/nyFeb2010_negraise_hits.csv
 playground/sample_couple.conll/_couple_.conllu
-playground/sample_few.conll/_few_.conllu
 playground/sample_neither.conll/_neither_.conllu
 playground/sample_nor.conll/_nor_.conllu
 playground/sample_not-so-much.conll/not-so-much.conllu
-playground/sample_only.conll/_only_.conllu
-playground/sample_without.conll/_without_.conllu
 quick2.conll/nyt_eng_200402.conllu
 quick2.conll/nyt_eng_200405.conllu
 hits/devel2/quick2_direct-neg_hits.csv
@@ -28738,7 +28735,6 @@ playground/data/devel2/quick2.without_relay/nyt_eng_200405.raw.json
 playground/data/devel2/sample_couple.without_relay/_couple_.json
 playground/data/devel2/sample_couple.without_relay/_couple_.raw.json
 playground/hits/devel2/sample_couple_without_relay_hits.csv
-playground/sample_very.conll/_very_.conllu
 playground/sample_until.conll/_until_.conllu
 playground/sample_some.conll/_some_.conllu
 playground/sample_no.conll/_no_.conllu
@@ -28754,3 +28750,5 @@ playground/sample_any.conll/_any_.conllu
 playground/sample_all.conll/_all_.conllu
 playground/sample_yet.conll/_yet_.conllu
 playground/nyDec2010.conll/nyt_eng_201012.conllu
+playground/Pat/pos_few.pat
+playground/Pat/devel/try-this.pat
