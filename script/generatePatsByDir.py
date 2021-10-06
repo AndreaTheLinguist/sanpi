@@ -1,5 +1,6 @@
 import os
 import time
+import argparse
 from collections import namedtuple
 from json import loads as parse_json
 from pathlib import Path
@@ -12,9 +13,11 @@ from pypandoc import convert_file
 
 def __main__():
 
-    top_dir_path = Path.cwd() / "Pat"
+    top_dir_path = parseargs()
 
-    specs_file_gen = (f for f in os.scandir(top_dir_path)
+    # top_dir_path = Path.cwd() / "Pat"
+
+    specs_file_gen = (f for f in top_dir_path.iterdir()
                       if f.name.startswith('specs_'))
 
     for specs_file in specs_file_gen:
@@ -39,6 +42,23 @@ def __main__():
         pprint(specs.loc[specs.type == 'Header', :].reset_index().keep)
 
         write_files(specs, output_dir)
+
+
+def parseargs():
+
+    parser = argparse.ArgumentParser(
+        description=('script to read all "specs..." files in a given '
+                     'directory and convert them to individual ".pat" '
+                     'files with labels corresponding to the file '
+                     'names and headers.'))
+
+    parser.add_argument('pat_dir_path', type=Path,
+                        help=('path to directory where pattern specification '
+                              '.md files are located. Output files will be '
+                              'saved to the same location.'))
+    args = parser.parse_args()
+
+    return args.pat_dir_path
 
 
 def parse_md(specs_path: str):

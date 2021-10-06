@@ -2,8 +2,8 @@
 
 ## start with
 
-- [ ] finalize `tabulateHits.py` changes to use `pandas.json_normalize()`
-- [ ] update github
+- [x] finalize `tabulateHits.py` changes to use `pandas.json_normalize()`
+- [x] update github
 - [ ] update kay
 - [ ] iron out template patterns
   - [ ] relay cases
@@ -21,9 +21,6 @@
     - comparatives
     - `less than`
 
-
-
-
 ## meeting notes
 
 - multinomial stats to augment actual occurence of data
@@ -31,13 +28,13 @@
 
 ## idea notes
 
-+ How to organize patterns and data:
+- How to organize patterns and data:
 
   - patterns specify polarity in context heading (of `pat_notes.md`)
   - to speed up data gathering, could:
     1. split each of the new polarity subdirectories into arbitrary chunks
     2. split subdirs into non-arbitrary chunks also specified in `pat_notes.md`
-  - Option 1 would be simplest, though the split would have to be either predetermined (size) 
+  - Option 1 would be simplest, though the split would have to be either predetermined (size)
     or calculated based on number of patterns in subdir
   - Option 2 would be extra work on the front end, but would be more meaningful
     and then could also be used in processing and analysis

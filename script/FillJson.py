@@ -7,7 +7,9 @@ from pathlib import Path
 
 import pyconll
 
-deptup = namedtuple('dependency', ['source', 'target','relation'])
+deptup = namedtuple('dependency', ['source', 'target', 'relation', 'enhanced'])
+toktup = namedtuple('token', ['lemma', 'ix', 'xpos', 'deprel', 'head'])
+
 
 def __main__():
 
@@ -61,7 +63,6 @@ def __main__():
         print(f'-> Processing {pref}...')
 
         # create generator object from conllu file
-
         sourceGenerator = pyconll.load.iter_from_file(
             conllDirPath / f'{pref}.conllu')
 
@@ -87,15 +88,16 @@ def __main__():
 
         hit_ids = [h['sent_id'] for h in hits]
 
-        ##TODO add info on what the "trigger" word is, and words directly preceding adv?
+        # TODO add info on what the "trigger" word is, and words directly preceding adv?
         # initialize new hit dictionary entries
         for hit_dict in hits:
             hit_dict['prev_sent'] = None
             hit_dict['next_sent'] = None
             hit_dict['text'] = None
-            hit_dict['matching']['fillers'] = None
-            hit_dict['matching']['deps'] = None
+            hit_dict['words'] = None
+            hit_dict['deps'] = None
             hit_dict['doc'] = None
+            hit_dict['lemma_str'] = None
 
         # initialize json entry count
         i = 0
@@ -118,6 +120,9 @@ def __main__():
 
             prev_sent = sent_text
             sent_text = info.text
+
+            tokdictlist = info._tokens
+            id_to_ix = info._ids_to_indexes
 
             try:
                 # see if current dictionary has 'newdoc id' defined
@@ -149,6 +154,7 @@ def __main__():
                     hit = hits[hitIndex]
 
                     hit['text'] = sent_text
+                    hit['lemma_str'] = ' '.join(t.lemma for t in tokdictlist)
                     hit['doc'] = doc_id
 
                     if same_doc:
@@ -159,34 +165,40 @@ def __main__():
                     edges = hit['matching']['edges']
                     deps = {}
 
-                    for k, v in nodes.items():                        
-                        try: 
-                            token = info._tokens[info._ids_to_indexes[v]]
-                        except KeyError: 
-                            token = info._tokens[int(v) - 1]
+                    for k, v in nodes.items():
+                        try:
+                            token = tokdictlist[info._ids_to_indexes[v]]
+                        except KeyError:
+                            token = tokdictlist[int(v) - 1]
 
                         fillers[k] = (token.lemma
                                       if args.tokenFillerType == 'lemma'
                                       else token.form)
 
-                    hit['matching']['fillers'] = fillers
+                    hit['words'] = fillers
 
-                    for edge, parts in edges.items(): 
-                        source = parts['source']
-                        target = parts['target']
-                        try: 
-                            source_token = info._tokens[info._ids_to_indexes[source]]
-                        except KeyError: 
-                            source_token = info._tokens[int(source) - 1]
+                    for node, id in nodes.items():
+                        nodes[node] = get_ix(id_to_ix, id)
+                    hit['index'] = nodes
 
-                        try: 
-                            target_token = info._tokens[info._ids_to_indexes[target]]
-                        except KeyError: 
-                            target_token = info._tokens[int(target) - 1]
-                        
-                        deps[edge] = deptup(source_token.lemma, target_token.lemma, parts['label'])
+                    for edge, parts in edges.items():
 
-                    hit['matching']['deps'] = deps
+                        source_tok = process_edge(
+                            parts['source'], tokdictlist, id_to_ix)
+                        target_tok = process_edge(
+                            parts['target'], tokdictlist, id_to_ix)
+                        label = parts['label']
+                        if type(label) == dict:
+                            enhanced = label['enhanced'] == 'yes'
+                            label = label.get('1', '_')
+
+                        deps[edge] = deptup(source_tok._asdict(),
+                                            target_tok._asdict(),
+                                            label, enhanced
+                                            )._asdict()
+
+                    hit['deps'] = deps
+                    hit.pop('matching')
 
                     i += 1
 
@@ -202,6 +214,23 @@ def __main__():
             json.dump(hits, o, indent=2)
 
     print('Finished processing all corresponding json and conll files.')
+
+
+def process_edge(id, tokdicts, id_to_ix):
+    ix = get_ix(id_to_ix, id)
+    tok = tokdicts[ix]
+    head = tokdicts[get_ix(id_to_ix, tok.head)].lemma
+
+    tokt = toktup(tok.lemma, ix, tok.xpos, tok.deprel, head)
+    return tokt
+
+
+def get_ix(id_to_ix, id):
+    try:
+        ix = id_to_ix[id]
+    except KeyError:
+        ix = int(id) - 1
+    return ix
 
 
 def parseArgs():
@@ -292,4 +321,4 @@ if __name__ == '__main__':
     absFinish = time.perf_counter()
     print(
         f'\nTime elapsed: {round((absFinish - absStart)/60, 2)} minutes\n'
-          '====================================\n')
+        '====================================\n')

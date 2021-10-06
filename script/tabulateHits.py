@@ -4,8 +4,10 @@ import argparse
 import json
 import sys
 import time
+import re
 from collections import namedtuple
 from pathlib import Path
+from pprint import pprint
 
 import pandas as pd
 
@@ -15,7 +17,7 @@ def __main__():
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = parseArgs()
 
-    json_dir = args.pattern
+    json_dir = args.pat_json_dir.resolve()
     if not json_dir.exists():
         sys.exit('Error: Specified json directory does not exist.')
     if not json_dir.is_dir():
@@ -37,7 +39,7 @@ def parseArgs():
     parser = argparse.ArgumentParser(
         description='script consolidate relevant hit data from filled json files into csv files')
 
-    parser.add_argument('-p', '--pattern', type=Path, required=True,
+    parser.add_argument('-p', '--pat_json_dir', type=Path, required=True,
                         help='path to directory containing filled json files '
                              'for pattern.')
 
@@ -51,15 +53,15 @@ def parseArgs():
                              'result in the output file \'freq/Nyt1_p1-n1_adv-'
                              'adj_counts.csv\'.')
 
-    parser.add_argument('-n1', '--node1', default='ADV',
-                        help='search label for first node, default is \'ADV\'. '
-                             'Both patterns being compared must have a single '
-                             'node with this label.')
+    # parser.add_argument('-n1', '--node1', default='ADV',
+    #                     help='search label for first node, default is \'ADV\'. '
+    #                          'Both patterns being compared must have a single '
+    #                          'node with this label.')
 
-    parser.add_argument('-n2', '--node2', default='ADJ',
-                        help='search label for second node, default is \'ADJ\'. '
-                             'Both patterns being compared must have a single '
-                             'node with this label.')
+    # parser.add_argument('-n2', '--node2', default='ADJ',
+    #                     help='search label for second node, default is \'ADJ\'. '
+    #                          'Both patterns being compared must have a single '
+    #                          'node with this label.')
 
     parser.add_argument('-m', '--minimal', action='store_true',
                         help='Option produce minimal output. If used, output '
@@ -69,10 +71,10 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
 
-    parser.add_argument('-e', '--extraInfo', action='store_true',
-                        help='Option to add ratio and totals to count output '
-                             'file. **This option will do nothing if --count/-c '
-                             'flag is not used.**')
+    # parser.add_argument('-e', '--extraInfo', action='store_true',
+    #                     help='Option to add ratio and totals to count output '
+    #                          'file. **This option will do nothing if --count/-c '
+    #                          'flag is not used.**')
 
     return parser.parse_args()
 
@@ -96,111 +98,65 @@ def getHitData(json_dir, args):
 
         with open(jf, 'r', encoding='utf-8') as j:
 
-            json_dict = json.load(j)
+            json_dicts = json.load(j)
 
-            if len(json_dict) < 1:
+            if len(json_dicts) < 1:
 
                 print(f'--> File is empty. Skipping.')
                 continue
 
-            if not json_dict[0]['matching']['fillers']:
+            if 'matching' in json_dicts[0].keys():
                 raw_path = jf.with_suffix('.raw.json')
                 print(f'-> Warning: Node labels have not been filled for {jf}. '
-                      f'Skipping file.\n     * Hint: Run FillJson.py on '
+                      'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
                 continue
 
-            deps = get_deps(json_dict)
-            tokens = get_tokens(json_dict)
-            match_ix, window_start, window_end = get_ix(json_dict)
+        df = pd.json_normalize(json_dicts, max_level=2)
 
-            match_df = tokens.join(deps).assign(
-                match_ix=match_ix,
-                window_start=window_start,
-                window_end=window_end)
+        df.columns = (df.columns.str.replace('.', '_')
+                      .str.replace('s_', '_'))
 
-            df = pd.DataFrame(json_dict)
-            raw_minus_matching = df[
-                ['sent_id', 'doc', 'text', 'prev_sent', 'next_sent']].assign(json_source=jf.stem)
+        df = df.rename(columns={'text': 'sent_text'})
 
-            recombined_df = raw_minus_matching.join(match_df)
+        invert_pat = re.compile(r'(\w+)_([A-Z]+)')
+        df.columns = [invert_pat.sub(r'\2_\1', label).lower()
+                      for label in df.columns]
 
-            hit_id = recombined_df.sent_id + ':' + recombined_df.match_ix
-            recombined_df = recombined_df.assign(hit_id=hit_id)
+        # index_pat = re.compile(r'(index)_([A-Z]+)')
+        # df.columns = [index_pat.sub(r'\2_\1', label).lower() for label in df.columns]
 
-            df_from_json = pd.concat((df_from_json, recombined_df))
+        ix_df = df.loc[:, df.columns.str.endswith('index')]
+        ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: int(min(x)), axis=1),
+                             max_ix=ix_df.apply(lambda y: int(max(y)), axis=1))
+        windows = [
+            df.lemma_str[x].split()[
+                min(0,
+                    ix_df.at[x, 'min_ix'] - 2):
+                max(len(df.lemma_str[x]),
+                    ix_df.at[x, 'max_ix'] + 2)]
+            for x in df.index
+        ]
 
-    return df_from_json.rename(columns={'doc': 'doc_id', 'text': 'sent_text'})
+        tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
+            ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
 
+        df = df.assign(json_source=jf.stem,
+                       match_ix=tok_ix_df.apply(
+                           lambda x: '-'.join(x), axis=1),
+                       lemma_window=[' '.join(w) for w in windows])
 
-def get_deps(json_dict: dict):
+        df = df.assign(hit_id=df.sent_id+':'+df.match_ix)
 
-    deps = [hit['matching']['deps'] for hit in json_dict]
-    deps_clean = []
+        df_from_json = pd.concat([df, df_from_json])
 
-    for hit in deps:
-        hit_clean = {}
-        for dep_name, dep_info in hit.items():
-            if type(dep_info[2]) == dict:
-                dep_info[2] = dep_info[2]['1']
-
-            dep_name = dep_name+'_dep'
-            hit_clean[dep_name] = dep_info
-
-        deps_clean.append(hit_clean)
-
-    deps = pd.DataFrame(deps_clean)
-    # TODO : Add variables here as new dependency relation tags
-    #   are introduced to/finalized in patterns
-    neg_label = relay_label = 'n/a'
-    if 'neg_dep' in deps.columns:
-        neg_label = [dep_list[2] for dep_list in deps.neg_dep]
-    if 'relay_dep' in deps.columns:
-        relay_label = [dep_list[2] for dep_list in deps.relay_dep]
-
-    deps = deps.assign(neg_deplabel=neg_label,
-                       relay_deplabel=relay_label)
-
-    return deps
-
-
-def get_tokens(json_dict: dict):
-
-    tokens = pd.DataFrame([hit['matching']['fillers']
-                           for hit in json_dict])
-    column_names = {}
-    for c in tokens.columns:
-        column_names[c] = c.lower()+'_word'
-
-    try:
-        collocs = tokens.ADV + '_' + tokens.ADJ
-    except AttributeError:
-        print('-> data is missing ADV or ADJ tags. No collocations specified.')
-    else:
-        tokens = tokens.assign(colloc=collocs)
-
-    return tokens.rename(columns=column_names)
-
-
-def get_ix(json_dict: dict):
-
-    nodes = pd.DataFrame([hit['matching']['nodes']
-                          for hit in json_dict])
-    try:
-        match_ix = nodes.ADV + '_' + nodes.ADJ
-    except AttributeError:
-        match_ix = nodes.iloc[:, 0] + '_' + nodes.iloc[:, 1]
-    all_ix = [
-        tuple(int(i) for i in hit['matching']['nodes'].values()) for hit in json_dict]
-    window_start = [min(a) for a in all_ix]
-    window_end = [max(a)+1 for a in all_ix]
-    return match_ix, window_start, window_end
+    return df_from_json
 
 
 def createOutput(hits_df, args):
 
     txt = args.minimal
-    patPath = args.pattern
+    patPath = args.pat_json_dir
     patcat = patPath.parent.stem
 
     outputDir = patPath.cwd() / 'hits' / patcat
@@ -216,8 +172,8 @@ def createOutput(hits_df, args):
 
     hits_df = hits_df.assign(category=patcat).convert_dtypes()
 
-    catcols = ['adv_word', 'adj_word', 'category', 'colloc',
-               'json_source', 'neg_word', 'relay_word',
+    catcols = ['colloc', 'adv_word', 'adj_word',
+               'neg_word', 'nr_word', 'json_source', 'category',
                # 'mit_word', pos_word, test_word
                ]
 
@@ -225,19 +181,9 @@ def createOutput(hits_df, args):
         if col not in hits_df.columns:
             hits_df[col] = '?'
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
-    window_text_list = []
-    for i, sent in enumerate(hits_df.sent_text):
 
-        words = sent.split(' ')
-        window_words = words[
-            max(0, hits_df.window_start[i]-2):min(hits_df.window_end[i]+2, len(words))]
-        window_text = ' '.join(window_words)
-        window_text_list.append(window_text)
-
-    hits_df = hits_df.assign(window_text=window_text_list)
-
-    cols = hits_df.columns.tolist()
-    hits_df = hits_df[cols[-2:] + cols[:-2]]
+    othercols = [c for c in hits_df.columns if c not in catcols]
+    hits_df = hits_df[catcols + othercols]
 
     # write rows to file
     outpath = outputDir / fname
@@ -254,8 +200,7 @@ def createOutput(hits_df, args):
     else:
         print(f'```\n#### {label} Sample\n')
         print(print_table)
-
-    print('```')
+        print('```')
 
 
 if __name__ == '__main__':
