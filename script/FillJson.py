@@ -187,10 +187,13 @@ def __main__():
                             parts['source'], tokdictlist, id_to_ix)
                         target_tok = process_edge(
                             parts['target'], tokdictlist, id_to_ix)
+
                         label = parts['label']
                         if type(label) == dict:
                             enhanced = label['enhanced'] == 'yes'
                             label = label.get('1', '_')
+                        else:
+                            enhanced = False
 
                         deps[edge] = deptup(source_tok._asdict(),
                                             target_tok._asdict(),
