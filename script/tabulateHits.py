@@ -53,15 +53,6 @@ def parseArgs():
                              'result in the output file \'freq/Nyt1_p1-n1_adv-'
                              'adj_counts.csv\'.')
 
-    # parser.add_argument('-n1', '--node1', default='ADV',
-    #                     help='search label for first node, default is \'ADV\'. '
-    #                          'Both patterns being compared must have a single '
-    #                          'node with this label.')
-
-    # parser.add_argument('-n2', '--node2', default='ADJ',
-    #                     help='search label for second node, default is \'ADJ\'. '
-    #                          'Both patterns being compared must have a single '
-    #                          'node with this label.')
 
     parser.add_argument('-m', '--minimal', action='store_true',
                         help='Option produce minimal output. If used, output '
@@ -70,11 +61,6 @@ def parseArgs():
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
-
-    # parser.add_argument('-e', '--extraInfo', action='store_true',
-    #                     help='Option to add ratio and totals to count output '
-    #                          'file. **This option will do nothing if --count/-c '
-    #                          'flag is not used.**')
 
     return parser.parse_args()
 
@@ -114,7 +100,7 @@ def getHitData(json_dir, args):
 
         df = pd.json_normalize(json_dicts, max_level=2)
 
-        df.columns = (df.columns.str.replace('.', '_')
+        df.columns = (df.columns.str.replace('\.', '_')
                       .str.replace('s_', '_'))
 
         df = df.rename(columns={'text': 'sent_text'})
@@ -177,22 +163,23 @@ def createOutput(hits_df, args):
     hits_df = hits_df.set_index('hit_id')
 
     hits_df = hits_df.assign(category=patcat).convert_dtypes()
+    hit_cols = hits_df.columns
 
     # set given columns as categories (to reduce memory impact)
     catcols = ['colloc', 'adv_word', 'adj_word',
                'neg_word', 'nr_word', 'json_source', 'category',
                # 'mit_word', pos_word, test_word
                ]
-
     for col in catcols:
-        if col not in hits_df.columns:
+        if col not in hit_cols:
             hits_df[col] = '?'
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
 
     # sort columns of dataframe
-    priority_cols = ['colloc', 'sent_text', 'lemma_window',
-                     'neg_word', 'adv_word', 'adj_word', 'relay_word', 'nr_word']
-    othercols = [c for c in hits_df.columns if c not in priority_cols]
+    priority_cols = [c for c in hit_cols
+                     if c in ('colloc', 'sent_text', 'lemma_window', 'neg_word',
+                              'adv_word', 'adj_word', 'relay_word', 'nr_word')]
+    othercols = [c for c in hit_cols if c not in priority_cols]
     hits_df = hits_df[priority_cols + othercols]
 
     # write rows to file
