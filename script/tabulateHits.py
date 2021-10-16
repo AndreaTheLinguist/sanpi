@@ -12,7 +12,7 @@ from pprint import pprint
 import pandas as pd
 
 
-def __main__():
+def main():
 
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = parseArgs()
@@ -123,9 +123,6 @@ def getHitData(json_dir, args):
         df.columns = [invert_pat.sub(r'\2_\1', label).lower()
                       for label in df.columns]
 
-        # index_pat = re.compile(r'(index)_([A-Z]+)')
-        # df.columns = [index_pat.sub(r'\2_\1', label).lower() for label in df.columns]
-
         ix_df = df.loc[:, df.columns.str.endswith('index')]
         ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: int(min(x)), axis=1),
                              max_ix=ix_df.apply(lambda y: int(max(y)), axis=1))
@@ -146,7 +143,16 @@ def getHitData(json_dir, args):
                            lambda x: '-'.join(x), axis=1),
                        lemma_window=[' '.join(w) for w in windows])
 
-        df = df.assign(hit_id=df.sent_id+':'+df.match_ix)
+        df = df.convert_dtypes()
+
+        # Note: This does not check that the adv and adj are actually true collocates
+        if 'adv_word' in df.columns and 'adj_word' in df.columns:
+            collocs = df.adv_word + '_' + df.adj_word
+        else:
+            collocs = ''
+
+        df = df.assign(hit_id=df.sent_id + ':' + df.match_ix,
+                       colloc=collocs)
 
         df_from_json = pd.concat([df, df_from_json])
 
@@ -162,7 +168,7 @@ def createOutput(hits_df, args):
     outputDir = patPath.cwd() / 'hits' / patcat
 
     if not outputDir.exists():
-        outputDir.mkdir()
+        outputDir.mkdir(parents=True)
 
     suffix = '.txt' if txt else '.csv'
 
@@ -172,6 +178,7 @@ def createOutput(hits_df, args):
 
     hits_df = hits_df.assign(category=patcat).convert_dtypes()
 
+    # set given columns as categories (to reduce memory impact)
     catcols = ['colloc', 'adv_word', 'adj_word',
                'neg_word', 'nr_word', 'json_source', 'category',
                # 'mit_word', pos_word, test_word
@@ -182,8 +189,11 @@ def createOutput(hits_df, args):
             hits_df[col] = '?'
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
 
-    othercols = [c for c in hits_df.columns if c not in catcols]
-    hits_df = hits_df[catcols + othercols]
+    # sort columns of dataframe
+    priority_cols = ['colloc', 'sent_text', 'lemma_window',
+                     'neg_word', 'adv_word', 'adj_word', 'relay_word', 'nr_word']
+    othercols = [c for c in hits_df.columns if c not in priority_cols]
+    hits_df = hits_df[priority_cols + othercols]
 
     # write rows to file
     outpath = outputDir / fname
@@ -206,7 +216,7 @@ def createOutput(hits_df, args):
 if __name__ == '__main__':
 
     absStart = time.perf_counter()
-    __main__()
+    main()
     absFinish = time.perf_counter()
     print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
           '====================================\n')
