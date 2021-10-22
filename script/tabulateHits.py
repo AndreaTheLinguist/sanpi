@@ -12,7 +12,7 @@ from pprint import pprint
 import pandas as pd
 
 
-def main():
+def tabulate_hits():
 
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = parseArgs()
@@ -98,10 +98,11 @@ def getHitData(json_dir, args):
                       f'{raw_path.name} and then try again.')
                 continue
 
+        
         df = pd.json_normalize(json_dicts, max_level=2)
 
-        df.columns = (df.columns.str.replace('\.', '_')
-                      .str.replace('s_', '_'))
+        df.columns = (df.columns.str.replace('.', '_', regex=False)
+                      .str.replace('s_', '_', regex=False))
 
         df = df.rename(columns={'text': 'sent_text'})
 
@@ -189,21 +190,22 @@ def createOutput(hits_df, args):
     view_sample_size = min(5, len(hits_df))
     label = 'Data'
 
-    try:
-        print_table = hits_df[['neg_word', 'colloc', 'sent_text']].sample(
-            view_sample_size).to_markdown()
-    except ImportError:
-        pass
-    else:
-        print(f'```\n#### {label} Sample\n')
-        print(print_table)
-        print('```')
+    if args.verbose:
+        try:
+            print_table = hits_df[['neg_word', 'colloc', 'sent_text']].sample(
+                view_sample_size).to_markdown()
+        except ImportError:
+            pass
+        else:
+            print(f'```\n#### {label} Sample\n')
+            print(print_table)
+            print('```')
 
 
 if __name__ == '__main__':
 
     absStart = time.perf_counter()
-    main()
+    tabulate_hits()
     absFinish = time.perf_counter()
     print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
           '====================================\n')

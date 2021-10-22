@@ -4,6 +4,7 @@ import os
 import time
 from pathlib import Path
 
+# TODO : turn scripts into utilities and import
 
 def main():
 
@@ -19,6 +20,9 @@ def main():
                else list(Path.cwd().glob('*.conll')))
 
     for patdir in patdirs:
+        # skip any directories without at least one .pat file
+        if not list(patdir.glob('*.pat')):
+            continue
 
         for corpus in corpora:
 
@@ -31,14 +35,14 @@ def main():
                 # args: corpus_dir pat_file output
                 corpus_name = corpus.stem.split('.')[0]
                 output_label = '.'.join([corpus_name, pat.stem])
+                data_dir = Path(f'data/{patdir.stem}/{output_label}').resolve()
+                if not data_dir.is_dir():
+                    data_dir.mkdir(parents=True)
 
-                grew_cmd = f'python script/grewSearchDir.py {corpus}/ {pat} {output_label}'
-                print(grew_cmd)
-                os.system(grew_cmd)
+                run_grew(pat, corpus, data_dir, args.replace_raw_data)
 
                 # run fill json
                 # args: FillJson.py [-h] -c CONLLU_DIR -r RAW_DIR [-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}]
-                data_dir = Path(f'data/{patdir.stem}/{output_label}').resolve()
                 filljson_cmd = f'python script/FillJson.py -c {corpus}/ -r {data_dir}/'
                 print(filljson_cmd)
                 os.system(filljson_cmd)
@@ -49,6 +53,23 @@ def main():
 
                 print(tabulate_cmd)
                 os.system(tabulate_cmd)
+
+
+def run_grew(pat, corpus, data_dir, replace):
+
+    if not replace:
+        # if all grew output files already exist in data_dir
+        prev_grew_run = set([d.stem.split('.')[0] for d in data_dir.glob(
+            '*raw*')]) == set([c.stem for c in corpus.iterdir()])
+
+        if prev_grew_run:
+            print(
+                f'{data_dir.relative_to(Path.cwd())} is already fully populated from previous run. Skipping.')
+
+    else:
+        grew_cmd = f'python script/grewSearchDir.py {corpus}/ {pat} {data_dir}'
+        print(grew_cmd)
+        os.system(grew_cmd)
 
 
 def parse_input_args():
@@ -62,13 +83,24 @@ def parse_input_args():
 
     parser.add_argument('-c', '--corpus', action='append', dest='corpora',
                         help='specify any corpus directory to be searched with. '
-                        'Can include as many as desired, but each one needs a flag.',
+                        'Can include as many as desired, but each one needs a flag. '
+                        'If not included, all `.conll` directories will be searched.',
                         type=Path)
 
     parser.add_argument('-p', '--patterns', action='append', dest='patterndirs',
                         help='specify pattern directory to gather data for. '
-                        'Can include as many as desired, but each one needs a flag.',
+                        'Can include as many as desired, but each one needs a flag. '
+                        'If not included, all patterns specified in a `.pat` file '
+                        'will be sought.',
                         type=Path)
+
+    parser.add_argument('-R', '--replace_raw_data', action='store_true',
+                        help='option to replace existing raw grew json output (`...raw.json` '
+                        'files) from a previous run. If not included, previous data '
+                        'will not be overwritten and grew search step will only be '
+                        'performed for data directories that are incompletely populated. '
+                        'Raw data processing scripts will still be run regardless '
+                        '(on existing `.raw.json` files).')
 
     return parser.parse_args()
 

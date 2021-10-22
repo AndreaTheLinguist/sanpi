@@ -4,11 +4,11 @@ import sys
 import time
 from pathlib import Path
 
-##TODO make default to not overwrite existing (non-empty) raw.json files; 
-# otherwise need to have new pat directories for any added patterns
-# (to avoid needing to redo all the searches already run)
+# TODO: make default to not overwrite existing (non-empty) raw.json files; 
+#   otherwise need to have new pat directories for any added patterns
+#   (to avoid needing to redo all the searches already run)
 
-def __main__():
+def grew_search():
 
     args = parseArgs()
 
@@ -21,7 +21,7 @@ def __main__():
     checkArgs(args)
 
     if not outputDir.exists():
-        outputDir.mkdir()
+        outputDir.mkdir(parents=True)
 
     # testDirStr = f'if [ ! -d {outputDir} ]; then mkdir {outputDir}; fi'
     # os.system(testDirStr)
@@ -112,7 +112,7 @@ def parseArgs():
 if __name__ == '__main__':
 
     absStart = time.perf_counter()
-    __main__()
+    grew_search()
     absFinish = time.perf_counter()
     print(f'\nTotal grew search time: '
           f'{round((absFinish - absStart)/60, 2)} minutes\n'
