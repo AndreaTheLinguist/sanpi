@@ -53,7 +53,6 @@ def parseArgs():
                              'result in the output file \'freq/Nyt1_p1-n1_adv-'
                              'adj_counts.csv\'.')
 
-
     parser.add_argument('-m', '--minimal', action='store_true',
                         help='Option produce minimal output. If used, output '
                              'will not have a header row and will have .txt '
@@ -98,7 +97,6 @@ def getHitData(json_dir, args):
                       f'{raw_path.name} and then try again.')
                 continue
 
-        
         df = pd.json_normalize(json_dicts, max_level=2)
 
         df.columns = (df.columns.str.replace('.', '_', regex=False)
@@ -114,10 +112,10 @@ def getHitData(json_dir, args):
         ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: int(min(x)), axis=1),
                              max_ix=ix_df.apply(lambda y: int(max(y)), axis=1))
         windows = [
-            df.lemma_str[x].split()[
+            df.token_str[x].split()[
                 min(0,
                     ix_df.at[x, 'min_ix'] - 2):
-                max(len(df.lemma_str[x]),
+                max(len(df.token_str[x]),
                     ix_df.at[x, 'max_ix'] + 2)]
             for x in df.index
         ]
@@ -128,13 +126,13 @@ def getHitData(json_dir, args):
         df = df.assign(json_source=jf.stem,
                        match_ix=tok_ix_df.apply(
                            lambda x: '-'.join(x), axis=1),
-                       lemma_window=[' '.join(w) for w in windows])
+                       text_window=[' '.join(w) for w in windows])
 
         df = df.convert_dtypes()
 
         # Note: This does not check that the adv and adj are actually true collocates
-        if 'adv_word' in df.columns and 'adj_word' in df.columns:
-            collocs = df.adv_word + '_' + df.adj_word
+        if 'adv_form' in df.columns and 'adj_form' in df.columns:
+            collocs = df.adv_form + '_' + df.adj_form
         else:
             collocs = ''
 
@@ -167,9 +165,9 @@ def createOutput(hits_df, args):
     hit_cols = hits_df.columns
 
     # set given columns as categories (to reduce memory impact)
-    catcols = ['colloc', 'adv_word', 'adj_word',
-               'neg_word', 'nr_word', 'json_source', 'category',
-               # 'mit_word', pos_word, test_word
+    catcols = ['colloc', 'adv_form', 'adj_form',
+               'neg_form', 'nr_form', 'json_source', 'category',
+               # 'mit_form', pos_form, test_form
                ]
     for col in catcols:
         if col not in hit_cols:
@@ -177,11 +175,12 @@ def createOutput(hits_df, args):
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
 
     # sort columns of dataframe
+    required_cols = ['colloc', 'sent_text']
     priority_cols = [c for c in hit_cols
-                     if c in ('colloc', 'sent_text', 'lemma_window', 'neg_word',
-                              'adv_word', 'adj_word', 'relay_word', 'nr_word')]
-    othercols = [c for c in hit_cols if c not in priority_cols]
-    hits_df = hits_df[priority_cols + othercols]
+                     if c in ('text_window', 'neg_form',
+                              'adv_form', 'adj_form', 'relay_form', 'nr_form')]
+    other_cols = [c for c in hit_cols if c not in priority_cols]
+    hits_df = hits_df[required_cols + priority_cols + other_cols]
 
     # write rows to file
     outpath = outputDir / fname
@@ -192,7 +191,7 @@ def createOutput(hits_df, args):
 
     if args.verbose:
         try:
-            print_table = hits_df[['neg_word', 'colloc', 'sent_text']].sample(
+            print_table = hits_df[['neg_form', 'colloc', 'sent_text']].sample(
                 view_sample_size).to_markdown()
         except ImportError:
             pass

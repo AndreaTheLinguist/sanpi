@@ -6,6 +6,8 @@ from pathlib import Path
 
 # TODO : turn scripts into utilities and import
 # TODO : add counter/progress message: e.g. x out of total
+
+
 def main():
 
     # check requirements
