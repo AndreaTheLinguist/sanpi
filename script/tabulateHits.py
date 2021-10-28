@@ -102,31 +102,15 @@ def getHitData(json_dir, args):
         df.columns = (df.columns.str.replace('.', '_', regex=False)
                       .str.replace('s_', '_', regex=False))
 
-        df = df.rename(columns={'text': 'sent_text'})
+        df = (df
+              .rename(columns={'text': 'sent_text'})
+              .assign(json_source=jf.stem))
 
         invert_pat = re.compile(r'(\w+)_([A-Z]+)')
         df.columns = [invert_pat.sub(r'\2_\1', label).lower()
                       for label in df.columns]
 
-        ix_df = df.loc[:, df.columns.str.endswith('index')]
-        ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: int(min(x)), axis=1),
-                             max_ix=ix_df.apply(lambda y: int(max(y)), axis=1))
-        windows = [
-            df.token_str[x].split()[
-                min(0,
-                    ix_df.at[x, 'min_ix'] - 2):
-                max(len(df.token_str[x]),
-                    ix_df.at[x, 'max_ix'] + 2)]
-            for x in df.index
-        ]
-
-        tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
-            ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
-
-        df = df.assign(json_source=jf.stem,
-                       match_ix=tok_ix_df.apply(
-                           lambda x: '-'.join(x), axis=1),
-                       text_window=[' '.join(w) for w in windows])
+        df = process_ix(df)
 
         df = df.convert_dtypes()
 
@@ -142,6 +126,45 @@ def getHitData(json_dir, args):
         df_from_json = pd.concat([df, df_from_json])
 
     return df_from_json
+
+
+def process_ix(df):
+    utt_len = df.token_str.apply(lambda x: len(x))
+    ix_df = df.loc[:, df.columns.str.endswith('index')
+                   ].fillna(0)
+
+    ix_df = ix_df.apply(pd.to_numeric)
+
+    ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: min(x), axis=1),
+                         max_ix=ix_df.apply(lambda y: max(y), axis=1),
+                         utt_len=utt_len,
+                         token_str=df.token_str)
+
+    windows = list(generate_window(ix_df))
+
+    # select index int columns to be used in creating hit id
+    tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
+        ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
+
+    df = df.assign(match_ix=tok_ix_df.apply(lambda x: '-'.join(x), axis=1),
+                   text_window=windows)
+
+    return df
+
+
+def generate_window(df):
+
+    for row in df.index:
+        min_ix = df.at[row, 'min_ix']
+        max_ix = df.at[row, 'max_ix']
+        go_back_2 = df.at[row, 'min_ix'] - 2
+        go_forward_2 = df.at[row, 'max_ix'] + 2
+
+        w0 = max(0, go_back_2)
+        w1 = min(df.at[row, 'utt_len'],
+                 go_forward_2) + 1
+
+        yield ' '.join(df.token_str[row].split()[w0:w1])
 
 
 def createOutput(hits_df, args):

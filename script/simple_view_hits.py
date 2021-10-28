@@ -8,7 +8,7 @@ import argparse
 # from sys import argv
 from pathlib import Path
 
-default_col_endings = ['colloc', 'window', 'word', 'id']
+default_col_endings = ['colloc', 'text', 'form', 'id']
 
 
 def main():
