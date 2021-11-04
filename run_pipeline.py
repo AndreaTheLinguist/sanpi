@@ -1,3 +1,12 @@
+"""simple "glue" script to initiate multiple pipes in one go. 
+            If no arguments are given, every corpus dir and pattern subdir 
+            in the current working directory will be run.
+
+    Returns:
+        panas.DataFrame formatted into a csv file for every combination of 
+        corpus directory and pattern file
+    """
+
 
 import argparse
 import os
@@ -10,15 +19,15 @@ from pathlib import Path
 
 def main():
 
+    args = parse_input_args()
+
     # check requirements
     os.system('bash script/checkRequirements.sh')
 
-    args = parse_input_args()
-
-    patdirs = (args.patterndirs if args.patterndirs
+    patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
                else list(Path.cwd().glob('Pat/*')))
 
-    corpora = (args.corpora if args.corpora
+    corpora = ((c.resolve() for c in args.corpora) if args.corpora
                else list(Path.cwd().glob('*.conll')))
 
     for patdir in patdirs:
@@ -29,7 +38,7 @@ def main():
         for corpus in corpora:
 
             print(
-                f'>> searching _{corpus.relative_to(Path.cwd())}_ for '
+                f'>> searching `{corpus.relative_to(Path.cwd())}` for '
                 f'patterns specified in _{patdir.relative_to(Path.cwd())}_...')
 
             # run grew search
@@ -44,16 +53,16 @@ def main():
                 run_grew(pat, corpus, data_dir, args.replace_raw_data)
 
                 # run fill json
-                # args: FillJson.py [-h] -c CONLLU_DIR -r RAW_DIR [-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}]
-                filljson_cmd = f'python script/FillJson.py -c {corpus}/ -r {data_dir}/'
-                print(filljson_cmd)
+                # args: FillJson.py [-h] CONLLU_DIR RAW_DIR [-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}]
+                filljson_cmd = f'python3 script/FillJson.py {corpus}/ {data_dir}/'
+                print('\n'+filljson_cmd)
                 os.system(filljson_cmd)
 
                 # run tabulate
-                # usage: tabulateHits.py [-h] -p PAT_JSON_DIR -o OUTPUTPREFIX [-m] [-v]
-                tabulate_cmd = f'python script/tabulateHits.py -p {data_dir} -o {corpus_name}_{pat.stem}'
+                # usage: tabulateHits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
+                tabulate_cmd = f'python3 script/tabulateHits.py {data_dir} {corpus_name}_{pat.stem}'
 
-                print(tabulate_cmd)
+                print('\n'+tabulate_cmd)
                 os.system(tabulate_cmd)
 
 
@@ -66,11 +75,11 @@ def run_grew(pat, corpus, data_dir, replace):
 
         if prev_grew_run:
             print(
-                f'{data_dir.relative_to(Path.cwd())} is already fully populated from previous run. Skipping.')
+                f'\n{data_dir.relative_to(Path.cwd())} is already fully populated from previous run. Skipping.')
 
     else:
-        grew_cmd = f'python script/grewSearchDir.py {corpus}/ {pat} {data_dir}'
-        print(grew_cmd)
+        grew_cmd = f'python3 script/grewSearchDir.py {corpus}/ {pat} {data_dir}'
+        print('\n'+grew_cmd)
         os.system(grew_cmd)
 
 
@@ -78,21 +87,20 @@ def parse_input_args():
 
     parser = argparse.ArgumentParser(
         description=(
-            'simple glue program to initiate multiple pipes in one go. '
-            'Default log option will be used. If no arguments are '
-            'given, every corpus dir and pattern subdir in the current '
-            'working directory will be run.'))
+            'simple "glue" script to initiate multiple pipes in one go. '
+            'If no arguments are given, every corpus dir and pattern subdir '
+            'in the current working directory will be run.'))
 
     parser.add_argument('-c', '--corpus', action='append', dest='corpora',
-                        help='specify any corpus directory to be searched with. '
+                        help='specify any corpus directory to be searched for pattern(s). '
                         'Can include as many as desired, but each one needs a flag. '
-                        'If not included, all `.conll` directories will be searched.',
+                        'If none specified, all `.conll` directories will be searched.',
                         type=Path)
 
     parser.add_argument('-p', '--patterns', action='append', dest='patterndirs',
-                        help='specify pattern directory to gather data for. '
+                        help='specify pattern directory containing patterns to search for. '
                         'Can include as many as desired, but each one needs a flag. '
-                        'If not included, all patterns specified in a `.pat` file '
+                        'If none specified, all patterns specified in a `.pat` file '
                         'will be sought.',
                         type=Path)
 

@@ -97,7 +97,7 @@ def add_conll_info(hits, conllfile):
 
         sent_id = hit_conll.id
         sent_text = hit_conll.text
-        
+
         if sent_id == get_context_id(prev_id, 1) and prev_id in hit_ids:
 
             # hitIndexList should always be defined if previous sentence was a hit
@@ -120,7 +120,7 @@ def add_conll_info(hits, conllfile):
             for hitIndex in hitIndexList:
 
                 hit = hits[hitIndex]
-                
+
                 hit['prev_sent'] = prev_sent
 
                 raw_match_info = hit.pop('matching')
@@ -156,13 +156,13 @@ def include_context(hits):
 
 def get_context_id(sid, position: int):
 
-    if '_' in sid: 
+    if '_' in sid:
         parts = sid.rsplit('_', 1)
-        cix =  f'{parts[0]}_{int(parts[1]) + position}'
-    
-    else: 
+        cix = f'{parts[0]}_{int(parts[1]) + position}'
+
+    else:
         cix = ''
-        
+
     return cix
 
 
@@ -286,11 +286,11 @@ def parseArgs():
             'result) files in a given directory and output new json files with '
             'info filled in from the corresponding .conllu (corpus info) files'))
 
-    parser.add_argument('-c', '--conllu_dir', required=True, type=Path,
+    parser.add_argument('conllu_dir', type=Path,
                         help='path to directory containing sentences .conllu '
                         'files. e.g. Nyt1.conll')
 
-    parser.add_argument('-r', '--raw_dir', type=Path, required=True,
+    parser.add_argument('raw_dir', type=Path,
                         help='path to directory containing unprocessed/raw '
                         '.json search result files to be processed of '
                         'form \'<sentenceSetID>.raw.json\'. e.g. Nyt1.if')

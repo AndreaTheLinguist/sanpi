@@ -2,12 +2,10 @@
 
 import argparse
 import json
+import re
 import sys
 import time
-import re
-from collections import namedtuple
 from pathlib import Path
-from pprint import pprint
 
 import pandas as pd
 
@@ -39,11 +37,11 @@ def parseArgs():
     parser = argparse.ArgumentParser(
         description='script consolidate relevant hit data from filled json files into csv files')
 
-    parser.add_argument('-p', '--pat_json_dir', type=Path, required=True,
+    parser.add_argument('pat_json_dir', type=Path,
                         help='path to directory containing filled json files '
                              'for pattern.')
 
-    parser.add_argument('-o', '--outputPrefix', type=str, required=True,
+    parser.add_argument('outputPrefix', type=str,
                         help='prefix for output file to be written to the '
                              '\'hits\' subdirectory (created if necessary) '
                              'found in the directory the script is run from. '
@@ -52,11 +50,6 @@ def parseArgs():
                              'e.g. \'Nyt1_[pattern filename]_\' which would '
                              'result in the output file \'freq/Nyt1_p1-n1_adv-'
                              'adj_counts.csv\'.')
-
-    parser.add_argument('-m', '--minimal', action='store_true',
-                        help='Option produce minimal output. If used, output '
-                             'will not have a header row and will have .txt '
-                             'extension')
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
@@ -169,7 +162,6 @@ def generate_window(df):
 
 def createOutput(hits_df, args):
 
-    txt = args.minimal
     patPath = args.pat_json_dir
     patcat = patPath.parent.stem
 
@@ -178,9 +170,7 @@ def createOutput(hits_df, args):
     if not outputDir.exists():
         outputDir.mkdir(parents=True)
 
-    suffix = '.txt' if txt else '.csv'
-
-    fname = f'{args.outputPrefix}_hits{suffix}'
+    fname = f'{args.outputPrefix}_hits.csv'
 
     hits_df = hits_df.set_index('hit_id')
 

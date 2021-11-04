@@ -211,7 +211,7 @@ do
 
   else
     
-    python3 ./script/grewSearchDir.py $corpusdir $pat $jsondir && python3 ./script/FillJson.py -c $corpusdir -r $jsondir && python3 script/tabulateHits.py -p $jsondir -o $hitslabel
+    python3 ./script/grewSearchDir.py $corpusdir $pat $jsondir && python3 ./script/FillJson.py $corpusdir $jsondir && python3 script/tabulateHits.py $jsondir $hitslabel
 
   fi
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # checkRequirements.sh
 
-echo "_Checking for requirements..._"
+echo "Checking for requirements..."
 echo "\`\`\`"
 if [[ $(echo "`which python3 -m pyconll`" ) == "" ]]
 then 
@@ -51,3 +51,4 @@ then
   opam install grew grewpy
 fi
 echo "grew located in $(echo "`which grew`")"
+echo "\`\`\`"
