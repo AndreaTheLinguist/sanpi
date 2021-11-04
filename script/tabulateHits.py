@@ -192,7 +192,8 @@ def createOutput(hits_df, args):
     priority_cols = [c for c in hit_cols
                      if c in ('text_window', 'neg_form',
                               'adv_form', 'adj_form', 'relay_form', 'nr_form')]
-    other_cols = [c for c in hit_cols if c not in priority_cols]
+    other_cols = [c for c in hit_cols
+                  if c not in priority_cols + required_cols]
     hits_df = hits_df[required_cols + priority_cols + other_cols]
 
     # write rows to file
