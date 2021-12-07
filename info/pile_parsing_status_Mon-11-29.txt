@@ -1,0 +1,83 @@
+==> test.log <==
+        20.69  sec elapsed
+  4706 of 52790: PiCC_test_04705
+        177.13  sec elapsed
+  4707 of 52790: PiCC_test_04706
+        172.64  sec elapsed
+  4708 of 52790: PiCC_test_04707
+        38.77  sec elapsed
+  4709 of 52790: PiCC_test_04708
+        487.42  sec elapsed
+  4710 of 52790: PiCC_test_04709
+
+==> tr12-13.log <==
+        172.34  sec elapsed
+  3587 of 1748845: PiCC_12_0003586
+        169.11  sec elapsed
+  3588 of 1748845: PiCC_12_0003587
+        25.99  sec elapsed
+  3589 of 1748845: PiCC_12_0003588
+        28.11  sec elapsed
+  3590 of 1748845: PiCC_12_0003589
+Killed
+arh234@kay:~/snpa$ 
+
+==> tr14-15.log <==
+        38.77  sec elapsed
+  4667 of 1748739: PiCC_14_0004666
+        18.59  sec elapsed
+  4668 of 1748739: PiCC_14_0004667
+        59.75  sec elapsed
+  4669 of 1748739: PiCC_14_0004668
+        19.85  sec elapsed
+  4670 of 1748739: PiCC_14_0004669
+        29.16  sec elapsed
+  4671 of 1748739: PiCC_14_0004670
+
+==> tr16-17.log <==
+        19.06  sec elapsed
+  4621 of 1747129: PiCC_16_0004620
+        297.19  sec elapsed
+  4622 of 1747129: PiCC_16_0004621
+        22.87  sec elapsed
+  4623 of 1747129: PiCC_16_0004622
+        110.34  sec elapsed
+  4624 of 1747129: PiCC_16_0004623
+        242.07  sec elapsed
+  4625 of 1747129: PiCC_16_0004624
+
+==> tr18-19.log <==
+        299.84  sec elapsed
+  4492 of 1749493: PiCC_18_0004491
+        185.18  sec elapsed
+  4493 of 1749493: PiCC_18_0004492
+        15.68  sec elapsed
+  4494 of 1749493: PiCC_18_0004493
+        19.15  sec elapsed
+  4495 of 1749493: PiCC_18_0004494
+        28.4  sec elapsed
+  4496 of 1749493: PiCC_18_0004495
+
+==> tr26-29.log <==
+        28.94  sec elapsed
+  4485 of 1747482: PiCC_26_0004484
+        18.64  sec elapsed
+  4486 of 1747482: PiCC_26_0004485
+        17.64  sec elapsed
+  4487 of 1747482: PiCC_26_0004486
+        37.42  sec elapsed
+  4488 of 1747482: PiCC_26_0004487
+        124.93  sec elapsed
+  4489 of 1747482: PiCC_26_0004488
+
+==> val.log <==
+        26.58  sec elapsed
+  4484 of 52792: PiCC_val_04483
+        25.73  sec elapsed
+  4485 of 52792: PiCC_val_04484
+        39.29  sec elapsed
+  4486 of 52792: PiCC_val_04485
+        397.54  sec elapsed
+  4487 of 52792: PiCC_val_04486
+        167.28  sec elapsed
+  4488 of 52792: PiCC_val_04487

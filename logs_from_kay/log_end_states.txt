@@ -1,0 +1,83 @@
+==> test.log <==
+        29.54  sec elapsed
+  10839 of 52790: PiCC_test_10838
+        25.33  sec elapsed
+  10840 of 52790: PiCC_test_10839
+        16.16  sec elapsed
+  10841 of 52790: PiCC_test_10840
+        129.95  sec elapsed
+  10842 of 52790: PiCC_test_10841
+        293.0  sec elapsed
+  10843 of 52790: PiCC_test_10842
+
+==> tr12-13.log <==
+  3587 of 1748845: PiCC_12_0003586
+        169.11  sec elapsed
+  3588 of 1748845: PiCC_12_0003587
+        25.99  sec elapsed
+  3589 of 1748845: PiCC_12_0003588
+        28.11  sec elapsed
+  3590 of 1748845: PiCC_12_0003589
+Killed
+arh234@kay:~/snpa$ [Karh234@kay:~/snpa$ exit
+exit
+
+==> tr14-15.log <==
+        561.53  sec elapsed
+  10581 of 1748739: PiCC_14_0010580
+        176.18  sec elapsed
+  10582 of 1748739: PiCC_14_0010581
+        45.12  sec elapsed
+  10583 of 1748739: PiCC_14_0010582
+        221.22  sec elapsed
+  10584 of 1748739: PiCC_14_0010583
+        18.56  sec elapsed
+  10585 of 1748739: PiCC_14_0010584
+
+==> tr16-17.log <==
+  5232 of 1747129: PiCC_16_0005231
+        167.2  sec elapsed
+  5233 of 1747129: PiCC_16_0005232
+        29.14  sec elapsed
+  5234 of 1747129: PiCC_16_0005233
+        15.02  sec elapsed
+  5235 of 1747129: PiCC_16_0005234
+Killed
+arh234@kay:~/snpa$ [Karh234@kay:~/snpa$ exit
+exit
+
+==> tr18-19.log <==
+        12.72  sec elapsed
+  10745 of 1749493: PiCC_18_0010744
+        24.25  sec elapsed
+  10746 of 1749493: PiCC_18_0010745
+        75.77  sec elapsed
+  10747 of 1749493: PiCC_18_0010746
+        222.75  sec elapsed
+  10748 of 1749493: PiCC_18_0010747
+        23.89  sec elapsed
+  10749 of 1749493: PiCC_18_0010748
+
+==> tr26-29.log <==
+        18.34  sec elapsed
+  10458 of 1747482: PiCC_26_0010457
+        17.18  sec elapsed
+  10459 of 1747482: PiCC_26_0010458
+        21.53  sec elapsed
+  10460 of 1747482: PiCC_26_0010459
+        18.15  sec elapsed
+  10461 of 1747482: PiCC_26_0010460
+        16.61  sec elapsed
+  10462 of 1747482: PiCC_26_0010461
+
+==> val.log <==
+        15.34  sec elapsed
+  10801 of 52792: PiCC_val_10800
+        24.77  sec elapsed
+  10802 of 52792: PiCC_val_10801
+        28.89  sec elapsed
+  10803 of 52792: PiCC_val_10802
+        12.37  sec elapsed
+  10804 of 52792: PiCC_val_10803
+        43.34  sec elapsed
+  10805 of 52792: PiCC_val_10804
