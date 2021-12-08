@@ -1,0 +1,72 @@
+(base) [01;32mandrea@Delilah[00m:[01;34m~[00m$ cd snap[K[K[K[Klitotes/
+(base) [01;32mandrea@Delilah[00m:[01;34m~/litotes[00m$ ls
+[0m[01;34mNyt1clean.conll[0m                   [01;34minfo[0m                                         [01;31mpositive-negative_thresh3_freq-table.pkl.gz[0m
+[01;34mPat[0m                               [01;34mlogs[0m                                         [01;34mprelim_data_samples[0m
+[01;34mPat_old[0m                           [01;34mlogs_from_kay[0m                                [01;34mprocess_pile[0m
+[01;34mPile-CC_12.conll[0m                  [01;34mlongtest.conll[0m                               [01;34mquick2.conll[0m
+[01;34mPile-CC_fixed.conll[0m               [01;31mnegative-contexts_adj-freq-table.pkl.gz[0m      [01;34mquicktest.conll[0m
+README.md                         [01;31mnegative-contexts_adv-freq-table.pkl.gz[0m      [01;32mrun_bash.py[0m
+[01;31mall-contexts_freq-table.pkl.gz[0m    [01;31mnegative-contexts_colloc-freq-table.pkl.gz[0m   [01;32mrun_pipeline.py[0m
+[01;31mall-contexts_with-overlap.pkl.gz[0m  [01;31mnegative-contexts_freq-table.pkl.gz[0m          sanity_check_div.ipynb
+[01;34mapwtest.conll[0m                     no-overlap_polarity_summary.csv              sanity_check_divs.py
+[01;34mbackup[0m                            [01;34mnyDec2010.conll[0m                              [01;34mscript[0m
+[01;31mcompiled_hits.pkl.gz[0m              [01;34mnyFeb2010.conll[0m                              [01;31mtest-contexts_adj-freq-table.pkl.gz[0m
+context_overlap_hits.csv          [01;34mold[0m                                          [01;31mtest-contexts_adv-freq-table.pkl.gz[0m
+[01;34mdata[0m                              [01;31mpileparse_pile_sample.pkl.gz[0m                 [01;31mtest-contexts_colloc-freq-table.pkl.gz[0m
+[01;34mdata_samples[0m                      [01;34mplayground[0m                                   [01;31mtest-contexts_freq-table.pkl.gz[0m
+duplicated_sents_info.csv         [01;31mpositive-contexts_adj-freq-table.pkl.gz[0m      test.ipynb
+explore.ipynb                     [01;31mpositive-contexts_adv-freq-table.pkl.gz[0m      [01;34mtest_data[0m
+explore_new_hits.ipynb            [01;31mpositive-contexts_colloc-freq-table.pkl.gz[0m   [01;34mtesting.conll[0m
+[01;34mhits[0m                              [01;31mpositive-contexts_freq-table.pkl.gz[0m          workspace.code-workspace
+[01;34mhits_old[0m                          [01;31mpositive-negative_thresh0_freq-table.pkl.gz[0m
+(base) [01;32mandrea@Delilah[00m:[01;34m~/litotes[00m$ python run_pipeline.py -c Pile-Cc[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[?5h[?5l[?5h[?5l[?5h[?5l[?5h[?5l[?5h[?5l[?5h[?5l[?5h[?5l[?5h[?5lls -lht P[K*12*
+total 317M
+-rw-r--r-- 1 andrea andrea  54M Dec  7 22:15 [0m[01;31mPiCC_12.conllu.gz[0m
+-rw-r--r-- 1 andrea andrea 264M Dec  7 22:15 PiCC_12.conllu
+(base) [01;32mandrea@Delilah[00m:[01;34m~/litotes[00m$ ce [K[Kd[K[K[?5h[?5lls -[K*12*
+PiCC_12.conllu  [0m[01;31mPiCC_12.conllu.gz[0m
+(base) [01;32mandrea@Delilah[00m:[01;34m~/litotes[00m$ ls *12*/**[K
+Pile-CC_12.conll/PiCC_12.conllu  [0m[01;31mPile-CC_12.conll/PiCC_12.conllu.gz[0m
+(base) [01;32mandrea@Delilah[00m:[01;34m~/litotes[00m$ ls *12*/*[K-lht *12*[Kcd litotes/ls[K -lht *12*[Kcd litotes/python script/fix_pile_textbreaks.py Pile-CC.conll/[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd litotes/[Kpython script/fix_pile_textbreaks.py Pile-CC.conll/[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd litotes/[Kls[K -lht *12*[5P*12*/*[K[?5h[?5l[?5h[?5l[?5h[?5lls *12*/*[K-lht *12*[Kcd litotes/python script/fix_pile_textbreaks.py Pile-CC.conll/[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kcd litotes/[1Pandrea/[4Plit[1P..python script/fix_pile_textbreaks.py Pile-CC.conll/[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kpython script/fix_pile_textbreaks.py Pile-CC.conll/[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kcd litotes/python run_pipeline.py -c Pile-CC_12_fixed.conll/ -p Pat/immediateNeg/ -R[1P[1P[1P[1P[1P[1P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+Checking for requirements...
+```
+pyconll located in /home/andrea/anaconda3/bin/python3
+pandas located in /home/andrea/anaconda3/bin/python3
+grew located in /home/andrea/.opam/4.11.1/bin/grew
+```
+>> searching `Pile-CC_12.conll` for patterns specified in _Pat/immediateNeg_...
+
+python3 script/grewSearchDir.py /home/andrea/litotes/Pile-CC_12.conll/ /home/andrea/litotes/Pat/immediateNeg/without_relay.pat /home/andrea/litotes/data/immediateNeg/Pile-CC_12.without_relay
+```
+### Running grew search on `Pile-CC_12.conll`...
+```
+1 total file(s) to be searched.
+-> searching Pile-CC_12.conll/PiCC_12.conllu:
+grew grep -pattern /home/andrea/litotes/Pat/immediateNeg/without_relay.pat -i /home/andrea/litotes/Pile-CC_12.conll/PiCC_12.conllu > /home/andrea/litotes/data/immediateNeg/Pile-CC_12.without_relay/PiCC_12.raw.json
+Killed
+1.5 minutes on PiCC_12.conllu
+
+Total grew search time: 1.5 minutes
+==============================================
+
+
+python3 script/FillJson.py /home/andrea/litotes/Pile-CC_12.conll/ /home/andrea/litotes/data/immediateNeg/Pile-CC_12.without_relay/
+```
+### Running `FillJson.py` script on json files in `Pile-CC_12.without_relay` from conll files in `Pile-CC_12.conll`...
+```
+-> Processing PiCC_12...
+! -> Skipping. (file is empty)
+Finished processing all corresponding json and conll files.
+
+Time elapsed: 0.0 minutes
+====================================
+
+
+python3 script/tabulateHits.py /home/andrea/litotes/data/immediateNeg/Pile-CC_12.without_relay Pile-CC_12_without_relay
+```
+### Tabulating hits via `tabulateHits.py`...
+```
+Error: specified json directory does not contain any processed json files.
+total time: 1.53 minutes
+(base) [01;32mandrea@Delilah[00m:[01;34m~/litotes[00m$ exit
+exit

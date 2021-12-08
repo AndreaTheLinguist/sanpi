@@ -2,18 +2,16 @@
 
 import argparse
 import json
+import re
 import sys
 import time
-import re
-from collections import namedtuple
 from pathlib import Path
-from pprint import pprint
 
 import pandas as pd
 
 
-def main():
-
+def tabulate_hits():
+    absStart = time.perf_counter()
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = parseArgs()
 
@@ -34,16 +32,20 @@ def main():
     else:
         sys.exit('No valid hits found.')
 
+    absFinish = time.perf_counter()
+    print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
+          '====================================\n')
+
 
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='script consolidate relevant hit data from filled json files into csv files')
 
-    parser.add_argument('-p', '--pat_json_dir', type=Path, required=True,
+    parser.add_argument('pat_json_dir', type=Path,
                         help='path to directory containing filled json files '
                              'for pattern.')
 
-    parser.add_argument('-o', '--outputPrefix', type=str, required=True,
+    parser.add_argument('outputPrefix', type=str,
                         help='prefix for output file to be written to the '
                              '\'hits\' subdirectory (created if necessary) '
                              'found in the directory the script is run from. '
@@ -52,12 +54,6 @@ def parseArgs():
                              'e.g. \'Nyt1_[pattern filename]_\' which would '
                              'result in the output file \'freq/Nyt1_p1-n1_adv-'
                              'adj_counts.csv\'.')
-
-
-    parser.add_argument('-m', '--minimal', action='store_true',
-                        help='Option produce minimal output. If used, output '
-                             'will not have a header row and will have .txt '
-                             'extension')
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
@@ -100,40 +96,24 @@ def getHitData(json_dir, args):
 
         df = pd.json_normalize(json_dicts, max_level=2)
 
-        df.columns = (df.columns.str.replace('\.', '_')
-                      .str.replace('s_', '_'))
+        df.columns = (df.columns.str.replace('.', '_', regex=False)
+                      .str.replace('s_', '_', regex=False))
 
-        df = df.rename(columns={'text': 'sent_text'})
+        df = (df
+              .rename(columns={'text': 'sent_text'})
+              .assign(json_source=jf.stem))
 
         invert_pat = re.compile(r'(\w+)_([A-Z]+)')
         df.columns = [invert_pat.sub(r'\2_\1', label).lower()
                       for label in df.columns]
 
-        ix_df = df.loc[:, df.columns.str.endswith('index')]
-        ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: int(min(x)), axis=1),
-                             max_ix=ix_df.apply(lambda y: int(max(y)), axis=1))
-        windows = [
-            df.lemma_str[x].split()[
-                min(0,
-                    ix_df.at[x, 'min_ix'] - 2):
-                max(len(df.lemma_str[x]),
-                    ix_df.at[x, 'max_ix'] + 2)]
-            for x in df.index
-        ]
-
-        tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
-            ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
-
-        df = df.assign(json_source=jf.stem,
-                       match_ix=tok_ix_df.apply(
-                           lambda x: '-'.join(x), axis=1),
-                       lemma_window=[' '.join(w) for w in windows])
+        df = process_ix(df)
 
         df = df.convert_dtypes()
 
         # Note: This does not check that the adv and adj are actually true collocates
-        if 'adv_word' in df.columns and 'adj_word' in df.columns:
-            collocs = df.adv_word + '_' + df.adj_word
+        if 'adv_form' in df.columns and 'adj_form' in df.columns:
+            collocs = df.adv_form + '_' + df.adj_form
         else:
             collocs = ''
 
@@ -145,9 +125,50 @@ def getHitData(json_dir, args):
     return df_from_json
 
 
+def process_ix(df):
+    if any(df.token_str.isna()): 
+        print(' --> WARNING: empty token string(s) in json data.')
+    df = df.assign(token_str = df.token_str.astype('string').fillna(''))
+    utt_len = df.token_str.apply(lambda x: len(x))
+    ix_df = df.loc[:, df.columns.str.endswith('index')
+                   ].fillna(0)
+
+    ix_df = ix_df.apply(pd.to_numeric)
+
+    ix_df = ix_df.assign(min_ix=ix_df.apply(lambda x: min(x), axis=1),
+                         max_ix=ix_df.apply(lambda y: max(y), axis=1),
+                         utt_len=utt_len,
+                         token_str=df.token_str)
+
+    windows = list(generate_window(ix_df))
+
+    # select index int columns to be used in creating hit id
+    tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
+        ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
+
+    df = df.assign(match_ix=tok_ix_df.apply(lambda x: '-'.join(x), axis=1),
+                   text_window=windows)
+
+    return df
+
+
+def generate_window(df):
+
+    for row in df.index:
+        min_ix = df.at[row, 'min_ix']
+        max_ix = df.at[row, 'max_ix']
+        go_back_2 = df.at[row, 'min_ix'] - 2
+        go_forward_2 = df.at[row, 'max_ix'] + 2
+
+        w0 = max(0, go_back_2)
+        w1 = min(df.at[row, 'utt_len'],
+                 go_forward_2) + 1
+
+        yield ' '.join(df.token_str[row].split()[w0:w1])
+
+
 def createOutput(hits_df, args):
 
-    txt = args.minimal
     patPath = args.pat_json_dir
     patcat = patPath.parent.stem
 
@@ -156,9 +177,7 @@ def createOutput(hits_df, args):
     if not outputDir.exists():
         outputDir.mkdir(parents=True)
 
-    suffix = '.txt' if txt else '.csv'
-
-    fname = f'{args.outputPrefix}_hits{suffix}'
+    fname = f'{args.outputPrefix}_hits.csv'
 
     hits_df = hits_df.set_index('hit_id')
 
@@ -166,9 +185,9 @@ def createOutput(hits_df, args):
     hit_cols = hits_df.columns
 
     # set given columns as categories (to reduce memory impact)
-    catcols = ['colloc', 'adv_word', 'adj_word',
-               'neg_word', 'nr_word', 'json_source', 'category',
-               # 'mit_word', pos_word, test_word
+    catcols = ['colloc', 'adv_form', 'adj_form',
+               'neg_form', 'nr_form', 'json_source', 'category',
+               # 'mit_form', pos_form, test_form
                ]
     for col in catcols:
         if col not in hit_cols:
@@ -176,11 +195,13 @@ def createOutput(hits_df, args):
     hits_df.loc[:, catcols] = hits_df[catcols].astype('category')
 
     # sort columns of dataframe
+    required_cols = ['colloc', 'sent_text']
     priority_cols = [c for c in hit_cols
-                     if c in ('colloc', 'sent_text', 'lemma_window', 'neg_word',
-                              'adv_word', 'adj_word', 'relay_word', 'nr_word')]
-    othercols = [c for c in hit_cols if c not in priority_cols]
-    hits_df = hits_df[priority_cols + othercols]
+                     if c in ('text_window', 'neg_form',
+                              'adv_form', 'adj_form', 'relay_form', 'nr_form')]
+    other_cols = [c for c in hit_cols
+                  if c not in priority_cols + required_cols]
+    hits_df = hits_df[required_cols + priority_cols + other_cols]
 
     # write rows to file
     outpath = outputDir / fname
@@ -189,21 +210,18 @@ def createOutput(hits_df, args):
     view_sample_size = min(5, len(hits_df))
     label = 'Data'
 
-    try:
-        print_table = hits_df[['neg_word', 'colloc', 'sent_text']].sample(
-            view_sample_size).to_markdown()
-    except ImportError:
-        pass
-    else:
-        print(f'```\n#### {label} Sample\n')
-        print(print_table)
-        print('```')
+    if args.verbose:
+        try:
+            print_table = hits_df[['neg_form', 'colloc', 'sent_text']].sample(
+                view_sample_size).to_markdown()
+        except ImportError:
+            pass
+        else:
+            print(f'```\n#### {label} Sample\n')
+            print(print_table)
+            print('```')
 
 
 if __name__ == '__main__':
 
-    absStart = time.perf_counter()
-    main()
-    absFinish = time.perf_counter()
-    print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
-          '====================================\n')
+    tabulate_hits()

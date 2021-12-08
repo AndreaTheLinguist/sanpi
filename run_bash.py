@@ -1,6 +1,6 @@
 
-import os
 import argparse
+import os
 from pathlib import Path
 
 
@@ -22,16 +22,18 @@ def main():
 
     args = parser.parse_args()
 
-    patdirs = args.patterndirs if args.patterndirs else list(
-        Path.cwd().glob('Pat/*'))
-    corpora = args.corpora if args.corpora else list(
-        Path.cwd().glob('*.conll'))
+    patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
+               else list(Path.cwd().glob('Pat/*')))
+
+    corpora = ((c.resolve() for c in args.corpora) if args.corpora
+               else list(Path.cwd().glob('*.conll')))
 
     for patdir in patdirs:
 
         for corpus in corpora:
 
-            print(f'>> searching _{corpus}_ for patterns specified in _{patdir}_...')
+            print(
+                f'>> searching {corpus} for patterns specified in {patdir}...')
             cmd_str = f'./script/makeTable.sh {corpus}/ {patdir}/ default'
             print(cmd_str)
             os.system(cmd_str)

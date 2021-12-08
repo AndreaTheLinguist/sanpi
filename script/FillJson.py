@@ -1,26 +1,229 @@
 import argparse
-from collections import namedtuple
 import json
 import sys
 import time
+from collections import namedtuple
 from pathlib import Path
 
 import pyconll
 
-deptup = namedtuple('dependency', ['source', 'target', 'relation', 'enhanced'])
+deptup = namedtuple('dependency', ['source', 'target', 'relation'])
 toktup = namedtuple('token', ['lemma', 'ix', 'xpos', 'deprel', 'head'])
 
 
-def __main__():
-
+def fill_json():
+    absStart = time.perf_counter()
     args = parseArgs()
+
+    prefixes, outputDir = check_dirs(args)
+
     jsonDirPath = args.raw_dir
     conllDirPath = args.conllu_dir
+    rewrite = args.rewriteFiles
 
     print(
         f'```\n### Running `FillJson.py` script on json files in '
         f'`{jsonDirPath.name}` from conll files in `{conllDirPath.name}`...\n'
         f'```')
+
+    for pref in prefixes:
+
+        startTime = time.perf_counter()
+
+        jsonfile = jsonDirPath.joinpath(f'{pref}.raw.json')
+        conllfile = conllDirPath.joinpath(f'{pref}.conllu')
+
+        if rewrite != 'yes' and skipFiles(pref, jsonDirPath, rewrite):
+            print(
+                f'-> Files with prefix {pref} have prior processing:\n'
+                f'   + File {jsonfile.relavtive_to(jsonfile.parent)} '
+                f'(from prior run) was not replaced.')
+            continue
+
+        print(f'-> Processing {pref}...')
+
+        # load json object
+        # note that ordering of sentence ids in json file are reverse of conllu
+        hits = load_hits_json(jsonfile)
+
+        if not hits:
+            print(f'! -> Skipping. (file is empty)')
+            continue
+
+        hits, json_entry_count, conll_count = add_conll_info(hits, conllfile)
+
+        finishTime = time.perf_counter()
+
+        print(f'    + {json_entry_count} hit results filled from {conll_count} total original '
+              f'sentences in {round(finishTime - startTime, 2)} seconds')
+
+        write_new(outputDir, pref, hits)
+
+    print('Finished processing all corresponding json and conll files.')
+    absFinish = time.perf_counter()
+    print(
+        f'\nTime elapsed: {round((absFinish - absStart)/60, 2)} minutes\n'
+        '====================================\n')
+
+
+def add_conll_info(hits, conllfile):
+
+    # TODO add info on what the "trigger" word is, and words directly preceding adv?
+
+    # connect (possible) context ids with hit ids
+    hit_ids, prev_ids, next_ids = include_context(hits)
+
+    # create dictionary mapping sentence id to text for possible context sentences
+    # context_sent_dict = {i.id: i.text
+    #                      for i in pyconll.load.iter_from_file(conllfile)
+    #                      if i.id in set(prev_ids + next_ids)}
+
+    # create full hit generator object from conllu file
+    conll_gen = (sent for sent in pyconll.load.iter_from_file(conllfile)
+                 if sent.id in set(hit_ids + prev_ids + next_ids))
+
+    # initialize json entry count
+    json_entry_count = 0
+
+    # initialize conllu entry count
+    conll_count = 0
+
+    prev_sent = ''
+    sent_id = ''
+    sent_text = ''
+
+    # add info from conllu to json
+    for hit_conll in conll_gen:
+
+        prev_sent = ''
+        prev_id = sent_id
+        prev_text = sent_text
+
+        sent_id = hit_conll.id
+        sent_text = hit_conll.text
+
+        if sent_id == get_context_id(prev_id, 1) and prev_id in hit_ids:
+
+            # hitIndexList should always be defined if previous sentence was a hit
+            for hitIndex in hitIndexList:
+                hits[hitIndex]['next_sent'] = sent_text
+
+        if sent_id in hit_ids:
+
+            if prev_id == get_context_id(sent_id, -1):
+                prev_sent = prev_text
+
+            id_to_ix = hit_conll._ids_to_indexes
+            tokdictlist = hit_conll._tokens
+            # list and for loop required to ensure all hit info will be
+            # filled in the case of a single sentence having more than 1
+            # search hit
+            hitIndexList = [ix for ix, hit_id in enumerate(hit_ids)
+                            if hit_id == sent_id]
+
+            for hitIndex in hitIndexList:
+
+                hit = hits[hitIndex]
+
+                hit['prev_sent'] = prev_sent
+
+                raw_match_info = hit.pop('matching')
+                hit['text'] = sent_text
+                hit['token_str'] = ' '.join(t.form for t in tokdictlist)
+                hit['lemma_str'] = ' '.join(t.lemma for t in tokdictlist)
+
+                update_tokens(hit_conll, tokdictlist, id_to_ix,
+                              hit, raw_match_info)
+
+                hit['deps'] = get_deps(raw_match_info['edges'],
+                                       tokdictlist, id_to_ix)
+
+                json_entry_count += 1
+
+        conll_count += 1
+
+    return hits, json_entry_count, conll_count
+
+
+def include_context(hits):
+
+    # context = namedtuple('context', ['prev_id', 'next_id'])
+
+    hit_ids = [h['sent_id'] for h in hits]
+    id_parts = [id_str.rsplit('_', 1) for id_str in hit_ids]
+
+    prev_ids = [f'{pair[0]}_{int(pair[1])-1}' for pair in id_parts]
+    next_ids = [f'{pair[0]}_{int(pair[1])+1}' for pair in id_parts]
+
+    return hit_ids, prev_ids, next_ids
+
+
+def get_context_id(sid, position: int):
+
+    if '_' in sid:
+        parts = sid.rsplit('_', 1)
+        cix = f'{parts[0]}_{int(parts[1]) + position}'
+
+    else:
+        cix = ''
+
+    return cix
+
+
+def update_tokens(info, tokdictlist, id_to_ix, hit, raw_match_info):
+    nodes = raw_match_info['nodes']
+
+    tok_lemmas = tok_forms = {}
+
+    for k, v in nodes.items():
+        try:
+            token = tokdictlist[info._ids_to_indexes[v]]
+        except KeyError:
+            token = tokdictlist[int(v) - 1]
+
+        tok_lemmas[k] = token.lemma
+        tok_forms[k] = token.form
+
+    hit['lemmas'] = tok_lemmas
+    hit['forms'] = tok_forms
+
+    for node, id in nodes.items():
+        nodes[node] = get_ix(id_to_ix, id)
+    hit['index'] = nodes
+
+
+def load_hits_json(jsonfile):
+
+    hits = None
+
+    # note that ordering of sentence ids in json file are reverse of conllu
+    with open(jsonfile, 'r') as j:
+
+        try:
+            hits = json.load(j)
+
+        except json.decoder.JSONDecodeError:
+            pass
+
+        else:
+
+            if len(hits) < 1:
+                hits = None
+
+    return hits
+
+
+def write_new(outputDir, pref, hits):
+
+    with open(outputDir / f'{pref}.json', 'w') as o:
+        print('   -> Writing output file...')
+        json.dump(hits, o, indent=2)
+
+
+def check_dirs(args):
+
+    jsonDirPath = args.raw_dir
+    conllDirPath = args.conllu_dir
 
     if not (jsonDirPath.is_dir() and conllDirPath.is_dir()):
 
@@ -42,181 +245,25 @@ def __main__():
     if not outputDir.exists():
         outputDir.mkdir()
 
-    rewrite = args.rewriteFiles
+    return prefixes, outputDir
 
-    for pref in prefixes:
 
-        startTime = time.perf_counter()
+def get_deps(edges, tokdictlist, id_to_ix):
+    deps = {}
+    for edge, parts in edges.items():
 
-        jsonfile = jsonDirPath / f'{pref}.raw.json'
-        conllfile = conllDirPath / f'{pref}.conllu'
+        source_tok = process_edge(parts['source'], tokdictlist, id_to_ix)
+        target_tok = process_edge(parts['target'], tokdictlist, id_to_ix)
 
-        if rewrite != 'yes' and skipFiles(pref, jsonDirPath, rewrite):
+        label = parts['label']
+        if type(label) == dict:
+            label = label.get('1', '_')
 
-            print(
-                f'-> Files with prefix {pref} have prior processing:\n'
-                f'   + File {jsonfile.relavtive_to(jsonfile.parent)} '
-                f'(from prior run) was not replaced.')
+        deps[edge] = deptup(source_tok._asdict(),
+                            target_tok._asdict(),
+                            label)._asdict()
 
-            continue
-
-        print(f'-> Processing {pref}...')
-
-        # create generator object from conllu file
-        sourceGenerator = pyconll.load.iter_from_file(
-            conllDirPath / f'{pref}.conllu')
-
-        # load json object
-        # note that ordering of sentence ids in json file are reverse of conllu
-        with open(jsonDirPath / f'{pref}.raw.json', 'r') as j:
-
-            try:
-
-                hits = json.load(j)
-
-            except json.decoder.JSONDecodeError:
-
-                print('   -> Skipping. (file is empty)')
-                continue
-
-            else:
-
-                if len(hits) < 1:
-
-                    print(f'-> Skipping. (file is empty)')
-                    continue
-
-        hit_ids = [h['sent_id'] for h in hits]
-
-        # TODO add info on what the "trigger" word is, and words directly preceding adv?
-        # initialize new hit dictionary entries
-        for hit_dict in hits:
-            hit_dict['prev_sent'] = None
-            hit_dict['next_sent'] = None
-            hit_dict['text'] = None
-            hit_dict['words'] = None
-            hit_dict['deps'] = None
-            hit_dict['doc'] = None
-            hit_dict['lemma_str'] = None
-
-        # initialize json entry count
-        i = 0
-
-        # initialize conllu entry count
-        c = 0
-
-        # initialize tracker variables
-        doc_id = ''
-        curr_id = ''
-        sent_text = ''
-        hitIndexList = [None]
-        same_doc = False
-
-        # for each sentence
-        for info in sourceGenerator:
-            # update variables
-            prev_id = curr_id
-            curr_id = info.id
-
-            prev_sent = sent_text
-            sent_text = info.text
-
-            tokdictlist = info._tokens
-            id_to_ix = info._ids_to_indexes
-
-            try:
-                # see if current dictionary has 'newdoc id' defined
-                doc_id = info._meta['newdoc id']
-            except KeyError:
-                # if no 'newdoc id' key, then same as previous
-                same_doc = True
-            else:
-                # if 'newdoc key' key exists, not same doc as previous
-                same_doc = False
-
-            # if this sentence follows a match sentence, add this sentence to
-            # the relevant hit dictionary entry
-            if same_doc and prev_id in hit_ids:
-                for hitIndex in hitIndexList:
-                    hits[hitIndex]['next_sent'] = sent_text
-
-            # if sentence matched search pattern, add info from conllu to json
-            if curr_id in hit_ids:
-
-                # list and for loop required to ensure all hit info will be
-                # filled in the case of a single sentence having more than 1
-                # search hit
-                hitIndexList = [ix for ix, hit_id in enumerate(hit_ids)
-                                if hit_id == curr_id]
-
-                for hitIndex in hitIndexList:
-
-                    hit = hits[hitIndex]
-
-                    hit['text'] = sent_text
-                    hit['lemma_str'] = ' '.join(t.lemma for t in tokdictlist)
-                    hit['doc'] = doc_id
-
-                    if same_doc:
-                        hit['prev_sent'] = prev_sent
-
-                    nodes = hit['matching']['nodes']
-                    fillers = {}
-                    edges = hit['matching']['edges']
-                    deps = {}
-
-                    for k, v in nodes.items():
-                        try:
-                            token = tokdictlist[info._ids_to_indexes[v]]
-                        except KeyError:
-                            token = tokdictlist[int(v) - 1]
-
-                        fillers[k] = (token.lemma
-                                      if args.tokenFillerType == 'lemma'
-                                      else token.form)
-
-                    hit['words'] = fillers
-
-                    for node, id in nodes.items():
-                        nodes[node] = get_ix(id_to_ix, id)
-                    hit['index'] = nodes
-
-                    for edge, parts in edges.items():
-
-                        source_tok = process_edge(
-                            parts['source'], tokdictlist, id_to_ix)
-                        target_tok = process_edge(
-                            parts['target'], tokdictlist, id_to_ix)
-
-                        label = parts['label']
-                        if type(label) == dict:
-                            enhanced = label['enhanced'] == 'yes'
-                            label = label.get('1', '_')
-                        else:
-                            enhanced = False
-
-                        deps[edge] = deptup(source_tok._asdict(),
-                                            target_tok._asdict(),
-                                            label, enhanced
-                                            )._asdict()
-
-                    hit['deps'] = deps
-                    hit.pop('matching')
-
-                    i += 1
-
-            c += 1
-
-        finishTime = time.perf_counter()
-
-        print(f'   => {i} hit results filled from {c} total original '
-              f'sentences in {round(finishTime - startTime, 2)} seconds')
-
-        with open(outputDir / f'{pref}.json', 'w') as o:
-            print('-> Writing output file...')
-            json.dump(hits, o, indent=2)
-
-    print('Finished processing all corresponding json and conll files.')
+    return deps
 
 
 def process_edge(id, tokdicts, id_to_ix):
@@ -243,27 +290,27 @@ def parseArgs():
             'result) files in a given directory and output new json files with '
             'info filled in from the corresponding .conllu (corpus info) files'))
 
-    parser.add_argument('-c', '--conllu_dir', required=True, type=Path,
+    parser.add_argument('conllu_dir', type=Path,
                         help='path to directory containing sentences .conllu '
-                             'files. e.g. Nyt1.conll')
+                        'files. e.g. Nyt1.conll')
 
-    parser.add_argument('-r', '--raw_dir', type=Path, required=True,
+    parser.add_argument('raw_dir', type=Path,
                         help='path to directory containing unprocessed/raw '
-                             '.json search result files to be processed of '
-                             'form \'<sentenceSetID>.raw.json\'. e.g. Nyt1.if')
+                        '.json search result files to be processed of '
+                        'form \'<sentenceSetID>.raw.json\'. e.g. Nyt1.if')
 
     parser.add_argument('-o', '--output_dir', type=Path, default=None,
                         help='path to directory to write filled output json '
-                             'files to. If not specified, the raw_dir path will'
-                             ' be used (output/filled json files lose the '
+                        'files to. If not specified, the raw_dir path will'
+                        ' be used (output/filled json files lose the '
                              '\'.raw\' in the filename.)')
 
     parser.add_argument('-w', '--rewriteFiles',
                         choices=['yes', 'no', 'check'],
                         default='yes',
                         help='Indicate whether to skip file pairs which '
-                             'already have a corresponding filled (already '
-                             'processed) json file. Options are: '
+                        'already have a corresponding filled (already '
+                        'processed) json file. Options are: '
                              '\'no\' = rewrite none; '
                              '\'yes\' = rewrite all; '
                              '\'check\' = check for each case, which requires '
@@ -274,7 +321,7 @@ def parseArgs():
                         choices=['lemma', 'form'],
                         default='lemma',
                         help='set type for fillers. options are lemma or form. '
-                             'Lemma is used by default.')
+                        'Lemma is used by default.')
 
     return parser.parse_args()
 
@@ -293,25 +340,20 @@ def getValidPrefixes(jsonDir, conllDir):
 
 def skipFiles(prefix, directory, rewrite):
 
-    outputFile = directory / f'{prefix}.json'
-
-    if outputFile.exists():
+    if directory.joinpath(f'{prefix}.json').exists():
 
         if rewrite == 'no':
             return True
 
         while rewrite == 'check':
-
             skipResponse = input(f'Filled json for prefix {prefix} already '
                                  f'exists in directory {directory}. Do you '
                                  f'want to skip this file pair? y/n ')
 
             if skipResponse.lower() == 'y':
-
                 return True
 
             if skipResponse.lower() == 'n':
-
                 return False
 
     return False
@@ -319,9 +361,4 @@ def skipFiles(prefix, directory, rewrite):
 
 if __name__ == '__main__':
 
-    absStart = time.perf_counter()
-    __main__()
-    absFinish = time.perf_counter()
-    print(
-        f'\nTime elapsed: {round((absFinish - absStart)/60, 2)} minutes\n'
-        '====================================\n')
+    fill_json()
