@@ -31,22 +31,22 @@ if not (sample_dir.exists() and sample_dir.is_dir()):
     sample_dir.mkdir()
 
 
-def __main__():
+def main():
 
     # load nonoverlapping hits dataframe
     compiled = pd.read_pickle("compiled_hits.pkl.gz")
     hits = compiled.loc[:, ['colloc', 'context', 'context_word',
                             'context_type', 'context_group', 'adv', 'adj', 'polarity']]
 
-    # print summary infomation on frequencies
-    polarity_descrip = hits.groupby("polarity").describe()
-    print(polarity_descrip)
-    polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
+    # # print summary infomation on frequencies
+    # polarity_descrip = hits.groupby("polarity").describe()
+    # print(polarity_descrip)
+    # polarity_descrip.to_csv("no-overlap_polarity_summary.csv")
 
     # TODO fix this hack once data has been fully gathered
     test_contexts = (
         hits[hits.context_word.isin(
-            ('every', 'everyone', 'everyone' 'if', 'never'))].context
+            ('every', 'everyone', 'everyone', 'if'))].context
         .append(hits[hits.polarity == 'unknown'].context)
         .unique())
 
@@ -54,6 +54,14 @@ def __main__():
     neg_hits = hits[hits.polarity == 'negative']
     neg_hits = neg_hits[~neg_hits.context.isin(test_contexts)]
     test_hits = hits[hits.context.isin(test_contexts)]
+
+    # testing
+    pos_adj_counts = basic_freq_table(pos_hits, 'positive', 'adj')
+    pos_adv_counts = basic_freq_table(pos_hits, 'positive', 'adv')
+    neg_adj_counts = basic_freq_table(neg_hits, 'negative', 'adj')
+    neg_adv_counts = basic_freq_table(neg_hits, 'negative', 'adv')
+    unk_adj_counts = basic_freq_table(test_hits, 'test', 'adj')
+    unk_adv_counts = basic_freq_table(test_hits, 'test', 'adv')
 
     # write sample files to sample_dir and returns frequency table dataframe(s)
     pos_colloc_counts = basic_freq_table(pos_hits, 'positive')
@@ -66,7 +74,8 @@ def __main__():
     collocs_by_context = (pos_colloc_counts.join(neg_colloc_counts)
                           .join(test_colloc_counts)).fillna(0).apply(pd.to_numeric, downcast='unsigned')
     collocs_by_context.to_pickle('all-contexts_freq-table.pkl.gz')
-    pprint(collocs_by_context.describe().sort_values("max", axis=1, ascending=False).round(3))
+    pprint(collocs_by_context.describe().sort_values(
+        "max", axis=1, ascending=False).round(3))
     print("")
 
     prop_of_colloc, prop_of_context = get_proportions(hits)
@@ -85,30 +94,47 @@ def __main__():
     compare_2_count_series(positive_counts, negative_counts,
                            'positive', 'negative', threshold=0)
 
-
     test_colloc_counts.to_pickle("test-contexts_freq-table.pkl.gz")
     test_colloc_counts.sample(n=500).sort_values("colloc").to_csv(
         sample_dir / 'test-contexts-freq_500rows.csv')
 
 
-def basic_freq_table(data: pd.DataFrame, name:str):
+def basic_freq_table(data: pd.DataFrame, name: str, mode: str = 'colloc'):
+    if mode == 'colloc':
+        crosstab_rows = data.colloc
+    elif mode == 'adv':
+        crosstab_rows = data.adv  # _word
+    elif mode == 'adj':
+        crosstab_rows = data.adj  # _word
 
     # get frequency table
-    collocs_by_context = pd.crosstab(
-        data.colloc, data.context).apply(pd.to_numeric, downcast="unsigned")
+    by_context = pd.crosstab(
+        crosstab_rows, data.context).apply(pd.to_numeric, downcast="unsigned")
+    with_sum = by_context.assign(cross_context_sum=by_context.sum(axis=1))
+    sum2 = with_sum.sum()
+    sum2.name = 'by_context_sum'
+    with_sum = with_sum.append(sum2)
+    with_sum = (with_sum
+                .sort_values('cross_context_sum', ascending=False)
+                .sort_values(by='by_context_sum', axis=1, ascending=False))
+    print('>>>', name, mode, 'frequencies')
+    print(with_sum.head(11))
 
+    # TODO re-enable save to pkl
     # write full frequency table to file (compressed pickle format)
-    collocs_by_context.to_pickle(f"{name}-contexts_freq-table.pkl.gz")
+    by_context.to_pickle(f"{name}-contexts_{mode}-freq-table.pkl.gz")
+
     # write sample csv for easy illustration
-    collocs_by_context.sample(n=300).sort_index().to_csv(
-        sample_dir / f'{name}_freq_300rows.csv')
+    # TODO re-enable save to pkl
+    with_sum.head(301).to_csv(
+        sample_dir / f'{name}_{mode}-freq_top300.csv')
 
     # +1 smoothing
     # counts_plus_one = collocs_by_context.add(1)
     # counts_plus_one.sample(n=500).sort_index().to_csv(
     #     sample_dir / 'freq_plus-one_500rows.csv')
 
-    return collocs_by_context
+    return by_context
 
 
 def get_proportions(data: pd.DataFrame):
@@ -239,6 +265,6 @@ def compare_2_count_series(counts1: pd.Series, counts2: pd.Series,
 if __name__ == '__main__':
 
     absStart = time.perf_counter()
-    __main__()
+    main()
     absFinish = time.perf_counter()
     print(f'Time elapsed: {round(absFinish - absStart, 3)} seconds')
