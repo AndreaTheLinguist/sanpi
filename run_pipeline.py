@@ -13,6 +13,10 @@ import os
 import time
 from pathlib import Path
 
+# from script.grewSearchDir import grew_search
+# from script.FillJson import fill_json
+# from script.
+
 # TODO : turn scripts into utilities and import
 # TODO : add counter/progress message: e.g. x out of total
 
@@ -76,11 +80,11 @@ def run_grew(pat, corpus, data_dir, replace):
         if prev_grew_run:
             print(
                 f'\n{data_dir.relative_to(Path.cwd())} is already fully populated from previous run. Skipping.')
+            return
 
-    else:
-        grew_cmd = f'python3 script/grewSearchDir.py {corpus}/ {pat} {data_dir}'
-        print('\n'+grew_cmd)
-        os.system(grew_cmd)
+    grew_cmd = f'python3 script/grewSearchDir.py {corpus}/ {pat} {data_dir}'
+    print('\n'+grew_cmd)
+    os.system(grew_cmd)
 
 
 def parse_input_args():

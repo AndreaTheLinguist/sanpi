@@ -4,12 +4,13 @@ import sys
 import time
 from pathlib import Path
 
-# TODO: make default to not overwrite existing (non-empty) raw.json files; 
+# TODO: make default to not overwrite existing (non-empty) raw.json files;
 #   otherwise need to have new pat directories for any added patterns
 #   (to avoid needing to redo all the searches already run)
 
-def grew_search():
 
+def grew_search():
+    absStart = time.perf_counter()
     args = parseArgs()
 
     dirPath = args.corpus_dir
@@ -52,7 +53,10 @@ def grew_search():
         fend = time.perf_counter()
         print(f'{round((fend - fstart)/60, 2)} minutes on {f.name}')
 
-    return
+    absFinish = time.perf_counter()
+    print(f'\nTotal grew search time: '
+          f'{round((absFinish - absStart)/60, 2)} minutes\n'
+          '==============================================\n')
 
 
 def checkArgs(args):
@@ -111,9 +115,4 @@ def parseArgs():
 
 if __name__ == '__main__':
 
-    absStart = time.perf_counter()
     grew_search()
-    absFinish = time.perf_counter()
-    print(f'\nTotal grew search time: '
-          f'{round((absFinish - absStart)/60, 2)} minutes\n'
-          '==============================================\n')

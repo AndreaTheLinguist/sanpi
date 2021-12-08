@@ -11,7 +11,7 @@ import pandas as pd
 
 
 def tabulate_hits():
-
+    absStart = time.perf_counter()
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = parseArgs()
 
@@ -31,6 +31,10 @@ def tabulate_hits():
         createOutput(hit_data, args)
     else:
         sys.exit('No valid hits found.')
+
+    absFinish = time.perf_counter()
+    print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
+          '====================================\n')
 
 
 def parseArgs():
@@ -122,6 +126,9 @@ def getHitData(json_dir, args):
 
 
 def process_ix(df):
+    if any(df.token_str.isna()): 
+        print(' --> WARNING: empty token string(s) in json data.')
+    df = df.assign(token_str = df.token_str.astype('string').fillna(''))
     utt_len = df.token_str.apply(lambda x: len(x))
     ix_df = df.loc[:, df.columns.str.endswith('index')
                    ].fillna(0)
@@ -217,8 +224,4 @@ def createOutput(hits_df, args):
 
 if __name__ == '__main__':
 
-    absStart = time.perf_counter()
     tabulate_hits()
-    absFinish = time.perf_counter()
-    print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
-          '====================================\n')

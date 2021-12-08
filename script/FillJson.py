@@ -12,7 +12,7 @@ toktup = namedtuple('token', ['lemma', 'ix', 'xpos', 'deprel', 'head'])
 
 
 def fill_json():
-
+    absStart = time.perf_counter()
     args = parseArgs()
 
     prefixes, outputDir = check_dirs(args)
@@ -60,6 +60,10 @@ def fill_json():
         write_new(outputDir, pref, hits)
 
     print('Finished processing all corresponding json and conll files.')
+    absFinish = time.perf_counter()
+    print(
+        f'\nTime elapsed: {round((absFinish - absStart)/60, 2)} minutes\n'
+        '====================================\n')
 
 
 def add_conll_info(hits, conllfile):
@@ -357,9 +361,4 @@ def skipFiles(prefix, directory, rewrite):
 
 if __name__ == '__main__':
 
-    absStart = time.perf_counter()
     fill_json()
-    absFinish = time.perf_counter()
-    print(
-        f'\nTime elapsed: {round((absFinish - absStart)/60, 2)} minutes\n'
-        '====================================\n')
