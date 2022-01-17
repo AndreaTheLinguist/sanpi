@@ -9,7 +9,7 @@ from collections import namedtuple
 from pathlib import Path
 from pprint import pprint
 from bs4 import BeautifulSoup
-from mediawiki_dump.tokenizer import clean as mwclean
+# from mediawiki_dump.tokenizer import clean as mwclean
 from numpy import empty
 import wikitextparser as wtp
 import jsonlines
@@ -19,7 +19,7 @@ from unidecode import unidecode
 from datetime import date, datetime
 
 doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
-# TODO : temporary! revert after testing
+
 output_limit = 10000
 pd.set_option('display.max_colwidth', 80)
 
@@ -548,7 +548,6 @@ def process_sentences(df, conlloutput, ix, doc):
             # "newdoc id" will be the text_id from the pile subset
             s.add_comment(f'# newdoc id = {text_id}')
 
-        # TODO : fix numbering of tokens (or see if necessary to start at 1)
         # "sent_id" will be doc/text id with _[sentence number] appended
         s.add_comment(f'# sent_id = {text_id}_{enumi}')
 
