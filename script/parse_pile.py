@@ -81,16 +81,14 @@ try:
     print('Loading dependency parsing pipeline...')
     nlp = stanza.Pipeline(
         lang='en',
-        processors='tokenize,pos,lemma,depparse'
-    )
+        processors='tokenize,pos,lemma,depparse')
 except stanza.pipeline.core.ResourcesFileNotFoundError:
     print('Language model not found. Downloading...')
     stanza.download('en')
     print('Loading dependency parsing pipeline...\n')
     nlp = stanza.Pipeline(
         lang='en',
-        processors='tokenize,mwt,pos,lemma,depparse'
-    )
+        processors='tokenize,mwt,pos,lemma,depparse')
 
 
 def main():
@@ -175,27 +173,32 @@ def process_pickledf(dfiles):
         print(f'\n---\n\nFinishing processing {pathstr}...')
 
         df = pd.read_pickle(dfpath)
-        data_stem = dfpath.stem.split('_')[1]
+        orig_data_stem = dfpath.stem.split('_')[1]
         if 'raw' not in df.columns:
             print('precleaned dataframe: no\n-> Cleaning...')
-            df = cleanup_df(df)
+            df = cleanup_df(df, dfpath, from_file=True)
             df.to_pickle(dfpath)
         else:
             print('precleaned dataframe: yes')
-        process_df(df, data_stem)
+        slice_df(df, orig_data_stem)
 
 
 def process_raw_jsonlines(rfiles, corpus_selection):
     for rawfile_path in rfiles:
         print(f'\n---\n\nPreprocessing {rawfile_path}...')
+        
         df = preprocess_pile_texts(rawfile_path, corpus_selection)
+        
         data_stem = rawfile_path.stem
+        slice_df(df, data_stem)
 
-        process_df(df, data_stem)
 
+def cleanup_df(df, dfpath, from_file: bool = False):
+    # if from file, dfpath is that of previous .pkl.gz save
 
-def cleanup_df(df):
-    
+    tmpdfpath = get_dfpkl_outpath(
+        dfpath.stem, is_tmp=True) if from_file else dfpath
+
     print('\nCleaning text in dataframe...')
     df = df.assign(
         text_id=df.text_id.str.replace('PiCC', 'pcc_eng').astype('category'),
@@ -223,6 +226,8 @@ def cleanup_df(df):
                                text=cleaned_text.astype('string'))
         df.loc[maybe_wiki, :] = wikidf
 
+    df.to_pickle(tmpdfpath)
+
     print('  looking for any html...')
     is_html = df.text.apply(
         lambda t: (bool(BeautifulSoup(t, "html.parser").find())))
@@ -231,12 +236,15 @@ def cleanup_df(df):
         print(f'  converting {len(df.loc[is_html, :])} html to text...')
 
         htmldf = df.loc[is_html, :]
+
+        html_text = htmldf.text.apply(
+            lambda t:
+            BeautifulSoup(t, "html.parser").get_text()).astype('string')
         htmldf = htmldf.assign(
             raw=df.text.astype('string'),
-            text=htmldf.text.apply(
-                lambda t:
-                BeautifulSoup(t, "html.parser").get_text()
-            ).astype('string'))
+            text=html_text)
+        if any(htmldf.text.isna()):
+            htmldf.loc[htmldf.text.isna(), 'text']
 
         # exdf = htmldf.sample(min(2, len(htmldf)))
         # print('  examples:\n')
@@ -250,12 +258,13 @@ def cleanup_df(df):
         df.loc[is_html, ['raw', 'text']] = (htmldf.loc[:, ['raw', 'text']]
                                             .astype('string'))
         df.loc[~is_html, 'raw'] = df.text.loc[~is_html].astype('string')
+        df.to_pickle(tmpdfpath)
 
-    else:
-        df = df.assign(raw=df.text)
-        df.loc[:, ['raw', 'text']] = (df.loc[:, ['raw', 'text']]
-                                      .astype('string')
-                                      )
+    df.loc[:, ['raw', 'text']] = (df.loc[:, ['raw', 'text']]
+                                  .astype('string'))
+
+    df.to_pickle(tmpdfpath)
+
     print('  cleaning up text...\n   - urls...')
     # clean up web markers
     df = df.assign(text=df.text.apply(
@@ -277,6 +286,7 @@ def cleanup_df(df):
     if any(precleaned):
         changedf = df.loc[precleaned, :]
         print(changedf[['text', 'raw']])
+
         # exdf = changedf.sample(min(2, len(changedf)))
         # print('  examples:\n')
         # for rix in exdf.index:
@@ -284,9 +294,13 @@ def cleanup_df(df):
         #     print(df.at[rix, 'text'])
         #     print('    from raw:')
         #     print(df.at[rix, 'raw'])
-
-    return df.assign(text=df.text.astype('string'),
-                     raw=df.raw.astype('string'))
+        
+    df.loc[:, ['text', 'raw']] = df[['text', 'raw']].astype('string')
+    
+    df.to_pickle(tmpdfpath)
+    print('cleaned dataframe saved in `./pile_tables/tmp/')
+    
+    return df
 
 
 def reformat_wiki(t):
@@ -310,43 +324,40 @@ def reformat_wiki(t):
     return t
 
 
-def process_df(full_df, data_stem):
+def slice_df(full_df, data_stem):
 
     for corpus_set, df in full_df.groupby('pile_set_code'):
 
-        remaining_df, excl_df = pull_exclusions(df, data_stem, corpus_set)
+        remaining_df, excl_df = pull_exclusions(df)
+        
         total = len(remaining_df)
         print(f'{total} total texts to parse')
         remaining_df = remaining_df.sort_values('text_id')
-        outfile_count = 0
+        slices = []
         while len(remaining_df) > 2.4*output_limit:
 
             dfslice = remaining_df.iloc[:output_limit, :].reset_index()
             remaining_df = remaining_df.iloc[output_limit:, :]
-
-            process_slice(dfslice, outfile_count, total,
-                          data_stem, corpus_set, excl_df)
-            outfile_count += 1
-
-        if len(remaining_df) > 1.4*output_limit:
+            slices.append(dfslice)
+            
+        if len(remaining_df) > 1.3*output_limit:
 
             half_remaining = int(len(remaining_df)/2)
 
             dfslice_penult = remaining_df.iloc[:half_remaining, :]
-            process_slice(dfslice_penult, outfile_count, total,
-                          data_stem, corpus_set, excl_df)
+            slices.append(dfslice_penult)
 
             remaining_df = remaining_df.iloc[half_remaining:, :]
-            outfile_count += 1
+            slices.append(remaining_df)
+            
+        for i, sdf in enumerate(slices): 
+            outpath = get_dfpkl_outpath(data_stem, corpus_set, slice_num = i, is_tmp = True)
+            sdf.to_pickle(outpath)
 
-        excl_df = process_slice(remaining_df, outfile_count, total,
-                                data_stem, corpus_set, excl_df)
-
-        excl_path = get_outpath('pkl.gz', f'{data_stem}_excluded', corpus_set)
-        excl_df.to_pickle(excl_path)
+        process_slices(slices, total, data_stem, corpus_set, excl_df)
 
 
-def pull_exclusions(df, data_stem, corpus_selection):
+def pull_exclusions(df):
     print('  pulling excluded formats...')
 
     # flag texts that contain technical seeming strings and exclude for now
@@ -360,16 +371,6 @@ def pull_exclusions(df, data_stem, corpus_selection):
     else:
         excl_df = pd.DataFrame()
 
-    # the text can be parsed with jsloads, it's in json format,
-    # which we do not want (and which will break stanza)
-    # for ix in df.index:
-    #     try:
-    #         __ = jsloads(df.text[ix])
-    #     except ValueError:
-    #         pass
-    #     else:
-    #         excl_df.append(df.loc[ix, :])
-
     print(f'{len(excl_df)} texts excluded, e.g.:')
     for i, x in enumerate(excl_df.sample(min(len(excl_df), 3)).text):
         print(f'({i+1})\n     {x[:800]}...\n-------')
@@ -377,7 +378,7 @@ def pull_exclusions(df, data_stem, corpus_selection):
 
 
 def get_outpath(ext, slice_name, subset):
-
+    '''returns path for final conllu output files'''
     out_fname = f'{subset.lower()}_eng_{slice_name}.{ext}'
     if ext == 'conllu':
         out_dir = Path.cwd().joinpath(f'{subset}.conll')
@@ -389,16 +390,31 @@ def get_outpath(ext, slice_name, subset):
     return out_dir.joinpath(out_fname)
 
 
-def process_slice(dfslice, outfile_count, total, 
-                  data_stem, subset, excl_df):
+def process_slices(slices: list,
+                  outfile_count: int,
+                  total: int,
+                  data_stem: str,
+                  subset: str,
+                  excl_df: pd.DataFrame):
     
-    out_path = get_outpath('conllu', f'{data_stem}-{outfile_count}', subset)
+    for outfile_count, dfslice in slices:
+        
+        out_path = get_outpath('conllu', f'{data_stem}-{outfile_count}', subset)
 
-    return stanza_parse(dfslice, out_path, excl_df, outfile_count, total)
+        excl_df = stanza_parse(dfslice, out_path, excl_df, outfile_count, total)
+        
+        actual_slice = dfslice[~dfslice.isin(exclusions)]
+        actual_slice.to_pkl(get_dfpkl_outpath(data_stem, subset, slice_num = outfile_count))
+       
+    excl_path = get_outpath('pkl.gz', f'{data_stem}_excluded', corpus_set)
+    excl_df.to_pickle(excl_path)
+
 
 
 ### raw processing functions ###
-def preprocess_pile_texts(raw_file_path, corpus_selection):
+def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
+    df_output_path = get_dfpkl_outpath(raw_file_path.stem, '-'.join(corpus_selection))
+
     # pile_data_path = Path('test.jsonl')
     datastem = raw_file_path.stem
     # define namedtuple to simplify dataframe creation from json object
@@ -430,8 +446,7 @@ def preprocess_pile_texts(raw_file_path, corpus_selection):
     # Clean it up a bit, and remove duplicate text items
     df = df.drop_duplicates(subset='text').reset_index(drop=True)
 
-    df = df.assign(
-        pile_set_name=df.pile_set_name.astype('category'))
+    df = df.assign(pile_set_name=df.pile_set_name.astype('category'))
 
     print('  translating encoding...')
     unidecode_t0 = time.perf_counter()
@@ -447,6 +462,10 @@ def preprocess_pile_texts(raw_file_path, corpus_selection):
                         'OpenWebText2': 'OWT2'}
     codes = (subset_abbr_dict[n] for n in df.pile_set_name)
     df = df.assign(pile_set_code=pd.Categorical(codes))
+    # save tmp df
+
+    tmpdfpath = tmp_df_dir.joinpath(df_output_path.name)
+    df.to_pickle(tmpdfpath)
 
     print('  adding subset codes & text IDs...')
     # Create text ids from raw file name, pile subset code, and dataframe index.
@@ -462,34 +481,57 @@ def preprocess_pile_texts(raw_file_path, corpus_selection):
 
         codedf = pd.concat([codedf, subdf])
     codes_t1 = time.perf_counter()
-    print(
-        f'  ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
+    print(f'  ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
 
     df = codedf[['text_id', 'text', 'pile_set_name', 'pile_set_code']]
     df = df.assign(text_id=df.text_id.astype('string'),
                    pile_set_code=df.pile_set_code.astype('category'))
 
-    df = cleanup_df(df)
+    df.to_pickle(tmpdfpath)
+
+    df = cleanup_df(df, tmpdfpath)
 
     print('\ndataframe info:')
     print(df.info())
     print('...')
 
-    df_output_path = get_predf_outpath(raw_file_path.stem, corpus_selection)
     print('Finished preprocessing: dataframe saved to', df_output_path)
     df.to_pickle(df_output_path)
 
     return df
 
 
-def get_predf_outpath(data_stem, corpus_selection):
+def get_dfpkl_outpath(data_stem: str,
+                      corpus_selection: str = None,
+                      slice_num: int = None,
+                      is_tmp: bool = False):
+
     df_output_dir = Path.cwd().joinpath('pile_tables')
+
+    # if corpus_selection is given, path is from jsonl file
+    if corpus_selection:
+        corp_name = "-".join(corpus_selection).replace(" ", "")
+        data_stem = f'pile_{data_stem}'
+
+    # if corpus is not given, path is from prev pkl.gz save of df
+    else:
+        # '.pkl' will not have been included in ext
+        data_stem, corp_name, __ = data_stem.rsplit('_', 2)
+
+    # if tmp save (in case of script crash)
+    if is_tmp:
+        df_output_dir = df_output_dir.joinpath('tmp')
+
+    # save each slice as its on pkl as well, for easier debugging/remediation
+    elif slice_num:
+        df_output_dir = df_output_dir.joinpath('slice')
+        data_stem += f'-{slice_num}'
+
     if not df_output_dir.is_dir():
-        df_output_dir.mkdir()
+        df_output_dir.mkdir(parents=True)
+
     df_output_path = df_output_dir.joinpath(
-        f'pile_{data_stem}_'
-        f'{"-".join(corpus_selection).replace(" ","")}'
-        '_table.pkl.gz')
+        f'{data_stem}_{corp_name}_df.pkl.gz')
 
     return df_output_path
 
@@ -511,14 +553,23 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
             text_id = df.at[ix, "text_id"]
             print(
                 f'  {doc_num+1} of {slice_total}/{total} (output file {filenum}): {text_id}')
-
+            # the text can be parsed with jsloads, it's in json format,
+            # which we do not want (and which will break stanza)
+            try:
+                __ = jsloads(df.text[ix])
+            except ValueError:
+                pass
+            else:
+                print(f'    in json format. Added to exclusions.')
+                excl_df.append(df.loc[ix, :])
+                
             # create doc (with parsing)
             try:
                 doc = nlp(df.text[ix])
             except RuntimeError:
                 excl_df.append(df.loc[ix, :])
                 print(
-                    'WARNING! Excluding unparsable text. (runtime error reason unknown)')
+                    f'WARNING! Excluding unparsable text. (runtime error reason unknown). Added to exclusions.')
 
             else:
                 process_sentences(df, conlloutput, ix, doc)
