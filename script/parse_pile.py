@@ -186,9 +186,9 @@ def process_pickledf(dfiles):
 def process_raw_jsonlines(rfiles, corpus_selection):
     for rawfile_path in rfiles:
         print(f'\n---\n\nPreprocessing {rawfile_path}...')
-        
+
         df = preprocess_pile_texts(rawfile_path, corpus_selection)
-        
+
         data_stem = rawfile_path.stem
         slice_df(df, data_stem)
 
@@ -294,12 +294,12 @@ def cleanup_df(df, dfpath, from_file: bool = False):
         #     print(df.at[rix, 'text'])
         #     print('    from raw:')
         #     print(df.at[rix, 'raw'])
-        
+
     df.loc[:, ['text', 'raw']] = df[['text', 'raw']].astype('string')
-    
+
     df.to_pickle(tmpdfpath)
     print('cleaned dataframe saved in `./pile_tables/tmp/')
-    
+
     return df
 
 
@@ -329,7 +329,7 @@ def slice_df(full_df, data_stem):
     for corpus_set, df in full_df.groupby('pile_set_code'):
 
         remaining_df, excl_df = pull_exclusions(df)
-        
+
         total = len(remaining_df)
         print(f'{total} total texts to parse')
         remaining_df = remaining_df.sort_values('text_id')
@@ -339,7 +339,7 @@ def slice_df(full_df, data_stem):
             dfslice = remaining_df.iloc[:output_limit, :].reset_index()
             remaining_df = remaining_df.iloc[output_limit:, :]
             slices.append(dfslice)
-            
+
         if len(remaining_df) > 1.3*output_limit:
 
             half_remaining = int(len(remaining_df)/2)
@@ -348,10 +348,13 @@ def slice_df(full_df, data_stem):
             slices.append(dfslice_penult)
 
             remaining_df = remaining_df.iloc[half_remaining:, :]
-            slices.append(remaining_df)
-            
-        for i, sdf in enumerate(slices): 
-            outpath = get_dfpkl_outpath(data_stem, corpus_set, slice_num = i, is_tmp = True)
+
+        # this must be outdented to catch smaller dataframes
+        slices.append(remaining_df)
+
+        for i, sdf in enumerate(slices):
+            outpath = get_dfpkl_outpath(
+                data_stem, corpus_set, slice_num=i, is_tmp=True)
             sdf.to_pickle(outpath)
 
         process_slices(slices, total, data_stem, corpus_set, excl_df)
@@ -371,9 +374,10 @@ def pull_exclusions(df):
     else:
         excl_df = pd.DataFrame()
 
-    print(f'{len(excl_df)} texts excluded, e.g.:')
-    for i, x in enumerate(excl_df.sample(min(len(excl_df), 3)).text):
-        print(f'({i+1})\n     {x[:800]}...\n-------')
+    print(f'{len(excl_df)} texts excluded')
+    if len(excl_df) > 0:
+        print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
+
     return df, excl_df
 
 
@@ -391,32 +395,34 @@ def get_outpath(ext, slice_name, subset):
 
 
 def process_slices(slices: list,
-                  outfile_count: int,
-                  total: int,
-                  data_stem: str,
-                  subset: str,
-                  excl_df: pd.DataFrame):
-    
-    for outfile_count, dfslice in slices:
-        
-        out_path = get_outpath('conllu', f'{data_stem}-{outfile_count}', subset)
+                   total: int,
+                   data_stem: str,
+                   subset: str,
+                   excl_df: pd.DataFrame):
 
-        excl_df = stanza_parse(dfslice, out_path, excl_df, outfile_count, total)
-        
+    for outfile_count, dfslice in enumerate(slices):
+
+        out_path = get_outpath(
+            'conllu', f'{data_stem}-{outfile_count}', subset)
+
+        excl_df = stanza_parse(
+            dfslice, out_path, excl_df, outfile_count, total)
+
         actual_slice = dfslice[~dfslice.isin(exclusions)]
-        actual_slice.to_pkl(get_dfpkl_outpath(data_stem, subset, slice_num = outfile_count))
-       
-    excl_path = get_outpath('pkl.gz', f'{data_stem}_excluded', corpus_set)
-    excl_df.to_pickle(excl_path)
+        actual_slice.to_pkl(get_dfpkl_outpath(
+            data_stem, subset, slice_num=outfile_count))
 
+    excl_path = get_outpath('pkl.gz', f'{data_stem}_excluded', subset)
+    excl_df.to_pickle(excl_path)
 
 
 ### raw processing functions ###
 def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
-    df_output_path = get_dfpkl_outpath(raw_file_path.stem, '-'.join(corpus_selection))
 
     # pile_data_path = Path('test.jsonl')
     datastem = raw_file_path.stem
+    df_output_path = get_dfpkl_outpath(datastem, '-'.join(corpus_selection))
+    tmpdfpath = get_dfpkl_outpath(df_output_path.stem, is_tmp=True)
     # define namedtuple to simplify dataframe creation from json object
     text_info = namedtuple('Text', ['text', 'pile_set_name'])
 
@@ -448,6 +454,8 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
 
     df = df.assign(pile_set_name=df.pile_set_name.astype('category'))
 
+    df.to_pickle(tmpdfpath)
+
     print('  translating encoding...')
     unidecode_t0 = time.perf_counter()
     df = df.assign(text=df.text.apply(unidecode))
@@ -464,7 +472,6 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     df = df.assign(pile_set_code=pd.Categorical(codes))
     # save tmp df
 
-    tmpdfpath = tmp_df_dir.joinpath(df_output_path.name)
     df.to_pickle(tmpdfpath)
 
     print('  adding subset codes & text IDs...')
@@ -502,7 +509,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
 
 
 def get_dfpkl_outpath(data_stem: str,
-                      corpus_selection: str = None,
+                      corpus_selection=None,
                       slice_num: int = None,
                       is_tmp: bool = False):
 
@@ -510,7 +517,8 @@ def get_dfpkl_outpath(data_stem: str,
 
     # if corpus_selection is given, path is from jsonl file
     if corpus_selection:
-        corp_name = "-".join(corpus_selection).replace(" ", "")
+        corp_name = "-".join(corpus_selection).replace(" ",
+                                                       "") if type(corpus_selection) == list else corpus_selection
         data_stem = f'pile_{data_stem}'
 
     # if corpus is not given, path is from prev pkl.gz save of df
@@ -523,8 +531,8 @@ def get_dfpkl_outpath(data_stem: str,
         df_output_dir = df_output_dir.joinpath('tmp')
 
     # save each slice as its on pkl as well, for easier debugging/remediation
-    elif slice_num:
-        df_output_dir = df_output_dir.joinpath('slice')
+    if slice_num:
+        df_output_dir = df_output_dir.joinpath('slices')
         data_stem += f'-{slice_num}'
 
     if not df_output_dir.is_dir():
@@ -562,7 +570,7 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
             else:
                 print(f'    in json format. Added to exclusions.')
                 excl_df.append(df.loc[ix, :])
-                
+
             # create doc (with parsing)
             try:
                 doc = nlp(df.text[ix])
