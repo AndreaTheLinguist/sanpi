@@ -223,7 +223,7 @@ def cleanup_df(df, dfpath, from_file: bool = False):
     if any(maybe_wiki):
         wikidf = df.loc[maybe_wiki, :]
         print(f'  cleaning {len(wikidf)} possibly wikitext formatted texts...')
-        cleaned_text = wikidf.text.apply(lambda t: reformat_wiki(t))
+        cleaned_text = wikidf.text.apply(lambda t: _reformat_wiki(t))
         wikidf = wikidf.assign(raw=wikidf.text.astype('string'),
                                text=cleaned_text.astype('string'))
         df.loc[maybe_wiki, :] = wikidf
@@ -305,7 +305,7 @@ def cleanup_df(df, dfpath, from_file: bool = False):
     return df
 
 
-def reformat_wiki(t):
+def _reformat_wiki(t):
 
     # add vertical space between bullet points
     t = wt0.sub('\n\n', t)
@@ -410,7 +410,7 @@ def process_slices(slices: list,
         excl_df = stanza_parse(
             dfslice, out_path, excl_df, outfile_count, total)
 
-        actual_slice = dfslice[~dfslice.isin(exclusions)]
+        actual_slice = dfslice[~dfslice.isin(excl_df)]
         actual_slice.to_pkl(get_dfpkl_outpath(
             data_stem, subset, slice_num=outfile_count))
 
@@ -519,8 +519,9 @@ def get_dfpkl_outpath(data_stem: str,
 
     # if corpus_selection is given, path is from jsonl file
     if corpus_selection:
-        corp_name = "-".join(corpus_selection).replace(" ",
-                                                       "") if type(corpus_selection) == list else corpus_selection
+        corp_name = ("-".join(corpus_selection).replace(" ", "")
+                     if isinstance(corpus_selection, list)
+                     else corpus_selection)
         data_stem = f'pile_{data_stem}'
 
     # if corpus is not given, path is from prev pkl.gz save of df
