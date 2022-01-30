@@ -172,11 +172,17 @@ def process_pickledf(dfiles):
             pathstr = dfpath.relative_to(Path.home())
         except:
             pathstr = dfpath
-        print(f'\n---\n\nFinishing processing {pathstr}...')
 
+        print(f'\n---\n\n## Finishing processing {pathstr}'
+              '\n-> Loading dataframe from compressed pickle...')
+        loadstart = time.perf_counter()
         df = pd.read_pickle(dfpath)
+        loadcomplete = time.perf_counter()
+        print('    [dataframe loaded in', round(
+            loadcomplete - loadstart, 2), 'seconds]')
         orig_data_stem = dfpath.stem.split('_')[1]
-        if 'raw' not in df.columns:
+        # run clean up on any dataframes in `tmp/` or `raw/`
+        if 'raw' not in df.columns or dfpath.parent.name in ('tmp', 'raw'):
             print('precleaned dataframe: no\n-> Cleaning...')
             df = cleanup_df(df, dfpath, from_file=True)
             df.to_pickle(dfpath)
@@ -425,6 +431,11 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     datastem = raw_file_path.stem
     df_output_path = get_dfpkl_outpath(datastem, '-'.join(corpus_selection))
     tmpdfpath = get_dfpkl_outpath(df_output_path.stem, is_tmp=True)
+    rawdfdir = tmpdfpath.parent.parent.joinpath('raw')
+    if not rawdfdir.is_dir(): 
+        rawdfdir.mkdir()
+    rawdfpath = rawdfdir.joinpath(tmpdfpath.name)
+
     # define namedtuple to simplify dataframe creation from json object
     text_info = namedtuple('Text', ['text', 'pile_set_name'])
 
@@ -456,7 +467,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
 
     df = df.assign(pile_set_name=df.pile_set_name.astype('category'))
 
-    df.to_pickle(tmpdfpath)
+    df.to_pickle(rawdfpath)
 
     print('  translating encoding...')
     unidecode_t0 = time.perf_counter()
@@ -474,7 +485,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     df = df.assign(pile_set_code=pd.Categorical(codes))
     # save tmp df
 
-    df.to_pickle(tmpdfpath)
+    df.to_pickle(rawdfpath)
 
     print('  adding subset codes & text IDs...')
     # Create text ids from raw file name, pile subset code, and dataframe index.
@@ -496,7 +507,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     df = df.assign(text_id=df.text_id.astype('string'),
                    pile_set_code=df.pile_set_code.astype('category'))
 
-    df.to_pickle(tmpdfpath)
+    df.to_pickle(rawdfpath)
 
     df = cleanup_df(df, tmpdfpath)
 
