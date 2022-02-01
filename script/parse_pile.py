@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import argparse
-from itertools import groupby as itgrby
-from more_itertools import pairwise, grouper
+# from itertools import groupby as itgrby
+# from more_itertools import pairwise, grouper
 from json import loads as jsloads
-import re
+# import re
 import time
 from collections import namedtuple
 from pathlib import Path
 from pprint import pprint
 from bs4 import BeautifulSoup
 # from mediawiki_dump.tokenizer import clean as mwclean
-from numpy import empty
+# from numpy import empty
 import wikitextparser as wtp
 import jsonlines
 import pandas as pd
@@ -24,55 +24,6 @@ doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 
 output_limit = 10000
 pd.set_option('display.max_colwidth', 80)
-
-# defwiki = re.compile(r'<nowiki>')
-# wikipat = re.compile(r'[{[]{2,}[^|}\]]+\|[^}\]]*\}{2,}')
-# wt0 = re.compile(r"\*")
-# wt1 = re.compile(r"(['(\s[])\w+/([\w{}]+)")
-# wt2 = re.compile(r"\[{2}spoiler:(.+?)\]{2}")
-# wt3 = re.compile(r"(\[{2})(note\]{2})(.+?)\1/\2")
-# wt4 = re.compile(r"\[{2}/?(\w+|\w+:[\w &]+)\]{2}")
-# wt5 = re.compile(r'\[{2}\S+\s([^\]]+)\]{2}')
-# wt6 = re.compile(r"\[=([^=]+)=\]")
-# wt7 = re.compile(r"([\{'])\1(\w+)\|([A-Z][\w]+)(\})\4")
-# wt8 = re.compile(r"\||(?<=@)/")
-# wt9 = re.compile(r"([{'])\1\w+/(\w+)([}'])\3")
-# wt10 = re.compile(r"\{{2}([^{}]+)\}{2}")
-# wt11 = re.compile(r"('{2,})([^']+'?[^']+?)\1")
-# wt12 = re.compile(r'\n{4,}')
-
-# likely_url = re.compile(
-#     r'(\(?\[?(?:https?|www)://\S*[^\s./]{2,}\.[^\s./]{2,}[\./\@]\S*[/:\@]\S*)')
-# variable_regex = re.compile(r'[\w]+?_[\w]+?')
-# possible_code = re.compile(
-#     r'(= ?)(?:self|true|false)|(= ?[^\s/]*\w+\.\w+[^\s/]*|[^\s/]*\w+\.\w+[^\s/]* ?=)',
-#     re.IGNORECASE)
-# json_pat = re.compile(r'{"\w+":{"\w+":')
-# # abbreviations that can be followed by r"\. [A-Z]" without signaling end of sentence
-# # only `Aa` capitalization is considered sentence start, not `AA` (another abbr.)
-# end_of_line_abbr = re.compile(
-#     r'(?:(Mr|M[sx]|Messrs|Mmes|[SG]en|[FS]t|Re[vp]|Pr(?:es|of)|Supe?|Capt|Asst|Ms?gr|Engr?|Assoc|Arb|Assemb|Pharm?|Hon|i\.e|e\.g|ca?|(?<![A-Z])[A-Z](?![A-Z]))(e?s?\.[^\w\n]?)\n([^\n\w]?[A-Z]))|(?<!\n)\n([^\n\w]?[A-Z]{2,})|(Jan|Feb|Mar|Apr|Ju[nl]|Aug|Sept?|Nov|Oct|Dec)(\.?)\n(?=\d)')
-# punc_only = re.compile(
-#     r'(?# full line nonword chars only )^([\W_]+)$'
-#     r'|(?# any punc/non`\n`ws repeated 4+)(_|[^\w\n])(\2{4,})'
-#     r'|(?# punc/non`\n`ws except . repeated 4)([^a-z\d.\n])(\4{3})'
-#     r'|(?# punc/non`\n`ws except .!?$*= or blank repeated 3)([^a-z\d.!?$=* \n])(\6{2})',
-#     re.MULTILINE | re.IGNORECASE)
-# linebreak_is_sent = re.compile(
-#     r'(?:(?#1--> )([^A-Z\n]{3,}[.?!;][\'"?! \t\f\v\r]*|\.{4,})\n[ \t\f\v\r]*(?#2--> )([(#["\']?[A-Z]|\W*?\d+\W*?\w))'
-#     r'|(?:(?#3--> )(\D[.;:][\'"?! \t\f\v\r]*)\n[ \t\f\v\r]*(?#4--> )([\(\#\["\']?[A-Z]|[\#\[\(]\d+[\)\]]))')
-
-# solonew_or_dupwhite = re.compile(r'(?<!\n)(\n)(?!\n)|([ \t\f\v\r])\2+')
-# extra_newlines = re.compile(r'\n{3,}')
-
-# # nonbreaking_colon = re.compile(r'\d+?:\n\d+?')
-# # linebreak_is_sent = re.compile(
-# #     r'([\w\d][.?!][\'"?! ]*?)\n+|([^,;:)\]\)/-])\n+'
-# #     + r'([A-Z][^A-Z]|[(#["\'][A-Z]|\W*?\d+.*?\w)')
-
-# start_chars = re.compile(
-#     r'^[A-Z][^A-Z\n]|^[\(\["\'][A-Z]|^[\W]*$')
-# sent_end_punc = re.compile(r'([.?!][\'"?!]?)')
 
 # initiate language model for dependency parsing (load just once)
 # Note:
@@ -175,19 +126,24 @@ def process_pickledf(dfiles):
 
         print(f'\n---\n\n## Finishing processing {pathstr}'
               '\n-> Loading dataframe from compressed pickle...')
+        
         loadstart = time.perf_counter()
         df = pd.read_pickle(dfpath)
         loadcomplete = time.perf_counter()
         print('    [dataframe loaded in', round(
             loadcomplete - loadstart, 2), 'seconds]')
+        
         orig_data_stem = dfpath.stem.split('_')[1]
+        
         # run clean up on any dataframes in `tmp/` or `raw/`
+        print('precleaned dataframe?')
         if 'raw' not in df.columns or dfpath.parent.name in ('tmp', 'raw'):
-            print('precleaned dataframe: no\n-> Cleaning...')
+            print('  no -> Cleaning...')
             df = cleanup_df(df, dfpath, from_file=True)
             df.to_pickle(dfpath)
         else:
-            print('precleaned dataframe: yes')
+            print('  yes')
+        
         slice_df(df, orig_data_stem)
 
 
@@ -432,7 +388,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     df_output_path = get_dfpkl_outpath(datastem, '-'.join(corpus_selection))
     tmpdfpath = get_dfpkl_outpath(df_output_path.stem, is_tmp=True)
     rawdfdir = tmpdfpath.parent.parent.joinpath('raw')
-    if not rawdfdir.is_dir(): 
+    if not rawdfdir.is_dir():
         rawdfdir.mkdir()
     rawdfpath = rawdfdir.joinpath(tmpdfpath.name)
 
