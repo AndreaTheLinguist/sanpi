@@ -129,25 +129,31 @@ def process_pickledf(dfiles):
 
         print(f'\n---\n\n## Finishing processing {pathstr}'
               '\n-> Loading dataframe from compressed pickle...')
-        
+
         loadstart = time.perf_counter()
         df = pd.read_pickle(dfpath)
         loadcomplete = time.perf_counter()
         print('    [dataframe loaded in', round(
             loadcomplete - loadstart, 2), 'seconds]')
         
-        orig_data_stem = dfpath.stem.split('_')[1]
-        
+        # previously saved df filestems
+        #   = pile_[original jsonl file/data source file stem]_...
+        # so index 1 gives the data_source_label when split by _
+        data_source_label = dfpath.stem.split('_')[1]
+
         # run clean up on any dataframes in `tmp/` or `raw/`
         print('precleaned dataframe?')
         if 'raw' not in df.columns or dfpath.parent.name in ('tmp', 'raw'):
-            print('  no -> Cleaning...')
-            df = cleanup_df(df, dfpath, from_file=True)
-            df.to_pickle(dfpath)
+            print(f'  no -> Cleaning {dfpath}...')
+            tmp_df_path = (dfpath if dfpath.parent.stem == 'tmp'
+                           else get_dfpkl_outpath(dfpath.stem, is_tmp=True))
+            df = clean_df(df, tmp_df_path)
+            df.to_pickle(get_dfpkl_outpath(dfpath.stem))
+
         else:
             print('  yes')
-        
-        slice_df(df, orig_data_stem)
+
+        slice_df(df, data_source_label)
 
 
 def process_raw_jsonlines(rfiles, corpus_selection):
@@ -160,40 +166,21 @@ def process_raw_jsonlines(rfiles, corpus_selection):
         slice_df(df, data_stem)
 
 
-def cleanup_df(df, dfpath, from_file: bool = False):
-    # if from file, dfpath is that of previous .pkl.gz save
+        
+        
 
-    tmpdfpath = get_dfpkl_outpath(
-        dfpath.stem, is_tmp=True) if from_file else dfpath
+
+
+def clean_df(df, tmp_save_path):
 
     print('\nCleaning text in dataframe...')
     df = df.assign(
         text_id=df.text_id.str.replace('PiCC', 'pcc_eng').astype('category'),
         raw=df.text)
 
-    print('  looking for wikitext/wikimedia formatting...')
-    is_wiki = df.text.apply(lambda t: bool(defwiki.search(t)))
-    if any(is_wiki):
-        wikidf = df.loc[is_wiki, :]
-        print(
-            f'  extracting text from {len(wikidf)} known wikitext formatting...')
-        wikidf = wikidf.assign(
-            raw=wikidf.text,
-            text=wikidf.text.apply(lambda t: wtp.parse(t).plain_text()))
-        df.loc[is_wiki, :] = wikidf
+    df = clean_wikitexts(df)
 
-    maybe_wiki = (
-        df.text.apply(
-            lambda t: bool(wikipat.search(t))))
-    if any(maybe_wiki):
-        wikidf = df.loc[maybe_wiki, :]
-        print(f'  cleaning {len(wikidf)} possibly wikitext formatted texts...')
-        cleaned_text = wikidf.text.apply(lambda t: _reformat_wiki(t))
-        wikidf = wikidf.assign(raw=wikidf.text.astype('string'),
-                               text=cleaned_text.astype('string'))
-        df.loc[maybe_wiki, :] = wikidf
-
-    df.to_pickle(tmpdfpath)
+    df.to_pickle(tmp_save_path)
 
     print('  looking for any html...')
     is_html = df.text.apply(
@@ -225,12 +212,12 @@ def cleanup_df(df, dfpath, from_file: bool = False):
         df.loc[is_html, ['raw', 'text']] = (htmldf.loc[:, ['raw', 'text']]
                                             .astype('string'))
         df.loc[~is_html, 'raw'] = df.text.loc[~is_html].astype('string')
-        df.to_pickle(tmpdfpath)
+        df.to_pickle(tmp_save_path)
 
     df.loc[:, ['raw', 'text']] = (df.loc[:, ['raw', 'text']]
                                   .astype('string'))
 
-    df.to_pickle(tmpdfpath)
+    df.to_pickle(tmp_save_path)
 
     print('  cleaning up text...\n   - urls...')
     # clean up web markers
@@ -263,9 +250,29 @@ def cleanup_df(df, dfpath, from_file: bool = False):
         #     print(df.at[rix, 'raw'])
 
     df.loc[:, ['text', 'raw']] = df[['text', 'raw']].astype('string')
+    return df
 
-    df.to_pickle(tmpdfpath)
-    print('cleaned dataframe saved in `./pile_tables/tmp/')
+
+def clean_wikitexts(df):
+    print('  looking for wikitext/wikimedia formatting...')
+    is_wiki = df.text.apply(lambda t: bool(defwiki.search(t)))
+    if any(is_wiki):
+        wikidf = df.loc[is_wiki, :]
+        print(
+            f'  extracting text from {len(wikidf)} known wikitext formatting...')
+        wikidf = wikidf.assign(
+            raw=wikidf.text,
+            text=wikidf.text.apply(lambda t: wtp.parse(t).plain_text()))
+        df.loc[is_wiki, :] = wikidf
+
+    maybe_wiki = (df.text.apply(lambda t: bool(wikipat.search(t))))
+    if any(maybe_wiki):
+        wikidf = df.loc[maybe_wiki, :]
+        print(f'  cleaning {len(wikidf)} possibly wikitext formatted texts...')
+        cleaned_text = wikidf.text.apply(lambda t: _reformat_wiki(t))
+        wikidf = wikidf.assign(raw=wikidf.text.astype('string'),
+                               text=cleaned_text.astype('string'))
+        df.loc[maybe_wiki, :] = wikidf
 
     return df
 
@@ -468,7 +475,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
 
     df.to_pickle(rawdfpath)
 
-    df = cleanup_df(df, tmpdfpath)
+    df = clean_df(df, tmpdfpath)
 
     print('\ndataframe info:')
     print(df.info())
