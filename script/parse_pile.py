@@ -82,7 +82,7 @@ def parse_arg_inputs():
 
     parser.add_argument(
         '-f', '--jsonl_file_path',
-        type=Path, action='append', dest='file_list',
+        type=Path, action='append', dest='jsonl_files',
         help=('flag to point to raw pile jsonlines file path to parse. Flag can be reused: '
               'All flagged paths will be appended to file list. If no file or dataframe '
               '(below) flags are included, '
@@ -102,16 +102,19 @@ def parse_arg_inputs():
 
 def get_rawfile_list(args):
     print('+ raw files selected to process:')
-    if args.file_list:
-        files = [f.resolve() for f in args.file_list]
-        pprint(files)
+    files_list = []
+    if args.jsonl_files:
+        files_list = [f.resolve() for f in args.jsonl_files]
+    # only do a glob search of directory if no pkl files given
     elif not args.df_files:
-        files = Path.cwd().glob('**/*jsonl')
-        pprint(list(Path.cwd().glob('**/*jsonl')))
+        files_list = list(Path.cwd().glob('**/*jsonl'))
+        # note: can't print files_iter here bc it's a generator obj
+
     else:
-        files = []
         print('[no raw data files to be processed]')
-    return files
+
+    pprint(files_list)
+    return files_list
 
 
 def process_pickledf(dfiles):
