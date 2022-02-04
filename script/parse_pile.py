@@ -53,16 +53,16 @@ def main():
 
     rfiles = get_rawfile_list(args)
     if rfiles:
-        corpus_selection = args.corpus_selection
+        subcorpora_list = args.corpus_selection
         print('\nraw jsonlines files will be processed for the following subcorpora: ')
-        pprint(corpus_selection)
+        pprint(subcorpora_list)
         print('')
 
     if dfiles:
         process_pickledf(dfiles)
 
     if rfiles:
-        process_raw_jsonlines(rfiles, corpus_selection)
+        process_raw_jsonlines(rfiles, subcorpora_list)
 
 
 def parse_arg_inputs():
@@ -156,19 +156,15 @@ def process_pickledf(dfiles):
         slice_df(df, data_source_label)
 
 
-def process_raw_jsonlines(rfiles, corpus_selection):
+def process_raw_jsonlines(rfiles, subcorpora_list):
     for rawfile_path in rfiles:
         print(f'\n---\n\nPreprocessing {rawfile_path}...')
 
-        df = preprocess_pile_texts(rawfile_path, corpus_selection)
+        df = preprocess_pile_texts(rawfile_path, subcorpora_list)
 
-        data_stem = rawfile_path.stem
-        slice_df(df, data_stem)
+        data_source_label = rawfile_path.stem
 
-
-        
-        
-
+        slice_df(df, data_source_label)
 
 
 def clean_df(df, tmp_save_path):
@@ -346,7 +342,7 @@ def slice_df(full_df, data_source_label):
 
 def pull_exclusions(df):
     print('  pulling excluded formats...')
-
+    # TODO : add pre-filter for existing exclusions file
     # flag texts that contain technical seeming strings and exclude for now
     technical = df.text.apply(lambda t:
                               bool(len(variable_regex.findall(t)) > 15
@@ -358,9 +354,8 @@ def pull_exclusions(df):
     else:
         excl_df = pd.DataFrame()
 
-    print(f'{len(excl_df)} texts excluded')
-    if len(excl_df) > 0:
-        print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
+    # if len(excl_df) > 0:
+    #     print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
 
     return df, excl_df
 
@@ -393,12 +388,16 @@ def process_slices(slices: list,
 
 
 ### raw processing functions ###
-def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
+def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
 
     # pile_data_path = Path('test.jsonl')
-    datastem = raw_file_path.stem
-    df_output_path = get_dfpkl_outpath(datastem, '-'.join(corpus_selection))
+    data_source_label = raw_file_path.stem
+    # path to save final version of df
+    df_output_path = get_dfpkl_outpath(data_source_label,
+                                       '-'.join(subcorpora_list))
+    # get temporary version of path for unfinished df files
     tmpdfpath = get_dfpkl_outpath(df_output_path.stem, is_tmp=True)
+    # raw path set for just this method: dataframes at any stage of pre-processing
     rawdfdir = tmpdfpath.parent.parent.joinpath('raw')
     if not rawdfdir.is_dir():
         rawdfdir.mkdir()
@@ -415,7 +414,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     with raw_file_path.open(encoding='utf-8-sig', mode='r') as jlf:
         jlines = jsonlines.Reader(jlf).iter()
         texts = (text_info(d['text'], d['meta']['pile_set_name'])
-                 for d in jlines if d['meta']['pile_set_name'] in corpus_selection)
+                 for d in jlines if d['meta']['pile_set_name'] in subcorpora_list)
         read_t1 = time.perf_counter()
         print(
             f'  ~ {round(read_t1 - read_t0, 4)}  sec elapsed')
@@ -461,7 +460,7 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     codes_t0 = time.perf_counter()
     for code in df.pile_set_code.unique():
         subdf = df.loc[df.pile_set_code == code, :].reset_index()
-        prefs = code + '_' + datastem + '_'
+        prefs = code + '_' + data_source_label + '_'
         idnums = subdf.index.astype('string')
         width = len(str(df.index.max()))
         idnums = idnums.str.zfill(width)
@@ -530,24 +529,24 @@ def get_dfpkl_outpath(stem: str,
     if is_bare:
         # process orig name parts and prefix 'pile_'
         subcorpus_label = ("-".join(subcorpus_label).replace(" ", "")
-                        if isinstance(subcorpus_label, list)
-                        else subcorpus_label)
+                           if isinstance(subcorpus_label, list)
+                           else subcorpus_label)
         stem = f'pile_{stem}'
-        
-    # entire stem of previously created pkl output path; 
+
+    # entire stem of previously created pkl output path;
     # e.g. "pile_00_Pile-CC_df" (".pkl" removed above)
-    elif is_full: 
+    elif is_full:
         # '.pkl' will not have been included in ext but removed above
         # data_type not inherited from stem in this case because
         #   exclusions input stem might include df if stem Path attribute
         stem, subcorpus_label = stem.rsplit('_')[:2]
 
-    # if not bare and not full, use `stem` and `subcorpus_label` as is; 
+    # if not bare and not full, use `stem` and `subcorpus_label` as is;
     # e.g. "pile_00", "pile_val", etc.
-    
+
     # If path is for dataframe slice
     # Note: need to test for None because `if slice_num` is False when 0
-    # This precedes the tmp clause so that tmp slices 
+    # This precedes the tmp clause so that tmp slices
     #   are in `slices/tmp/` instead of `tmp/slices/`
     if slice_num is not None:
         df_output_dir = df_output_dir.joinpath('slices')
@@ -581,6 +580,10 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
             text_id = df.at[ix, "text_id"]
             print(
                 f'  {doc_num+1} of {slice_total}/{total} (output file {filenum}): {text_id}')
+
+            print(f'  {doc_num+1} of {slice_total} '
+                  f'in slice {filenum} ({total} total): {text_id}')
+            
             # the text can be parsed with jsloads, it's in json format,
             # which we do not want (and which will break stanza)
             try:
@@ -596,8 +599,8 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
                 doc = nlp(df.text[ix])
             except RuntimeError:
                 excl_df.append(df.loc[ix, :])
-                print(
-                    f'WARNING! Excluding unparsable text. (runtime error reason unknown). Added to exclusions.')
+                print('WARNING! Excluding unparsable text. (runtime error, '
+                      'reason unknown). Added to exclusions.')
 
             else:
                 process_sentences(df, conlloutput, ix, doc)
