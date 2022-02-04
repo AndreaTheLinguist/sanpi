@@ -1,0 +1,860 @@
+(base) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ pyt[K[K[Kpython ~/s[Kcompare_conda_envs.py stanza stanza[Katmp
+conda list -n stanza
+conda list -n stanzatmp
+In only stanza
+
+In only stanzatmp
+libzlib                  1.2.11    h36c2ea0_1013       conda-forge         
+platformdirs             2.4.0     pyhd3eb1b0_0        defaults            
+asttokens                2.0.5     pyhd8ed1ab_0        conda-forge         
+tbb                      2021.5.0  hd09550d_0          defaults            
+dataclasses              0.8       pyh6d0b6a4_7        defaults            
+mypy_extensions          0.4.3     py38h06a4308_1      defaults            
+llvm-openmp              12.0.1    h4bd325d_1          conda-forge         
+click                    8.0.3     pyhd3eb1b0_0        defaults            
+pathspec                 0.9.0     pyhd8ed1ab_0        conda-forge         
+pure_eval                0.2.2     pyhd8ed1ab_0        conda-forge         
+typed-ast                1.5.2     py38h497a2fe_0      conda-forge         
+black                    22.1.0    pyhd8ed1ab_0        conda-forge         
+tomli                    2.0.0     pyhd8ed1ab_1        conda-forge         
+libnsl                   2.0.0     h7f98852_0          conda-forge         
+stack_data               0.1.4     pyhd8ed1ab_0        conda-forge         
+executing                0.8.2     pyhd8ed1ab_0        conda-forge         
+
+In both, same version:
+ipython_genutils         0.2.0     pyhd3eb1b0_1        defaults            
+blas                     1.0       mkl                 defaults            
+mkl-service              2.4.0     py38h7f8727e_0      defaults            
+idna                     3.3       pyhd3eb1b0_0        defaults            
+tqdm                     4.62.3    pyhd3eb1b0_1        defaults            
+zeromq                   4.3.4     h2531618_0          defaults            
+sqlite                   3.37.0    hc218d9a_0          defaults            
+unidecode                1.3.2     pypi_0              pypi                
+tk                       8.6.11    h1ccaba5_0          defaults            
+autopep8                 1.6.0     pyhd3eb1b0_0        defaults            
+parso                    0.8.3     pyhd3eb1b0_0        defaults            
+readline                 8.1.2     h7f8727e_1          defaults            
+stanza                   1.3.0     py38_0              stanfordnlp         
+libblas                  3.9.0     12_linux64_mkl      conda-forge         
+pyconll                  3.1.0     pypi_0              pypi                
+html5lib                 1.1       pyhd3eb1b0_0        defaults            
+mkl_fft                  1.3.1     py38hd3c417c_0      defaults            
+ca-certificates          2021.10.26h06a4308_2          defaults            
+ninja                    1.10.2    py38hd09550d_3      defaults            
+numexpr                  2.8.1     py38h6abb31d_0      defaults            
+cryptography             36.0.0    py38h9ce1e76_0      defaults            
+certifi                  2021.10.8 py38h06a4308_2      defaults            
+mkl_random               1.2.2     py38h51133e4_0      defaults            
+python-dateutil          2.8.2     pyhd3eb1b0_0        defaults            
+ptyprocess               0.7.0     pyhd3eb1b0_2        defaults            
+beautifulsoup4           4.10.0    pyh06a4308_0        defaults            
+soupsieve                2.3.1     pyhd3eb1b0_0        defaults            
+pytz                     2021.3    pyhd3eb1b0_0        defaults            
+xz                       5.2.5     h7b6447c_0          defaults            
+tornado                  6.1       py38h27cfd23_0      defaults            
+backcall                 0.2.0     pyhd3eb1b0_0        defaults            
+numpy                    1.21.2    py38h20f2e39_0      defaults            
+libsodium                1.0.18    h7b6447c_0          defaults            
+python_abi               3.8       2_cp38              conda-forge         
+wcwidth                  0.2.5     pyhd3eb1b0_0        defaults            
+ncurses                  6.3       h7f8727e_2          defaults            
+wikitextparser           0.48.0    pypi_0              pypi                
+wheel                    0.37.1    pyhd3eb1b0_0        defaults            
+packaging                21.3      pyhd3eb1b0_0        defaults            
+pysocks                  1.7.1     py38h06a4308_0      defaults            
+pycodestyle              2.8.0     pyhd3eb1b0_0        defaults            
+jsonlines                2.0.0     pyhd3eb1b0_2        defaults            
+bottleneck               1.3.2     py38heb32a55_1      defaults            
+traitlets                5.1.1     pyhd3eb1b0_0        defaults            
+more-itertools           8.12.0    pyhd3eb1b0_0        defaults            
+toml                     0.10.2    pyhd3eb1b0_0        defaults            
+future                   0.18.2    py38_1              defaults            
+numpy-base               1.21.2    py38h79a1101_0      defaults            
+webencodings             0.5.1     py38_1              defaults            
+debugpy                  1.5.1     py38h295c915_0      defaults            
+pyzmq                    22.3.0    py38h295c915_2      defaults            
+striprtf                 0.0.19    pypi_0              pypi                
+pexpect                  4.8.0     pyhd3eb1b0_3        defaults            
+six                      1.16.0    pyhd3eb1b0_0        defaults            
+requests                 2.27.1    pyhd3eb1b0_0        defaults            
+brotlipy                 0.7.0     py38h27cfd23_1003   defaults            
+bs4                      4.10.0    hd3eb1b0_0          defaults            
+pickleshare              0.7.5     pyhd3eb1b0_1003     defaults            
+pycparser                2.21      pyhd3eb1b0_0        defaults            
+jupyter_core             4.9.1     py38h06a4308_0      defaults            
+
+Packages in both, with differnt versions:
+typing_extensions :
+    stanza         3.10.0.2  pyh06a4308_0        defaults            
+    stanzatmp      4.0.1     pyha770c72_0        conda-forge         
+charset-normalizer :
+    stanza         2.0.4     pyhd3eb1b0_0        defaults            
+    stanzatmp      2.0.11    pyhd8ed1ab_0        conda-forge         
+zlib :
+    stanza         1.2.11    h7f8727e_4          defaults            
+    stanzatmp      1.2.11    h36c2ea0_1013       conda-forge         
+entrypoints :
+    stanza         0.3       py38_0              defaults            
+    stanzatmp      0.4       pyhd8ed1ab_0        conda-forge         
+pyparsing :
+    stanza         3.0.4     pyhd3eb1b0_0        defaults            
+    stanzatmp      3.0.7     pyhd8ed1ab_0        conda-forge         
+mkl :
+    stanza         2021.4.0  h06a4308_640        defaults            
+    stanzatmp      2021.4.0  h8d4b97c_729        conda-forge         
+python :
+    stanza         3.8.12    h12debd9_0          defaults            
+    stanzatmp      3.8.12    h0744224_3_cpython  conda-forge         
+jupyter_client :
+    stanza         7.1.0     pyhd3eb1b0_0        defaults            
+    stanzatmp      7.1.2     pyhd3eb1b0_0        defaults            
+prompt-toolkit :
+    stanza         3.0.20    pyhd3eb1b0_0        defaults            
+    stanzatmp      3.0.26    pyha770c72_0        conda-forge         
+nest-asyncio :
+    stanza         1.5.1     pyhd3eb1b0_0        defaults            
+    stanzatmp      1.5.4     pyhd8ed1ab_0        conda-forge         
+jedi :
+    stanza         0.18.0    py38h06a4308_1      defaults            
+    stanzatmp      0.18.1    py38h06a4308_0      defaults            
+pandas :
+    stanza         1.3.5     py38h8c16a72_0      defaults            
+    stanzatmp      1.4.0     py38h43a58ef_0      conda-forge         
+libstdcxx-ng :
+    stanza         9.3.0     hd4cf53a_17         defaults            
+    stanzatmp      11.2.0    he4da1e4_12         conda-forge         
+libffi :
+    stanza         3.3       he6710b0_2          defaults            
+    stanzatmp      3.4.2     h295c915_2          defaults            
+pip :
+    stanza         21.2.4    py38h06a4308_0      defaults            
+    stanzatmp      22.0.3    pyhd8ed1ab_0        conda-forge         
+_openmp_mutex :
+    stanza         4.5       1_gnu               defaults            
+    stanzatmp      4.5       1_llvm              conda-forge         
+emoji :
+    stanza         1.6.1     pyhd8ed1ab_0        conda-forge         
+    stanzatmp      1.6.3     pyhd8ed1ab_0        conda-forge         
+ipykernel :
+    stanza         6.4.1     py38h06a4308_1      defaults            
+    stanzatmp      6.8.0     py38he5a9106_0      conda-forge         
+decorator :
+    stanza         5.1.0     pyhd3eb1b0_0        defaults            
+    stanzatmp      5.1.1     pyhd3eb1b0_0        defaults            
+urllib3 :
+    stanza         1.26.7    pyhd3eb1b0_0        defaults            
+    stanzatmp      1.26.8    pyhd3eb1b0_0        defaults            
+pygments :
+    stanza         2.10.0    pyhd3eb1b0_0        defaults            
+    stanzatmp      2.11.2    pyhd8ed1ab_0        conda-forge         
+libprotobuf :
+    stanza         3.16.0    h780b84a_0          conda-forge         
+    stanzatmp      3.19.4    h780b84a_0          conda-forge         
+sleef :
+    stanza         3.5.1     h7f98852_1          conda-forge         
+    stanzatmp      3.5.1     h9b69904_2          conda-forge         
+_libgcc_mutex :
+    stanza         0.1       main                defaults            
+    stanzatmp      0.1       conda_forge         conda-forge         
+libgomp :
+    stanza         9.3.0     h5101ec6_17         defaults            
+    stanzatmp      11.2.0    h1d223b6_12         conda-forge         
+libgcc-ng :
+    stanza         9.3.0     h5101ec6_17         defaults            
+    stanzatmp      11.2.0    h1d223b6_12         conda-forge         
+openssl :
+    stanza         1.1.1m    h7f8727e_0          defaults            
+    stanzatmp      3.0.0     h7f98852_2          conda-forge         
+intel-openmp :
+    stanza         2021.4.0  h06a4308_3561       defaults            
+    stanzatmp      2022.0.1  h06a4308_3633       defaults            
+regex :
+    stanza         2021.11.2 py38h7f8727e_0      defaults            
+    stanzatmp      2022.1.18 py38h497a2fe_0      conda-forge         
+setuptools :
+    stanza         58.0.4    py38h06a4308_0      defaults            
+    stanzatmp      60.7.1    py38h578d9bd_0      conda-forge         
+cffi :
+    stanza         1.14.6    py38h400218f_0      defaults            
+    stanzatmp      1.15.0    py38hd667e15_1      defaults            
+pyopenssl :
+    stanza         21.0.0    pyhd3eb1b0_1        defaults            
+    stanzatmp      22.0.0    pyhd3eb1b0_0        defaults            
+protobuf :
+    stanza         3.16.0    py38h709712a_0      conda-forge         
+    stanzatmp      3.19.4    py38h709712a_0      conda-forge         
+pytorch :
+    stanza         1.9.0     cpu_py38h4bbe6ce_2  conda-forge         
+    stanzatmp      1.10.0    cpu_py38h7c5583f_1  conda-forge         
+ipython :
+    stanza         7.29.0    py38hb070fc8_0      defaults            
+    stanzatmp      8.0.1     py38h578d9bd_0      conda-forge         
+ld_impl_linux-64 :
+    stanza         2.35.1    h7274673_9          defaults            
+    stanzatmp      2.36.1    hea4e1c9_2          conda-forge         
+matplotlib-inline :
+    stanza         0.1.2     pyhd3eb1b0_2        defaults            
+    stanzatmp      0.1.3     pyhd8ed1ab_0        conda-forge         
+(base) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ echo[K[Kho('using staza tmp to run pile [K[K[K[K[Kparse_pile')
+bash: syntax error near unexpected token `'using staza tmp to run parse_pile''
+(base) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ p[Kpython script/parse_pile.py dat[K[K[Kpile_ta[K[Kdata/s[Kpile-sample.jsonl [C[C[C[C[C[1@ [1@-[1@f[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K pile_data/pile-sample.jsonl [1@-[1@f[1@ [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+Traceback (most recent call last):
+  File "/home/arh234/litotes/script/parse_pile.py", line 14, in <module>
+    import wikitextparser as wtp
+ModuleNotFoundError: No module named 'wikitextparser'
+(base) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanzatmp
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanzatmppython script/parse_pile.py -f pile_data/pile-sample.jsonl 
+Loading dependency parsing pipeline...
+2022-02-03 23:18:14 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:18:14 INFO: Use device: cpu
+2022-02-03 23:18:14 INFO: Loading: tokenize
+2022-02-03 23:18:14 INFO: Loading: pos
+2022-02-03 23:18:15 INFO: Loading: lemma
+2022-02-03 23:18:15 INFO: Loading: depparse
+2022-02-03 23:18:15 INFO: Done loading processors!
+started: Thu Feb  3 23:18:15 2022
++ raw files selected to process:
+[PosixPath('/home/arh234/litotes/pile_data/pile-sample.jsonl')]
+
+raw jsonlines files will be processed for the following subcorpora: 
+['Pile-CC']
+
+
+---
+
+Preprocessing /home/arh234/litotes/pile_data/pile-sample.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.0005  sec elapsed
+  building dataframe from from `jsonlines` generator object...
+  ~ 0.003  sec elapsed
+  translating encoding...
+  ~ 0.01  sec elapsed
+  adding subset codes & text IDs...
+  ~ 0.004  sec elapsed
+
+Cleaning text in dataframe...
+  looking for wikitext/wikimedia formatting...
+  looking for any html...
+  cleaning up text...
+   - urls...
+   - title abbreviations at line breaks...
+   - punctuation delineated text breaks
+1 of 5 texts modified
+
+dataframe info:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5 entries, 0 to 4
+Data columns (total 5 columns):
+ #   Column         Non-Null Count  Dtype   
+---  ------         --------------  -----   
+ 0   text_id        5 non-null      category
+ 1   text           5 non-null      string  
+ 2   pile_set_name  5 non-null      category
+ 3   pile_set_code  5 non-null      category
+ 4   raw            5 non-null      string  
+dtypes: category(3), string(2)
+memory usage: 667.0 bytes
+None
+...
+Finished preprocessing: dataframe saved to /home/arh234/litotes/pile_tables/pile_pile-sample_Pile-CC_df.pkl.gz
+  pulling excluded formats...
+1 exclusions saved to pile_exclusions/pile_pile-sample_Pcc_excl.pkl.gz]
+4 total texts to parse
+Starting output 1: 4 of 4 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_pile-sample-1.conllu
+  1 of 4 in slice 1 (4 total): Pcc_pile-sample_0
+       ~ 0.3  seconds
+  2 of 4 in slice 1 (4 total): Pcc_pile-sample_1
+       ~ 1.2  seconds
+  3 of 4 in slice 1 (4 total): Pcc_pile-sample_2
+       ~ 0.5  seconds
+  4 of 4 in slice 1 (4 total): Pcc_pile-sample_3
+       ~ 0.2  seconds
+Finished writing parses to /home/arh234/litotes/Pcc.conll/pcc_eng_pile-sample-1.conllu
+Thu Feb  3 23:18:18 2022
+= 4 of 4 texts successfully parsed.
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -f pile_data/pile-sample.jsonl [K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K pile_tables/tmp[K[K[Km[Ktmp/pile_00sample_Pile-CC_df.pkl.gz [K-pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gzdpile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+Loading dependency parsing pipeline...
+2022-02-03 23:20:41 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:20:41 INFO: Use device: cpu
+2022-02-03 23:20:41 INFO: Loading: tokenize
+2022-02-03 23:20:41 INFO: Loading: pos
+2022-02-03 23:20:41 INFO: Loading: lemma
+2022-02-03 23:20:41 INFO: Loading: depparse
+2022-02-03 23:20:42 INFO: Done loading processors!
+started: Thu Feb  3 23:20:42 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+    [dataframe loaded in 0.4 seconds]
+precleaned dataframe?
+  no -> Cleaning /home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz...
+
+Cleaning text in dataframe...
+  looking for wikitext/wikimedia formatting...
+  looking for any html...
+  cleaning up text...
+   - urls...
+   - title abbreviations at line breaks...
+   - punctuation delineated text breaks
+731 of 10000 texts modified
+  pulling excluded formats...
+104 exclusions saved to pile_exclusions/pile_00sample_Pcc_excl.pkl.gz]
+9896 total texts to parse
+Starting output 1: 9896 of 9896 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_00sample-1.conllu
+  1 of 9896 in slice 1 (9896 total): Pcc_00_0000936
+       ~ 0.8  seconds
+  2 of 9896 in slice 1 (9896 total): Pcc_00_0000995
+       ~ 0.5  seconds
+  3 of 9896 in slice 1 (9896 total): Pcc_00_0001098
+       ~ 1.8  seconds
+  4 of 9896 in slice 1 (9896 total): Pcc_00_0001112
+       ~ 0.3  seconds
+  5 of 9896 in slice 1 (9896 total): Pcc_00_0001113
+       ~ 0.4  seconds
+  6 of 9896 in slice 1 (9896 total): Pcc_00_0001238
+       ~ 2.7  seconds
+  7 of 9896 in slice 1 (9896 total): Pcc_00_0001282
+       ~ 0.6  seconds
+  8 of 9896 in slice 1 (9896 total): Pcc_00_0001408
+       ~ 1.2  seconds
+  9 of 9896 in slice 1 (9896 total): Pcc_00_0001460
+       ~ 1.1  seconds
+  10 of 9896 in slice 1 (9896 total): Pcc_00_0001540
+       ~ 0.7  seconds
+  11 of 9896 in slice 1 (9896 total): Pcc_00_0001971
+       ~ 3.4  seconds
+  12 of 9896 in slice 1 (9896 total): Pcc_00_0002008
+       ~ 1.5  seconds
+  13 of 9896 in slice 1 (9896 total): Pcc_00_0002288
+       ~ 1.0  seconds
+  14 of 9896 in slice 1 (9896 total): Pcc_00_0002651
+       ~ 0.8  seconds
+  15 of 9896 in slice 1 (9896 total): Pcc_00_0003259
+       ~ 0.5  seconds
+hit problem case
+  16 of 9896 in slice 1 (9896 total): Pcc_00_0003587
+Killed
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanza
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanzapython script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[19Pf pile_data/pile-sample.jsonl 
+Loading dependency parsing pipeline...
+2022-02-03 23:33:40 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:33:40 INFO: Use device: cpu
+2022-02-03 23:33:40 INFO: Loading: tokenize
+2022-02-03 23:33:40 INFO: Loading: pos
+2022-02-03 23:33:40 INFO: Loading: lemma
+2022-02-03 23:33:40 INFO: Loading: depparse
+2022-02-03 23:33:40 INFO: Done loading processors!
+started: Thu Feb  3 23:33:40 2022
++ raw files selected to process:
+[PosixPath('/home/arh234/litotes/pile_data/pile-sample.jsonl')]
+
+raw jsonlines files will be processed for the following subcorpora: 
+['Pile-CC']
+
+
+---
+
+Preprocessing /home/arh234/litotes/pile_data/pile-sample.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.0028  sec elapsed
+  building dataframe from from `jsonlines` generator object...
+  ~ 0.002  sec elapsed
+  translating encoding...
+  ~ 0.01  sec elapsed
+  adding subset codes & text IDs...
+  ~ 0.005  sec elapsed
+
+Cleaning text in dataframe...
+  looking for wikitext/wikimedia formatting...
+  looking for any html...
+  cleaning up text...
+   - urls...
+   - title abbreviations at line breaks...
+   - punctuation delineated text breaks
+1 of 5 texts modified
+
+dataframe info:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5 entries, 0 to 4
+Data columns (total 5 columns):
+ #   Column         Non-Null Count  Dtype   
+---  ------         --------------  -----   
+ 0   text_id        5 non-null      category
+ 1   text           5 non-null      string  
+ 2   pile_set_name  5 non-null      category
+ 3   pile_set_code  5 non-null      category
+ 4   raw            5 non-null      string  
+dtypes: category(3), string(2)
+memory usage: 667.0 bytes
+None
+...
+Finished preprocessing: dataframe saved to /home/arh234/litotes/pile_tables/pile_pile-sample_Pile-CC_df.pkl.gz
+  pulling excluded formats...
+1 exclusions saved to pile_exclusions/pile_pile-sample_Pcc_excl.pkl.gz]
+4 total texts to parse
+Starting output 1: 4 of 4 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_pile-sample-1.conllu
+  1 of 4 in slice 1 (4 total): Pcc_pile-sample_0
+       ~ 0.4  seconds
+  2 of 4 in slice 1 (4 total): Pcc_pile-sample_1
+       ~ 1.3  seconds
+  3 of 4 in slice 1 (4 total): Pcc_pile-sample_2
+       ~ 0.6  seconds
+  4 of 4 in slice 1 (4 total): Pcc_pile-sample_3
+       ~ 0.3  seconds
+Finished writing parses to /home/arh234/litotes/Pcc.conll/pcc_eng_pile-sample-1.conllu
+Thu Feb  3 23:33:43 2022
+= 4 of 4 texts successfully parsed.
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -f pile_data/pile-sample.jsonl [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[38Pconda activate stanzapython script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[K(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+  File "script/parse_pile.py", line 20
+    from pandas._libs import
+                           ^
+SyntaxError: invalid syntax
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+Loading dependency parsing pipeline...
+2022-02-03 23:43:29 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:43:29 INFO: Use device: cpu
+2022-02-03 23:43:29 INFO: Loading: tokenize
+2022-02-03 23:43:29 INFO: Loading: pos
+2022-02-03 23:43:29 INFO: Loading: lemma
+2022-02-03 23:43:29 INFO: Loading: depparse
+2022-02-03 23:43:30 INFO: Done loading processors!
+started: Thu Feb  3 23:43:30 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+Traceback (most recent call last):
+  File "script/parse_pile.py", line 774, in <module>
+    main()
+  File "script/parse_pile.py", line 62, in main
+    for df, data_source_label in process_pickledf(dfiles):
+  File "script/parse_pile.py", line 141, in process_pickledf
+    df = pd.read_pickle(dfpath, compression='gzip')
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/io/pickle.py", line 222, in read_pickle
+    return pc.load(handles.handle, encoding=None)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/compat/pickle_compat.py", line 274, in load
+    return up.load()
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1212, in load
+    dispatch[key[0]](self)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1537, in load_stack_global
+    self.append(self.find_class(module, name))
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/compat/pickle_compat.py", line 206, in find_class
+    return super().find_class(module, name)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1581, in find_class
+    return _getattribute(sys.modules[module], name)[0]
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 331, in _getattribute
+    raise AttributeError("Can't get attribute {!r} on {!r}"
+AttributeError: Can't get attribute '_unpickle_block' on <module 'pandas._libs.internals' from '/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/_libs/internals.cpython-38-x86_64-linux-gnu.so'>
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ c[Kconda actiave[K[K[K[Kivate stanzatmp
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanzatmppython script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+Loading dependency parsing pipeline...
+2022-02-03 23:44:05 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:44:05 INFO: Use device: cpu
+2022-02-03 23:44:05 INFO: Loading: tokenize
+2022-02-03 23:44:05 INFO: Loading: pos
+2022-02-03 23:44:05 INFO: Loading: lemma
+2022-02-03 23:44:05 INFO: Loading: depparse
+2022-02-03 23:44:05 INFO: Done loading processors!
+started: Thu Feb  3 23:44:05 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+    [dataframe loaded in 0.29 seconds]
+precleaned dataframe?
+  no -> Cleaning /home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz...
+
+Cleaning text in dataframe...
+  looking for wikitext/wikimedia formatting...
+  looking for any html...
+  cleaning up text...
+   - urls...
+   - title abbreviations at line breaks...
+   - punctuation delineated text breaks
+731 of 10000 texts modified
+  pulling excluded formats...
+104 exclusions saved to pile_exclusions/pile_00sample_Pcc_excl.pkl.gz]
+9896 total texts to parse
+Starting output 1: 9896 of 9896 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_00sample-1.conllu
+  1 of 9896 in slice 1 (9896 total): Pcc_00_0000936
+       ~ 1.0  seconds
+  2 of 9896 in slice 1 (9896 total): Pcc_00_0000995
+       ~ 0.8  seconds
+  3 of 9896 in slice 1 (9896 total): Pcc_00_0001098
+       ~ 2.7  seconds
+  4 of 9896 in slice 1 (9896 total): Pcc_00_0001112
+       ~ 0.4  seconds
+  5 of 9896 in slice 1 (9896 total): Pcc_00_0001113
+       ~ 0.6  seconds
+  6 of 9896 in slice 1 (9896 total): Pcc_00_0001238
+       ~ 3.5  seconds
+  7 of 9896 in slice 1 (9896 total): Pcc_00_0001282
+       ~ 0.9  seconds
+  8 of 9896 in slice 1 (9896 total): Pcc_00_0001408
+       ~ 1.7  seconds
+  9 of 9896 in slice 1 (9896 total): Pcc_00_0001460
+       ~ 1.6  seconds
+  10 of 9896 in slice 1 (9896 total): Pcc_00_0001540
+       ~ 0.6  seconds
+  11 of 9896 in slice 1 (9896 total): Pcc_00_0001971
+       ~ 3.7  seconds
+  12 of 9896 in slice 1 (9896 total): Pcc_00_0002008
+       ~ 2.0  seconds
+  13 of 9896 in slice 1 (9896 total): Pcc_00_0002288
+       ~ 1.4  seconds
+  14 of 9896 in slice 1 (9896 total): Pcc_00_0002651
+       ~ 1.1  seconds
+  15 of 9896 in slice 1 (9896 total): Pcc_00_0003259
+       ~ 1.1  seconds
+hit problem case
+  16 of 9896 in slice 1 (9896 total): Pcc_00_0003587
+Killed
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ [K(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+Loading dependency parsing pipeline...
+2022-02-03 23:57:48 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:57:48 INFO: Use device: cpu
+2022-02-03 23:57:48 INFO: Loading: tokenize
+2022-02-03 23:57:48 INFO: Loading: pos
+2022-02-03 23:57:48 INFO: Loading: lemma
+2022-02-03 23:57:48 INFO: Loading: depparse
+2022-02-03 23:57:48 INFO: Done loading processors!
+started: Thu Feb  3 23:57:48 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+    [dataframe loaded in 0.28 seconds]
+precleaned dataframe?
+  no -> Cleaning /home/arh234/litotes/pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz...
+
+Cleaning text in dataframe...
+  looking for wikitext/wikimedia formatting...
+  looking for any html...
+  cleaning up text...
+   - urls...
+   - title abbreviations at line breaks...
+   - punctuation delineated text breaks
+731 of 10000 texts modified
+  pulling excluded formats...
+104 exclusions saved to pile_exclusions/pile_00sample_Pcc_excl.pkl.gz]
+9896 total texts to parse
+Starting output 1: 9896 of 9896 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_00sample-1.conllu
+  1 of 9896 in slice 1 (9896 total): Pcc_00_0000936
+       ~ 0.8  seconds
+  2 of 9896 in slice 1 (9896 total): Pcc_00_0000995
+       ~ 0.5  seconds
+  3 of 9896 in slice 1 (9896 total): Pcc_00_0001098
+       ~ 1.5  seconds
+  4 of 9896 in slice 1 (9896 total): Pcc_00_0001112
+       ~ 0.3  seconds
+  5 of 9896 in slice 1 (9896 total): Pcc_00_0001113
+       ~ 0.5  seconds
+  6 of 9896 in slice 1 (9896 total): Pcc_00_0001238
+       ~ 2.6  seconds
+  7 of 9896 in slice 1 (9896 total): Pcc_00_0001282
+       ~ 0.6  seconds
+  8 of 9896 in slice 1 (9896 total): Pcc_00_0001408
+       ~ 1.2  seconds
+  9 of 9896 in slice 1 (9896 total): Pcc_00_0001460
+       ~ 1.1  seconds
+  10 of 9896 in slice 1 (9896 total): Pcc_00_0001540
+       ~ 0.5  seconds
+  11 of 9896 in slice 1 (9896 total): Pcc_00_0001971
+       ~ 3.3  seconds
+  12 of 9896 in slice 1 (9896 total): Pcc_00_0002008
+       ~ 1.6  seconds
+  13 of 9896 in slice 1 (9896 total): Pcc_00_0002288
+       ~ 1.2  seconds
+  14 of 9896 in slice 1 (9896 total): Pcc_00_0002651
+       ~ 1.0  seconds
+  15 of 9896 in slice 1 (9896 total): Pcc_00_0003259
+       ~ 0.9  seconds
+hit problem case
+  16 of 9896 in slice 1 (9896 total): Pcc_00_0003587
+Killed
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/tmp/pile_00sample_Pile-CC_df.pkl.gz[A(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ [K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cpython script/parse_pile.py -d pile_tables/pile_00sample_Pile-CC_df.pkl.gz
+Loading dependency parsing pipeline...
+2022-02-03 23:59:15 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:59:15 INFO: Use device: cpu
+2022-02-03 23:59:15 INFO: Loading: tokenize
+2022-02-03 23:59:15 INFO: Loading: pos
+2022-02-03 23:59:15 INFO: Loading: lemma
+2022-02-03 23:59:15 INFO: Loading: depparse
+2022-02-03 23:59:16 INFO: Done loading processors!
+started: Thu Feb  3 23:59:16 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+    [dataframe loaded in 0.41 seconds]
+precleaned dataframe?
+  yes
+  pulling excluded formats...
+104 exclusions saved to pile_exclusions/pile_00sample_Pcc_excl.pkl.gz]
+9896 total texts to parse
+Starting output 1: 9896 of 9896 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_00sample-1.conllu
+  1 of 9896 in slice 1 (9896 total): Pcc_00_0000936
+       ~ 0.8  seconds
+  2 of 9896 in slice 1 (9896 total): Pcc_00_0000995
+       ~ 0.7  seconds
+  3 of 9896 in slice 1 (9896 total): Pcc_00_0001098
+       ~ 2.1  seconds
+  4 of 9896 in slice 1 (9896 total): Pcc_00_0001112
+       ~ 0.3  seconds
+  5 of 9896 in slice 1 (9896 total): Pcc_00_0001113
+       ~ 0.6  seconds
+  6 of 9896 in slice 1 (9896 total): Pcc_00_0001238
+       ~ 3.4  seconds
+  7 of 9896 in slice 1 (9896 total): Pcc_00_0001282
+       ~ 0.7  seconds
+  8 of 9896 in slice 1 (9896 total): Pcc_00_0001408
+^CTraceback (most recent call last):
+  File "script/parse_pile.py", line 774, in <module>
+    main()
+  File "script/parse_pile.py", line 63, in main
+    slice_df(df, data_source_label)
+  File "script/parse_pile.py", line 351, in slice_df
+    process_slices(
+  File "script/parse_pile.py", line 387, in process_slices
+    excl_df = stanza_parse(dfslice, out_path, excl_df,
+  File "script/parse_pile.py", line 614, in stanza_parse
+    doc = nlp(df.text[ix])
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/pipeline/core.py", line 231, in __call__
+    doc = self.process(doc)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/pipeline/core.py", line 225, in process
+    doc = process(doc)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/pipeline/pos_processor.py", line 41, in process
+    preds += self.trainer.predict(b)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/models/pos/trainer.py", line 73, in predict
+    _, preds = self.model(word, word_mask, wordchars, wordchars_mask, upos, xpos, ufeats, pretrained, word_orig_idx, sentlens, wordlens)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/models/pos/model.py", line 158, in forward
+    xpos_pred = clffunc(self.xpos_clf, xpos_hid)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/models/pos/model.py", line 147, in <lambda>
+    clffunc = lambda clf, hid: clf(self.drop(hid), self.drop(upos_emb))
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/stanza/models/common/biaffine.py", line 46, in forward
+    return self.W_bilin(input1, input2)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/torch/nn/modules/linear.py", line 189, in forward
+    return F.bilinear(input1, input2, self.weight, self.bias)
+  File "/home/arh234/anaconda3/envs/stanzatmp/lib/python3.8/site-packages/torch/nn/functional.py", line 1875, in bilinear
+    return torch.bilinear(input1, input2, weight, bias)
+KeyboardInterrupt
+
+(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/pile_00sample_Pile-CC_df.pkl.gztmp/pile_00sample_Pile-CC_df.pkl.gz[A(stanzatmp) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanzatmp[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[K[K
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ conda activate stanzapython script/parse_pile.py -d pile_tables/pile_00sample_Pile-CC_df.pkl.gz
+Loading dependency parsing pipeline...
+2022-02-03 23:59:51 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-03 23:59:51 INFO: Use device: cpu
+2022-02-03 23:59:51 INFO: Loading: tokenize
+2022-02-03 23:59:51 INFO: Loading: pos
+2022-02-03 23:59:51 INFO: Loading: lemma
+2022-02-03 23:59:51 INFO: Loading: depparse
+2022-02-03 23:59:51 INFO: Done loading processors!
+started: Thu Feb  3 23:59:51 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+Traceback (most recent call last):
+  File "script/parse_pile.py", line 774, in <module>
+    main()
+  File "script/parse_pile.py", line 62, in main
+    for df, data_source_label in process_pickledf(dfiles):
+  File "script/parse_pile.py", line 141, in process_pickledf
+    df = pd.read_pickle(dfpath, compression='gzip')
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/io/pickle.py", line 222, in read_pickle
+    return pc.load(handles.handle, encoding=None)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/compat/pickle_compat.py", line 274, in load
+    return up.load()
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1212, in load
+    dispatch[key[0]](self)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1537, in load_stack_global
+    self.append(self.find_class(module, name))
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/compat/pickle_compat.py", line 206, in find_class
+    return super().find_class(module, name)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1581, in find_class
+    return _getattribute(sys.modules[module], name)[0]
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 331, in _getattribute
+    raise AttributeError("Can't get attribute {!r} on {!r}"
+AttributeError: Can't get attribute '_unpickle_block' on <module 'pandas._libs.internals' from '/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/_libs/internals.cpython-38-x86_64-linux-gnu.so'>
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ python script/parse_pile.py -d pile_tables/pile_00sample_Pile-CC_df.pkl.gz
+Loading dependency parsing pipeline...
+2022-02-04 00:00:09 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-04 00:00:09 INFO: Use device: cpu
+2022-02-04 00:00:09 INFO: Loading: tokenize
+2022-02-04 00:00:09 INFO: Loading: pos
+2022-02-04 00:00:09 INFO: Loading: lemma
+2022-02-04 00:00:09 INFO: Loading: depparse
+2022-02-04 00:00:10 INFO: Done loading processors!
+started: Fri Feb  4 00:00:10 2022
++ raw files selected to process:
+[no raw data files to be processed]
+[]
+Preprocessed dataframes to parse into conllu files:
+
+[PosixPath('/home/arh234/litotes/pile_tables/pile_00sample_Pile-CC_df.pkl.gz')]
+
+---
+
+## Finishing processing litotes/pile_tables/pile_00sample_Pile-CC_df.pkl.gz
+-> Loading dataframe from compressed pickle...
+Traceback (most recent call last):
+  File "script/parse_pile.py", line 774, in <module>
+    main()
+  File "script/parse_pile.py", line 62, in main
+    for df, data_source_label in process_pickledf(dfiles):
+  File "script/parse_pile.py", line 141, in process_pickledf
+    df = pd.read_pickle(dfpath, compression='gzip')
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/io/pickle.py", line 222, in read_pickle
+    return pc.load(handles.handle, encoding=None)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/compat/pickle_compat.py", line 274, in load
+    return up.load()
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1212, in load
+    dispatch[key[0]](self)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1537, in load_stack_global
+    self.append(self.find_class(module, name))
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/compat/pickle_compat.py", line 206, in find_class
+    return super().find_class(module, name)
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 1581, in find_class
+    return _getattribute(sys.modules[module], name)[0]
+  File "/home/arh234/anaconda3/envs/stanza/lib/python3.8/pickle.py", line 331, in _getattribute
+    raise AttributeError("Can't get attribute {!r} on {!r}"
+AttributeError: Can't get attribute '_unpickle_block' on <module 'pandas._libs.internals' from '/home/arh234/anaconda3/envs/stanza/lib/python3.8/site-packages/pandas/_libs/internals.cpython-38-x86_64-linux-gnu.so'>
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ 
