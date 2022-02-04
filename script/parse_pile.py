@@ -135,7 +135,7 @@ def process_pickledf(dfiles):
         loadcomplete = time.perf_counter()
         print('    [dataframe loaded in', round(
             loadcomplete - loadstart, 2), 'seconds]')
-        
+
         # previously saved df filestems
         #   = pile_[original jsonl file/data source file stem]_...
         # so index 1 gives the data_source_label when split by _
@@ -298,14 +298,20 @@ def _reformat_wiki(t):
     return t
 
 
-def slice_df(full_df, data_stem):
+def slice_df(full_df, data_source_label):
 
-    for corpus_set, df in full_df.groupby('pile_set_code'):
+    for subcorpus_label, df in full_df.groupby('pile_set_code'):
 
         remaining_df, excl_df = pull_exclusions(df)
+        excl_save_path = get_dfpkl_outpath(
+            data_source_label, subcorpus_label, is_excl=True)
+        excl_df.to_pickle(excl_save_path)
+        print(f'{len(excl_df)} exclusions saved '
+              f'to {excl_save_path.relative_to(Path.cwd())}]')
 
         total = len(remaining_df)
         print(f'{total} total texts to parse')
+
         remaining_df = remaining_df.sort_values('text_id')
         slices = []
         while len(remaining_df) > 2.4*output_limit:
@@ -327,11 +333,15 @@ def slice_df(full_df, data_stem):
         slices.append(remaining_df)
 
         for i, sdf in enumerate(slices):
+            # starting at i = 0 meant the first slice wasn't
+            # getting saved bc if slice_num was evaluating as False
             outpath = get_dfpkl_outpath(
-                data_stem, corpus_set, slice_num=i, is_tmp=True)
+                data_source_label, subcorpus_label,
+                slice_num=i+1, is_tmp=True)
             sdf.to_pickle(outpath)
 
-        process_slices(slices, total, data_stem, corpus_set, excl_df)
+        process_slices(
+            slices, total,  data_source_label, subcorpus_label, excl_df)
 
 
 def pull_exclusions(df):
@@ -355,38 +365,30 @@ def pull_exclusions(df):
     return df, excl_df
 
 
-def get_outpath(ext, slice_name, subset):
-    '''returns path for final conllu output files'''
-    out_fname = f'{subset.lower()}_eng_{slice_name}.{ext}'
-    if ext == 'conllu':
-        out_dir = Path.cwd().joinpath(f'{subset}.conll')
-    else:
-        out_dir = Path.cwd().joinpath(f'exclusions_{subset}')
-    if not out_dir.is_dir():
-        out_dir.mkdir()
-
-    return out_dir.joinpath(out_fname)
-
-
 def process_slices(slices: list,
                    total: int,
-                   data_stem: str,
-                   subset: str,
+                   data_source_label: str,
+                   subset_label: str,
                    excl_df: pd.DataFrame):
 
-    for outfile_count, dfslice in enumerate(slices):
+    for i, dfslice in enumerate(slices):
+        slice_number = i + 1
+        out_path = get_conllu_outpath(
+            f'{data_source_label}-{slice_number}',
+            subset_label)
 
-        out_path = get_outpath(
-            'conllu', f'{data_stem}-{outfile_count}', subset)
+        excl_df = stanza_parse(dfslice, out_path, excl_df,
+                               slice_number, total)
 
-        excl_df = stanza_parse(
-            dfslice, out_path, excl_df, outfile_count, total)
-
+        # save version of dataframe for all texts actually processed
         actual_slice = dfslice[~dfslice.isin(excl_df)]
-        actual_slice.to_pkl(get_dfpkl_outpath(
-            data_stem, subset, slice_num=outfile_count))
+        actual_slice.to_pickle(
+            get_dfpkl_outpath(data_source_label, subset_label,
+                              slice_num=slice_number))
 
-    excl_path = get_outpath('pkl.gz', f'{data_stem}_excluded', subset)
+    # save exclusions df
+    excl_path = get_dfpkl_outpath(
+        data_source_label, subset_label, is_excl=True)
     excl_df.to_pickle(excl_path)
 
 
@@ -487,41 +489,79 @@ def preprocess_pile_texts(raw_file_path: Path, corpus_selection: str):
     return df
 
 
-def get_dfpkl_outpath(data_stem: str,
-                      corpus_selection=None,
+def get_dfpkl_outpath(stem: str,
+                      subcorpus_label='Pcc',
                       slice_num: int = None,
-                      is_tmp: bool = False):
+                      is_tmp: bool = False,
+                      is_excl: bool = False):
+    '''
+    return path object for dataframes to be saved as `.pkl.gz`:
+    file name template = `pile_[jsonl stem]_[subcorpus]_{df, excl}.pkl.gz`
+    * If input is bare or only prefixed (`pile_[jsonl stem]`), 
+        `corpus_selection` must be provided
+    * all full dataframe file names/stems have 3 underscores
+    Directories are as follows:
+        - for pre-processing saves,
+            `pile_tables/raw/`
+        - for unfinalized saves, 
+            `pile_tables/tmp/`
+        - for df slices unfiltered for exclusions,
+            `pile_tables/slices/tmp/`
+        - for df slices with exclusions removed, 
+            `pile_tables/slices/`
+        - for exclusions dataframe, 
+            `pile_exclusions/`
+    '''
 
-    df_output_dir = Path.cwd().joinpath('pile_tables')
+    data_type = 'excl' if is_excl else 'df'
 
-    # if corpus_selection is given, path is from jsonl file
-    if corpus_selection:
-        corp_name = ("-".join(corpus_selection).replace(" ", "")
-                     if isinstance(corpus_selection, list)
-                     else corpus_selection)
-        data_stem = f'pile_{data_stem}'
+    # to remove any '.pkl' strings still included with [path].stem attributes
+    if '.' in set(stem):
+        stem = stem.split('.', 1)[0]
 
-    # if corpus is not given, path is from prev pkl.gz save of df
-    else:
-        # '.pkl' will not have been included in ext
-        data_stem, corp_name, __ = data_stem.rsplit('_', 2)
+    is_bare = False if '_' in stem else True
+    is_prefixed = stem.startswith('pile_')
+    is_full = stem.count('_') == 3 and is_prefixed
+
+    df_output_dir = (Path.cwd().joinpath('pile_exclusions') if is_excl
+                     else Path.cwd().joinpath('pile_tables'))
+
+    # just the jsonl stem, e.g. "00", "val", etc.
+    if is_bare:
+        # process orig name parts and prefix 'pile_'
+        subcorpus_label = ("-".join(subcorpus_label).replace(" ", "")
+                        if isinstance(subcorpus_label, list)
+                        else subcorpus_label)
+        stem = f'pile_{stem}'
+        
+    # entire stem of previously created pkl output path; 
+    # e.g. "pile_00_Pile-CC_df" (".pkl" removed above)
+    elif is_full: 
+        # '.pkl' will not have been included in ext but removed above
+        # data_type not inherited from stem in this case because
+        #   exclusions input stem might include df if stem Path attribute
+        stem, subcorpus_label = stem.rsplit('_')[:2]
+
+    # if not bare and not full, use `stem` and `subcorpus_label` as is; 
+    # e.g. "pile_00", "pile_val", etc.
+    
+    # If path is for dataframe slice
+    # Note: need to test for None because `if slice_num` is False when 0
+    # This precedes the tmp clause so that tmp slices 
+    #   are in `slices/tmp/` instead of `tmp/slices/`
+    if slice_num is not None:
+        df_output_dir = df_output_dir.joinpath('slices')
+        stem += f'-{slice_num}'
 
     # if tmp save (in case of script crash)
     if is_tmp:
         df_output_dir = df_output_dir.joinpath('tmp')
 
-    # save each slice as its on pkl as well, for easier debugging/remediation
-    if slice_num:
-        df_output_dir = df_output_dir.joinpath('slices')
-        data_stem += f'-{slice_num}'
-
     if not df_output_dir.is_dir():
         df_output_dir.mkdir(parents=True)
 
-    df_output_path = df_output_dir.joinpath(
-        f'{data_stem}_{corp_name}_df.pkl.gz')
-
-    return df_output_path
+    return df_output_dir.joinpath(
+        f'{stem}_{subcorpus_label}_{data_type}.pkl.gz')
 
 
 ### parsing functions ###
@@ -698,6 +738,18 @@ def try_redoc(ix, sent_list):
         # print(f'      {new_sentences[0].text}')
 
     return sent_list[:ix] + new_sentences + sent_list[ix+1:]
+
+
+def get_conllu_outpath(slice_name, subset):
+    '''returns path for final conllu output files'''
+
+    out_fname = f'{subset.lower()}_eng_{slice_name}.conllu'
+    out_dir = Path.cwd().joinpath(f'{subset}.conll')
+
+    if not out_dir.is_dir():
+        out_dir.mkdir()
+
+    return out_dir.joinpath(out_fname)
 
 
 if __name__ == '__main__':
