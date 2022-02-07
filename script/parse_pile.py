@@ -41,7 +41,7 @@ except stanza.pipeline.core.ResourcesFileNotFoundError:
     print('Loading dependency parsing pipeline...\n')
     nlp = stanza.Pipeline(
         lang='en',
-        processors='tokenize,mwt,pos,lemma,depparse')
+        processors='tokenize,pos,lemma,depparse')
 
 
 def main():
@@ -59,10 +59,17 @@ def main():
         print('')
 
     if dfiles:
-        process_pickledf(dfiles)
+        for df, data_source_label in process_pickledf(dfiles):
+            slice_df(df, data_source_label)
+        # df_data_gen = process_pickledf(dfiles)
 
     if rfiles:
-        process_raw_jsonlines(rfiles, subcorpora_list)
+        for df, data_source_label in process_raw_jsonlines(rfiles, subcorpora_list):
+            slice_df(df, data_source_label)
+        # jl_data_gen = process_raw_jsonlines(rfiles, subcorpora_list)
+
+    # for df, data_source_label in df_data_gen + jl_data_gen:
+    #     slice_df(df, data_source_label)
 
 
 def parse_arg_inputs():
@@ -153,7 +160,7 @@ def process_pickledf(dfiles):
         else:
             print('  yes')
 
-        slice_df(df, data_source_label)
+        yield df, data_source_label
 
 
 def process_raw_jsonlines(rfiles, subcorpora_list):
@@ -164,7 +171,7 @@ def process_raw_jsonlines(rfiles, subcorpora_list):
 
         data_source_label = rawfile_path.stem
 
-        slice_df(df, data_source_label)
+        yield df, data_source_label
 
 
 def clean_df(df, tmp_save_path):
@@ -235,7 +242,7 @@ def clean_df(df, tmp_save_path):
     precleaned = ~df.text.isin(df.raw)
     if any(precleaned):
         changedf = df.loc[precleaned, :]
-        print(changedf[['text', 'raw']])
+        print(f'{len(changedf)} of {len(df)} texts modified')
 
         # exdf = changedf.sample(min(2, len(changedf)))
         # print('  examples:\n')
@@ -298,25 +305,27 @@ def slice_df(full_df, data_source_label):
 
     for subcorpus_label, df in full_df.groupby('pile_set_code'):
 
-        remaining_df, excl_df = pull_exclusions(df)
         excl_save_path = get_dfpkl_outpath(
             data_source_label, subcorpus_label, is_excl=True)
-        excl_df.to_pickle(excl_save_path)
-        print(f'{len(excl_df)} exclusions saved '
-              f'to {excl_save_path.relative_to(Path.cwd())}]')
+        remaining_df, excl_df = pull_exclusions(df, excl_save_path)
 
         total = len(remaining_df)
         print(f'{total} total texts to parse')
 
         remaining_df = remaining_df.sort_values('text_id')
         slices = []
-        while len(remaining_df) > 2.4*output_limit:
+        # e.g. if limit were 1000:
+        # slice off 1000 rows at a time until total is 2400 or less
+        while len(remaining_df) > int(2.4*output_limit):
 
             dfslice = remaining_df.iloc[:output_limit, :].reset_index()
             remaining_df = remaining_df.iloc[output_limit:, :]
             slices.append(dfslice)
-
-        if len(remaining_df) > 1.3*output_limit:
+        # if 2400 split remaining: 2 slices of 1200
+        # if 1202, split remaining: 2 slices of 610
+        # if remaining df is 1200 rows or less:
+        #   keep as is (no more slicing)
+        if len(remaining_df) > 1.2*output_limit:
 
             half_remaining = int(len(remaining_df)/2)
 
@@ -340,22 +349,33 @@ def slice_df(full_df, data_source_label):
             slices, total,  data_source_label, subcorpus_label, excl_df)
 
 
-def pull_exclusions(df):
+def pull_exclusions(df: pd.DataFrame, excl_save_path: Path):
     print('  pulling excluded formats...')
-    # TODO : add pre-filter for existing exclusions file
+    excl_df = pd.DataFrame()
+    if excl_save_path.is_file:
+        excl_df = pd.read_pickle(excl_save_path)
+
+        df = df.loc[~df.text_id.isin(excl_df.text_id)]
+        print(f'  -> {len(excl_df)} previously identified exclusions removed')
+
+    else:
     # flag texts that contain technical seeming strings and exclude for now
     technical = df.text.apply(lambda t:
                               bool(len(variable_regex.findall(t)) > 15
                                    or possible_code.search(t)))
+
     is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
+
     if any(technical) or any(is_json):
-        excl_df = df.loc[technical | is_json, :]
-        df = df.loc[~df.index.isin(excl_df.index), :]
-    else:
-        excl_df = pd.DataFrame()
+            excl_df = pd.concat([excl_df,
+                                df.loc[technical | is_json, :]])
+            df = df.loc[~df.text_id.isin(excl_df.text_id), :]
 
     # if len(excl_df) > 0:
     #     print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
+        excl_df.to_pickle(excl_save_path)
+        print(f'  -> {len(excl_df)} exclusions saved '
+              f'to {excl_save_path.relative_to(Path.cwd())}]')
 
     return df, excl_df
 
@@ -489,7 +509,7 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
 
 
 def get_dfpkl_outpath(stem: str,
-                      subcorpus_label='Pcc',
+                      subcorpus_label='',
                       slice_num: int = None,
                       is_tmp: bool = False,
                       is_excl: bool = False):
@@ -539,7 +559,7 @@ def get_dfpkl_outpath(stem: str,
         # '.pkl' will not have been included in ext but removed above
         # data_type not inherited from stem in this case because
         #   exclusions input stem might include df if stem Path attribute
-        stem, subcorpus_label = stem.rsplit('_')[:2]
+        stem, subcorpus_label = stem.rsplit('_', 2)[:2]
 
     # if not bare and not full, use `stem` and `subcorpus_label` as is;
     # e.g. "pile_00", "pile_val", etc.
@@ -559,6 +579,9 @@ def get_dfpkl_outpath(stem: str,
     if not df_output_dir.is_dir():
         df_output_dir.mkdir(parents=True)
 
+    if not subcorpus_label:
+        print('WARNING: subcorpus label not provided for output path. Default "Pile-CC" inserted.')
+        subcorpus_label = 'Pile-CC'
     return df_output_dir.joinpath(
         f'{stem}_{subcorpus_label}_{data_type}.pkl.gz')
 
@@ -618,6 +641,7 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
 
 def process_sentences(df, conlloutput, ix, doc):
     # check for line breaks in sentence text string
+    print('    - processing sentences...')
     doc = confirm_parse(doc)
 
     # add comments to sentences (info pulled from dataframe)
