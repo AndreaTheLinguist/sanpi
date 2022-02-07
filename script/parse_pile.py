@@ -8,6 +8,7 @@ import time
 from collections import namedtuple
 from pathlib import Path
 from pprint import pprint
+import zlib
 from bs4 import BeautifulSoup
 # from mediawiki_dump.tokenizer import clean as mwclean
 # from numpy import empty
@@ -129,8 +130,9 @@ def process_pickledf(dfiles):
     pprint(dfiles)
 
     for dfpath in dfiles:
+        dfpath = dfpath.resolve()
         try:
-            pathstr = dfpath.relative_to(Path.home())
+            pathstr = dfpath.relative_to(Path.cwd())
         except:
             pathstr = dfpath
 
@@ -138,12 +140,18 @@ def process_pickledf(dfiles):
               '\n-> Loading dataframe from compressed pickle...')
 
         loadstart = time.perf_counter()
-        df = pd.read_pickle(dfpath)
-        loadcomplete = time.perf_counter()
-        print('    [dataframe loaded in', round(
-            loadcomplete - loadstart, 2), 'seconds]')
-
+        try:
+            df = pd.read_pickle(dfpath)
+        except zlib.error:
+            print('Error: File cannot be decompressed (zlib). Skipping.')
+            continue
+        
         # previously saved df filestems
+        else:
+            loadcomplete = time.perf_counter()
+            print('    [dataframe loaded in', round(
+                loadcomplete - loadstart, 2), 'seconds]')
+
         #   = pile_[original jsonl file/data source file stem]_...
         # so index 1 gives the data_source_label when split by _
         data_source_label = dfpath.stem.split('_')[1]
@@ -177,9 +185,16 @@ def process_raw_jsonlines(rfiles, subcorpora_list):
 def clean_df(df, tmp_save_path):
 
     print('\nCleaning text in dataframe...')
-    df = df.assign(
-        text_id=df.text_id.str.replace('PiCC', 'pcc_eng').astype('category'),
-        raw=df.text)
+    if any(df.text_id.str.startswith(('PiCC', 'pcc_eng'))):
+
+        df = df.assign(
+            text_id=df.text_id.str.replace('PiCC', 'pcc_eng').astype('category'))
+
+    if 'raw' not in df.columns:
+        df = df.assign(raw=df.text)
+
+    df = df.assign(text=df.text.astype('string'),
+                   raw=df.raw.astype('string'))
 
     df = clean_wikitexts(df)
 
@@ -197,9 +212,7 @@ def clean_df(df, tmp_save_path):
         html_text = htmldf.text.apply(
             lambda t:
             BeautifulSoup(t, "html.parser").get_text()).astype('string')
-        htmldf = htmldf.assign(
-            raw=df.text.astype('string'),
-            text=html_text)
+        htmldf = htmldf.assign(text=html_text)
         if any(htmldf.text.isna()):
             htmldf.loc[htmldf.text.isna(), 'text']
 
@@ -214,12 +227,10 @@ def clean_df(df, tmp_save_path):
 
         df.loc[is_html, ['raw', 'text']] = (htmldf.loc[:, ['raw', 'text']]
                                             .astype('string'))
-        df.loc[~is_html, 'raw'] = df.text.loc[~is_html].astype('string')
         df.to_pickle(tmp_save_path)
 
-    df.loc[:, ['raw', 'text']] = (df.loc[:, ['raw', 'text']]
-                                  .astype('string'))
-
+    else: 
+        print('    [none found]')
     df.to_pickle(tmp_save_path)
 
     print('  cleaning up text...\n   - urls...')
@@ -258,14 +269,15 @@ def clean_df(df, tmp_save_path):
 
 def clean_wikitexts(df):
     print('  looking for wikitext/wikimedia formatting...')
+    wikidf = None    
+    
     is_wiki = df.text.apply(lambda t: bool(defwiki.search(t)))
     if any(is_wiki):
         wikidf = df.loc[is_wiki, :]
         print(
             f'  extracting text from {len(wikidf)} known wikitext formatting...')
         wikidf = wikidf.assign(
-            raw=wikidf.text,
-            text=wikidf.text.apply(lambda t: wtp.parse(t).plain_text()))
+            text=wikidf.text.apply(lambda t: wtp.parse(t).plain_text()).astype('string'))
         df.loc[is_wiki, :] = wikidf
 
     maybe_wiki = (df.text.apply(lambda t: bool(wikipat.search(t))))
@@ -273,10 +285,11 @@ def clean_wikitexts(df):
         wikidf = df.loc[maybe_wiki, :]
         print(f'  cleaning {len(wikidf)} possibly wikitext formatted texts...')
         cleaned_text = wikidf.text.apply(lambda t: _reformat_wiki(t))
-        wikidf = wikidf.assign(raw=wikidf.text.astype('string'),
-                               text=cleaned_text.astype('string'))
+        wikidf = wikidf.assign(text=cleaned_text.astype('string'))
         df.loc[maybe_wiki, :] = wikidf
 
+    if not wikidf:
+        print('    [none found]')
     return df
 
 
@@ -358,24 +371,26 @@ def pull_exclusions(df: pd.DataFrame, excl_save_path: Path):
         df = df.loc[~df.text_id.isin(excl_df.text_id)]
         print(f'  -> {len(excl_df)} previously identified exclusions removed')
 
+    # this assumes exclusion search run previously would have been identical
     else:
-    # flag texts that contain technical seeming strings and exclude for now
-    technical = df.text.apply(lambda t:
-                              bool(len(variable_regex.findall(t)) > 15
-                                   or possible_code.search(t)))
+        # flag texts that contain technical seeming strings and exclude for now
+        technical = df.text.apply(lambda t:
+                                  bool(len(variable_regex.findall(t)) > 15
+                                       or possible_code.search(t)))
 
-    is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
+        is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
 
-    if any(technical) or any(is_json):
+        if any(technical) or any(is_json):
             excl_df = pd.concat([excl_df,
                                 df.loc[technical | is_json, :]])
             df = df.loc[~df.text_id.isin(excl_df.text_id), :]
 
+            excl_df.to_pickle(excl_save_path)
+            print(f'  -> {len(excl_df)} exclusions saved '
+                f'to {excl_save_path.relative_to(Path.cwd())}]')
+            
     # if len(excl_df) > 0:
     #     print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
-        excl_df.to_pickle(excl_save_path)
-        print(f'  -> {len(excl_df)} exclusions saved '
-              f'to {excl_save_path.relative_to(Path.cwd())}]')
 
     return df, excl_df
 
@@ -601,12 +616,9 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
             parse_t0 = time.perf_counter()
 
             text_id = df.at[ix, "text_id"]
-            print(
-                f'  {doc_num+1} of {slice_total}/{total} (output file {filenum}): {text_id}')
-
             print(f'  {doc_num+1} of {slice_total} '
                   f'in slice {filenum} ({total} total): {text_id}')
-            
+
             # the text can be parsed with jsloads, it's in json format,
             # which we do not want (and which will break stanza)
             try:
