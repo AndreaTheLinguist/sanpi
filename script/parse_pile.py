@@ -288,7 +288,7 @@ def clean_wikitexts(df):
         wikidf = wikidf.assign(text=cleaned_text.astype('string'))
         df.loc[maybe_wiki, :] = wikidf
 
-    if not wikidf:
+    if wikidf is None:
         print('    [none found]')
     return df
 
