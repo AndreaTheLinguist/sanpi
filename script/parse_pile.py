@@ -59,10 +59,17 @@ def main():
         print('')
 
     if dfiles:
-        process_pickledf(dfiles)
+        for df, data_source_label in process_pickledf(dfiles):
+            slice_df(df, data_source_label)
+        # df_data_gen = process_pickledf(dfiles)
 
     if rfiles:
-        process_raw_jsonlines(rfiles, subcorpora_list)
+        for df, data_source_label in process_raw_jsonlines(rfiles, subcorpora_list):
+            slice_df(df, data_source_label)
+        # jl_data_gen = process_raw_jsonlines(rfiles, subcorpora_list)
+
+    # for df, data_source_label in df_data_gen + jl_data_gen:
+    #     slice_df(df, data_source_label)
 
 
 def parse_arg_inputs():
@@ -153,7 +160,7 @@ def process_pickledf(dfiles):
         else:
             print('  yes')
 
-        slice_df(df, data_source_label)
+        yield df, data_source_label
 
 
 def process_raw_jsonlines(rfiles, subcorpora_list):
