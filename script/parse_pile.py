@@ -23,7 +23,7 @@ from pile_regex_imports import *
 
 doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 
-output_limit = 10000
+global_output_limit = 10000
 pd.set_option('display.max_colwidth', 80)
 
 # initiate language model for dependency parsing (load just once)
@@ -193,6 +193,9 @@ def clean_df(df, tmp_save_path):
     if 'raw' not in df.columns:
         df = df.assign(raw=df.text)
 
+    print('Saving to tmp file:', tmp_save_path.relative_to(Path.cwd()))
+    df.to_pickle(tmp_save_path)
+
     df = df.assign(text=df.text.astype('string'),
                    raw=df.raw.astype('string'))
 
@@ -205,7 +208,7 @@ def clean_df(df, tmp_save_path):
         lambda t: (bool(BeautifulSoup(t, "html.parser").find())))
 
     if any(is_html):
-        print(f'  converting {len(df.loc[is_html, :])} html to text...')
+        print(f'    converting {len(df.loc[is_html, :])} html to text...')
 
         htmldf = df.loc[is_html, :]
 
@@ -329,16 +332,16 @@ def slice_df(full_df, data_source_label):
         slices = []
         # e.g. if limit were 1000:
         # slice off 1000 rows at a time until total is 2400 or less
-        while len(remaining_df) > int(2.4*output_limit):
+        while len(remaining_df) > int(2.4*global_output_limit):
 
-            dfslice = remaining_df.iloc[:output_limit, :].reset_index()
-            remaining_df = remaining_df.iloc[output_limit:, :]
+            dfslice = remaining_df.iloc[:global_output_limit, :].reset_index()
+            remaining_df = remaining_df.iloc[global_output_limit:, :]
             slices.append(dfslice)
         # if 2400 split remaining: 2 slices of 1200
         # if 1202, split remaining: 2 slices of 610
         # if remaining df is 1200 rows or less:
         #   keep as is (no more slicing)
-        if len(remaining_df) > 1.2*output_limit:
+        if len(remaining_df) > 1.2*global_output_limit:
 
             half_remaining = int(len(remaining_df)/2)
 
@@ -453,7 +456,7 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
         read_t1 = time.perf_counter()
         print(
             f'  ~ {round(read_t1 - read_t0, 4)}  sec elapsed')
-        print('  building dataframe from from `jsonlines` generator object...')
+        print('  building dataframe from `jsonlines` generator object...')
         # This has to be done before the file is closed:
         #   Since we're using a generator to speed things up, the data is not fully
         #   loaded into the workspace until it's put into the dataframe.
