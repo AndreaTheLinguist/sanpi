@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 import argparse
-# from itertools import groupby as itgrby
-# from more_itertools import pairwise, grouper
-from json import loads as jsloads
-# import re
 import time
+import zlib
 from collections import namedtuple
+from datetime import datetime
+from json import loads as jsloads
 from pathlib import Path
 from pprint import pprint
-import zlib
-from bs4 import BeautifulSoup
-# from mediawiki_dump.tokenizer import clean as mwclean
-# from numpy import empty
-import wikitextparser as wtp
+
 import jsonlines
 import pandas as pd
 import stanza
+import wikitextparser as wtp
+from bs4 import BeautifulSoup
 from unidecode import unidecode
-from datetime import date, datetime
 
 from pile_regex_imports import *
 
@@ -25,7 +21,11 @@ doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 
 global_output_limit = 10000
 pd.set_option('display.max_colwidth', 80)
-
+global_subset_abbr_dict = {'Gutenberg (PG-19)': 'PG19',
+                           'Books3': 'Bks3',
+                           'BookCorpus2': 'BkC2',
+                           'Pile-CC': 'Pcc',
+                           'OpenWebText2': 'OWT2'}
 # initiate language model for dependency parsing (load just once)
 # Note:
 #   standfordNLP does not have multi-word token (mwt) expansion
@@ -480,16 +480,12 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
     unidecode_t1 = time.perf_counter()
     print(
         f'  ~ {round(unidecode_t1 - unidecode_t0, 2)}  sec elapsed')
+
     # Create codes for data subsets
-    subset_abbr_dict = {'Gutenberg (PG-19)': 'PG19',
-                        'Books3': 'Bks3',
-                        'BookCorpus2': 'BkC2',
-                        'Pile-CC': 'Pcc',
-                        'OpenWebText2': 'OWT2'}
-    codes = (subset_abbr_dict[n] for n in df.pile_set_name)
+    # (code dict is now a global variable)
+    codes = (global_subset_abbr_dict[n] for n in df.pile_set_name)
     df = df.assign(pile_set_code=pd.Categorical(codes))
     # save tmp df
-
     df.to_pickle(rawdfpath)
 
     print('  adding subset codes & text IDs...')
@@ -597,9 +593,16 @@ def get_dfpkl_outpath(stem: str,
     if not df_output_dir.is_dir():
         df_output_dir.mkdir(parents=True)
 
-    if not subcorpus_label:
-        print('WARNING: subcorpus label not provided for output path. Default "Pile-CC" inserted.')
+    if subcorpus_label in global_subset_abbr_dict.values():
+        subcorpus_label = [k
+                           for k, v in global_subset_abbr_dict.items()
+                           if v == subcorpus_label][0]
+
+    elif not subcorpus_label:
+        print('WARNING: subcorpus label not provided for output path. '
+              'Default "Pile-CC" inserted.')
         subcorpus_label = 'Pile-CC'
+
     return df_output_dir.joinpath(
         f'{stem}_{subcorpus_label}_{data_type}.pkl.gz')
 
@@ -784,7 +787,7 @@ def try_redoc(ix, sent_list):
 
 def get_conllu_outpath(slice_name, subset):
     '''returns path for final conllu output files'''
-
+    subset = global_subset_abbr_dict.get(subset, subset)
     out_fname = f'{subset.lower()}_eng_{slice_name}.conllu'
     out_dir = Path.cwd().joinpath(f'{subset}.conll')
 
