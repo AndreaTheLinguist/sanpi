@@ -11,8 +11,8 @@ from pprint import pprint
 import jsonlines
 import pandas as pd
 import stanza
-import wikitextparser as wtp
-from bs4 import BeautifulSoup
+
+# from bs4 import BeautifulSoup
 from unidecode import unidecode
 
 from pile_regex_imports import *
@@ -145,7 +145,7 @@ def process_pickledf(dfiles):
         except zlib.error:
             print('Error: File cannot be decompressed (zlib). Skipping.')
             continue
-        
+
         # previously saved df filestems
         else:
             loadcomplete = time.perf_counter()
@@ -182,64 +182,64 @@ def process_raw_jsonlines(rfiles, subcorpora_list):
         yield df, data_source_label
 
 
-def clean_df(df, tmp_save_path):
+def clean_df(orig_df, tmp_save_path):
 
     print('\nCleaning text in dataframe...')
-    if any(df.text_id.str.startswith(('PiCC', 'pcc_eng'))):
+    if any(orig_df.text_id.str.startswith(('PiCC', 'pcc_eng'))):
 
-        df = df.assign(
-            text_id=df.text_id.str.replace('PiCC', 'pcc_eng').astype('category'))
+        orig_df = orig_df.assign(
+            text_id=orig_df.text_id.str.replace('PiCC', 'pcc_eng')
+            .astype('category'))
 
-    if 'raw' not in df.columns:
-        df = df.assign(raw=df.text)
+    if 'raw' not in orig_df.columns:
+        orig_df = orig_df.assign(raw=orig_df.text)
 
-    print('Saving to tmp file:', tmp_save_path.relative_to(Path.cwd()))
+    print('+ Excluding messy data...')
+    excl_save_path = get_dfpkl_outpath(tmp_save_path.stem, is_excl=True)
+
+    df, excl_df = pull_exclusions(orig_df, excl_save_path)
+
     df.to_pickle(tmp_save_path)
+
 
     df = df.assign(text=df.text.astype('string'),
                    raw=df.raw.astype('string'))
 
-    df = clean_wikitexts(df)
+    # Andrea Hummel on Feb 11, 2022 at 7:14 PM
+    # This was an attempt at fixing exclusions, if the offenses were minor. However,
+    # this is not consistent with the new approach of excluding texts that "*might* be
+    # problems" because they might cause **problems**. I.e. the point of pulling
+    # anything that might be messy or hard to parse text is so that those can be
+    # safely ignored for now while the *easier* stuff gets processed. Any fixing needs
+    # to be tabled, perhaps indefinitely.
+    #
+    # Keeping the `recheck` parameter and code in `pull_exclusions()` for now, but it
+    # will not be reached ever (i.e. is not called as a recheck)
+    #
+    # if not excl_df.empty:
+    #     clean_excl = excl_df.assign(
+    #         text=excl_df.text.apply(lambda t: bracket_url.sub(r'\1', t)))
+    #     clean_excl = clean_excl.assign(
+    #         text=clean_excl.text.apply(lambda t: likely_url.sub('', t)))
+    #     clean_excl = clean_excl.assign(
+    #         text=clean_excl.text.apply(
+    #             lambda t: punc_only.sub(r'\1\2\3\4\5\6\7\n\n', t)))
+    #     restore_to_df, still_excl_df = pull_exclusions(
+    #         clean_excl, excl_save_path, recheck=True)
+    #     # if any previous exclusions were not caught after cleaning attempts
+    #     # restore them to the main dataframe,
+    #     # and overwrite the saved exclusions file with only those remaining
+    #     if not restore_to_df.empty:
+    #         df.loc[restore_to_df.index.to_list(), :] = restore_to_df
+    #         still_excl_df.to_pickle(excl_save_path)
 
-    df.to_pickle(tmp_save_path)
-
-    print('  looking for any html...')
-    is_html = df.text.apply(
-        lambda t: (bool(BeautifulSoup(t, "html.parser").find())))
-
-    if any(is_html):
-        print(f'    converting {len(df.loc[is_html, :])} html to text...')
-
-        htmldf = df.loc[is_html, :]
-
-        html_text = htmldf.text.apply(
-            lambda t:
-            BeautifulSoup(t, "html.parser").get_text()).astype('string')
-        htmldf = htmldf.assign(text=html_text)
-        if any(htmldf.text.isna()):
-            htmldf.loc[htmldf.text.isna(), 'text']
-
-        # exdf = htmldf.sample(min(2, len(htmldf)))
-        # print('  examples:\n')
-        # for rix in exdf.index:
-        #     print('    text:')
-        #     print(exdf.at[rix, 'text'])
-        #     print('    from raw html:')
-        #     print(exdf.at[rix, 'raw'])
-        #     print('...')
-
-        df.loc[is_html, ['raw', 'text']] = (htmldf.loc[:, ['raw', 'text']]
-                                            .astype('string'))
-        df.to_pickle(tmp_save_path)
-
-    else: 
-        print('    [none found]')
-    df.to_pickle(tmp_save_path)
-
-    print('  cleaning up text...\n   - urls...')
-    # clean up web markers
+    # clean up internet syntax quirks
+    print('+ Cleaning up text...\n   - punctuation delineated text breaks')
     df = df.assign(text=df.text.apply(
-        lambda t: likely_url.sub(r' [url] ', t)))
+        lambda t: punc_only.sub(r'\1\2\3\4\5\6\7\n\n', t)))
+    print('   - urls...')
+    df = df.assign(text=df.text.apply(lambda t: bracket_url.sub(r'\1', t)))
+    df = df.assign(text=df.text.apply(lambda t: likely_url.sub(r' ', t)))
     # print('   - @ and # tagging...')
     # df = df.assign(text=df.text.apply(
     #     lambda t: re.sub(r'\@\w+(\s)', r' \<\@tag \1\>', t)))
@@ -248,87 +248,182 @@ def clean_df(df, tmp_save_path):
     print('   - title abbreviations at line breaks...')
     df = df.assign(
         text=df.text.apply(lambda t: end_of_line_abbr.sub(r'\1\2\5\6 \3\4', t)))
-    print('   - punctuation delineated text breaks')
-    df = df.assign(
-        text=df.text.apply(
-            lambda t: punc_only.sub(r'\1\2\3\4\5\6\7\n\n', t)))
 
-    precleaned = ~df.text.isin(df.raw)
-    if any(precleaned):
-        changedf = df.loc[precleaned, :]
+    text_diff = ~df.text.isin(df.raw)
+    if any(text_diff):
+        changedf = df.loc[text_diff, :]
         print(f'{len(changedf)} of {len(df)} texts modified')
-
-        # exdf = changedf.sample(min(2, len(changedf)))
-        # print('  examples:\n')
-        # for rix in exdf.index:
-        #     print('    new text:')
-        #     print(df.at[rix, 'text'])
-        #     print('    from raw:')
-        #     print(df.at[rix, 'raw'])
 
     df.loc[:, ['text', 'raw']] = df[['text', 'raw']].astype('string')
     return df
 
 
-def clean_wikitexts(df):
+def pull_exclusions(df: pd.DataFrame,
+                    excl_save_path: Path,
+                    recheck: bool = False):
+
+    print('  pulling excluded formats...')
+    excl_df = pd.DataFrame()
+    loaded_from_file = False
+    found_exclusions = False
+    prev_excl_count = 0
+    if excl_save_path.is_file() and not recheck:
+        loaded_from_file = True
+        prev_excl = pd.read_pickle(excl_save_path)
+        if 'raw' not in prev_excl.columns:
+            excl_df = prev_excl.assign(raw=prev_excl.text,
+                                       excl_type=None)
+        else:
+            excl_df = prev_excl.assign(excl_type=None)
+
+        df = df.loc[~df.text_id.isin(excl_df.text_id)]
+        prev_excl_count = len(excl_df)
+        print(f'  -> {prev_excl_count} previously '
+              'identified exclusions loaded from file')
+
+    df, wiki_df = exclude_wikitexts(df)
+    if not wiki_df.empty:
+        found_exclusions = True
+        wiki_df = wiki_df.assign(excl_type='wiki')
+        excl_df = pd.concat([excl_df, wiki_df])
+
+    df, html_df = exclude_html(df)
+    if not html_df.empty:
+        found_exclusions = True
+        html_df = html_df.assign(excl_type='html')
+        excl_df = pd.concat([excl_df, html_df])
+
+    # flag texts that contain technical seeming strings and exclude for now
+    print('  looking for other messy text...')
+    likely_source_code = df.text.apply(
+        lambda t: bool(len(variable_regex.findall(t)) > 15
+                       or possible_code.search(t)))
+
+    has_embedded_ids = df.text.apply(
+        lambda t: bool(len(likely_idtag.findall(t)) > 5))
+
+    likely_hard_parsing = likely_source_code | has_embedded_ids
+
+    if any(likely_hard_parsing):
+        found_exclusions = True
+        new_excl = df.loc[likely_hard_parsing, :]
+        new_excl = new_excl.assign(excl_type='mess')
+        print(f'   +{len(new_excl)} exclusions')
+        excl_df = pd.concat([excl_df, new_excl])
+        df = df.loc[~df.text_id.isin(excl_df.text_id), :]
+
+    is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
+    if any(is_json):
+        found_exclusions = True
+        new_excl = df.loc[is_json, :]
+        new_excl = new_excl.assign(excl_type='json')
+        print(f'   +{len(new_excl)} exclusions')
+        excl_df = pd.concat([excl_df, new_excl])
+        df = df.loc[~df.text_id.isin(excl_df.text_id), :]
+
+    # currently unreachable (no calls of function as recheck)
+    if recheck:
+        if not found_exclusions:
+            print('all previously flagged exclusions have been fixed by simple cleanup')
+        elif len(excl_df) < len(df):
+            print('some excluded texts have been fixed by simple cleanup')
+        else:
+            print('all prev exclusions remain')
+
+    else:
+        # only save if (new) texts were marked as exclusions
+        if found_exclusions:
+            excl_df.to_pickle(excl_save_path)
+            print(f'  = {len(excl_df)} exclusions '
+                  f'({len(excl_df) - prev_excl_count} new) saved to '
+                  f'{excl_save_path.relative_to(Path.cwd())}]')
+
+        elif loaded_from_file:
+            print('  = No additional exclusions found.')
+
+        else:
+            print('  = No exclusions found.')
+
+        # if len(excl_df) > 0:
+        #     print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
+
+    return df, excl_df
+
+
+def exclude_wikitexts(df):
     print('  looking for wikitext/wikimedia formatting...')
-    wikidf = None    
-    
+    wikidf = pd.DataFrame()
+
     is_wiki = df.text.apply(lambda t: bool(defwiki.search(t)))
     if any(is_wiki):
-        wikidf = df.loc[is_wiki, :]
-        print(
-            f'  extracting text from {len(wikidf)} known wikitext formatting...')
-        wikidf = wikidf.assign(
-            text=wikidf.text.apply(lambda t: wtp.parse(t).plain_text()).astype('string'))
-        df.loc[is_wiki, :] = wikidf
+        wikidf = pd.concat([wikidf, df.loc[is_wiki, :]])
+        df = df.loc[~is_wiki, :]
 
     maybe_wiki = (df.text.apply(lambda t: bool(wikipat.search(t))))
     if any(maybe_wiki):
-        wikidf = df.loc[maybe_wiki, :]
-        print(f'  cleaning {len(wikidf)} possibly wikitext formatted texts...')
-        cleaned_text = wikidf.text.apply(lambda t: _reformat_wiki(t))
-        wikidf = wikidf.assign(text=cleaned_text.astype('string'))
-        df.loc[maybe_wiki, :] = wikidf
+        wikidf = pd.concat([wikidf, df.loc[maybe_wiki, :]])
+        df = df.loc[~maybe_wiki, :]
 
-    if wikidf is None:
-        print('    [none found]')
-    return df
+    print(f'   +{len(wikidf)} exclusions')
+    return df, wikidf
 
 
-def _reformat_wiki(t):
+def exclude_html(df):
+    print('  looking for any html...')
+    html_df = pd.DataFrame()
+    is_html = df.text.apply(
+        lambda t: bool(
+            likely_html.search(t)
+            # BeautifulSoup(t, "html.parser").find()
+        ))
 
-    # add vertical space between bullet points
-    t = wt0.sub('\n\n', t)
-    t = wt1.sub(r'\1\2', t)
-    t = wt2.sub(r'\1', t)
-    t = wt3.sub(r' (\3)', t)
-    t = wt4.sub('\n\n', t)
-    # remove links, internal or url
-    t = wt5.sub(r'\1', t)
-    t = wt6.sub(r'\1', t)
-    t = wt7.sub(r'\1\1\2 \3\4\4', t)
-    t = wt8.sub('', t)
-    t = wt9.sub(r'\2', t)
-    t = wt10.sub(r'\1', t)
-    t = wt11.sub(r'\2', t)
-    t = wt12.sub('\n\n\n', t)
+    if any(is_html):
 
-    return t
+        html_df = df.loc[is_html, :]
+        df = df.loc[~is_html, :]
+
+        # html_text = htmldf.text.apply(
+        #     lambda t:
+        #     BeautifulSoup(t, "html.parser").get_text()).astype('string')
+        # htmldf = htmldf.assign(text=html_text)
+        # if any(htmldf.text.isna()):
+        #     htmldf.loc[htmldf.text.isna(), 'text']
+
+        # df.loc[is_html, ['raw', 'text']] = (htmldf.loc[:, ['raw', 'text']]
+        #                                     .astype('string'))
+        # df.to_pickle(tmp_save_path)
+
+    print(f'   +{len(html_df)} exclusions')
+    return df, html_df
 
 
 def slice_df(full_df, data_source_label):
 
-    for subcorpus_label, df in full_df.groupby('pile_set_code'):
+    for subcorpus_code, df in full_df.groupby('pile_set_code'):
+        subcorpus_name = df.pile_set_name.iat[0]
+        print(f'Partitioning data in {subcorpus_name} subset')
 
-        excl_save_path = get_dfpkl_outpath(
-            data_source_label, subcorpus_label, is_excl=True)
-        remaining_df, excl_df = pull_exclusions(df, excl_save_path)
+        # Andrea Hummel on Feb 11, 2022 at 9:13 PM
+        # Currently, `excl_df` is not passed into this method. Instead of
+        # getting it via a redundant call to `pull_exclusions()`
+        # (that happens in `clean_df()` now) it is loaded from where it
+        # was saved either in the previous call, or in a previous run
+        # of the script.
+        # If for some reason the exclusions file cannot be found, run again.
+        #    (but save with different name so as to not overwrite original.)
+        excl_save_path = get_dfpkl_outpath(data_source_label,
+                                           subcorpus_name, is_excl=True)
+        if excl_save_path.is_file():
+            excl_df = pd.read_pickle(excl_save_path)
+        else:
+            print('Warning: previous exclusions file could not be found. '
+                  'Reassessing data...')
+            df, excl_df = pull_exclusions(df, excl_save_path.with_name(
+                excl_save_path.name.split('.', 1)[0]+'-slicing.pkl.gz'))
+        print('Excluded data:', excl_save_path.relative_to(Path.cwd()))
+        print(f'{len(df)} total texts to parse')
 
-        total = len(remaining_df)
-        print(f'{total} total texts to parse')
-
-        remaining_df = remaining_df.sort_values('text_id')
+        remaining_df = df.sort_values('text_id')
         slices = []
         # e.g. if limit were 1000:
         # slice off 1000 rows at a time until total is 2400 or less
@@ -353,53 +448,23 @@ def slice_df(full_df, data_source_label):
         # this must be outdented to catch smaller dataframes
         slices.append(remaining_df)
 
+        # Andrea Hummel on Feb 3, 2022 at 4:45 PM
+        # Note that this first save of the dataframe slices is *after* `pull_exclusions()`
+        # is called, so to get the full set of texts covered in the full dataframe, need
+        # to look at the union of the slices _and_ the corresponding exclusions dataframe.
         for i, sdf in enumerate(slices):
             # starting at i = 0 meant the first slice wasn't
             # getting saved bc if slice_num was evaluating as False
             outpath = get_dfpkl_outpath(
-                data_source_label, subcorpus_label,
+                data_source_label, subcorpus_code,
                 slice_num=i+1, is_tmp=True)
             sdf.to_pickle(outpath)
 
         process_slices(
-            slices, total,  data_source_label, subcorpus_label, excl_df)
-
-
-def pull_exclusions(df: pd.DataFrame, excl_save_path: Path):
-    print('  pulling excluded formats...')
-    excl_df = pd.DataFrame()
-    if excl_save_path.is_file:
-        excl_df = pd.read_pickle(excl_save_path)
-
-        df = df.loc[~df.text_id.isin(excl_df.text_id)]
-        print(f'  -> {len(excl_df)} previously identified exclusions removed')
-
-    # this assumes exclusion search run previously would have been identical
-    else:
-        # flag texts that contain technical seeming strings and exclude for now
-        technical = df.text.apply(lambda t:
-                                  bool(len(variable_regex.findall(t)) > 15
-                                       or possible_code.search(t)))
-
-        is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
-
-        if any(technical) or any(is_json):
-            excl_df = pd.concat([excl_df,
-                                df.loc[technical | is_json, :]])
-            df = df.loc[~df.text_id.isin(excl_df.text_id), :]
-
-            excl_df.to_pickle(excl_save_path)
-            print(f'  -> {len(excl_df)} exclusions saved '
-                f'to {excl_save_path.relative_to(Path.cwd())}]')
-            
-    # if len(excl_df) > 0:
-    #     print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
-
-    return df, excl_df
+            slices, data_source_label, subcorpus_code, excl_df)
 
 
 def process_slices(slices: list,
-                   total: int,
                    data_source_label: str,
                    subset_label: str,
                    excl_df: pd.DataFrame):
@@ -411,7 +476,7 @@ def process_slices(slices: list,
             subset_label)
 
         excl_df = stanza_parse(dfslice, out_path, excl_df,
-                               slice_number, total)
+                               slice_number, len(slices))
 
         # save version of dataframe for all texts actually processed
         actual_slice = dfslice[~dfslice.isin(excl_df)]
@@ -623,7 +688,7 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
 
             text_id = df.at[ix, "text_id"]
             print(f'  {doc_num+1} of {slice_total} '
-                  f'in slice {filenum} ({total} total): {text_id}')
+                  f'in slice {filenum} (of {total}): {text_id}')
 
             # the text can be parsed with jsloads, it's in json format,
             # which we do not want (and which will break stanza)

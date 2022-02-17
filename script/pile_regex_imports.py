@@ -1,5 +1,7 @@
 import re
 
+likely_html = re.compile(r'<(\w*).*>[^<]*</\1>')
+
 defwiki = re.compile(r'<nowiki>')
 wikipat = re.compile(r'[{[]{2,}[^|}\]]+\|[^}\]]*\}{2,}')
 wt0 = re.compile(r"\*")
@@ -16,8 +18,15 @@ wt10 = re.compile(r"\{{2}([^{}]+)\}{2}")
 wt11 = re.compile(r"('{2,})([^']+'?[^']+?)\1")
 wt12 = re.compile(r'\n{4,}')
 
+bracket_url = re.compile(r'\[url=[^\]]*]([^[]*)\[/url\]')
 likely_url = re.compile(
-    r'(\(?\[?(?:https?|www)://\S*[^\s./]{2,}\.[^\s./]{2,}[\./\@]\S*[/:\@]\S*)')
+    r'https?://\S*\s|www\.\S*\s|[\w\d]+\.[\w\d]+\.[\w\d]+\S*\s'
+    # r'(\(?\[?(?:https?)://w{0,3}\S*[^\s./]{2,}\.[^\s./]{2,}[\./\@]\S*[/:\@]\S*)'
+)
+likely_idtag = re.compile(
+    r'\b[a-z]+\d+[a-z]*\d*[^\s\.\[]*\b'
+    r'|\d+[a-z]+[a-z]*\d*[^\s\.\[]*\b'
+    r'|\b[\da-z]+[&#>?]+[\da-z]+[^\s\.\[]*\b', re.IGNORECASE)
 variable_regex = re.compile(r'[\w]+?_[\w]+?')
 possible_code = re.compile(
     r'(= ?)(?:self|true|false)|(= ?[^\s/]*\w+\.\w+[^\s/]*|[^\s/]*\w+\.\w+[^\s/]* ?=)',
@@ -26,7 +35,11 @@ json_pat = re.compile(r'{"\w+":{"\w+":')
 # abbreviations that can be followed by r"\. [A-Z]" without signaling end of sentence
 # only `Aa` capitalization is considered sentence start, not `AA` (another abbr.)
 end_of_line_abbr = re.compile(
-    r'(?:(Mr|M[sx]|Messrs|Mmes|[SG]en|[FS]t|Re[vp]|Pr(?:es|of)|Supe?|Capt|Asst|Ms?gr|Engr?|Assoc|Arb|Assemb|Pharm?|Hon|i\.e|e\.g|ca?|(?<![A-Z])[A-Z](?![A-Z]))(e?s?\.[^\w\n]?)\n([^\n\w]?[A-Z]))|(?<!\n)\n([^\n\w]?[A-Z]{2,})|(Jan|Feb|Mar|Apr|Ju[nl]|Aug|Sept?|Nov|Oct|Dec)(\.?)\n(?=\d)')
+    r'(?:(Mr|M[sx]|Messrs|Mmes|[SG]en|[FS]t|Re[vp]|Pr(?:es|of)|Supe?|Capt'
+        r'|Asst|Ms?gr|Engr?|Assoc|Arb|Assemb|Pharm?|Hon|i\.e|e\.g|ca?'
+    r'|(?<![A-Z])[A-Z](?![A-Z]))(e?s?\.[^\w\n]?)\n([^\n\w]?[A-Z]))'
+    r'|(?<!\n)\n([^\n\w]?[A-Z]{2,})'
+    r'|(Jan|Feb|Mar|Apr|Ju[nl]|Aug|Sept?|Nov|Oct|Dec)(\.?)\n(?=\d)')
 punc_only = re.compile(
     r'(?# full line nonword chars only )^([\W_]+)$'
     r'|(?# any punc/non`\n`ws repeated 4+)(_|[^\w\n])(\2{4,})'
