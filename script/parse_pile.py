@@ -201,7 +201,6 @@ def clean_df(orig_df, tmp_save_path):
 
     df.to_pickle(tmp_save_path)
 
-
     df = df.assign(text=df.text.astype('string'),
                    raw=df.raw.astype('string'))
 
@@ -342,6 +341,7 @@ def pull_exclusions(df: pd.DataFrame,
             print('  = No additional exclusions found.')
 
         else:
+            excl_df.to_pickle(excl_save_path)
             print('  = No exclusions found.')
 
         # if len(excl_df) > 0:
@@ -413,14 +413,22 @@ def slice_df(full_df, data_source_label):
         #    (but save with different name so as to not overwrite original.)
         excl_save_path = get_dfpkl_outpath(data_source_label,
                                            subcorpus_name, is_excl=True)
+
         if excl_save_path.is_file():
             excl_df = pd.read_pickle(excl_save_path)
         else:
-            print('Warning: previous exclusions file could not be found. '
-                  'Reassessing data...')
-            df, excl_df = pull_exclusions(df, excl_save_path.with_name(
-                excl_save_path.name.split('.', 1)[0]+'-slicing.pkl.gz'))
-        print('Excluded data:', excl_save_path.relative_to(Path.cwd()))
+            backup_path = excl_save_path.with_name(excl_save_path.name
+                                                   .split('.', 1)[0]+'-slicing.pkl.gz')
+            if backup_path.is_file():
+                excl_df = pd.read_pickle(backup_path)
+            else:
+                print('Warning: previous exclusions file could not be found. '
+                      'Reassessing data...')
+                df, excl_df = pull_exclusions(df, backup_path)
+
+            print('Excluded data alternate:',
+                  backup_path.relative_to(Path.cwd()))
+
         print(f'{len(df)} total texts to parse')
 
         remaining_df = df.sort_values('text_id')
@@ -682,68 +690,76 @@ def stanza_parse(df, output_path, excl_df, filenum, total):
     print(f'  parsed data will be written to {output_path}')
     with output_path.open(mode='w') as conlloutput:
         # for each text in the pile subset...
-        count = 0
-        for doc_num, ix in enumerate(df.index):
+        successes = 0
+        for position_in_slice, ix in enumerate(df.index):
+            # `position_in_slice` should only be used for ordinal/counting
             parse_t0 = time.perf_counter()
+            row_df = df.loc[[ix], :]
 
-            text_id = df.at[ix, "text_id"]
-            print(f'  {doc_num+1} of {slice_total} '
+            text_id = row_df.text_id.squeeze()
+            print(f'  {position_in_slice+1} of {slice_total} '
                   f'in slice {filenum} (of {total}): {text_id}')
+
+            textstr = row_df.text.squeeze()
 
             # the text can be parsed with jsloads, it's in json format,
             # which we do not want (and which will break stanza)
             try:
-                __ = jsloads(df.text[ix])
+                __ = jsloads(textstr)
             except ValueError:
                 pass
             else:
                 print(f'    in json format. Added to exclusions.')
-                excl_df.append(df.loc[ix, :])
+                excl_df = pd.concat([excl_df, row_df])
 
             # create doc (with parsing)
             try:
-                doc = nlp(df.text[ix])
+                doc = nlp(textstr)
             except RuntimeError:
-                excl_df.append(df.loc[ix, :])
+                excl_df = pd.concat([excl_df, row_df])
                 print('WARNING! Excluding unparsable text. (runtime error, '
                       'reason unknown). Added to exclusions.')
 
             else:
-                process_sentences(df, conlloutput, ix, doc)
-                count += 1
+                process_sentences(row_df, conlloutput, doc)
+                successes += 1
 
             parse_t1 = time.perf_counter()
             print(f'       ~ {round(parse_t1 - parse_t0, 1)}  seconds')
 
     print(f'Finished writing parses to {output_path}')
     print(datetime.now().ctime())
-    print(f'= {count} of {len(df)} texts successfully parsed.')
+    print(f'= {successes} of {len(df)} texts successfully parsed.')
 
     return excl_df
 
 
-def process_sentences(df, conlloutput, ix, doc):
-    # check for line breaks in sentence text string
+def process_sentences(row_df, conlloutput, doc):
+
     print('    - processing sentences...')
+    text_id = row_df.text_id.squeeze()
+
+    # check for line breaks in sentence text string
     doc = confirm_parse(doc)
 
     # add comments to sentences (info pulled from dataframe)
-    for enumi, s in enumerate(doc.sentences):
+    for enumi, sentence in enumerate(doc.sentences):
 
-        text_id = df.at[ix, 'text_id']
-        # text = re.sub(r'\n+|\s{2,}', ' ', s.text)
         # ignore s.id--these will be off if sentences with line breaks were broken up above
         if enumi == 0:
             # "newdoc id" will be the text_id from the pile subset
-            s.add_comment(f'# newdoc id = {text_id}')
+            sentence.add_comment(f'# newdoc id = {text_id}')
 
         # "sent_id" will be doc/text id with _[sentence number] appended
-        s.add_comment(f'# sent_id = {text_id}_{enumi}')
+        # TODO : change this to `enumi + 1` for consistency with other conllu files
+        sent_id = f'{text_id}_{enumi}'
+        sentence.add_comment(f'# sent_id = {sent_id}')
+        print('     ', sent_id)
 
         # remove line breaks and duplicated white space characters with single space
-        text = remove_breaks(s.text)
+        text = remove_breaks(sentence.text)
         # this adds the full text string to the output file
-        s.add_comment(f'# text = {text}')
+        sentence.add_comment(f'# text = {text}')
 
         # write conll formatted string of doc to output file
     conlloutput.write(doc2conll_text(doc))
