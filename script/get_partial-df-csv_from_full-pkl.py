@@ -13,23 +13,23 @@ from sys import argv
 import pandas as pd
 
 
-# inpath = Path(argv[1]).resolve()
-inpath = Path('pile_tables/tmp/pile_00_Pile-CC_df.pkl.gz').resolve()
+inpath = Path(argv[1]).resolve()
+# inpath = Path('pile_tables/tmp/pile_pile-val_Pile-CC_df.pkl.gz').resolve()
 print('source file:', inpath.relative_to(Path.cwd()))
 fulldf = pd.read_pickle(inpath)
 
 try:
     n = int(
-        50
-        # argv[2]
+        # 20
+        argv[2]
     )
 except IndexError:
     n = 10
 print('number of rows:', n)
 try:
     startix = int(
-        1000
-        # argv[3]
+        # 1000
+        argv[3]
     )
 except IndexError:
     ix = 0

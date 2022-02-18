@@ -9,6 +9,11 @@ test_json_dir/*
 old/*
 .idea/*
 .history/*
+**/*.__ini 
+
+# "smart versioned" file copies
+**/*.?.* 
+
 playground/*
 logs/Apw/basic.md
 logs/Nyt1/basic.md
