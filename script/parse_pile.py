@@ -157,12 +157,10 @@ def process_pickledf(dfiles):
         data_source_label = dfpath.stem.split('_')[1]
 
         # run clean up on any dataframes in `tmp/` or `raw/`
-        print('precleaned dataframe?')
-        if 'raw' not in df.columns or dfpath.parent.name in ('tmp', 'raw'):
-            print(f'  no -> Cleaning {dfpath}...')
-            tmp_df_path = (dfpath if dfpath.parent.stem == 'tmp'
-                           else get_dfpkl_outpath(dfpath.stem, is_tmp=True))
-            df = clean_df(df, tmp_df_path)
+        print('finalized dataframe?')
+        if dfpath.parent.name in ('tmp', 'raw'):
+            print(f'  no -> Cleaning {dfpath.name}...')
+            df = clean_df(df, dfpath)
             df.to_pickle(get_dfpkl_outpath(dfpath.stem))
 
         else:
@@ -335,7 +333,7 @@ def pull_exclusions(df: pd.DataFrame,
             excl_df.to_pickle(excl_save_path)
             print(f'  = {len(excl_df)} exclusions '
                   f'({len(excl_df) - prev_excl_count} new) saved to '
-                  f'{excl_save_path.relative_to(Path.cwd())}]')
+                  f'{excl_save_path.relative_to(Path.cwd())}')
 
         elif loaded_from_file:
             print('  = No additional exclusions found.')
@@ -626,7 +624,7 @@ def get_dfpkl_outpath(stem: str,
         stem = stem.split('.', 1)[0]
 
     is_bare = False if '_' in stem else True
-    is_prefixed = stem.startswith('pile_')
+    is_prefixed = bool(stem.count('_')) or stem.startswith('pile_')
     is_full = stem.count('_') == 3 and is_prefixed
 
     df_output_dir = (Path.cwd().joinpath('pile_exclusions') if is_excl
