@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import sys
 import time
 import zlib
 from collections import namedtuple
@@ -21,6 +22,7 @@ doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 
 global_output_limit = 10000
 pd.set_option('display.max_colwidth', 80)
+global_char_replacement = '<__?UNK__>'
 global_subset_abbr_dict = {'Gutenberg (PG-19)': 'PG19',
                            'Books3': 'Bks3',
                            'BookCorpus2': 'BkC2',
@@ -48,29 +50,49 @@ except stanza.pipeline.core.ResourcesFileNotFoundError:
 def main():
     print('started:', datetime.now().ctime())
     args = parse_arg_inputs()
+    input_files = args.input_files
+    df_files = []
+    js_files = get_rawfile_list(args)
 
-    dfiles = [d.resolve()
-              for d in args.df_files] if args.df_files else []
-
-    rfiles = get_rawfile_list(args)
-    if rfiles:
+    if js_files:
         subcorpora_list = args.corpus_selection
         print('\nraw jsonlines files will be processed for the following subcorpora: ')
         pprint(subcorpora_list)
         print('')
 
-    if dfiles:
-        for df, data_source_label in process_pickledf(dfiles):
-            slice_df(df, data_source_label)
-        # df_data_gen = process_pickledf(dfiles)
+    if input_files:
+        df_files = [p.resolve()
+                    for p in input_files
+                    if p.name.endswith('pkl') or p.stem.endswith('pkl')]
+    # won't have both jsonl and pkl.gz files in the same directory
+    elif not js_files and args.search_dir:
+        print(f'seeking all `.df.pkl` files in {args.search_dir}')
+        df_files = [p.resolve() for p in args.search_dir.glob('*pkl.gz')]
+    print('Dataframes to be processed:')
+    pprint(df_files)
 
-    if rfiles:
-        for df, data_source_label in process_raw_jsonlines(rfiles, subcorpora_list):
-            slice_df(df, data_source_label)
-        # jl_data_gen = process_raw_jsonlines(rfiles, subcorpora_list)
+    if df_files:
+        presliced_files = [f for f in df_files
+                           if 'slices' in (f.parent.name, f.parent.parent.name)]
+        fulldf_files = [f for f in df_files if f not in presliced_files]
 
-    # for df, data_source_label in df_data_gen + jl_data_gen:
-    #     slice_df(df, data_source_label)
+        for df, data_source_label in process_pickledf(fulldf_files):
+            slice_df(df, data_source_label)
+
+        for slice_path in presliced_files:
+            print('processing dataframe slice',
+                  slice_path.relative_to(Path.cwd()))
+
+            if slice_path.parent.name != 'tmp' or slice_path.parent.parent.joinpath(slice_path.name).is_file():
+                print('This slice has already been fully processed. Skipping.\n'
+                      '   (To *reprocess*, delete file from `slices/`')
+                continue
+
+            process_slice(pd.read_pickle(slice_path))
+
+    if js_files:
+        for df, data_source_label in process_raw_jsonlines(js_files, subcorpora_list):
+            slice_df(df, data_source_label)
 
 
 def parse_arg_inputs():
@@ -81,53 +103,77 @@ def parse_arg_inputs():
         'Required packages: stanza, unidecode, and pandas')
 
     parser.add_argument(
-        '-s', '--pile_set_name',
+        '-i', '--input_file',
+        type=Path, action='append', dest='input_files',
+        help='path(s) for input file(s). Can be `.jsonl` or `.pkl(.gz).` '
+        'If not specified, script will seek all applicable files '
+        'the scope of the calling directory or directory specified with -s flag.')
+
+    parser.add_argument(
+        '-s', '--search_dir',
+        type=Path, default=Path.cwd(),
+        help='Path to search for `jsonl` files. Only relevant if no input files are specified. '
+        'Defaults to calling directory.')
+
+    parser.add_argument(
+        '-n', '--pile_set_name',
         default=['Pile-CC'],
         type=str, action='append', dest='corpus_selection',
         help=('option to select alternate pile set(s). Default selection: "Pile-CC".'
               ' Flag can be reused: '
               'All flagged paths will be appended to selection list'))
 
-    parser.add_argument(
-        '-f', '--jsonl_file_path',
-        type=Path, action='append', dest='jsonl_files',
-        help=('flag to point to raw pile jsonlines file path to parse. Flag can be reused: '
-              'All flagged paths will be appended to file list. If no file or dataframe '
-              '(below) flags are included, '
-              'all .jsonl data files will be run.'))
+    # parser.add_argument(
+    #     '-f', '--jsonl_file_path',
+    #     type=Path, action='append', dest='jsonl_files',
+    #     help=('OLD: flag to point to raw pile jsonlines file path to parse. Flag can be reused: '
+    #           'All flagged paths will be appended to file list. If no file or dataframe '
+    #           '(below) flags are included, '
+    #           'all .jsonl data files will be run.'))
 
-    parser.add_argument(
-        '-d', '--dataframe',
-        type=Path, action='append', dest='df_files',
-        help=('If a pickle/.pkl(.gz) of the processed dataframe already exists from a previous run '
-              '(saved in `[cwd]/pile_tables/`), use this '
-              'option to specify its path and skip the first step of the script. This flag can be reused: '
-              'all specified paths will be appended to `df_files`. *NOTE*: -f and -d flags can be run together,'
-              'so make sure they are not redundant!'))
+    # parser.add_argument(
+    #     '-d', '--dataframe',
+    #     type=Path, action='append', dest='df_files',
+    #     help=('OLD: If a pickle/.pkl(.gz) of the processed dataframe already exists from a previous run '
+    #           '(saved in `[cwd]/pile_tables/`), use this '
+    #           'option to specify its path and skip the first step of the script. This flag can be reused: '
+    #           'all specified paths will be appended to `df_files`. *NOTE*: -f and -d flags can be run together,'
+    #           'so make sure they are not redundant!'))
 
     return parser.parse_args()
 
 
 def get_rawfile_list(args):
+    inputs = args.input_files
+    search_dir = args.search_dir
     print('+ raw files selected to process:')
-    files_list = []
-    if args.jsonl_files:
-        files_list = [f.resolve() for f in args.jsonl_files]
-    # only do a glob search of directory if no pkl files given
-    elif not args.df_files:
-        files_list = list(Path.cwd().glob('**/*jsonl'))
-        # note: can't print files_iter here bc it's a generator obj
+    jsonl_list = []
+
+    if inputs:
+        jsonl_list = [i.resolve()
+                      for i in inputs if i.name.endswith('jsonl')]
+    # if args.jsonl_files:
+    #     files_list = [f.resolve() for f in args.jsonl_files]
+    # # only do a glob search of directory if no pkl files given
+    # elif not args.df_files:
+    #     files_list = list(Path.cwd().glob('**/*jsonl'))
+    #     # note: can't print files_iter here bc it's a generator obj
+    elif search_dir.is_dir():
+        print('seeking all `.jsonl` files in', search_dir)
+        jsonl_list = list(search_dir.glob('**/*jsonl'))
 
     else:
-        print('[no raw data files to be processed]')
+        sys.exit(
+            'Error: No input files or valid search directory specified. See --help for more info.')
 
-    pprint(files_list)
-    return files_list
+    if jsonl_list:
+        pprint(jsonl_list)
+    else:
+        print('[no raw data files to be processed]')
+    return jsonl_list
 
 
 def process_pickledf(dfiles):
-    print('Preprocessed dataframes to parse into conllu files:\n')
-    pprint(dfiles)
 
     for dfpath in dfiles:
         dfpath = dfpath.resolve()
@@ -158,9 +204,13 @@ def process_pickledf(dfiles):
 
         # run clean up on any dataframes in `tmp/` or `raw/`
         print('finalized dataframe?')
+
         if dfpath.parent.name in ('tmp', 'raw'):
             print(f'  no -> Cleaning {dfpath.name}...')
-            df = clean_df(df, dfpath)
+            tmpdfpath = (get_dfpkl_outpath(dfpath.stem, is_tmp=True)
+                         if dfpath.parent.name == 'raw'
+                         else dfpath)
+            df = clean_df(df, tmpdfpath)
             df.to_pickle(get_dfpkl_outpath(dfpath.stem))
 
         else:
@@ -183,18 +233,40 @@ def process_raw_jsonlines(rfiles, subcorpora_list):
 def clean_df(orig_df, tmp_save_path):
 
     print('\nCleaning text in dataframe...')
-    if any(orig_df.text_id.str.startswith(('PiCC', 'pcc_eng'))):
+    if any(orig_df.text_id.str.startswith(('PiCC', 'Pcc'))):
 
         orig_df = orig_df.assign(
-            text_id=orig_df.text_id.str.replace('PiCC', 'pcc_eng')
-            .astype('category'))
+            text_id=orig_df.text_id.str.replace('PiCC', 'pcc')
+            .str.lower().astype('category'))
 
-    if 'raw' not in orig_df.columns:
-        orig_df = orig_df.assign(raw=orig_df.text)
+    if 'text' not in orig_df.columns:
+        orig_df = orig_df.assign(text=orig_df.raw)
+
+    # moved this here from preprocessing method because translating encoding belongs in cleanup
+    # doing it before `pull_exclusions()` because texts with errors will be excluded
+    print('  translating encoding...')
+    unidecode_t0 = time.perf_counter()
+    df = orig_df.assign(
+        text=orig_df.text.apply(
+            lambda t: unidecode(t, errors='replace',
+                                replace_str=global_char_replacement))
+    )
+    unidecode_t1 = time.perf_counter()
+    print(
+        f'  ~ {round(unidecode_t1 - unidecode_t0, 2)}  sec elapsed')
+
+    # removing urls before pulling exclusions so that "variable" and "id" patterns
+    #   will not throw out texts simply due to urls that would have been removed
+    print('  removing URLs...')
+    t0 = time.perf_counter()
+    df = df.assign(text=df.text.apply(
+        lambda t: bracket_url.sub(r'\1', t)))
+    df = df.assign(text=df.text.apply(lambda t: likely_url.sub(r' ', t)))
+    t1 = time.perf_counter()
+    print(f'  ~ {round(t1 - t0, 2)}  sec elapsed')
 
     print('+ Excluding messy data...')
     excl_save_path = get_dfpkl_outpath(tmp_save_path.stem, is_excl=True)
-
     df, excl_df = pull_exclusions(orig_df, excl_save_path)
 
     df.to_pickle(tmp_save_path)
@@ -234,9 +306,7 @@ def clean_df(orig_df, tmp_save_path):
     print('+ Cleaning up text...\n   - punctuation delineated text breaks')
     df = df.assign(text=df.text.apply(
         lambda t: punc_only.sub(r'\1\2\3\4\5\6\7\n\n', t)))
-    print('   - urls...')
-    df = df.assign(text=df.text.apply(lambda t: bracket_url.sub(r'\1', t)))
-    df = df.assign(text=df.text.apply(lambda t: likely_url.sub(r' ', t)))
+
     # print('   - @ and # tagging...')
     # df = df.assign(text=df.text.apply(
     #     lambda t: re.sub(r'\@\w+(\s)', r' \<\@tag \1\>', t)))
@@ -277,46 +347,64 @@ def pull_exclusions(df: pd.DataFrame,
         prev_excl_count = len(excl_df)
         print(f'  -> {prev_excl_count} previously '
               'identified exclusions loaded from file')
+    else:
+        print('[No previous exclusion assessment found.]')
 
+    # uninterpretable/unknown characters (could not be decoded)
+    print('  looking for uninterpretable characters...')
+    t0 = time.perf_counter()
+    cannot_interpret = df.text.str.contains(global_char_replacement)
+    if any(cannot_interpret):
+        found_exclusions = True
+        unkchardf = df.loc[cannot_interpret, :].assign(excl_type='?unk')
+        print(f'   +{len(unkchardf)} exclusions')
+        excl_df = pd.concat([excl_df, unkchardf])
+        df = df.loc[~cannot_interpret, :]
+    t1 = time.perf_counter()
+    print(f'= ?unk char excl ~~ {round(t1-t0, 2)} seconds')
+
+    # wikitext
+    t0 = time.perf_counter()
     df, wiki_df = exclude_wikitexts(df)
     if not wiki_df.empty:
         found_exclusions = True
         wiki_df = wiki_df.assign(excl_type='wiki')
         excl_df = pd.concat([excl_df, wiki_df])
+    t1 = time.perf_counter()
+    print(f'= wiki excl ~~ {round(t1-t0, 2)} seconds')
 
+    # html source code
+    t0 = time.perf_counter()
     df, html_df = exclude_html(df)
     if not html_df.empty:
         found_exclusions = True
         html_df = html_df.assign(excl_type='html')
         excl_df = pd.concat([excl_df, html_df])
+    t1 = time.perf_counter()
+    print(f'= html excl ~~ {round(t1-t0, 2)} seconds')
 
     # flag texts that contain technical seeming strings and exclude for now
     print('  looking for other messy text...')
-    likely_source_code = df.text.apply(
-        lambda t: bool(len(variable_regex.findall(t)) > 15
-                       or possible_code.search(t)))
+    # likely_source_code = df.text.apply(
+    #     lambda t: bool(len(variable_regex.findall(t)) > 15
+    #                    or possible_code.search(t)))
 
-    has_embedded_ids = df.text.apply(
-        lambda t: bool(len(likely_idtag.findall(t)) > 5))
+    # has_embedded_ids = df.text.apply(
+    #     lambda t: bool(len(likely_idtag.findall(t)) > 5))
 
-    likely_hard_parsing = likely_source_code | has_embedded_ids
+    # likely_hard_parsing = likely_source_code | has_embedded_ids
 
-    if any(likely_hard_parsing):
-        found_exclusions = True
-        new_excl = df.loc[likely_hard_parsing, :]
-        new_excl = new_excl.assign(excl_type='mess')
-        print(f'   +{len(new_excl)} exclusions')
-        excl_df = pd.concat([excl_df, new_excl])
-        df = df.loc[~df.text_id.isin(excl_df.text_id), :]
+    df, excl_df, found_exclusions = exclude_regex(
+        df, excl_df, found_exclusions)
 
-    is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
-    if any(is_json):
-        found_exclusions = True
-        new_excl = df.loc[is_json, :]
-        new_excl = new_excl.assign(excl_type='json')
-        print(f'   +{len(new_excl)} exclusions')
-        excl_df = pd.concat([excl_df, new_excl])
-        df = df.loc[~df.text_id.isin(excl_df.text_id), :]
+    # is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
+    # if any(is_json):
+    #     found_exclusions = True
+    #     new_excl = df.loc[is_json, :]
+    #     new_excl = new_excl.assign(excl_type='json')
+    #     print(f'   +{len(new_excl)} exclusions')
+    #     excl_df = pd.concat([excl_df, new_excl])
+    #     df = df.loc[~df.text_id.isin(excl_df.text_id), :]
 
     # currently unreachable (no calls of function as recheck)
     if recheck:
@@ -341,11 +429,35 @@ def pull_exclusions(df: pd.DataFrame,
         else:
             excl_df.to_pickle(excl_save_path)
             print('  = No exclusions found.')
-
         # if len(excl_df) > 0:
         #     print(f'e.g.:\n', excl_df.sample(1).text.iloc[0][:800])
 
     return df, excl_df
+
+
+def exclude_regex(df, excl_df, found_excl):
+
+    pattern_type_dict = {
+        'json': json_regex,
+        'code': code_regex,
+        '_wrd': underscore_regex,
+        'a0wrd': mixed_letter_digit_regex,
+    }
+
+    for excl_type_str, excl_regex in pattern_type_dict.items():
+        t0 = time.perf_counter()
+        excl_boolean = df.text.apply(lambda t: bool(excl_regex.search(t)))
+        if any(excl_boolean):
+            found_excl = True
+            new_excl = df.loc[excl_boolean, :]
+            new_excl = new_excl.assign(excl_type=excl_type_str)
+            print(f'   +{len(new_excl)} {excl_type_str} exclusions')
+            excl_df = pd.concat([excl_df, new_excl])
+            df = df.loc[~df.text_id.isin(excl_df.text_id), :]
+        t1 = time.perf_counter()
+        print(f'= {excl_type_str} filtering ~~ {round(t1-t0, 2)} seconds')
+
+    return df, excl_df, found_excl
 
 
 def exclude_wikitexts(df):
@@ -453,7 +565,7 @@ def slice_df(full_df, data_source_label):
 
         # this must be outdented to catch smaller dataframes
         slices.append(remaining_df)
-
+        slices_total_str = str(len(slices))
         # Andrea Hummel on Feb 3, 2022 at 4:45 PM
         # Note that this first save of the dataframe slices is *after* `pull_exclusions()`
         # is called, so to get the full set of texts covered in the full dataframe, need
@@ -461,38 +573,44 @@ def slice_df(full_df, data_source_label):
         for i, sdf in enumerate(slices):
             # starting at i = 0 meant the first slice wasn't
             # getting saved bc if slice_num was evaluating as False
+            slice_num = i+1
+            slice_zfilled = str(slice_num).zfill(len(str(len(slices))))
+            sdf = create_ids(sdf, zfilled_slice_num=slice_zfilled)
+            print(f'slice {slice_num}: ({len(sdf)} texts)\n  {sdf.text_id.iloc[0]}'
+                  f'\n  ...\n  {sdf.text_id.iloc[-1]}')
             outpath = get_dfpkl_outpath(
                 data_source_label, subcorpus_code,
-                slice_num=i+1, is_tmp=True)
+                slice_num=slice_num, is_tmp=True)
             sdf.to_pickle(outpath)
 
-        process_slices(
-            slices, data_source_label, subcorpus_code, excl_df)
+            process_slice(sdf, slices_total_str)
 
 
-def process_slices(slices: list,
-                   data_source_label: str,
-                   subset_label: str,
-                   excl_df: pd.DataFrame):
+def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
+    id_prototype = dfslice.text_id.iloc[0]
+    subset_label, __, data_source_label, slice_id, __ = id_prototype.split('_')
+    slice_number, __ = slice_id.split('.')
+    subset_label = subset_label.capitalize()
 
-    for i, dfslice in enumerate(slices):
-        slice_number = i + 1
-        out_path = get_conllu_outpath(
-            f'{data_source_label}-{slice_number}',
-            subset_label)
-
-        excl_df = stanza_parse(dfslice, out_path, excl_df,
-                               slice_number, len(slices))
-
-        # save version of dataframe for all texts actually processed
-        actual_slice = dfslice[~dfslice.isin(excl_df)]
-        actual_slice.to_pickle(
-            get_dfpkl_outpath(data_source_label, subset_label,
-                              slice_num=slice_number))
-
-    # save exclusions df
     excl_path = get_dfpkl_outpath(
         data_source_label, subset_label, is_excl=True)
+    excl_df = pd.read_pickle(excl_path)
+
+    out_path = get_conllu_outpath(
+        f'{data_source_label}-{slice_number}',
+        subset_label)
+
+    excl_df = stanza_parse(dfslice, out_path, excl_df,
+                           slice_number, slices_total_str)
+
+    # save version of dataframe for all texts actually processed
+    actual_slice = dfslice[~dfslice.isin(excl_df)]
+    actual_slice.to_pickle(
+        get_dfpkl_outpath(data_source_label, subset_label,
+                          slice_num=slice_number))
+
+    # save exclusions df
+
     excl_df.to_pickle(excl_path)
 
 
@@ -513,7 +631,7 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
     rawdfpath = rawdfdir.joinpath(tmpdfpath.name)
 
     # define namedtuple to simplify dataframe creation from json object
-    text_info = namedtuple('Text', ['text', 'pile_set_name'])
+    text_info = namedtuple('Text', ['raw', 'pile_set_name'])
 
     # Load the (sample) jsonlines formatted (`.jsonl`) file using `jsonlines`.
     # Create a generator object which directly filters out texts from unwanted data sets.
@@ -539,18 +657,9 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
             f'  ~ {round(toDF_t1 - toDf_t0, 3)}  sec elapsed')
 
     # Clean it up a bit, and remove duplicate text items
-    df = df.drop_duplicates(subset='text').reset_index(drop=True)
+    df = df.drop_duplicates(subset='raw').reset_index(drop=True)
 
     df = df.assign(pile_set_name=df.pile_set_name.astype('category'))
-
-    df.to_pickle(rawdfpath)
-
-    print('  translating encoding...')
-    unidecode_t0 = time.perf_counter()
-    df = df.assign(text=df.text.apply(unidecode))
-    unidecode_t1 = time.perf_counter()
-    print(
-        f'  ~ {round(unidecode_t1 - unidecode_t0, 2)}  sec elapsed')
 
     # Create codes for data subsets
     # (code dict is now a global variable)
@@ -560,33 +669,25 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
     df.to_pickle(rawdfpath)
 
     print('  adding subset codes & text IDs...')
-    # Create text ids from raw file name, pile subset code, and dataframe index.
-    codedf = pd.DataFrame()
-    codes_t0 = time.perf_counter()
-    for code in df.pile_set_code.unique():
-        subdf = df.loc[df.pile_set_code == code, :].reset_index()
-        prefs = code + '_' + data_source_label + '_'
-        idnums = subdf.index.astype('string')
-        width = len(str(df.index.max()))
-        idnums = idnums.str.zfill(width)
-        subdf = subdf.assign(text_id=prefs + idnums)
+    codedf = create_ids(df, data_source_label=data_source_label)
 
-        codedf = pd.concat([codedf, subdf])
-    codes_t1 = time.perf_counter()
-    print(f'  ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
-
-    df = codedf[['text_id', 'text', 'pile_set_name', 'pile_set_code']]
+    df = codedf[['text_id', 'raw', 'pile_set_name', 'pile_set_code']]
     df = df.assign(text_id=df.text_id.astype('string'),
                    pile_set_code=df.pile_set_code.astype('category'))
 
     df.to_pickle(rawdfpath)
+    print(f'raw dataframe saved to {rawdfpath.relative_to(Path.cwd())}')
 
     df = clean_df(df, tmpdfpath)
 
-    print('\ndataframe info:')
-    print(df.info())
-    print('...')
-
+    # print('\ndataframe info:')
+    # print(df.info())
+    # print('...')
+    # raw column will no longer be saved to finalized dataframe output
+    # dataframes in `raw/` will have only `raw`
+    # dataframes in `tmp/` will have both `raw` and `text`
+    # dataframes in the parent dir, `pile_tables` will have only `text`
+    df.pop('raw')
     print('Finished preprocessing: dataframe saved to', df_output_path)
     df.to_pickle(df_output_path)
 
@@ -664,7 +765,7 @@ def get_dfpkl_outpath(stem: str,
     if not df_output_dir.is_dir():
         df_output_dir.mkdir(parents=True)
 
-    if subcorpus_label in global_subset_abbr_dict.values():
+    if subcorpus_label in [v for v in global_subset_abbr_dict.values()]:
         subcorpus_label = [k
                            for k, v in global_subset_abbr_dict.items()
                            if v == subcorpus_label][0]
@@ -678,12 +779,55 @@ def get_dfpkl_outpath(stem: str,
         f'{stem}_{subcorpus_label}_{data_type}.pkl.gz')
 
 
+def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_num: str = None):
+    # Create text ids from raw file name, pile subset code, and dataframe index.
+    codedf = pd.DataFrame()
+    codes_t0 = time.perf_counter()
+    fullix = bool(data_source_label)
+    sliceix = bool(zfilled_slice_num)
+    for code in df.pile_set_code.unique():
+        subdf = df.loc[df.pile_set_code == code, :].reset_index()
+        code = code.lower()
+        prefix = ''
+
+        if fullix:
+            prefix = f'{code}_{data_source_label}_'
+        elif sliceix:
+            subdf = subdf.assign(orig_text_id=subdf.text_id)
+            __, file_label, __ = subdf.orig_text_id.iloc[0].split(
+                '_')
+            prefix = f'{code}_eng_{file_label}_{zfilled_slice_num}.'
+            # then add... '{slice_ix.zfill}-{jsonl_ix}
+
+        # start at 1 instead of 0
+        idnums = subdf.index + 1
+        zfill_len = len(str(df.index.max()))
+        idnums = idnums.astype('string').str.zfill(zfill_len)
+
+        subdf = subdf.assign(id_stem=prefix + idnums)
+        if sliceix:
+            subdf = subdf.assign(
+                text_id=(subdf.id_stem + '_x'
+                         + subdf.text_id.str.rsplit('_', 1).str.get(1)))
+        else:
+            subdf = subdf.assign(text_id=subdf.id_stem)
+
+        subdf.pop('id_stem')
+        codedf = pd.concat([codedf, subdf])
+    codes_t1 = time.perf_counter()
+    print(f'  ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
+
+    return codedf
+
 ### parsing functions ###
-def stanza_parse(df, output_path, excl_df, filenum, total):
+
+
+def stanza_parse(df, output_path, excl_df, filenum, total: str):
     # TODO : change POS to XPOS; remove extra features?
 
     slice_total = len(df)
-    print(f'Starting output {filenum}: {slice_total} of {total} texts')
+    print(
+        f'Starting output {filenum} of {total}: {slice_total} texts in current slice')
     # open output file for conll formatted data
     print(f'  parsed data will be written to {output_path}')
     with output_path.open(mode='w') as conlloutput:
@@ -739,18 +883,19 @@ def process_sentences(row_df, conlloutput, doc):
 
     # check for line breaks in sentence text string
     doc = confirm_parse(doc)
-
+    sent_zfill = len(str(len(doc.sentences)))
     # add comments to sentences (info pulled from dataframe)
     for enumi, sentence in enumerate(doc.sentences):
-
+        enumi += 1
         # ignore s.id--these will be off if sentences with line breaks were broken up above
-        if enumi == 0:
+        if enumi == 1:
             # "newdoc id" will be the text_id from the pile subset
             sentence.add_comment(f'# newdoc id = {text_id}')
 
         # "sent_id" will be doc/text id with _[sentence number] appended
         # TODO : change this to `enumi + 1` for consistency with other conllu files
-        sent_id = f'{text_id}_{enumi}'
+
+        sent_id = f'{text_id}_{str(enumi).zfill(sent_zfill)}'
         sentence.add_comment(f'# sent_id = {sent_id}')
         print('     ', sent_id)
 
