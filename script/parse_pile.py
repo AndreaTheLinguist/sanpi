@@ -265,6 +265,9 @@ def clean_df(orig_df, tmp_save_path):
     t1 = time.perf_counter()
     print(f'  ~ {round(t1 - t0, 2)}  sec elapsed')
 
+    df.to_pickle(tmp_save_path)
+    print(f'dataframe saved to {tmp_save_path.relative_to(Path.cwd())}')
+
     print('+ Excluding messy data...')
     excl_save_path = get_dfpkl_outpath(tmp_save_path.stem, is_excl=True)
     df, excl_df = pull_exclusions(orig_df, excl_save_path)
@@ -583,6 +586,10 @@ def slice_df(full_df, data_source_label):
                 slice_num=slice_num, is_tmp=True)
             sdf.to_pickle(outpath)
 
+        # this needs to be its own loop so that all the slices can be saved
+        # before any of them are processed
+        # (which takes a long time and has a high likelihood of crashing)
+        for sdf in slices:
             process_slice(sdf, slices_total_str)
 
 
