@@ -1,0 +1,615 @@
+arh234@kay:~/snpa/logs/pile_Feb28$ exit[Kcd ~/snpa/ ; python3 script/parse_pile.py -i pile_data/train/02.jsonl2[1P[1@9data/train/09.jsonl
+Loading dependency parsing pipeline...
+2022-02-28 00:46:00 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-28 00:46:00 INFO: Use device: cpu
+2022-02-28 00:46:00 INFO: Loading: tokenize
+2022-02-28 00:46:00 INFO: Loading: pos
+2022-02-28 00:46:01 INFO: Loading: lemma
+2022-02-28 00:46:01 INFO: Loading: depparse
+2022-02-28 00:46:01 INFO: Done loading processors!
+started: Mon Feb 28 00:46:01 2022
++ raw files selected to process:
+[PosixPath('/data/pile/train/09.jsonl')]
+
+raw jsonlines files will be processed for the following subcorpora: 
+['Pile-CC']
+
+Dataframes to be processed:
+[]
+
+---
+
+Preprocessing /data/pile/train/09.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.0007  sec elapsed
+  building dataframe from `jsonlines` generator object...
+  ~ 633.314  sec elapsed
+Killed
+arh234@kay:~/snpa$ [Karh234@kay:~/snpa$ cd ~/snpa/ ; python3 script/parse_pile.py -i pile_data/train/09.jsonlarh234@kay:~/snpa$ [1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@python3 script/parse_pile.py -i pile_data/train/09.jsonl
+Loading dependency parsing pipeline...
+2022-02-28 16:50:51 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-28 16:50:51 INFO: Use device: cpu
+2022-02-28 16:50:51 INFO: Loading: tokenize
+2022-02-28 16:50:51 INFO: Loading: pos
+2022-02-28 16:50:52 INFO: Loading: lemma
+2022-02-28 16:50:52 INFO: Loading: depparse
+2022-02-28 16:50:54 INFO: Done loading processors!
+started: Mon Feb 28 16:50:54 2022
++ raw files selected to process:
+[PosixPath('/data/pile/train/09.jsonl')]
+
+raw jsonlines files will be processed for the following subcorpora: 
+['Pile-CC']
+
+Dataframes to be processed:
+[]
+
+---
+
+Preprocessing /data/pile/train/09.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.0007  sec elapsed
+  building dataframe from `jsonlines` generator object...
+  ~ 880.955  sec elapsed
+  adding subset codes & text IDs...
+  ~ 3.096  sec elapsed
+raw dataframe saved to pile_tables/raw/pile_09_Pile-CC_df.pkl.gz
+
+Cleaning text in dataframe...
+  translating encoding...
+  ~ 1846.41  sec elapsed
+  removing URLs...
+  ~ 1313.56  sec elapsed
+dataframe saved to pile_tables/tmp/pile_09_Pile-CC_df.pkl.gz
++ Excluding messy data...
+  pulling excluded formats...
+[No previous exclusion assessment found.]
+  looking for uninterpretable characters...
+= ?unk char excl ~~ 6.63 seconds
+  looking for wikitext/wikimedia formatting...
+   +498 exclusions
+= wiki excl ~~ 156.83 seconds
+  looking for any html...
+   +5644 exclusions
+= html excl ~~ 60.11 seconds
+  looking for other messy text...
+   +109 json exclusions
+= json filtering ~~ 6.81 seconds
+   +99418 code exclusions
+= code filtering ~~ 178.03 seconds
+   +43108 _wrd exclusions
+= _wrd filtering ~~ 585.95 seconds
+   +610634 a0wrd exclusions
+= a0wrd filtering ~~ 531.95 seconds
+  = 759411 exclusions (759411 new) saved to pile_exclusions/pile_09_Pile-CC_excl.pkl.gz
++ Cleaning up text...
+   - punctuation delineated text breaks
+   - title abbreviations at line breaks...
+57399 of 992443 texts modified
+Finished preprocessing: dataframe saved to /projects/sem/snpa/pile_tables/pile_09_Pile-CC_df.pkl.gz
+Partitioning data in Pile-CC subset
+992443 total texts to parse
+  ~ 0.03  sec elapsed
+slice 1: (10000 texts)
+  pcc_eng_09_01.0001_x0000002
+  ...
+  pcc_eng_09_01.10000_x0017502
+  ~ 0.03  sec elapsed
+slice 2: (10000 texts)
+  pcc_eng_09_02.0001_x0017503
+  ...
+  pcc_eng_09_02.10000_x0035067
+  ~ 0.031  sec elapsed
+slice 3: (10000 texts)
+  pcc_eng_09_03.0001_x0035068
+  ...
+  pcc_eng_09_03.10000_x0052841
+  ~ 0.03  sec elapsed
+slice 4: (10000 texts)
+  pcc_eng_09_04.0001_x0052842
+  ...
+  pcc_eng_09_04.10000_x0070674
+  ~ 0.031  sec elapsed
+slice 5: (10000 texts)
+  pcc_eng_09_05.0001_x0070675
+  ...
+  pcc_eng_09_05.10000_x0088257
+  ~ 0.032  sec elapsed
+slice 6: (10000 texts)
+  pcc_eng_09_06.0001_x0088258
+  ...
+  pcc_eng_09_06.10000_x0105898
+  ~ 0.03  sec elapsed
+slice 7: (10000 texts)
+  pcc_eng_09_07.0001_x0105901
+  ...
+  pcc_eng_09_07.10000_x0123603
+  ~ 0.03  sec elapsed
+slice 8: (10000 texts)
+  pcc_eng_09_08.0001_x0123604
+  ...
+  pcc_eng_09_08.10000_x0141228
+  ~ 0.03  sec elapsed
+slice 9: (10000 texts)
+  pcc_eng_09_09.0001_x0141232
+  ...
+  pcc_eng_09_09.10000_x0158925
+  ~ 0.03  sec elapsed
+slice 10: (10000 texts)
+  pcc_eng_09_10.0001_x0158928
+  ...
+  pcc_eng_09_10.10000_x0176514
+  ~ 0.03  sec elapsed
+slice 11: (10000 texts)
+  pcc_eng_09_11.0001_x0176516
+  ...
+  pcc_eng_09_11.10000_x0194139
+  ~ 0.03  sec elapsed
+slice 12: (10000 texts)
+  pcc_eng_09_12.0001_x0194140
+  ...
+  pcc_eng_09_12.10000_x0211719
+  ~ 0.031  sec elapsed
+slice 13: (10000 texts)
+  pcc_eng_09_13.0001_x0211720
+  ...
+  pcc_eng_09_13.10000_x0229553
+  ~ 0.03  sec elapsed
+slice 14: (10000 texts)
+  pcc_eng_09_14.0001_x0229554
+  ...
+  pcc_eng_09_14.10000_x0247312
+  ~ 0.031  sec elapsed
+slice 15: (10000 texts)
+  pcc_eng_09_15.0001_x0247313
+  ...
+  pcc_eng_09_15.10000_x0265077
+  ~ 0.03  sec elapsed
+slice 16: (10000 texts)
+  pcc_eng_09_16.0001_x0265079
+  ...
+  pcc_eng_09_16.10000_x0282882
+  ~ 0.031  sec elapsed
+slice 17: (10000 texts)
+  pcc_eng_09_17.0001_x0282883
+  ...
+  pcc_eng_09_17.10000_x0300581
+  ~ 0.039  sec elapsed
+slice 18: (10000 texts)
+  pcc_eng_09_18.0001_x0300582
+  ...
+  pcc_eng_09_18.10000_x0318274
+  ~ 0.031  sec elapsed
+slice 19: (10000 texts)
+  pcc_eng_09_19.0001_x0318275
+  ...
+  pcc_eng_09_19.10000_x0336026
+  ~ 0.031  sec elapsed
+slice 20: (10000 texts)
+  pcc_eng_09_20.0001_x0336027
+  ...
+  pcc_eng_09_20.10000_x0353730
+  ~ 0.03  sec elapsed
+slice 21: (10000 texts)
+  pcc_eng_09_21.0001_x0353732
+  ...
+  pcc_eng_09_21.10000_x0371294
+  ~ 0.031  sec elapsed
+slice 22: (10000 texts)
+  pcc_eng_09_22.0001_x0371297
+  ...
+  pcc_eng_09_22.10000_x0388902
+  ~ 0.03  sec elapsed
+slice 23: (10000 texts)
+  pcc_eng_09_23.0001_x0388903
+  ...
+  pcc_eng_09_23.10000_x0406729
+  ~ 0.031  sec elapsed
+slice 24: (10000 texts)
+  pcc_eng_09_24.0001_x0406731
+  ...
+  pcc_eng_09_24.10000_x0424373
+  ~ 0.031  sec elapsed
+slice 25: (10000 texts)
+  pcc_eng_09_25.0001_x0424374
+  ...
+  pcc_eng_09_25.10000_x0442100
+  ~ 0.031  sec elapsed
+slice 26: (10000 texts)
+  pcc_eng_09_26.0001_x0442103
+  ...
+  pcc_eng_09_26.10000_x0459834
+  ~ 0.031  sec elapsed
+slice 27: (10000 texts)
+  pcc_eng_09_27.0001_x0459835
+  ...
+  pcc_eng_09_27.10000_x0477460
+  ~ 0.031  sec elapsed
+slice 28: (10000 texts)
+  pcc_eng_09_28.0001_x0477461
+  ...
+  pcc_eng_09_28.10000_x0495233
+  ~ 0.031  sec elapsed
+slice 29: (10000 texts)
+  pcc_eng_09_29.0001_x0495235
+  ...
+  pcc_eng_09_29.10000_x0512989
+  ~ 2.066  sec elapsed
+slice 30: (10000 texts)
+  pcc_eng_09_30.0001_x0512990
+  ...
+  pcc_eng_09_30.10000_x0530508
+  ~ 0.04  sec elapsed
+slice 31: (10000 texts)
+  pcc_eng_09_31.0001_x0530509
+  ...
+  pcc_eng_09_31.10000_x0548037
+  ~ 0.041  sec elapsed
+slice 32: (10000 texts)
+  pcc_eng_09_32.0001_x0548038
+  ...
+  pcc_eng_09_32.10000_x0565550
+  ~ 0.04  sec elapsed
+slice 33: (10000 texts)
+  pcc_eng_09_33.0001_x0565551
+  ...
+  pcc_eng_09_33.10000_x0583189
+  ~ 0.041  sec elapsed
+slice 34: (10000 texts)
+  pcc_eng_09_34.0001_x0583190
+  ...
+  pcc_eng_09_34.10000_x0600801
+  ~ 0.039  sec elapsed
+slice 35: (10000 texts)
+  pcc_eng_09_35.0001_x0600802
+  ...
+  pcc_eng_09_35.10000_x0618383
+  ~ 0.04  sec elapsed
+slice 36: (10000 texts)
+  pcc_eng_09_36.0001_x0618384
+  ...
+  pcc_eng_09_36.10000_x0635871
+  ~ 0.04  sec elapsed
+slice 37: (10000 texts)
+  pcc_eng_09_37.0001_x0635872
+  ...
+  pcc_eng_09_37.10000_x0653534
+  ~ 0.039  sec elapsed
+slice 38: (10000 texts)
+  pcc_eng_09_38.0001_x0653535
+  ...
+  pcc_eng_09_38.10000_x0671023
+  ~ 0.04  sec elapsed
+slice 39: (10000 texts)
+  pcc_eng_09_39.0001_x0671025
+  ...
+  pcc_eng_09_39.10000_x0688843
+  ~ 0.099  sec elapsed
+slice 40: (10000 texts)
+  pcc_eng_09_40.0001_x0688844
+  ...
+  pcc_eng_09_40.10000_x0706620
+  ~ 0.043  sec elapsed
+slice 41: (10000 texts)
+  pcc_eng_09_41.0001_x0706622
+  ...
+  pcc_eng_09_41.10000_x0724201
+  ~ 0.04  sec elapsed
+slice 42: (10000 texts)
+  pcc_eng_09_42.0001_x0724203
+  ...
+  pcc_eng_09_42.10000_x0741847
+  ~ 0.04  sec elapsed
+slice 43: (10000 texts)
+  pcc_eng_09_43.0001_x0741849
+  ...
+  pcc_eng_09_43.10000_x0759434
+  ~ 0.039  sec elapsed
+slice 44: (10000 texts)
+  pcc_eng_09_44.0001_x0759436
+  ...
+  pcc_eng_09_44.10000_x0777040
+  ~ 0.038  sec elapsed
+slice 45: (10000 texts)
+  pcc_eng_09_45.0001_x0777041
+  ...
+  pcc_eng_09_45.10000_x0794716
+  ~ 0.041  sec elapsed
+slice 46: (10000 texts)
+  pcc_eng_09_46.0001_x0794717
+  ...
+  pcc_eng_09_46.10000_x0812279
+  ~ 0.04  sec elapsed
+slice 47: (10000 texts)
+  pcc_eng_09_47.0001_x0812282
+  ...
+  pcc_eng_09_47.10000_x0829848
+  ~ 0.04  sec elapsed
+slice 48: (10000 texts)
+  pcc_eng_09_48.0001_x0829851
+  ...
+  pcc_eng_09_48.10000_x0847404
+  ~ 0.102  sec elapsed
+slice 49: (10000 texts)
+  pcc_eng_09_49.0001_x0847405
+  ...
+  pcc_eng_09_49.10000_x0865124
+  ~ 0.04  sec elapsed
+slice 50: (10000 texts)
+  pcc_eng_09_50.0001_x0865125
+  ...
+  pcc_eng_09_50.10000_x0882867
+  ~ 0.039  sec elapsed
+slice 51: (10000 texts)
+  pcc_eng_09_51.0001_x0882872
+  ...
+  pcc_eng_09_51.10000_x0900416
+  ~ 0.041  sec elapsed
+slice 52: (10000 texts)
+  pcc_eng_09_52.0001_x0900417
+  ...
+  pcc_eng_09_52.10000_x0918054
+  ~ 0.039  sec elapsed
+slice 53: (10000 texts)
+  pcc_eng_09_53.0001_x0918059
+  ...
+  pcc_eng_09_53.10000_x0935621
+  ~ 0.039  sec elapsed
+slice 54: (10000 texts)
+  pcc_eng_09_54.0001_x0935622
+  ...
+  pcc_eng_09_54.10000_x0953198
+  ~ 0.04  sec elapsed
+slice 55: (10000 texts)
+  pcc_eng_09_55.0001_x0953200
+  ...
+  pcc_eng_09_55.10000_x0970852
+  ~ 0.04  sec elapsed
+slice 56: (10000 texts)
+  pcc_eng_09_56.0001_x0970858
+  ...
+  pcc_eng_09_56.10000_x0988468
+  ~ 0.042  sec elapsed
+slice 57: (10000 texts)
+  pcc_eng_09_57.0001_x0988469
+  ...
+  pcc_eng_09_57.10000_x1006024
+  ~ 0.105  sec elapsed
+slice 58: (10000 texts)
+  pcc_eng_09_58.0001_x1006026
+  ...
+  pcc_eng_09_58.10000_x1023893
+  ~ 0.04  sec elapsed
+slice 59: (10000 texts)
+  pcc_eng_09_59.0001_x1023897
+  ...
+  pcc_eng_09_59.10000_x1041295
+  ~ 0.039  sec elapsed
+slice 60: (10000 texts)
+  pcc_eng_09_60.0001_x1041297
+  ...
+  pcc_eng_09_60.10000_x1058929
+  ~ 0.039  sec elapsed
+slice 61: (10000 texts)
+  pcc_eng_09_61.0001_x1058930
+  ...
+  pcc_eng_09_61.10000_x1076631
+  ~ 0.04  sec elapsed
+slice 62: (10000 texts)
+  pcc_eng_09_62.0001_x1076633
+  ...
+  pcc_eng_09_62.10000_x1094229
+  ~ 0.04  sec elapsed
+slice 63: (10000 texts)
+  pcc_eng_09_63.0001_x1094230
+  ...
+  pcc_eng_09_63.10000_x1111919
+  ~ 0.04  sec elapsed
+slice 64: (10000 texts)
+  pcc_eng_09_64.0001_x1111922
+  ...
+  pcc_eng_09_64.10000_x1129514
+  ~ 0.04  sec elapsed
+slice 65: (10000 texts)
+  pcc_eng_09_65.0001_x1129516
+  ...
+  pcc_eng_09_65.10000_x1147178
+  ~ 0.04  sec elapsed
+slice 66: (10000 texts)
+  pcc_eng_09_66.0001_x1147179
+  ...
+  pcc_eng_09_66.10000_x1164676
+  ~ 0.04  sec elapsed
+slice 67: (10000 texts)
+  pcc_eng_09_67.0001_x1164677
+  ...
+  pcc_eng_09_67.10000_x1182149
+  ~ 0.102  sec elapsed
+slice 68: (10000 texts)
+  pcc_eng_09_68.0001_x1182151
+  ...
+  pcc_eng_09_68.10000_x1199772
+  ~ 0.039  sec elapsed
+slice 69: (10000 texts)
+  pcc_eng_09_69.0001_x1199773
+  ...
+  pcc_eng_09_69.10000_x1217411
+  ~ 0.04  sec elapsed
+slice 70: (10000 texts)
+  pcc_eng_09_70.0001_x1217412
+  ...
+  pcc_eng_09_70.10000_x1234993
+  ~ 0.04  sec elapsed
+slice 71: (10000 texts)
+  pcc_eng_09_71.0001_x1234995
+  ...
+  pcc_eng_09_71.10000_x1252871
+  ~ 0.04  sec elapsed
+slice 72: (10000 texts)
+  pcc_eng_09_72.0001_x1252872
+  ...
+  pcc_eng_09_72.10000_x1270635
+  ~ 0.039  sec elapsed
+slice 73: (10000 texts)
+  pcc_eng_09_73.0001_x1270638
+  ...
+  pcc_eng_09_73.10000_x1288335
+  ~ 0.041  sec elapsed
+slice 74: (10000 texts)
+  pcc_eng_09_74.0001_x1288336
+  ...
+  pcc_eng_09_74.10000_x1305924
+  ~ 0.04  sec elapsed
+slice 75: (10000 texts)
+  pcc_eng_09_75.0001_x1305925
+  ...
+  pcc_eng_09_75.10000_x1323431
+  ~ 0.04  sec elapsed
+slice 76: (10000 texts)
+  pcc_eng_09_76.0001_x1323433
+  ...
+  pcc_eng_09_76.10000_x1340947
+  ~ 0.108  sec elapsed
+slice 77: (10000 texts)
+  pcc_eng_09_77.0001_x1340948
+  ...
+  pcc_eng_09_77.10000_x1358444
+  ~ 0.039  sec elapsed
+slice 78: (10000 texts)
+  pcc_eng_09_78.0001_x1358445
+  ...
+  pcc_eng_09_78.10000_x1375963
+  ~ 0.041  sec elapsed
+slice 79: (10000 texts)
+  pcc_eng_09_79.0001_x1375964
+  ...
+  pcc_eng_09_79.10000_x1393704
+  ~ 0.05  sec elapsed
+slice 80: (10000 texts)
+  pcc_eng_09_80.0001_x1393705
+  ...
+  pcc_eng_09_80.10000_x1411545
+  ~ 0.04  sec elapsed
+slice 81: (10000 texts)
+  pcc_eng_09_81.0001_x1411546
+  ...
+  pcc_eng_09_81.10000_x1429400
+  ~ 0.042  sec elapsed
+slice 82: (10000 texts)
+  pcc_eng_09_82.0001_x1429401
+  ...
+  pcc_eng_09_82.10000_x1446798
+  ~ 0.042  sec elapsed
+slice 83: (10000 texts)
+  pcc_eng_09_83.0001_x1446799
+  ...
+  pcc_eng_09_83.10000_x1464450
+  ~ 0.042  sec elapsed
+slice 84: (10000 texts)
+  pcc_eng_09_84.0001_x1464451
+  ...
+  pcc_eng_09_84.10000_x1482029
+  ~ 0.04  sec elapsed
+slice 85: (10000 texts)
+  pcc_eng_09_85.0001_x1482030
+  ...
+  pcc_eng_09_85.10000_x1499777
+  ~ 0.102  sec elapsed
+slice 86: (10000 texts)
+  pcc_eng_09_86.0001_x1499779
+  ...
+  pcc_eng_09_86.10000_x1517388
+  ~ 0.04  sec elapsed
+slice 87: (10000 texts)
+  pcc_eng_09_87.0001_x1517389
+  ...
+  pcc_eng_09_87.10000_x1535295
+  ~ 0.042  sec elapsed
+slice 88: (10000 texts)
+  pcc_eng_09_88.0001_x1535296
+  ...
+  pcc_eng_09_88.10000_x1553096
+  ~ 0.04  sec elapsed
+slice 89: (10000 texts)
+  pcc_eng_09_89.0001_x1553097
+  ...
+  pcc_eng_09_89.10000_x1570721
+  ~ 0.041  sec elapsed
+slice 90: (10000 texts)
+  pcc_eng_09_90.0001_x1570722
+  ...
+  pcc_eng_09_90.10000_x1588381
+  ~ 0.04  sec elapsed
+slice 91: (10000 texts)
+  pcc_eng_09_91.0001_x1588382
+  ...
+  pcc_eng_09_91.10000_x1606023
+  ~ 0.04  sec elapsed
+slice 92: (10000 texts)
+  pcc_eng_09_92.0001_x1606025
+  ...
+  pcc_eng_09_92.10000_x1623674
+  ~ 0.041  sec elapsed
+slice 93: (10000 texts)
+  pcc_eng_09_93.0001_x1623675
+  ...
+  pcc_eng_09_93.10000_x1641385
+  ~ 0.04  sec elapsed
+slice 94: (10000 texts)
+  pcc_eng_09_94.0001_x1641387
+  ...
+  pcc_eng_09_94.10000_x1658978
+  ~ 0.04  sec elapsed
+slice 95: (10000 texts)
+  pcc_eng_09_95.0001_x1658980
+  ...
+  pcc_eng_09_95.10000_x1676882
+  ~ 0.106  sec elapsed
+slice 96: (10000 texts)
+  pcc_eng_09_96.0001_x1676883
+  ...
+  pcc_eng_09_96.10000_x1694657
+  ~ 0.042  sec elapsed
+slice 97: (10000 texts)
+  pcc_eng_09_97.0001_x1694658
+  ...
+  pcc_eng_09_97.10000_x1712168
+  ~ 0.047  sec elapsed
+slice 98: (11221 texts)
+  pcc_eng_09_98.0000001_x1712169
+  ...
+  pcc_eng_09_98.0011221_x1732039
+  ~ 0.045  sec elapsed
+slice 99: (11222 texts)
+  pcc_eng_09_99.0000001_x1732043
+  ...
+  pcc_eng_09_99.0011222_x1751854
+Traceback (most recent call last):
+  File "script/parse_pile.py", line 1032, in <module>
+    main()
+  File "script/parse_pile.py", line 95, in main
+    slice_df(df, data_source_label)
+  File "script/parse_pile.py", line 593, in slice_df
+    process_slice(sdf, slices_total_str)
+  File "script/parse_pile.py", line 598, in process_slice
+    subset_label, __, data_source_label, slice_id, __ = id_prototype.split('_')
+ValueError: not enough values to unpack (expected 5, got 3)
+arh234@kay:~/snpa$ 

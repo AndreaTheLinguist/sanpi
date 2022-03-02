@@ -1,0 +1,62 @@
+arh234@kay:~/snpa/logs/pile_Feb28$ exit[Kcd ~/snpa/ ; python3 script/parse_pile.py -i pile_data/train/02.jsonl[1P[1P[1@1[1@1.jsonl
+Loading dependency parsing pipeline...
+2022-02-28 00:46:48 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-28 00:46:48 INFO: Use device: cpu
+2022-02-28 00:46:48 INFO: Loading: tokenize
+2022-02-28 00:46:48 INFO: Loading: pos
+2022-02-28 00:46:49 INFO: Loading: lemma
+2022-02-28 00:46:49 INFO: Loading: depparse
+2022-02-28 00:46:50 INFO: Done loading processors!
+started: Mon Feb 28 00:46:50 2022
++ raw files selected to process:
+[PosixPath('/data/pile/train/11.jsonl')]
+
+raw jsonlines files will be processed for the following subcorpora: 
+['Pile-CC']
+
+Dataframes to be processed:
+[]
+
+---
+
+Preprocessing /data/pile/train/11.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.0006  sec elapsed
+  building dataframe from `jsonlines` generator object...
+  ~ 616.295  sec elapsed
+  adding subset codes & text IDs...
+  ~ 2.846  sec elapsed
+raw dataframe saved to pile_tables/raw/pile_11_Pile-CC_df.pkl.gz
+
+Cleaning text in dataframe...
+  translating encoding...
+  ~ 1752.36  sec elapsed
+  removing URLs...
+  ~ 439.41  sec elapsed
++ Excluding messy data...
+  pulling excluded formats...
+[No previous exclusion assessment found.]
+  looking for uninterpretable characters...
+= ?unk char excl ~~ 9.19 seconds
+  looking for wikitext/wikimedia formatting...
+   +380 exclusions
+= wiki excl ~~ 154.21 seconds
+  looking for any html...
+   +5629 exclusions
+= html excl ~~ 52.37 seconds
+  looking for other messy text...
+   +108 json exclusions
+= json filtering ~~ 6.79 seconds
+   +98861 code exclusions
+= code filtering ~~ 175.38 seconds
+Killed
+arh234@kay:~/snpa$ 
