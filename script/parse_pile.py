@@ -514,35 +514,8 @@ def slice_df(full_df, data_source_label):
 
     for subcorpus_code, df in full_df.groupby('pile_set_code'):
         subcorpus_name = df.pile_set_name.iat[0]
-        print(f'Partitioning data in {subcorpus_name} subset')
-
-        # Andrea Hummel on Feb 11, 2022 at 9:13 PM
-        # Currently, `excl_df` is not passed into this method. Instead of
-        # getting it via a redundant call to `pull_exclusions()`
-        # (that happens in `clean_df()` now) it is loaded from where it
-        # was saved either in the previous call, or in a previous run
-        # of the script.
-        # If for some reason the exclusions file cannot be found, run again.
-        #    (but save with different name so as to not overwrite original.)
-        excl_save_path = get_dfpkl_outpath(data_source_label,
-                                           subcorpus_name, is_excl=True)
-
-        if excl_save_path.is_file():
-            excl_df = pd.read_pickle(excl_save_path)
-        else:
-            backup_path = excl_save_path.with_name(excl_save_path.name
-                                                   .split('.', 1)[0]+'-slicing.pkl.gz')
-            if backup_path.is_file():
-                excl_df = pd.read_pickle(backup_path)
-            else:
-                print('Warning: previous exclusions file could not be found. '
-                      'Reassessing data...')
-                df, excl_df = pull_exclusions(df, backup_path)
-
-            print('Excluded data alternate:',
-                  backup_path.relative_to(Path.cwd()))
-
-        print(f'{len(df)} total texts to parse')
+        print(f'Partitioning data in {subcorpus_name} subset\n'
+              f'{len(df)} total texts to parse')
 
         remaining_df = df.sort_values('text_id')
         slices = []
@@ -600,9 +573,32 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
     slice_number, __ = slice_id.split('.')
     subset_label = subset_label.capitalize()
 
-    excl_path = get_dfpkl_outpath(
-        data_source_label, subset_label, is_excl=True)
-    excl_df = pd.read_pickle(excl_path)
+    # below note was originally in `slice_df()`  but still relevant here
+    # Andrea Hummel on Feb 11, 2022 at 9:13 PM
+    # Currently, `excl_df` is not passed into this method. Instead of
+    # getting it via a redundant call to `pull_exclusions()`
+    # (that happens in `clean_df()` now) it is loaded from where it
+    # was saved either in the previous call, or in a previous run
+    # of the script.
+    # If for some reason the exclusions file cannot be found, run again.
+    #    (but save with different name so as to not overwrite original.)
+    excl_save_path = get_dfpkl_outpath(data_source_label, 
+                                       subset_label, is_excl=True)
+
+    if excl_save_path.is_file():
+        excl_df = pd.read_pickle(excl_save_path)
+    else:
+        backup_path = excl_save_path.with_name(excl_save_path.name
+                                               .split('.', 1)[0]+'-alt.pkl.gz')
+        if backup_path.is_file():
+            excl_df = pd.read_pickle(backup_path)
+        else:
+            print('Warning: previous exclusions file could not be found. '
+                  'Reassessing data...')
+            df, excl_df = pull_exclusions(df, backup_path)
+
+        print('Excluded data alternate:',
+              backup_path.relative_to(Path.cwd()))
 
     out_path = get_conllu_outpath(
         f'{data_source_label}-{slice_number}',
@@ -619,7 +615,7 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
 
     # save exclusions df
 
-    excl_df.to_pickle(excl_path)
+    excl_df.to_pickle(excl_save_path)
 
 
 ### raw processing functions ###
