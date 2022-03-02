@@ -579,6 +579,7 @@ def slice_df(full_df, data_source_label):
             slice_num = i+1
             slice_zfilled = str(slice_num).zfill(len(str(len(slices))))
             sdf = create_ids(sdf, zfilled_slice_num=slice_zfilled)
+            slices[i] = sdf
             print(f'slice {slice_num}: ({len(sdf)} texts)\n  {sdf.text_id.iloc[0]}'
                   f'\n  ...\n  {sdf.text_id.iloc[-1]}')
             outpath = get_dfpkl_outpath(
