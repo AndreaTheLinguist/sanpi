@@ -6552,3 +6552,194 @@ srwx------ 1 andrea andrea 0 Jan  6 12:43 [0m[01;35m26340.pts-6.Delilah[0m
 [01;34mboot[0m  [01;34metc[0m  [01;32minit[0m  [01;36mlib32[0m  [01;36mlibx32[0m  [01;34mmedia[0m       [01;34mproc[0m  [01;34mrun[0m   [01;34msnap[0m  [01;34msys[0m  [01;34musr[0m  [01;34mwslibhaOe[0m
 (stanza_parsing) [01;32mandrea@Delilah[00m:[01;34m/[00m$ ls[K[K[?5h[?5lexit
 exit
+(base) [01;32marh234@Delilah[00m:[01;34m~/litotes/info/logs[00m$ conda sa[K[Kactivate stanza
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes/info/logs[00m$ conda activate stanza[3Pupdate --allactivate main[5Penv listupdate --alltop[Ksudo ./sysmaintain.sh exit[K[2Plscd info/logs/python script/parse_pile.py -f pile_data/test-main.jsonl[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[35Pconda activate stanzapython script/parse_pile.py -f pile_data/test-main.jsonl[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K
+python: can't open file 'script/parse_pile.py': [Errno 2] No such file or directory
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes/info/logs[00m$ python script/parse_pile.py[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kcd ..
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes/info[00m$ cd ..
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ cd ..python script/parse_pile.py[6Pconda activate stanzapython script/parse_pile.py
+Loading dependency parsing pipeline...
+2022-02-15 23:49:49 INFO: Loading these models for language: en (English):
+========================
+| Processor | Package  |
+------------------------
+| tokenize  | combined |
+| pos       | combined |
+| lemma     | combined |
+| depparse  | combined |
+========================
+
+2022-02-15 23:49:49 INFO: Use device: cpu
+2022-02-15 23:49:49 INFO: Loading: tokenize
+2022-02-15 23:49:49 INFO: Loading: pos
+2022-02-15 23:49:49 INFO: Loading: lemma
+2022-02-15 23:49:49 INFO: Loading: depparse
+2022-02-15 23:49:50 INFO: Done loading processors!
+started: Tue Feb 15 23:49:50 2022
++ raw files selected to process:
+[PosixPath('/home/arh234/litotes/pile_data/pile-sample.jsonl'),
+ PosixPath('/home/arh234/litotes/pile_data/test-sample.jsonl'),
+ PosixPath('/home/arh234/litotes/pile_data/test-main.jsonl'),
+ PosixPath('/home/arh234/litotes/playground/misc/pile-sample.jsonl'),
+ PosixPath('/home/arh234/litotes/process_pile/pile_data/test-main.jsonl'),
+ PosixPath('/home/arh234/litotes/process_pile/pile_data/train/test-train.jsonl')]
+
+raw jsonlines files will be processed for the following subcorpora: 
+['Pile-CC']
+
+
+---
+
+Preprocessing /home/arh234/litotes/pile_data/pile-sample.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.001  sec elapsed
+  building dataframe from `jsonlines` generator object...
+  ~ 0.003  sec elapsed
+  translating encoding...
+  ~ 0.01  sec elapsed
+  adding subset codes & text IDs...
+  ~ 0.003  sec elapsed
+
+Cleaning text in dataframe...
++ Excluding messy data...
+  pulling excluded formats...
+  -> 1 previously identified exclusions loaded from file
+  looking for wikitext/wikimedia formatting...
+   +0 exclusions
+  looking for any html...
+   +0 exclusions
+  looking for other messy text...
+  = No additional exclusions found.
++ Cleaning up text...
+   - punctuation delineated text breaks
+   - urls...
+   - title abbreviations at line breaks...
+
+dataframe info:
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 4 entries, 0 to 3
+Data columns (total 5 columns):
+ #   Column         Non-Null Count  Dtype   
+---  ------         --------------  -----   
+ 0   text_id        4 non-null      string  
+ 1   text           4 non-null      string  
+ 2   pile_set_name  4 non-null      category
+ 3   pile_set_code  4 non-null      category
+ 4   raw            4 non-null      string  
+dtypes: category(2), string(3)
+memory usage: 368.0 bytes
+None
+...
+Finished preprocessing: dataframe saved to /home/arh234/litotes/pile_tables/pile_pile-sample_Pile-CC_df.pkl.gz
+Partitioning data in Pile-CC subset
+Excluded data: pile_exclusions/pile_pile-sample_Pile-CC_excl.pkl.gz
+4 total texts to parse
+Starting output 1: 4 of 1 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_pile-sample-1.conllu
+  1 of 4 in slice 1 (of 1): Pcc_pile-sample_0
+    - processing sentences...
+       ~ 0.4  seconds
+  2 of 4 in slice 1 (of 1): Pcc_pile-sample_1
+    - processing sentences...
+       ~ 1.2  seconds
+  3 of 4 in slice 1 (of 1): Pcc_pile-sample_2
+    - processing sentences...
+       ~ 0.5  seconds
+  4 of 4 in slice 1 (of 1): Pcc_pile-sample_3
+    - processing sentences...
+       ~ 0.1  seconds
+Finished writing parses to /home/arh234/litotes/Pcc.conll/pcc_eng_pile-sample-1.conllu
+Tue Feb 15 23:49:52 2022
+= 4 of 4 texts successfully parsed.
+
+---
+
+Preprocessing /home/arh234/litotes/pile_data/test-sample.jsonl...
+  creating `jsonlines` generator for corpus selection...
+  ~ 0.0001  sec elapsed
+  building dataframe from `jsonlines` generator object...
+  ~ 0.007  sec elapsed
+  translating encoding...
+  ~ 0.04  sec elapsed
+  adding subset codes & text IDs...
+  ~ 0.003  sec elapsed
+
+Cleaning text in dataframe...
++ Excluding messy data...
+  pulling excluded formats...
+  -> 7 previously identified exclusions loaded from file
+  looking for wikitext/wikimedia formatting...
+   +0 exclusions
+  looking for any html...
+   +0 exclusions
+  looking for other messy text...
+  = No additional exclusions found.
++ Cleaning up text...
+   - punctuation delineated text breaks
+   - urls...
+   - title abbreviations at line breaks...
+4 of 42 texts modified
+
+dataframe info:
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 42 entries, 0 to 48
+Data columns (total 5 columns):
+ #   Column         Non-Null Count  Dtype   
+---  ------         --------------  -----   
+ 0   text_id        42 non-null     string  
+ 1   text           42 non-null     string  
+ 2   pile_set_name  42 non-null     category
+ 3   pile_set_code  42 non-null     category
+ 4   raw            42 non-null     string  
+dtypes: category(2), string(3)
+memory usage: 1.6 KB
+None
+...
+Finished preprocessing: dataframe saved to /home/arh234/litotes/pile_tables/pile_test-sample_Pile-CC_df.pkl.gz
+Partitioning data in Pile-CC subset
+Excluded data: pile_exclusions/pile_test-sample_Pile-CC_excl.pkl.gz
+42 total texts to parse
+Starting output 1: 42 of 1 texts
+  parsed data will be written to /home/arh234/litotes/Pcc.conll/pcc_eng_test-sample-1.conllu
+  1 of 42 in slice 1 (of 1): Pcc_test-sample_00
+    - processing sentences...
+       ~ 0.9  seconds
+  2 of 42 in slice 1 (of 1): Pcc_test-sample_01
+    - processing sentences...
+       ~ 0.2  seconds
+  3 of 42 in slice 1 (of 1): Pcc_test-sample_02
+    - processing sentences...
+       ~ 0.8  seconds
+  4 of 42 in slice 1 (of 1): Pcc_test-sample_03
+    - processing sentences...
+       ~ 0.2  seconds
+  5 of 42 in slice 1 (of 1): Pcc_test-sample_04
+    - processing sentences...
+       ~ 1.8  seconds
+  6 of 42 in slice 1 (of 1): Pcc_test-sample_06
+    - processing sentences...
+       ~ 0.2  seconds
+  7 of 42 in slice 1 (of 1): Pcc_test-sample_07
+    - processing sentences...
+       ~ 0.1  seconds
+  8 of 42 in slice 1 (of 1): Pcc_test-sample_09
+    - processing sentences...
+       ~ 0.2  seconds
+  9 of 42 in slice 1 (of 1): Pcc_test-sample_10
+    - processing sentences...
+       ~ 0.2  seconds
+  10 of 42 in slice 1 (of 1): Pcc_test-sample_11
+    - processing sentences...
+       ~ 0.2  seconds
+  11 of 42 in slice 1 (of 1): Pcc_test-sample_12
+    - processing sentences...
+       ~ 0.9  seconds
+  12 of 42 in slice 1 (of 1): Pcc_test-sample_13
+    - processing sentences...
+       ~ 0.5  seconds
+  13 of 42 in slice 1 (of 1): Pcc_test-sample_14
+    - processing sentences...
+       ~ 0.2  seconds
+  14 of 42 in slice 1 (of 1): Pcc_test-sample_15
+Killed
+(stanza) [01;32marh234@Delilah[00m:[01;34m~/litotes[00m$ 
