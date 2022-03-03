@@ -514,35 +514,8 @@ def slice_df(full_df, data_source_label):
 
     for subcorpus_code, df in full_df.groupby('pile_set_code'):
         subcorpus_name = df.pile_set_name.iat[0]
-        print(f'Partitioning data in {subcorpus_name} subset')
-
-        # Andrea Hummel on Feb 11, 2022 at 9:13 PM
-        # Currently, `excl_df` is not passed into this method. Instead of
-        # getting it via a redundant call to `pull_exclusions()`
-        # (that happens in `clean_df()` now) it is loaded from where it
-        # was saved either in the previous call, or in a previous run
-        # of the script.
-        # If for some reason the exclusions file cannot be found, run again.
-        #    (but save with different name so as to not overwrite original.)
-        excl_save_path = get_dfpkl_outpath(data_source_label,
-                                           subcorpus_name, is_excl=True)
-
-        if excl_save_path.is_file():
-            excl_df = pd.read_pickle(excl_save_path)
-        else:
-            backup_path = excl_save_path.with_name(excl_save_path.name
-                                                   .split('.', 1)[0]+'-slicing.pkl.gz')
-            if backup_path.is_file():
-                excl_df = pd.read_pickle(backup_path)
-            else:
-                print('Warning: previous exclusions file could not be found. '
-                      'Reassessing data...')
-                df, excl_df = pull_exclusions(df, backup_path)
-
-            print('Excluded data alternate:',
-                  backup_path.relative_to(Path.cwd()))
-
-        print(f'{len(df)} total texts to parse')
+        print(f'Partitioning data in {subcorpus_name} subset\n'
+              f'{len(df)} total texts to parse')
 
         remaining_df = df.sort_values('text_id')
         slices = []
@@ -600,9 +573,32 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
     slice_number, __ = slice_id.split('.')
     subset_label = subset_label.capitalize()
 
-    excl_path = get_dfpkl_outpath(
-        data_source_label, subset_label, is_excl=True)
-    excl_df = pd.read_pickle(excl_path)
+    # below note was originally in `slice_df()`  but still relevant here
+    # Andrea Hummel on Feb 11, 2022 at 9:13 PM
+    # Currently, `excl_df` is not passed into this method. Instead of
+    # getting it via a redundant call to `pull_exclusions()`
+    # (that happens in `clean_df()` now) it is loaded from where it
+    # was saved either in the previous call, or in a previous run
+    # of the script.
+    # If for some reason the exclusions file cannot be found, run again.
+    #    (but save with different name so as to not overwrite original.)
+    excl_save_path = get_dfpkl_outpath(data_source_label, 
+                                       subset_label, is_excl=True)
+
+    if excl_save_path.is_file():
+        excl_df = pd.read_pickle(excl_save_path)
+    else:
+        backup_path = excl_save_path.with_name(excl_save_path.name
+                                               .split('.', 1)[0]+'-alt.pkl.gz')
+        if backup_path.is_file():
+            excl_df = pd.read_pickle(backup_path)
+        else:
+            print('Warning: previous exclusions file could not be found. '
+                  'Reassessing data...')
+            df, excl_df = pull_exclusions(df, backup_path)
+
+        print('Excluded data alternate:',
+              backup_path.relative_to(Path.cwd()))
 
     out_path = get_conllu_outpath(
         f'{data_source_label}-{slice_number}',
@@ -619,7 +615,7 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
 
     # save exclusions df
 
-    excl_df.to_pickle(excl_path)
+    excl_df.to_pickle(excl_save_path)
 
 
 ### raw processing functions ###
@@ -1017,11 +1013,21 @@ def try_redoc(ix, sent_list):
     return sent_list[:ix] + new_sentences + sent_list[ix+1:]
 
 
-def get_conllu_outpath(slice_name, subset):
+def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
     '''returns path for final conllu output files'''
-    subset = global_subset_abbr_dict.get(subset, subset)
-    out_fname = f'{subset.lower()}_eng_{slice_name}.conllu'
-    out_dir = Path.cwd().joinpath(f'{subset}.conll')
+    # ensure the *code* (e.g. Pcc) is used, not the *name*
+    subset = global_subset_abbr_dict.get(subset_label, subset_label.capitalize())
+    out_fname = f'{subset.lower()}_eng_{source_fname}-{slice_numstr.zfill(2)}.conllu'
+    
+    # create separate conll output dir for every original source file, 
+    # since it looks to be gigantic
+    try: 
+        conlldir_num = int(source_fname)
+    except ValueError: 
+        conlldir_id = 'X'
+    else: 
+        conlldir_id = str(conlldir_num).zfill(2)
+    out_dir = Path.cwd().joinpath(f'{subset}{conlldir_id}.conll')
 
     if not out_dir.is_dir():
         out_dir.mkdir()
