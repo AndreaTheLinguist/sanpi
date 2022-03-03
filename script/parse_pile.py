@@ -1013,11 +1013,21 @@ def try_redoc(ix, sent_list):
     return sent_list[:ix] + new_sentences + sent_list[ix+1:]
 
 
-def get_conllu_outpath(slice_name, subset):
+def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
     '''returns path for final conllu output files'''
-    subset = global_subset_abbr_dict.get(subset, subset)
-    out_fname = f'{subset.lower()}_eng_{slice_name}.conllu'
-    out_dir = Path.cwd().joinpath(f'{subset}.conll')
+    # ensure the *code* (e.g. Pcc) is used, not the *name*
+    subset = global_subset_abbr_dict.get(subset_label, subset_label.capitalize())
+    out_fname = f'{subset.lower()}_eng_{source_fname}-{slice_numstr.zfill(2)}.conllu'
+    
+    # create separate conll output dir for every original source file, 
+    # since it looks to be gigantic
+    try: 
+        conlldir_num = int(source_fname)
+    except ValueError: 
+        conlldir_id = 'X'
+    else: 
+        conlldir_id = str(conlldir_num).zfill(2)
+    out_dir = Path.cwd().joinpath(f'{subset}{conlldir_id}.conll')
 
     if not out_dir.is_dir():
         out_dir.mkdir()
