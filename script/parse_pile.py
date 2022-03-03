@@ -277,44 +277,11 @@ def clean_df(orig_df, tmp_save_path):
     df = df.assign(text=df.text.astype('string'),
                    raw=df.raw.astype('string'))
 
-    # Andrea Hummel on Feb 11, 2022 at 7:14 PM
-    # This was an attempt at fixing exclusions, if the offenses were minor. However,
-    # this is not consistent with the new approach of excluding texts that "*might* be
-    # problems" because they might cause **problems**. I.e. the point of pulling
-    # anything that might be messy or hard to parse text is so that those can be
-    # safely ignored for now while the *easier* stuff gets processed. Any fixing needs
-    # to be tabled, perhaps indefinitely.
-    #
-    # Keeping the `recheck` parameter and code in `pull_exclusions()` for now, but it
-    # will not be reached ever (i.e. is not called as a recheck)
-    #
-    # if not excl_df.empty:
-    #     clean_excl = excl_df.assign(
-    #         text=excl_df.text.apply(lambda t: bracket_url.sub(r'\1', t)))
-    #     clean_excl = clean_excl.assign(
-    #         text=clean_excl.text.apply(lambda t: likely_url.sub('', t)))
-    #     clean_excl = clean_excl.assign(
-    #         text=clean_excl.text.apply(
-    #             lambda t: punc_only.sub(r'\1\2\3\4\5\6\7\n\n', t)))
-    #     restore_to_df, still_excl_df = pull_exclusions(
-    #         clean_excl, excl_save_path, recheck=True)
-    #     # if any previous exclusions were not caught after cleaning attempts
-    #     # restore them to the main dataframe,
-    #     # and overwrite the saved exclusions file with only those remaining
-    #     if not restore_to_df.empty:
-    #         df.loc[restore_to_df.index.to_list(), :] = restore_to_df
-    #         still_excl_df.to_pickle(excl_save_path)
-
     # clean up internet syntax quirks
     print('+ Cleaning up text...\n   - punctuation delineated text breaks')
     df = df.assign(text=df.text.apply(
         lambda t: punc_only.sub(r'\1\2\3\4\5\6\7\n\n', t)))
 
-    # print('   - @ and # tagging...')
-    # df = df.assign(text=df.text.apply(
-    #     lambda t: re.sub(r'\@\w+(\s)', r' \<\@tag \1\>', t)))
-    # df = df.assign(text=df.text.apply(
-    #     lambda t: re.sub(r'\#(\w+\s)', r' \<\#tag \1\>', t)))
     print('   - title abbreviations at line breaks...')
     df = df.assign(
         text=df.text.apply(lambda t: end_of_line_abbr.sub(r'\1\2\5\6 \3\4', t)))
@@ -388,26 +355,9 @@ def pull_exclusions(df: pd.DataFrame,
 
     # flag texts that contain technical seeming strings and exclude for now
     print('  looking for other messy text...')
-    # likely_source_code = df.text.apply(
-    #     lambda t: bool(len(variable_regex.findall(t)) > 15
-    #                    or possible_code.search(t)))
-
-    # has_embedded_ids = df.text.apply(
-    #     lambda t: bool(len(likely_idtag.findall(t)) > 5))
-
-    # likely_hard_parsing = likely_source_code | has_embedded_ids
 
     df, excl_df, found_exclusions = exclude_regex(
         df, excl_df, found_exclusions)
-
-    # is_json = df.text.apply(lambda t: bool(json_pat.search(t)))
-    # if any(is_json):
-    #     found_exclusions = True
-    #     new_excl = df.loc[is_json, :]
-    #     new_excl = new_excl.assign(excl_type='json')
-    #     print(f'   +{len(new_excl)} exclusions')
-    #     excl_df = pd.concat([excl_df, new_excl])
-    #     df = df.loc[~df.text_id.isin(excl_df.text_id), :]
 
     # currently unreachable (no calls of function as recheck)
     if recheck:
@@ -485,26 +435,12 @@ def exclude_html(df):
     print('  looking for any html...')
     html_df = pd.DataFrame()
     is_html = df.text.apply(
-        lambda t: bool(
-            likely_html.search(t)
-            # BeautifulSoup(t, "html.parser").find()
-        ))
+        lambda t: bool(likely_html.search(t)))
 
     if any(is_html):
 
         html_df = df.loc[is_html, :]
         df = df.loc[~is_html, :]
-
-        # html_text = htmldf.text.apply(
-        #     lambda t:
-        #     BeautifulSoup(t, "html.parser").get_text()).astype('string')
-        # htmldf = htmldf.assign(text=html_text)
-        # if any(htmldf.text.isna()):
-        #     htmldf.loc[htmldf.text.isna(), 'text']
-
-        # df.loc[is_html, ['raw', 'text']] = (htmldf.loc[:, ['raw', 'text']]
-        #                                     .astype('string'))
-        # df.to_pickle(tmp_save_path)
 
     print(f'   +{len(html_df)} exclusions')
     return df, html_df
@@ -800,24 +736,29 @@ def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_nu
             subdf = subdf.assign(orig_text_id=subdf.text_id)
             __, file_label, __ = subdf.orig_text_id.iloc[0].split(
                 '_')
+            # e.g. pcc_eng_00_01.
             prefix = f'{code}_eng_{file_label}_{zfilled_slice_num}.'
-            # then add... '{slice_ix.zfill}-{jsonl_ix}
 
         # start at 1 instead of 0
         idnums = subdf.index + 1
         zfill_len = len(str(df.index.max()))
         idnums = idnums.astype('string').str.zfill(zfill_len)
 
+        # e.g. pcc_val_00001; pcc_eng_00_01.0001
         subdf = subdf.assign(id_stem=prefix + idnums)
+
         if sliceix:
             subdf = subdf.assign(
+                # e.g. pcc_eng_00_01.0001_x000003 (indices may not match)
                 text_id=(subdf.id_stem + '_x'
                          + subdf.text_id.str.rsplit('_', 1).str.get(1)))
         else:
+            # e.g. pcc_val_00001
             subdf = subdf.assign(text_id=subdf.id_stem)
 
         subdf.pop('id_stem')
         codedf = pd.concat([codedf, subdf])
+
     codes_t1 = time.perf_counter()
     print(f'  ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
 
@@ -867,7 +808,11 @@ def stanza_parse(df, output_path, excl_df, filenum, total: str):
                       'reason unknown). Added to exclusions.')
 
             else:
-                process_sentences(row_df, conlloutput, doc)
+                doc = process_sentences(row_df, conlloutput, doc)
+                
+                # write conll formatted string of doc to output file
+                conlloutput.write(doc2conll_text(doc))
+                
                 successes += 1
 
             parse_t1 = time.perf_counter()
@@ -908,8 +853,7 @@ def process_sentences(row_df, conlloutput, doc):
         # this adds the full text string to the output file
         sentence.add_comment(f'# text = {text}')
 
-        # write conll formatted string of doc to output file
-    conlloutput.write(doc2conll_text(doc))
+    return doc
 
 
 def confirm_parse(doc):
