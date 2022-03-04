@@ -210,7 +210,14 @@ def process_pickledf(dfiles):
             tmpdfpath = (get_dfpkl_outpath(dfpath.stem, is_tmp=True)
                          if dfpath.parent.name == 'raw'
                          else dfpath)
+            
             df = clean_df(df, tmpdfpath)
+            # raw column will no longer be saved to finalized dataframe output
+            # dataframes in `raw/` will have only `raw`
+            # dataframes in `tmp/` will have both `raw` and `text` 
+            # (tmp dfs are saved in `clean_df()`)
+            # dataframes in the parent dir, `pile_tables` will have only `text`
+            df.pop('raw')
             df.to_pickle(get_dfpkl_outpath(dfpath.stem))
 
         else:
@@ -239,6 +246,8 @@ def clean_df(orig_df, tmp_save_path):
             text_id=orig_df.text_id.str.replace('PiCC', 'pcc')
             .str.lower().astype('category'))
 
+    # if it doesn't have `text` column it should have `raw` column
+    #   i.e. should be from the `raw/` directory
     if 'text' not in orig_df.columns:
         orig_df = orig_df.assign(text=orig_df.raw)
 
@@ -270,7 +279,7 @@ def clean_df(orig_df, tmp_save_path):
 
     print('+ Excluding messy data...')
     excl_save_path = get_dfpkl_outpath(tmp_save_path.stem, is_excl=True)
-    df, excl_df = pull_exclusions(orig_df, excl_save_path)
+    df, __ = pull_exclusions(orig_df, excl_save_path)
 
     df.to_pickle(tmp_save_path)
 
