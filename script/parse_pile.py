@@ -4,7 +4,7 @@ import sys
 import time
 import zlib
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 from json import loads as jsloads
 from pathlib import Path
 from pprint import pprint
@@ -20,6 +20,8 @@ from pile_regex_imports import *
 
 doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 
+global_start_time = datetime.now()
+print(f'started: {global_start_time.ctime()}')
 global_output_limit = 10000
 pd.set_option('display.max_colwidth', 80)
 global_char_replacement = '<__?UNK__>'
@@ -48,7 +50,6 @@ except stanza.pipeline.core.ResourcesFileNotFoundError:
 
 
 def main():
-    print('started:', datetime.now().ctime())
     args = parse_arg_inputs()
     input_files = args.input_files
     df_files = []
@@ -342,19 +343,17 @@ def pull_exclusions(df: pd.DataFrame,
                     recheck: bool = False):
 
     print('  pulling excluded formats...')
-    excl_df = pd.DataFrame()
+    excl_df = pd.DataFrame(
+        columns=['text_id', 'slice_id', 'excl_type', 'text',
+                 'pile_set_name', 'pile_set_code'])
     loaded_from_file = False
     found_exclusions = False
     prev_excl_count = 0
     if excl_save_path.is_file() and not recheck:
         loaded_from_file = True
         prev_excl = pd.read_pickle(excl_save_path)
-        if 'raw' not in prev_excl.columns:
-            excl_df = prev_excl.assign(raw=prev_excl.text,
-                                       excl_type=None)
-        else:
-            excl_df = prev_excl.assign(excl_type=None)
-
+        excl_df = pd.concat([excl_df, prev_excl],
+                            ignore_index=True)
         df = df.loc[~df.text_id.isin(excl_df.text_id)]
         prev_excl_count = len(excl_df)
         print(f'  -> {prev_excl_count} previously '
@@ -428,7 +427,16 @@ def pull_exclusions(df: pd.DataFrame,
             print('all prev exclusions remain')
 
     else:
+
+        # remove `raw` column for exclusion dataframes
+        # (any added later due to failed parsing attempts will not
+        #  have the `raw` column, and this info can always be
+        # retrieved from dataframes in `raw/` if needed)
+        if 'raw' in excl_df.columns:
+            excl_df.pop('raw')
+
         # only save if (new) texts were marked as exclusions
+        #   or if no pre-existing file (to prevent researching later)
         if found_exclusions:
             excl_df.to_pickle(excl_save_path)
             print(f'  = {len(excl_df)} exclusions '
@@ -582,20 +590,39 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
     slice_number, __ = slice_id.split('.')
     subset_label = subset_label.capitalize()
 
+    out_path = get_conllu_outpath(data_source_label, slice_number,
+                                  subset_label)
+
+    # parse slice and write to conllu output file
+    successful_df = stanza_parse(
+        dfslice, out_path, slice_number, slices_total_str)
+
+    # save version of dataframe for all texts actually processed
+    successful_df.to_pickle(
+        get_dfpkl_outpath(data_source_label, subset_label,
+                          slice_num=slice_number))
+
+    if len(successful_df) == len(dfslice):
+        print('No skipped texts added to exclusions')
+        return
+
+    # if any texts failed,
+    #   load previous exclusions file to add them
     # below note was originally in `slice_df()`  but still relevant here
-    # Andrea Hummel on Feb 11, 2022 at 9:13 PM
-    # Currently, `excl_df` is not passed into this method. Instead of
-    # getting it via a redundant call to `pull_exclusions()`
-    # (that happens in `clean_df()` now) it is loaded from where it
-    # was saved either in the previous call, or in a previous run
-    # of the script.
-    # If for some reason the exclusions file cannot be found, run again.
-    #    (but save with different name so as to not overwrite original.)
+    #     Feb 11, 2022 at 9:13 PM
+    #       Currently, `excl_df` is not passed into this method. Instead of
+    #     getting it via a redundant call to `pull_exclusions()`
+    #     (that happens in `clean_df()` now) it is loaded from where it
+    #     was saved either in the previous call, or in a previous run
+    #     of the script.
+    #     If for some reason the exclusions file cannot be found, run again.
+    #        (but save with different name so as to not overwrite original.)
     excl_save_path = get_dfpkl_outpath(data_source_label, 
                                        subset_label, is_excl=True)
-
     if excl_save_path.is_file():
         excl_df = pd.read_pickle(excl_save_path)
+        print('Adding skipped texts to', excl_save_path.relative_to(Path.cwd()))
+
     else:
         backup_path = excl_save_path.with_name(excl_save_path.name
                                                .split('.', 1)[0]+'-alt.pkl.gz')
@@ -606,24 +633,20 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
                   'Reassessing data...')
             df, excl_df = pull_exclusions(df, backup_path)
 
-        print('Excluded data alternate:',
+        print('Exclusions file could not be found. Saving skipped texts to ',
               backup_path.relative_to(Path.cwd()))
 
-    out_path = get_conllu_outpath(
-        f'{data_source_label}-{slice_number}',
-        subset_label)
-
-    excl_df = stanza_parse(dfslice, out_path, excl_df,
-                           slice_number, slices_total_str)
-
-    # save version of dataframe for all texts actually processed
-    actual_slice = dfslice[~dfslice.isin(excl_df)]
-    actual_slice.to_pickle(
-        get_dfpkl_outpath(data_source_label, subset_label,
-                          slice_num=slice_number))
+    # add any skipped texts/rows
+    skip_df = dfslice.loc[~dfslice.text_id.isin(successful_df.text_id), :]
+    skip_df = skip_df.assign(excl_type='fail',
+                             slice_id=skip_df.text_id,
+                             text_id=skip_df.orig_text_id).reset_index()
+    skip_df.pop('orig_text_id')
+    excl_df = pd.concat([excl_df, skip_df], axis=0, ignore_index=True)
+    print(f'{len(skip_df)} texts added to exclusions (with excl_type="fail"):')
+    print(skip_df[['text_id', 'slice_id', 'excl_type']])
 
     # save exclusions df
-
     excl_df.to_pickle(excl_save_path)
 
 
@@ -835,25 +858,26 @@ def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_nu
 ### parsing functions ###
 
 
-def stanza_parse(df, output_path, excl_df, filenum, total: str):
+def stanza_parse(df, output_path, filenum, total_num_slices: str):
     # TODO : change POS to XPOS; remove extra features?
-
-    slice_total = len(df)
-    print(
-        f'Starting output {filenum} of {total}: {slice_total} texts in current slice')
+    # really just a way to initiate a boolean series of the right length
+    # all rows should be False at this point
+    row_skipped = df.text.isna()
+    num_texts_in_slice = len(df)
+    print(f'Starting output {filenum} of {total_num_slices}: '
+          f'{num_texts_in_slice} texts in current slice')
     # open output file for conll formatted data
     print(f'  parsed data will be written to {output_path}')
     with output_path.open(mode='w') as conlloutput:
         # for each text in the pile subset...
-        successes = 0
         for position_in_slice, ix in enumerate(df.index):
             # `position_in_slice` should only be used for ordinal/counting
             parse_t0 = time.perf_counter()
             row_df = df.loc[[ix], :]
 
             text_id = row_df.text_id.squeeze()
-            print(f'  {position_in_slice+1} of {slice_total} '
-                  f'in slice {filenum} (of {total}): {text_id}')
+            print(f'  {position_in_slice+1} of {num_texts_in_slice} '
+                  f'in slice {filenum} (of {total_num_slices}): {text_id}')
 
             textstr = row_df.text.squeeze()
 
@@ -864,29 +888,35 @@ def stanza_parse(df, output_path, excl_df, filenum, total: str):
             except ValueError:
                 pass
             else:
-                print(f'    in json format. Added to exclusions.')
-                excl_df = pd.concat([excl_df, row_df])
+                print(f'    in json format. Skipping.')
+                row_skipped.loc[ix] = True
 
             # create doc (with parsing)
             try:
                 doc = nlp(textstr)
             except RuntimeError:
-                excl_df = pd.concat([excl_df, row_df])
                 print('WARNING! Excluding unparsable text. (runtime error, '
-                      'reason unknown). Added to exclusions.')
+                      'reason unknown). Skipping.')
+                row_skipped.loc[ix] = True
 
             else:
                 process_sentences(row_df, conlloutput, doc)
-                successes += 1
 
             parse_t1 = time.perf_counter()
             print(f'       ~ {round(parse_t1 - parse_t0, 1)}  seconds')
 
-    print(f'Finished writing parses to {output_path}')
-    print(datetime.now().ctime())
-    print(f'= {successes} of {len(df)} texts successfully parsed.')
+    t = datetime.now()
+    print(f'Finished writing parses to {output_path}\n@{t.ctime()}]')
 
-    return excl_df
+    delta = timedelta(seconds=round(
+        t.timestamp() - global_start_time.timestamp()))
+    print(f'  current script runtime: {delta}')
+
+    successful_df = df.loc[~row_skipped, :]
+    print(f'= {len(successful_df)} of '
+          f'{num_texts_in_slice} texts successfully parsed.')
+
+    return successful_df
 
 
 def process_sentences(row_df, conlloutput, doc):
@@ -1025,7 +1055,8 @@ def try_redoc(ix, sent_list):
 def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
     '''returns path for final conllu output files'''
     # ensure the *code* (e.g. Pcc) is used, not the *name*
-    subset = global_subset_abbr_dict.get(subset_label, subset_label.capitalize())
+    subset = global_subset_abbr_dict.get(
+        subset_label, subset_label.capitalize())
     out_fname = f'{subset.lower()}_eng_{source_fname}-{slice_numstr.zfill(2)}.conllu'
     
     # create separate conll output dir for every original source file, 
@@ -1046,3 +1077,8 @@ def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
 
 if __name__ == '__main__':
     main()
+    end_time = datetime.now()
+    elapsed = str(timedelta(seconds=round(
+        end_time.timestamp() - global_start_time.timestamp())))
+    print(f'\n====================\nScript Completed: {end_time.ctime()}\n '
+          f'= total elapsed time: {elapsed}')
