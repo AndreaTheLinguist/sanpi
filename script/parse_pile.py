@@ -3,6 +3,7 @@ import argparse
 import sys
 import time
 import zlib
+from itertools import groupby
 from collections import namedtuple
 from datetime import datetime, timedelta
 from json import loads as jsloads
@@ -12,8 +13,6 @@ from pprint import pprint
 import jsonlines
 import pandas as pd
 import stanza
-
-# from bs4 import BeautifulSoup
 from unidecode import unidecode
 
 from pile_regex_imports import *
@@ -31,10 +30,12 @@ global_subset_abbr_dict = {'Gutenberg (PG-19)': 'PG19',
                            'Pile-CC': 'Pcc',
                            'OpenWebText2': 'OWT2'}
 # initiate language model for dependency parsing (load just once)
-# Note:
-#   standfordNLP does not have multi-word token (mwt) expansion
-#   for English, so `mwt` processor is not required for dependency parsing
-#   (https://github.com/stanfordnlp/stanza/issues/297#issuecomment-627673245)
+'''
+*Note:
+   standfordNLP does not have multi-word token (mwt) expansion
+   for English, so `mwt` processor is not required for dependency parsing
+   (https://github.com/stanfordnlp/stanza/issues/297#issuecomment-627673245)
+'''
 try:
     print('Loading dependency parsing pipeline...')
     nlp = stanza.Pipeline(
@@ -50,58 +51,322 @@ except stanza.pipeline.core.ResourcesFileNotFoundError:
 
 
 def main():
+    # TODO: debug the changes to file selection and structuring
     args = parse_arg_inputs()
     input_files = args.input_files
-    df_files = []
-    js_files = get_rawfile_list(args)
+    search_dir = args.search_dir
+    init_df_paths = []
+    init_js_paths = get_jsonl_paths(args)
 
-    if js_files:
-        subcorpora_list = args.corpus_selection
-        print('\nraw jsonlines files will be processed for the following subcorpora: ')
-        pprint(subcorpora_list)
-        print('')
-
+    # if there were input files given via the `-i` flag
     if input_files:
-        df_files = [p.resolve()
-                    for p in input_files
-                    if p.name.endswith('pkl') or p.stem.endswith('pkl')]
-    # won't have both jsonl and pkl.gz files in the same directory
-    elif not js_files and args.search_dir:
-        print(f'seeking all `.df.pkl` files in {args.search_dir}')
-        df_files = [p.resolve() for p in args.search_dir.glob('*pkl.gz')]
-    print('Dataframes to be processed:')
-    pprint(df_files)
+        init_df_paths = [p.resolve() for p in input_files
+                         if '.pkl' in p.suffixes]
 
-    if df_files:
-        presliced_files = [f for f in df_files
-                           if 'slices' in (f.parent.name, f.parent.parent.name)]
-        fulldf_files = [f for f in df_files if f not in presliced_files]
+    # won't have both jsonl and pkl.gz files in the same directory
+    elif not init_js_paths:
+        print('seeking all dataframe files in '
+              f'{search_dir} and subdirectories')
+        init_df_paths = [p.resolve() for p in search_dir.rglob('*.pkl*')]
+
+    data_selection = init_js_paths + init_df_paths
+    # if jsonl paths were input or selected via directory search
+    if data_selection:
+        js_paths, df_paths = check_status(args, data_selection)
+
+    if not df_paths + js_paths:
+        sys.exit('No valid files in need of processing. Exiting.')
+
+    if js_paths:
+        subcorpora_list = args.corpus_selection
+        print('\nsubcorpora selection: ')
+        pprint(subcorpora_list)
+
+    if df_paths:
+        print('Dataframes to be processed:')
+        pprint([str(path) for path in df_paths])
+        slice_paths = [p for p in df_paths if 'slices' in p.parts]
+        fulldf_files = list(set(df_paths) - set(slice_paths))
 
         for df, data_source_label in process_pickledf(fulldf_files):
             slice_df(df, data_source_label)
 
-        for slice_path in presliced_files:
+        for slice_path in slice_paths:
             print('processing dataframe slice',
                   slice_path.relative_to(Path.cwd()))
 
-            if slice_path.parent.name != 'tmp' or slice_path.parent.parent.joinpath(slice_path.name).is_file():
-                print('This slice has already been fully processed. Skipping.\n'
-                      '   (To *reprocess*, delete file from `slices/`')
-                continue
-
             process_slice(pd.read_pickle(slice_path))
 
-    if js_files:
-        for df, data_source_label in process_raw_jsonlines(js_files, subcorpora_list):
+    if js_paths:
+        for df, data_source_label in process_raw_jsonlines(js_paths, subcorpora_list):
             slice_df(df, data_source_label)
+
+
+def check_status(args, data_selection):
+    js_paths = []
+    df_paths = []
+    print('seeking existing progress on selected files...'
+          '\n---------------')
+    for datapath in data_selection:
+        fname = datapath.name
+        print('\n',datapath.relative_to(Path.cwd()))
+        if not datapath.is_file():
+            print(' x - does not exist! Skipping.')
+            continue
+
+        datadir = datapath.parent
+        path_mod_time = datapath.stat().st_mtime
+        data_file_stem = datapath.stem
+        is_df = '.pkl' in datapath.suffixes
+        is_js = datapath.suffix == '.jsonl'
+        is_slice = 'slices' in datapath.parts
+        pile_set_name = (args.corpus_selection if is_js
+                         else data_file_stem.split('_')[2])
+        data_group = (data_file_stem if is_js
+                      else data_file_stem.split('_')[1])
+
+        if is_df and is_slice:
+            finished_slice = (datadir.parent.joinpath(fname)
+                              if datadir.name == 'tmp' else datapath)
+
+            if (finished_slice.exists()
+                    and finished_slice.stat().st_mtime >= path_mod_time):
+
+                has_conllu = confirm_conllu(finished_slice)
+                if not has_conllu:
+                    df_paths.append(finished_slice)
+                    if finished_slice != datapath:
+                        print(' -> final slice df file:',
+                              finished_slice.relative_to(Path.cwd()))
+                    else: 
+                        print(' -> No previous processing found.')
+
+            else:
+                df_paths.append(datapath)
+                print(' -> No previous processing found.')
+
+            continue
+
+        # slice df files will not match this filename
+        finalfull_dfpath = get_dfpkl_outpath(data_group,
+                                             pile_set_name)
+        toplevel_dfdir = finalfull_dfpath.parent
+        fulldf_filename = finalfull_dfpath.name
+        # TODO : save slice info to "finished" slice dir, above `tmp/`
+        slices_info_glob = toplevel_dfdir.glob(
+            f'slices/**/{data_group}_slice_index.csv')
+        try:
+            newest_sliceinfo_path = most_recent(slices_info_glob)
+        except ValueError:
+            pass
+        else:
+            # TODO: add file path info (tmp slices, finished slices, and corresponding conllu paths)
+            slice_info = pd.read_csv(newest_sliceinfo_path)
+
+            parent_dir = newest_sliceinfo_path.parent
+            slice_dir = parent_dir.parent if parent_dir.name == 'tmp' else parent_dir
+            slice_fname_pattern = f'pile_{data_group}-*.pkl*'
+            # TODO : finished slices are not saved to the data_grouped directory, but to top level of slices/. Fix!
+            complete = []
+            incomplete = []
+            final_slices = list(slice_dir.glob(slice_fname_pattern))
+            for f in final_slices:
+                if confirm_conllu(f):
+                    complete.append(f)
+                else:
+                    incomplete.append(f)
+            tmp_slices = [
+                path for path
+                in slice_dir.joinpath('tmp').glob(slice_fname_pattern)
+                if path.name not in (f.name for f in final_slices)
+            ]
+            incomplete += tmp_slices
+            # *if slices exist
+            if incomplete:
+                df_paths += incomplete
+                print(' -> df slices:')
+                for f in incomplete:
+                    print('  +', f.relative_to(Path.cwd()))
+                continue
+            if complete:
+                print(' + All slices have been fully processed into conllu files.')
+                continue
+
+        matching_fulldfs = tuple(Path.cwd().rglob(
+            f'pile_tables/**/{fulldf_filename}'))
+
+        if not matching_fulldfs and is_js:
+            js_paths.append(datapath)
+            print(' -> No previous processing found.')
+            continue
+
+        final_df_list = [p for p in matching_fulldfs
+                         if not {'tmp', 'raw'}.intersection(set(p.parts))]
+
+        if final_df_list:
+            final_df_path = most_recent(final_df_list)
+            if final_df_path.stat().st_mtime >= path_mod_time:
+                df_paths.append(final_df_path)
+                if final_df_path != datapath:
+                    print(' -> final full df:\n  +',
+                          final_df_path.relative_to(Path.cwd()))
+                else:
+                    print(' -> No previous processing found.')
+        else:
+            tmp_df_list = [p for p in matching_fulldfs
+                           if 'tmp' in p.parts]
+            if tmp_df_list:
+
+                tmp_df_path = most_recent(tmp_df_list)
+                if tmp_df_path.stat().st_mtime >= path_mod_time:
+                    df_paths.append(tmp_df_path)
+                    if tmp_df_path != datapath:
+                        print(' -> partially processed df:\n  +',
+                              tmp_df_path.relative_to(Path.cwd()))
+                    else:
+                        print(' -> No previous processing found.')
+
+            else:
+                raw_df_list = [p for p in matching_fulldfs
+                               if 'raw' in p.parts]
+                try:
+                    raw_df_path = most_recent(raw_df_list)
+                except ValueError:
+
+                    print('Error in file selection. No final, tmp, or raw dataframe '
+                          'files found in paths matching dataframe paths:')
+                    pprint([str(m) for m in matching_fulldfs])
+
+                else:
+                    if raw_df_path.stat().st_mtime >= path_mod_time:
+                        df_paths.append(raw_df_path)
+                        if raw_df_path != datapath:
+                            print(' -> raw df:\n  +',
+                                  raw_df_path.relative_to(Path.cwd()))
+                        else:
+                            print(' -> No previous processing found.')
+
+    # remove duplicates
+    df_paths = list(set(df_paths))
+    js_paths = list(set(js_paths))
+    print('---------------')
+    return js_paths, df_paths
+
+
+def confirm_conllu(final_slice: Path):
+    pile_set_name = final_slice.stem.split('_')[2]
+    data_group = final_slice.stem.split('_')[1]
+    data_group, slice_num = data_group.rsplit('-', 1)
+    path_mod_time = final_slice.stat().st_mtime
+    has_conllu = False
+    conllu_path = get_conllu_outpath(data_group, slice_num,
+                                     pile_set_name)
+    #! final slice files are saved *after* conllu is finished
+    if (conllu_path.is_file()
+        and conllu_path.stat().st_mtime < path_mod_time):
+
+        print(' ! already has corresponding conllu file',
+              conllu_path.relative_to(Path.cwd()),
+              '\n  = processing complete. Skipping.')
+        has_conllu = True
+    return has_conllu
+
+    # see if dataframe already exists
+    # tmp_df_path = get_dfpkl_outpath(data_group, subcorpus_label=pile_set_name, is_tmp = True)
+    # final_df_path = tmp_df_path.parent.joinpath(tmp_df_path.name)
+    # raw_df_path = tmp_df_path.parent.joinpath('raw').joinpath(tmp_df_path.name)
+
+    # if is_js and no slices_info, slices do not exist
+
+    # datadir = datapath.parent
+    # # * this one will apply to both full and sliced dataframes
+    # tmp_without_final = (datadir.name == 'tmp'
+    #                      and not datadir.parent.joinpath(fname).is_file())
+    # raw_without_tmp = (datadir.name == 'raw'
+    #                    and not datadir.joinpath(f'tmp/{fname}').is_file())
+    # full_without_slices = (datadir.name == 'pile_tables'
+    #                        and not datadir.joinpath('slices').rglob(f'{data_file_stem.rsplit("_",2)[0]}*pkl*'))
+
+    # if tmp_without_final or raw_without_tmp:
+    #     if is_js:
+    #         js_paths.append(datapath)
+    #     else:
+    #         df_paths.append(datapath)
+
+    # elif final_df_path.is_file():
+
+    #     # check to see if finished parsing, or at least sliced
+    #     slice_dir_tmp = get_dfpkl_outpath(
+    #         data_file_stem, slice_num=0,
+    #         subcorpus_label='_', is_tmp=True).parent
+
+    #     preliminary_slices = set(slice_dir_tmp.iter_dir())
+
+    #     if preliminary_slices:
+    #         slice_dir_final = slice_dir_tmp.parent
+    #         finished_slices = set(slice_dir_final.iter_dir())
+    #         unfinished_slices = preliminary_slices - finished_slices
+
+    #         if unfinished_slices:
+    #             print(
+    #                 f'Sliced dataframes already present. Redirecting.')
+    #             df_paths += list(unfinished_slices)
+
+    #         else:
+    #             conllu_outputs = list(
+    #                 get_conllu_outpath(data_group, '', pile_set_name).parent.glob('*conllu'))
+    #             if len(conllu_outputs) == len(list(finished_slices)):
+    #                 print(
+    #                     f'{data_file_stem} has same number of files in '
+    #                     'final slice dir as conllu dir = processing finished. Skipping.')
+
+    #     else:
+    #         print(
+    #             f'Finalized dataframe already exists. Redirecting.')
+    #         df_paths.append(final_df_path)
+
+    # # if no finalized dataframe, check for previous stages of work
+    # elif tmp_df_path.is_file():
+    #     print(
+    #         'Partially processed dataframe already present. Redirecting.')
+    #     df_paths.append(tmp_df_path)
+
+    # elif raw_df_path.is_file():
+    #     print(
+    #         'Dataframe (unprocessed) already present. Redirecting.')
+    #     df_paths.append(raw_df_path)
+
+    # else:
+    #     print('No previous progress found. Keeping.',
+    #           fname)
+    #     if is_df:
+    #         df_paths.append(datapath)
+
+    #     elif is_js:
+    #         js_paths.append(datapath)
+
+
+def most_recent(Path_iter):
+    """returns the most recently modified path from an iterable of PosixPaths
+
+    Args:
+        Path_iter (iterable): iterable of PosixPath objects
+
+    Returns:
+        PosixPath: most recently modified path
+    """
+    return max(
+        (path.stat().st_mtime, path) for path in Path_iter)[1]
 
 
 def parse_arg_inputs():
 
     parser = argparse.ArgumentParser(
         description='script to convert scrambled pile data from raw jsonlines format '
-        'into dependency parsed conllu files.'
-        'Required packages: stanza, unidecode, and pandas')
+        'into dependency parsed conllu files. Note that if neither input files nor a '
+        'search directory is specified, the calling directory AND subdirectories '
+        'will be searched for dataframe files'
+        '*Required packages: stanza (stanford), unidecode, zlib, and pandas')
 
     parser.add_argument(
         '-i', '--input_file',
@@ -124,53 +389,29 @@ def parse_arg_inputs():
               ' Flag can be reused: '
               'All flagged paths will be appended to selection list'))
 
-    # parser.add_argument(
-    #     '-f', '--jsonl_file_path',
-    #     type=Path, action='append', dest='jsonl_files',
-    #     help=('OLD: flag to point to raw pile jsonlines file path to parse. Flag can be reused: '
-    #           'All flagged paths will be appended to file list. If no file or dataframe '
-    #           '(below) flags are included, '
-    #           'all .jsonl data files will be run.'))
-
-    # parser.add_argument(
-    #     '-d', '--dataframe',
-    #     type=Path, action='append', dest='df_files',
-    #     help=('OLD: If a pickle/.pkl(.gz) of the processed dataframe already exists from a previous run '
-    #           '(saved in `[cwd]/pile_tables/`), use this '
-    #           'option to specify its path and skip the first step of the script. This flag can be reused: '
-    #           'all specified paths will be appended to `df_files`. *NOTE*: -f and -d flags can be run together,'
-    #           'so make sure they are not redundant!'))
-
+    # TODO : maybe add argument to force reprocessing inputs? even if there is a "later" save point
     return parser.parse_args()
 
 
-def get_rawfile_list(args):
+def get_jsonl_paths(args):
     inputs = args.input_files
     search_dir = args.search_dir
-    print('+ raw files selected to process:')
-    jsonl_list = []
+    print('+ raw jsonl files selected to process:')
+    jsonl_list = None
 
     if inputs:
-        jsonl_list = [i.resolve()
-                      for i in inputs if i.name.endswith('jsonl')]
-    # if args.jsonl_files:
-    #     files_list = [f.resolve() for f in args.jsonl_files]
-    # # only do a glob search of directory if no pkl files given
-    # elif not args.df_files:
-    #     files_list = list(Path.cwd().glob('**/*jsonl'))
-    #     # note: can't print files_iter here bc it's a generator obj
+        jsonl_list = [i.resolve() for i in inputs if i.suffix == '.jsonl']
+
     elif search_dir.is_dir():
         print('seeking all `.jsonl` files in', search_dir)
-        jsonl_list = list(search_dir.glob('**/*jsonl'))
+        jsonl_list = list(search_dir.rglob('*.jsonl'))
 
     else:
-        sys.exit(
-            'Error: No input files or valid search directory specified. See --help for more info.')
+        sys.exit('Error: No input files or valid search '
+                 'directory specified. See --help for more info.')
 
-    if jsonl_list:
-        pprint(jsonl_list)
-    else:
-        print('[no raw data files to be processed]')
+    pprint([str(path) for path in jsonl_list])
+
     return jsonl_list
 
 
@@ -211,13 +452,15 @@ def process_pickledf(dfiles):
             tmpdfpath = (get_dfpkl_outpath(dfpath.stem, is_tmp=True)
                          if dfpath.parent.name == 'raw'
                          else dfpath)
-            
             df = clean_df(df, tmpdfpath)
-            # raw column will no longer be saved to finalized dataframe output
-            # dataframes in `raw/` will have only `raw`
-            # dataframes in `tmp/` will have both `raw` and `text` 
-            # (tmp dfs are saved in `clean_df()`)
-            # dataframes in the parent dir, `pile_tables` will have only `text`
+
+            ''' 
+            raw column will no longer be saved to finalized dataframe output
+                dataframes in `raw/` will have only `raw`
+                dataframes in `tmp/` will have both `raw` and `text`
+                (tmp dfs are saved in `clean_df()`)
+                dataframes in the parent dir, `pile_tables` will have only `text`
+            '''
             df.pop('raw')
             df.to_pickle(get_dfpkl_outpath(dfpath.stem))
 
@@ -367,7 +610,7 @@ def pull_exclusions(df: pd.DataFrame,
     df, excl_df, found_exclusions = exclude_regex(
         df, excl_df, found_exclusions)
 
-    # currently unreachable (no calls of function as recheck)
+    #! currently unreachable (no calls of function as recheck)
     if recheck:
         if not found_exclusions:
             print('all previously flagged exclusions have been fixed by simple cleanup')
@@ -378,7 +621,7 @@ def pull_exclusions(df: pd.DataFrame,
 
     else:
 
-        # remove `raw` column for exclusion dataframes
+        # * remove `raw` column for exclusion dataframes
         # (any added later due to failed parsing attempts will not
         #  have the `raw` column, and this info can always be
         # retrieved from dataframes in `raw/` if needed)
@@ -495,27 +738,45 @@ def slice_df(full_df, data_source_label):
         # this must be outdented to catch smaller dataframes
         slices.append(remaining_df)
         slices_total_str = str(len(slices))
+        zfill_len = len(slices_total_str)
         # Andrea Hummel on Feb 3, 2022 at 4:45 PM
-        # Note that this first save of the dataframe slices is *after* `pull_exclusions()`
-        # is called, so to get the full set of texts covered in the full dataframe, need
-        # to look at the union of the slices _and_ the corresponding exclusions dataframe.
-        for i, sdf in enumerate(slices):
-            # starting at i = 0 meant the first slice wasn't
-            # getting saved bc if slice_num was evaluating as False
-            slice_num = i+1
-            slice_zfilled = str(slice_num).zfill(len(str(len(slices))))
+        # * Note that this first save of the dataframe slices is *after* `pull_exclusions()`
+        #   is called, so to get the full set of texts covered in the full dataframe, need
+        #   to look at the union of the slices _and_ the corresponding exclusions dataframe.
+        slice_labels = [str(x+1).zfill(zfill_len) for x in range(len(slices))]
+        slice_info = pd.DataFrame(columns=['total_texts', 'first_text_id', 'last_text_id'],
+                                  index=slice_labels)
+        for i, zipped in enumerate(zip(slice_labels, slices)):
+            # slice numbering starts at 1, not 0
+            slice_zfilled, sdf = zipped
+
+            # update text ids
             sdf = create_ids(sdf, zfilled_slice_num=slice_zfilled)
+
+            # reassign modified dataframe to list of slices
             slices[i] = sdf
-            print(f'slice {slice_num}: ({len(sdf)} texts)\n  {sdf.text_id.iloc[0]}'
-                  f'\n  ...\n  {sdf.text_id.iloc[-1]}')
+
+            # save slice dataframe as compressed pickle
             outpath = get_dfpkl_outpath(
                 data_source_label, subcorpus_code,
-                slice_num=slice_num, is_tmp=True)
+                slice_id=slice_zfilled, is_tmp=True)
             sdf.to_pickle(outpath)
 
-        # this needs to be its own loop so that all the slices can be saved
-        # before any of them are processed
-        # (which takes a long time and has a high likelihood of crashing)
+            # add info on slice to slice_info meta dataframe
+            first_id = sdf.text_id.iloc[0]
+            last_id = sdf.text_id.iloc[-1]
+            texts_in_slice = len(sdf)
+            # print(f'slice {slice_zfilled}: ({texts_in_slice} texts)\n  {first_id}'
+            #       f'\n  ...\n  {last_id}')
+            slice_info.iloc[i, :] = [texts_in_slice, first_id, last_id]
+
+        # and save slice_info same directory when complete
+        slice_info.to_csv(outpath.with_name(
+            f'{data_source_label}_slice_index.csv'))
+
+        #! this needs to be its own loop so that all the slices can be saved
+        #   before any of them are processed
+        #   (which takes a long time and has a high likelihood of crashing)
         for sdf in slices:
             process_slice(sdf, slices_total_str)
 
@@ -535,8 +796,8 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
 
     # save version of dataframe for all texts actually processed
     successful_df.to_pickle(
-        get_dfpkl_outpath(data_source_label, subset_label,
-                          slice_num=slice_number))
+        get_dfpkl_outpath(data_source_label, subcorpus_label=subset_label,
+                          slice_id=slice_number))
 
     if len(successful_df) == len(dfslice):
         print('No skipped texts added to exclusions')
@@ -553,7 +814,7 @@ def process_slice(dfslice: pd.DataFrame, slices_total_str: str = '?'):
     #     of the script.
     #     If for some reason the exclusions file cannot be found, run again.
     #        (but save with different name so as to not overwrite original.)
-    excl_save_path = get_dfpkl_outpath(data_source_label, 
+    excl_save_path = get_dfpkl_outpath(data_source_label,
                                        subset_label, is_excl=True)
     if excl_save_path.is_file():
         excl_df = pd.read_pickle(excl_save_path)
@@ -618,7 +879,7 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
         print(
             f'  ~ {round(read_t1 - read_t0, 4)}  sec elapsed')
         print('  building dataframe from `jsonlines` generator object...')
-        # This has to be done before the file is closed:
+        #! This has to be done before the file is closed:
         #   Since we're using a generator to speed things up, the data is not fully
         #   loaded into the workspace until it's put into the dataframe.
         toDf_t0 = time.perf_counter()
@@ -637,8 +898,12 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
     # (code dict is now a global variable)
     codes = (global_subset_abbr_dict[n] for n in df.pile_set_name)
     df = df.assign(pile_set_code=pd.Categorical(codes))
-    # save tmp df
-    df.to_pickle(rawdfpath)
+
+    #! Since the script cannot currently distinguish between
+    # a partial and complete `raw` dataframe, no intermediate
+    # saves should be used since they would only introduce errors
+    # # save tmp df
+    # df.to_pickle(rawdfpath)
 
     print('  adding subset codes & text IDs...')
     codedf = create_ids(df, data_source_label=data_source_label)
@@ -668,30 +933,38 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
 
 def get_dfpkl_outpath(stem: str,
                       subcorpus_label='',
-                      slice_num: int = None,
+                      slice_id=None,
                       is_tmp: bool = False,
                       is_excl: bool = False):
-    '''
-    return path object for dataframes to be saved as `.pkl.gz`:
+    """    return path object for dataframes to be saved as `.pkl.gz`:
     file name template = `pile_[jsonl stem]_[subcorpus]_{df, excl}.pkl.gz`
-    * If input is bare or only prefixed (`pile_[jsonl stem]`), 
+    + If input is bare or only prefixed (`pile_[jsonl stem]`), 
         `corpus_selection` must be provided
-    * all full dataframe file names/stems have 3 underscores
+    + all full dataframe file names/stems have 3 underscores
     Directories are as follows:
         - for pre-processing saves,
             `pile_tables/raw/`
         - for unfinalized saves, 
             `pile_tables/tmp/`
-        - for df slices unfiltered for exclusions,
+        - for df slices before parsing is complete,
             `pile_tables/slices/tmp/`
-        - for df slices with exclusions removed, 
+        - for *actual* dataframe slices (aligned with conllu output),
             `pile_tables/slices/`
         - for exclusions dataframe, 
             `pile_exclusions/`
-    '''
+
+    Args:
+        stem (str): _description_
+        subcorpus_label (str, optional): _description_. Defaults to ''.
+        slice_id (_type_, optional): _description_. Defaults to None.
+        is_tmp (bool, optional): _description_. Defaults to False.
+        is_excl (bool, optional): _description_. Defaults to False.
+
+    Returns:
+        PosixPath: path to save input dataframe to
+    """
 
     data_type = 'excl' if is_excl else 'df'
-
     # to remove any '.pkl' strings still included with [path].stem attributes
     if '.' in set(stem):
         stem = stem.split('.', 1)[0]
@@ -706,6 +979,7 @@ def get_dfpkl_outpath(stem: str,
     # just the jsonl stem, e.g. "00", "val", etc.
     if is_bare:
         # process orig name parts and prefix 'pile_'
+        source = stem
         subcorpus_label = ("-".join(subcorpus_label).replace(" ", "")
                            if isinstance(subcorpus_label, list)
                            else subcorpus_label)
@@ -717,27 +991,14 @@ def get_dfpkl_outpath(stem: str,
         # '.pkl' will not have been included in ext but removed above
         # data_type not inherited from stem in this case because
         #   exclusions input stem might include df if stem Path attribute
+        # ['pile_00', 'Pile-CC']
         stem, subcorpus_label = stem.rsplit('_', 2)[:2]
+        source = stem.split('_')[1]
 
     # if not bare and not full, use `stem` and `subcorpus_label` as is;
     # e.g. "pile_00", "pile_val", etc.
 
-    # If path is for dataframe slice
-    # Note: need to test for None because `if slice_num` is False when 0
-    # This precedes the tmp clause so that tmp slices
-    #   are in `slices/tmp/` instead of `tmp/slices/`
-    if slice_num is not None:
-        df_output_dir = df_output_dir.joinpath('slices')
-        stem += f'-{slice_num}'
-
-    # if tmp save (in case of script crash)
-    if is_tmp:
-        df_output_dir = df_output_dir.joinpath('tmp')
-
-    if not df_output_dir.is_dir():
-        df_output_dir.mkdir(parents=True)
-
-    if subcorpus_label in [v for v in global_subset_abbr_dict.values()]:
+    if subcorpus_label.lower() in [v.lower() for v in global_subset_abbr_dict.values()]:
         subcorpus_label = [k
                            for k, v in global_subset_abbr_dict.items()
                            if v == subcorpus_label][0]
@@ -747,12 +1008,34 @@ def get_dfpkl_outpath(stem: str,
               'Default "Pile-CC" inserted.')
         subcorpus_label = 'Pile-CC'
 
+    # If path is for dataframe slice
+    #!Note: need to test for None because `if slice_num` is False when 0
+    # This precedes the tmp clause so that tmp slices
+    #   are in `slices/tmp/` instead of `tmp/slices/`
+    if slice_id is not None:
+        slice_dir = df_output_dir.joinpath('slices')
+        # this must precede adding the slice number to the string
+        #   want, e.g., `slices/Pcc00/` not `slices/Pcc00-01/`, etc.
+        dirname = get_conllu_outpath(source, str(slice_id),
+                                     subcorpus_label).parent.name
+        dirname = dirname.replace('.conll', '')
+        df_output_dir = slice_dir.joinpath(dirname)
+
+        stem += f'-{slice_id}'
+
+    # if tmp save (in case of script crash)
+    if is_tmp:
+        df_output_dir = df_output_dir.joinpath('tmp')
+
+    if not df_output_dir.is_dir():
+        df_output_dir.mkdir(parents=True)
+
     return df_output_dir.joinpath(
         f'{stem}_{subcorpus_label}_{data_type}.pkl.gz')
 
 
 def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_num: str = None):
-    # Create text ids from raw file name, pile subset code, and dataframe index.
+    '''Create text ids from raw file name, pile subset code, and dataframe index.'''
     codedf = pd.DataFrame()
     codes_t0 = time.perf_counter()
     fullix = bool(data_source_label)
@@ -842,7 +1125,7 @@ def stanza_parse(df, output_path, filenum, total_num_slices: str):
 
             else:
                 doc = process_sentences(row_df, conlloutput, doc)
-                
+
                 # write conll formatted string of doc to output file
                 conlloutput.write(doc2conll_text(doc))
 
@@ -1001,14 +1284,14 @@ def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
     subset = global_subset_abbr_dict.get(
         subset_label, subset_label.capitalize())
     out_fname = f'{subset.lower()}_eng_{source_fname}-{slice_numstr.zfill(2)}.conllu'
-    
-    # create separate conll output dir for every original source file, 
+
+    # create separate conll output dir for every original source file,
     # since it looks to be gigantic
-    try: 
+    try:
         conlldir_num = int(source_fname)
-    except ValueError: 
+    except ValueError:
         conlldir_id = 'X'
-    else: 
+    else:
         conlldir_id = str(conlldir_num).zfill(2)
     out_dir = Path.cwd().joinpath(f'{subset}{conlldir_id}.conll')
 
@@ -1023,5 +1306,5 @@ if __name__ == '__main__':
     end_time = datetime.now()
     elapsed = str(timedelta(seconds=round(
         end_time.timestamp() - global_start_time.timestamp())))
-    print(f'\n====================\nScript Completed: {end_time.ctime()}\n '
+    print(f'\n*******************************\nScript Completed: {end_time.ctime()}\n '
           f'= total elapsed time: {elapsed}')
