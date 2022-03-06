@@ -72,7 +72,7 @@ def main():
     data_selection = init_js_paths + init_df_paths
     js_paths = init_js_paths
     df_paths = init_df_paths
-    if data_selection and not args.Rewrite:
+    if data_selection and not args.Reprocess:
         js_paths, df_paths = check_status(args, data_selection)
 
     if not df_paths + js_paths:
