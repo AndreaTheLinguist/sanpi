@@ -70,8 +70,9 @@ def main():
         init_df_paths = [p.resolve() for p in search_dir.rglob('*.pkl*')]
 
     data_selection = init_js_paths + init_df_paths
-    # if jsonl paths were input or selected via directory search
-    if data_selection:
+    js_paths = init_js_paths
+    df_paths = init_df_paths
+    if data_selection and not args.Rewrite:
         js_paths, df_paths = check_status(args, data_selection)
 
     if not df_paths + js_paths:
@@ -109,7 +110,7 @@ def check_status(args, data_selection):
           '\n---------------')
     for datapath in data_selection:
         fname = datapath.name
-        print('\n',datapath.relative_to(Path.cwd()))
+        print('\n', datapath.relative_to(Path.cwd()))
         if not datapath.is_file():
             print(' x - does not exist! Skipping.')
             continue
@@ -357,40 +358,6 @@ def most_recent(Path_iter):
     """
     return max(
         (path.stat().st_mtime, path) for path in Path_iter)[1]
-
-
-def parse_arg_inputs():
-
-    parser = argparse.ArgumentParser(
-        description='script to convert scrambled pile data from raw jsonlines format '
-        'into dependency parsed conllu files. Note that if neither input files nor a '
-        'search directory is specified, the calling directory AND subdirectories '
-        'will be searched for dataframe files'
-        '*Required packages: stanza (stanford), unidecode, zlib, and pandas')
-
-    parser.add_argument(
-        '-i', '--input_file',
-        type=Path, action='append', dest='input_files',
-        help='path(s) for input file(s). Can be `.jsonl` or `.pkl(.gz).` '
-        'If not specified, script will seek all applicable files '
-        'the scope of the calling directory or directory specified with -s flag.')
-
-    parser.add_argument(
-        '-s', '--search_dir',
-        type=Path, default=Path.cwd(),
-        help='Path to search for `jsonl` files. Only relevant if no input files are specified. '
-        'Defaults to calling directory.')
-
-    parser.add_argument(
-        '-n', '--pile_set_name',
-        default=['Pile-CC'],
-        type=str, action='append', dest='corpus_selection',
-        help=('option to select alternate pile set(s). Default selection: "Pile-CC".'
-              ' Flag can be reused: '
-              'All flagged paths will be appended to selection list'))
-
-    # TODO : maybe add argument to force reprocessing inputs? even if there is a "later" save point
-    return parser.parse_args()
 
 
 def get_jsonl_paths(args):
@@ -870,22 +837,22 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
     # Create a generator object which directly filters out texts from unwanted data sets.
     # Use pandas to create a flattened dataframe from the generator.
     print('  creating `jsonlines` generator for corpus selection...')
-    read_t0 = time.perf_counter()
+    read_t0 = datetime.now().timestamp()
     with raw_file_path.open(encoding='utf-8-sig', mode='r') as jlf:
         jlines = jsonlines.Reader(jlf).iter()
         texts = (text_info(d['text'], d['meta']['pile_set_name'])
                  for d in jlines if d['meta']['pile_set_name'] in subcorpora_list)
-        read_t1 = time.perf_counter()
+        read_t1 = datetime.now().timestamp()
         print(
-            f'  ~ {round(read_t1 - read_t0, 4)}  sec elapsed')
+            f'  ~ {round(read_t1 - read_t0, 3)}  sec elapsed')
         print('  building dataframe from `jsonlines` generator object...')
         #! This has to be done before the file is closed:
         #   Since we're using a generator to speed things up, the data is not fully
         #   loaded into the workspace until it's put into the dataframe.
-        toDf_t0 = time.perf_counter()
+        toDf_t0 = datetime.now().timestamp()
         df = pd.DataFrame(
             texts, columns=text_info._fields, dtype='string')
-        toDF_t1 = time.perf_counter()
+        toDF_t1 = datetime.now().timestamp()
         print(
             f'  ~ {round(toDF_t1 - toDf_t0, 3)}  sec elapsed')
 
@@ -911,7 +878,8 @@ def preprocess_pile_texts(raw_file_path: Path, subcorpora_list: list):
     df = codedf[['text_id', 'raw', 'pile_set_name', 'pile_set_code']]
     df = df.assign(text_id=df.text_id.astype('string'),
                    pile_set_code=df.pile_set_code.astype('category'))
-
+    print('time to make raw dataframe from jsonl =', timedelta(
+        seconds=round(datetime.now().timestamp() - read_t0)))
     df.to_pickle(rawdfpath)
     print(f'raw dataframe saved to {rawdfpath.relative_to(Path.cwd())}')
 
@@ -1299,6 +1267,45 @@ def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
         out_dir.mkdir()
 
     return out_dir.joinpath(out_fname)
+
+
+def parse_arg_inputs():
+
+    parser = argparse.ArgumentParser(
+        description='script to convert scrambled pile data from raw jsonlines format '
+        'into dependency parsed conllu files. Note that if neither input files nor a '
+        'search directory is specified, the calling directory AND subdirectories '
+        'will be searched for dataframe files'
+        '*Required packages: stanza (stanford), unidecode, zlib, and pandas')
+
+    parser.add_argument(
+        '-i', '--input_file',
+        type=Path, action='append', dest='input_files',
+        help='path(s) for input file(s). Can be `.jsonl` or `.pkl(.gz).` '
+        'If not specified, script will seek all applicable files '
+        'the scope of the calling directory or directory specified with -s flag.')
+
+    parser.add_argument(
+        '-s', '--search_dir',
+        type=Path, default=Path.cwd(),
+        help='Path to search for `jsonl` files. Only relevant if no input files are specified. '
+        'Defaults to calling directory.')
+
+    parser.add_argument(
+        '-n', '--pile_set_name',
+        default=['Pile-CC'],
+        type=str, action='append', dest='corpus_selection',
+        help=('option to select alternate pile set(s). Default selection: "Pile-CC".'
+              ' Flag can be reused: '
+              'All flagged paths will be appended to selection list'))
+
+    parser.add_argument(
+        '-R', '--Reprocess',
+        default=False, action='store_true',
+        help=('option to skip step looking for existing progress and reprocess files, '
+              'even if more processed outputs have already been created. Intended for debugging.'))
+
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
