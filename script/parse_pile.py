@@ -75,6 +75,7 @@ def main():
     if data_selection and not args.Reprocess:
         js_paths, df_paths = check_processing_status(args, data_selection)
 
+
     if not df_paths + js_paths:
         sys.exit('No valid files in need of processing. Exiting.')
 
