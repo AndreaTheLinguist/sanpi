@@ -991,7 +991,6 @@ def slice_df(full_df):
                 outpath.parent.parent.joinpath(
                     outpath.name).relative_to(Path.cwd()),
                 conllu_path.relative_to(Path.cwd())]
-            print(slice_info)
 
         # //final_df_path = get_dfpkl_outpath(data_source_label, subcorpus_name)
         slice_info = slice_info.assign(
@@ -1017,25 +1016,27 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
     slices_total_str = '?' if slice_info.empty else len(slice_info)
 
     id_prototype = dfslice.text_id.iloc[0]
-    slice_id = id_prototype.split('_')[3]
-    slice_info = slice_info.assign(slice_id=slice_id)
-    slice_number = slice_id.split('.')[0]
+    data_group, slice_textid= id_prototype.split('_')[2:4]
+    slice_number = slice_textid.split('.')[0]
+    slice_name = f'{data_group}_{slice_number}'
+    print('Slice:', slice_name)
     slice_info.index = slice_info.index.astype('string')
     slice_info_row = slice_info.loc[[slice_number], :]
-    slice_info_row = slice_info_row.set_index('slice_id')
-    slice_info_row = slice_info_row.rename({'index': 'slice_number'})
+    slice_info_row = slice_info_row.assign(slice_id=slice_name,
+                                           slice_number=slice_info_row.index)
+    # // slice_info_row = slice_info_row.set_index('slice_id')
 
     slice_info = slice_info_row.squeeze()
-    out_path = Path(slice_info.loc['conllu_path'])
-    data_source_label = slice_info.loc['data_origin_group']
+    out_path = Path(slice_info.conllu_path)
+    # data_source_label = slice_info.loc['data_origin_group']
 
     # parse slice and write to conllu output file
     successful_df = stanza_parse(
         dfslice, out_path, slice_number, slices_total_str)
 
     # save version of dataframe for all texts actually processed
-    successful_df.to_pickle(slice_info.loc['final_slice_path'])
-
+    successful_df.to_pickle(slice_info.final_slice_path)
+    slice_info_row = slice_info_row.assign(finished_at=datetime.now().ctime())
     master_slice_index_path = Path.cwd().joinpath(
         'pile_tables/master_slice-index.csv')
     if master_slice_index_path.is_file():
@@ -1045,6 +1046,9 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
         master_slice_info = pd.DataFrame()
 
     master_slice_info = pd.concat([master_slice_info, slice_info_row])
+    if master_slice_info.index.name != 'slice_id':
+        master_slice_info = master_slice_info.set_index('slice_id')
+
     master_slice_info.to_csv(master_slice_index_path)
     print('Fully processed slice added to master slice index:',
           str(master_slice_index_path.relative_to(Path.cwd())))
@@ -1064,7 +1068,7 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
     #     of the script.
     #     If for some reason the exclusions file cannot be found, run again.
     #        (but save with different name so as to not overwrite original.)
-    excl_save_path = get_dfpkl_outpath(slice_info.loc['exclusions_path'])
+    excl_save_path = get_dfpkl_outpath(slice_info.exclusions_path)
     if excl_save_path.is_file():
         excl_df = pd.read_pickle(excl_save_path)
         print('Adding skipped texts to', excl_save_path.relative_to(Path.cwd()))
@@ -1139,7 +1143,7 @@ def stanza_parse(df: pd.DataFrame, output_path: Path, filenum, total_num_slices:
                 row_skipped.loc[ix] = True
 
             else:
-                doc = process_sentences(row_df, conlloutput, doc)
+                doc = process_sentences(row_df, doc)
 
                 # write conll formatted string of doc to output file
                 conlloutput.write(doc2conll_text(doc))
@@ -1161,7 +1165,7 @@ def stanza_parse(df: pd.DataFrame, output_path: Path, filenum, total_num_slices:
     return successful_df
 
 
-def process_sentences(row_df, conlloutput, doc):
+def process_sentences(row_df, doc):
 
     print('    - processing sentences...')
     text_id = row_df.text_id.squeeze()
@@ -1178,17 +1182,17 @@ def process_sentences(row_df, conlloutput, doc):
             sentence.add_comment(f'# newdoc id = {text_id}')
 
         # "sent_id" will be doc/text id with _[sentence number] appended
-        # TODO : change this to `enumi + 1` for consistency with other conllu files
-
         sent_id = f'{text_id}_{str(enumi).zfill(sent_zfill)}'
         sentence.add_comment(f'# sent_id = {sent_id}')
-        print('     ', sent_id)
+        if enumi == 1:
+            print('     ', sent_id, '\n       ...')
 
         # remove line breaks and duplicated white space characters with single space
         text = remove_breaks(sentence.text)
         # this adds the full text string to the output file
         sentence.add_comment(f'# text = {text}')
 
+    print('     ', sent_id)
     return doc
 
 
