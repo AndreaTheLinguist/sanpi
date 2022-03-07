@@ -22,7 +22,7 @@ doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 global_start_time = datetime.now()
 print(f'started: {global_start_time.ctime()}')
 global_output_limit = 10000
-pd.set_option('display.max_colwidth', 80)
+# //pd.set_option('display.max_colwidth', 80)
 global_char_replacement = '<__?UNK__>'
 global_subset_abbr_dict = {'Gutenberg (PG-19)': 'PG19',
                            'Books3': 'Bks3',
@@ -364,26 +364,26 @@ def preprocess_pile_texts(raw_fpath: Path, subcorpora_list: list):
     # pile_data_path = Path('test.jsonl')
     data_source_label = raw_fpath.stem
     # path to save final version of df
-    df_output_path = get_dfpkl_outpath(data_source_label,
-                                       '-'.join(subcorpora_list))
+    finaldf_fpath = get_dfpkl_outpath(data_source_label,
+                                      '-'.join(subcorpora_list))
     # get temporary version of path for unfinished df files
-    tmpdfpath = get_dfpkl_outpath(df_output_path.stem, is_tmp=True)
+    tmpdf_fpath = get_dfpkl_outpath(finaldf_fpath.stem, is_tmp=True)
     # raw path set for just this method: dataframes at any stage of pre-processing
-    rawdfdir = tmpdfpath.parent.parent.joinpath('raw')
-    if not rawdfdir.is_dir():
-        rawdfdir.mkdir()
-    rawdfpath = rawdfdir.joinpath(tmpdfpath.name)
+    rawdf_dir = tmpdf_fpath.parent.parent.joinpath('raw')
+    if not rawdf_dir.is_dir():
+        rawdf_dir.mkdir()
+    rawdf_fpath = rawdf_dir.joinpath(tmpdf_fpath.name)
 
     # define namedtuple to simplify dataframe creation from json object
-    text_info = namedtuple(
-        'Text', ['raw', 'pile_set_name', 'pile_set_code', 'data_origin_fpath'])
+    # //text_info = namedtuple(
+    # //    'Text', ['raw', 'pile_set_name', 'pile_set_code', 'data_origin_fpath'])
     selected_subset = subcorpora_list[0]
     if len(subcorpora_list) > 1:
         print('Warning: functionality of processing 2 subcorpora '
               'simultaneously is no longer supported. Only the first '
               f'entry will be processed: {selected_subset}.'
               f'Run the script again to process {subcorpora_list[1:]}')
-    selection_code = global_subset_abbr_dict[selected_subset]
+    # //selection_code = global_subset_abbr_dict[selected_subset]
     # Load the (sample) jsonlines formatted (`.jsonl`) file using `jsonlines`.
     # Create a generator object which directly filters out texts from unwanted data sets.
     # Use pandas to create a flattened dataframe from the generator.
@@ -391,10 +391,7 @@ def preprocess_pile_texts(raw_fpath: Path, subcorpora_list: list):
     read_t0 = datetime.now().timestamp()
     with raw_fpath.open(encoding='utf-8-sig', mode='r') as jlf:
         jlines = jsonlines.Reader(jlf).iter()
-        texts = (text_info(d['text'],
-                           selected_subset,
-                           selection_code,
-                           raw_fpath)
+        texts = (d['text']
                  for d in jlines if d['meta']['pile_set_name'] == selected_subset)
         read_t1 = datetime.now().timestamp()
         print(
@@ -404,11 +401,8 @@ def preprocess_pile_texts(raw_fpath: Path, subcorpora_list: list):
         #   Since we're using a generator to speed things up, the data is not fully
         #   loaded into the workspace until it's put into the dataframe.
         toDf_t0 = datetime.now().timestamp()
-        df = (pd.DataFrame(texts, columns=text_info._fields)
-              .astype(dtype={'raw': 'string',
-                             'pile_set_name': 'category',
-                             'pile_set_code': 'category',
-                             'data_origin_fpath': 'category'}))
+        df = pd.DataFrame(texts, columns=['raw'], dtype='string')
+
         toDF_t1 = datetime.now().timestamp()
         print(
             f'  ~ {round(toDF_t1 - toDf_t0, 3)}  sec elapsed')
@@ -417,13 +411,17 @@ def preprocess_pile_texts(raw_fpath: Path, subcorpora_list: list):
 
     # Clean it up a bit, and remove duplicate text items
     df = df.drop_duplicates(subset='raw').reset_index(drop=True)
-
-    # df = df.assign(pile_set_name=df.pile_set_name.astype('category'))
+    df = (df.assign(pile_set_name=selected_subset,
+                    pile_set_code=global_subset_abbr_dict[selected_subset])
+          .astype(dtype={'pile_set_name': 'category',
+                         'pile_set_code': 'category'})
+          )
+    # //df = df.assign(pile_set_name=df.pile_set_name.astype('category'))
 
     # Create codes for data subsets
     # (code dict is now a global variable)
-    # codes = (global_subset_abbr_dict[n] for n in df.pile_set_name)
-    # df = df.assign(pile_set_code=pd.Categorical(codes))
+    # //codes = (global_subset_abbr_dict[n] for n in df.pile_set_name)
+    # //df = df.assign(pile_set_code=pd.Categorical(codes))
 
     #! Since the script cannot currently distinguish between
     # a partial and complete `raw` dataframe, no intermediate
@@ -433,30 +431,35 @@ def preprocess_pile_texts(raw_fpath: Path, subcorpora_list: list):
 
     print('  adding subset codes & text IDs...')
     codedf = create_ids(df, data_source_label=data_source_label)
-    # first_cols = ['text_id', 'raw']
-    # [first_cols + codedf.columns.loc[~codedfcolumns.isin(first_cols)]]]
-    df = codedf
-    df = df.assign(  # data_origin_fpath=raw_fpath,
-        text_id=df.text_id.astype('string'),
-        # pile_set_code=df.pile_set_code.astype('category')
-    )
+    # // df = codedf[['text_id', 'raw', 'pile_set_name', 'pile_set_code']]
+    # // df = codedf
+    first_cols = ['text_id', 'raw']
+    # //cols = [first_cols + codedf.columns.loc[~codedfcolumns.isin(first_cols)]]]
+    following_cols = list(set(codedf.columns) - set(first_cols))
+    df = codedf[first_cols + following_cols]
+    df = (df.assign(data_origin_fpath=raw_fpath,
+                    dataframe_fpath=finaldf_fpath)
+          .astype(dtype={'text_id': 'string',
+                         'data_origin_fpath': 'category',
+                         'dataframe_fpath': 'category'}))
+    # //df = df.assign(data_origin_fpath=raw_file_path,
+    # //               dataframe_fpath=df_output_path)
 
     # df = df.assign(data_origin_fpath=df.data_origin_fpath.astype('category'))
     print('time to make raw dataframe from jsonl =', timedelta(
         seconds=round(datetime.now().timestamp() - read_t0)), '\nsaving...')
-    
-    df.to_pickle(rawdfpath)
-    print(f'raw dataframe saved to {rawdfpath.relative_to(Path.cwd())}')
 
-    df = clean_df(df, tmpdfpath)
+    df.to_pickle(rawdf_fpath)
+    print(f'raw dataframe saved to {rawdf_fpath.relative_to(Path.cwd())}')
+
+    df = clean_df(df, tmpdf_fpath)
 
     # // print('\ndataframe info:')
     # // print(df.info())
     # // print('...')
     print('\nsaving final dataframe...')
-    df.to_pickle(df_output_path)
-    print('Finished preprocessing and saved to', df_output_path)
-
+    df.to_pickle(finaldf_fpath)
+    print('Finished preprocessing and saved to', finaldf_fpath)
 
     return df
 
@@ -569,16 +572,16 @@ def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_nu
     # //codedf = pd.DataFrame()
     codes_t0 = time.perf_counter()
     # //fullix = bool(data_source_label)
-    sliceix = bool(zfilled_slice_num)
-    #// subdf = df.loc[df.pile_set_code == code, :].reset_index()
+    # //sliceix = bool(zfilled_slice_num)
+    # // subdf = df.loc[df.pile_set_code == code, :].reset_index()
     code = df.pile_set_code.iloc[0].lower()
     prefix = ''
 
-    if not sliceix:
+    if not zfilled_slice_num:
         prefix = f'{code}_{data_source_label}_'
     else:
         df = df.assign(orig_text_id=df.text_id)
-        file_label= df.orig_text_id.iloc[0].split(
+        file_label = df.orig_text_id.iloc[0].split(
             '_')[1]
         # e.g. pcc_eng_00_01.
         prefix = f'{code}_eng_{file_label}_{zfilled_slice_num}.'
@@ -591,11 +594,11 @@ def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_nu
     # e.g. pcc_val_00001; pcc_eng_00_01.0001
     df = df.assign(id_stem=prefix + idnums)
 
-    if sliceix:
+    if zfilled_slice_num:
         df = df.assign(
             # e.g. pcc_eng_00_01.0001_x000003 (indices may not match)
             text_id=(df.id_stem + '_x'
-                        + df.text_id.str.rsplit('_', 1).str.get(1)))
+                     + df.text_id.str.rsplit('_', 1).str.get(1)))
     else:
         # e.g. pcc_val_00001
         df = df.assign(text_id=df.id_stem)
@@ -931,24 +934,24 @@ def slice_df(full_df):
         # slice off 1000 rows at a time until total is 2400 or less
         while len(remaining_df) > int(2.4*global_output_limit):
 
-            dfslice = remaining_df.iloc[:global_output_limit, :].reset_index()
+            dfslice = remaining_df.iloc[:global_output_limit, :]
             remaining_df = remaining_df.iloc[global_output_limit:, :]
-            slices.append(dfslice)
+            slices.append(dfslice.reset_index())
         # if 2400 split remaining: 2 slices of 1200
         # if 1202, split remaining: 2 slices of 610
         # if remaining df is 1200 rows or less:
         #   keep as is (no more slicing)
-        if len(remaining_df) > 1.2*global_output_limit:
+        if len(remaining_df) > int(1.2*global_output_limit):
 
             half_remaining = int(len(remaining_df)/2)
 
             dfslice_penult = remaining_df.iloc[:half_remaining, :]
-            slices.append(dfslice_penult)
+            slices.append(dfslice_penult.reset_index())
 
             remaining_df = remaining_df.iloc[half_remaining:, :]
 
         # this must be outdented to catch smaller dataframes
-        slices.append(remaining_df)
+        slices.append(remaining_df.reset_index())
         slices_total_str = str(len(slices))
         zfill_len = len(slices_total_str)
         # Andrea Hummel on Feb 3, 2022 at 4:45 PM
@@ -988,6 +991,7 @@ def slice_df(full_df):
                 outpath.parent.parent.joinpath(
                     outpath.name).relative_to(Path.cwd()),
                 conllu_path.relative_to(Path.cwd())]
+            print(slice_info)
 
         # //final_df_path = get_dfpkl_outpath(data_source_label, subcorpus_name)
         slice_info = slice_info.assign(
