@@ -91,7 +91,8 @@ def main():
         fulldf_files = list(set(df_paths) - set(slice_paths))
 
         for df in process_pickledf(fulldf_files, search_dir):
-
+            if 'raw' in df.columns:
+                df.pop('raw')
             slice_df(df)
 
         for slice_path in slice_paths:
@@ -103,10 +104,20 @@ def main():
             try:
                 slice_info_path = most_recent(slice_info_search)
             except ValueError:
-                slice_info = pd.DataFrame()
+                print('Error: script no longer supports processing sliced dataframe '
+                      'without corresponding slice index dataframe.\n'
+                      'Skipping file. To process this data, run from corresponding final dataframe '
+                      'in ./pile_tables/')
+                continue
             else:
                 slice_info = pd.read_csv(slice_info_path, index_col=0)
-            process_slice(pd.read_pickle(slice_path), slice_info)
+                slice_info.index.name = 'slice_number'
+
+            sdf = pd.read_pickle(slice_path)
+            if 'raw' in sdf.columns:
+                sdf.pop('raw')
+
+            process_slice(sdf, slice_info)
 
     if js_paths:
         for df in process_raw_jsonlines(js_paths, subcorpora_list):
@@ -172,11 +183,11 @@ def check_processing_status(args, data_selection):
                         print(' -> final slice df file:',
                               finished_slice.relative_to(Path.cwd()))
                     else:
-                        print(' -> No previous processing found.')
+                        print(' -> No prior processing found.')
 
             else:
                 df_paths.append(datapath)
-                print(' -> No previous processing found.')
+                print(' -> No prior processing found.')
 
             continue
 
@@ -233,7 +244,7 @@ def check_processing_status(args, data_selection):
 
         if not matching_fulldfs and is_js:
             js_paths.append(datapath)
-            print(' -> No previous processing found.')
+            print(' -> No prior processing found.')
             continue
 
         final_df_list = [p for p in matching_fulldfs
@@ -247,7 +258,7 @@ def check_processing_status(args, data_selection):
                     print(' -> final full df:\n  +',
                           final_df_path.relative_to(Path.cwd()))
                 else:
-                    print(' -> No previous processing found.')
+                    print(' -> No prior processing found.')
         else:
             tmp_df_list = [p for p in matching_fulldfs
                            if 'tmp' in p.parts]
@@ -260,7 +271,7 @@ def check_processing_status(args, data_selection):
                         print(' -> partially processed df:\n  +',
                               tmp_df_path.relative_to(Path.cwd()))
                     else:
-                        print(' -> No previous processing found.')
+                        print(' -> No prior processing found.')
 
             else:
                 raw_df_list = [p for p in matching_fulldfs
@@ -280,7 +291,7 @@ def check_processing_status(args, data_selection):
                             print(' -> raw df:\n  +',
                                   raw_df_path.relative_to(Path.cwd()))
                         else:
-                            print(' -> No previous processing found.')
+                            print(' -> No prior processing found.')
 
     # remove duplicates
     if df_paths and any(pd.Series(df_paths).value_counts() > 1):
@@ -640,25 +651,38 @@ def process_pickledf(dfiles, search_dir):
         # #   = pile_[original jsonl file/data source file stem]_...
         # # so index 1 gives the data_source_label when split by _
         # // data_source_label = dfpath.stem.split('_')[1]
+        df_has_data_origin = 'data_origin_fpath' in df.columns
         changed = False
-        if 'data_origin_fpath' not in df.columns:
-            changed = True
-            jsonl_fname = dfpath.stem.split('_')[1]+'.jsonl'
-            origin_fpath = Path(jsonl_fname)
-            try:
-                origin_fpath = most_recent(Path.cwd().rglob(jsonl_fname))
-            except ValueError:
-                if search_dir and search_dir.is_dir():
-                    try:
-                        origin_fpath = most_recent(
-                            search_dir.rglob(jsonl_fname))
-                    except ValueError:
-                        pass
+        if (not df_has_data_origin
+                or not Path(df.data_origin_fpath.iloc[0]).is_file()):
 
-            if not origin_fpath.is_file():
-                print('** Warning: Absolute path to original data is unknown. '
-                      f'Filename only path inserted instead: {origin_fpath}')
-            df = df.assign(data_origin_fpath=origin_fpath)
+            origin_fpath = None
+
+            if df_has_data_origin:
+                jsonl_fname = df.data_origin_fpath.iloc[0]
+            else:
+                jsonl_fname = dfpath.stem.split('_')[1]+'.jsonl'
+
+            possible_dirs = [Path.cwd(), search_dir, Path(
+                'pile_data'), Path('/data/pile')]
+            i = 0
+            while not origin_fpath and i < len(possible_dirs):
+                data_dir = possible_dirs[i]
+                origin_fpath = find_jsonl(data_dir, jsonl_fname)
+                i += 1
+
+            # if none of those worked, just put in a relative path
+            if not (not origin_fpath and df_has_data_origin):
+
+                if not origin_fpath:
+                    #! Do not resolve this path! It would just be wrong, so leave it unresolved.
+                    origin_fpath = Path(jsonl_fname)
+                    print('** Warning: Absolute path to original data is unknown. '
+                          f'Filename only path inserted instead: {origin_fpath}')
+                else:
+                    changed = True
+
+                df = df.assign(data_origin_fpath=origin_fpath)
 
         if 'dataframe_fpath' not in df.columns:
             changed = True
@@ -686,6 +710,14 @@ def process_pickledf(dfiles, search_dir):
             print('  yes')
 
         yield df
+
+
+def find_jsonl(dirpath: Path, jsonl_fname: str):
+    matches = list(dirpath.rglob(jsonl_fname))
+    if matches:
+        return most_recent(matches)
+    else:
+        return None
 
 
 # process dataframes
@@ -967,7 +999,7 @@ def slice_df(full_df):
         for i, zipped in enumerate(zip(slice_labels, slices)):
             # slice numbering starts at 1, not 0
             slice_zfilled, sdf = zipped
-
+            sdf.index.name = 'slice_number'
             # update text ids
             sdf = create_ids(sdf, zfilled_slice_num=slice_zfilled)
 
@@ -1002,7 +1034,7 @@ def slice_df(full_df):
                 data_source_label, subcorpus_name, is_excl=True).relative_to(Path.cwd()))
         # and save slice_info same directory when finished looping
         slice_info.to_csv(outpath.with_name(
-            f'slice-index_{data_source_label}.csv'))
+            f'slice-index_{data_source_label}.csv'), index_label='slice_number')
         print(slice_info)
 
         #! this needs to be its own loop so that all the slices can be saved
@@ -1017,7 +1049,7 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
     slices_total_str = '?' if slice_info.empty else len(slice_info)
 
     id_prototype = dfslice.text_id.iloc[0]
-    data_group, slice_textid= id_prototype.split('_')[2:4]
+    data_group, slice_textid = id_prototype.split('_')[2:4]
     slice_number = slice_textid.split('.')[0]
     slice_name = f'{data_group}_{slice_number}'
     print('Slice:', slice_name)

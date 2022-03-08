@@ -17,6 +17,8 @@ inpath = Path(argv[1]).resolve()
 # inpath = Path('pile_tables/tmp/pile_pile-val_Pile-CC_df.pkl.gz').resolve()
 print('source file:', inpath.relative_to(Path.cwd()))
 fulldf = pd.read_pickle(inpath)
+ix_col = 'index' if 'index' in fulldf.columns else 'text_id'
+fulldf = fulldf.set_index(ix_col)
 
 try:
     n = int(
@@ -33,9 +35,9 @@ try:
     )
 except IndexError:
     ix = 0
-else: 
+else:
     ix = min(len(fulldf) - n, startix)
-    
+
 print('starting at:', ix)
 
 partial = fulldf.iloc[ix:ix+n, :]
@@ -43,8 +45,8 @@ partial = fulldf.iloc[ix:ix+n, :]
 outdir = inpath.parent.joinpath('partials').resolve()
 if not outdir.is_dir():
     outdir.mkdir()
-outpath = outdir.joinpath(f'{inpath.stem.split(".")[0]}{ix}plus{n}.csv')
+outpath = outdir.joinpath(f'{inpath.stem.split(".")[0]}{ix}plus{n}.psv')
 
-partial.to_csv(outpath)
+partial.to_csv(outpath, sep='|')
 print(f'Selected portion of {inpath.name} ({n} rows, {ix}-{ix+n}) '
       f'saved to {outpath.relative_to(Path.cwd())}')
