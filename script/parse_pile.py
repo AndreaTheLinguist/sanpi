@@ -671,7 +671,7 @@ def process_pickledf(dfiles, search_dir):
         df_has_data_origin = 'data_origin_fpath' in df.columns
         changed = False
         if (not df_has_data_origin
-                or not Path(df.data_origin_fpath.iloc[0]).is_file()):
+            or not Path(df.data_origin_fpath.iloc[0]).is_file()):
 
             origin_fpath = None
 
@@ -706,7 +706,7 @@ def process_pickledf(dfiles, search_dir):
             df = df.assign(dataframe_fpath=dfpath)
 
         if changed:
-            print('saving...')
+            print('added data path info columns saving...')
             df.to_pickle(dfpath)
             df.loc[:, ['dataframe_fpath', 'data_origin_fpath']] = (
                 df.loc[:, ['dataframe_fpath', 'data_origin_fpath']]
