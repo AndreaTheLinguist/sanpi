@@ -1,0 +1,16 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.history": true,
+        "**/.vscode": true,
+        "**/venv": true,
+        "**/.idea": true,
+        "**/__pycache__": true
+    },
+    "explorerExclude.backup": null
+}

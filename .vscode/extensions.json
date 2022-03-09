@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "lgrobol.vscode-conllu",
+        "codestream.codestream",
+        "emilast.logfilehighlighter",
+        "mhutchie.git-graph"
+    ]
+}
