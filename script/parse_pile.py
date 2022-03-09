@@ -17,18 +17,19 @@ from unidecode import unidecode
 
 from pile_regex_imports import *
 
-doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
+_doc2conll_text = stanza.utils.conll.CoNLL.doc2conll_text
 
 global_start_time = datetime.now()
 print(f'started: {global_start_time.ctime()}')
-global_output_limit = 10000
-# //pd.set_option('display.max_colwidth', 80)
-global_char_replacement = '<__?UNK__>'
-global_subset_abbr_dict = {'Gutenberg (PG-19)': 'PG19',
-                           'Books3': 'Bks3',
-                           'BookCorpus2': 'BkC2',
-                           'Pile-CC': 'Pcc',
-                           'OpenWebText2': 'OWT2'}
+_slinfo_fpref = 'slice-info_'
+_sldf_row_limit = 10000
+pd.set_option('display.max_colwidth', 80)
+_unk_char_str = '<__?UNK__>'
+_pile_set_code_dict = {'Gutenberg (PG-19)': 'PG19',
+                       'Books3': 'Bks3',
+                       'BookCorpus2': 'BkC2',
+                       'Pile-CC': 'Pcc',
+                       'OpenWebText2': 'OWT2'}
 # initiate language model for dependency parsing (load just once)
 '''
 *Note:
@@ -75,7 +76,6 @@ def main():
     if data_selection and not args.Reprocess:
         js_paths, df_paths = check_processing_status(args, data_selection)
 
-
     if not df_paths + js_paths:
         sys.exit('No valid files in need of processing. Exiting.')
 
@@ -90,19 +90,25 @@ def main():
         slice_paths = [p for p in df_paths if 'slices' in p.parts]
         fulldf_files = list(set(df_paths) - set(slice_paths))
 
+        print('\n\n*** (1) Full Dataframes ***')
         for df in process_pickledf(fulldf_files, search_dir):
             if 'raw' in df.columns:
                 df.pop('raw')
             slice_df(df)
 
+        # TODO : move this up to parse before the full dataframes
+        print('\n\n*** (2) Previously Sliced Dataframes ***')
         for slice_path in slice_paths:
-            print('processing dataframe slice',
+            print('Processing dataframe slice',
                   slice_path.relative_to(Path.cwd()))
 
-            slice_info_search = slice_path.parent.rglob(
-                f'*index*{slice_path.stem.split("_")[1][:2]}*csv')
+            slices_metadf_search = slice_path.parent.rglob(
+                get_metadf_fname(slice_path.stem
+                                 .split('_')[1]  # get second _ delimited chunk
+                                 .rsplit('-', 1)[0])  # pop off the slice number
+            )
             try:
-                slice_info_path = most_recent(slice_info_search)
+                slice_info_path = most_recent(slices_metadf_search)
             except ValueError:
                 print('Error: script no longer supports processing sliced dataframe '
                       'without corresponding slice index dataframe.\n'
@@ -110,15 +116,19 @@ def main():
                       'in ./pile_tables/')
                 continue
             else:
-                slice_info = pd.read_csv(slice_info_path, index_col=0)
-                slice_info.index.name = 'slice_number'
+                slices_metadf = pd.read_csv(slice_info_path, index_col=0)
 
-            sdf = pd.read_pickle(slice_path)
-            if 'raw' in sdf.columns:
-                sdf.pop('raw')
+                # (only for file saving/loading purposes)
+                slices_metadf.index.name = 'slice_number'
 
-            process_slice(sdf, slice_info)
+            sldf = pd.read_pickle(slice_path)
+            if 'raw' in sldf.columns:
+                sldf.pop('raw')
 
+            process_slice(sldf, slices_metadf)
+
+    step = 3 if df_paths else 1
+    print(f'\n\n*** ({step}) The Pile\'s Original Data Files (.jsonl) ***')
     if js_paths:
         for df in process_raw_jsonlines(js_paths, subcorpora_list):
             slice_df(df)
@@ -172,7 +182,7 @@ def check_processing_status(args, data_selection):
         if is_df and is_slice:
             finished_slice = (datadir.parent.joinpath(fname)
                               if datadir.name == 'tmp' else datapath)
-
+            # TODO : add warning or input request here if slice's info csv cannot be located
             if (finished_slice.exists()
                     and finished_slice.stat().st_mtime >= path_mod_time):
 
@@ -201,7 +211,7 @@ def check_processing_status(args, data_selection):
             continue
         # TODO : save slice info to "finished" slice dir, above `tmp/`
         slices_info_glob = toplevel_dfdir.glob(
-            f'slices/**/*index*{data_group}*.csv')
+            'slices/**/' + get_metadf_fname(data_group))
         try:
             newest_sliceinfo_path = most_recent(slices_info_glob)
         except ValueError:
@@ -306,6 +316,10 @@ def check_processing_status(args, data_selection):
     return js_paths, df_paths
 
 
+def get_metadf_fname(data_group):
+    return f'{_slinfo_fpref}{data_group}.csv'
+
+
 def confirm_conllu(final_slice: Path):
     pile_set_name = final_slice.stem.split('_')[2]
     data_group = final_slice.stem.split('_')[1]
@@ -341,7 +355,7 @@ def most_recent(Path_iter):
 def get_conllu_outpath(source_fname: str, slice_numstr: str, subset_label: str):
     '''returns path for final conllu output files'''
     # ensure the *code* (e.g. Pcc) is used, not the *name*
-    subset = global_subset_abbr_dict.get(
+    subset = _pile_set_code_dict.get(
         subset_label, subset_label.capitalize())
     out_fname = f'{subset.lower()}_eng_{source_fname}-{slice_numstr.zfill(2)}.conllu'
 
@@ -424,7 +438,7 @@ def preprocess_pile_texts(raw_fpath: Path, subcorpora_list: list):
     # Clean it up a bit, and remove duplicate text items
     df = df.drop_duplicates(subset='raw').reset_index(drop=True)
     df = (df.assign(pile_set_name=selected_subset,
-                    pile_set_code=global_subset_abbr_dict[selected_subset])
+                    pile_set_code=_pile_set_code_dict[selected_subset])
           .astype(dtype={'pile_set_name': 'category',
                          'pile_set_code': 'category'})
           )
@@ -543,9 +557,9 @@ def get_dfpkl_outpath(stem: str,
     # if not bare and not full, use `stem` and `subcorpus_label` as is;
     # e.g. "pile_00", "pile_val", etc.
 
-    if subcorpus_label.lower() in [v.lower() for v in global_subset_abbr_dict.values()]:
+    if subcorpus_label.lower() in [v.lower() for v in _pile_set_code_dict.values()]:
         subcorpus_label = [k
-                           for k, v in global_subset_abbr_dict.items()
+                           for k, v in _pile_set_code_dict.items()
                            if v == subcorpus_label][0]
 
     elif not subcorpus_label:
@@ -581,6 +595,7 @@ def get_dfpkl_outpath(stem: str,
 
 def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_num: str = None):
     '''Create text ids from raw file name, pile subset code, and dataframe index.'''
+
     # //codedf = pd.DataFrame()
     codes_t0 = time.perf_counter()
     # //fullix = bool(data_source_label)
@@ -590,8 +605,10 @@ def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_nu
     prefix = ''
 
     if not zfilled_slice_num:
+        print('  assigning text_id for each text (i.e. row)')
         prefix = f'{code}_{data_source_label}_'
     else:
+        print('  updating text_id column for slice', zfilled_slice_num)
         df = df.assign(orig_text_id=df.text_id)
         file_label = df.orig_text_id.iloc[0].split(
             '_')[1]
@@ -617,7 +634,7 @@ def create_ids(df: pd.DataFrame, data_source_label: str = None, zfilled_slice_nu
 
     df.pop('id_stem')
     codes_t1 = time.perf_counter()
-    print(f'  ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
+    print(f'   ~ {round(codes_t1 - codes_t0, 3)}  sec elapsed')
 
     return df
 
@@ -645,8 +662,8 @@ def process_pickledf(dfiles, search_dir):
         # previously saved df filestems
         else:
             loadcomplete = time.perf_counter()
-            print('    [dataframe loaded in', round(
-                loadcomplete - loadstart, 2), 'seconds]')
+            print('    load time =',
+                  str(timedelta(seconds=loadcomplete - loadstart))[:11],)
 
         # #   = pile_[original jsonl file/data source file stem]_...
         # # so index 1 gives the data_source_label when split by _
@@ -742,7 +759,7 @@ def clean_df(orig_df, tmp_save_path):
     df = orig_df.assign(
         text=orig_df.text.apply(
             lambda t: unidecode(t, errors='replace',
-                                replace_str=global_char_replacement))
+                                replace_str=_unk_char_str))
     )
     unidecode_t1 = time.perf_counter()
     print(f'  ~ {round(unidecode_t1 - unidecode_t0, 2)} sec elapsed')
@@ -817,7 +834,7 @@ def pull_exclusions(df: pd.DataFrame,
     # uninterpretable/unknown characters (could not be decoded)
     print('  looking for uninterpretable characters...')
     t0 = time.perf_counter()
-    cannot_interpret = df.text.str.contains(global_char_replacement)
+    cannot_interpret = df.text.str.contains(_unk_char_str)
     if any(cannot_interpret):
         found_exclusions = True
         unkchardf = df.loc[cannot_interpret, :].assign(excl_type='?unk')
@@ -957,24 +974,26 @@ def slice_df(full_df):
     for subcorpus_code, df in full_df.groupby('pile_set_code'):
         subcorpus_name = df.pile_set_name.iat[0]
         data_orig_fpath = df.data_origin_fpath.iat[0]
-        data_source_label = data_orig_fpath.stem
-        print(f'Partitioning data in {subcorpus_name} subset\n'
-              f'{len(df)} total texts to parse')
+        data_grp_str = data_orig_fpath.stem
+        print(f'\n{len(df)} remaining {subcorpus_name} texts in '
+              f'{data_grp_str} dataset\n'
+              f'Slicing dataframe into smaller subsets of around {_sldf_row_limit} rows each'
+              )
 
         remaining_df = df.sort_values('text_id')
         slices = []
         # e.g. if limit were 1000:
         # slice off 1000 rows at a time until total is 2400 or less
-        while len(remaining_df) > int(2.4*global_output_limit):
+        while len(remaining_df) > int(2.4*_sldf_row_limit):
 
-            dfslice = remaining_df.iloc[:global_output_limit, :]
-            remaining_df = remaining_df.iloc[global_output_limit:, :]
+            dfslice = remaining_df.iloc[:_sldf_row_limit, :]
+            remaining_df = remaining_df.iloc[_sldf_row_limit:, :]
             slices.append(dfslice.reset_index())
         # if 2400 split remaining: 2 slices of 1200
         # if 1202, split remaining: 2 slices of 610
         # if remaining df is 1200 rows or less:
         #   keep as is (no more slicing)
-        if len(remaining_df) > int(1.2*global_output_limit):
+        if len(remaining_df) > int(1.2*_sldf_row_limit):
 
             half_remaining = int(len(remaining_df)/2)
 
@@ -997,27 +1016,27 @@ def slice_df(full_df):
                      'tmp_slice_path', 'final_slice_path', 'conllu_path'],
             index=slice_labels)
         for i, zipped in enumerate(zip(slice_labels, slices)):
-            # slice numbering starts at 1, not 0
-            slice_zfilled, sdf = zipped
-            sdf.index.name = 'slice_number'
+            #! slice numbering starts at 1, not 0 (cannot use i)
+            slice_zfilled, sldf = zipped
+
             # update text ids
-            sdf = create_ids(sdf, zfilled_slice_num=slice_zfilled)
+            sldf = create_ids(sldf, zfilled_slice_num=slice_zfilled)
 
             #! must reassign modified dataframe to list of slices
-            slices[i] = sdf
+            slices[i] = sldf
 
             # save slice dataframe as compressed pickle
             outpath = get_dfpkl_outpath(
-                data_source_label, subcorpus_code,
+                data_grp_str, subcorpus_code,
                 slice_id=slice_zfilled, is_tmp=True)
-            sdf.to_pickle(outpath)
+            sldf.to_pickle(outpath)
 
             # add info on slice to slice_info meta dataframe
-            first_id = sdf.text_id.iloc[0]
-            last_id = sdf.text_id.iloc[-1]
-            texts_in_slice = len(sdf)
+            first_id = sldf.text_id.iloc[0]
+            last_id = sldf.text_id.iloc[-1]
+            texts_in_slice = len(sldf)
             conllu_path = get_conllu_outpath(
-                data_source_label, slice_zfilled, subcorpus_code)
+                data_grp_str, slice_zfilled, subcorpus_code)
             slice_info.loc[slice_zfilled, :] = [
                 texts_in_slice, first_id, last_id,
                 outpath.relative_to(Path.cwd()),
@@ -1028,65 +1047,84 @@ def slice_df(full_df):
         # //final_df_path = get_dfpkl_outpath(data_source_label, subcorpus_name)
         slice_info = slice_info.assign(
             origin_filepath=data_orig_fpath,
-            data_origin_group=data_source_label,
+            data_origin_group=data_grp_str,
             final_df_path=df.dataframe_fpath.iloc[0].relative_to(Path.cwd()),
             exclusions_path=get_dfpkl_outpath(
-                data_source_label, subcorpus_name, is_excl=True).relative_to(Path.cwd()))
+                data_grp_str, subcorpus_name, is_excl=True).relative_to(Path.cwd()))
+        slice_info.index.name = 'slice_number'
         # and save slice_info same directory when finished looping
         slice_info.to_csv(outpath.with_name(
-            f'slice-index_{data_source_label}.csv'), index_label='slice_number')
+            get_metadf_fname(data_grp_str)))
         print(slice_info)
 
         #! this needs to be its own loop so that all the slices can be saved
         #   before any of them are processed
         #   (which takes a long time and has a high likelihood of crashing)
-        for sdf in slices:
-            process_slice(sdf, slice_info)
+        for sldf in slices:
+            process_slice(sldf, slice_info)
 
 
-def process_slice(dfslice: pd.DataFrame, slice_info):
+def process_slice(sldf: pd.DataFrame, metadf: pd.DataFrame):
+    slice_t0 = datetime.now()
+    slices_total_str = '?' if metadf.empty else len(metadf)
 
-    slices_total_str = '?' if slice_info.empty else len(slice_info)
-
-    id_prototype = dfslice.text_id.iloc[0]
-    data_group, slice_textid = id_prototype.split('_')[2:4]
-    slice_number = slice_textid.split('.')[0]
+    id_prototype = sldf.text_id.iloc[0]
+    data_group, slice_sample_textid = id_prototype.split('_')[2:4]
+    slice_number = slice_sample_textid.split('.')[0]
     slice_name = f'{data_group}_{slice_number}'
-    print('Slice:', slice_name)
-    slice_info.index = slice_info.index.astype('string')
-    slice_info_row = slice_info.loc[[slice_number], :]
-    slice_info_row = slice_info_row.assign(slice_id=slice_name,
-                                           slice_number=slice_info_row.index)
-    # // slice_info_row = slice_info_row.set_index('slice_id')
+    print('=============================\n'
+          f'Slice "{slice_name}" started\n  @ {slice_t0.ctime()}\n')
 
-    slice_info = slice_info_row.squeeze()
-    out_path = Path(slice_info.conllu_path)
-    # data_source_label = slice_info.loc['data_origin_group']
+    metadf.index = metadf.index.astype('string')
+
+    this_sl_metadf = metadf.loc[[slice_number], :]
+    this_sl_metadf = this_sl_metadf.assign(slice_name=slice_name,
+                                           slice_number=this_sl_metadf.index,
+                                           started_at=slice_t0.ctime())
+    # // slice_info_row = slice_info_row.set_index('slice_id')
+    this_sl_info = this_sl_metadf.squeeze()
 
     # parse slice and write to conllu output file
     successful_df = stanza_parse(
-        dfslice, out_path, slice_number, slices_total_str)
+        sldf, Path(this_sl_info.conllu_path), slice_number, slices_total_str)
+
+    successful_df.to_pickle(this_sl_info.final_slice_path)
+    slice_t1 = datetime.now()
+    print(f'Finished writing parses to {this_sl_info.conllu_path}\n'
+          f'  @ {slice_t1.ctime()}')
+    delta = trim_delta(slice_t0, slice_t1)
+    print(f'    {delta} -- Slice parsing time')
+
+    # // runtime = timedelta(seconds=round(
+    # // slice.timestamp() - global_start_time.timestamp()))
+    print(f'    {trim_delta(global_start_time, datetime.now())} '
+          '-- Current script runtime')
 
     # save version of dataframe for all texts actually processed
-    successful_df.to_pickle(slice_info.final_slice_path)
-    slice_info_row = slice_info_row.assign(finished_at=datetime.now().ctime())
-    master_slice_index_path = Path.cwd().joinpath(
-        'pile_tables/master_slice-index.csv')
-    if master_slice_index_path.is_file():
-        master_slice_info = pd.read_csv(master_slice_index_path)
+    this_sl_metadf = this_sl_metadf.assign(
+        finished_at=slice_t1.ctime(),
+        parsing_time=delta)
+
+    this_sl_metadf = this_sl_metadf.set_index('slice_name')
+
+    master_metadf_path = Path.cwd().joinpath(
+        'pile_tables/master_all-slices_index.csv')
+    if master_metadf_path.is_file():
+        master_slice_metadf = pd.read_csv(master_metadf_path)
 
     else:
-        master_slice_info = pd.DataFrame()
+        master_slice_metadf = pd.DataFrame()
 
-    master_slice_info = pd.concat([master_slice_info, slice_info_row])
-    if master_slice_info.index.name != 'slice_id':
-        master_slice_info = master_slice_info.set_index('slice_id')
+    if 'slice_name' in master_slice_metadf.columns:
+        master_slice_metadf = master_slice_metadf.set_index('slice_name')
 
-    master_slice_info.to_csv(master_slice_index_path)
-    print('Fully processed slice added to master slice index:',
-          str(master_slice_index_path.relative_to(Path.cwd())))
+    master_slice_metadf = pd.concat(
+        [master_slice_metadf, this_sl_metadf])
+    master_slice_metadf.to_csv(master_metadf_path)
+    print('Info for fully processed slice added to master completed slice meta index:',
+          master_metadf_path.relative_to(Path.cwd()))
 
-    if len(successful_df) == len(dfslice):
+    if len(successful_df) == len(sldf):
         print('No skipped texts added to exclusions')
         return
 
@@ -1101,7 +1139,7 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
     #     of the script.
     #     If for some reason the exclusions file cannot be found, run again.
     #        (but save with different name so as to not overwrite original.)
-    excl_save_path = get_dfpkl_outpath(slice_info.exclusions_path)
+    excl_save_path = get_dfpkl_outpath(this_sl_info.exclusions_path)
     if excl_save_path.is_file():
         excl_df = pd.read_pickle(excl_save_path)
         print('Adding skipped texts to', excl_save_path.relative_to(Path.cwd()))
@@ -1120,7 +1158,7 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
               backup_path.relative_to(Path.cwd()))
 
     # add any skipped texts/rows
-    skip_df = dfslice.loc[~dfslice.text_id.isin(successful_df.text_id), :]
+    skip_df = sldf.loc[~sldf.text_id.isin(successful_df.text_id), :]
     skip_df = skip_df.assign(excl_type='fail',
                              slice_id=skip_df.text_id,
                              text_id=skip_df.orig_text_id).reset_index()
@@ -1133,6 +1171,12 @@ def process_slice(dfslice: pd.DataFrame, slice_info):
     excl_df.to_pickle(excl_save_path)
 
 
+def trim_delta(start, end):
+    d = end - start
+    delta = d - timedelta(microseconds=d.microseconds)
+    return delta
+
+
 ### parsing functions ###
 def stanza_parse(df: pd.DataFrame, output_path: Path, filenum, total_num_slices: str):
     # TODO : change POS to XPOS; remove extra features?
@@ -1140,7 +1184,7 @@ def stanza_parse(df: pd.DataFrame, output_path: Path, filenum, total_num_slices:
     # all rows should be False at this point
     row_skipped = df.text.isna()
     num_texts_in_slice = len(df)
-    print(f'Starting output {filenum} of {total_num_slices}: '
+    print(f'Starting slice {filenum} of {total_num_slices}: '
           f'{num_texts_in_slice} texts in current slice')
     # open output file for conll formatted data
     print(f'  parsed data will be written to {output_path}')
@@ -1148,7 +1192,7 @@ def stanza_parse(df: pd.DataFrame, output_path: Path, filenum, total_num_slices:
         # for each text in the pile subset...
         for position_in_slice, ix in enumerate(df.index):
             # `position_in_slice` should only be used for ordinal/counting
-            parse_t0 = time.perf_counter()
+            parse_t0 = datetime.now()
             row_df = df.loc[[ix], :]
 
             text_id = row_df.text_id.squeeze()
@@ -1179,17 +1223,17 @@ def stanza_parse(df: pd.DataFrame, output_path: Path, filenum, total_num_slices:
                 doc = process_sentences(row_df, doc)
 
                 # write conll formatted string of doc to output file
-                conlloutput.write(doc2conll_text(doc))
+                conlloutput.write(_doc2conll_text(doc))
 
-            parse_t1 = time.perf_counter()
-            print(f'       ~ {round(parse_t1 - parse_t0, 1)}  seconds')
+            parse_t1 = datetime.now()
+            print('       ~', str(parse_t1 - parse_t0)[:10])
 
-    t = datetime.now()
-    print(f'Finished writing parses to {output_path}\n@{t.ctime()}]')
+    # // t = datetime.now()
+    # // print(f'Finished writing parses to {output_path}\n  @ {t.ctime()}')
 
-    delta = timedelta(seconds=round(
-        t.timestamp() - global_start_time.timestamp()))
-    print(f'  current script runtime: {delta}')
+    # // delta = timedelta(seconds=round(
+    # //     t.timestamp() - global_start_time.timestamp()))
+    # // print(f'  current script runtime: {delta}')
 
     successful_df = df.loc[~row_skipped, :]
     print(f'= {len(successful_df)} of '
