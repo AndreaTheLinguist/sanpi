@@ -1,0 +1,17 @@
+name: sanpi
+channels:
+  - pyconll
+  - defaults
+  - conda-forge
+dependencies:
+  - matplotlib
+  - more-itertools
+  - opam
+  - pandas
+  - pyconll
+  - python
+  - scipy
+  - tabulate
+  - unidecode
+prefix: ~/anaconda3/envs/sanpi
+

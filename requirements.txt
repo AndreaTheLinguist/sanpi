@@ -2,5 +2,4 @@ pandas
 tabulate
 pyconll
 scipy
-jsonlines
 Unidecode

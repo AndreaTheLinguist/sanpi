@@ -1,5 +1,6 @@
 #!/bin/bash
 # makeTable.sh
+#! obsolete code. Replaced by `./run_pipeline.py`
 
 echo "Arguments provided:" "$@"
 

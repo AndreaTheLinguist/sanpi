@@ -1,0 +1,23 @@
+name: dev-sanpi
+channels:
+  - pyconll
+  - defaults
+  - conda-forge
+dependencies:
+  - autopep8
+  - ipykernel
+  - ipython
+  - jupyter_client
+  - jupyter_core
+  - matplotlib
+  - more-itertools
+  - opam
+  - pandas
+  - pyconll
+  - pylint
+  - python
+  - scipy
+  - tabulate
+  - unidecode
+prefix: ~/anaconda3/envs/dev-sanpi
+
