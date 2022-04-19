@@ -9,6 +9,7 @@ test_json_dir/*
 old/*
 .idea/*
 .history/*
+.untracked/*
 **/*.__ini 
 
 # "smart versioned" file copies

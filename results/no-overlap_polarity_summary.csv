@@ -1,6 +1,0 @@
-,colloc,colloc,colloc,colloc,context,context,context,context,context_word,context_word,context_word,context_word,context_type,context_type,context_type,context_type,context_group,context_group,context_group,context_group,adv,adv,adv,adv,adj,adj,adj,adj
-,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq,count,unique,top,freq
-polarity,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-negative,260417,34716,immediately_clear,15784,260417,15,not_VP-adv,238598,260417,12,not,238598,260417,6,VP-adv,245900,260417,3,neg-ext-nonsubj,246489,260417,1606,as,55538,260417,8638,clear,21110
-positive,374956,80650,too_early,2688,374956,1,be-ADV-ADJ_positive,374956,374956,1,be-ADV-ADJ,374956,374956,1,basic,374956,374956,1,outdated_input_file,374956,374956,3186,very,50781,374954,12821,good,10436
-unknown,5712,2563,so_excited,74,5712,3,everyone_subj,2881,5712,3,everyone,2881,5712,2,subj,4486,5712,1,unknown-polarity,5712,5712,385,so,1552,5712,1057,excited,277

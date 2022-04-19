@@ -4,6 +4,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
+  - bubblewrap
   - autopep8
   - ipykernel
   - ipython
