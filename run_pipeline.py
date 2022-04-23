@@ -1,38 +1,42 @@
-"""simple "glue" script to initiate multiple pipes in one go. 
-            If no arguments are given, every corpus dir and pattern subdir 
+# coding=utf-8
+"""
+    simple "glue" script to initiate multiple pipes in one go.
+            If no arguments are given, every corpus dir and pattern subdir
             in the current working directory will be run.
 
+    usage: run_pipeline.py [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
     Returns:
-        panas.DataFrame formatted into a csv file for every combination of 
+        panas.DataFrame formatted into a csv file for every combination of
         corpus directory and pattern file
-    """
-
+"""
 
 import argparse
 import os
 import time
 from pathlib import Path
+from tkinter.tix import IMMEDIATE
 
+# TODO : turn scripts into utilities and import
 # from script.grewSearchDir import grew_search
 # from script.FillJson import fill_json
 # from script.
 
-# TODO : turn scripts into utilities and import
 # TODO : add counter/progress message: e.g. x out of total
+DATA_DIR = Path.home().joinpath('data')
 
 
-def main():
+def _main():
 
-    args = parse_input_args()
+    args = _parse_input_args()
 
     # check requirements
-    os.system('bash script/checkRequirements.sh')
+    os.system('bash script/condacheck.sh')
 
     patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
                else list(Path.cwd().glob('Pat/*')))
 
-    corpora = ((c.resolve() for c in args.corpora) if args.corpora
-               else list(Path.cwd().glob('*.conll')))
+    corpora = ((c for c in args.corpora) if args.corpora
+               else (DATA_DIR.glob('devel/*.conll')))
 
     for patdir in patdirs:
         # skip any directories without at least one .pat file
@@ -42,52 +46,55 @@ def main():
         for corpus in corpora:
 
             print(
-                f'>> searching `{corpus.relative_to(Path.cwd())}` for '
-                f'patterns specified in _{patdir.relative_to(Path.cwd())}_...')
+                f'>> searching `{corpus}` for '
+                f'patterns specified in `{patdir}`...')
 
             # run grew search
             for pat in patdir.iterdir():
                 # args: corpus_dir pat_file output
                 corpus_name = corpus.stem.split('.')[0]
                 output_label = '.'.join([corpus_name, pat.stem])
-                data_dir = Path(f'data/{patdir.stem}/{output_label}').resolve()
-                if not data_dir.is_dir():
-                    data_dir.mkdir(parents=True)
+                output_dir = DATA_DIR.joinpath(
+                    f'sanpi/1_json_grew-matches/{patdir.stem}/{output_label}')
+                if not output_dir.is_dir():
+                    output_dir.mkdir(parents=True)
 
-                run_grew(pat, corpus, data_dir, args.replace_raw_data)
+                _run_grew(pat, corpus, output_dir, args.replace_raw_data)
 
                 # run fill json
-                # args: FillJson.py [-h] CONLLU_DIR RAW_DIR [-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}]
-                filljson_cmd = f'python3 script/FillJson.py {corpus}/ {data_dir}/'
-                print('\n'+filljson_cmd)
+                # args: FillJson.py [-h] CONLLU_DIR RAW_DIR
+                #                   ([-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}])
+                filljson_cmd = f'python script/FillJson.py {corpus}/ {output_dir}/'
+                print('\n' + filljson_cmd)
                 os.system(filljson_cmd)
 
                 # run tabulate
                 # usage: tabulateHits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
-                tabulate_cmd = f'python3 script/tabulateHits.py {data_dir} {corpus_name}_{pat.stem}'
+                tabulate_cmd = f'python script/tabulateHits.py {output_dir} {corpus_name}_{pat.stem}'
 
                 print('\n'+tabulate_cmd)
                 os.system(tabulate_cmd)
 
 
-def run_grew(pat, corpus, data_dir, replace):
+def _run_grew(pat, corpus_dir, match_dir, replace):
 
     if not replace:
         # if all grew output files already exist in data_dir
-        prev_grew_run = set([d.stem.split('.')[0] for d in data_dir.glob(
-            '*raw*')]) == set([c.stem for c in corpus.iterdir()])
+        prev_grew_run = (set(d.stem.split('.')[0]
+                             for d in match_dir.glob('*raw*'))
+                         == set(c.stem for c in corpus_dir.iterdir()))
 
         if prev_grew_run:
-            print(
-                f'\n{data_dir.relative_to(Path.cwd())} is already fully populated from previous run. Skipping.')
+            print(f'\n{match_dir.relative_to(DATA_DIR)} '
+                  'is already fully populated from previous run. Skipping.')
             return
 
-    grew_cmd = f'python3 script/grewSearchDir.py {corpus}/ {pat} {data_dir}'
+    grew_cmd = f'python script/grewSearchDir.py {corpus_dir}/ {pat} {match_dir}'
     print('\n'+grew_cmd)
     os.system(grew_cmd)
 
 
-def parse_input_args():
+def _parse_input_args():
 
     parser = argparse.ArgumentParser(
         description=(
@@ -104,7 +111,7 @@ def parse_input_args():
     parser.add_argument('-p', '--patterns', action='append', dest='patterndirs',
                         help='specify pattern directory containing patterns to search for. '
                         'Can include as many as desired, but each one needs a flag. '
-                        'If none specified, all patterns specified in a `.pat` file '
+                        'If none specified, all patterns (`.pat` files) '
                         'will be sought.',
                         type=Path)
 
@@ -121,6 +128,6 @@ def parse_input_args():
 
 if __name__ == '__main__':
     t0 = time.perf_counter()
-    main()
+    _main()
     t1 = time.perf_counter()
     print(f'total time: {round((t1-t0)/60, 2)} minutes')

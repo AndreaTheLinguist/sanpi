@@ -10,16 +10,16 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi"
+            "cwd": "${workspaceFolder}"
         },
         // * Pipeline
         {
-            "name": "pipeline",
+            "name": "pipeline puddin val",
             "type": "python",
             "request": "launch",
             "program": "run_pipeline.py",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi",
+            "cwd": "${workspaceFolder}",
             //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
             "args": [
                 "-c",
@@ -30,30 +30,30 @@
         },
         // * Grew Search
         {
-            "name": "grew search",
+            "name": "apw grew relayed",
             "type": "python",
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi",
+            "cwd": "${workspaceFolder}",
             "args": [
-                "/home/arh234/data/sanpi/apwtest.conll/",
-                "Pat/nonimmediateNeg/with_relay.pat",
-                "apwtest.with_relay"
+                "/home/arh234/data/devel/apwtest.conll/",
+                "Pat/nonimmediateNeg/with-relay.pat",
+                "apwtest.with-relay"
             ]
         },
         {
-            "name": "Pile grew search",
+            "name": "puddin grew immediate",
             "type": "python",
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi",
+            "cwd": "${workspaceFolder}",
             // args: corpus_dir pat_file output
             "args": [
-                "/home/arh234/data/sanpi/PccVa.conll/",
-                "Pat/immediateNeg/without_relay.pat",
-                "pile.without_relay"
+                "/home/arh234/data/devel/quicktest.conll/",
+                "Pat/immediateNeg/without-relay.pat",
+                "PccVa.without-relay"
             ]
         },
         {
@@ -62,85 +62,84 @@
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
-            "cwd": "~/projects/sanpi",
+            "cwd": "${workspaceFolder}",
             // args: corpus_dir pat_file output
             "args": [
-                "~/data/puddin/PccVa.conll/",
-                "Pat/immediateNeg/without_relay.pat",
-                "PccVa.without_relay"
+                "/home/arh234/data/puddin/PccVa.conll/",
+                "Pat/immediateNeg/without-relay.pat",
+                "PccVa.without-relay"
             ]
         },
         // * Fill Json
         {
-            "name": "FillJson testing devel",
+            "name": "FillJson testing immed-val",
             "type": "python",
             "request": "launch",
-            "program": "/home/arh234/projects/sanpi/script/FillJson.py",
+            "program": "script/FillJson.py",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi/",
+            "cwd": "${workspaceFolder}",
             // args: [-h] CONLLU_DIR RAW_DIR [-o OUTPUT_DIR] 
             //          ([-w {yes,no,check}] [-t {lemma,form}])
             "args": [
-                "~/data/devel/quicktest.conll",
-                "~/data/sanpi/immediateNeg/quicktest.without_relay"
+                "/home/arh234/data/puddin/PccVa.conll/",
+                "/home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay/"
             ]
         },
         {
             "name": "FillJson quicktest",
             "type": "python",
             "request": "launch",
-            "program": "~/projects/sanpi/script/FillJson.py",
+            "program": "script/FillJson.py",
             "console": "integratedTerminal",
-            "cwd": "~/projects/sanpi/",
             // args: [-h] CONLLU_DIR RAW_DIR [-o OUTPUT_DIR] 
             //          ([-w {yes,no,check}] [-t {lemma,form}])
             "args": [
-                "~/data/devel/quicktest.conll",
-                "~/data/immediateNeg/quicktest.without_relay"
+                "/home/arh234/data/devel/quicktest.conll",
+                "/home/arh234/data/immediateNeg/quicktest.without-relay"
             ]
         },
         // * Tabulate Hits
         {
-            "name": "main tabulateHits",
+            "name": "tabulateHits puddin pcc val",
             "type": "python",
             "request": "launch",
-            "program": "/home/arh234/projects/sanpi/script/tabulateHits.py",
+            "program": "script/tabulateHits.py",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi",
+            "cwd": "${workspaceFolder}",
             "args": [
-                "/home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/[original conllu stem].without_relay",
-                "temp"
+                "/home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay",
+                "PccVa_without-relay"
             ]
         },
         {
-            "name": "tabulateHits",
+            "name": "tabulateHits devel",
             "type": "python",
             "request": "launch",
-            "program": "~/projects/sanpi/script/tabulateHits.py",
+            "program": "script/tabulateHits.py",
             "console": "integratedTerminal",
-            "cwd": "~/projects/sanpi",
-            // args: 
+            "cwd": "${workspaceFolder}",
+            // args: [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
             "args": [
-                "[]",
+                "[filled json dir]",
                 "temp"
             ]
         },
         // * Get Frequencies
+        {
+            "name": "getFrequecies abs",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+        },
         {
             "name": "getFrequecies",
             "type": "python",
             "request": "launch",
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
             "console": "integratedTerminal",
-            "cwd": "/home/arh234/projects/sanpi",
-        },
-        {
-            "name": "getFrequecies",
-            "type": "python",
-            "request": "launch",
-            "program": "~/projects/sanpi/script/getFrequencies.py",
-            "console": "integratedTerminal",
-            "cwd": "~/projects/sanpi",
+            "cwd": "${workspaceFolder}",
         },
         // * simple view hits
         // {
@@ -149,9 +148,9 @@
         //     "request": "launch",
         //     "program": "/home/arh234/projects/sanpi/script/simple_view_hits.py",
         //     "console": "integratedTerminal",
-        //     "cwd": "/home/arh234/projects/sanpi/",
+        //     "cwd": "${workspaceFolder},
         //     "args": [
-        //         "hits_new/immediateNeg/apwtest_without_relay_hits.csv",
+        //         "hits_new/immediateNeg/apwtest_without-relay_hits.csv",
         //         "script-debug",
         //         // "-k", 
         //         // "word", 
@@ -167,11 +166,11 @@
         //     "name": "specified simple_view_hits",
         //     "type": "python",
         //     "request": "launch",
-        //     "program": "~/projects/sanpi/script/simple_view_hits.py",
+        //     "program": "/home/arh234/projects/sanpi/script/simple_view_hits.py",
         //     "console": "integratedTerminal",
-        //     "cwd": "~/projects/sanpi/",
+        //     "cwd": "${workspaceFolder},
         //     "args": [
-        //         // "hits_new/immediateNeg/apwtest_without_relay_hits.csv",
+        //         // "hits_new/immediateNeg/apwtest_without-relay_hits.csv",
         //         // "script-debug",
         //         // "-k", 
         //         // "word", 

@@ -13,9 +13,9 @@ toktup = namedtuple('token', ['lemma', 'ix', 'xpos', 'deprel', 'head'])
 
 def fill_json():
     absStart = time.perf_counter()
-    args = parseArgs()
+    args = _parseArgs()
 
-    prefixes, outputDir = check_dirs(args)
+    prefixes, outputDir = _check_dirs(args)
 
     jsonDirPath = args.raw_dir
     conllDirPath = args.conllu_dir
@@ -30,34 +30,32 @@ def fill_json():
 
         startTime = time.perf_counter()
 
-        jsonfile = jsonDirPath.joinpath(f'{pref}.raw.json')
-        conllfile = conllDirPath.joinpath(f'{pref}.conllu')
-
-        if rewrite != 'yes' and skipFiles(pref, jsonDirPath, rewrite):
+        jsonfiles = jsonDirPath.glob(f'{pref}*')
+        # //if rewrite != 'yes' and _skipFiles(pref, jsonDirPath, rewrite):
+        if any('raw' not in j.suffixes for j in jsonfiles):
             print(
-                f'-> Files with prefix {pref} have prior processing:\n'
-                f'   + File {jsonfile.relavtive_to(jsonfile.parent)} '
-                f'(from prior run) was not replaced.')
+                f'-> {pref} data was previously processed. Skipping.')
             continue
 
         print(f'-> Processing {pref}...')
-
+        conllfile = conllDirPath.joinpath(f'{pref}.conllu')
+        jsonfile = jsonDirPath.joinpath(f'{pref}.raw.json')
         # load json object
         # note that ordering of sentence ids in json file are reverse of conllu
-        hits = load_hits_json(jsonfile)
+        hits = _load_hits_json(jsonfile)
 
         if not hits:
-            print(f'! -> Skipping. (file is empty)')
+            print('! -> Skipping. (file is empty)')
             continue
 
-        hits, json_entry_count, conll_count = add_conll_info(hits, conllfile)
+        hits, json_entry_count, conll_count = _add_conll_info(hits, conllfile)
 
         finishTime = time.perf_counter()
 
         print(f'    + {json_entry_count} hit results filled from {conll_count} total original '
               f'sentences in {round(finishTime - startTime, 2)} seconds')
 
-        write_new(outputDir, pref, hits)
+        _write_new(outputDir, pref, hits)
 
     print('Finished processing all corresponding json and conll files.')
     absFinish = time.perf_counter()
@@ -66,12 +64,12 @@ def fill_json():
         '====================================\n')
 
 
-def add_conll_info(hits, conllfile):
+def _add_conll_info(hits, conllfile):
 
     # TODO add info on what the "trigger" word is, and words directly preceding adv?
 
     # connect (possible) context ids with hit ids
-    hit_ids, prev_ids, next_ids = include_context(hits)
+    hit_ids, prev_ids, next_ids = _include_context(hits)
 
     # create dictionary mapping sentence id to text for possible context sentences
     # context_sent_dict = {i.id: i.text
@@ -102,7 +100,7 @@ def add_conll_info(hits, conllfile):
         sent_id = hit_conll.id
         sent_text = hit_conll.text
 
-        if sent_id == get_context_id(prev_id, 1) and prev_id in hit_ids:
+        if sent_id == _get_context_id(prev_id, 1) and prev_id in hit_ids:
 
             # hitIndexList should always be defined if previous sentence was a hit
             for hitIndex in hitIndexList:
@@ -110,7 +108,7 @@ def add_conll_info(hits, conllfile):
 
         if sent_id in hit_ids:
 
-            if prev_id == get_context_id(sent_id, -1):
+            if prev_id == _get_context_id(sent_id, -1):
                 prev_sent = prev_text
 
             id_to_ix = hit_conll._ids_to_indexes
@@ -132,10 +130,10 @@ def add_conll_info(hits, conllfile):
                 hit['token_str'] = ' '.join(t.form for t in tokdictlist)
                 hit['lemma_str'] = ' '.join(t.lemma for t in tokdictlist)
 
-                update_tokens(hit_conll, tokdictlist, id_to_ix,
+                _update_tokens(hit_conll, tokdictlist, id_to_ix,
                               hit, raw_match_info)
 
-                hit['deps'] = get_deps(raw_match_info['edges'],
+                hit['deps'] = _get_deps(raw_match_info['edges'],
                                        tokdictlist, id_to_ix)
 
                 json_entry_count += 1
@@ -145,7 +143,7 @@ def add_conll_info(hits, conllfile):
     return hits, json_entry_count, conll_count
 
 
-def include_context(hits):
+def _include_context(hits):
 
     # context = namedtuple('context', ['prev_id', 'next_id'])
 
@@ -158,7 +156,7 @@ def include_context(hits):
     return hit_ids, prev_ids, next_ids
 
 
-def get_context_id(sid, position: int):
+def _get_context_id(sid, position: int):
 
     if '_' in sid:
         parts = sid.rsplit('_', 1)
@@ -170,7 +168,7 @@ def get_context_id(sid, position: int):
     return cix
 
 
-def update_tokens(info, tokdictlist, id_to_ix, hit, raw_match_info):
+def _update_tokens(info, tokdictlist, id_to_ix, hit, raw_match_info):
     nodes = raw_match_info['nodes']
 
     tok_lemmas = tok_forms = {}
@@ -188,11 +186,11 @@ def update_tokens(info, tokdictlist, id_to_ix, hit, raw_match_info):
     hit['forms'] = tok_forms
 
     for node, id in nodes.items():
-        nodes[node] = get_ix(id_to_ix, id)
+        nodes[node] = _get_ix(id_to_ix, id)
     hit['index'] = nodes
 
 
-def load_hits_json(jsonfile):
+def _load_hits_json(jsonfile):
 
     hits = None
 
@@ -213,14 +211,14 @@ def load_hits_json(jsonfile):
     return hits
 
 
-def write_new(outputDir, pref, hits):
+def _write_new(outputDir, pref, hits):
 
     with open(outputDir / f'{pref}.json', 'w') as o:
         print('   -> Writing output file...')
         json.dump(hits, o, indent=2)
 
 
-def check_dirs(args):
+def _check_dirs(args):
 
     jsonDirPath = args.raw_dir
     conllDirPath = args.conllu_dir
@@ -232,7 +230,7 @@ def check_dirs(args):
             ' in the base directory.')
 
     if len(list(jsonDirPath.iterdir())) > 0:
-        prefixes = getValidPrefixes(jsonDirPath, conllDirPath)
+        prefixes = _getValidPrefixes(jsonDirPath, conllDirPath)
 
         if not prefixes:
             sys.exit('Error: No corresponding .json and .conllu files found.')
@@ -248,12 +246,12 @@ def check_dirs(args):
     return prefixes, outputDir
 
 
-def get_deps(edges, tokdictlist, id_to_ix):
+def _get_deps(edges, tokdictlist, id_to_ix):
     deps = {}
     for edge, parts in edges.items():
 
-        source_tok = process_edge(parts['source'], tokdictlist, id_to_ix)
-        target_tok = process_edge(parts['target'], tokdictlist, id_to_ix)
+        source_tok = _process_edge(parts['source'], tokdictlist, id_to_ix)
+        target_tok = _process_edge(parts['target'], tokdictlist, id_to_ix)
 
         label = parts['label']
         if type(label) == dict:
@@ -266,16 +264,16 @@ def get_deps(edges, tokdictlist, id_to_ix):
     return deps
 
 
-def process_edge(id, tokdicts, id_to_ix):
-    ix = get_ix(id_to_ix, id)
+def _process_edge(id, tokdicts, id_to_ix):
+    ix = _get_ix(id_to_ix, id)
     tok = tokdicts[ix]
-    head = tokdicts[get_ix(id_to_ix, tok.head)].lemma
+    head = tokdicts[_get_ix(id_to_ix, tok.head)].lemma
 
     tokt = toktup(tok.lemma, ix, tok.xpos, tok.deprel, head)
     return tokt
 
 
-def get_ix(id_to_ix, id):
+def _get_ix(id_to_ix, id):
     try:
         ix = id_to_ix[id]
     except KeyError:
@@ -283,7 +281,7 @@ def get_ix(id_to_ix, id):
     return ix
 
 
-def parseArgs():
+def _parseArgs():
     parser = argparse.ArgumentParser(
         description=(
             'This is a script to loop over all \'.raw.json\' (grew-match '
@@ -326,7 +324,7 @@ def parseArgs():
     return parser.parse_args()
 
 
-def getValidPrefixes(jsonDir, conllDir):
+def _getValidPrefixes(jsonDir, conllDir):
     '''function to return list of file prefixes which have both conll and raw
         json files '''
 
@@ -338,24 +336,18 @@ def getValidPrefixes(jsonDir, conllDir):
     return rawJsonSet.intersection(conlluSet)
 
 
-def skipFiles(prefix, directory, rewrite):
-
+def _skipFiles(prefix, directory, rewrite):
     if directory.joinpath(f'{prefix}.json').exists():
-
         if rewrite == 'no':
             return True
-
         while rewrite == 'check':
             skipResponse = input(f'Filled json for prefix {prefix} already '
                                  f'exists in directory {directory}. Do you '
                                  f'want to skip this file pair? y/n ')
-
             if skipResponse.lower() == 'y':
                 return True
-
             if skipResponse.lower() == 'n':
                 return False
-
     return False
 
 

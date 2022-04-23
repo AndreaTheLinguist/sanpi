@@ -9,26 +9,28 @@ from pathlib import Path
 
 import pandas as pd
 
+DATA_DIR = Path.home().joinpath('data')
+
 
 def tabulate_hits():
     absStart = time.perf_counter()
     print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
-    args = parseArgs()
+    args = _parseArgs()
 
-    json_dir = args.pat_json_dir.resolve()
+    json_dir = args.grew_match_dir
     if not json_dir.exists():
         sys.exit('Error: Specified json directory does not exist.')
     if not json_dir.is_dir():
         sys.exit('Error: Specified json path is not a directory.')
 
-    hit_data = getHitData(json_dir, args)
+    hit_data = _getHitData(json_dir, args)
 
     hit_count = len(hit_data)
     if hit_count > 0:
         print(f'\n^_^ Finished tabulating data for {hit_count}'
               f' sentence(s) from all json files in {json_dir}.\n'
               '-> Writing tables to csv files...')
-        createOutput(hit_data, args)
+        _createOutput(hit_data, args)
     else:
         sys.exit('No valid hits found.')
 
@@ -37,23 +39,26 @@ def tabulate_hits():
           '====================================\n')
 
 
-def parseArgs():
+def _parseArgs():
     parser = argparse.ArgumentParser(
         description='script consolidate relevant hit data from filled json files into csv files')
 
-    parser.add_argument('pat_json_dir', type=Path,
+    parser.add_argument('grew_match_dir', type=Path,
                         help='path to directory containing filled json files '
                              'for pattern.')
 
     parser.add_argument('outputPrefix', type=str,
-                        help='prefix for output file to be written to the '
-                             '\'hits\' subdirectory (created if necessary) '
-                             'found in the directory the script is run from. '
-                             'This should be a string which contains info about '
-                             'the patterns, corpus data set, and nodes counted; '
-                             'e.g. \'Nyt1_[pattern filename]_\' which would '
-                             'result in the output file \'freq/Nyt1_p1-n1_adv-'
-                             'adj_counts.csv\'.')
+                        help=('prefix for output file to be written to the '
+                              '`~/data/sanpi/2_csv_hits` subdirectory (created if necessary) '
+                              'found in the directory the script is run from. '
+                              'This should be a string which contains info about '
+                              'the patterns, corpus data set, and nodes counted; '
+                              'e.g. `Nyt1_[pattern filename]_` '
+                              #  'which would '
+                              #  'result in the output file \'freq/Nyt1_p1-n1_adv-'
+                              #  'adj_counts.csv\'.'
+                              )
+                        )
 
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Option to increase verbosity of console output')
@@ -61,7 +66,7 @@ def parseArgs():
     return parser.parse_args()
 
 
-def getHitData(json_dir, args):
+def _getHitData(json_dir, args):
 
     fileCount = 0
     df_from_json = pd.DataFrame()
@@ -72,24 +77,24 @@ def getHitData(json_dir, args):
         sys.exit('Error: specified json directory does not contain any '
                  'processed json files.')
 
-    for jf in processed_files:
+    for json_file in processed_files:
 
         fileCount += 1
 
-        print(f'-> Processing {jf.name}...')
+        print(f'-> Processing {json_file.name}...')
 
-        with open(jf, 'r', encoding='utf-8') as j:
+        with open(json_file, 'r', encoding='utf-8') as j:
 
             json_dicts = json.load(j)
 
             if len(json_dicts) < 1:
 
-                print(f'--> File is empty. Skipping.')
+                print('--> File is empty. Skipping.')
                 continue
 
             if 'matching' in json_dicts[0].keys():
-                raw_path = jf.with_suffix('.raw.json')
-                print(f'-> Warning: Node labels have not been filled for {jf}. '
+                raw_path = json_file.with_suffix('.raw.json')
+                print(f'-> Warning: Node labels have not been filled for {json_file}. '
                       'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
                 continue
@@ -101,13 +106,13 @@ def getHitData(json_dir, args):
 
         df = (df
               .rename(columns={'text': 'sent_text'})
-              .assign(json_source=jf.stem))
+              .assign(json_source=json_file.stem))
 
         invert_pat = re.compile(r'(\w+)_([A-Z]+)')
         df.columns = [invert_pat.sub(r'\2_\1', label).lower()
                       for label in df.columns]
 
-        df = process_ix(df)
+        df = _process_ix(df)
 
         df = df.convert_dtypes()
 
@@ -125,10 +130,10 @@ def getHitData(json_dir, args):
     return df_from_json
 
 
-def process_ix(df):
-    if any(df.token_str.isna()): 
+def _process_ix(df):
+    if any(df.token_str.isna()):
         print(' --> WARNING: empty token string(s) in json data.')
-    df = df.assign(token_str = df.token_str.astype('string').fillna(''))
+    df = df.assign(token_str=df.token_str.astype('string').fillna(''))
     utt_len = df.token_str.apply(lambda x: len(x))
     ix_df = df.loc[:, df.columns.str.endswith('index')
                    ].fillna(0)
@@ -140,7 +145,7 @@ def process_ix(df):
                          utt_len=utt_len,
                          token_str=df.token_str)
 
-    windows = list(generate_window(ix_df))
+    windows = list(_generate_window(ix_df))
 
     # select index int columns to be used in creating hit id
     tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
@@ -152,7 +157,7 @@ def process_ix(df):
     return df
 
 
-def generate_window(df):
+def _generate_window(df):
 
     for row in df.index:
         min_ix = df.at[row, 'min_ix']
@@ -167,12 +172,13 @@ def generate_window(df):
         yield ' '.join(df.token_str[row].split()[w0:w1])
 
 
-def createOutput(hits_df, args):
+def _createOutput(hits_df, args):
 
-    patPath = args.pat_json_dir
-    patcat = patPath.parent.stem
+    # home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay
+    patPath = args.grew_match_dir
+    pat_category = patPath.parent.stem
 
-    outputDir = patPath.cwd() / 'hits' / patcat
+    outputDir = DATA_DIR.joinpath(f'sanpi/2_csv_hits/{pat_category}')
 
     if not outputDir.exists():
         outputDir.mkdir(parents=True)
@@ -181,7 +187,7 @@ def createOutput(hits_df, args):
 
     hits_df = hits_df.set_index('hit_id')
 
-    hits_df = hits_df.assign(category=patcat).convert_dtypes()
+    hits_df = hits_df.assign(category=pat_category).convert_dtypes()
     hit_cols = hits_df.columns
 
     # set given columns as categories (to reduce memory impact)
