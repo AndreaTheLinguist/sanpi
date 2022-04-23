@@ -14,7 +14,6 @@ import argparse
 import os
 import time
 from pathlib import Path
-from tkinter.tix import IMMEDIATE
 
 # TODO : turn scripts into utilities and import
 # from script.grewSearchDir import grew_search
