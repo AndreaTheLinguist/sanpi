@@ -25,7 +25,23 @@
                 "-c",
                 "/home/arh234/data/puddin/PccVa.conll/",
                 "-p",
-                "Pat/immediateNeg"
+                "Pat/contig"
+            ]
+        },
+        {
+            "name": "pipeline puddin val env-check",
+            "type": "python",
+            "request": "launch",
+            "program": "run_pipeline.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
+            "args": [
+                "-c",
+                "/home/arh234/data/puddin/PccVa.conll/",
+                "-p",
+                "Pat/contig",
+                "--env_check"
             ]
         },
         // * Grew Search
@@ -38,7 +54,7 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "/home/arh234/data/devel/apwtest.conll/",
-                "Pat/nonimmediateNeg/with-relay.pat",
+                "Pat/noncontig/with-relay.pat",
                 "apwtest.with-relay"
             ]
         },
@@ -52,12 +68,12 @@
             // args: corpus_dir pat_file output
             "args": [
                 "/home/arh234/data/devel/quicktest.conll/",
-                "Pat/immediateNeg/without-relay.pat",
-                "PccVa.without-relay"
+                "Pat/contig/sans-relay.pat",
+                "PccVa.sans-relay"
             ]
         },
         {
-            "name": "pcc-val grew without-relay",
+            "name": "pcc-val grew sans-relay",
             "type": "python",
             "request": "launch",
             "program": "script/grewSearchDir.py",
@@ -66,8 +82,8 @@
             // args: corpus_dir pat_file output
             "args": [
                 "/home/arh234/data/puddin/PccVa.conll/",
-                "Pat/immediateNeg/without-relay.pat",
-                "PccVa.without-relay"
+                "Pat/contig/sans-relay.pat",
+                "PccVa.sans-relay"
             ]
         },
         // * Fill Json
@@ -82,7 +98,7 @@
             //          ([-w {yes,no,check}] [-t {lemma,form}])
             "args": [
                 "/home/arh234/data/puddin/PccVa.conll/",
-                "/home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay/"
+                "/home/arh234/data/sanpi/1_json_grew-matches/contig/PccVa.sans-relay/"
             ]
         },
         {
@@ -95,7 +111,7 @@
             //          ([-w {yes,no,check}] [-t {lemma,form}])
             "args": [
                 "/home/arh234/data/devel/quicktest.conll",
-                "/home/arh234/data/immediateNeg/quicktest.without-relay"
+                "/home/arh234/data/contig/quicktest.sans-relay"
             ]
         },
         // * Tabulate Hits
@@ -107,8 +123,8 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "args": [
-                "/home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay",
-                "PccVa_without-relay"
+                "/home/arh234/data/sanpi/1_json_grew-matches/contig/PccVa.sans-relay",
+                "PccVa_sans-relay"
             ]
         },
         {
@@ -150,7 +166,7 @@
         //     "console": "integratedTerminal",
         //     "cwd": "${workspaceFolder},
         //     "args": [
-        //         "hits_new/immediateNeg/apwtest_without-relay_hits.csv",
+        //         "hits_new/contig/apwtest_sans-relay_hits.csv",
         //         "script-debug",
         //         // "-k", 
         //         // "word", 
@@ -170,7 +186,7 @@
         //     "console": "integratedTerminal",
         //     "cwd": "${workspaceFolder},
         //     "args": [
-        //         // "hits_new/immediateNeg/apwtest_without-relay_hits.csv",
+        //         // "hits_new/contig/apwtest_sans-relay_hits.csv",
         //         // "script-debug",
         //         // "-k", 
         //         // "word", 

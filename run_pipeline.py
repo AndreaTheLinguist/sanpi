@@ -23,7 +23,7 @@ from pathlib import Path
 
 DATA_DIR = Path.home().joinpath('data')
 SCRIPT_DIR = Path(argv[0]).with_name('script')
-print(f' scripts located in {SCRIPT_DIR}')
+    # print(f' scripts located in {SCRIPT_DIR}')
 
 
 def _main():
@@ -31,7 +31,8 @@ def _main():
     args = _parse_input_args()
 
     # check requirements
-    os.system('bash script/condacheck.sh')
+    if args.env_check:
+        os.system('bash script/condacheck.sh')
     patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
                else list(SCRIPT_DIR.parent.glob('Pat/*')))
 
@@ -103,26 +104,31 @@ def _parse_input_args():
             'If no arguments are given, every corpus dir and pattern subdir '
             'in the current working directory will be run.'))
 
-    parser.add_argument('-c', '--corpus', action='append', dest='corpora',
-                        help='specify any corpus directory to be searched for pattern(s). '
-                        'Can include as many as desired, but each one needs a flag. '
-                        'If none specified, all `.conll` directories will be searched.',
-                        type=Path)
+    parser.add_argument('-c', '--corpus', action='append', dest='corpora', type=Path,
+                        help=('specify any corpus directory to be searched for pattern(s). '
+                              'Can include as many as desired, but each one needs a flag. '
+                              'If none specified, all `.conll` directories will be searched.')
+                        )
 
-    parser.add_argument('-p', '--patterns', action='append', dest='patterndirs',
-                        help='specify pattern directory containing patterns to search for. '
-                        'Can include as many as desired, but each one needs a flag. '
-                        'If none specified, all patterns (`.pat` files) '
-                        'will be sought.',
-                        type=Path)
+    parser.add_argument('-p', '--patterns', action='append', dest='patterndirs', type=Path,
+                        help=('specify pattern directory containing patterns to search for. '
+                              'Can include as many as desired, but each one needs a flag. '
+                              'If none specified, all patterns (`.pat` files) '
+                              'will be sought.')
+                        )
 
     parser.add_argument('-R', '--replace_raw_data', action='store_true',
-                        help='option to replace existing raw grew json output (`...raw.json` '
-                        'files) from a previous run. If not included, previous data '
-                        'will not be overwritten and grew search step will only be '
-                        'performed for data directories that are incompletely populated. '
-                        'Raw data processing scripts will still be run regardless '
-                        '(on existing `.raw.json` files).')
+                        help=('option to replace existing raw grew json output '
+                              '(`...raw.json` files) from a previous run. If not included, '
+                              'previous data will not be overwritten and grew search step '
+                              'will only be performed for data directories that are '
+                              'incompletely populated. '
+                              'Raw data processing scripts will still be run regardless '
+                              '(on existing `.raw.json` files).'))
+
+    parser.add_argument('-E', '--env_check', action='store_true',
+                        help=('option to confirm environment satisfies requirements '
+                              'before running programs.'))
 
     return parser.parse_args()
 
