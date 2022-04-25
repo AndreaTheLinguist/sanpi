@@ -28,6 +28,7 @@ def grew_search():
     # os.system(testDirStr)
 
     # iterate over items in dirPath ending with ".conllu"
+    # TODO: make this a parallel loop? 
     for f in (i for i in dirPath.iterdir() if i.suffix == '.conllu'):
 
         fstart = time.perf_counter()

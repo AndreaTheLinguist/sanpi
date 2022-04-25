@@ -13,6 +13,7 @@
 import argparse
 import os
 import time
+from sys import argv
 from pathlib import Path
 
 # TODO : turn scripts into utilities and import
@@ -20,8 +21,9 @@ from pathlib import Path
 # from script.FillJson import fill_json
 # from script.
 
-# TODO : add counter/progress message: e.g. x out of total
 DATA_DIR = Path.home().joinpath('data')
+SCRIPT_DIR = Path(argv[0]).with_name('script')
+print(f' scripts located in {SCRIPT_DIR}')
 
 
 def _main():
@@ -30,13 +32,13 @@ def _main():
 
     # check requirements
     os.system('bash script/condacheck.sh')
-
     patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
-               else list(Path.cwd().glob('Pat/*')))
+               else list(SCRIPT_DIR.parent.glob('Pat/*')))
 
     corpora = ((c for c in args.corpora) if args.corpora
                else (DATA_DIR.glob('devel/*.conll')))
 
+    # TODO: turn into parallel loop
     for patdir in patdirs:
         # skip any directories without at least one .pat file
         if not list(patdir.glob('*.pat')):
@@ -63,13 +65,13 @@ def _main():
                 # run fill json
                 # args: FillJson.py [-h] CONLLU_DIR RAW_DIR
                 #                   ([-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}])
-                filljson_cmd = f'python script/FillJson.py {corpus}/ {output_dir}/'
+                filljson_cmd = f'python {SCRIPT_DIR}/FillJson.py {corpus}/ {output_dir}/'
                 print('\n' + filljson_cmd)
                 os.system(filljson_cmd)
 
                 # run tabulate
                 # usage: tabulateHits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
-                tabulate_cmd = f'python script/tabulateHits.py {output_dir} {corpus_name}_{pat.stem}'
+                tabulate_cmd = f'python {SCRIPT_DIR}/tabulateHits.py {output_dir} {corpus_name}_{pat.stem}'
 
                 print('\n'+tabulate_cmd)
                 os.system(tabulate_cmd)
@@ -88,7 +90,7 @@ def _run_grew(pat, corpus_dir, match_dir, replace):
                   'is already fully populated from previous run. Skipping.')
             return
 
-    grew_cmd = f'python script/grewSearchDir.py {corpus_dir}/ {pat} {match_dir}'
+    grew_cmd = f'python {SCRIPT_DIR}/grewSearchDir.py {corpus_dir}/ {pat} {match_dir}'
     print('\n'+grew_cmd)
     os.system(grew_cmd)
 
