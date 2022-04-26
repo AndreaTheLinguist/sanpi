@@ -80,7 +80,7 @@ SEED_CORPUS=${DATA_DIR}/puddin/Pcc${SEED}.conll
 if [[ -d $SEED_CORPUS && -d $PAT_DIR ]]; then
     # run script and send both stdout and stderr to log file
     DATE="$(date -I)"
-    LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}_${SEED}_${DATE}.log
+    LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}${SEED}_${DATE}.log
     echo "Combined log will be appended to ${LOG_FILE}"
  
     echo "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}"
