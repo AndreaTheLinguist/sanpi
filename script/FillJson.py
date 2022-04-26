@@ -32,7 +32,7 @@ def fill_json():
 
         jsonfiles = jsonDirPath.glob(f'{pref}*')
         # //if rewrite != 'yes' and _skipFiles(pref, jsonDirPath, rewrite):
-        if any('raw' not in j.suffixes for j in jsonfiles):
+        if any('.raw' not in j.suffixes for j in jsonfiles):
             print(
                 f'-> {pref} data was previously processed. Skipping.')
             continue
@@ -131,10 +131,10 @@ def _add_conll_info(hits, conllfile):
                 hit['lemma_str'] = ' '.join(t.lemma for t in tokdictlist)
 
                 _update_tokens(hit_conll, tokdictlist, id_to_ix,
-                              hit, raw_match_info)
+                               hit, raw_match_info)
 
                 hit['deps'] = _get_deps(raw_match_info['edges'],
-                                       tokdictlist, id_to_ix)
+                                        tokdictlist, id_to_ix)
 
                 json_entry_count += 1
 
