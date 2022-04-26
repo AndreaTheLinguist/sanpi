@@ -88,7 +88,7 @@
         },
         // * Fill Json
         {
-            "name": "FillJson testing immed-val",
+            "name": "FillJson testing contig-val",
             "type": "python",
             "request": "launch",
             "program": "script/FillJson.py",
