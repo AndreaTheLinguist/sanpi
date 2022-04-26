@@ -7,8 +7,8 @@
 #SBATCH --open-mode=append
 #SBATCH -N 1                            # Total number of nodes requested
 #SBATCH -n 1                            # Total number of cores requested
-#SBATCH --mem=10G                     # Total amount of (real) memory requested (per node)
-#SBATCH --time 3:00:00                  # Time limit (hh:mm:ss)
+#SBATCH --mem=11G                     # Total amount of (real) memory requested (per node)
+#SBATCH --time 6:00:00                  # Time limit (hh:mm:ss)
 # #SBATCH --partition=gpu                 # Request partition for resource allocation
 #SBATCH --get-user-env
 # #SBATCH --gres=gpu:1                    # Specify a list of generic consumable resources (per node)
