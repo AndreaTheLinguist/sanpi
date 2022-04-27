@@ -1,3 +1,4 @@
+"""obsolete (script to generate `.pat` files from markdown format for more reliable editing)"""
 import os
 import time
 import argparse
