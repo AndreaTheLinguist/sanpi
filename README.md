@@ -1,3 +1,27 @@
+# SANPI 
+**_Scalar Ambiguity of Negative Polarity Inferences_**
+
+## Environment Set Up
+
+1. Install (anaconda)[https://docs.anaconda.com/anaconda/install/index.html] if you not already installed.
+
+2. From the `setup/` directory, run: 
+
+        $ conda env create -f sanpi_env.yml
+
+   Or from `sanpi/` directory, run: 
+
+        $ conda env create -f setup/sanpi_env.yml
+
+    _For development, use `setup/dev-sanpi_env.yml` instead_
+
+3. To check for remaining required tools, run: 
+
+        $ bash setup/condacheck.sh
+
+
+## Project Overview
+
 This is a project to collect collocation frequencies of adv-adj pairs, weak NPIs, and strong NPIs under a variety of contexts. 
 
 The `script/` directory contains python code for running grew-match searches, process the hits (output as json files), and run statistical comparisons on the results. Match results can be found in csv tables in `hits/`. Use `bash script/viewHits.sh hits/[filename]` for a reader friendly view of the hits in the command line.

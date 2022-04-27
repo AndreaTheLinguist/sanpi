@@ -32,7 +32,7 @@ def _main():
 
     # check requirements
     if args.env_check:
-        os.system(f'bash {THIS_DIR.joinpath("condacheck.sh")}')
+        os.system(f'bash {THIS_DIR.joinpath("setup/condacheck.sh")}')
     patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
                else list(CODE_DIR.parent.glob('Pat/*')))
 
