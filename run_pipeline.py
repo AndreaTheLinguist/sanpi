@@ -23,7 +23,7 @@ from pathlib import Path
 
 THIS_DIR = Path(argv[0]).parent
 DATA_DIR = Path.home().joinpath('data')
-CODE_DIR = THIS_DIR.joinpath('script')
+CODE_DIR = THIS_DIR.joinpath('source/gather')
 
 
 def _main():
@@ -52,7 +52,6 @@ def _main():
 
             # run grew search
             for pat in patdir.iterdir():
-                # args: corpus_dir pat_file output
                 corpus_name = corpus.stem.split('.')[0]
                 output_label = '.'.join([corpus_name, pat.stem])
                 output_dir = DATA_DIR.joinpath(
@@ -62,16 +61,19 @@ def _main():
 
                 _run_grew(pat, corpus, output_dir, args.replace_raw_data)
 
-                # run fill json
-                # args: FillJson.py [-h] CONLLU_DIR RAW_DIR
+                # add language info to raw jsons from conllus
+                # args: fill_match_info.py [-h] CONLLU_DIR RAW_DIR
                 #                   ([-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}])
-                filljson_cmd = f'python {CODE_DIR}/FillJson.py {corpus}/ {output_dir}/'
-                print('\n' + filljson_cmd)
-                os.system(filljson_cmd)
+                #       (OUTPUT_DIR defaults to same dir as .raw.json files=RAW_DIR)
+                fill_info_cmd = (f'python {CODE_DIR}/fill_match_info.py '
+                                 f'{corpus}/ {output_dir}/')
+                print('\n' + fill_info_cmd)
+                os.system(fill_info_cmd)
 
                 # run tabulate
-                # usage: tabulateHits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
-                tabulate_cmd = f'python {CODE_DIR}/tabulateHits.py {output_dir} {corpus_name}_{pat.stem}'
+                # usage: tabulate_hits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
+                tabulate_cmd = (f'python {CODE_DIR}/tabulate_hits.py '
+                                f'{output_dir} {corpus_name}_{pat.stem}')
 
                 print('\n'+tabulate_cmd)
                 os.system(tabulate_cmd)
@@ -90,7 +92,7 @@ def _run_grew(pat, corpus_dir, match_dir, replace):
                   'is already fully populated from previous run. Skipping.')
             return
 
-    grew_cmd = f'python {CODE_DIR}/grewSearchDir.py {corpus_dir}/ {pat} {match_dir}'
+    grew_cmd = f'python {CODE_DIR}/grew_search.py {corpus_dir}/ {pat} {match_dir}'
     print('\n'+grew_cmd)
     os.system(grew_cmd)
 
