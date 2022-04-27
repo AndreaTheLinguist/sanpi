@@ -22,21 +22,6 @@ for p in "${pypackages[@]}"; do
   echo ""
 done
 
-
-# shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
-
-# for p in "${shpackages[@]}"; do
-#   echo "> ${p}"
-#   which ${p} || conda install ${p}
-#   echo ""
-# done
-
-# if [[ ! $(echo "`opam --version`") =~ 2.* ]]
-# then
-#   echo "opam version obsolete"
-#   conda update opam=2.*
-# fi
-
 echo "# opam installs"
 if [[ -z $( echo "`which grew`" ) ]]
 then
@@ -48,6 +33,11 @@ then
     which ${p} || conda install ${p}
     echo ""
   done
+
+  BUBBLE="$(conda list bubblewrap)"
+  if [[ ${BUBBLE:(-7)} == "Channel" ]]; then
+  conda install bubblewrap
+  fi
 
   if [[ ! $(echo "`opam --version`") =~ 2.* ]]
   then
