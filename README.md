@@ -3,7 +3,7 @@
 
 ## Environment Set Up
 
-1. Install (anaconda)[https://docs.anaconda.com/anaconda/install/index.html] if you not already installed.
+1. Install [anaconda](https://docs.anaconda.com/anaconda/install/index.html) if not already installed.
 
 2. From the `setup/` directory, run: 
 
