@@ -7,6 +7,8 @@ Returns:
     None
 """
 import argparse
+from collections import namedtuple
+from email import generator
 import sys
 from pathlib import Path
 
@@ -44,8 +46,9 @@ def _parse_args():
     parser.add_argument(
         '-p', '--pat_path',
         type=Path,
-        default='/home/arh234/projects/sanpi/Pat/contig/sans-relay.pat',
-        help=('path to `.pat` pattern file specifying pattern string to create seek')
+        default='Pat/advadj/all-RB-JJs.pat',
+        help=('path to `.pat` pattern file specifying pattern string to create seek. '
+              '*note* If run from top level of project sanpi/, this must be specified.')
     )
 
     args = parser.parse_args()
@@ -96,22 +99,75 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     if not matches_found:
         sys.exit(f'No matches for {pat_path.name} in {conllu_path.name}.')
     # pull out sentence id for every match
-    match_ids = set(m['sent_id'] for m in matches_found)
+    match_ids_set = {m['sent_id'] for m in matches_found}
+    extended_ids_iter = _add_context(match_ids_set)
 
     # collect conllu sentence objects for each matching sentence
     #   and put in string output format + line break
     print('generating subset conllu...')
-    match_conllus = (f'{sent.conll()}\n'
-                     for sent in pyconll.iter_from_file(str(conllu_path))
-                     if sent.id in match_ids)
+    conllu_subset_str_gen = _generate_conllu_strings(
+        pyconll.iter_from_file(str(conllu_path)),
+        extended_ids_iter, match_ids_set,
+        f'{pat_path.parent.name}_{pat_path.stem}')
 
     # create string of conllu formatted strings
-    out_str = '\n'.join(match_conllus)
+    out_str = '\n'.join(conllu_subset_str_gen)
 
     # write string to new subset file
     out_file.write_text(out_str, encoding='utf8')
 
     print(f'Subset conllu file saved to {out_file}.\n')
+
+
+def _add_context(match_ids: iter):
+    match_context_tuples = _generate_match_tuples(match_ids)
+    extended_ids_tuple = tuple(sent_id
+                               for match_context in match_context_tuples
+                               for sent_id in match_context)
+    return extended_ids_tuple
+
+
+def _generate_match_tuples(match_ids: iter):
+    match_info = namedtuple(
+        'MatchContext', ['prev_sent', 'match_sent', 'next_sent'])
+
+    for m_id in match_ids:
+        doc, match = m_id.rsplit('_', 1)
+        zf_len = len(match)
+        sent_int = int(match)
+        prev_sent = str(sent_int-1).zfill(zf_len)
+        next_sent = str(sent_int+1).zfill(zf_len)
+        match_tuple = match_info(f'{doc}_{prev_sent}',
+                                 m_id,
+                                 f'{doc}_{next_sent}')
+
+        yield match_tuple
+
+
+def _generate_conllu_strings(conll_iter: generator,
+                             subset_ids: iter,
+                             match_set: set,
+                             pattern: str):
+
+    added_docs = []
+    for sent in conll_iter:
+        preface = ''
+        sent_id = sent.id
+        if sent_id in subset_ids:
+
+            doc_id = sent_id.rsplit('_', 1)[0]
+            if doc_id not in added_docs and 'newdoc id' not in sent._meta.keys():
+                sent._meta['newdoc id'] = doc_id
+            if sent_id in match_set:
+                try:
+                    prev_pattern_match = sent._meta['pattern_match']
+                except KeyError:
+                    pattern_match = pattern
+                else:
+                    pattern_match = '; '.join((prev_pattern_match, pattern))
+                sent._meta['pattern_match'] = pattern_match
+
+            yield f'{preface}{sent.conll()}\n'
 
 
 if __name__ == '__main__':
