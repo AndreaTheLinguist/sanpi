@@ -379,4 +379,6 @@ tags
 .untracked/
 sandbox/
 *.[0-9]
+*.err
+*.out
 
