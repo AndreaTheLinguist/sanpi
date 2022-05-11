@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../data/puddin"
+		},
+		{
+			"path": "../../data/sanpi"
+		},
+	],
+	"settings": {
+		"files.watcherExclude": {
+			"/share/compling/data/sanpi": true,
+			"/share/compling/data/puddin": true,
+			"/share/compling/projects/*/logs/*/*": true
+		}
+	}
+}

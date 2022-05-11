@@ -1,0 +1,20 @@
+name: parallel-sanpi
+channels:
+  - pyconll
+  - defaults
+  - conda-forge
+dependencies:
+  - bubblewrap
+  - matplotlib
+  - more-itertools
+  - opam
+  - pandas
+  - parallel
+  - pyconll
+  - pypandoc
+  - python
+  - scipy
+  - tabulate
+  - unidecode
+prefix: ~/anaconda3/envs/parallel-sanpi
+
