@@ -19,25 +19,30 @@ echo ">>=======================================<<"
 echo "JOB ID: ${SLURM_JOB_ID}"
 echo "started @ $(date) from $(pwd)"
 echo ""
-# activate conda environment
-eval "$(conda shell.bash hook)"
-conda activate sanpi
-echo "Active Environment:"
-echo "$(conda env list)"
-echo ""
+
 
 DATA_DIR=/share/compling/data
 if [[ ! -d $DATA_DIR ]]; then
     DATA_DIR=/home/$(pwd)/data
 fi
 
-SOURCE_DIR=/home/arh234/projects/sanpi
+SOURCE_DIR=/share/compling/projects/sanpi
+# activate conda environment
+eval "$(conda shell.bash hook)"
+if [[ -z "$(find /home/$(whoami)/.conda/envs -name parallel-sanpi -type d)" ]]; then
+  echo "could not find parallel env"
+  # conda create -f ${SOURCE_DIR}/setup/parallel-sanpi_env.yml
+fi
+conda activate parallel-sanpi
+echo "Active Environment:"
+echo "$(conda env list)"
+echo ""
 
 echo "Creating match subset conllu files..."
 echo "conllu:   $1"
 echo "pattern:  $2"
 
-BASE_PYTHON_CMD="python /home/$(whoami)/projects/sanpi/script/create_match_conllu.py"
+BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
 
 LOG_DIR="${DATA_DIR}/sanpi/logs"
 if [[ ! -d $LOG_DIR ]]; then
@@ -45,22 +50,22 @@ if [[ ! -d $LOG_DIR ]]; then
 fi
 
 if [[ $# -eq 0 ]]; then
-  exec >> "${LOG_DIR}/subset_defaults.log" 2>&1
+  # exec >> "${LOG_DIR}/subset_defaults.log" 2>&1
   date
   echo $BASE_PYTHON_CMD
   time $BASE_PYTHON_CMD
   exit 0
 else
   CONLLU=$1
-  LOG_SUFFIX=${CONLLU##*/}
-  if [[ -z ${LOG_SUFFIX} ]]; then
-    NOSLASH=${CONLLU%/}
-    LOG_SUFFIX=${NOSLASH##*/}
-    echo $LOG_SUFFIX
-  fi
+  # LOG_SUFFIX=${CONLLU##*/}
+  # if [[ -z ${LOG_SUFFIX} ]]; then
+  #   NOSLASH=${CONLLU%/}
+  #   LOG_SUFFIX=${NOSLASH##*/}
+
+  # fi
   
-  LOG_FILE="${LOG_DIR}/subset_${LOG_SUFFIX}.log"
-  exec >> ${LOG_FILE} 2>&1
+  # LOG_FILE="${LOG_DIR}/subset_${LOG_SUFFIX}.log"
+  # exec >> ${LOG_FILE} 2>&1
 fi
 
 date
@@ -87,7 +92,7 @@ elif [[ -d "${CONLLU}" ]]; then
 
   else
     echo "find ${CONLLU} -name *.conllu -exec bash -c \"echo \\\"\\\" ; echo \\\"_______________________\\\" ; echo \\\">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}\" \;"
-    find ${CONLLU} -type f -name *.conllu -exec bash-c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \;
+    find ${CONLLU} -type f -name *.conllu -exec bash -c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \;
   fi
 
 fi
