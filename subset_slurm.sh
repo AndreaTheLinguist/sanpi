@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --mail-user=arh234@cornell.edu
 #SBATCH --mail-type=ALL
-#SBATCH -J contig-puddin         # Job name
+#SBATCH -J subset         # Job name
 #SBATCH -o %x_%j.out                # Name of stdout output log file (%j expands to jobID)
 #SBATCH -e %x_%j.err                # Name of stderr output log file (%j expands to jobID)
 #SBATCH --open-mode=append
@@ -23,16 +23,16 @@ echo ""
 
 DATA_DIR=/share/compling/data
 if [[ ! -d $DATA_DIR ]]; then
-    DATA_DIR=/home/$(pwd)/data
+    DATA_DIR=/home/$(whoami)/data
 fi
 
 SOURCE_DIR=/share/compling/projects/sanpi
 # activate conda environment
 eval "$(conda shell.bash hook)"
-if [[ -z "$(find /home/$(whoami)/.conda/envs -name parallel-sanpi -type d)" ]]; then
-  echo "could not find parallel env"
-  # conda create -f ${SOURCE_DIR}/setup/parallel-sanpi_env.yml
-fi
+# if [[ -z "$(find /home/$(whoami)/.conda/envs -name parallel-sanpi -type d)" ]]; then
+#   echo "could not find parallel env"
+#   # conda create -f ${SOURCE_DIR}/setup/parallel-sanpi_env.yml
+# fi
 conda activate parallel-sanpi
 echo "Active Environment:"
 echo "$(conda env list)"
