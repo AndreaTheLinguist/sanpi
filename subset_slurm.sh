@@ -2,8 +2,8 @@
 #SBATCH --mail-user=arh234@cornell.edu
 #SBATCH --mail-type=ALL
 #SBATCH -J subset         # Job name
-#SBATCH -o %x_%j.out                # Name of stdout output log file (%j expands to jobID)
-#SBATCH -e %x_%j.err                # Name of stderr output log file (%j expands to jobID)
+#SBATCH -o %x_%j-%3t.out                # Name of stdout output log file (%j expands to jobID)
+#SBATCH -e %x_%j-%3t.err                # Name of stderr output log file (%j expands to jobID)
 #SBATCH --open-mode=append
 #SBATCH -N 1                            # Total number of nodes requested
 #SBATCH -n 10                            # Total number of cores requested
