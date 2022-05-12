@@ -86,6 +86,7 @@ then
   
 fi
 
-
+echo "making sure python module is installed"
+pip install grew
 
 echo "$(echo "`grew version | tail -1`"), located in $(echo "`which grew`")"
