@@ -11,7 +11,7 @@
     outputs several pkl or csv files to the project home directory 
     as well as several sample csv files to the defined "sample_dir".
 """
-
+import argparse
 import sys
 import time
 from collections import namedtuple
@@ -20,30 +20,37 @@ from pathlib import Path
 import pandas as pd
 
 
-sample_dir = Path.cwd() / 'data_samples'
-if not sample_dir.exists():
-    sample_dir.mkdir()
 
-data_dir = Path(Path.cwd() / "hits")
-if not data_dir.exists():
-    sys.exit('/hits/ directory not found. *Be sure to run this script from '
-             'the level above your hits directory')
 
 cat_columns = [
-    'colloc', 'adv', 'adj', 'polarity', 'context_group', 'context', 'context_word', 'context_type', 'corpus', 'corpus_segment']
+    'colloc', 'adv', 'adj', 'polarity', 'context_group', 'context', 
+    'context_word', 'context_type', 'corpus', 'corpus_segment']
 
 
 def __main__():
 
-    # files = process_file_info()
+    args = _parse_input_args()
+    data_dir = args.data_dir
+    print(f'Processing data in {data_dir}')
+    if not data_dir.is_dir():
+        sys.exit('Invalid data directory. Exiting.')
 
-    # categories_dict = set_categories(files)
+    sample_dir = data_dir.joinpath('analysis_samples')
+    if not sample_dir.is_dir():
+        sample_dir.mkdir()
 
-    # # process basic pattern results first
-    # baseline_hits, combined_contexts = process_hit_csvs(files, categories_dict)
+    hits_dir=data_dir.joinpath('2_csv_hits')
+    if not hits_dir.is_dir(): 
+        sys.exit(f'No input csv hit files found. Directory {hits_dir} does not exist.')
 
-    # # get basic hits that are not caught by any specific context
-    # all_contexts = coordinate_dataframes(baseline_hits, combined_contexts)
+    files = process_file_info(hits_dir)
+    categories_dict = set_categories(files)
+
+    # process basic pattern results first
+    baseline_hits, combined_contexts = process_hit_csvs(files, categories_dict)
+
+    # get basic hits that are not caught by any specific context
+    all_contexts = coordinate_dataframes(baseline_hits, combined_contexts)
 
     all_contexts = pd.read_pickle("all-contexts_with-overlap.pkl.gz")
 
@@ -60,14 +67,27 @@ def __main__():
         f'>>>> {len(no_overlap_or_duplicates)} remaining hits saved to "compiled_hits.pkl.gz"')
 
     # create samples for easy viewing on github
-    create_samples(no_overlap_or_duplicates)
+    create_samples(no_overlap_or_duplicates, sample_dir)
 
 
-def process_file_info():
+def _parse_input_args():
+
+    parser = argparse.ArgumentParser(
+        description='script to manipulate separate hits csv files into single dataframe')
+
+    parser.add_argument(
+        '-d', '--data_dir', type=Path, default='/home/arh234/data/sanpi',
+        help='path to directory containing results from `run_pipeline.py`. Must contain `2_csv_hist/`')
+
+    return parser.parse_args()
+
+
+def process_file_info(hits_dir):
     files = pd.DataFrame()
     file_info = namedtuple('file_info', ['name', 'path', 'context_group',
                                          'polarity', 'corpus', 'context_word', 'context_type'])
-    for grp_dir in data_dir.iterdir():
+    for grp_dir in (d for d in hits_dir.iterdir()
+                    if d.name in list(Path.cwd().joinpath('Pat').iterdir())):
 
         contextgrp = grp_dir.name
         if contextgrp.startswith('neg'):
@@ -286,7 +306,7 @@ def filter_duplicate_text(no_overlap):
     return no_overlap_or_duplicates
 
 
-def create_samples(no_overlap_or_duplicates):
+def create_samples(no_overlap_or_duplicates, sample_dir):
     print(f'Saving sample csv files to {sample_dir}')
     sample_df = no_overlap_or_duplicates.sample(
         n=1500).sort_values(by="colloc")

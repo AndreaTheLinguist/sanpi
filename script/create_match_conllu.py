@@ -21,8 +21,8 @@ def _main():
     # setting example inputs
     conllu_path, pat_path = _parse_args()
 
-    if not conllu_path.is_file():
-        sys.exit(f'{conllu_path} does not exist.\n')
+    if not (conllu_path.is_file() or conllu_path.suffix != '.conllu'):
+        sys.exit(f'{conllu_path} is not a .conllu file.\n')
 
     if conllu_path.stat().st_size == 0:
         sys.exit(f'{conllu_path} is empty.\n')
@@ -98,6 +98,7 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
         pat_path.read_text(encoding='utf8'), corpus_ix)
     if not matches_found:
         sys.exit(f'No matches for {pat_path.name} in {conllu_path.name}.')
+    print(len(matches_found), 'pattern matches found.')
     # pull out sentence id for every match
     match_ids_set = {m['sent_id'] for m in matches_found}
     extended_ids_iter = _add_context(match_ids_set)
