@@ -2,16 +2,15 @@
 #SBATCH --mail-user=arh234@cornell.edu
 #SBATCH --mail-type=ALL
 #SBATCH -J subset         # Job name
-#SBATCH -o %x_%j.out                # Name of stdout output log file (%j expands to jobID)
-#SBATCH -e %x_%j.err                # Name of stderr output log file (%j expands to jobID)
+#SBATCH -o logs/%x_%j.out                # Name of stdout output log file (%j expands to jobID)
+#SBATCH -e logs/%x_%j.err                # Name of stderr output log file (%j expands to jobID)
 #SBATCH --open-mode=append
-#SBATCH -N 1                            # Total number of nodes requested
-#SBATCH -n 10                            # Total number of cores requested
-#SBATCH --mem=5G                     # Total amount of (real) memory requested (per node)
-#SBATCH --time 8:00:00                  # Time limit (hh:mm:ss)
-# #SBATCH --partition=gpu                 # Request partition for resource allocation
+#SBATCH -N 3                            # Total number of nodes requested
+#SBATCH -n 3                            # Total number of cores requested
+#SBATCH -c 10                           # number of cpus per task
+#SBATCH --mem-per-cpu=20G                     # Total amount of (real) memory requested (per node)
+#SBATCH --time 4:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
-# #SBATCH --gres=gpu:1                    # Specify a list of generic consumable resources (per node)
 # # SBATCH --array 0-31
 
 # set -o errexit
@@ -19,6 +18,7 @@ echo ">>=======================================<<"
 echo "JOB ID: ${SLURM_JOB_ID}"
 echo "started @ $(date) from $(pwd)"
 echo ""
+echo "running with ${SLURM_CPUS_PER_TASK}"
 
 
 DATA_DIR=/share/compling/data
@@ -88,7 +88,7 @@ if [[ -f ${CONLLU} ]]; then
 elif [[ -d "${CONLLU}" ]]; then
 
   if [[ `which parallel` ]]; then
-    find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL ; echo \" ~ completed @ $(date) \"; echo \"\" "
+    find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL && echo \" ~ completed @ $(date) \"; echo \"\" "
 
   else
     echo "find ${CONLLU} -name *.conllu -exec bash -c \"echo \\\"\\\" ; echo \\\"_______________________\\\" ; echo \\\">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}\" \;"

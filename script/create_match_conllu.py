@@ -10,6 +10,7 @@ import argparse
 from collections import namedtuple
 from email import generator
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import grew
@@ -74,8 +75,10 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
             'Input conllu is already a subset matching search pattern: '
             f'{pat_path.relative_to(pat_path.parent.parent)}\n')
     out_dir = conllu_path.with_name(out_dir_name)
-    if not out_dir.is_dir():
+    try:
         out_dir.mkdir()
+    except FileExistsError:
+        pass
     # and filename to original conllu name plus pat name
     #   [ORIGIN_CONLLU_STEM]_[PAT_STEM].conllu
     out_file = out_dir.joinpath(f'{conllu_path.stem}_{pat_path.stem}.conllu')
@@ -118,6 +121,7 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     out_file.write_text(out_str, encoding='utf8')
 
     print(f'Subset conllu file saved to {out_file}.\n')
+    print(f'  ~ completed at {datetime.now().ctime()}')
 
 
 def _add_context(match_ids: iter):
