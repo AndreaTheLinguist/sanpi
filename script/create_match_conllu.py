@@ -118,7 +118,7 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     out_str = '\n'.join(conllu_subset_str_gen)
 
     # write string to new subset file
-    out_file.write_text(out_str, encoding='utf8')
+    out_file.write_text(out_str+'\n', encoding='utf8')
 
     print(f'Subset conllu file saved to {out_file}.\n')
     print(f'  ~ completed at {datetime.now().ctime()}')
