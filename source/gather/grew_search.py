@@ -29,7 +29,7 @@ def grew_search():
 
     # iterate over items in dirPath ending with ".conllu"
     # TODO: make this a parallel loop? 
-    for f in (i for i in dirPath.iterdir() if i.suffix == '.conllu'):
+    for f in dirPath.glob('*.conllu'):
 
         fstart = time.perf_counter()
         # skip any subdirectories in corpus/conllu files directory
@@ -67,7 +67,7 @@ def checkArgs(args):
     if not dirPath.is_dir():
         sys.exit('Error: specified corpus path is not a directory.')
 
-    corpus_files = tuple(dirPath.glob('**/*.conllu'))
+    corpus_files = tuple(dirPath.glob('*.conllu'))
     if not corpus_files:
         sys.exit(
             'Error: specified corpus directory does not contain any conllu '
