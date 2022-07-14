@@ -7,11 +7,11 @@ Returns:
     None
 """
 import argparse
-from collections import namedtuple
-from email import generator
 import sys
+from collections import namedtuple
 from datetime import datetime
 from pathlib import Path
+from types import GeneratorType
 
 import grew
 import pyconll
@@ -40,14 +40,14 @@ def _parse_args():
     parser.add_argument(
         '-c', '--conllu_path',
         type=Path,
-        default='/home/arh234/data/devel/quicktest.conll/nyt_eng_199912.conllu',
+        default='/share/compling/data/puddin/Pcc00.conll/pcc_eng_00-001.conllu',
         help=('path to full `.conllu` corpus file to search')
     )
 
     parser.add_argument(
         '-p', '--pat_path',
         type=Path,
-        default='Pat/advadj/all-RB-JJs.pat',
+        default='share/compling/projects/sanpi/Pat/advadj/all-RB-JJs.pat',
         help=('path to `.pat` pattern file specifying pattern string to create seek. '
               '*note* If run from top level of project sanpi/, this must be specified.')
     )
@@ -83,14 +83,38 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     #   [ORIGIN_CONLLU_STEM]_[PAT_STEM].conllu
     out_file = out_dir.joinpath(f'{conllu_path.stem}_{pat_path.stem}.conllu')
     if (out_file.is_file() and out_file.stat().st_size > 0
-       and out_file.stat().st_mtime > pat_path.stat().st_mtime):
+        and out_file.stat().st_mtime > pat_path.stat().st_mtime
+            and out_file.stat().st_mtime > conllu_path.stat().st_mtime):
+
         sys.exit(
             f'Subset {out_file.relative_to(conllu_path.parent)} already '
             'exists and is more recent than any pattern file modifications.\n')
 
     print(f'\nSearching {conllu_path.name} for {pat_path.stem} pattern:\n')
     # * grew tool must be started!
-    grew.init()
+    # with socket() as s:
+    #     s.bind(('', 0))
+    #     portnum=s.getsockname()[1]
+    # print('trying port', portnum)
+    # not_started = True
+    # portnum=8888
+
+    # while not_started:
+    #     try:
+    #         print(portnum)
+    #         grew.init(port=portnum)
+    #     except:
+    #         print('grew failed to start')
+    #         portnum+=1
+    #         # sys.exit('ERROR: Grew could not be initialized. Subset not created.')
+    #     else:
+    #         print('yay! grew started!')
+    #         not_started = False
+    try:
+        grew.init()
+    except:
+        sys.exit('ERROR: Grew could not be initialized. Subset not created.')
+
     # load corpus into grew interface
     print('loading corpus file...')
     corpus_ix = grew.corpus(str(conllu_path))
@@ -118,13 +142,13 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     out_str = '\n'.join(conllu_subset_str_gen)
 
     # write string to new subset file
-    out_file.write_text(out_str+'\n', encoding='utf8')
+    out_file.write_text(out_str, encoding='utf8')
 
     print(f'Subset conllu file saved to {out_file}.\n')
     print(f'  ~ completed at {datetime.now().ctime()}')
 
 
-def _add_context(match_ids: iter):
+def _add_context(match_ids):
     match_context_tuples = _generate_match_tuples(match_ids)
     extended_ids_tuple = tuple(sent_id
                                for match_context in match_context_tuples
@@ -132,7 +156,7 @@ def _add_context(match_ids: iter):
     return extended_ids_tuple
 
 
-def _generate_match_tuples(match_ids: iter):
+def _generate_match_tuples(match_ids):
     match_info = namedtuple(
         'MatchContext', ['prev_sent', 'match_sent', 'next_sent'])
 
@@ -149,8 +173,8 @@ def _generate_match_tuples(match_ids: iter):
         yield match_tuple
 
 
-def _generate_conllu_strings(conll_iter: generator,
-                             subset_ids: iter,
+def _generate_conllu_strings(conll_iter: GeneratorType,
+                             subset_ids,
                              match_set: set,
                              pattern: str):
 
@@ -159,18 +183,18 @@ def _generate_conllu_strings(conll_iter: generator,
         preface = ''
         sent_id = sent.id
         if sent_id in subset_ids:
-
+            sent_meta = sent._meta
             doc_id = sent_id.rsplit('_', 1)[0]
-            if doc_id not in added_docs and 'newdoc id' not in sent._meta.keys():
-                sent._meta['newdoc id'] = doc_id
+            if doc_id not in added_docs and 'newdoc id' not in sent_meta.keys():
+                sent_meta['newdoc id'] = doc_id
             if sent_id in match_set:
                 try:
-                    prev_pattern_match = sent._meta['pattern_match']
+                    prev_pattern_match = sent_meta['pattern_match']
                 except KeyError:
                     pattern_match = pattern
                 else:
                     pattern_match = '; '.join((prev_pattern_match, pattern))
-                sent._meta['pattern_match'] = pattern_match
+                sent_meta['pattern_match'] = pattern_match
 
             yield f'{preface}{sent.conll()}\n'
 

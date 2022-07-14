@@ -19,14 +19,22 @@ if [[ $1 == "-h" ]]; then
   
   exit 0
 fi
-  
+set -o errexit
+# * activate conda environment
+eval "$(conda shell.bash hook)"
+# if [[ -z "$(find /home/$(whoami)/.conda/envs -name parallel-sanpi -type d)" ]]; then
+#   echo "could not find parallel env"
+#   # conda create -f ${SOURCE_DIR}/setup/parallel-sanpi_env.yml
+# fi
+conda activate parallel-sanpi
+
 echo "Creating match subset conllu files..."
-# conllu file/dir (path) = "$1"
-# pattern file  (path) = "$2"
+# conllu file/dir (path) = first arg
+# pattern file  (path) = second arg
 
 # echo "number of arguments = $#"
-echo "conllu:   $1"
-echo "pattern:  $2"
+echo "conllu supplied:   $1"
+echo "pattern supplied:  $2"
 
 # read -p "Are all arguments correct? y/n " -r -n 1
 
@@ -36,20 +44,24 @@ echo "pattern:  $2"
 #   [[ $0 = $BASH_SOURCE ]] && exit 1 || return 1 
 #   # handle exits from shell or function but don't exit interactive shell
 # fi
+SOURCE_DIR=/share/compling/projects/sanpi
+if [[ ! -d ${SOURCE_DIR} ]]; then
+    SOURCE_DIR=/home/$(whoami)/projects/sanpi
+fi
+BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
+echo "base command is: ${BASE_PYTHON_CMD}"
 
-BASE_PYTHON_CMD="python /home/$(whoami)/projects/sanpi/script/create_match_conllu.py"
-# echo $BASE_PYTHON_CMD
-# activate conda environment
-eval "$(conda shell.bash hook)"
-conda activate sanpi
 
-LOG_DIR="logs"
+LOG_DIR=${SOURCE_DIR}/logs
 if [[ ! -d $LOG_DIR ]]; then
   mkdir $LOG_DIR
 fi
 
+date
+PAT_CALL=""
+LOG_FILE_NAME="subset_defaults.log"
 if [[ $# -eq 0 ]]; then
-  exec >> "${LOG_DIR}/subset_defaults.log" 2>&1
+
   date
   echo $BASE_PYTHON_CMD
   time $BASE_PYTHON_CMD
@@ -58,26 +70,27 @@ else
   CONLLU=$1
   LOG_SUFFIX=${CONLLU##*/}
   if [[ -z ${LOG_SUFFIX} ]]; then
-    NOSLASH=${CONLLU%/}
-    LOG_SUFFIX=${NOSLASH##*/}
-
+    LOG_SUFFIX=${CONLLU%/}
     echo $LOG_SUFFIX
   fi
-  LOG_FILE="${LOG_DIR}/subset_${LOG_SUFFIX}.log"
-  exec >> ${LOG_FILE} 2>&1
-fi
 
-date
-PAT_CALL=""
-if [[ $# -gt 1 ]]; then
-  PAT=$2
-  if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then
-      PAT_CALL="-p ${PAT}"
-  else
-    echo "Invalid pattern file supplied. Must be existing '.pat' file."
-    exit 1  
+  LOG_FILE_NAME="subset_${LOG_SUFFIX%.conllu}"
+  # exec >> ${LOG_FILE} 2>&1
+
+  if [[ $# -gt 1 ]]; then
+    PAT=$2
+    if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then
+        PAT_CALL="-p ${PAT}"
+        PAT_NAME=${PAT##*/}
+        LOG_FILE_NAME=${PAT_NAME%.pat}-${LOG_FILE_NAME}
+    else
+      echo "Invalid pattern file supplied. Must be existing '.pat' file."
+      exit 1  
+    fi
   fi
 fi
+LOG_FILE="${LOG_DIR}/${LOG_FILE_NAME%.conll}.log"
+echo "log file: ${LOG_FILE}"
 
     
 if [[ -f ${CONLLU} ]]; then
@@ -87,13 +100,16 @@ if [[ -f ${CONLLU} ]]; then
 elif [[ -d "${CONLLU}" ]]; then
 
   if [[ `which parallel` ]]; then
-    # find ${CONLLU} -type f -name *.conllu -print0 | parallel -0 bash -c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" " #&& time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \;
-    # find ${CONLLU} -type f -name *.conllu | parallel "echo \"------>>> {} <<<------\" && echo \"time ${BASE_PYTHON_CMD} -c {}\" && echo \"\" && \"time ${BASE_PYTHON_CMD} -c {}\" && echo \"\""
-    find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL ; echo \" ~ completed @ $(date) \"; echo \"\" "
+    echo "conll directory given >> using parallel..."
+    echo "------------------------------------------"
+    echo 'find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL ; echo \"\" " >> >(tee -i -a $LOG_FILE) 2>&1'
+    echo "===>>"
+    echo "find ${CONLLU} -type f -name *.conllu | parallel \"echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL ; echo \"\" \" >> >(tee -i -a $LOG_FILE) 2>&1"
+    find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL ; echo \"\" " >> >(tee -i -a $LOG_FILE) 2>&1
 
   else
     echo "find ${CONLLU} -name *.conllu -exec bash -c \"echo \\\"\\\" ; echo \\\"_______________________\\\" ; echo \\\">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}\" \;"
-    find ${CONLLU} -type f -name *.conllu -exec bash-c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \;
+    find ${CONLLU} -type f -name *.conllu -exec bash -c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \;
   fi
 
 fi

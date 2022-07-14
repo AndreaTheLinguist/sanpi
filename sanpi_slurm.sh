@@ -9,9 +9,7 @@
 #SBATCH -n 1                            # Total number of cores requested
 #SBATCH --mem=11G                     # Total amount of (real) memory requested (per node)
 #SBATCH --time 12:00:00                  # Time limit (hh:mm:ss)
-# #SBATCH --partition=gpu                 # Request partition for resource allocation
 #SBATCH --get-user-env
-# #SBATCH --gres=gpu:1                    # Specify a list of generic consumable resources (per node)
 #SBATCH --array 0-31
 
 set -o errexit
@@ -26,8 +24,9 @@ echo "Active Environment:"
 echo "$(conda env list)"
 echo ""
 
-PAT=${SLURM_JOB_NAME:0:6}
-echo "Pattern set: ${PAT}"
+# pattern directory should be specified as path argument
+PAT_DIR=$1
+echo "Pattern Type: ${PAT_DIR##*/}"
 DATA_DIR=/share/compling/data
 if [[ ! -d $DATA_DIR ]]; then
     DATA_DIR=/home/arh234/data
@@ -53,7 +52,7 @@ echo "   - node: $SLURM_JOB_NODELIST"
 echo "   - 1 of $SLURM_ARRAY_TASK_COUNT"
 
 SOURCE_DIR=/home/arh234/projects/sanpi
-PAT_DIR=${SOURCE_DIR}/Pat/${PAT}
+# // PAT_DIR=${SOURCE_DIR}/Pat/${PAT}
 
 SEED=$((SLURM_ARRAY_TASK_ID))
 echo "Array Index = ${SEED}"
