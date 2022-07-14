@@ -1,20 +1,86 @@
 {
 	"folders": [
 		{
-			"path": ".."
+			"path": "/share/compling/projects"
 		},
 		{
-			"path": "../../data/puddin"
+			"path": "/share/compling/data/puddin"
 		},
 		{
-			"path": "../../data/sanpi"
-		},
+			"path": "/share/compling/data/sanpi"
+		}
 	],
 	"settings": {
 		"files.watcherExclude": {
-			"/share/compling/data/sanpi": true,
-			"/share/compling/data/puddin": true,
-			"/share/compling/projects/*/logs/*/*": true
+			"/share/projects/try": true,
+			"**/.history": true,
+			"/share/projects/testing": true,
+			// "/share/compling/data/sanpi": true,
+			// "/share/compling/data/puddin": true,
+			"/share/compling/**/logs": true
 		}
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Python: check doc ids",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/puddin/script/confirm_doc_ids.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/puddin/bin/python"
+			},
+			{
+				"name": "Python: create_match_conllu",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python"
+			},
+			{
+				"name": "Python: create_match_conllu DIR",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+				"args": [
+					""
+				]
+			},
+			{
+				"name": "Python: parse_pile Pcc22-29",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/puddin/script/parse_pile.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/puddin/bin/python",
+				"cwd": "/share/compling/projects/puddin",
+				"args": [
+					"-i",
+					"/share/compling/data/puddin/pile_tables/slices/Pcc22/tmp/pile_22-029_Pile-CC_df.pkl.gz",
+					"-d",
+					"/share/compling/projects/puddin/debug",
+				]
+			},
+			{
+				"name": "Python: parse_pile Pile Val",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/puddin/script/parse_pile.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/puddin/bin/python",
+				"cwd": "/share/compling/projects/puddin",
+				"args": [
+					"-i",
+					"/share/compling/data/pile/val.jsonl",
+					"-d",
+					"/share/compling/projects/puddin/debug",
+					"-S"
+				]
+			},
+		]
 	}
 }
