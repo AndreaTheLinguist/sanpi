@@ -110,9 +110,15 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     #     else:
     #         print('yay! grew started!')
     #         not_started = False
-    try:
-        grew.init()
-    except:
+    c = 0
+    while c < 5:
+        try:
+            grew.init()
+            c = 100
+        except:
+            c += 1
+
+    if c < 10:
         sys.exit('ERROR: Grew could not be initialized. Subset not created.')
 
     # load corpus into grew interface
