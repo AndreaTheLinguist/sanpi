@@ -5,16 +5,16 @@
 #SBATCH -o %x_%j.out              # Name of stdout output log file (%j expands to jobID)
 #SBATCH -e %x_%j.err              # Name of stderr output log file (%j expands to jobID)
 ##SBATCH --open-mode=append
-#SBATCH --nodes=1                       # Total number of nodes requested
-#SBATCH --ntasks=1                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
-#SBATCH --cpus-per-task=8               # number of cpus per task
-#SBATCH --ntasks-per-socket=1
-#SBATCH --mem-per-cpu=20G               # Total amount of (real) memory requested (per node)
+#SBATCH --nodes=2                       # Total number of nodes requested
+#SBATCH --ntasks=2                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
+#SBATCH --cpus-per-task=4               # number of cpus per task
+##SBATCH --ntasks-per-socket=1
+#SBATCH --mem-per-cpu=25G               # Total amount of (real) memory requested (per node)
 #SBATCH --time 10:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --chdir=/share/compling/data/sanpi/logs/subsets      # change working directory to this before execution
 
-# set -o errexit
+set -o errexit
 if [[ -n "${SLURM_JOB_ID}" ]]; then
   echo ">>=======================================<<"
   echo "JOB ID: ${SLURM_JOB_ID}"
@@ -41,7 +41,7 @@ SOURCE_DIR=/share/compling/projects/sanpi
 eval "$(conda shell.bash hook)"
 
 conda activate parallel-sanpi
-${SOURCE_DIR}/script/check_subsets.sh 
+${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
 
 echo -e "\n>>> Gather still missing subsets...\n"
 #: set pat file AND FILTER FILE LIST paths. Default to `exactly-JJ.pat`
@@ -65,25 +65,33 @@ fi
 # echo ${PAT_CALL}
 
 if [[ -f ${MISSING_LIST} ]]; then
-  echo "Files in need of processing: $(egrep "conllu\n" ${MISSING_LIST}) total"
-  echo -e "$(head -3 ${MISSING_LIST})\n...\n$(tail -3 ${MISSING_LIST})"
-  cat ${MISSING_LIST} | parallel --pipe -N 50 --round-robin --jobs=${SLURM_CPUS_ON_NODE} parallel --group --jobs=${SLURM_CPUS_ON_NODE} "time ${BASE_PYTHON_CMD} ${PAT_CALL} -c {}"
-  # cat ${MISSING_LIST} | parallel --pipe -N 50 --round-robin -j50 parallel --dryrun --jobs=${SLURM_CPUS_ON_NODE} "echo -e '\n{#} ({%}) {/}\ntime ${BASE_PYTHON_CMD} ${PAT_CALL} -c'; time ${BASE_PYTHON_CMD} ${PAT_CALL} -c"
+  echo "Files in need of processing: $(egrep -c "conllu\n" ${MISSING_LIST}) total"
+  echo -e "$(head -4 ${MISSING_LIST})\n...\n$(tail -4 ${MISSING_LIST})"
+  while [[ -n "$(head ${MISSING_LIST})" ]]; do
+    parallel --halt soon,fail=20 --jobs=+0 echo "\[ {#} \| {%}\ ]: {/.}"\; time ${BASE_PYTHON_CMD} ${PAT_CALL} -c {} ::: $( head -250 ${MISSING_LIST})
+    wait
+    sleep 1
+    sync /share/compling/data/puddin
+    ${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
+    echo -e "\n--- new batch ---"
+  done
 
 else
   echo "Filter list not found. Running entire directory."
   exit 1
 fi
-wait
+# wait
 
-${SOURCE_DIR}/script/check_subsets.sh
+# ${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
 
-if [[ $( egrep -c ".conllu\n" ${MISSING_LIST} ) -ne 0 ]]; then
-  echo "Files *still* in need of processing: $(egrep "conllu\n" ${MISSING_LIST}) total"
-  echo -e "$(head -5 ${MISSING_LIST})\n...\n$(tail -5 ${MISSING_LIST})"
+# if [[ $( egrep -c ".conllu\n" ${MISSING_LIST} ) -ne 0 ]]; then
+#   echo "Files *still* in need of processing: $(egrep "conllu\n" ${MISSING_LIST}) total"
+#   echo -e "$(head -3 ${MISSING_LIST})\n...\n$(tail -3 ${MISSING_LIST})"
 
-  cat ${MISSING_LIST} | parallel --pipe -N 50 --round-robin --jobs=${SLURM_CPUS_ON_NODE} parallel --group --jobs=${SLURM_CPUS_ON_NODE} "time ${BASE_PYTHON_CMD} ${PAT_CALL} -c {}"
-fi
+#   while [[ -n "$(head ${MISSING_LIST})" ]]; do
+#     parallel --jobs=+0 echo "+>> ({#}) {\}"\; time ${BASE_PYTHON_CMD} ${PAT_CALL} -c {} ::: head -250 ${MISSING_LIST}
+#   done
+# fi
 
 date "+%F %X %Z"
 echo "Job closed."
