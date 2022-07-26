@@ -18,7 +18,11 @@
 			// "/share/compling/data/sanpi": true,
 			// "/share/compling/data/puddin": true,
 			"/share/compling/**/logs": true
-		}
+		},
+		"python.linting.pylintArgs": [
+			"--disable:protected-access"
+		],
+		"editor.defaultFormatter": "ms-python.python"
 	},
 	"launch": {
 		"version": "0.2.0",
@@ -40,14 +44,17 @@
 				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python"
 			},
 			{
-				"name": "Python: create_match_conllu DIR",
+				"name": "Python: create_match_conllu FILE PAT",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
 				"console": "integratedTerminal",
 				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
 				"args": [
-					""
+					"-c", 
+					"/share/compling/data/puddin/Pcc00.conll/pcc_eng_00-002.conllu", 
+					"-p", 
+					"/share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
 				]
 			},
 			{
