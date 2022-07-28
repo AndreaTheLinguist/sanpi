@@ -17,9 +17,9 @@ from sys import argv
 from pathlib import Path
 
 # TODO : ? turn scripts into utilities and import
-# from script.grewSearchDir import grew_search
-# from script.FillJson import fill_json
-# from script.
+from source.gather.grew_search import grew_search
+from source.gather.fill_match_info import fill_json
+from source.gather.tabulate_hits import tabulate_hits
 
 THIS_DIR = Path(argv[0]).parent
 DATA_DIR = Path.home().joinpath('data')
@@ -52,10 +52,11 @@ def _main():
 
             # run grew search
             for pat in patdir.iterdir():
+                #? is this necessary?
                 corpus_name = corpus.stem.split('.')[0]
-                output_label = '.'.join([corpus_name, pat.stem])
+                # output_label = '.'.join([corpus_name, pat.stem])
                 output_dir = DATA_DIR.joinpath(
-                    f'sanpi/1_json_grew-matches/{patdir.stem}/{output_label}')
+                    f'sanpi/1_json_grew-matches/{patdir.stem}/{corpus_name}.{pat.stem}')
                 if not output_dir.is_dir():
                     output_dir.mkdir(parents=True)
 
@@ -92,9 +93,11 @@ def _run_grew(pat, corpus_dir, match_dir, replace):
                   'is already fully populated from previous run. Skipping.')
             return
 
-    grew_cmd = f'python {CODE_DIR}/grew_search.py {corpus_dir}/ {pat} {match_dir}'
-    print('\n'+grew_cmd)
-    os.system(grew_cmd)
+    # grew_cmd = f'python {CODE_DIR}/grew_search.py {corpus_dir}/ {pat} {match_dir}'
+    # print('\n'+grew_cmd)
+    # os.system(grew_cmd)
+    # TODO : check whether `skip_files` should be True or False
+    grew_search(corpus_dir, pat, match_dir, True)
 
 
 def _parse_input_args():

@@ -22,7 +22,8 @@
 		"python.linting.pylintArgs": [
 			"--disable:protected-access"
 		],
-		"editor.defaultFormatter": "ms-python.python"
+		"editor.defaultFormatter": "ms-python.python",
+		"todo-tree.tree.scanMode": "current file"
 	},
 	"launch": {
 		"version": "0.2.0",
@@ -51,10 +52,66 @@
 				"console": "integratedTerminal",
 				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
 				"args": [
-					"-c", 
-					"/share/compling/data/puddin/Pcc00.conll/pcc_eng_00-002.conllu", 
-					"-p", 
+					"-c",
+					"/share/compling/data/puddin/Pcc27.conll/pcc_eng_27-105.conllu",
+					"-p",
 					"/share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
+				]
+			},
+			{
+				"name": "Python: demo PccX2 grew_search",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"args": [
+					"data/corpora/puddin/PccX2.conll",
+					"Pat/filter/exactly-JJ.pat",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "Python: demo PccX3 grew_search",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"args": [
+					"data/corpora/puddin/PccX3.conll",
+					"Pat/filter/exactly-JJ.pat",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "Python: demo PccX5 grew_search",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"args": [
+					"data/corpora/puddin/PccX5.conll",
+					"Pat/filter/exactly-JJ.pat",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "Python: demo x5 exactly grew_search",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
+				"console": "integratedTerminal",
+				"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"args": [
+					"data/corpora/puddin/x5_subset_exactly",
+					"Pat/filter/neg-prefixJJ.pat",
+					"data/1_json_grew-matches"
 				]
 			},
 			{

@@ -1,0 +1,143 @@
+[
+  {
+    "sent_id": "pcc_eng_29_109.6494_x1750698_18",
+    "matching": {
+      "nodes": { "ADV": "14", "ADJ": "15" },
+      "edges": {
+        "mod": { "source": "15", "label": "advmod", "target": "14" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.6470_x1750660_08",
+    "matching": {
+      "nodes": { "ADV": "23", "ADJ": "24" },
+      "edges": {
+        "mod": { "source": "24", "label": "advmod", "target": "23" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.6435_x1750606_42",
+    "matching": {
+      "nodes": { "ADV": "2", "ADJ": "3" },
+      "edges": { "mod": { "source": "3", "label": "advmod", "target": "2" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.6325_x1750431_32",
+    "matching": {
+      "nodes": { "ADV": "11", "ADJ": "12" },
+      "edges": {
+        "mod": { "source": "12", "label": "advmod", "target": "11" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.6185_x1750211_14",
+    "matching": {
+      "nodes": { "ADV": "8", "ADJ": "9" },
+      "edges": { "mod": { "source": "9", "label": "advmod", "target": "8" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.6036_x1749944_08",
+    "matching": {
+      "nodes": { "ADV": "9", "ADJ": "10" },
+      "edges": {
+        "mod": { "source": "10", "label": "advmod", "target": "9" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.5041_x1748348_12",
+    "matching": {
+      "nodes": { "ADV": "8", "ADJ": "9" },
+      "edges": { "mod": { "source": "9", "label": "advmod", "target": "8" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.4987_x1748262_16",
+    "matching": {
+      "nodes": { "ADV": "17", "ADJ": "18" },
+      "edges": {
+        "mod": { "source": "18", "label": "advmod", "target": "17" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.4480_x1747475_11",
+    "matching": {
+      "nodes": { "ADV": "21", "ADJ": "22" },
+      "edges": {
+        "mod": { "source": "22", "label": "advmod", "target": "21" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.3999_x1746684_30",
+    "matching": {
+      "nodes": { "ADV": "15", "ADJ": "16" },
+      "edges": {
+        "mod": { "source": "16", "label": "advmod", "target": "15" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.3748_x1746284_27",
+    "matching": {
+      "nodes": { "ADV": "7", "ADJ": "8" },
+      "edges": { "mod": { "source": "8", "label": "advmod", "target": "7" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.3033_x1745106_26",
+    "matching": {
+      "nodes": { "ADV": "14", "ADJ": "15" },
+      "edges": {
+        "mod": { "source": "15", "label": "advmod", "target": "14" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.2833_x1744798_22",
+    "matching": {
+      "nodes": { "ADV": "15", "ADJ": "16" },
+      "edges": {
+        "mod": { "source": "16", "label": "advmod", "target": "15" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.2750_x1744682_24",
+    "matching": {
+      "nodes": { "ADV": "5", "ADJ": "6" },
+      "edges": { "mod": { "source": "6", "label": "advmod", "target": "5" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.2157_x1743766_24",
+    "matching": {
+      "nodes": { "ADV": "7", "ADJ": "8" },
+      "edges": { "mod": { "source": "8", "label": "advmod", "target": "7" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.1697_x1743015_043",
+    "matching": {
+      "nodes": { "ADV": "17", "ADJ": "18" },
+      "edges": {
+        "mod": { "source": "18", "label": "advmod", "target": "17" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_29_109.0705_x1741471_152",
+    "matching": {
+      "nodes": { "ADV": "13", "ADJ": "14" },
+      "edges": {
+        "mod": { "source": "14", "label": "advmod", "target": "13" }
+      }
+    }
+  }
+]
