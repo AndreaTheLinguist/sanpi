@@ -1,13 +1,15 @@
 import argparse
 import multiprocessing
-import logging
+# import logging
 import os
 import sys
 import time
 from pathlib import Path
 
 _LOGGER = multiprocessing.log_to_stderr()
-_LOGGER.setLevel(logging.WARNING)
+_LOGGER.setLevel(30)  # warning
+# _LOGGER.setLevel(20) # info
+# _LOGGER.setLevel(10) # debug
 
 # TODO : make default to not overwrite existing (non-empty) raw.json files; otherwise need to have new pat directories for any added patterns (to avoid needing to redo all the searches already run)
 
@@ -26,8 +28,8 @@ def grew_search(corpus_dir: Path,
     #: set pool `processes` argument to number of _available_ cpus
     # OR number of files to be searched, whichever is smaller
     cpus = min(len(os.sched_getaffinity(0)), file_count)
-    print(f'\n> {file_count} files total in ../'
-          f'{Path(*corpus_dir.parts[-3:])}/ to be searched with {cpus} CPUs...')
+    print(f'\n> searching {file_count} files in ../'
+          f'{Path(*corpus_dir.parts[-3:])}/ with {cpus} CPUs...')
     _start = time.perf_counter()
 
     with multiprocessing.Pool(processes=cpus) as pool:
@@ -39,23 +41,88 @@ def grew_search(corpus_dir: Path,
                                  match_dir, pat_file, skip_files))
 
         zfill_len = len(str(file_count))
-        gap = max(4, zfill_len)+2
-        print(f'  task{" " * (gap -2 )}|  time\tinput data\n'
-              f'{"-" * (gap + 4 -2)}  |  {"-" * 8}\t---------------')
+        in_sz_w = 7
+        out_sz_w = 8
+        in_name_w = len(list(corpus_dir.glob('*conllu'))[0].stem)+1
+        print(('  task  |  time  \tin size\tout size\t'
+               f'{"in data".ljust(in_name_w)}\t'
+               ' out data\n'
+               f' ------ | ------ \t'
+               f'{"-"*in_sz_w}\t'
+               f'{"-"*out_sz_w}\t'
+               f'{"-"*in_name_w}\t'
+               f'{"-"*40}'
+               ).expandtabs(3))
         #! this is required to actually get the processes to run
         for i, result in enumerate(results):
-            print(
-                f'   {str(i+1).zfill(zfill_len)}{" " * (gap+1-zfill_len)}|  {result}')
+            dur, in_name, in_size, out_name, out_size = result
+            print((f'{str(i+1).zfill(zfill_len).center(8)}|{dur.rjust(7)} \t'
+                   f'{in_size.center(in_sz_w)}\t'
+                   f'{out_size.center(out_sz_w)}\t'
+                   f'{in_name.ljust(in_name_w)}\t'
+                   f'{out_name}').expandtabs(3))
         # ? Is there a better way to do this? ^^ Like, some "run" or "start" or "join" method?
 
         _end = time.perf_counter()
 
     print(f'\n{file_count} files searched'
-          f'\nacross \t{cpus} cpus'
+          f'\nacross {cpus} cpus'
           f'\nin {round((_end - _start)/60, 2):.2f} minutes\n'
           f'Raw pattern match json files saved to:\n'
           f'  ../{Path(*match_dir.parts[-5:])}/\n'
           '============================')
+
+
+def _seek_pat_in_file(corpus, pat, out):
+
+    f_start = time.perf_counter()
+    # append ' 2>/dev/null' for debugging
+    grew_cmd_str = (
+        f'grew grep -pattern {pat} -i {corpus} > {out} 2>/dev/null')
+
+    # TODO : update this to use `subprocess` module instead,
+    #   so that grew warnings/errors can be handled better
+    os.system(grew_cmd_str)
+
+    dur = time.perf_counter() - f_start
+    if dur < 60:
+        dur = f'{_dur_round(dur)}s'
+    else:
+        dur = f'{_dur_round(dur/60)}m'
+
+    return (dur,
+            corpus.stem, _size_round(corpus.stat().st_size),
+            Path(*out.parts[-2:]), _size_round(out.stat().st_size))
+
+
+def _dur_round(dur: float):
+
+    if dur < 10:
+        return f'{round(dur, 2):.2f}'
+
+    return f'{round(dur, 1):.1f}'
+
+
+def _size_round(size: int):
+
+    if size >= 10**8:
+        unit = 'G'
+        power = 9
+    elif size >= 10**5:
+        unit = 'M'
+        power = 6
+    elif size >= 10**2:
+        unit = 'K'
+        power = 3
+    else:
+        unit = ''
+        power = 0
+
+    return f'{round(size / (10**power), 1):.1f} {unit}B'
+
+
+def _star_seek_pat(args):
+    return _seek_pat_in_file(*args)
 
 
 def _arg_paths_generator(file_glob,
@@ -84,49 +151,19 @@ def _arg_paths_generator(file_glob,
             else:
                 # if empty and predates pattern file changes
                 if size < 100 and output_path.stat().st_mtime < pat_file.stat().st_mtime:
-                    _LOGGER.warning(msg='File exists but is empty and older than last pattern modification. '
-                                    'Grew search will be re-run.')
+                    _LOGGER.warning(
+                        'File exists but is empty and older than last pattern modification. '
+                        'Grew search will be re-run.')
                 # if nonempty or pattern has not changed since output last modified
                 #  =>> SKIP
                 else:
-                    _LOGGER.warning(msg=f'{output_path.resolve()}\n'
-                                    '  >> {input_path.stem} matches will not be updated.\n'
-                                    f'     (Output path is non-empty '
-                                    'and pattern has not changed.)')
+                    _LOGGER.warning(
+                        '%s\n  >> %s matches will not be updated.\n'
+                        '     (Output path is non-empty and pattern has not changed.)',
+                        output_path.resolve(), input_path.stem)
                     continue
 
         yield input_path, pat_file, output_path
-
-
-def _seek_pat_in_file(corpus, pat, out):
-
-    f_start = time.perf_counter()
-
-    # append ' 2>/dev/null' for debugging
-    grew_cmd_str = (
-        f'grew grep -pattern {pat} -i {corpus} > {out}')
-
-    # TODO : update this to use `subprocess` module instead, so that grew warnings/errors can be handled better
-    os.system(grew_cmd_str)
-
-    dur = time.perf_counter() - f_start
-    if dur < 60:
-        dur = f'{_dur_round(dur)}s'
-    else:
-        dur = f'{_dur_round(dur/60)}m'
-
-    return (f'{dur}\t{corpus.stem}')
-
-
-def _dur_round(dur):
-    if dur < 10:
-        return f'{round(dur, 2):.2f}'
-    else:
-        return f'{round(dur, 1):.1f}'
-
-
-def _star_seek_pat(args):
-    return _seek_pat_in_file(*args)
 
 
 def _validate_args(args):
@@ -179,11 +216,11 @@ def _parse_args():
     pat_path = args.pat_file
     args.output_dir = args.output_dir.joinpath(
         pat_path.parent.name, f'{args.corpus_dir.stem}.{pat_path.stem}')
-    
+
     for name, value in args._get_kwargs():
-        print(f'{name}\t: {value}')
-    print(f'[Logging Level\t: {_LOGGER.getEffectiveLevel()}]')
-    
+        print(f'{name.rjust(15)} : {value}')
+    print(f'{"[Logging Level".rjust(15)} : {_LOGGER.getEffectiveLevel()}]')
+
     return [a[1] for a in args._get_kwargs()]
 
 

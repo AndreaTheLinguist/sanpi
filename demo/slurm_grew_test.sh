@@ -1,17 +1,26 @@
 #!/bin/bash
 #SBATCH -N1 
-#SBATCH -n3 
-##SBATCH --mem=40G
-#SBATCH --mem-per-cpu=15G 
+#SBATCH -n6
+#SBATCH --mem-per-cpu=10G 
 #SBATCH --partition=compling
-#SBATCH -o mp-test-sub20_%j.out
-#SBATCH -e mp-test-sub20_%j.err
+#SBATCH -o %x_%j.out
+#SBATCH -e %x_%j.err
 #SBATCH --time 1:30:00
-#SBATCH -J testing-pool-runs
-#SBATCH --chdir=/share/compling/projects/sanpi/demo
+#SBATCH -J pool-test
+#SBATCH --chdir=/share/compling/projects/sanpi/demo/logs
 
+echo "JOB ID: ${SLURM_JOB_ID}"
+echo "JOB NAME: ${SLURM_JOB_NAME}"
+echo "started @ $(date '+%F %X') from $(pwd)"
+echo ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
+echo "running on ${SLURM_JOB_NODELIST} with:"
+echo "  - ${SLURM_NTASKS} cores"
+echo "  - ${SLURM_MEM_PER_CPU} mem/cpu"
+echo "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
 
 eval "$(conda shell.bash hook)"
 conda activate sanpi
 DEMO_DIR=/share/compling/projects/sanpi/demo
-python ${DEMO_DIR}/source/gather/grew_search.py ${DEMO_DIR}/data/corpora/puddin/x20_subset_exactly ${DEMO_DIR}/Pat/filter/exactly-JJ.pat ${DEMO_DIR}/data/1_json_grew-matches
+CORP=${1:-PccX9.conll}
+PAT=${2:-advadj/all-RB-JJs.pat}
+python ${DEMO_DIR}/source/gather/grew_search.py ${DEMO_DIR}/data/corpora/puddin/${CORP} ${DEMO_DIR}/Pat/${PAT} ${DEMO_DIR}/data/1_json_grew-matches

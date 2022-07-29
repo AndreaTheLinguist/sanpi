@@ -5,12 +5,12 @@
 #SBATCH -o %x_%j.out              # Name of stdout output log file (%j expands to jobID)
 #SBATCH -e %x_%j.err              # Name of stderr output log file (%j expands to jobID)
 ##SBATCH --open-mode=append
-#SBATCH --nodes=2                       # Total number of nodes requested
-#SBATCH --ntasks=2                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
-#SBATCH --cpus-per-task=4               # number of cpus per task
+#SBATCH --nodes=1                       # Total number of nodes requested
+#SBATCH --ntasks=1                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
+#SBATCH --cpus-per-task=6               # number of cpus per task
 ##SBATCH --ntasks-per-socket=1
-#SBATCH --mem-per-cpu=25G               # Total amount of (real) memory requested (per node)
-#SBATCH --time 10:00:00                  # Time limit (hh:mm:ss)
+#SBATCH --mem-per-cpu=20G               # Total amount of (real) memory requested (per node)
+#SBATCH --time 12:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --chdir=/share/compling/data/sanpi/logs/subsets      # change working directory to this before execution
 
