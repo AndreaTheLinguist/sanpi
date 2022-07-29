@@ -54,18 +54,20 @@ def grew_search(corpus_dir: Path,
                f'{"-"*40}'
                ).expandtabs(3))
         #! this is required to actually get the processes to run
-        for i, result in enumerate(results):
+        i = 0
+        for result in results:
+            i += 1
             dur, in_name, in_size, out_name, out_size = result
-            print((f'{str(i+1).zfill(zfill_len).center(8)}|{dur.rjust(7)} \t'
+            print((f'{str(i).zfill(zfill_len).center(8)}|{dur.rjust(7)} \t'
                    f'{in_size.center(in_sz_w)}\t'
                    f'{out_size.center(out_sz_w)}\t'
                    f'{in_name.ljust(in_name_w)}\t'
                    f'{out_name}').expandtabs(3))
+        search_count = i
         # ? Is there a better way to do this? ^^ Like, some "run" or "start" or "join" method?
-
         _end = time.perf_counter()
 
-    print(f'\n{file_count} files searched'
+    print(f'\n{search_count} files searched'
           f'\nacross {cpus} cpus'
           f'\nin {round((_end - _start)/60, 2):.2f} minutes\n'
           f'Raw pattern match json files saved to:\n'
@@ -78,7 +80,7 @@ def _seek_pat_in_file(corpus, pat, out):
     f_start = time.perf_counter()
     # append ' 2>/dev/null' for debugging
     grew_cmd_str = (
-        f'grew grep -pattern {pat} -i {corpus} > {out} 2>/dev/null')
+        f'grew grep -pattern {pat} -i {corpus} > {out}')
 
     # TODO : update this to use `subprocess` module instead,
     #   so that grew warnings/errors can be handled better
@@ -135,32 +137,41 @@ def _arg_paths_generator(file_glob,
         # ? isn't this redundant given the glob expression? ^^
         if not input_path.is_file():
             continue
+        corpus = input_path.stem
         output_path = match_dir_path.joinpath(
-            input_path.stem + '.raw.json')
+            f'{corpus}.raw.json')
 
-        # if skip flag given, see which if any files should be skipped
-        if skip_files:
-            try:
-                size = output_path.stat().st_size
+        try:
+            size = output_path.stat().st_size
 
-            # if file does not exist, still include file in generator
-            except FileNotFoundError:
-                pass
+        # if file does not exist, still include file in generator
+        except FileNotFoundError:
+            pass
 
-            # if file does exist already
-            else:
-                # if empty and predates pattern file changes
-                if size < 100 and output_path.stat().st_mtime < pat_file.stat().st_mtime:
+        # if file does exist already
+        else:
+            # if skip flag given, see which if any files should be skipped
+            if skip_files:
+                
+                # if file size is exactly 0 bytes (nothing in it at all)
+                # NOTE: a "no hits found" file consists of "[]" (3 bytes; "[\n]\n" is 5 bytes)
+                if size == 0: 
                     _LOGGER.warning(
-                        'File exists but is empty and older than last pattern modification. '
-                        'Grew search will be re-run.')
+                        'Results file exists but is completely empty, suggesting a previous out-of-memory crash. '
+                        'Grew search will be re-attempted.'
+                    )
+                # if no hits and predates pattern file changes
+                elif size < 10 and output_path.stat().st_mtime < pat_file.stat().st_mtime:
+                    _LOGGER.warning(
+                        'Results file exists but is empty and older than last pattern modification. '
+                        'Grew search will be re-attempted for %s', corpus)
                 # if nonempty or pattern has not changed since output last modified
                 #  =>> SKIP
                 else:
                     _LOGGER.warning(
                         '%s\n  >> %s matches will not be updated.\n'
                         '     (Output path is non-empty and pattern has not changed.)',
-                        output_path.resolve(), input_path.stem)
+                        output_path.resolve(), corpus)
                     continue
 
         yield input_path, pat_file, output_path

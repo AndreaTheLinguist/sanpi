@@ -6,8 +6,16 @@
 #SBATCH -o %x_%j.out
 #SBATCH -e %x_%j.err
 #SBATCH --time 1:30:00
-#SBATCH -J pool-test
+#SBATCH -J pool-grew
 #SBATCH --chdir=/share/compling/projects/sanpi/demo/logs
+
+# bash script to start batch slurm job to run **demo/** grew_search with cluster resources
+# usage: 
+#     sbatch [slurm flags addtions/overrides] slurm_grew_test.sh \
+#         [name of corpus dir in ..sanpi/demo/data/corpora/puddin/] \
+#         [path of pattern file relative to ..sanpi/demo/Pat/] \
+#         <optional '-s' to skip files with existing results>
+
 
 echo "JOB ID: ${SLURM_JOB_ID}"
 echo "JOB NAME: ${SLURM_JOB_NAME}"
@@ -23,4 +31,4 @@ conda activate sanpi
 DEMO_DIR=/share/compling/projects/sanpi/demo
 CORP=${1:-PccX9.conll}
 PAT=${2:-advadj/all-RB-JJs.pat}
-python ${DEMO_DIR}/source/gather/grew_search.py ${DEMO_DIR}/data/corpora/puddin/${CORP} ${DEMO_DIR}/Pat/${PAT} ${DEMO_DIR}/data/1_json_grew-matches
+python ${DEMO_DIR}/source/gather/grew_search.py ${3:-""} ${DEMO_DIR}/data/corpora/puddin/${CORP} ${DEMO_DIR}/Pat/${PAT} ${DEMO_DIR}/data/1_json_grew-matches

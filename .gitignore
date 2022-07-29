@@ -382,3 +382,6 @@ sandbox/
 *.err
 *.out
 playground
+demo/**/x20_*
+demo/**/PccX9*
+demo/**/subset*
