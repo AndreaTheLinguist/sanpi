@@ -51,7 +51,7 @@ conda activate parallel-sanpi
 # echo "$(conda env list)"
 # echo ""
 
-#: set pat file path. Default to `exactly-JJ.pat`
+#) set pat file path. Default to `exactly-JJ.pat`
 PAT=${1:-${SOURCE_DIR}/Pat/filter/exactly-JJ.pat}
 
 # example usage: 
@@ -98,7 +98,7 @@ echo "Processing ${SEED} dataset"
 SEED_CORPUS_DIR=${DATA_DIR}/puddin/Pcc${SEED}.conll
 MISSING_LIST=$( dirname ${SEED_CORPUS_DIR} )/info/exactly_subset/ALLpaths_missing-subset.txt
 
-##: running the code
+##) running the code
 if [[ -d $SEED_CORPUS_DIR ]]; then
   # run script and send both stdout and stderr to log file
   echo "> ${SEED_CORPUS_DIR}"
@@ -110,9 +110,9 @@ if [[ -d $SEED_CORPUS_DIR ]]; then
     #// INPUTS_CMD="find ${SEED_CORPUS_DIR} -maxdepth 1 -type f -name \"*.conllu\" )
     #// # echo $FILTER_DIR"
 
-    #// #: if filter dir path was given
+    #// #) if filter dir path was given
     #// if [[ -n "${FILTER_DIR}" ]]; then
-      #: locate the "...missing.txt" for the given SEED
+      #) locate the "...missing.txt" for the given SEED
       #//# ! must include `-maxdepth 1` to exclude files in `../prev/`
       # FILE_LIST_PATH=`find $( dirname ${SEED_CORPUS_DIR} )/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt"`
       # FILE_LIST_PATH=$( find $( dirname ${SEED_CORPUS_DIR} )/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt" )

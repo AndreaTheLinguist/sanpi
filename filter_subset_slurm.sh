@@ -44,7 +44,7 @@ conda activate parallel-sanpi
 ${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
 
 echo -e "\n>>> Gather still missing subsets...\n"
-#: set pat file AND FILTER FILE LIST paths. Default to `exactly-JJ.pat`
+#) set pat file AND FILTER FILE LIST paths. Default to `exactly-JJ.pat`
 MISSING_LIST=${DATA_DIR}/puddin/info/exactly_subset/ALLpaths_missing-subset.txt
 PAT=${2:-${SOURCE_DIR}/Pat/filter/exactly-JJ.pat}
 # example usage: 

@@ -1,6 +1,5 @@
 import argparse
 import multiprocessing
-# import logging
 import os
 import sys
 import time
@@ -8,8 +7,8 @@ from pathlib import Path
 
 _LOGGER = multiprocessing.log_to_stderr()
 _LOGGER.setLevel(30)  # warning
-# _LOGGER.setLevel(20) # info
-# _LOGGER.setLevel(10) # debug
+#// _LOGGER.setLevel(20) # info
+#// _LOGGER.setLevel(10) # debug
 
 # TODO : make default to not overwrite existing (non-empty) raw.json files; otherwise need to have new pat directories for any added patterns (to avoid needing to redo all the searches already run)
 
@@ -25,8 +24,8 @@ def grew_search(corpus_dir: Path,
 
     file_count = len(tuple(corpus_dir.glob('*.conllu')))
 
-    #: set pool `processes` argument to number of _available_ cpus
-    # OR number of files to be searched, whichever is smaller
+    #) set pool `processes` argument to number of _available_ cpus
+    #) OR number of files to be searched, whichever is smaller
     cpus = min(len(os.sched_getaffinity(0)), file_count)
     print(f'\n> searching {file_count} files in ../'
           f'{Path(*corpus_dir.parts[-3:])}/ with {cpus} CPUs...')
@@ -78,12 +77,12 @@ def grew_search(corpus_dir: Path,
 def _seek_pat_in_file(corpus, pat, out):
 
     f_start = time.perf_counter()
-    # append ' 2>/dev/null' for debugging
+    #) append ' 2>/dev/null' for debugging
     grew_cmd_str = (
         f'grew grep -pattern {pat} -i {corpus} > {out}')
 
-    # TODO : update this to use `subprocess` module instead,
-    #   so that grew warnings/errors can be handled better
+    #^ TODO: update this to use `subprocess` module instead,
+    #^   so that grew warnings/errors can be handled better
     os.system(grew_cmd_str)
 
     dur = time.perf_counter() - f_start
@@ -133,7 +132,7 @@ def _arg_paths_generator(file_glob,
                          skip_files: bool):
 
     for input_path in file_glob:
-        #: skip any subdirectories in corpus/conllu files directory
+        #) skip any subdirectories in corpus/conllu files directory
         # ? isn't this redundant given the glob expression? ^^
         if not input_path.is_file():
             continue
@@ -144,7 +143,7 @@ def _arg_paths_generator(file_glob,
         try:
             size = output_path.stat().st_size
 
-        # if file does not exist, still include file in generator
+        # if file does not exist, include file in generator
         except FileNotFoundError:
             pass
 
@@ -152,10 +151,10 @@ def _arg_paths_generator(file_glob,
         else:
             # if skip flag given, see which if any files should be skipped
             if skip_files:
-                
+
                 # if file size is exactly 0 bytes (nothing in it at all)
                 # NOTE: a "no hits found" file consists of "[]" (3 bytes; "[\n]\n" is 5 bytes)
-                if size == 0: 
+                if size == 0:
                     _LOGGER.warning(
                         'Results file exists but is completely empty, suggesting a previous out-of-memory crash. '
                         'Grew search will be re-attempted.'
