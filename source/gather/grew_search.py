@@ -78,30 +78,43 @@ def _seek_pat_in_file(corpus, pat, out):
 
     f_start = time.perf_counter()
     #) append ' 2>/dev/null' for debugging
-    grew_cmd_str = (
-        f'grew grep -pattern {pat} -i {corpus} > {out}')
+    grew_cmd_str = (f'grew grep -pattern {pat} -i {corpus} > {out}')
 
-    #^ TODO: update this to use `subprocess` module instead,
-    #^   so that grew warnings/errors can be handled better
+    # ^ TODO: update this to use `subprocess` module instead,
+    # ^   so that grew warnings/errors can be handled better
     os.system(grew_cmd_str)
 
-    dur = time.perf_counter() - f_start
-    if dur < 60:
-        dur = f'{_dur_round(dur)}s'
-    else:
-        dur = f'{_dur_round(dur/60)}m'
+    dur = dur_round(time.perf_counter() - f_start)
 
     return (dur,
             corpus.stem, _size_round(corpus.stat().st_size),
             Path(*out.parts[-2:]), _size_round(out.stat().st_size))
 
 
-def _dur_round(dur: float):
+def dur_round(dur: float):
+    """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits 
+
+    Args:
+        dur (float): seconds value
+
+    Returns:
+        str: value converted and rounded with unit label of 's','m', or 'h'
+    """    
+    unit = 's'
+    if dur >= 60:
+        dur = dur/60
+        unit = 'm'
+        
+        if dur >= 60: 
+            dur = dur/60
+            unit = 'h'
 
     if dur < 10:
-        return f'{round(dur, 2):.2f}'
+        dur_str = f'{round(dur, 2):.2f}{unit}'
+    else:
+        dur_str = f'{round(dur, 1):.1f}{unit}'
 
-    return f'{round(dur, 1):.1f}'
+    return dur_str
 
 
 def _size_round(size: int):
