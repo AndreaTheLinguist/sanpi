@@ -29,7 +29,15 @@
 		"version": "0.2.0",
 		"configurations": [
 			{
-				"name": "Python: check doc ids",
+				"name": "Python: Current File",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": true
+			},
+			{
+				"name": "puddin confirm_doc_ids",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/puddin/script/confirm_doc_ids.py",
@@ -37,7 +45,7 @@
 				"python": "/home/arh234/.conda/envs/puddin/bin/python"
 			},
 			{
-				"name": "Python: create_match_conllu",
+				"name": "sanpi make subset (default)",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
@@ -45,7 +53,7 @@
 				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python"
 			},
 			{
-				"name": "Python: create_match_conllu FILE PAT",
+				"name": "sanpi make subset (test args)",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
@@ -59,7 +67,7 @@
 				]
 			},
 			{
-				"name": "Python: demo PccX2 grew_search",
+				"name": "sanpi-DEMO PccX2 grew_search",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
@@ -73,7 +81,7 @@
 				]
 			},
 			{
-				"name": "Python: demo PccX3 grew_search",
+				"name": "sanpi-DEMO PccX3 grew_search",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
@@ -87,7 +95,7 @@
 				]
 			},
 			{
-				"name": "Python: demo PccX5 grew_search",
+				"name": "sanpi-DEMO PccX5 grew_search",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
@@ -101,7 +109,7 @@
 				]
 			},
 			{
-				"name": "Python: demo x5 exactly grew_search",
+				"name": "sanpi-DEMO x5 subset-exactly grew_search",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/demo/source/gather/grew_search.py",
@@ -110,12 +118,12 @@
 				"cwd": "/share/compling/projects/sanpi/demo",
 				"args": [
 					"data/corpora/puddin/x5_subset_exactly",
-					"Pat/filter/neg-prefixJJ.pat",
+					"Pat/contig/sans-relay.pat",
 					"data/1_json_grew-matches"
 				]
 			},
 			{
-				"name": "Python: parse_pile Pcc22-29",
+				"name": "puddin parse_pile Pcc22-29",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/puddin/script/parse_pile.py",
@@ -130,7 +138,7 @@
 				]
 			},
 			{
-				"name": "Python: parse_pile Pile Val",
+				"name": "puddin parse_pile Pile Val",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/puddin/script/parse_pile.py",
