@@ -1,0 +1,461 @@
+# sent_id = pcc_eng_11_094.0013_x1505525_11
+# text = I thought it was enough, I went back to the mall and returned the watch to the smiling executive, who happily refunded the entire amount.
+# newdoc id = pcc_eng_11_094.0013_x1505525
+1	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	2	nsubj	_	end_char=1171|start_char=1170
+2	thought	think	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	0	root	_	end_char=1179|start_char=1172
+3	it	it	PRON	PRP	Case=Nom|Gender=Neut|Number=Sing|Person=3|PronType=Prs	5	nsubj	_	end_char=1182|start_char=1180
+4	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	5	cop	_	end_char=1186|start_char=1183
+5	enough	enough	ADJ	JJ	Degree=Pos	2	ccomp	_	end_char=1193|start_char=1187
+6	,	,	PUNCT	,	_	8	punct	_	end_char=1194|start_char=1193
+7	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	8	nsubj	_	end_char=1196|start_char=1195
+8	went	go	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	2	parataxis	_	end_char=1201|start_char=1197
+9	back	back	ADV	RB	_	8	advmod	_	end_char=1206|start_char=1202
+10	to	to	ADP	IN	_	12	case	_	end_char=1209|start_char=1207
+11	the	the	DET	DT	Definite=Def|PronType=Art	12	det	_	end_char=1213|start_char=1210
+12	mall	mall	NOUN	NN	Number=Sing	8	obl	_	end_char=1218|start_char=1214
+13	and	and	CCONJ	CC	_	14	cc	_	end_char=1222|start_char=1219
+14	returned	return	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	8	conj	_	end_char=1231|start_char=1223
+15	the	the	DET	DT	Definite=Def|PronType=Art	16	det	_	end_char=1235|start_char=1232
+16	watch	watch	NOUN	NN	Number=Sing	14	obj	_	end_char=1241|start_char=1236
+17	to	to	ADP	IN	_	20	case	_	end_char=1244|start_char=1242
+18	the	the	DET	DT	Definite=Def|PronType=Art	20	det	_	end_char=1248|start_char=1245
+19	smiling	smile	VERB	VBG	VerbForm=Ger	20	amod	_	end_char=1256|start_char=1249
+20	executive	executive	ADJ	JJ	Degree=Pos	14	obl	_	end_char=1266|start_char=1257
+21	,	,	PUNCT	,	_	24	punct	_	end_char=1267|start_char=1266
+22	who	who	PRON	WP	PronType=Rel	24	nsubj	_	end_char=1271|start_char=1268
+23	happily	happily	ADV	RB	_	24	advmod	_	end_char=1279|start_char=1272
+24	refunded	refund	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	20	acl:relcl	_	end_char=1288|start_char=1280
+25	the	the	DET	DT	Definite=Def|PronType=Art	27	det	_	end_char=1292|start_char=1289
+26	entire	entire	ADJ	JJ	Degree=Pos	27	amod	_	end_char=1299|start_char=1293
+27	amount	amount	NOUN	NN	Number=Sing	24	obj	_	end_char=1306|start_char=1300
+28	.	.	PUNCT	.	_	2	punct	_	end_char=1307|start_char=1306
+
+# sent_id = pcc_eng_11_094.0013_x1505525_12
+# text = The next morning turned out to be exactly opposite!
+# newdoc id = pcc_eng_11_094.0013_x1505525
+# pattern_match = filter_exactly-JJ
+1	The	the	DET	DT	Definite=Def|PronType=Art	3	det	_	end_char=1312|start_char=1309
+2	next	next	ADJ	JJ	Degree=Pos	3	amod	_	end_char=1317|start_char=1313
+3	morning	morning	NOUN	NN	Number=Sing	4	nsubj	_	end_char=1325|start_char=1318
+4	turned	turn	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	0	root	_	end_char=1332|start_char=1326
+5	out	out	ADP	RP	_	4	compound:prt	_	end_char=1336|start_char=1333
+6	to	to	PART	TO	_	9	mark	_	end_char=1339|start_char=1337
+7	be	be	AUX	VB	VerbForm=Inf	9	cop	_	end_char=1342|start_char=1340
+8	exactly	exactly	ADV	RB	_	9	advmod	_	end_char=1350|start_char=1343
+9	opposite	opposite	ADJ	JJ	Degree=Pos	4	xcomp	_	end_char=1359|start_char=1351
+10	!	!	PUNCT	.	_	4	punct	_	end_char=1360|start_char=1359
+
+# sent_id = pcc_eng_11_094.0013_x1505525_13
+# text = I was convinced by friends that I should buy an Apple Watch, as I was contemplating a replacement for my regular watch and it was a nice idea to pick up something which was going to be in demand in our home country in sometime.
+# newdoc id = pcc_eng_11_094.0013_x1505525
+1	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	3	nsubj:pass	_	end_char=1362|start_char=1361
+2	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	3	aux:pass	_	end_char=1366|start_char=1363
+3	convinced	convince	VERB	VBN	Tense=Past|VerbForm=Part|Voice=Pass	0	root	_	end_char=1376|start_char=1367
+4	by	by	ADP	IN	_	5	case	_	end_char=1379|start_char=1377
+5	friends	friend	NOUN	NNS	Number=Plur	3	obl	_	end_char=1387|start_char=1380
+6	that	that	PRON	WDT	PronType=Rel	9	obj	_	end_char=1392|start_char=1388
+7	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	9	nsubj	_	end_char=1394|start_char=1393
+8	should	should	AUX	MD	VerbForm=Fin	9	aux	_	end_char=1401|start_char=1395
+9	buy	buy	VERB	VB	VerbForm=Inf	5	acl:relcl	_	end_char=1405|start_char=1402
+10	an	a	DET	DT	Definite=Ind|PronType=Art	12	det	_	end_char=1408|start_char=1406
+11	Apple	Apple	PROPN	NNP	Number=Sing	12	compound	_	end_char=1414|start_char=1409
+12	Watch	watch	NOUN	NN	Number=Sing	9	obj	_	end_char=1420|start_char=1415
+13	,	,	PUNCT	,	_	17	punct	_	end_char=1421|start_char=1420
+14	as	as	SCONJ	IN	_	17	mark	_	end_char=1424|start_char=1422
+15	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	17	nsubj	_	end_char=1426|start_char=1425
+16	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	17	aux	_	end_char=1430|start_char=1427
+17	contemplating	contemplate	VERB	VBG	Tense=Pres|VerbForm=Part	9	advcl	_	end_char=1444|start_char=1431
+18	a	a	DET	DT	Definite=Ind|PronType=Art	19	det	_	end_char=1446|start_char=1445
+19	replacement	replacement	NOUN	NN	Number=Sing	17	obj	_	end_char=1458|start_char=1447
+20	for	for	ADP	IN	_	23	case	_	end_char=1462|start_char=1459
+21	my	my	PRON	PRP$	Number=Sing|Person=1|Poss=Yes|PronType=Prs	23	nmod:poss	_	end_char=1465|start_char=1463
+22	regular	regular	ADJ	JJ	Degree=Pos	23	amod	_	end_char=1473|start_char=1466
+23	watch	watch	NOUN	NN	Number=Sing	17	obl	_	end_char=1479|start_char=1474
+24	and	and	CCONJ	CC	_	29	cc	_	end_char=1483|start_char=1480
+25	it	it	PRON	PRP	Case=Nom|Gender=Neut|Number=Sing|Person=3|PronType=Prs	29	nsubj	_	end_char=1486|start_char=1484
+26	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	29	cop	_	end_char=1490|start_char=1487
+27	a	a	DET	DT	Definite=Ind|PronType=Art	29	det	_	end_char=1492|start_char=1491
+28	nice	nice	ADJ	JJ	Degree=Pos	29	amod	_	end_char=1497|start_char=1493
+29	idea	idea	NOUN	NN	Number=Sing	3	conj	_	end_char=1502|start_char=1498
+30	to	to	PART	TO	_	31	mark	_	end_char=1505|start_char=1503
+31	pick	pick	VERB	VB	VerbForm=Inf	29	acl	_	end_char=1510|start_char=1506
+32	up	up	ADP	RP	_	31	compound:prt	_	end_char=1513|start_char=1511
+33	something	something	PRON	NN	Number=Sing	31	obj	_	end_char=1523|start_char=1514
+34	which	which	PRON	WDT	PronType=Rel	36	nsubj	_	end_char=1529|start_char=1524
+35	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	36	aux	_	end_char=1533|start_char=1530
+36	going	go	VERB	VBG	Tense=Pres|VerbForm=Part	33	acl:relcl	_	end_char=1539|start_char=1534
+37	to	to	PART	TO	_	40	mark	_	end_char=1542|start_char=1540
+38	be	be	AUX	VB	VerbForm=Inf	40	cop	_	end_char=1545|start_char=1543
+39	in	in	ADP	IN	_	40	case	_	end_char=1548|start_char=1546
+40	demand	demand	NOUN	NN	Number=Sing	36	xcomp	_	end_char=1555|start_char=1549
+41	in	in	ADP	IN	_	44	case	_	end_char=1558|start_char=1556
+42	our	we	PRON	PRP$	Number=Plur|Person=1|Poss=Yes|PronType=Prs	44	nmod:poss	_	end_char=1562|start_char=1559
+43	home	home	NOUN	NN	Number=Sing	44	compound	_	end_char=1567|start_char=1563
+44	country	country	NOUN	NN	Number=Sing	40	nmod	_	end_char=1575|start_char=1568
+45	in	in	ADV	RB	_	46	advmod	_	end_char=1578|start_char=1576
+46	sometime	sometime	ADV	RB	_	40	advmod	_	end_char=1587|start_char=1579
+47	.	.	PUNCT	.	_	3	punct	_	end_char=1588|start_char=1587
+
+# sent_id = pcc_eng_11_094.2920_x1510274_28
+# text = Dumoulin and Reese will stay together, but Mormina will take Morrow's spot with Philip Samuelsson and Wild will be paired with Grant.
+# newdoc id = pcc_eng_11_094.2920_x1510274
+1	Dumoulin	Dumoulin	PROPN	NNP	Number=Sing	5	nsubj	_	end_char=2113|start_char=2105
+2	and	and	CCONJ	CC	_	3	cc	_	end_char=2117|start_char=2114
+3	Reese	Reese	PROPN	NNP	Number=Sing	1	conj	_	end_char=2123|start_char=2118
+4	will	will	AUX	MD	VerbForm=Fin	5	aux	_	end_char=2128|start_char=2124
+5	stay	stay	VERB	VB	VerbForm=Inf	0	root	_	end_char=2133|start_char=2129
+6	together	together	ADV	RB	_	5	advmod	_	end_char=2142|start_char=2134
+7	,	,	PUNCT	,	_	11	punct	_	end_char=2143|start_char=2142
+8	but	but	CCONJ	CC	_	11	cc	_	end_char=2147|start_char=2144
+9	Mormina	Mormina	PROPN	NNP	Number=Sing	11	nsubj	_	end_char=2155|start_char=2148
+10	will	will	AUX	MD	VerbForm=Fin	11	aux	_	end_char=2160|start_char=2156
+11	take	take	VERB	VB	VerbForm=Inf	5	conj	_	end_char=2165|start_char=2161
+12	Morrow	Morrow	PROPN	NNP	Number=Sing	14	nmod:poss	_	end_char=2172|start_char=2166
+13	's	's	PART	POS	_	12	case	_	end_char=2174|start_char=2172
+14	spot	spot	NOUN	NN	Number=Sing	11	obj	_	end_char=2179|start_char=2175
+15	with	with	ADP	IN	_	16	case	_	end_char=2184|start_char=2180
+16	Philip	Philip	PROPN	NNP	Number=Sing	11	obl	_	end_char=2191|start_char=2185
+17	Samuelsson	Samuelsson	PROPN	NNP	Number=Sing	16	flat	_	end_char=2202|start_char=2192
+18	and	and	CCONJ	CC	_	22	cc	_	end_char=2206|start_char=2203
+19	Wild	Wild	PROPN	NNP	Number=Sing	22	nsubj:pass	_	end_char=2211|start_char=2207
+20	will	will	AUX	MD	VerbForm=Fin	22	aux	_	end_char=2216|start_char=2212
+21	be	be	AUX	VB	VerbForm=Inf	22	aux:pass	_	end_char=2219|start_char=2217
+22	paired	pair	VERB	VBN	Tense=Past|VerbForm=Part|Voice=Pass	11	conj	_	end_char=2226|start_char=2220
+23	with	with	ADP	IN	_	24	case	_	end_char=2231|start_char=2227
+24	Grant	grant	NOUN	NN	Number=Sing	22	obl	_	end_char=2237|start_char=2232
+25	.	.	PUNCT	.	_	5	punct	_	end_char=2238|start_char=2237
+
+# sent_id = pcc_eng_11_094.2920_x1510274_29
+# text = Those last two pairings aren't exactly new.
+# newdoc id = pcc_eng_11_094.2920_x1510274
+# pattern_match = filter_exactly-JJ
+1	Those	that	DET	DT	Number=Plur|PronType=Dem	4	det	_	end_char=2245|start_char=2240
+2	last	last	ADJ	JJ	Degree=Pos	4	amod	_	end_char=2250|start_char=2246
+3	two	two	NUM	CD	NumType=Card	4	nummod	_	end_char=2254|start_char=2251
+4	pairings	pairing	NOUN	NNS	Number=Plur	8	nsubj	_	end_char=2263|start_char=2255
+5	are	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	8	cop	_	end_char=2267|start_char=2264
+6	n't	not	PART	RB	_	8	advmod	_	end_char=2270|start_char=2267
+7	exactly	exactly	ADV	RB	_	8	advmod	_	end_char=2278|start_char=2271
+8	new	new	ADJ	JJ	Degree=Pos	0	root	_	end_char=2282|start_char=2279
+9	.	.	PUNCT	.	_	8	punct	_	end_char=2283|start_char=2282
+
+# sent_id = pcc_eng_11_094.2920_x1510274_30
+# text = The Penguins used them extensively down the stretch and into the playoffs last season.
+# newdoc id = pcc_eng_11_094.2920_x1510274
+1	The	the	DET	DT	Definite=Def|PronType=Art	2	det	_	end_char=2287|start_char=2284
+2	Penguins	Penguin	PROPN	NNPS	Number=Plur	3	nsubj	_	end_char=2296|start_char=2288
+3	used	use	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	0	root	_	end_char=2301|start_char=2297
+4	them	they	PRON	PRP	Case=Acc|Number=Plur|Person=3|PronType=Prs	3	obj	_	end_char=2306|start_char=2302
+5	extensively	extensively	ADV	RB	_	3	advmod	_	end_char=2318|start_char=2307
+6	down	down	ADP	IN	_	8	case	_	end_char=2323|start_char=2319
+7	the	the	DET	DT	Definite=Def|PronType=Art	8	det	_	end_char=2327|start_char=2324
+8	stretch	stretch	NOUN	NN	Number=Sing	3	obl	_	end_char=2335|start_char=2328
+9	and	and	CCONJ	CC	_	12	cc	_	end_char=2339|start_char=2336
+10	into	into	ADP	IN	_	12	case	_	end_char=2344|start_char=2340
+11	the	the	DET	DT	Definite=Def|PronType=Art	12	det	_	end_char=2348|start_char=2345
+12	playoffs	playoff	NOUN	NNS	Number=Plur	3	conj	_	end_char=2357|start_char=2349
+13	last	last	ADJ	JJ	Degree=Pos	14	amod	_	end_char=2362|start_char=2358
+14	season	season	NOUN	NN	Number=Sing	12	nmod:tmod	_	end_char=2369|start_char=2363
+15	.	.	PUNCT	.	_	3	punct	_	end_char=2370|start_char=2369
+
+# sent_id = pcc_eng_11_094.3538_x1511305_61
+# text = They do health testing, they do temperament testing.
+# newdoc id = pcc_eng_11_094.3538_x1511305
+1	They	they	PRON	PRP	Case=Nom|Number=Plur|Person=3|PronType=Prs	2	nsubj	_	end_char=5007|start_char=5003
+2	do	do	VERB	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	0	root	_	end_char=5010|start_char=5008
+3	health	health	NOUN	NN	Number=Sing	4	compound	_	end_char=5017|start_char=5011
+4	testing	testing	NOUN	NN	Number=Sing	2	obj	_	end_char=5025|start_char=5018
+5	,	,	PUNCT	,	_	2	punct	_	end_char=5026|start_char=5025
+6	they	they	PRON	PRP	Case=Nom|Number=Plur|Person=3|PronType=Prs	7	nsubj	_	end_char=5031|start_char=5027
+7	do	do	VERB	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	2	parataxis	_	end_char=5034|start_char=5032
+8	temperament	temperament	NOUN	NN	Number=Sing	9	compound	_	end_char=5046|start_char=5035
+9	testing	testing	NOUN	NN	Number=Sing	7	obj	_	end_char=5054|start_char=5047
+10	.	.	PUNCT	.	_	2	punct	_	end_char=5055|start_char=5054
+
+# sent_id = pcc_eng_11_094.3538_x1511305_62
+# text = The thing is, some breeds are exactly right for some families--and when a family gets a dog that's a perfect match for them, the chances are much slimmer that the dog will end up in a shelter.
+# newdoc id = pcc_eng_11_094.3538_x1511305
+# pattern_match = filter_exactly-JJ
+1	The	the	DET	DT	Definite=Def|PronType=Art	2	det	_	end_char=5059|start_char=5056
+2	thing	thing	NOUN	NN	Number=Sing	3	nsubj	_	end_char=5065|start_char=5060
+3	is	be	VERB	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	end_char=5068|start_char=5066
+4	,	,	PUNCT	,	_	3	punct	_	end_char=5069|start_char=5068
+5	some	some	DET	DT	_	6	det	_	end_char=5074|start_char=5070
+6	breeds	breed	NOUN	NNS	Number=Plur	9	nsubj	_	end_char=5081|start_char=5075
+7	are	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	9	cop	_	end_char=5085|start_char=5082
+8	exactly	exactly	ADV	RB	_	9	advmod	_	end_char=5093|start_char=5086
+9	right	right	ADJ	JJ	Degree=Pos	3	ccomp	_	end_char=5099|start_char=5094
+10	for	for	ADP	IN	_	12	case	_	end_char=5103|start_char=5100
+11	some	some	DET	DT	_	12	det	_	end_char=5108|start_char=5104
+12	families	family	NOUN	NNS	Number=Plur	9	obl	_	end_char=5117|start_char=5109
+13	--	--	PUNCT	,	_	3	punct	_	end_char=5119|start_char=5117
+14	and	and	CCONJ	CC	_	33	cc	_	end_char=5122|start_char=5119
+15	when	when	SCONJ	WRB	PronType=Int	18	mark	_	end_char=5127|start_char=5123
+16	a	a	DET	DT	Definite=Ind|PronType=Art	17	det	_	end_char=5129|start_char=5128
+17	family	family	NOUN	NN	Number=Sing	18	nsubj	_	end_char=5136|start_char=5130
+18	gets	get	VERB	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	33	advcl	_	end_char=5141|start_char=5137
+19	a	a	DET	DT	Definite=Ind|PronType=Art	20	det	_	end_char=5143|start_char=5142
+20	dog	dog	NOUN	NN	Number=Sing	18	obj	_	end_char=5147|start_char=5144
+21	that	that	PRON	WDT	PronType=Rel	25	nsubj	_	end_char=5152|start_char=5148
+22	's	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	25	cop	_	end_char=5154|start_char=5152
+23	a	a	DET	DT	Definite=Ind|PronType=Art	25	det	_	end_char=5156|start_char=5155
+24	perfect	perfect	ADJ	JJ	Degree=Pos	25	amod	_	end_char=5164|start_char=5157
+25	match	match	NOUN	NN	Number=Sing	20	acl:relcl	_	end_char=5170|start_char=5165
+26	for	for	ADP	IN	_	27	case	_	end_char=5174|start_char=5171
+27	them	they	PRON	PRP	Case=Acc|Number=Plur|Person=3|PronType=Prs	25	nmod	_	end_char=5179|start_char=5175
+28	,	,	PUNCT	,	_	33	punct	_	end_char=5180|start_char=5179
+29	the	the	DET	DT	Definite=Def|PronType=Art	30	det	_	end_char=5184|start_char=5181
+30	chances	chance	NOUN	NNS	Number=Plur	33	nsubj	_	end_char=5192|start_char=5185
+31	are	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	33	cop	_	end_char=5196|start_char=5193
+32	much	much	ADV	RB	_	33	advmod	_	end_char=5201|start_char=5197
+33	slimmer	slimm	ADJ	JJR	Degree=Cmp	3	conj	_	end_char=5209|start_char=5202
+34	that	that	SCONJ	IN	_	38	mark	_	end_char=5214|start_char=5210
+35	the	the	DET	DT	Definite=Def|PronType=Art	36	det	_	end_char=5218|start_char=5215
+36	dog	dog	NOUN	NN	Number=Sing	38	nsubj	_	end_char=5222|start_char=5219
+37	will	will	AUX	MD	VerbForm=Fin	38	aux	_	end_char=5227|start_char=5223
+38	end	end	VERB	VB	VerbForm=Inf	33	ccomp	_	end_char=5231|start_char=5228
+39	up	up	ADP	RP	_	38	compound:prt	_	end_char=5234|start_char=5232
+40	in	in	ADP	IN	_	42	case	_	end_char=5237|start_char=5235
+41	a	a	DET	DT	Definite=Ind|PronType=Art	42	det	_	end_char=5239|start_char=5238
+42	shelter	shelter	NOUN	NN	Number=Sing	38	obl	_	end_char=5247|start_char=5240
+43	.	.	PUNCT	.	_	3	punct	_	end_char=5248|start_char=5247
+
+# sent_id = pcc_eng_11_094.3538_x1511305_63
+# text = All that being said, now that I'm an experienced dog owner, I would definitely be open to getting a mixed breed dog.
+# newdoc id = pcc_eng_11_094.3538_x1511305
+1	All	all	DET	DT	_	19	nsubj	_	end_char=5253|start_char=5250
+2	that	that	PRON	DT	Number=Sing|PronType=Dem	4	nsubj:pass	_	end_char=5258|start_char=5254
+3	being	be	AUX	VBG	VerbForm=Ger	4	aux:pass	_	end_char=5264|start_char=5259
+4	said	say	VERB	VBN	Tense=Past|VerbForm=Part|Voice=Pass	1	acl:relcl	_	end_char=5269|start_char=5265
+5	,	,	PUNCT	,	_	19	punct	_	end_char=5270|start_char=5269
+6	now	now	ADV	RB	_	19	advmod	_	end_char=5274|start_char=5271
+7	that	that	SCONJ	IN	_	13	mark	_	end_char=5279|start_char=5275
+8	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	13	nsubj	_	end_char=5281|start_char=5280
+9	'm	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	13	cop	_	end_char=5283|start_char=5281
+10	an	a	DET	DT	Definite=Ind|PronType=Art	13	det	_	end_char=5286|start_char=5284
+11	experienced	experienced	ADJ	JJ	Degree=Pos	13	amod	_	end_char=5298|start_char=5287
+12	dog	dog	NOUN	NN	Number=Sing	13	compound	_	end_char=5302|start_char=5299
+13	owner	owner	NOUN	NN	Number=Sing	6	ccomp	_	end_char=5308|start_char=5303
+14	,	,	PUNCT	,	_	19	punct	_	end_char=5309|start_char=5308
+15	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	19	nsubj	_	end_char=5311|start_char=5310
+16	would	would	AUX	MD	VerbForm=Fin	19	aux	_	end_char=5317|start_char=5312
+17	definitely	definitely	ADV	RB	_	19	advmod	_	end_char=5328|start_char=5318
+18	be	be	AUX	VB	VerbForm=Inf	19	cop	_	end_char=5331|start_char=5329
+19	open	open	ADJ	JJ	Degree=Pos	0	root	_	end_char=5336|start_char=5332
+20	to	to	SCONJ	IN	_	21	mark	_	end_char=5339|start_char=5337
+21	getting	get	VERB	VBG	VerbForm=Ger	19	advcl	_	end_char=5347|start_char=5340
+22	a	a	DET	DT	Definite=Ind|PronType=Art	25	det	_	end_char=5349|start_char=5348
+23	mixed	mix	VERB	VBN	Tense=Past|VerbForm=Part	25	amod	_	end_char=5355|start_char=5350
+24	breed	breed	NOUN	NN	Number=Sing	25	compound	_	end_char=5361|start_char=5356
+25	dog	dog	NOUN	NN	Number=Sing	21	obj	_	end_char=5365|start_char=5362
+26	.	.	PUNCT	.	_	19	punct	_	end_char=5366|start_char=5365
+
+# sent_id = pcc_eng_11_094.4518_x1512903_04
+# text = The Senators' big man has been getting an earful from Ottawa hockey fans.
+# newdoc id = pcc_eng_11_094.4518_x1512903
+1	The	the	DET	DT	Definite=Def|PronType=Art	2	det	_	end_char=246|start_char=243
+2	Senators	Senator	PROPN	NNPS	Number=Plur	5	nmod:poss	_	end_char=255|start_char=247
+3	'	's	PART	POS	_	2	case	_	end_char=256|start_char=255
+4	big	big	ADJ	JJ	Degree=Pos	5	amod	_	end_char=260|start_char=257
+5	man	man	NOUN	NN	Number=Sing	8	nsubj	_	end_char=264|start_char=261
+6	has	have	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	8	aux	_	end_char=268|start_char=265
+7	been	be	AUX	VBN	Tense=Past|VerbForm=Part	8	aux	_	end_char=273|start_char=269
+8	getting	get	VERB	VBG	Tense=Pres|VerbForm=Part	0	root	_	end_char=281|start_char=274
+9	an	a	DET	DT	Definite=Ind|PronType=Art	10	det	_	end_char=284|start_char=282
+10	earful	earful	NOUN	NN	Number=Sing	8	obj	_	end_char=291|start_char=285
+11	from	from	ADP	IN	_	14	case	_	end_char=296|start_char=292
+12	Ottawa	Ottawa	PROPN	NNP	Number=Sing	14	compound	_	end_char=303|start_char=297
+13	hockey	hockey	NOUN	NN	Number=Sing	14	compound	_	end_char=310|start_char=304
+14	fans	fan	NOUN	NNS	Number=Plur	10	nmod	_	end_char=315|start_char=311
+15	.	.	PUNCT	.	_	8	punct	_	end_char=316|start_char=315
+
+# sent_id = pcc_eng_11_094.4518_x1512903_05
+# text = Then again, when you're 6-foot-9, it isn't exactly easy to hide from it.
+# newdoc id = pcc_eng_11_094.4518_x1512903
+# pattern_match = filter_exactly-JJ
+1	Then	then	ADV	RB	PronType=Dem	17	advmod	_	end_char=322|start_char=318
+2	again	again	ADV	RB	_	17	advmod	_	end_char=328|start_char=323
+3	,	,	PUNCT	,	_	17	punct	_	end_char=329|start_char=328
+4	when	when	SCONJ	WRB	PronType=Int	9	mark	_	end_char=334|start_char=330
+5	you	you	PRON	PRP	Case=Nom|Person=2|PronType=Prs	9	nsubj	_	end_char=338|start_char=335
+6	're	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	9	cop	_	end_char=341|start_char=338
+7	6	6	NUM	CD	NumType=Card	9	nummod	_	end_char=343|start_char=342
+8	-	-	PUNCT	HYPH	_	9	punct	_	end_char=344|start_char=343
+9	foot	foot	NOUN	NN	Number=Sing	17	advcl	_	end_char=348|start_char=344
+10	-	-	SYM	SYM	_	11	case	_	end_char=349|start_char=348
+11	9	9	NUM	CD	NumType=Card	9	nmod	_	end_char=350|start_char=349
+12	,	,	PUNCT	,	_	17	punct	_	end_char=351|start_char=350
+13	it	it	PRON	PRP	Case=Nom|Gender=Neut|Number=Sing|Person=3|PronType=Prs	17	expl	_	end_char=354|start_char=352
+14	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	17	cop	_	end_char=357|start_char=355
+15	n't	not	PART	RB	_	17	advmod	_	end_char=360|start_char=357
+16	exactly	exactly	ADV	RB	_	17	advmod	_	end_char=368|start_char=361
+17	easy	easy	ADJ	JJ	Degree=Pos	0	root	_	end_char=373|start_char=369
+18	to	to	PART	TO	_	19	mark	_	end_char=376|start_char=374
+19	hide	hide	VERB	VB	VerbForm=Inf	17	csubj	_	end_char=381|start_char=377
+20	from	from	ADP	IN	_	21	case	_	end_char=386|start_char=382
+21	it	it	PRON	PRP	Case=Acc|Gender=Neut|Number=Sing|Person=3|PronType=Prs	19	obl	_	end_char=389|start_char=387
+22	.	.	PUNCT	.	_	17	punct	_	end_char=390|start_char=389
+
+# sent_id = pcc_eng_11_094.4518_x1512903_06
+# text = Defenceman Zdeno Chara, one of the Senators' most recognizable faces, is still in town rehabbing an injured thumb.
+# newdoc id = pcc_eng_11_094.4518_x1512903
+1	Defenceman	Defenceman	PROPN	NNP	Number=Sing	17	nsubj	_	end_char=402|start_char=392
+2	Zdeno	Zdeno	PROPN	NNP	Number=Sing	1	flat	_	end_char=408|start_char=403
+3	Chara	Chara	PROPN	NNP	Number=Sing	1	flat	_	end_char=414|start_char=409
+4	,	,	PUNCT	,	_	5	punct	_	end_char=415|start_char=414
+5	one	one	NUM	CD	NumForm=Word|NumType=Card	1	appos	_	end_char=419|start_char=416
+6	of	of	ADP	IN	_	12	case	_	end_char=422|start_char=420
+7	the	the	DET	DT	Definite=Def|PronType=Art	8	det	_	end_char=426|start_char=423
+8	Senators	Senator	PROPN	NNPS	Number=Plur	12	nmod:poss	_	end_char=435|start_char=427
+9	'	's	PART	POS	_	8	case	_	end_char=436|start_char=435
+10	most	most	ADV	RBS	Degree=Sup	11	advmod	_	end_char=441|start_char=437
+11	recognizable	recognizable	ADJ	JJ	Degree=Pos	12	amod	_	end_char=454|start_char=442
+12	faces	face	NOUN	NNS	Number=Plur	5	nmod	_	end_char=460|start_char=455
+13	,	,	PUNCT	,	_	17	punct	_	end_char=461|start_char=460
+14	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	17	cop	_	end_char=464|start_char=462
+15	still	still	ADV	RB	Degree=Pos	17	advmod	_	end_char=470|start_char=465
+16	in	in	ADP	IN	_	17	case	_	end_char=473|start_char=471
+17	town	town	NOUN	NN	Number=Sing	0	root	_	end_char=478|start_char=474
+18	rehabbing	rehabb	VERB	VBG	VerbForm=Ger	17	acl	_	end_char=488|start_char=479
+19	an	a	DET	DT	Definite=Ind|PronType=Art	21	det	_	end_char=491|start_char=489
+20	injured	injure	VERB	VBN	Tense=Past|VerbForm=Part	21	amod	_	end_char=499|start_char=492
+21	thumb	thumb	NOUN	NN	Number=Sing	18	obj	_	end_char=505|start_char=500
+22	.	.	PUNCT	.	_	17	punct	_	end_char=506|start_char=505
+
+# sent_id = pcc_eng_11_094.5219_x1514022_04
+# text = Only a few species of mammals are monogamous, and now dueling scientific teams think they've figured out why they got that way.
+# newdoc id = pcc_eng_11_094.5219_x1514022
+1	Only	only	ADV	RB	_	4	advmod	_	end_char=94|start_char=90
+2	a	a	DET	DT	Definite=Ind|PronType=Art	4	det	_	end_char=96|start_char=95
+3	few	few	ADJ	JJ	Degree=Pos	4	amod	_	end_char=100|start_char=97
+4	species	species	NOUN	NNS	Number=Plur	8	nsubj	_	end_char=108|start_char=101
+5	of	of	ADP	IN	_	6	case	_	end_char=111|start_char=109
+6	mammals	mammal	NOUN	NNS	Number=Plur	4	nmod	_	end_char=119|start_char=112
+7	are	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	8	cop	_	end_char=123|start_char=120
+8	monogamous	monogamous	ADJ	JJ	Degree=Pos	0	root	_	end_char=134|start_char=124
+9	,	,	PUNCT	,	_	15	punct	_	end_char=135|start_char=134
+10	and	and	CCONJ	CC	_	15	cc	_	end_char=139|start_char=136
+11	now	now	ADV	RB	_	12	advmod	_	end_char=143|start_char=140
+12	dueling	duel	VERB	VBG	VerbForm=Ger	15	csubj	_	end_char=151|start_char=144
+13	scientific	scientific	ADJ	JJ	Degree=Pos	14	amod	_	end_char=162|start_char=152
+14	teams	team	NOUN	NNS	Number=Plur	12	obj	_	end_char=168|start_char=163
+15	think	think	VERB	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	8	conj	_	end_char=174|start_char=169
+16	they	they	PRON	PRP	Case=Nom|Number=Plur|Person=3|PronType=Prs	18	nsubj	_	end_char=179|start_char=175
+17	've	have	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	18	aux	_	end_char=182|start_char=179
+18	figured	figure	VERB	VBN	Tense=Past|VerbForm=Part	15	ccomp	_	end_char=190|start_char=183
+19	out	out	ADP	RP	_	18	compound:prt	_	end_char=194|start_char=191
+20	why	why	SCONJ	WRB	PronType=Int	22	mark	_	end_char=198|start_char=195
+21	they	they	PRON	PRP	Case=Nom|Number=Plur|Person=3|PronType=Prs	22	nsubj	_	end_char=203|start_char=199
+22	got	get	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	18	advcl	_	end_char=207|start_char=204
+23	that	that	DET	DT	Number=Sing|PronType=Dem	24	det	_	end_char=212|start_char=208
+24	way	way	NOUN	NN	Number=Sing	22	obj	_	end_char=216|start_char=213
+25	.	.	PUNCT	.	_	8	punct	_	end_char=217|start_char=216
+
+# sent_id = pcc_eng_11_094.5219_x1514022_05
+# text = But their answers aren't exactly romantic.
+# newdoc id = pcc_eng_11_094.5219_x1514022
+# pattern_match = filter_exactly-JJ
+1	But	but	CCONJ	CC	_	7	cc	_	end_char=221|start_char=218
+2	their	they	PRON	PRP$	Number=Plur|Person=3|Poss=Yes|PronType=Prs	3	nmod:poss	_	end_char=227|start_char=222
+3	answers	answer	NOUN	NNS	Number=Plur	7	nsubj	_	end_char=235|start_char=228
+4	are	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	7	cop	_	end_char=239|start_char=236
+5	n't	not	PART	RB	_	7	advmod	_	end_char=242|start_char=239
+6	exactly	exactly	ADV	RB	_	7	advmod	_	end_char=250|start_char=243
+7	romantic	romantic	ADJ	JJ	Degree=Pos	0	root	_	end_char=259|start_char=251
+8	.	.	PUNCT	.	_	7	punct	_	end_char=260|start_char=259
+
+# sent_id = pcc_eng_11_094.5219_x1514022_06
+# text = The answers aren't even the same.
+# newdoc id = pcc_eng_11_094.5219_x1514022
+1	The	the	DET	DT	Definite=Def|PronType=Art	2	det	_	end_char=265|start_char=262
+2	answers	answer	NOUN	NNS	Number=Plur	7	nsubj	_	end_char=273|start_char=266
+3	are	be	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	7	cop	_	end_char=277|start_char=274
+4	n't	not	PART	RB	_	7	advmod	_	end_char=280|start_char=277
+5	even	even	ADV	RB	_	7	advmod	_	end_char=285|start_char=281
+6	the	the	DET	DT	Definite=Def|PronType=Art	7	det	_	end_char=289|start_char=286
+7	same	same	ADJ	JJ	Degree=Pos	0	root	_	end_char=294|start_char=290
+8	.	.	PUNCT	.	_	7	punct	_	end_char=295|start_char=294
+
+# sent_id = pcc_eng_11_094.6431_x1515949_11
+# text = "I will be taking advice from the Integrity Commissioner.
+# newdoc id = pcc_eng_11_094.6431_x1515949
+1	"	"	PUNCT	``	_	5	punct	_	end_char=1684|start_char=1683
+2	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	5	nsubj	_	end_char=1685|start_char=1684
+3	will	will	AUX	MD	VerbForm=Fin	5	aux	_	end_char=1690|start_char=1686
+4	be	be	AUX	VB	VerbForm=Inf	5	aux	_	end_char=1693|start_char=1691
+5	taking	take	VERB	VBG	Tense=Pres|VerbForm=Part	0	root	_	end_char=1700|start_char=1694
+6	advice	advice	NOUN	NN	Number=Sing	5	obj	_	end_char=1707|start_char=1701
+7	from	from	ADP	IN	_	10	case	_	end_char=1712|start_char=1708
+8	the	the	DET	DT	Definite=Def|PronType=Art	10	det	_	end_char=1716|start_char=1713
+9	Integrity	Integrity	PROPN	NNP	Number=Sing	10	compound	_	end_char=1726|start_char=1717
+10	Commissioner	Commissioner	PROPN	NNP	Number=Sing	5	obl	_	end_char=1739|start_char=1727
+11	.	.	PUNCT	.	_	5	punct	_	end_char=1740|start_char=1739
+
+# sent_id = pcc_eng_11_094.6431_x1515949_12
+# text = If my order - that is, that our lobbyists register is to be exactly right - has not been followed, I will take the appropriate action to have that corrected," he said.
+# newdoc id = pcc_eng_11_094.6431_x1515949
+# pattern_match = filter_exactly-JJ
+1	If	if	SCONJ	IN	_	3	mark	_	end_char=1743|start_char=1741
+2	my	my	PRON	PRP$	Number=Sing|Person=1|Poss=Yes|PronType=Prs	3	nmod:poss	_	end_char=1746|start_char=1744
+3	order	order	NOUN	NN	Number=Sing	12	nsubj	_	end_char=1752|start_char=1747
+4	-	-	PUNCT	,	_	3	punct	_	end_char=1754|start_char=1753
+5	that	that	PRON	DT	Number=Sing|PronType=Dem	6	nsubj	_	end_char=1759|start_char=1755
+6	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	12	cop	_	end_char=1762|start_char=1760
+7	,	,	PUNCT	,	_	12	punct	_	end_char=1763|start_char=1762
+8	that	that	SCONJ	IN	_	11	mark	_	end_char=1768|start_char=1764
+9	our	we	PRON	PRP$	Number=Plur|Person=1|Poss=Yes|PronType=Prs	10	nmod:poss	_	end_char=1772|start_char=1769
+10	lobbyists	lobbyist	NOUN	NNS	Number=Plur	11	nsubj	_	end_char=1782|start_char=1773
+11	register	register	VERB	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	12	csubj	_	end_char=1791|start_char=1783
+12	is	be	VERB	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	36	ccomp	_	end_char=1794|start_char=1792
+13	to	to	PART	TO	_	16	mark	_	end_char=1797|start_char=1795
+14	be	be	AUX	VB	VerbForm=Inf	16	cop	_	end_char=1800|start_char=1798
+15	exactly	exactly	ADV	RB	_	16	advmod	_	end_char=1808|start_char=1801
+16	right	right	ADJ	JJ	Degree=Pos	12	xcomp	_	end_char=1814|start_char=1809
+17	-	-	PUNCT	,	_	12	punct	_	end_char=1816|start_char=1815
+18	has	have	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	21	aux	_	end_char=1820|start_char=1817
+19	not	not	PART	RB	_	21	advmod	_	end_char=1824|start_char=1821
+20	been	be	AUX	VBN	Tense=Past|VerbForm=Part	21	aux:pass	_	end_char=1829|start_char=1825
+21	followed	follow	VERB	VBN	Tense=Past|VerbForm=Part|Voice=Pass	12	parataxis	_	end_char=1838|start_char=1830
+22	,	,	PUNCT	,	_	25	punct	_	end_char=1839|start_char=1838
+23	I	I	PRON	PRP	Case=Nom|Number=Sing|Person=1|PronType=Prs	25	nsubj	_	end_char=1841|start_char=1840
+24	will	will	AUX	MD	VerbForm=Fin	25	aux	_	end_char=1846|start_char=1842
+25	take	take	VERB	VB	VerbForm=Inf	12	parataxis	_	end_char=1851|start_char=1847
+26	the	the	DET	DT	Definite=Def|PronType=Art	28	det	_	end_char=1855|start_char=1852
+27	appropriate	appropriate	ADJ	JJ	Degree=Pos	28	amod	_	end_char=1867|start_char=1856
+28	action	action	NOUN	NN	Number=Sing	25	obj	_	end_char=1874|start_char=1868
+29	to	to	PART	TO	_	30	mark	_	end_char=1877|start_char=1875
+30	have	have	VERB	VB	VerbForm=Inf	28	acl	_	end_char=1882|start_char=1878
+31	that	that	PRON	DT	Number=Sing|PronType=Dem	30	obj	_	end_char=1887|start_char=1883
+32	corrected	correct	VERB	VBN	Tense=Past|VerbForm=Part	30	xcomp	_	end_char=1897|start_char=1888
+33	,	,	PUNCT	,	_	36	punct	_	end_char=1898|start_char=1897
+34	"	"	PUNCT	''	_	36	punct	_	end_char=1899|start_char=1898
+35	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	36	nsubj	_	end_char=1902|start_char=1900
+36	said	say	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	0	root	_	end_char=1907|start_char=1903
+37	.	.	PUNCT	.	_	36	punct	_	end_char=1908|start_char=1907
+
+# sent_id = pcc_eng_11_094.6431_x1515949_13
+# text = Dr Flegg questioned why his "disgruntled ex-staffer" did not take his concerns to the police or Crime and Misconduct Commission.
+# newdoc id = pcc_eng_11_094.6431_x1515949
+1	Dr	Dr	PROPN	NNP	Number=Sing	3	nsubj	_	end_char=1912|start_char=1910
+2	Flegg	Flegg	PROPN	NNP	Number=Sing	1	flat	_	end_char=1918|start_char=1913
+3	questioned	question	VERB	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	0	root	_	end_char=1929|start_char=1919
+4	why	why	SCONJ	WRB	PronType=Int	12	mark	_	end_char=1933|start_char=1930
+5	his	he	PRON	PRP$	Gender=Masc|Number=Sing|Person=3|Poss=Yes|PronType=Prs	8	nmod:poss	_	end_char=1937|start_char=1934
+6	"	"	PUNCT	``	_	8	punct	_	end_char=1939|start_char=1938
+7	disgruntled	disgruntled	ADJ	JJ	Degree=Pos	8	amod	_	end_char=1950|start_char=1939
+8	ex-staffer	ex-staffer	NOUN	NN	Number=Sing	12	nsubj	_	end_char=1961|start_char=1951
+9	"	"	PUNCT	''	_	8	punct	_	end_char=1962|start_char=1961
+10	did	do	AUX	VBD	Mood=Ind|Tense=Past|VerbForm=Fin	12	aux	_	end_char=1966|start_char=1963
+11	not	not	PART	RB	_	12	advmod	_	end_char=1970|start_char=1967
+12	take	take	VERB	VB	VerbForm=Inf	3	ccomp	_	end_char=1975|start_char=1971
+13	his	he	PRON	PRP$	Gender=Masc|Number=Sing|Person=3|Poss=Yes|PronType=Prs	14	nmod:poss	_	end_char=1979|start_char=1976
+14	concerns	concern	NOUN	NNS	Number=Plur	12	obj	_	end_char=1988|start_char=1980
+15	to	to	ADP	IN	_	22	case	_	end_char=1991|start_char=1989
+16	the	the	DET	DT	Definite=Def|PronType=Art	22	det	_	end_char=1995|start_char=1992
+17	police	police	NOUN	NN	Number=Sing	22	compound	_	end_char=2002|start_char=1996
+18	or	or	CCONJ	CC	_	19	cc	_	end_char=2005|start_char=2003
+19	Crime	crime	PROPN	NNP	Number=Sing	17	conj	_	end_char=2011|start_char=2006
+20	and	and	CCONJ	CC	_	21	cc	_	end_char=2015|start_char=2012
+21	Misconduct	Misconduct	PROPN	NNP	Number=Sing	17	conj	_	end_char=2026|start_char=2016
+22	Commission	Commission	PROPN	NNP	Number=Sing	12	obl	_	end_char=2037|start_char=2027
+23	.	.	PUNCT	.	_	3	punct	_	end_char=2038|start_char=2037
