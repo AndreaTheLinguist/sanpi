@@ -50,11 +50,11 @@ def _main():
                 f'>> searching `{corpus}` for '
                 f'patterns specified in `{patdir}`...')
 
-            # run grew search
+            #* run grew search
             for pat in patdir.iterdir():
                 #? is this necessary?
                 corpus_name = corpus.stem.split('.')[0]
-                # output_label = '.'.join([corpus_name, pat.stem])
+                #// output_label = '.'.join([corpus_name, pat.stem])
                 output_dir = DATA_DIR.joinpath(
                     f'sanpi/1_json_grew-matches/{patdir.stem}/{corpus_name}.{pat.stem}')
                 if not output_dir.is_dir():
@@ -62,7 +62,7 @@ def _main():
 
                 _run_grew(pat, corpus, output_dir, args.replace_raw_data)
 
-                # add language info to raw jsons from conllus
+                #* add language info to raw jsons from conllus
                 # args: fill_match_info.py [-h] CONLLU_DIR RAW_DIR
                 #                   ([-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}])
                 #       (OUTPUT_DIR defaults to same dir as .raw.json files=RAW_DIR)
@@ -71,7 +71,7 @@ def _main():
                 print('\n' + fill_info_cmd)
                 os.system(fill_info_cmd)
 
-                # run tabulate
+                #* run tabulate
                 # usage: tabulate_hits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
                 tabulate_cmd = (f'python {CODE_DIR}/tabulate_hits.py '
                                 f'{output_dir} {corpus_name}_{pat.stem}')
