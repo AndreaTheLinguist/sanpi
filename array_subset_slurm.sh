@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --mail-user=arh234@cornell.edu
 #SBATCH --mail-type=ALL
-#SBATCH -J subset-exactly                 # Job name
+#SBATCH -J subset-RBJJ                # Job name
 #SBATCH -o %x-%2a_%A.out              # Name of stdout output log file (%j expands to jobID)
 #SBATCH -e %x-%2a_%A.err              # Name of stderr output log file (%j expands to jobID)
 ##SBATCH --open-mode=append
 #SBATCH --nodes=1                       # Total number of nodes requested
-#SBATCH --ntasks=2                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
+#SBATCH --ntasks=1                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
 ##SBATCH --cpus-per-task=8               # number of cpus per task
 #SBATCH --ntasks-per-socket=1
 ##SBATCH --mem-per-cpu=10G               # Total amount of (real) memory requested (per node)
@@ -49,10 +49,10 @@ echo "Active Environment:"
 echo "$(conda env list)"
 echo ""
 
-#) set pat file path. Default to `exactly-JJ.pat`
-PAT=${1:-${SOURCE_DIR}/Pat/filter/exactly-JJ.pat}
-#) info/ subdir containing relevant "...subset-missing.txt" files
-#)    e.g. "exactly_subset"
+#> set pat file path. Default to `exactly-JJ.pat`
+PAT=${1:-${SOURCE_DIR}/Pat/advadj/all-RB-JJs.pat}
+#> info/ subdir containing relevant "...subset-missing.txt" files
+#>    e.g. "exactly_subset"
 #! can only use this option if pat is explicitly given as well
 FILTER_DIR=${2}
 # example usage: 
@@ -98,7 +98,7 @@ fi
 echo "Processing ${SEED} dataset"
 SEED_CORPUS_DIR=${DATA_DIR}/puddin/Pcc${SEED}.conll
 
-##) running the code
+##> running the code
 if [[ -d $SEED_CORPUS_DIR ]]; then
   # run script and send both stdout and stderr to log file
   # DATE="$(date +%F_%R)"
@@ -111,9 +111,9 @@ if [[ -d $SEED_CORPUS_DIR ]]; then
     INPUTS_CMD="find ${SEED_CORPUS_DIR} -maxdepth 1 -type f -name \"*.conllu\" )
     # echo $FILTER_DIR"
 
-    #) if filter dir path was  given
+    #> if filter dir path was  given
     if [[ -n "${FILTER_DIR}" ]]; then
-      #) locate the "...missing.txt" for the given SEED
+      #> locate the "...missing.txt" for the given SEED
       #! must include `-maxdepth 1` to exclude files in `../prev/`
       FILE_LIST_PATH=`find $( dirname ${SEED_CORPUS_DIR} )/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt"`
       # FILE_LIST_PATH=$( find $( dirname ${SEED_CORPUS_DIR} )/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt" )

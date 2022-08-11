@@ -24,8 +24,8 @@ def grew_search(corpus_dir: Path,
 
     file_count = len(tuple(corpus_dir.glob('*.conllu')))
 
-    #) set pool `processes` argument to number of _available_ cpus
-    #) OR number of files to be searched, whichever is smaller
+    #> set pool `processes` argument to number of _available_ cpus
+    #> OR number of files to be searched, whichever is smaller
     cpus = min(len(os.sched_getaffinity(0)), file_count)
     print(f'\n> searching {file_count} files in ../'
           f'{Path(*corpus_dir.parts[-3:])}/ with {cpus} CPUs...')
@@ -77,7 +77,7 @@ def grew_search(corpus_dir: Path,
 def _seek_pat_in_file(corpus, pat, out):
 
     f_start = time.perf_counter()
-    #) append ' 2>/dev/null' for debugging
+    #> append ' 2>/dev/null' for debugging
     grew_cmd_str = (f'grew grep -pattern {pat} -i {corpus} > {out}')
 
     # ^ TODO: update this to use `subprocess` module instead,
@@ -145,7 +145,7 @@ def _arg_paths_generator(file_glob,
                          skip_files: bool):
 
     for input_path in file_glob:
-        #) skip any subdirectories in corpus/conllu files directory
+        #> skip any subdirectories in corpus/conllu files directory
         # ? isn't this redundant given the glob expression? ^^
         if not input_path.is_file():
             continue

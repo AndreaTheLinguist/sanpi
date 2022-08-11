@@ -10,11 +10,24 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "justMyCode": true
+        },
+        {
+            "name": "create_match_conllu",
+            "type": "python",
+            "request": "launch",
+            "program": "script/create_match_conllu.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            // "justMyCode": false,
+            "args": [
+                "-c",
+                "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-01.conllu",
+            ]
         },
         // * Pipeline
         {
-            "name": "pipeline puddin val",
+            "name": "pipeline puddin val contig",
             "type": "python",
             "request": "launch",
             "program": "run_pipeline.py",
@@ -25,8 +38,26 @@
                 "-c",
                 "/home/arh234/data/puddin/PccVa.conll/",
                 "-p",
-                "Pat/contig"
+                "Pat/scoped"
             ]
+        },
+        {
+            "name": "pipeline val-advadj scoped-raised",
+            "type": "python",
+            "request": "launch",
+            "program": "run_pipeline.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
+            "args": [
+                "-c",
+                "/home/arh234/data/puddin/PccVa.conll/subset_advadj",
+                // "-p",
+                // "Pat/scoped", 
+                "-p",
+                "Pat/raised"
+            ], 
+            "justMyCode": false
         },
         {
             "name": "pipeline puddin val env-check",
@@ -140,6 +171,7 @@
                 "temp"
             ]
         },
+        // * subset
         // * Get Frequencies
         {
             "name": "getFrequecies abs",
