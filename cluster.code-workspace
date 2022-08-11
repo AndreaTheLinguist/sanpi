@@ -3,6 +3,12 @@
 		{
 			"path": "/share/compling/projects"
 		},
+		// {
+		// 	"path": "/share/compling/projects/puddin"
+		// },
+		// {
+		// 	"path": "/share/compling/projects/sanpi"
+		// },
 		{
 			"path": "/share/compling/data/puddin"
 		},
@@ -37,12 +43,22 @@
 				"justMyCode": true
 			},
 			{
-				"name": "puddin confirm_doc_ids",
+				"name": "puddin validate test,val",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/puddin/script/confirm_doc_ids.py",
 				"console": "integratedTerminal",
-				"python": "/home/arh234/.conda/envs/puddin/bin/python"
+				"python": "/home/arh234/.conda/envs/puddin/bin/python",
+				// "justMyCode": false,
+				"cwd": "/share/compling/projects/puddin",
+				"args": [
+					"-d",
+					"/share/compling/data/puddin",
+					"-g",
+					"test",
+					"-g",
+					"val"
+				]
 			},
 			{
 				"name": "sanpi make subset (default)",
