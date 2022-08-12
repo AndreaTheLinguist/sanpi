@@ -7,5 +7,22 @@
 			"path": "../../data"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"settings": {
+			"files.watcherExclude": {
+				"./.untracked/**": true,
+				"./**/.history/**": true,
+				"./demo/data/corpora/**": true,
+				"./.git/**": true,
+				"./*/.vscode/**": true,
+				"./setup/**": true,
+				"./*data_samples*/**": true
+			},
+			"python.linting.pylintArgs": [
+				"--disable:protected-access"
+			],
+			"editor.defaultFormatter": "ms-python.python",
+			"todo-tree.tree.scanMode": "current file"
+		},
+	}
 }
