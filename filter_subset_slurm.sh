@@ -1,18 +1,31 @@
 #!/bin/bash
 ##SBATCH --mail-user=arh234@cornell.edu
 ##SBATCH --mail-type=ALL
-#SBATCH -J redo-subset-exactly                 # Job name
+#SBATCH -J redo-subset                 # Job name
 #SBATCH -o %x_%j.out              # Name of stdout output log file (%j expands to jobID)
 #SBATCH -e %x_%j.err              # Name of stderr output log file (%j expands to jobID)
 ##SBATCH --open-mode=append
 #SBATCH --nodes=1                       # Total number of nodes requested
 #SBATCH --ntasks=1                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
-#SBATCH --cpus-per-task=6               # number of cpus per task
+#SBATCH --cpus-per-task=8              # number of cpus per task
 ##SBATCH --ntasks-per-socket=1
-#SBATCH --mem-per-cpu=20G               # Total amount of (real) memory requested (per node)
-#SBATCH --time 12:00:00                  # Time limit (hh:mm:ss)
+#SBATCH --mem-per-cpu=10G               # Total amount of (real) memory requested (per node)
+#SBATCH --time 24:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --chdir=/share/compling/data/sanpi/logs/subsets      # change working directory to this before execution
+
+  # """
+  # this will run the check_subsets.sh script directly. The arguments are: 
+  #   1: SUBSET_TAG
+  #     some unique portion of the pattern file *stem*, not the parent dir. This does not have to be the whole thing, but it needs to be something that will correctly identify the associated files. e.g.:
+  #       'exactly' for Pat/filter/exactly-JJ.pat, 
+  #       'RB-JJ' for Pat/advadj/all-RB-JJs.pat, etc.
+  #     This will be used for the check_subsets.sh output in info/ and then in turn pick out the right file listing the paths to be searched.
+  #   2: PATTERN_PATH
+  #     the path to the file to create the subset for. This should be the absolute path, since cwd will be set to 'data/sanpi/logs/subsets' by slurm
+  #   3: QUIET_FLAG
+  #     include literally anything as a third argument and the output of the subcall of 'check_subsets.sh' will be sent to null
+  # """
 
 set -o errexit
 if [[ -n "${SLURM_JOB_ID}" ]]; then
@@ -41,12 +54,27 @@ SOURCE_DIR=/share/compling/projects/sanpi
 eval "$(conda shell.bash hook)"
 
 conda activate parallel-sanpi
-${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
+
+SUBSET_TAG=${1:-${exactly}}
+QUIET_FLAG=${3:-""}
+
+if [[ -n "${QUIET_FLAG}" ]]; then
+  SILENCER="&>/dev/null"
+else
+  SILENCER=""
+fi
+
+${SOURCE_DIR}/script/check_subsets.sh ${SUBSET_TAG} $SILENCER
 
 echo -e "\n>>> Gather still missing subsets...\n"
 #> set pat file AND FILTER FILE LIST paths. Default to `exactly-JJ.pat`
-MISSING_LIST=${DATA_DIR}/puddin/info/exactly_subset/ALLpaths_missing-subset.txt
+MISSING_LIST=${DATA_DIR}/puddin/info/${SUBSET_TAG}_subset/ALLpaths_missing-subset.txt
+# sanpi/Pat/advadj/all-RB-JJs.pat
 PAT=${2:-${SOURCE_DIR}/Pat/filter/exactly-JJ.pat}
+
+echo $MISSING_LIST
+echo $PAT
+
 # example usage: 
 #   sbatch [SLURM FLAGS] array_subset_slurm.sh (filter/)exactly-JJ(.pat) (info/)exactly_subset
 BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
@@ -65,14 +93,16 @@ fi
 # echo ${PAT_CALL}
 
 if [[ -f ${MISSING_LIST} ]]; then
-  echo "Files in need of processing: $(egrep -c "conllu\n" ${MISSING_LIST}) total"
+  # search string "conllu/n" yields total = 0 ㄟ( ▔, ▔ )ㄏ
+  echo "Files in need of processing: $(egrep -c "conllu" ${MISSING_LIST}) total"
   echo -e "$(head -4 ${MISSING_LIST})\n...\n$(tail -4 ${MISSING_LIST})"
+
   while [[ -n "$(head ${MISSING_LIST})" ]]; do
     parallel --halt soon,fail=20 --jobs=+0 echo "\[ {#} \| {%}\ ]: {/.}"\; time ${BASE_PYTHON_CMD} ${PAT_CALL} -c {} ::: $( head -250 ${MISSING_LIST})
     wait
-    sleep 1
+    sleep 2
     sync /share/compling/data/puddin
-    ${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
+    ${SOURCE_DIR}/script/check_subsets.sh ${SILENCER}
     echo -e "\n--- new batch ---"
   done
 
