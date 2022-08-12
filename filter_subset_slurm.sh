@@ -15,16 +15,16 @@
 #SBATCH --chdir=/share/compling/data/sanpi/logs/subsets      # change working directory to this before execution
 
   # """
-  # this will run the check_subsets.sh script directly. The arguments are: 
+  # this will run the check_subset.sh script directly. The arguments are: 
   #   1: SUBSET_TAG
   #     some unique portion of the pattern file *stem*, not the parent dir. This does not have to be the whole thing, but it needs to be something that will correctly identify the associated files. e.g.:
   #       'exactly' for Pat/filter/exactly-JJ.pat, 
   #       'RB-JJ' for Pat/advadj/all-RB-JJs.pat, etc.
-  #     This will be used for the check_subsets.sh output in info/ and then in turn pick out the right file listing the paths to be searched.
+  #     This will be used for the check_subset.sh output in info/ and then in turn pick out the right file listing the paths to be searched.
   #   2: PATTERN_PATH
   #     the path to the file to create the subset for. This should be the absolute path, since cwd will be set to 'data/sanpi/logs/subsets' by slurm
   #   3: QUIET_FLAG
-  #     include literally anything as a third argument and the output of the subcall of 'check_subsets.sh' will be sent to null
+  #     include literally anything as a third argument and the output of the subcall of 'check_subset.sh' will be sent to null
   # """
 
 set -o errexit
@@ -64,7 +64,7 @@ else
   SILENCER=""
 fi
 
-${SOURCE_DIR}/script/check_subsets.sh ${SUBSET_TAG} $SILENCER
+${SOURCE_DIR}/script/check_subset.sh ${SUBSET_TAG} $SILENCER
 
 echo -e "\n>>> Gather still missing subsets...\n"
 #> set pat file AND FILTER FILE LIST paths. Default to `exactly-JJ.pat`
@@ -77,7 +77,7 @@ echo $PAT
 
 # example usage: 
 #   sbatch [SLURM FLAGS] array_subset_slurm.sh (filter/)exactly-JJ(.pat) (info/)exactly_subset
-BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
+BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 
 # e.g. PAT_CALL="-p /share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
 if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then
@@ -102,7 +102,7 @@ if [[ -f ${MISSING_LIST} ]]; then
     wait
     sleep 2
     sync /share/compling/data/puddin
-    ${SOURCE_DIR}/script/check_subsets.sh ${SILENCER}
+    ${SOURCE_DIR}/script/check_subset.sh ${SUBSET_TAG} ${SILENCER}
     echo -e "\n--- new batch ---"
   done
 
@@ -112,7 +112,7 @@ else
 fi
 # wait
 
-# ${SOURCE_DIR}/script/check_subsets.sh &>/dev/null
+# ${SOURCE_DIR}/script/check_subset.sh &>/dev/null
 
 # if [[ $( egrep -c ".conllu\n" ${MISSING_LIST} ) -ne 0 ]]; then
 #   echo "Files *still* in need of processing: $(egrep "conllu\n" ${MISSING_LIST}) total"

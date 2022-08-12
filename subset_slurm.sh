@@ -42,7 +42,7 @@ echo "Creating match subset conllu files..."
 echo "conllu:   $1"
 echo "pattern:  $2"
 
-BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
+BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 
 LOG_DIR="${DATA_DIR}/sanpi/logs"
 if [[ ! -d $LOG_DIR ]]; then
