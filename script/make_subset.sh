@@ -1,6 +1,6 @@
 #!/bin/bash
 # make_subset.sh
-# glue script to run 'create_match_conllu.py' 
+# glue script to run 'make_subset_conllus.py' 
 #   a little more neatly for more than 1 conllu file at a time
 # echo "Input:" "$@"
 
@@ -12,7 +12,7 @@ if [[ $1 == "-h" ]]; then
   echo "  !! CONLLU_PATH must end with '/' to be parsed as directory"
   echo ""
   echo "Usage: (sanpi\$) bash script/$(basename $0) [CONLLU_PATH=path PATTERN_FILE=path]"
-  echo "  If arguments are not given, python script (create_match_conllu.py) defaults to:"
+  echo "  If arguments are not given, python script (make_subset_conllus.py) defaults to:"
   echo "    CONLLU = ~/data/devel/quicktest.conll/nyt_eng_199912.conllu"
   echo "    PATTERN = Pat/advadj/all-RB-JJs.pat"
   echo "       (will crash with pattern default if not run from dir containing 'Pat/')"
@@ -48,7 +48,7 @@ SOURCE_DIR=/share/compling/projects/sanpi
 if [[ ! -d ${SOURCE_DIR} ]]; then
     SOURCE_DIR=/home/$(whoami)/projects/sanpi
 fi
-BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
+BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 echo "base command is: ${BASE_PYTHON_CMD}"
 
 

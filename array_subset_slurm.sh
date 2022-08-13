@@ -58,7 +58,7 @@ FILTER_DIR=${2}
 # example usage: 
 #   sbatch [SLURM FLAGS] array_subset_slurm.sh (filter/)exactly-JJ(.pat) (info/)exactly_subset
 
-BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/create_match_conllu.py"
+BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 
 # e.g. PAT_CALL="-p /share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
 if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then

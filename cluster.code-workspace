@@ -1,20 +1,21 @@
 {
 	"folders": [
 		{
-			"path": "/share/compling/projects"
-		},
-		// {
-		// 	"path": "/share/compling/projects/puddin"
-		// },
-		// {
-		// 	"path": "/share/compling/projects/sanpi"
-		// },
-		{
-			"path": "/share/compling/data/puddin"
+			"path": "/share/compling/projects/puddin",
+			"name": "puddin-source"
 		},
 		{
-			"path": "/share/compling/data/sanpi"
-		}
+			"path": "/share/compling/projects/sanpi",
+			"name": "sanpi-source"
+		},
+		{
+			"path": "/share/compling/data/puddin",
+			"name": "puddin-data"
+		},
+		{
+			"path": "/share/compling/data/sanpi",
+			"name": "sanpi-data"
+		},
 	],
 	"settings": {
 		"files.watcherExclude": {
@@ -25,11 +26,31 @@
 			// "/share/compling/data/puddin": true,
 			"/share/compling/**/logs": true
 		},
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/.[^b]*": true,
+			"**/.bash_[hl]*": true,
+			"**/*conda3": true,
+			"**/stanza_resources": true,
+			"**/*kaldi*": true
+		},
 		"python.linting.pylintArgs": [
 			"--disable:protected-access"
 		],
 		"editor.defaultFormatter": "ms-python.python",
-		"todo-tree.tree.scanMode": "current file"
+		"todo-tree.tree.scanMode": "current file",
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.python"
+		},
+		"explorerExclude.backup": {},
+		"[shellscript]": {
+			"editor.defaultFormatter": "foxundermoon.shell-format"
+		}
 	},
 	"launch": {
 		"version": "0.2.0",
@@ -40,7 +61,17 @@
 				"request": "launch",
 				"program": "${file}",
 				"console": "integratedTerminal",
-				"justMyCode": true
+			},
+			{
+				"name": "concatonate dfs",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/puddin/script/concat_df_dir.py",
+				"console": "integratedTerminal",
+				"args": [
+					"/share/compling/data/puddin/info/validation_by_group/status-overview",
+					"/share/compling/data/puddin/info/all-texts-combined_status-info.pkl.gz"
+				]
 			},
 			{
 				"name": "puddin validate test,val",
@@ -64,7 +95,7 @@
 				"name": "sanpi make subset (default)",
 				"type": "python",
 				"request": "launch",
-				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
+				"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
 				"console": "integratedTerminal",
 				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python"
 			},
@@ -72,7 +103,7 @@
 				"name": "sanpi make subset (test args)",
 				"type": "python",
 				"request": "launch",
-				"program": "/share/compling/projects/sanpi/script/create_match_conllu.py",
+				"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
 				"console": "integratedTerminal",
 				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
 				"args": [

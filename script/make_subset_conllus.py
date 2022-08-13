@@ -1,5 +1,5 @@
 # coding=utf-8
-# create_match_conllu.py
+# make_subset_conllus.py
 """defines function to create (write to file) a subset conllu file containing
 all matches in given full conllu file for given pattern file.
 

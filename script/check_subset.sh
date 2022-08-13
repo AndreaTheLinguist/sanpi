@@ -1,5 +1,5 @@
 #!/bin/bash
-#check_subsets.sh
+#check_subset.sh
 
 SUBSET_TAG=${1:-exactly}
 PUDDIN_DIR=/share/compling/data/puddin
