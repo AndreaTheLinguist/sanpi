@@ -28,21 +28,21 @@ echo ""
 PAT_DIR=$1
 echo "Pattern Type: ${PAT_DIR##*/}"
 DATA_DIR=/share/compling/data
-if [[ ! -d $DATA_DIR ]]; then
+if [[ ! -d ${DATA_DIR} ]]; then
     DATA_DIR=/home/arh234/data
 fi
 
 OUT_DIR=${DATA_DIR}/sanpi
-if [[ ! -d $OUT_DIR ]]; then
+if [[ ! -d ${OUT_DIR} ]]; then
     echo "Creating output directory: ${OUT_DIR}"
-    mkdir $OUT_DIR
+    mkdir ${OUT_DIR}
 else
     echo "Output will be saved to ${OUT_DIR}"
 fi
 
 LOGS_DIR=${OUT_DIR}/logs
-if [ ! -d "$LOGS_DIR" ]; then
-    mkdir $LOGS_DIR
+if [ ! -d "${LOGS_DIR}" ]; then
+    mkdir ${LOGS_DIR}
 fi
 
 echo "Job $SLURM_JOB_NAME - $SLURM_JOB_ID"
@@ -71,19 +71,18 @@ else
     echo "  ${SEED} dataset"
 fi
 
-
 SEED_CORPUS=${DATA_DIR}/puddin/Pcc${SEED}.conll
 # echo "  ${SEED_CORPUS}"
 # echo "  ${PAT_DIR}"
 
-if [[ -d $SEED_CORPUS && -d $PAT_DIR ]]; then
+if [[ -d $SEED_CORPUS && -d ${PAT_DIR} ]]; then
     # run script and send both stdout and stderr to log file
     DATE="$(date -I)"
     LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}${SEED}_${DATE}.log
     echo "Combined log will be appended to ${LOG_FILE}"
- 
+
     echo "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}"
-    time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR} >> >(tee -i -a $LOG_FILE) 2>&1
+    time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR} >> >(tee -i -a ${LOG_FILE}) 2>&1
 
 else
     echo "SEED values ${SEED} do not point to existing directories. Skipping."

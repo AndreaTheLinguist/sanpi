@@ -16,6 +16,10 @@
 			"path": "/share/compling/data/sanpi",
 			"name": "sanpi-data"
 		},
+		{
+			"path": "/share/compling/data/new_york_times", 
+			"name": "nyt-data"
+		}
 	],
 	"settings": {
 		"files.watcherExclude": {
@@ -92,12 +96,18 @@
 				]
 			},
 			{
-				"name": "sanpi make subset (default)",
+				"name": "sanpi make subset NYT",
 				"type": "python",
 				"request": "launch",
 				"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
 				"console": "integratedTerminal",
-				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python"
+				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+				"args": [
+					"-c",
+					"/share/compling/data/new_york_times/Nyt1.conll/nyt_eng_199502.conllu",
+					"-p",
+					"/share/compling/projects/sanpi/Pat/advadj/all-RB-JJs.pat"
+				]
 			},
 			{
 				"name": "sanpi make subset (test args)",
