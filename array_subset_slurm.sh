@@ -34,7 +34,7 @@ fi
 
 DATA_DIR=/share/compling/data
 if [[ ! -d ${DATA_DIR} ]]; then
-    DATA_DIR=/home/$(whoami)/data
+  DATA_DIR=/home/$(whoami)/data
 fi
 
 SOURCE_DIR=/share/compling/projects/sanpi
@@ -55,18 +55,18 @@ PAT=${1:-${SOURCE_DIR}/Pat/advadj/all-RB-JJs.pat}
 #>    e.g. "exactly_subset"
 #! can only use this option if pat is explicitly given as well
 FILTER_DIR=${2}
-# example usage: 
+# example usage:
 #   sbatch [SLURM FLAGS] array_subset_slurm.sh (filter/)exactly-JJ(.pat) (info/)exactly_subset
 
 BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 
 # e.g. PAT_CALL="-p /share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
 if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then
-    PAT_CALL="-p ${PAT}"
-    echo "Subset pattern: ${PAT##${SOURCE_DIR}}"
+  PAT_CALL="-p ${PAT}"
+  echo "Subset pattern: ${PAT##${SOURCE_DIR}}"
 
-elif [[ $( find ${SOURCE_DIR} -path "*Pat*${PAT}*" | wc -l )=="1" ]]; then
-    PAT_CALL="-p $( find ${SOURCE_DIR} -path "*Pat*${PAT}*" )"
+elif [[ $(find ${SOURCE_DIR} -path "*Pat*${PAT}*" | wc -l)=="1" ]]; then
+  PAT_CALL="-p $(find ${SOURCE_DIR} -path "*Pat*${PAT}*")"
 else
   echo "Invalid pattern file supplied. Must be existing '.pat' file."
   exit 1
@@ -90,7 +90,7 @@ if [[ -n "${SLURM_JOB_ID}" ]]; then
       SEED="0${SEED}"
     fi
   fi
-  
+
 else
   SEED=00
 fi
@@ -105,17 +105,17 @@ if [[ -d $SEED_CORPUS_DIR ]]; then
   echo "> ${SEED_CORPUS_DIR}"
   date "+%F %X"
 
-  if [[ `which parallel` ]]; then
+  if [[ $(which parallel) ]]; then
 
     #! `-maxdepth 1` required to exclude previously made subset .conllu files
     INPUTS_CMD="find ${SEED_CORPUS_DIR} -maxdepth 1 -type f -name \"*.conllu\" )
-    # echo $FILTER_DIR"
+    # echo ${FILTER_DIR}"
 
     #> if filter dir path was  given
     if [[ -n "${FILTER_DIR}" ]]; then
       #> locate the "...missing.txt" for the given SEED
       #! must include `-maxdepth 1` to exclude files in `../prev/`
-      FILE_LIST_PATH=`find $( dirname ${SEED_CORPUS_DIR} )/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt"`
+      FILE_LIST_PATH=$(find $(dirname ${SEED_CORPUS_DIR})/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt")
       # FILE_LIST_PATH=$( find $( dirname ${SEED_CORPUS_DIR} )/**/*${FILTER_DIR}* -maxdepth 1 -type f -name "*${SEED}*missing.txt" )
       if [[ -f ${FILE_LIST_PATH} ]]; then
         INPUTS_CMD="cat ${FILE_LIST_PATH}"
@@ -123,27 +123,26 @@ if [[ -d $SEED_CORPUS_DIR ]]; then
         echo -e "All conllu files in ${SEED_CORPUS_DIR##${DATA_DIR}} have corresponding subset files.\n> Exiting script."
         exit 0
       fi
-      
+
     fi
 
     echo -e "Files to be processed\n*********************\n${INPUTS}"
     echo "DRY RUN"
-    (${INPUTS} | sort | parallel --keep-order --jobs $( nproc ) "srun -J exactly-${SEED} -o %x_%j.out -e %x_%j.err --mem=8G (echo \"------>>> {/} <<<------\"; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL) || echo 'Script call failed 1'") || echo 'Script call failed 2'
+    (${INPUTS} | sort | parallel --keep-order --jobs $(nproc) "srun -J exactly-${SEED} -o %x_%j.out -e %x_%j.err --mem=8G (echo \"------>>> {/} <<<------\"; echo \"time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}) || echo 'Script call failed 1'") || echo 'Script call failed 2'
 
     wait
 
   else
 
-    find ${SEED_CORPUS_DIR} -maxdepth 1 -type f -name *.conllu -exec bash -c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \; #>> >(tee -i -a $LOG_FILE) 2>&1
+    find ${SEED_CORPUS_DIR} -maxdepth 1 -type f -name *.conllu -exec bash -c "echo \"\" ; echo \"_______________________\" ; echo \">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}" \; #>> >(tee -i -a ${LOG_FILE}) 2>&1
   fi
 
 else
-    echo "SEED value ${SEED} does not point to existing directory. Skipping."
-    exit 1
+  echo "SEED value ${SEED} does not point to existing directory. Skipping."
+  exit 1
 
 fi
 
 date "+%F %R %Z"
 echo "Job closed."
 exit 0
-

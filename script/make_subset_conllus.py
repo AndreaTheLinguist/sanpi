@@ -71,9 +71,10 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     #   subset_[PATTERN_DIR]/
     out_dir_name = f'subset_{pat_path.parent.stem}'
     if out_dir_name == conllu_path.parent.name:
-        sys.exit(
-            'Input conllu is already a subset matching search pattern: '
-            f'{pat_path.relative_to(pat_path.parent.parent)}\n')
+        print('Input conllu is already a subset matching search pattern: '
+              f'{pat_path.relative_to(pat_path.parent.parent)}\n')
+        # successful termination
+        sys.exit(0)
     out_dir = conllu_path.with_name(out_dir_name)
     try:
         out_dir.mkdir()
@@ -86,9 +87,12 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
         and out_file.stat().st_mtime > pat_path.stat().st_mtime
             and out_file.stat().st_mtime > conllu_path.stat().st_mtime):
 
-        sys.exit(
-            f'Subset {out_file.relative_to(conllu_path.parent)} already '
-            'exists and is more recent than any pattern file modifications.\n')
+        #! print(message_string) and exit() because exit(message_string) indicates error:
+        #   exit([anything but 0 or None]) gets exit code of 1, which indicates error.
+        #   exit()(exit(0), exit(None)) indicates successful termination
+        print(f'Subset {out_file.relative_to(conllu_path.parent)} already '
+              'exists and is more recent than any pattern file modifications.\n')
+        sys.exit(0)
 
     print(f'\nSearching {conllu_path.name} for {pat_path.stem} pattern:\n')
     # * grew tool must be started!
@@ -130,7 +134,9 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     matches_found = grew.corpus_search(
         pat_path.read_text(encoding='utf8'), corpus_ix)
     if not matches_found:
-        sys.exit(f'No matches for {pat_path.name} in {conllu_path.name}.')
+        print(f'No matches for {pat_path.name} in {conllu_path.name}.')
+        # successful exit
+        sys.exit(0)
     print(len(matches_found), 'pattern matches found.')
     # pull out sentence id for every match
     match_ids_set = {m['sent_id'] for m in matches_found}
@@ -148,7 +154,8 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     out_str = '\n'.join(conllu_subset_str_gen)
 
     # write string to new subset file
-    out_file.write_text(out_str, encoding='utf8')
+    #! grew complains when conllu file does not end with a blank line
+    out_file.write_text(out_str+'\n', encoding='utf8')
 
     print(f'Subset conllu file saved to {out_file}.\n')
     print(f'  ~ completed at {datetime.now().ctime()}')

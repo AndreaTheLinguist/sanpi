@@ -20,10 +20,9 @@ echo "started @ $(date) from $(pwd)"
 echo ""
 echo "running with ${SLURM_CPUS_PER_TASK}"
 
-
 DATA_DIR=/share/compling/data
-if [[ ! -d $DATA_DIR ]]; then
-    DATA_DIR=/home/$(whoami)/data
+if [[ ! -d ${DATA_DIR} ]]; then
+  DATA_DIR=/home/$(whoami)/data
 fi
 
 SOURCE_DIR=/share/compling/projects/sanpi
@@ -45,15 +44,15 @@ echo "pattern:  $2"
 BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 
 LOG_DIR="${DATA_DIR}/sanpi/logs"
-if [[ ! -d $LOG_DIR ]]; then
-  mkdir $LOG_DIR
+if [[ ! -d ${LOG_DIR} ]]; then
+  mkdir ${LOG_DIR}
 fi
 
 if [[ $# -eq 0 ]]; then
   # exec >> "${LOG_DIR}/subset_defaults.log" 2>&1
   date
-  echo $BASE_PYTHON_CMD
-  time $BASE_PYTHON_CMD
+  echo ${BASE_PYTHON_CMD}
+  time ${BASE_PYTHON_CMD}
   exit 0
 else
   CONLLU=$1
@@ -63,7 +62,7 @@ else
   #   LOG_SUFFIX=${NOSLASH##*/}
 
   # fi
-  
+
   # LOG_FILE="${LOG_DIR}/subset_${LOG_SUFFIX}.log"
   # exec >> ${LOG_FILE} 2>&1
 fi
@@ -73,22 +72,21 @@ PAT_CALL=""
 if [[ $# -gt 1 ]]; then
   PAT=$2
   if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then
-      PAT_CALL="-p ${PAT}"
+    PAT_CALL="-p ${PAT}"
   else
     echo "Invalid pattern file supplied. Must be existing '.pat' file."
-    exit 1  
+    exit 1
   fi
 fi
 
-    
 if [[ -f ${CONLLU} ]]; then
   echo "time ${BASE_PYTHON_CMD} -c ${CONLLU} ${PAT_CALL}"
   time ${BASE_PYTHON_CMD} -c ${CONLLU} ${PAT_CALL}
 
 elif [[ -d "${CONLLU}" ]]; then
 
-  if [[ `which parallel` ]]; then
-    find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} $PAT_CALL\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} $PAT_CALL && echo \" ~ completed @ $(date) \"; echo \"\" "
+  if [[ $(which parallel) ]]; then
+    find ${CONLLU} -type f -name *.conllu | parallel "echo \"\" ; echo \"------>>> {} <<<------\" ; date ; echo \"time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}\" && echo \"...\"; echo \"\"; time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL} && echo \" ~ completed @ $(date) \"; echo \"\" "
 
   else
     echo "find ${CONLLU} -name *.conllu -exec bash -c \"echo \\\"\\\" ; echo \\\"_______________________\\\" ; echo \\\">>> {}\" && time ${BASE_PYTHON_CMD} -c {} ${PAT_CALL}\" \;"
