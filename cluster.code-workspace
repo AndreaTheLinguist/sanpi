@@ -21,7 +21,8 @@
 			"name": "nyt-data"
 		},
 		{
-			"path": "../../../../share/compling/data/assoc_press"
+			"path": "/share/compling/data/assoc_press", 
+			"name": "apw-data"
 		}
 	],
 	"settings": {
