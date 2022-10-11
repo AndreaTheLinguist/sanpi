@@ -104,6 +104,20 @@
             ]
         },
         {
+            "name": "exactly grew immediate",
+            "type": "python",
+            "request": "launch",
+            "program": "source/gather/grewSearchDir.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            // args: corpus_dir pat_file output
+            "args": [
+                "/share/compling/data/puddin/exactly_subset/pcc_eng_02-002_exactly-JJ.conllu",
+                "Pat/contig/sans-relay.pat",
+                "PccVa.sans-relay"
+            ]
+        },
+        {
             "name": "pcc-val grew sans-relay",
             "type": "python",
             "request": "launch",

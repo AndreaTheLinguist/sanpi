@@ -133,6 +133,13 @@ def write_matches_to_conllu(conllu_path: Path, pat_path: Path):
     print('collecting matches...')
     matches_found = grew.corpus_search(
         pat_path.read_text(encoding='utf8'), corpus_ix)
+    
+# Andrea Hummel on Oct 11, 2022 at 12:40 PM
+# TODO: Need to modify the python script to create an **empty** subset conllu for
+#   cases with no match, so that there is a record of processing having already been
+#   completed. 
+#       - otherwise, code will never mark subset as "complete" and loop over the
+#   files endlessly
     if not matches_found:
         print(f'No matches for {pat_path.name} in {conllu_path.name}.')
         # successful exit

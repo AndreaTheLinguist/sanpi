@@ -1,6 +1,6 @@
 #!/bin/bash
-##SBATCH --mail-user=arh234@cornell.edu
-##SBATCH --mail-type=ALL
+#SBATCH --mail-user=arh234@cornell.edu
+#SBATCH --mail-type=ALL
 #SBATCH -J subset                 # Job name
 #SBATCH -o %x_%j.out              # Name of stdout output log file (%j expands to jobID)
 #SBATCH -e %x_%j.err              # Name of stderr output log file (%j expands to jobID)
@@ -8,15 +8,16 @@
 #SBATCH --nodes=1                       # Total number of nodes requested
 #SBATCH --ntasks=1                      # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
 #SBATCH --cpus-per-task=10              # number of cpus per task
-##SBATCH --ntasks-per-socket=1
-#SBATCH --mem-per-cpu=8G               # Total amount of (real) memory requested (per node)
+#//#SBATCH --ntasks-per-socket=1
+#SBATCH --mem-per-cpu=10G               # Total amount of (real) memory requested (per node)
 #SBATCH --time 48:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --chdir=/share/compling/data/sanpi/logs/subsets    # change cwd before execution
+#SBATCH --requeue
 
 # """
 #   usage:
-#     $0 {string} {file} [-q]
+#     $0 {string} {file} {directory} [-q]
 
 #   Note: this will run the check_subset.sh script directly,
 #           so it doesn't need to be run beforehand.
@@ -27,7 +28,7 @@
 #       some unique portion of the pattern file *stem*, not the parent dir.
 #         This does not have to be the whole thing, but it needs to be something
 #         that will correctly identify the associated files. e.g.:
-#           'entirely' for Pat/filter/entirely-JJ.pat,
+#           'exactly' for Pat/filter/exactly-JJ.pat,
 #           'RB-JJ' for Pat/advadj/all-RB-JJs.pat, etc.
 #       This will be used for the check_subset.sh output in info/ and then
 #       in turn pick out the right file listing the paths to be searched.
@@ -37,7 +38,12 @@
 #         This should be the absolute path, since cwd will be set to
 #         'data/sanpi/logs/subsets' by slurm
 
-#     3: QUIET_FLAG
+#     3 -> DATA_PATH
+#       the path to directory containing original corpus file directories
+#         This should be the absolute path, since cwd will be set to
+#         'data/sanpi/logs/subsets' by slurm
+
+#     4: QUIET_FLAG
 #       include literally anything as a third argument and the output of
 #       the subcall of 'check_subset.sh' will be sent to null
 #   """
@@ -62,11 +68,9 @@ if [[ -n "${SLURM_JOB_ID}" ]]; then
   echo "  - ${SLURM_MEM_PER_CPU} mem/cpu"
 fi
 
-DATA_DIR="/share/compling/data"
-if [[ ! -d ${DATA_DIR} ]]; then
-  DATA_DIR="/home/$(whoami)/data"
-fi
-
+DATA_DIR=${3:-"/share/compling/data/puddin"}
+INFO_DIR="${DATA_DIR}/info"
+mkdir -p ${INFO_DIR}
 SOURCE_DIR="/share/compling/projects/sanpi"
 # activate conda environment
 eval "$(conda shell.bash hook)"
@@ -74,7 +78,7 @@ eval "$(conda shell.bash hook)"
 conda activate parallel-sanpi
 
 SUBSET_TAG=${1:-${exactly}}
-QUIET_FLAG=${3:-""}
+QUIET_FLAG=${4:-""}
 
 if [[ -n "${QUIET_FLAG}" ]]; then
   SILENCER= &>/dev/null
@@ -82,26 +86,21 @@ else
   SILENCER=""
 fi
 
-${SOURCE_DIR}/script/check_subset.sh ${SUBSET_TAG} $SILENCER
+${SOURCE_DIR}/script/check_subset.sh ${SUBSET_TAG} ${DATA_DIR} $SILENCER
 
-echo -e "\n>>> Gather still missing subsets...\n"
-#> set pat file AND FILTER FILE LIST paths. Default to `entirely-JJ.pat`
-MISSING_LIST_PATH="${DATA_DIR}/puddin/info/${SUBSET_TAG}_subset/ALLpaths_missing-subset.txt"
+#> set pat file AND FILTER FILE LIST paths. Default to `exactly-JJ.pat`
+MISSING_LIST_PATH="${INFO_DIR}/${SUBSET_TAG}_subset/ALLpaths_missing-subset.txt"
 # sanpi/Pat/advadj/all-RB-JJs.pat
-PAT=${2:-${SOURCE_DIR}/Pat/filter/entirely-JJ.pat}
-
-echo "Data files to process read from: ${MISSING_LIST_PATH}"
-
-# example usage:
-#   sbatch [SLURM FLAGS] array_subset_slurm.sh (filter/)entirely-JJ(.pat) (info/)entirely_subset
+PAT=${2:-${SOURCE_DIR}/Pat/filter/exactly-JJ.pat}
 BASE_PYTHON_CMD="python ${SOURCE_DIR}/script/make_subset_conllus.py"
 
-# e.g. PAT_CALL="-p /share/compling/projects/sanpi/Pat/filter/entirely-JJ.pat"
+# e.g. PAT_CALL="-p /share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
 if [[ -f ${PAT} && ${PAT##*.} == "pat" ]]; then
   PAT_CALL="-p ${PAT}"
-  echo "Subset pattern: ${PAT}"
 
-elif [[ $(find ${SOURCE_DIR} -path "*Pat*${PAT}*" | wc -l)=="1" ]]; then
+elif
+  [[ $(find ${SOURCE_DIR} -path "*Pat*${PAT}*" | wc -l)=="1" ]]
+then
   PAT_CALL="-p $(find ${SOURCE_DIR} -path \"*Pat*${PAT}*\")"
 else
   echo "Invalid pattern file supplied. Must be existing '.pat' file."
@@ -109,6 +108,13 @@ else
 fi
 
 if [[ -f ${MISSING_LIST_PATH} ]]; then
+  if [[ $(egrep -v "conllu" ${MISSING_LIST_PATH}) ]]; then
+    date "+%F %X %Z"
+    echo "Job finished successfully."
+    exit 0
+  fi
+  echo -e "\n>>> Gather subsets for files listed in ${MISSING_LIST_PATH}...\n"
+  echo "Subset pattern: ${PAT}"
   # search string "conllu/n" yields total = 0 ㄟ( ▔, ▔ )ㄏ
   echo "Files in need of processing: $(egrep -c "conllu" ${MISSING_LIST_PATH}) total"
   echo -e "$(head -4 ${MISSING_LIST_PATH})\n...\n$(tail -4 ${MISSING_LIST_PATH})"
@@ -118,18 +124,20 @@ if [[ -f ${MISSING_LIST_PATH} ]]; then
     NAME250="$(basename $(head -250 ${MISSING_LIST_PATH} | tail -1))"
     echo -e "\n--- batch ${NAME1%.conllu} through ${NAME250%.conllu} ---"
 
-    parallel --halt soon,fail=20 --jobs=+0 echo "\[ {#} \| {%}\ ]: {/.}"\; time $BASE_PYTHON_CMD $PAT_CALL -c {} ::: $(head -250 $MISSING_LIST_PATH)
+    parallel --halt soon,fail=15 --jobs=+0 echo "\[ {#} \| {%}\ ]: {/.}"\; time $BASE_PYTHON_CMD $PAT_CALL -c {} ::: $(head -200 $MISSING_LIST_PATH)
 
     wait
     sleep 2
-    sync ${DATA_DIR}/puddin
+    sync ${DATA_DIR}
 
-    ${SOURCE_DIR}/script/check_subset.sh ${SUBSET_TAG} ${SILENCER}
+    ${SOURCE_DIR}/script/check_subset.sh ${SUBSET_TAG} ${DATA_DIR} ${SILENCER}
 
   done
 
 else
-  echo "Filter list not found. Running entire directory."
+  echo "File list not found. Terminating."
+  date "+%F %X %Z"
+  echo "Job closed without success."
   exit 1
 fi
 # wait
@@ -147,4 +155,3 @@ fi
 
 date "+%F %X %Z"
 echo "Job closed."
-exit 0

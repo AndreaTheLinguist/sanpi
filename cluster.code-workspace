@@ -17,8 +17,11 @@
 			"name": "sanpi-data"
 		},
 		{
-			"path": "/share/compling/data/new_york_times", 
+			"path": "/share/compling/data/new_york_times",
 			"name": "nyt-data"
+		},
+		{
+			"path": "../../../../share/compling/data/assoc_press"
 		}
 	],
 	"settings": {
