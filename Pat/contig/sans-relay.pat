@@ -7,3 +7,5 @@ pattern {
     neg: ADJ -[re"[^E].*"]-> NEG;
     NEG << ADV;
 }
+
+# will not match `not uninteresting`
