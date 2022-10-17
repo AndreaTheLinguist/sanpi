@@ -4,4 +4,4 @@ pattern {
     ADV < ADJ
 }
 
-# not (non\w+\b|un\w+\b|[md]is\w+\b|i[lmnr]\w+\b|de\w+\b)
+% not (non\w+\b|un\w+\b|[md]is\w+\b|i[lmnr]\w+\b|de\w+\b)

@@ -8,4 +8,4 @@ pattern {
     NEG << ADV;
 }
 
-# will not match `not uninteresting`
+% will not match `not uninteresting` where "not" is adverb and "uninteresting" is adjective

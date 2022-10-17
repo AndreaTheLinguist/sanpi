@@ -13,7 +13,7 @@
 import argparse
 import os
 import time
-from sys import argv
+import sys
 from pathlib import Path
 
 # TODO : ? turn scripts into utilities and import
@@ -21,8 +21,8 @@ from source.gather.grew_search import grew_search
 from source.gather.fill_match_info import fill_json
 from source.gather.tabulate_hits import tabulate_hits
 
-THIS_DIR = Path(argv[0]).parent
-DATA_DIR = Path.home().joinpath('data')
+THIS_DIR = Path(sys.argv[0]).parent
+DATA_DIR = Path('/share/compling/data')
 CODE_DIR = THIS_DIR.joinpath('source/gather')
 
 
@@ -36,72 +36,91 @@ def _main():
     patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
                else list(CODE_DIR.parent.glob('Pat/*')))
 
-    corpora = ((c for c in args.corpora) if args.corpora
-               else (DATA_DIR.glob('devel/*.conll')))
+    corpora = tuple((c for c in args.corpora) if args.corpora
+                    else (DATA_DIR.glob('devel/*.conll')))
+    if not corpora:
+        sys.exit('No valid corpora directories indicated. Terminating.')
 
+    rewrite_files = args.rerun_grew_search
     for patdir in patdirs:
         # skip any directories without at least one .pat file
         if not list(patdir.glob('*.pat')):
             continue
 
         for corpus in corpora:
-
+            corpus = corpus.resolve()
             print(
                 f'>> searching `{corpus}` for '
                 f'patterns specified in `{patdir}`...')
 
-            #* run grew search
             for pat in patdir.iterdir():
-                #? is this necessary?
-                corpus_name = corpus.stem.split('.')[0]
-                #// output_label = '.'.join([corpus_name, pat.stem])
-                output_dir = DATA_DIR.joinpath(
-                    f'sanpi/1_json_grew-matches/{patdir.stem}/{corpus_name}.{pat.stem}')
-                if not output_dir.is_dir():
-                    output_dir.mkdir(parents=True)
+                # > can use "corpus.stem" for corpus subset name
+                # >     because pathlib treats ".conll" of dir name as suffix
+                grew_json_dir = (args.grew_output_dir
+                                 .joinpath(pat.parent.name, f'{corpus.stem}.{pat.stem}')
+                                 .resolve())
 
-                _run_grew(pat, corpus, output_dir, args.replace_raw_data)
+                if not grew_json_dir.is_dir():
+                    grew_json_dir.mkdir(parents=True)
 
-                #* add language info to raw jsons from conllus
+                # * run grew search
+                _run_grew(pat, corpus, grew_json_dir, rewrite_files)
+
+                # * add word/token info to raw jsons from conllus
                 # args: fill_match_info.py [-h] CONLLU_DIR RAW_DIR
-                #                   ([-o OUTPUT_DIR] [-w {yes,no,check}] [-t {lemma,form}])
+                #                   ([-o OUTPUT_DIR] [-R])
                 #       (OUTPUT_DIR defaults to same dir as .raw.json files=RAW_DIR)
-                fill_info_cmd = (f'python {CODE_DIR}/fill_match_info.py '
-                                 f'{corpus}/ {output_dir}/')
-                print('\n' + fill_info_cmd)
-                os.system(fill_info_cmd)
 
-                #* run tabulate
+                fill_json(conllu_dir=corpus,
+                          raw_dir=grew_json_dir,
+                          rewrite=rewrite_files)
+                # fill_info_cmd = (f'python {CODE_DIR}/fill_match_info.py '
+                #                  f'{corpus}/ {grew_json_dir}/')
+                # print('\n' + fill_info_cmd)
+                # os.system(fill_info_cmd)
+
+                # * run tabulate
+                # TODO: convert this into module call
                 # usage: tabulate_hits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
                 tabulate_cmd = (f'python {CODE_DIR}/tabulate_hits.py '
-                                f'{output_dir} {corpus_name}_{pat.stem}')
+                                f'{grew_json_dir} {corpus.stem}_{pat.stem}')
 
                 print('\n'+tabulate_cmd)
                 os.system(tabulate_cmd)
 
 
-def _run_grew(pat, corpus_dir, match_dir, replace):
+def _run_grew(pat: Path,
+              corpus_dir: Path,
+              match_dir: Path,
+              replace: bool):
 
-    if not replace:
-        # if all grew output files already exist in data_dir
-        prev_grew_run = (set(d.stem.split('.')[0]
-                             for d in match_dir.glob('*raw*'))
-                         == set(c.stem for c in corpus_dir.iterdir()))
+    if replace:
+        # > skips files with exising output by default
+        grew_search(corpus_dir=corpus_dir,
+                    pat_file=pat,
+                    match_dir=match_dir,
+                    skip_files=False)
+
+    else:
+        # > check if all grew output files already exist in data_dir
+        prev_grew_run = (
+            set(d.stem.split('.')[0]
+                for d in match_dir.glob('*raw*'))
+            == set(c.stem for c in corpus_dir.iterdir())
+        )
 
         if prev_grew_run:
-            print(f'\n{match_dir.relative_to(DATA_DIR)} '
+            print(f'\n{match_dir.relative_to(DATA_DIR.parent)} '
                   'is already fully populated from previous run. Skipping.')
-            return
 
-    # grew_cmd = f'python {CODE_DIR}/grew_search.py {corpus_dir}/ {pat} {match_dir}'
-    # print('\n'+grew_cmd)
-    # os.system(grew_cmd)
-    # TODO : check whether `skip_files` should be True or False
-    grew_search(corpus_dir, pat, match_dir, True)
+        else:
+            grew_search(corpus_dir=corpus_dir,
+                        pat_file=pat,
+                        match_dir=match_dir)
 
 
 def _parse_input_args():
-
+    print('parsing argument inputs...')
     parser = argparse.ArgumentParser(
         description=(
             'simple "glue" script to initiate multiple pipes in one go. '
@@ -121,7 +140,12 @@ def _parse_input_args():
                               'will be sought.')
                         )
 
-    parser.add_argument('-R', '--replace_raw_data', action='store_true',
+    parser.add_argument('-g', '--grew_output_dir', type=Path,
+                        default=DATA_DIR.joinpath('1_json_grew-matches'),
+                        help=('specify location to direct output to other than default supplied by `grew_search.py`: '
+                              '/share/compling/data/sanpi/1_json_grew-matches'))
+
+    parser.add_argument('-R', '--rerun_grew_search', action='store_true',
                         help=('option to replace existing raw grew json output '
                               '(`...raw.json` files) from a previous run. If not included, '
                               'previous data will not be overwritten and grew search step '

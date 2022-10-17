@@ -7,25 +7,24 @@ from pathlib import Path
 
 _LOGGER = multiprocessing.log_to_stderr()
 _LOGGER.setLevel(30)  # warning
-#// _LOGGER.setLevel(20) # info
-#// _LOGGER.setLevel(10) # debug
+# _LOGGER.setLevel(20)  # info
+# _LOGGER.setLevel(10) # debug
 
-# TODO : make default to not overwrite existing (non-empty) raw.json files; otherwise need to have new pat directories for any added patterns (to avoid needing to redo all the searches already run)
-
+# not sure this makes sense, but it's been done
+# // TODO : make default to not overwrite existing (non-empty) raw.json files; otherwise need to have new pat directories for any added patterns (to avoid needing to redo all the searches already run)
 
 def grew_search(corpus_dir: Path,
                 pat_file: Path,
                 match_dir: Path,
-                skip_files=False):
+                skip_files=True):
     multiprocessing.set_start_method('forkserver')
-
     if not match_dir.is_dir():
         match_dir.mkdir(parents=True)
 
     file_count = len(tuple(corpus_dir.glob('*.conllu')))
 
-    #> set pool `processes` argument to number of _available_ cpus
-    #> OR number of files to be searched, whichever is smaller
+    # > set pool `processes` argument to number of _available_ cpus
+    # > OR number of files to be searched, whichever is smaller
     cpus = min(len(os.sched_getaffinity(0)), file_count)
     print(f'\n> searching {file_count} files in ../'
           f'{Path(*corpus_dir.parts[-3:])}/ with {cpus} CPUs...')
@@ -77,7 +76,7 @@ def grew_search(corpus_dir: Path,
 def _seek_pat_in_file(corpus, pat, out):
 
     f_start = time.perf_counter()
-    #> append ' 2>/dev/null' for debugging
+    # > append ' 2>/dev/null' for debugging
     grew_cmd_str = (f'grew grep -pattern {pat} -i {corpus} > {out}')
 
     # ^ TODO: update this to use `subprocess` module instead,
@@ -99,13 +98,13 @@ def dur_round(dur: float):
 
     Returns:
         str: value converted and rounded with unit label of 's','m', or 'h'
-    """    
+    """
     unit = 's'
     if dur >= 60:
         dur = dur/60
         unit = 'm'
-        
-        if dur >= 60: 
+
+        if dur >= 60:
             dur = dur/60
             unit = 'h'
 
@@ -145,7 +144,7 @@ def _arg_paths_generator(file_glob,
                          skip_files: bool):
 
     for input_path in file_glob:
-        #> skip any subdirectories in corpus/conllu files directory
+        # > skip any subdirectories in corpus/conllu files directory
         # ? isn't this redundant given the glob expression? ^^
         if not input_path.is_file():
             continue
@@ -169,13 +168,13 @@ def _arg_paths_generator(file_glob,
                 # NOTE: a "no hits found" file consists of "[]" (3 bytes; "[\n]\n" is 5 bytes)
                 if size == 0:
                     _LOGGER.warning(
-                        'Results file exists but is completely empty, suggesting a previous out-of-memory crash. '
-                        'Grew search will be re-attempted.'
+                        'Results file %s exists for but is completely empty, suggesting a previous out-of-memory crash. '
+                        'Grew search will be re-attempted on for %s data', output_path.name, corpus
                     )
                 # if no hits and predates pattern file changes
                 elif size < 10 and output_path.stat().st_mtime < pat_file.stat().st_mtime:
                     _LOGGER.warning(
-                        'Results file exists but is empty and older than last pattern modification. '
+                        f'Results file {output_path} exists but is empty and older than last pattern modification. '
                         'Grew search will be re-attempted for %s', corpus)
                 # if nonempty or pattern has not changed since output last modified
                 #  =>> SKIP
@@ -221,9 +220,10 @@ def _parse_args():
 
     parser.add_argument('output_dir', type=Path,
                         default='/share/compling/data/sanpi/1_json_grew-matches',
-                        help='upper level output directory name. Should correspond to '
-                             'sentence data source and pattern like so: '
-                             '"<data set>.<pattern name>", e.g. "Nyt1."')
+                        help='upper level output directory name for grew match data. '
+                        'Will be populated with subdir corresponding to pattern dir, '
+                        'with filenames patterned like so: '
+                             '"[conll dirname].[pat filename]", e.g. "Nyt1.sans-relay"')
 
     parser.add_argument('-s', '--skip_files', action='store_true',
                         default=False,

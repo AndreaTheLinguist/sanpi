@@ -4,4 +4,4 @@ pattern {
     ADV < ADJ
 }
 
-# will match e.g. `not uninteresting`
+% will match e.g. `not uninteresting`

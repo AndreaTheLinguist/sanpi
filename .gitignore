@@ -331,7 +331,7 @@ cython_debug/
 ### Vim ###
 # Swap
 [._]*.s[a-v][a-z]
-!*.svg  # comment out if you don't need vector files
+!*.svg # comment out if you don't need vector files
 [._]*.sw[a-p]
 [._]s[a-rt-v][a-z]
 [._]ss[a-gi-z]
@@ -349,7 +349,7 @@ tags
 [._]*.un~
 
 ### VisualStudioCode ###
-.vscode/*
+**/.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -358,6 +358,7 @@ tags
 
 # Local History for Visual Studio Code
 .history/
+**/.lh/
 
 # Built Visual Studio Code Extensions
 *.vsix
@@ -389,3 +390,4 @@ demo/**/subset*
 demo/**/Pcc*.conll/*conllu
 demo/**/*tar
 demo/**/*.py
+
