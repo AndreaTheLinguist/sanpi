@@ -53,18 +53,18 @@ def _main():
                 f'>> searching `{corpus}` for '
                 f'patterns specified in `{patdir}`...')
 
-            for pat in patdir.iterdir():
+            for pat_path in patdir.iterdir():
                 # > can use "corpus.stem" for corpus subset name
                 # >     because pathlib treats ".conll" of dir name as suffix
                 grew_json_dir = (args.grew_output_dir
-                                 .joinpath(pat.parent.name, f'{corpus.stem}.{pat.stem}')
+                                 .joinpath(pat_path.parent.name, f'{corpus.stem}.{pat_path.stem}')
                                  .resolve())
 
                 if not grew_json_dir.is_dir():
                     grew_json_dir.mkdir(parents=True)
 
                 # * run grew search
-                _run_grew(pat, corpus, grew_json_dir, rewrite_files)
+                _run_grew(pat_path, corpus, grew_json_dir, rewrite_files)
 
                 # * add word/token info to raw jsons from conllus
                 # args: fill_match_info.py [-h] CONLLU_DIR RAW_DIR
@@ -80,13 +80,17 @@ def _main():
                 # os.system(fill_info_cmd)
 
                 # * run tabulate
-                # TODO: convert this into module call
                 # usage: tabulate_hits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
-                tabulate_cmd = (f'python {CODE_DIR}/tabulate_hits.py '
-                                f'{grew_json_dir} {corpus.stem}_{pat.stem}')
+                # tabulate_cmd = (f'python {CODE_DIR}/tabulate_hits.py '
+                #                 f'{grew_json_dir} {corpus.stem}_{pat.stem}')
 
-                print('\n'+tabulate_cmd)
-                os.system(tabulate_cmd)
+                # print('\n'+tabulate_cmd)
+                # os.system(tabulate_cmd)
+                # output_prefix = f'{grew_json_dir} {corpus.stem}_{pat.stem}'
+                tabulate_hits(match_dir=grew_json_dir, 
+                            #   pat_path=pat_path, 
+                            #   output_prefix=output_prefix
+                              )
 
 
 def _run_grew(pat: Path,

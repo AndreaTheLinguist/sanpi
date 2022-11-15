@@ -23,10 +23,10 @@ def fill_json(conllu_dir: Path,
     for data_stem, paths_pair in paired_paths.items():
         file_start = time.perf_counter()
         json_fpath = paths_pair.raw_json
-
-        if not rewrite and json_fpath.with_name(json_fpath.name.replace('.raw', '')).exists():
+        filled_json_path = json_fpath.with_name(json_fpath.name.replace('.raw', ''))
+        if not rewrite and filled_json_path.exists():
             print(
-                f'-> {data_stem} data was previously processed. Skipping.')
+                f'-> {data_stem} data was previously processed: Skipping.\n     Output in {filled_json_path}')
             continue
 
         print(f'-> Processing {data_stem}...')
@@ -66,7 +66,7 @@ def fill_json(conllu_dir: Path,
         print(f'    + {json_entry_count} hit results filled from {conll_count} total original '
               f'sentences in {round(finish - file_start, 2)} seconds')
 
-        _write_new(output_dir, data_stem, hits_json)
+        _write_new(filled_json_path, hits_json)
 
     print('Finished processing all corresponding json and conll files.')
     absFinish = time.perf_counter()
@@ -262,10 +262,10 @@ def _load_hits_json(raw_json_file):
     return hits
 
 
-def _write_new(out_dir: Path, pref: str, hits):
+def _write_new(out_path: Path, hits):
 
-    with open(out_dir / f'{pref}.json', 'w') as o:
-        print('   -> Writing output file...')
+    with open(out_path, 'w') as o:
+        print(f'   -> Writing output file {Path(*out_path._parts[-4:])}...')
         json.dump(hits, o, indent=2)
 
 
