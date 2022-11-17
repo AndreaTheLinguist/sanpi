@@ -1,0 +1,79 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.linting.pylintEnabled": true, 
+		"pylint.args": [
+			"--ignore=notebooks",
+			"--ignore=*.ipynb",
+			"--disable=undefined-variable",
+			"--disable=protected-access",
+			"--disable=invalid-name",
+			"--disable=line-too-long",
+			"--disable=trailing-whitespace",
+			"--disable=missing-module-docstring",
+			"--disable=missing-final-newline",
+			"--disable=pointless-statement",
+			"--disable=missing-function-docstring"
+		],
+		"files.exclude": {
+			"**/.git": false,
+			"**/.svn": false,
+			"**/.hg": false,
+			"**/CVS": false,
+			"**/.DS_Store": false,
+			"**/Thumbs.db": false,
+			"**/.[^b]*": false,
+			"**/.bash_[hl]*": false,
+			"**/*conda3": false,
+			"**/stanza_resources": false,
+			"**/*kaldi*": false
+		},
+		"explorerExclude.backup": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/.[^b]*": true,
+			"**/.bash_[hl]*": true,
+			"**/*conda3": true,
+			"**/stanza_resources": true,
+			"**/*kaldi*": true
+		},
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Python: Current File",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": true
+			},
+			{
+				"name": "run_pipeline PccX2 contig",
+				"type": "python",
+				"request": "launch",
+				"program": "/share/compling/projects/sanpi/run_pipeline.py",
+				"console": "integratedTerminal",
+				"justMyCode": true,
+				"args": [
+					"-c",
+					"data/corpora/puddin/PccX2.conll",
+					"-p",
+					"Pat/contig",
+					"--grew_output_dir",
+					"data/1_json_grew-matches",
+				]
+			},
+		],
+		"compounds": []
+	}
+}
