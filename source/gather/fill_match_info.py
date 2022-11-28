@@ -45,10 +45,12 @@ def fill_json(conllu_dir: Path,
         hits_by_id = {}
         for hit_dict in hits_json:
             sent_id = hit_dict['sent_id']
-            hit_dict['prev_id'] = context_sent_ids[sent_id].prev_id
-            hit_dict['prev_sent'] = ''
-            hit_dict['next_id'] = context_sent_ids[sent_id].next_id
-            hit_dict['next_sent'] = ''
+            context_dict = {}
+            context_dict['prev_id'] = context_sent_ids[sent_id].prev_id
+            context_dict['prev_sent'] = ''
+            context_dict['next_id'] = context_sent_ids[sent_id].next_id
+            context_dict['next_sent'] = ''
+            hit_dict['context'] = context_dict
             node_id_dict = hit_dict['matching']['nodes']
             # > add hit id
             # >   format: [sentence id]-[ADV node id]-[ADJ node id]
@@ -137,10 +139,10 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
                                              tok_dicts, id_to_ix)
                 json_entry_count += 1
             elif current_id == hit_dict['prev_id']:
-                hit_dict['prev_sent'] = sent_text
+                hit_dict['context']['prev_sent'] = sent_text
 
             elif current_id == hit_dict['next_id']:
-                hit_dict['next_sent'] = sent_text
+                hit_dict['context']['next_sent'] = sent_text
             json_loops += 1
         conll_count += 1
 
@@ -207,16 +209,16 @@ def _include_context(hits):
     # // return hit_ids, prev_ids, next_ids
 
 
-# def _get_context_id(sid, position: int):
+#// def _get_context_id(sid, position: int):
 
-    # if '_' in sid:
-    #     parts = sid.rsplit('_', 1)
-    #     cix = f'{parts[0]}_{int(parts[1]) + position}'
-
-    # else:
-    #     cix = ''
-
-    # return cix
+    #// if '_' in sid:
+    #//     parts = sid.rsplit('_', 1)
+    #//     cix = f'{parts[0]}_{int(parts[1]) + position}'
+    #//
+    #// else:
+    #//     cix = ''
+    #//
+    #// return cix
 
 
 def _update_tokens(info, tok_dict_list, id_to_ix, hit, raw_match_info):
@@ -309,6 +311,7 @@ def _get_deps(edges, tok_dicts, id_to_ix):
         target_tok = _process_edge(parts['target'], tok_dicts, id_to_ix)
 
         label = parts['label']
+        ## TODO: change to `isinstance()`
         if type(label) == dict:
             label = label.get('1', '_')
 

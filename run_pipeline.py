@@ -16,7 +16,6 @@ import time
 import sys
 from pathlib import Path
 
-# TODO : ? turn scripts into utilities and import
 from source.gather.grew_search import grew_search
 from source.gather.fill_match_info import fill_json
 from source.gather.tabulate_hits import tabulate_hits
@@ -40,20 +39,23 @@ def _main():
                     else (DATA_DIR.glob('devel/*.conll')))
     if not corpora:
         sys.exit('No valid corpora directories indicated. Terminating.')
-
+    tab_only = args.tabulate_only
     rewrite_files = args.rerun_grew_search
     for patdir in patdirs:
         # skip any directories without at least one .pat file
         if not list(patdir.glob('*.pat')):
             continue
-
+        
         for corpus in corpora:
             corpus = corpus.resolve()
+            
+            verb = 'process' if tab_only else 'search'
             print(
-                f'>> searching `{corpus}` for '
+                f'>> {verb}ing `{corpus}` data for '
                 f'patterns specified in `{patdir}`...')
 
             for pat_path in patdir.iterdir():
+                
                 # > can use "corpus.stem" for corpus subset name
                 # >     because pathlib treats ".conll" of dir name as suffix
                 grew_json_dir = (args.grew_output_dir
@@ -61,32 +63,21 @@ def _main():
                                  .resolve())
 
                 if not grew_json_dir.is_dir():
-                    grew_json_dir.mkdir(parents=True)
+                    if tab_only:
+                        print('ERROR: "tabulate_only" option specificed, but no hit files exist for given pattern and corpus. Run full pipeline.')
+                    else:
+                        grew_json_dir.mkdir(parents=True)
 
-                # * run grew search
-                _run_grew(pat_path, corpus, grew_json_dir, rewrite_files)
+                if not tab_only:
+                    # * run grew search
+                    _run_grew(pat_path, corpus, grew_json_dir, rewrite_files)
 
-                # * add word/token info to raw jsons from conllus
-                # args: fill_match_info.py [-h] CONLLU_DIR RAW_DIR
-                #                   ([-o OUTPUT_DIR] [-R])
-                #       (OUTPUT_DIR defaults to same dir as .raw.json files=RAW_DIR)
-
-                fill_json(conllu_dir=corpus,
-                          raw_dir=grew_json_dir,
-                          rewrite=rewrite_files)
-                # fill_info_cmd = (f'python {CODE_DIR}/fill_match_info.py '
-                #                  f'{corpus}/ {grew_json_dir}/')
-                # print('\n' + fill_info_cmd)
-                # os.system(fill_info_cmd)
+                    # * add word/token info to raw jsons from conllus
+                    fill_json(conllu_dir=corpus,
+                            raw_dir=grew_json_dir,
+                            rewrite=rewrite_files)
 
                 # * run tabulate
-                # usage: tabulate_hits.py [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
-                # tabulate_cmd = (f'python {CODE_DIR}/tabulate_hits.py '
-                #                 f'{grew_json_dir} {corpus.stem}_{pat.stem}')
-
-                # print('\n'+tabulate_cmd)
-                # os.system(tabulate_cmd)
-                # output_prefix = f'{grew_json_dir} {corpus.stem}_{pat.stem}'
                 tabulate_hits(match_dir=grew_json_dir, 
                             #   pat_path=pat_path, 
                             #   output_prefix=output_prefix
@@ -157,6 +148,11 @@ def _parse_input_args():
                               'incompletely populated. '
                               'Raw data processing scripts will still be run regardless '
                               '(on existing `.raw.json` files).'))
+    parser.add_argument(
+        '-T', '--tabulate_only', action='store_true', default=False,
+        help=('option to jump directly to tabulate step.'
+              'Use if previous processing interrupted during tabulation.'),
+    )
 
     parser.add_argument('-E', '--env_check', action='store_true',
                         help=('option to confirm environment satisfies requirements '
@@ -165,8 +161,35 @@ def _parse_input_args():
     return parser.parse_args()
 
 
+def dur_round(time_dur: float):
+    """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits
+
+    Args:
+        dur (float): seconds value
+
+    Returns:
+        str: value converted and rounded with unit label of 's','m', or 'h'
+    """
+    unit = "s"
+
+    if time_dur >= 60:
+        time_dur = time_dur / 60
+        unit = "m"
+
+        if time_dur >= 60:
+            time_dur = time_dur / 60
+            unit = "h"
+
+    if time_dur < 10:
+        dur_str = f"{round(time_dur, 2):.2f}{unit}"
+    else:
+        dur_str = f"{round(time_dur, 1):.1f}{unit}"
+
+    return dur_str
+
+
 if __name__ == '__main__':
-    t0 = time.perf_counter()
+    proc_t0 = time.perf_counter()
     _main()
-    t1 = time.perf_counter()
-    print(f'total time: {round((t1-t0)/60, 2)} minutes')
+    proc_t1 = time.perf_counter()
+    print(f'Total time to run pipeline: {dur_round(proc_t1 - proc_t0)}')
