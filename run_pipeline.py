@@ -105,7 +105,7 @@ def _run_grew(pat: Path,
         )
 
         if prev_grew_run:
-            print(f'\n{match_dir.relative_to(DATA_DIR.parent)} '
+            print(f'\n{Path(*match_dir.parts[-4:])} '
                   'is already fully populated from previous run. Skipping.')
 
         else:

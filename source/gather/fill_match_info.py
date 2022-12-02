@@ -51,14 +51,19 @@ def fill_json(conllu_dir: Path,
             context_dict['next_id'] = context_sent_ids[sent_id].next_id
             context_dict['next_sent'] = ''
             hit_dict['context'] = context_dict
+            #TODO: fix this non-unique identifier bug
+            #! Using this as the dict key is the source of the empty hits later on: if 2
+            #!   matches have the same `ADV` and `ADJ` nodes, but different `NEG` nodes, only 1
+            #!   is processed. That is, the second hit overwrites the first in the dictionary.
             node_id_dict = hit_dict['matching']['nodes']
             # > add hit id
             # >   format: [sentence id]-[ADV node id]-[ADJ node id]
             #       (where `sentence id` = [doc_id]_[sentence index])
-            hit_id = f"{sent_id}-{node_id_dict['ADV']}-{node_id_dict['ADJ']}"
+            hit_id = f"{sent_id}:{node_id_dict['NEG']}-{node_id_dict['ADV']}-{node_id_dict['ADJ']}"
             # > add additional top layer to json to order by hit id, rather than int index
             hits_by_id[hit_id] = hit_dict
             hit_dict['hit_id'] = hit_id
+
 
         hits_by_id, json_entry_count, conll_count = _add_conll_info(
             hits_by_id, paths_pair.conllu, context_sent_ids)

@@ -136,13 +136,12 @@ def _get_hit_data(json_dir):
         else:
             collocs = ''
 
-        # > pre-existing `hit_id` includes only sentence number, adv index, and adj index
-        # >  match_ix is `[neg ix]-[adv ix]-[adj ix]`
         #   (having both adv and adj is unnecessary since they are required to be contiguous with ADV first,
         #    but I'm sure I'd get confused about which token it is if only 1 was included)
-        # > change ADV-ADJ only id to `colloc_id` and set `hit_id` to NEG-ADV-ADJ version
-        df = df.assign(colloc_id=df.hit_id,
-                       hit_id=df.sent_id + ':' + df.match_ix,
+        # > `hit_id` ->  NEG-ADV-ADJ
+        # > `colloc_id` ->  ADV-ADJ (only)
+        df = df.assign(hit_id=df.sent_id+':'+df.match_ix,
+                        colloc_id=df.sent_id+':'+df.adv_index.astype('string')+'-' + df.adj_index.astype('string'),
                        colloc=collocs)
 
         df_from_json = pd.concat([df, df_from_json])
