@@ -1,0 +1,152 @@
+[
+  {
+    "sent_id": "pcc_eng_27_070.9917_x1131694_05",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "advmod", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8877_x1130027_06",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "2", "ADJ": "3" },
+      "edges": {
+        "neg": { "source": "3", "label": "advmod", "target": "1" },
+        "mod": { "source": "3", "label": "advmod", "target": "2" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8645_x1129662_4",
+    "matching": {
+      "nodes": { "NEG": "25", "ADV": "26", "ADJ": "27" },
+      "edges": {
+        "neg": { "source": "27", "label": "advmod", "target": "25" },
+        "mod": { "source": "27", "label": "advmod", "target": "26" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8552_x1129516_4",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "advmod", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.7120_x1127229_18",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "advmod", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.6674_x1126483_064",
+    "matching": {
+      "nodes": { "NEG": "15", "ADV": "16", "ADJ": "17" },
+      "edges": {
+        "neg": { "source": "17", "label": "advmod", "target": "15" },
+        "mod": { "source": "17", "label": "advmod", "target": "16" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4888_x1123515_213",
+    "matching": {
+      "nodes": { "NEG": "24", "ADV": "25", "ADJ": "26" },
+      "edges": {
+        "neg": { "source": "26", "label": "advmod", "target": "24" },
+        "mod": { "source": "26", "label": "advmod", "target": "25" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.2970_x1120419_20",
+    "matching": {
+      "nodes": { "NEG": "13", "ADV": "14", "ADJ": "15" },
+      "edges": {
+        "neg": { "source": "15", "label": "advmod", "target": "13" },
+        "mod": { "source": "15", "label": "advmod", "target": "14" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.1968_x1118821_6",
+    "matching": {
+      "nodes": { "NEG": "9", "ADV": "10", "ADJ": "11" },
+      "edges": {
+        "neg": { "source": "11", "label": "advmod", "target": "9" },
+        "mod": { "source": "11", "label": "advmod", "target": "10" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.1123_x1117444_06",
+    "matching": {
+      "nodes": { "NEG": "17", "ADV": "18", "ADJ": "19" },
+      "edges": {
+        "neg": { "source": "19", "label": "advmod", "target": "17" },
+        "mod": { "source": "19", "label": "advmod", "target": "18" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0776_x1116894_04",
+    "matching": {
+      "nodes": { "NEG": "23", "ADV": "24", "ADJ": "25" },
+      "edges": {
+        "neg": { "source": "25", "label": "advmod", "target": "23" },
+        "mod": { "source": "25", "label": "advmod", "target": "24" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0367_x1116208_04",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "2", "ADJ": "3" },
+      "edges": {
+        "neg": { "source": "3", "label": "advmod", "target": "1" },
+        "mod": { "source": "3", "label": "advmod", "target": "2" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0315_x1116118_16",
+    "matching": {
+      "nodes": { "NEG": "2", "ADV": "3", "ADJ": "4" },
+      "edges": {
+        "neg": { "source": "4", "label": "advmod", "target": "2" },
+        "mod": { "source": "4", "label": "advmod", "target": "3" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0202_x1115929_106",
+    "matching": {
+      "nodes": { "NEG": "11", "ADV": "12", "ADJ": "13" },
+      "edges": {
+        "neg": { "source": "13", "label": "advmod", "target": "11" },
+        "mod": { "source": "13", "label": "advmod", "target": "12" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0055_x1115700_024",
+    "matching": {
+      "nodes": { "NEG": "7", "ADV": "8", "ADJ": "9" },
+      "edges": {
+        "neg": { "source": "9", "label": "advmod", "target": "7" },
+        "mod": { "source": "9", "label": "advmod", "target": "8" }
+      }
+    }
+  }
+]

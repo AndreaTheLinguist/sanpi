@@ -1,0 +1,1346 @@
+[
+  {
+    "sent_id": "nyt_eng_19960526_0027_22",
+    "context": {
+      "prev_id": "nyt_eng_19960526_0027_21",
+      "prev_sent": "But using a mechanical device for aid on the course is taboo .",
+      "next_id": "nyt_eng_19960526_0027_23",
+      "next_sent": "It never changes .  -RDQ-"
+    },
+    "hit_id": "nyt_eng_19960526_0027_22:3-4-5",
+    "text": "Sorenstam is n't exactly sure why the rule includes compasses because  -LBQ-  North is always north .",
+    "token_str": "Sorenstam is n't exactly sure why the rule includes compasses because `` North is always north .",
+    "lemma_str": "Sorenstam be not exactly sure why the rule include compass because `` North be always north .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "sure"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960521_0276_26",
+    "context": {
+      "prev_id": "nyt_eng_19960521_0276_25",
+      "prev_sent": "Still , remember there 's no correlation between splits and market declines .",
+      "next_id": "nyt_eng_19960521_0276_27",
+      "next_sent": "Last year , there were 132 by companies listed on the New York Stock Exchange , far below the record 225 in 1983 ."
+    },
+    "hit_id": "nyt_eng_19960521_0276_26:8-9-10",
+    "text": "And in any event , splits are n't exactly overwhelming in number .",
+    "token_str": "and in any event , splits are n't exactly overwhelming in number .",
+    "lemma_str": "and in any event , splits be not exactly overwhelming in number .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "overwhelming"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "overwhelming"
+    },
+    "index": {
+      "NEG": 7,
+      "ADV": 8,
+      "ADJ": 9
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "overwhelming",
+          "ix": 9,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 7,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "overwhelming"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "overwhelming",
+          "ix": 9,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 8,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "overwhelming"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960515_0521_23",
+    "context": {
+      "prev_id": "nyt_eng_19960515_0521_22",
+      "prev_sent": "Robby Muller 's photography gives this forbidding scene the eerie distance of some antique picture-card viewing device .",
+      "next_id": "nyt_eng_19960515_0521_24",
+      "next_sent": ""
+    },
+    "hit_id": "nyt_eng_19960515_0521_23:18-19-20",
+    "text": "The score , by Neil Young , grates like an electric guitar juiced on prairie lightning ... not exactly listenable as music , but appropriate to the film 's grim drolleries .",
+    "token_str": "the score , by Neil Young , grates like an electric guitar juiced on prairie lightning ... not exactly listenable as music , but appropriate to the film 's grim drolleries .",
+    "lemma_str": "the score , by Neil Young , grate like a electric guitar juice on prairie lightning ... not exactly listenable as music , but appropriate to the film 's grim drollery .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "listenable"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "listenable"
+    },
+    "index": {
+      "NEG": 17,
+      "ADV": 18,
+      "ADJ": 19
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "listenable",
+          "ix": 19,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "grate"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 17,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "listenable"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "listenable",
+          "ix": 19,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "grate"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 18,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "listenable"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960515_0268_28",
+    "context": {
+      "prev_id": "nyt_eng_19960515_0268_27",
+      "prev_sent": "Aksigorta AS , an insurance company held by one of Turkey 's largest industrial groups Haci Omer Sabanci Holding AS , fell by 2500 lira or 11.36 percent to 19,500 lira .",
+      "next_id": "nyt_eng_19960515_0268_29",
+      "next_sent": "-LBQ-  We believe that the future of the government will not be clear before week-end .  -RDQ-"
+    },
+    "hit_id": "nyt_eng_19960515_0268_28:4-5-6",
+    "text": "-LBQ-  It was n't exactly clear what the court decision entailed ,  -RDQ-  said Atilla Yesilada , the director of research at Global Securities , in a written statement .",
+    "token_str": "`` It was n't exactly clear what the court decision entailed , '' said Atilla Yesilada , the director of research at Global Securities , in a written statement .",
+    "lemma_str": "`` it be not exactly clear what the court decision entail , '' say Atilla Yesilada , the director of research at Global Securities , in a written statement .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "clear",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "clear"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "clear",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "clear"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960515_0101_19",
+    "context": {
+      "prev_id": "nyt_eng_19960515_0101_18",
+      "prev_sent": "He said they would have to wait for the official ruling to be published in the Offical Gazette before proceeding further , Turkish press reports said .",
+      "next_id": "nyt_eng_19960515_0101_20",
+      "next_sent": "-LBQ-  We believe that the future of the government will not be clear before week-end .  -RDQ-"
+    },
+    "hit_id": "nyt_eng_19960515_0101_19:4-5-6",
+    "text": "-LBQ-  It was n't exactly clear what the court decision entailed ,  -RDQ-  said Atilla Yesilada , the director of research at Global Securities , in a written statement .",
+    "token_str": "`` It was n't exactly clear what the court decision entailed , '' said Atilla Yesilada , the director of research at Global Securities , in a written statement .",
+    "lemma_str": "`` it be not exactly clear what the court decision entail , '' say Atilla Yesilada , the director of research at Global Securities , in a written statement .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "clear",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "clear"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "clear",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "clear"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960513_0064_4",
+    "context": {
+      "prev_id": "nyt_eng_19960513_0064_3",
+      "prev_sent": "It is , in plain fact , degenerate .",
+      "next_id": "nyt_eng_19960513_0064_5",
+      "next_sent": "Market forces , including the usual anticipated summertime increase in driving , are pushing up gasoline prices , as they do every year about this time ."
+    },
+    "hit_id": "nyt_eng_19960513_0064_4:7-8-9",
+    "text": "The history of American politics is not exactly unblemished by pandering , but few examples are quite as craven as this one .",
+    "token_str": "the history of American politics is not exactly unblemished by pandering , but few examples are quite as craven as this one .",
+    "lemma_str": "the history of american politics be not exactly unblemished by pandering , but few example be quite as craven as this one .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "unblemished"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "unblemished"
+    },
+    "index": {
+      "NEG": 6,
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "unblemished",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "unblemished"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "unblemished",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 7,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "unblemished"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960511_0508_4",
+    "context": {
+      "prev_id": "nyt_eng_19960511_0508_3",
+      "prev_sent": "Lovullo has pinch run for Mark McGwire in all six games of this homestand .",
+      "next_id": "nyt_eng_19960511_0508_5",
+      "next_sent": "McGwire keeps reaching base in the late innings , so Lovullo keeps replacing him ."
+    },
+    "hit_id": "nyt_eng_19960511_0508_4:3-4-5",
+    "text": "Lovullo is not exactly fast , but manager Art Howe wants to be careful with McGwire 's troublesome right foot .",
+    "token_str": "Lovullo is not exactly fast , but manager Art Howe wants to be careful with McGwire 's troublesome right foot .",
+    "lemma_str": "Lovullo be not exactly fast , but manager Art Howe want to be careful with McGwire 's troublesome right foot .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "fast"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "fast"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "fast",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "fast"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "fast",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "fast"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960508_0501_7",
+    "context": {
+      "prev_id": "nyt_eng_19960508_0501_6",
+      "prev_sent": "And no one fueled that passion more fervently than my mom , an imaginative home cook and something of a Perle Mesta when it came to entertaining .",
+      "next_id": "nyt_eng_19960508_0501_8",
+      "next_sent": "Admittedly , my mother was not immune from using those staples from time to time ."
+    },
+    "hit_id": "nyt_eng_19960508_0501_7:30-31-32",
+    "text": "Canned mushrooms , onion salt , ground beef , iceberg lettuce , Jell-O _ the larders stocked by most small-town Midwestern families in the '60s and '70s _ were n't exactly adventurous .",
+    "token_str": "canned mushrooms , onion salt , ground beef , iceberg lettuce , Jell-O _ the larders stocked by most small-town Midwestern families in the '60s and '70s _ were n't exactly adventurous .",
+    "lemma_str": "can mushroom , onion salt , ground beef , iceberg lettuce , Jell-O _ the larder stock by most small-town midwestern family in the '60 and '70 _ be not exactly adventurous .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "adventurous"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "adventurous"
+    },
+    "index": {
+      "NEG": 29,
+      "ADV": 30,
+      "ADJ": 31
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "adventurous",
+          "ix": 31,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 29,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "adventurous"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "adventurous",
+          "ix": 31,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 30,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "adventurous"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960508_0310_59",
+    "context": {
+      "prev_id": "nyt_eng_19960508_0310_58",
+      "prev_sent": "A 30,000-word DragonDictate system sells for about the same price as Kurzweil 's system , and a 10,000-word Dragon system goes for a bargain rate of $ 395 .",
+      "next_id": "nyt_eng_19960508_0310_60",
+      "next_sent": "In a year or so , similar programs will probably be bundled with high-end computer systems , just as word processors are now ."
+    },
+    "hit_id": "nyt_eng_19960508_0310_59:1-6-7",
+    "text": "None of this software is exactly cheap , but the price is bound to fall over time .",
+    "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
+    "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
+    "lemmas": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "forms": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "index": {
+      "NEG": 0,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "none",
+          "ix": 0,
+          "xpos": "NN",
+          "deprel": "nsubj",
+          "head": "cheap"
+        },
+        "relation": "nsubj"
+      },
+      "mod": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "cheap"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0773_18",
+    "context": {
+      "prev_id": "nyt_eng_19960506_0773_17",
+      "prev_sent": "-LBQ-  Building a stadium is just not that dramatic ,  -RDQ-  she says , adding that everyone designing the Atlanta stadium gets along just fine .",
+      "next_id": "nyt_eng_19960506_0773_19",
+      "next_sent": "-LBQ-  A tiger in the rough ,  -RDQ-  Louis Mosley calls her ."
+    },
+    "hit_id": "nyt_eng_19960506_0773_18:3-4-5",
+    "text": "That 's not exactly true .",
+    "token_str": "that 's not exactly true .",
+    "lemma_str": "that be not exactly true .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "true"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "true"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "true",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "true"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "true",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "true"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0773_17",
+    "context": {
+      "prev_id": "nyt_eng_19960506_0773_16",
+      "prev_sent": "",
+      "next_id": "nyt_eng_19960506_0773_18",
+      "next_sent": "That 's not exactly true ."
+    },
+    "hit_id": "nyt_eng_19960506_0773_17:7-8-9",
+    "text": "-LBQ-  Building a stadium is just not that dramatic ,  -RDQ-  she says , adding that everyone designing the Atlanta stadium gets along just fine .",
+    "token_str": "`` Building a stadium is just not that dramatic , '' she says , adding that everyone designing the Atlanta stadium gets along just fine .",
+    "lemma_str": "`` building a stadium be just not that dramatic , '' she say , add that everyone design the Atlanta stadium get along just fine .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "that",
+      "ADJ": "dramatic"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "that",
+      "ADJ": "dramatic"
+    },
+    "index": {
+      "NEG": 6,
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "dramatic",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "dramatic"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "dramatic",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "that",
+          "ix": 7,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "dramatic"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0771_18",
+    "context": {
+      "prev_id": "nyt_eng_19960506_0771_17",
+      "prev_sent": "-LBQ-  Building a stadium is just not that dramatic ,  -RDQ-  she says , adding that everyone designing the Atlanta stadium gets along just fine .",
+      "next_id": "nyt_eng_19960506_0771_19",
+      "next_sent": "-LBQ-  A tiger in the rough ,  -RDQ-  Louis Mosley calls her ."
+    },
+    "hit_id": "nyt_eng_19960506_0771_18:3-4-5",
+    "text": "That 's not exactly true .",
+    "token_str": "that 's not exactly true .",
+    "lemma_str": "that be not exactly true .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "true"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "true"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "true",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "true"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "true",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "true"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0771_17",
+    "context": {
+      "prev_id": "nyt_eng_19960506_0771_16",
+      "prev_sent": "",
+      "next_id": "nyt_eng_19960506_0771_18",
+      "next_sent": "That 's not exactly true ."
+    },
+    "hit_id": "nyt_eng_19960506_0771_17:7-8-9",
+    "text": "-LBQ-  Building a stadium is just not that dramatic ,  -RDQ-  she says , adding that everyone designing the Atlanta stadium gets along just fine .",
+    "token_str": "`` Building a stadium is just not that dramatic , '' she says , adding that everyone designing the Atlanta stadium gets along just fine .",
+    "lemma_str": "`` building a stadium be just not that dramatic , '' she say , add that everyone design the Atlanta stadium get along just fine .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "that",
+      "ADJ": "dramatic"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "that",
+      "ADJ": "dramatic"
+    },
+    "index": {
+      "NEG": 6,
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "dramatic",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "dramatic"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "dramatic",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "that",
+          "ix": 7,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "dramatic"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0122_14",
+    "context": {
+      "prev_id": "nyt_eng_19960506_0122_13",
+      "prev_sent": "He also has a young daughter with the actress Frances Fisher .",
+      "next_id": "nyt_eng_19960506_0122_15",
+      "next_sent": "-LBQ-  There 's a wonderful line in ` White Hunter , Black Heart , ' where the lead character says something like , ` If you start thinking anybody will see the movie that you 're making , it 'll destroy you , '  -RDQ-  he said ."
+    },
+    "hit_id": "nyt_eng_19960506_0122_14:4-6-7",
+    "text": "If he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
+    "token_str": "if he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
+    "lemma_str": "if he has never be exactly gabby when it come to he home life , however , Eastwood will happily talk moviemaking .",
+    "lemmas": {
+      "NEG": "never",
+      "ADV": "exactly",
+      "ADJ": "gabby"
+    },
+    "forms": {
+      "NEG": "never",
+      "ADV": "exactly",
+      "ADJ": "gabby"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "gabby",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "advcl",
+          "head": "talk"
+        },
+        "target": {
+          "lemma": "never",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "gabby"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "gabby",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "advcl",
+          "head": "talk"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "gabby"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0067_14",
+    "context": {
+      "prev_id": "nyt_eng_19960506_0067_13",
+      "prev_sent": "He also has a young daughter with the actress Frances Fisher .",
+      "next_id": "nyt_eng_19960506_0067_15",
+      "next_sent": "-LBQ-  There 's a wonderful line in ` White Hunter , Black Heart , ' where the lead character says something like , ` If you start thinking anybody will see the movie that you 're making , it 'll destroy you , '  -RDQ-  he said ."
+    },
+    "hit_id": "nyt_eng_19960506_0067_14:4-6-7",
+    "text": "If he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
+    "token_str": "if he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
+    "lemma_str": "if he has never be exactly gabby when it come to he home life , however , Eastwood will happily talk moviemaking .",
+    "lemmas": {
+      "NEG": "never",
+      "ADV": "exactly",
+      "ADJ": "gabby"
+    },
+    "forms": {
+      "NEG": "never",
+      "ADV": "exactly",
+      "ADJ": "gabby"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "gabby",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "advcl",
+          "head": "talk"
+        },
+        "target": {
+          "lemma": "never",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "gabby"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "gabby",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "advcl",
+          "head": "talk"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "gabby"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960505_0102_14",
+    "context": {
+      "prev_id": "nyt_eng_19960505_0102_13",
+      "prev_sent": "He also has a young daughter with the actress Frances Fisher .",
+      "next_id": "nyt_eng_19960505_0102_15",
+      "next_sent": "-LBQ-  There 's a wonderful line in ` White Hunter , Black Heart , ' where the lead character says something like , ` If you start thinking anybody will see the movie that you 're making , it 'll destroy you , '  -RDQ-  he said ."
+    },
+    "hit_id": "nyt_eng_19960505_0102_14:4-6-7",
+    "text": "If he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
+    "token_str": "if he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
+    "lemma_str": "if he has never be exactly gabby when it come to he home life , however , Eastwood will happily talk moviemaking .",
+    "lemmas": {
+      "NEG": "never",
+      "ADV": "exactly",
+      "ADJ": "gabby"
+    },
+    "forms": {
+      "NEG": "never",
+      "ADV": "exactly",
+      "ADJ": "gabby"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "gabby",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "advcl",
+          "head": "talk"
+        },
+        "target": {
+          "lemma": "never",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "gabby"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "gabby",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "advcl",
+          "head": "talk"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "gabby"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960504_0091_59",
+    "context": {
+      "prev_id": "nyt_eng_19960504_0091_58",
+      "prev_sent": "A 30,000-word DragonDictate system sells for about the same price as Kurzweil 's system , and a 10,000-word Dragon system goes for a bargain rate of $ 395 .",
+      "next_id": "nyt_eng_19960504_0091_60",
+      "next_sent": "In a year or so , similar programs will probably be bundled with high-end computer systems , just as word processors are now ."
+    },
+    "hit_id": "nyt_eng_19960504_0091_59:1-6-7",
+    "text": "None of this software is exactly cheap , but the price is bound to fall over time .",
+    "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
+    "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
+    "lemmas": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "forms": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "index": {
+      "NEG": 0,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "none",
+          "ix": 0,
+          "xpos": "NN",
+          "deprel": "nsubj",
+          "head": "cheap"
+        },
+        "relation": "nsubj"
+      },
+      "mod": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "cheap"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960504_0071_16",
+    "context": {
+      "prev_id": "nyt_eng_19960504_0071_15",
+      "prev_sent": "-LBQ-  There has been an increasing tendency for companies to get write-ups like this during registration , and that may soon precipitate attention from the regulatory agencies .  -RDQ-",
+      "next_id": "nyt_eng_19960504_0071_17",
+      "next_sent": "She may have done more harm than good by exposing her opinions and practices to criticism ."
+    },
+    "hit_id": "nyt_eng_19960504_0071_16:33-34-35",
+    "text": "Even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering .",
+    "token_str": "even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering .",
+    "lemma_str": "even if Ms. Karan stay on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interview that go into the magazine article be not exactly standard for a corporate road show lead up to a offering .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "standard"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "standard"
+    },
+    "index": {
+      "NEG": 32,
+      "ADV": 33,
+      "ADJ": 34
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "standard",
+          "ix": 34,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 32,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "standard"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "standard",
+          "ix": 34,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 33,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "standard"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960503_0775_59",
+    "context": {
+      "prev_id": "nyt_eng_19960503_0775_58",
+      "prev_sent": "A 30,000-word DragonDictate system sells for about the same price as Kurzweil 's system , and a 10,000-word Dragon system goes for a bargain rate of $ 395 .",
+      "next_id": "nyt_eng_19960503_0775_60",
+      "next_sent": "In a year or so , similar programs will probably be bundled with high-end computer systems , just as word processors are now ."
+    },
+    "hit_id": "nyt_eng_19960503_0775_59:1-6-7",
+    "text": "None of this software is exactly cheap , but the price is bound to fall over time .",
+    "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
+    "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
+    "lemmas": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "forms": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "index": {
+      "NEG": 0,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "none",
+          "ix": 0,
+          "xpos": "NN",
+          "deprel": "nsubj",
+          "head": "cheap"
+        },
+        "relation": "nsubj"
+      },
+      "mod": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "cheap"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960503_0735_16",
+    "context": {
+      "prev_id": "nyt_eng_19960503_0735_15",
+      "prev_sent": "-LBQ-  There has been an increasing tendency for companies to get write-ups like this during registration , and that may soon precipitate attention from the regulatory agencies .  -RDQ-",
+      "next_id": "nyt_eng_19960503_0735_17",
+      "next_sent": "She may have done more harm than good by exposing her opinions and practices to criticism ."
+    },
+    "hit_id": "nyt_eng_19960503_0735_16:33-34-35",
+    "text": "Even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering .",
+    "token_str": "even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering .",
+    "lemma_str": "even if Ms. Karan stay on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interview that go into the magazine article be not exactly standard for a corporate road show lead up to a offering .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "standard"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "standard"
+    },
+    "index": {
+      "NEG": 32,
+      "ADV": 33,
+      "ADJ": 34
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "standard",
+          "ix": 34,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 32,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "standard"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "standard",
+          "ix": 34,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 33,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "standard"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960502_0398_59",
+    "context": {
+      "prev_id": "nyt_eng_19960502_0398_58",
+      "prev_sent": "A 30,000-word DragonDictate system sells for about the same price as Kurzweil 's system , and a 10,000-word Dragon system goes for a bargain rate of $ 395 .",
+      "next_id": "nyt_eng_19960502_0398_60",
+      "next_sent": "In a year or so , similar programs will probably be bundled with high-end computer systems , just as word processors are now ."
+    },
+    "hit_id": "nyt_eng_19960502_0398_59:1-6-7",
+    "text": "None of this software is exactly cheap , but the price is bound to fall over time .",
+    "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
+    "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
+    "lemmas": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "forms": {
+      "NEG": "none",
+      "ADV": "exactly",
+      "ADJ": "cheap"
+    },
+    "index": {
+      "NEG": 0,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "none",
+          "ix": 0,
+          "xpos": "NN",
+          "deprel": "nsubj",
+          "head": "cheap"
+        },
+        "relation": "nsubj"
+      },
+      "mod": {
+        "source": {
+          "lemma": "cheap",
+          "ix": 6,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "cheap"
+        },
+        "relation": "advmod"
+      }
+    }
+  }
+]

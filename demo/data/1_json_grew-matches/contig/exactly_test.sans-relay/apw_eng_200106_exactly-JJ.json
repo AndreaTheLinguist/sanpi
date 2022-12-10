@@ -1,0 +1,514 @@
+[
+  {
+    "sent_id": "apw_eng_20010628_1604_15",
+    "context": {
+      "prev_id": "apw_eng_20010628_1604_14",
+      "prev_sent": "Makeup will lead growth , followed by skincare , Fred H. Langhammer , president and chief executive , told investors in Thursday 's conference call .",
+      "next_id": "apw_eng_20010628_1604_16",
+      "next_sent": "During the conference call , Langhammer said that the company decided to close the 86 underperforming Tommy Hilfiger fragrance shops , after evaluating their productivity ."
+    },
+    "hit_id": "apw_eng_20010628_1604_15:4-5-6",
+    "text": "-LBQ-  Fragrance is not exactly buoyant at this juncture ,  -RDQ-  he noted , adding , however , that he does expect some growth next year .",
+    "token_str": "`` Fragrance is not exactly buoyant at this juncture , '' he noted , adding , however , that he does expect some growth next year .",
+    "lemma_str": "`` Fragrance be not exactly buoyant at this juncture , '' he note , add , however , that he does expect some growth next year .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "buoyant"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "buoyant"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "buoyant",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "note"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "buoyant"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "buoyant",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "note"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "buoyant"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010628_1030_15",
+    "context": {
+      "prev_id": "apw_eng_20010628_1030_14",
+      "prev_sent": "Makeup will lead growth , followed by skincare , Fred H. Langhammer , president and chief executive , told investors in Thursday 's conference call .",
+      "next_id": "apw_eng_20010628_1030_16",
+      "next_sent": "During the conference call , Langhammer said that the company decided to close the 86 underperforming Tommy Hilfiger fragrance shops , after evaluating their productivity ."
+    },
+    "hit_id": "apw_eng_20010628_1030_15:4-5-6",
+    "text": "-LBQ-  Fragrance is not exactly buoyant at this juncture ,  -RDQ-  he noted , adding , however , that he does expect some growth next year .",
+    "token_str": "`` Fragrance is not exactly buoyant at this juncture , '' he noted , adding , however , that he does expect some growth next year .",
+    "lemma_str": "`` Fragrance be not exactly buoyant at this juncture , '' he note , add , however , that he does expect some growth next year .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "buoyant"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "buoyant"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "buoyant",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "note"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "buoyant"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "buoyant",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "note"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "buoyant"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010616_0013_13",
+    "context": {
+      "prev_id": "apw_eng_20010616_0013_12",
+      "prev_sent": "-LBQ-  I think the overwhelming majority of employers understand when medical needs call for it , that some policies need to be relaxed ,  -RDQ-  said Alan Feldman , spokesman for MGM Mirage , the largest hotel-casino owner in Las Vegas .",
+      "next_id": "apw_eng_20010616_0013_14",
+      "next_sent": "They say they know women who have had to quit their jobs because casinos would n't budge on the high heel policy ."
+    },
+    "hit_id": "apw_eng_20010616_0013_13:7-8-9",
+    "text": "Arrowsmith and Cunningham say that 's not exactly true .",
+    "token_str": "Arrowsmith and Cunningham say that 's not exactly true .",
+    "lemma_str": "Arrowsmith and Cunningham say that be not exactly true .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "true"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "true"
+    },
+    "index": {
+      "NEG": 6,
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "true",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "true"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "true",
+          "ix": 8,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "say"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 7,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "true"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010614_0420_19",
+    "context": {
+      "prev_id": "apw_eng_20010614_0420_18",
+      "prev_sent": "-LBQ-  We want more information because we want to stop these deaths from happening .  -RDQ-",
+      "next_id": "apw_eng_20010614_0420_20",
+      "next_sent": "However , Uribe may not be taking his case to a higher court ."
+    },
+    "hit_id": "apw_eng_20010614_0420_19:3-4-5",
+    "text": "Julin was n't exactly sure when the appeals process would begin , but said it would probably start at the Fifth District Court of Appeals in a week or two .",
+    "token_str": "Julin was n't exactly sure when the appeals process would begin , but said it would probably start at the Fifth District Court of Appeals in a week or two .",
+    "lemma_str": "Julin be not exactly sure when the appeal process would begin , but say it would probably start at the Fifth District Court of Appeals in a week or two .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "sure"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010614_0326_17",
+    "context": {
+      "prev_id": "apw_eng_20010614_0326_16",
+      "prev_sent": "-LBQ-  We want more information because we want to stop these deaths from happening .  -RDQ-",
+      "next_id": "apw_eng_20010614_0326_18",
+      "next_sent": "However , Uribe may not be taking his case to a higher court ."
+    },
+    "hit_id": "apw_eng_20010614_0326_17:3-4-5",
+    "text": "Julin was n't exactly sure when the appeals process would begin , but said it would probably start at the Fifth District Court of Appeals in a week or two .",
+    "token_str": "Julin was n't exactly sure when the appeals process would begin , but said it would probably start at the Fifth District Court of Appeals in a week or two .",
+    "lemma_str": "Julin be not exactly sure when the appeal process would begin , but say it would probably start at the Fifth District Court of Appeals in a week or two .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "sure"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010609_0285_23",
+    "context": {
+      "prev_id": "apw_eng_20010609_0285_22",
+      "prev_sent": "When the water builds up , it acts as a lubricant , allowing the glacier to slide forward at a much faster-than-normal rate .",
+      "next_id": "apw_eng_20010609_0285_24",
+      "next_sent": "Adema and two field technicians camped beside the Tokositna for three days last month , skiing across its surface , measuring its movement and listening to the sounds of large blocks of ice falling away as the glacier moved forward ."
+    },
+    "hit_id": "apw_eng_20010609_0285_23:12-13-14",
+    "text": "While scientists think they know how glaciers surge , they 're not exactly sure why .",
+    "token_str": "while scientists think they know how glaciers surge , they 're not exactly sure why .",
+    "lemma_str": "while scientist think they know how glacier surge , they be not exactly sure why .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 11,
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 11,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "sure"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 12,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010608_1251_22",
+    "context": {
+      "prev_id": "apw_eng_20010608_1251_21",
+      "prev_sent": "When the water builds up , it acts as a lubricant , allowing the glacier to slide forward at a much faster-than-normal rate .",
+      "next_id": "apw_eng_20010608_1251_23",
+      "next_sent": "Adema and two field technicians camped beside the Tokositna for three days last month , skiing across its surface , measuring its movement and listening to the sounds of large blocks of ice falling away as the glacier moved forward ."
+    },
+    "hit_id": "apw_eng_20010608_1251_22:12-13-14",
+    "text": "While scientists think they know how glaciers surge , they 're not exactly sure why .",
+    "token_str": "while scientists think they know how glaciers surge , they 're not exactly sure why .",
+    "lemma_str": "while scientist think they know how glacier surge , they be not exactly sure why .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 11,
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 11,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "sure"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 12,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "apw_eng_20010602_0234_1",
+    "context": {
+      "prev_id": "apw_eng_20010602_0234_0",
+      "prev_sent": "",
+      "next_id": "apw_eng_20010602_0234_2",
+      "next_sent": "-LBQ-  I knew someone he worked with , someone who 's all connected ,  -RDQ-  Sobieski told YM magazine 's Love issue , on newsstands through October ."
+    },
+    "hit_id": "apw_eng_20010602_0234_1:12-13-14",
+    "text": "The beginning of Leelee Sobieski and Paul Walker 's friendship was n't exactly smooth .",
+    "token_str": "the beginning of Leelee Sobieski and Paul Walker 's friendship was n't exactly smooth .",
+    "lemma_str": "the beginning of Leelee Sobieski and Paul Walker 's friendship be not exactly smooth .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "smooth"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "smooth"
+    },
+    "index": {
+      "NEG": 11,
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "smooth",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 11,
+          "xpos": "RB",
+          "deprel": "neg",
+          "head": "smooth"
+        },
+        "relation": "neg"
+      },
+      "mod": {
+        "source": {
+          "lemma": "smooth",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 12,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "smooth"
+        },
+        "relation": "advmod"
+      }
+    }
+  }
+]

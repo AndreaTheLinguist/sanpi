@@ -1,0 +1,13 @@
+[
+  {
+    "sent_id": "pcc_eng_27_070.9565_x1131118_16",
+    "matching": {
+      "nodes": { "NR": "8", "NEG": "7", "ADV": "14", "ADJ": "15" },
+      "edges": {
+        "negraise": { "source": "8", "label": "ccomp", "target": "15" },
+        "neg": { "source": "8", "label": "advmod", "target": "7" },
+        "mod": { "source": "15", "label": "advmod", "target": "14" }
+      }
+    }
+  }
+]

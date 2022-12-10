@@ -61,8 +61,9 @@
 				"name": "run_pipeline PccX2 contig",
 				"type": "python",
 				"request": "launch",
-				"program": "/share/compling/projects/sanpi/run_pipeline.py",
+				"program": "run_pipeline.py",
 				"console": "integratedTerminal",
+				"cwd": "/home/arh234/projects/sanpi/demo",
 				"justMyCode": true,
 				"args": [
 					"-c",
@@ -70,7 +71,71 @@
 					"-p",
 					"Pat/contig",
 					"--grew_output_dir",
-					"data/1_json_grew-matches",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "pipeline exactly_test contig",
+				"type": "python",
+				"request": "launch",
+				"program": "run_pipeline.py",
+				"console": "integratedTerminal",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"justMyCode": true,
+				"args": [
+					"-c",
+					"data/corpora/subsets/exactly_test",
+					"-p",
+					"Pat/contig",
+					"--grew_output_dir",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "pipeline exactly_test negraise",
+				"type": "python",
+				"request": "launch",
+				"program": "run_pipeline.py",
+				"console": "integratedTerminal",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"justMyCode": true,
+				"args": [
+					"-c",
+					"data/corpora/subsets/exactly_test",
+					"-p",
+					"Pat/raised",
+					"--grew_output_dir",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "pipeline exactly_test scoped",
+				"type": "python",
+				"request": "launch",
+				"program": "run_pipeline.py",
+				"console": "integratedTerminal",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"justMyCode": true,
+				"args": [
+					"-c",
+					"data/corpora/subsets/exactly_test",
+					"-p",
+					"Pat/scoped",
+					"--grew_output_dir",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "process exactly_test contig",
+				"type": "python",
+				"request": "launch",
+				"program": "source/analyze/processTables.py",
+				"console": "integratedTerminal",
+				"cwd": "/share/compling/projects/sanpi/demo",
+				"justMyCode": true,
+				"args": [
+					"-d",
+					"data",
 				]
 			},
 		],

@@ -1,0 +1,86 @@
+[
+  {
+    "sent_id": "pcc_eng_27_070.9565_x1131118_16",
+    "context": {
+      "prev_id": "pcc_eng_27_070.9565_x1131118_15",
+      "prev_sent": "The data we want will not be available for several years, especially since period immediately following the financial crisis will be very atypical*, and therefore not useful in assessing the longer term trend.",
+      "next_id": "pcc_eng_27_070.9565_x1131118_17",
+      "next_sent": "It has been suprisingly focused on low-skill, male workers."
+    },
+    "hit_id": "pcc_eng_27_070.9565_x1131118_16:7-14-15",
+    "text": "Let me add that I don't think pre-recession wage stagnation has been exactly widespread.",
+    "token_str": "Let me add that I do n't think pre-recession wage stagnation has been exactly widespread .",
+    "lemma_str": "let I add that I do not think pre-recession wage stagnation have be exactly widespread .",
+    "lemmas": {
+      "NR": "think",
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "widespread"
+    },
+    "forms": {
+      "NR": "think",
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "widespread"
+    },
+    "index": {
+      "NR": 7,
+      "NEG": 6,
+      "ADV": 13,
+      "ADJ": 14
+    },
+    "deps": {
+      "negraise": {
+        "source": {
+          "lemma": "think",
+          "ix": 7,
+          "xpos": "VB",
+          "deprel": "ccomp",
+          "head": "add"
+        },
+        "target": {
+          "lemma": "widespread",
+          "ix": 14,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "think"
+        },
+        "relation": "ccomp"
+      },
+      "neg": {
+        "source": {
+          "lemma": "think",
+          "ix": 7,
+          "xpos": "VB",
+          "deprel": "ccomp",
+          "head": "add"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "think"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "widespread",
+          "ix": 14,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "think"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 13,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "widespread"
+        },
+        "relation": "advmod"
+      }
+    }
+  }
+]

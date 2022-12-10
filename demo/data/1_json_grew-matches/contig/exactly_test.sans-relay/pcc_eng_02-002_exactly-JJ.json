@@ -1,0 +1,642 @@
+[
+  {
+    "sent_id": "pcc_eng_02_002.9137_x0030933_37",
+    "context": {
+      "prev_id": "pcc_eng_02_002.9137_x0030933_36",
+      "prev_sent": "",
+      "next_id": "pcc_eng_02_002.9137_x0030933_38",
+      "next_sent": "Due to his not exactly carefree childhood, he took his life into his own hands quite early and began to dream of true happiness."
+    },
+    "hit_id": "pcc_eng_02_002.9137_x0030933_37:20-22-23",
+    "text": "Although Stephan Bosshard was born (on August 6, 1960) and raised in Switzerland, it wouldn't be quite appropriate to call him the typical Swiss.",
+    "token_str": "Although Stephan Bosshard was born ( on August 6 , 1960 ) and raised in Switzerland , it would n't be quite appropriate to call him the typical Swiss .",
+    "lemma_str": "although Stephan Bosshard be bear ( on August 6 , 1960 ) and raise in Switzerland , it would not be quite appropriate to call he the typical Swiss .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "quite",
+      "ADJ": "appropriate"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "quite",
+      "ADJ": "appropriate"
+    },
+    "index": {
+      "NEG": 19,
+      "ADV": 21,
+      "ADJ": 22
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "appropriate",
+          "ix": 22,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 19,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "appropriate"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "appropriate",
+          "ix": 22,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "quite",
+          "ix": 21,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "appropriate"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.7501_x0028305_09",
+    "context": {
+      "prev_id": "pcc_eng_02_002.7501_x0028305_08",
+      "prev_sent": "Then came last month's blockbuster trade that sent replacement ace Kyle Hendricks and leading hitter Christian Villaneuva from the Texas Rangers to the Chicago Cubs in exchange for pitcher Ryan Dempster.",
+      "next_id": "pcc_eng_02_002.7501_x0028305_10",
+      "next_sent": "Rather than complain about a lack of food, the Pelicans are cooking with what they have available."
+    },
+    "hit_id": "pcc_eng_02_002.7501_x0028305_09:4-5-6",
+    "text": "The cupboard's not exactly bare, but take a team's top two pitchers and top two hitters out of the lineup and see what happens.",
+    "token_str": "The cupboard 's not exactly bare , but take a team 's top two pitchers and top two hitters out of the lineup and see what happens .",
+    "lemma_str": "the cupboard be not exactly bare , but take a team 's top two pitcher and top two hitter out of the lineup and see what happen .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "bare"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "bare"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "bare",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "bare"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "bare",
+          "ix": 5,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "bare"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.5336_x0024817_16",
+    "context": {
+      "prev_id": "pcc_eng_02_002.5336_x0024817_15",
+      "prev_sent": "Right now things aren't looking terrible, there are quite a number of factors that could have lead to the way my kidneys are reading the way they are, one being that antibiotic I was taking for my skin condition for such a long time, my once higher weight and high blood pressure going undiagnosed and so severely high.",
+      "next_id": "pcc_eng_02_002.5336_x0024817_17",
+      "next_sent": "We are going do some lab work, an ultrasound of my kidneys, and some other things in the coming weeks/months."
+    },
+    "hit_id": "pcc_eng_02_002.5336_x0024817_16:3-4-5",
+    "text": "Still isn't exactly alarming, also my urine test proved fine as well.",
+    "token_str": "Still is n't exactly alarming , also my urine test proved fine as well .",
+    "lemma_str": "still be not exactly alarming , also my urine test prove fine as well .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "alarming"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "alarming"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "alarming",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "alarming"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "alarming",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "alarming"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.4430_x0023370_37",
+    "context": {
+      "prev_id": "pcc_eng_02_002.4430_x0023370_36",
+      "prev_sent": "\"You talk of your nuclear capabilities, but ours are so massive and powerful that I pray to God they will never have to be used.\"",
+      "next_id": "pcc_eng_02_002.4430_x0023370_38",
+      "next_sent": "--BUT MAYBE THERE'S A FUTURE FOR US AFTER ALL."
+    },
+    "hit_id": "pcc_eng_02_002.4430_x0023370_37:8-9-10",
+    "text": "Worth noting here: Western religion is not exactly welcome in North Korea, a secular state where Christians have long been persecuted.",
+    "token_str": "Worth noting here : Western religion is not exactly welcome in North Korea , a secular state where Christians have long been persecuted .",
+    "lemma_str": "worth note here : western religion be not exactly welcome in North Korea , a secular state where Christian have long be persecute .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "welcome"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "welcome"
+    },
+    "index": {
+      "NEG": 7,
+      "ADV": 8,
+      "ADJ": 9
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "welcome",
+          "ix": 9,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "worth"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 7,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "welcome"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "welcome",
+          "ix": 9,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "worth"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 8,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "welcome"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.3765_x0022291_05",
+    "context": {
+      "prev_id": "pcc_eng_02_002.3765_x0022291_04",
+      "prev_sent": "Comment",
+      "next_id": "pcc_eng_02_002.3765_x0022291_06",
+      "next_sent": "As you've told us they spread by passing on their curse to others."
+    },
+    "hit_id": "pcc_eng_02_002.3765_x0022291_05:12-13-14",
+    "text": "\"Excuse me, Chapter Master, I know this isn't exactly necessary to know to carry out our mission, but I can't help but wonder how these wretched things first came to be?",
+    "token_str": "\" Excuse me , Chapter Master , I know this is n't exactly necessary to know to carry out our mission , but I ca n't help but wonder how these wretched things first came to be ?",
+    "lemma_str": "\" excuse I , Chapter master , I know this be not exactly necessary to know to carry out we mission , but I can not help but wonder how this wretched thing first come to be ?",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "necessary"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "necessary"
+    },
+    "index": {
+      "NEG": 11,
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "necessary",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "know"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 11,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "necessary"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "necessary",
+          "ix": 13,
+          "xpos": "JJ",
+          "deprel": "ccomp",
+          "head": "know"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 12,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "necessary"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.3652_x0022086_04",
+    "context": {
+      "prev_id": "pcc_eng_02_002.3652_x0022086_03",
+      "prev_sent": "\"We've experienced playing without him before.",
+      "next_id": "pcc_eng_02_002.3652_x0022086_05",
+      "next_sent": "I just know that any time you lose a player like that or you can't use a player like that, you need to put your time into a few different things, and other people have to play different roles,\" Mc Daniels said on Tuesday, via the Boston Globe."
+    },
+    "hit_id": "pcc_eng_02_002.3652_x0022086_04:13-14-15",
+    "text": "I don't know if we're better equipped, I'm not exactly sure how to rate that.",
+    "token_str": "I do n't know if we 're better equipped , I 'm not exactly sure how to rate that .",
+    "lemma_str": "I do not know if we be well equip , I be not exactly sure how to rate that .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 12,
+      "ADV": 13,
+      "ADJ": 14
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 14,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "know"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 12,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 14,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "know"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 13,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.3360_x0021609_007",
+    "context": {
+      "prev_id": "pcc_eng_02_002.3360_x0021609_006",
+      "prev_sent": "Sleds up to that point were primarily short trackers modified for those who needed something to handle the deep snow and mountainous terrain.",
+      "next_id": "pcc_eng_02_002.3360_x0021609_008",
+      "next_sent": "The question today is, where can't we ride and get to?"
+    },
+    "hit_id": "pcc_eng_02_002.3360_x0021609_007:25-26-27",
+    "text": "Sure, that first Summit, unleashed on the western market for the 1994 season, was nose heavy and kind of bulky and not exactly easy on the eyes (at least compared to today's machines), but look at what we have now, a dozen years later.",
+    "token_str": "Sure , that first Summit , unleashed on the western market for the 1994 season , was nose heavy and kind of bulky and not exactly easy on the eyes ( at least compared to today 's machines ) , but look at what we have now , a dozen years later .",
+    "lemma_str": "sure , that first Summit , unleash on the western market for the 1994 season , be nose heavy and kind of bulky and not exactly easy on the eye ( at least compare to today 's machine ) , but look at what we have now , a dozen year late .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "easy"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "easy"
+    },
+    "index": {
+      "NEG": 24,
+      "ADV": 25,
+      "ADJ": 26
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "easy",
+          "ix": 26,
+          "xpos": "JJ",
+          "deprel": "conj",
+          "head": "heavy"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 24,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "easy"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "easy",
+          "ix": 26,
+          "xpos": "JJ",
+          "deprel": "conj",
+          "head": "heavy"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 25,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "easy"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.2391_x0020034_09",
+    "context": {
+      "prev_id": "pcc_eng_02_002.2391_x0020034_08",
+      "prev_sent": "Please keep funding Mr Hopkins' dreams!",
+      "next_id": "pcc_eng_02_002.2391_x0020034_10",
+      "next_sent": "This film is full of cliche."
+    },
+    "hit_id": "pcc_eng_02_002.2391_x0020034_09:25-26-27",
+    "text": "This film takes all the usual 80s tropes that are doing the rounds of late (yes, that Stranger Things reference above wasn't exactly subtle was it?) but somehow gets away with it.",
+    "token_str": "This film takes all the usual 80s tropes that are doing the rounds of late ( yes , that Stranger Things reference above was n't exactly subtle was it ? ) but somehow gets away with it .",
+    "lemma_str": "this film take all the usual 80s trope that be do the round of late ( yes , that Strange Thing reference above be not exactly subtle be it ? ) but somehow get away with it .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "subtle"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "subtle"
+    },
+    "index": {
+      "NEG": 24,
+      "ADV": 25,
+      "ADJ": 26
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "subtle",
+          "ix": 26,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "it"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 24,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "subtle"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "subtle",
+          "ix": 26,
+          "xpos": "JJ",
+          "deprel": "parataxis",
+          "head": "it"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 25,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "subtle"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.0716_x0017333_018",
+    "context": {
+      "prev_id": "pcc_eng_02_002.0716_x0017333_017",
+      "prev_sent": "Wow... zero votes in 3 different districts.",
+      "next_id": "pcc_eng_02_002.0716_x0017333_019",
+      "next_sent": "I have never heard of such a thing."
+    },
+    "hit_id": "pcc_eng_02_002.0716_x0017333_018:3-4-5",
+    "text": "I am not exactly sure how that happens...",
+    "token_str": "I am not exactly sure how that happens ...",
+    "lemma_str": "I be not exactly sure how that happen ...",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "..."
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ",
+          "deprel": "root",
+          "head": "..."
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "sure"
+        },
+        "relation": "advmod"
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_02_002.0449_x0016906_3",
+    "context": {
+      "prev_id": "pcc_eng_02_002.0449_x0016906_2",
+      "prev_sent": "One helpful Ubuntu hacker blogger posts a guide to getting Google Chrome working as a stand-alone app in Ubuntu, using the latest version of the Windows translator WINE and a stand-alone copy of Chrome's installer.",
+      "next_id": "pcc_eng_02_002.0449_x0016906_4",
+      "next_sent": "If you're not about to mess with WINE, try putting an emulated Chrome in its own window with our guide to running Windows apps seamlessly in Linux, or wait until the open-source browser eventually makes its way onto the open-source OS."
+    },
+    "hit_id": "pcc_eng_02_002.0449_x0016906_3:16-17-18",
+    "text": "You'll definitely need your terminal open for this one, and the result isn't exactly flawless--no https support, problems with pop-ups, and a bit slower than you'd get in Windows--but it is a neat way for dedicated Linux users to check out what all the fuss is about.",
+    "token_str": "You 'll definitely need your terminal open for this one , and the result is n't exactly flawless -- no https support , problems with pop-ups , and a bit slower than you 'd get in Windows -- but it is a neat way for dedicated Linux users to check out what all the fuss is about .",
+    "lemma_str": "you will definitely need you terminal open for this one , and the result be not exactly flawless -- no https support , problem with pop-up , and a bit slow than you would get in window -- but it be a neat way for dedicate Linux user to check out what all the fuss be about .",
+    "lemmas": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "flawless"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "flawless"
+    },
+    "index": {
+      "NEG": 15,
+      "ADV": 16,
+      "ADJ": 17
+    },
+    "deps": {
+      "neg": {
+        "source": {
+          "lemma": "flawless",
+          "ix": 17,
+          "xpos": "JJ",
+          "deprel": "conj",
+          "head": "need"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 15,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "flawless"
+        },
+        "relation": "advmod"
+      },
+      "mod": {
+        "source": {
+          "lemma": "flawless",
+          "ix": 17,
+          "xpos": "JJ",
+          "deprel": "conj",
+          "head": "need"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 16,
+          "xpos": "RB",
+          "deprel": "advmod",
+          "head": "flawless"
+        },
+        "relation": "advmod"
+      }
+    }
+  }
+]

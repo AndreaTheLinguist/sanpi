@@ -124,8 +124,8 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
         relevant_hit_ids_iter = (
             hit_id for hit_id in hits_by_id.keys()
             if current_id in (hits_by_id[hit_id]['sent_id'],
-                              hits_by_id[hit_id]['prev_id'],
-                              hits_by_id[hit_id]['next_id']))
+                              hits_by_id[hit_id]['context']['prev_id'],
+                              hits_by_id[hit_id]['context']['next_id']))
 
         for hit_id in relevant_hit_ids_iter:
 
@@ -143,10 +143,10 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
                 hit_dict['deps'] = _get_deps(raw_match_info['edges'],
                                              tok_dicts, id_to_ix)
                 json_entry_count += 1
-            elif current_id == hit_dict['prev_id']:
+            elif current_id == hit_dict['context']['prev_id']:
                 hit_dict['context']['prev_sent'] = sent_text
 
-            elif current_id == hit_dict['next_id']:
+            elif current_id == hit_dict['context']['next_id']:
                 hit_dict['context']['next_sent'] = sent_text
             json_loops += 1
         conll_count += 1

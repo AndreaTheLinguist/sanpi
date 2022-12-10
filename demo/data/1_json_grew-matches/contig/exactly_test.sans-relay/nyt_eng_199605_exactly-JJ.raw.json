@@ -1,0 +1,212 @@
+[
+  {
+    "sent_id": "nyt_eng_19960526_0027_22",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960521_0276_26",
+    "matching": {
+      "nodes": { "NEG": "8", "ADV": "9", "ADJ": "10" },
+      "edges": {
+        "neg": { "source": "10", "label": "neg", "target": "8" },
+        "mod": { "source": "10", "label": "advmod", "target": "9" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960515_0521_23",
+    "matching": {
+      "nodes": { "NEG": "18", "ADV": "19", "ADJ": "20" },
+      "edges": {
+        "neg": { "source": "20", "label": "neg", "target": "18" },
+        "mod": { "source": "20", "label": "advmod", "target": "19" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960515_0268_28",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "5", "ADJ": "6" },
+      "edges": {
+        "neg": { "source": "6", "label": "neg", "target": "4" },
+        "mod": { "source": "6", "label": "advmod", "target": "5" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960515_0101_19",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "5", "ADJ": "6" },
+      "edges": {
+        "neg": { "source": "6", "label": "neg", "target": "4" },
+        "mod": { "source": "6", "label": "advmod", "target": "5" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960513_0064_4",
+    "matching": {
+      "nodes": { "NEG": "7", "ADV": "8", "ADJ": "9" },
+      "edges": {
+        "neg": { "source": "9", "label": "neg", "target": "7" },
+        "mod": { "source": "9", "label": "advmod", "target": "8" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960511_0508_4",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960508_0501_7",
+    "matching": {
+      "nodes": { "NEG": "30", "ADV": "31", "ADJ": "32" },
+      "edges": {
+        "neg": { "source": "32", "label": "neg", "target": "30" },
+        "mod": { "source": "32", "label": "advmod", "target": "31" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960508_0310_59",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "nsubj", "target": "1" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0773_18",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0773_17",
+    "matching": {
+      "nodes": { "NEG": "7", "ADV": "8", "ADJ": "9" },
+      "edges": {
+        "neg": { "source": "9", "label": "neg", "target": "7" },
+        "mod": { "source": "9", "label": "advmod", "target": "8" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0771_18",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0771_17",
+    "matching": {
+      "nodes": { "NEG": "7", "ADV": "8", "ADJ": "9" },
+      "edges": {
+        "neg": { "source": "9", "label": "neg", "target": "7" },
+        "mod": { "source": "9", "label": "advmod", "target": "8" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0122_14",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "neg", "target": "4" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960506_0067_14",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "neg", "target": "4" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960505_0102_14",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "neg", "target": "4" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960504_0091_59",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "nsubj", "target": "1" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960504_0071_16",
+    "matching": {
+      "nodes": { "NEG": "33", "ADV": "34", "ADJ": "35" },
+      "edges": {
+        "neg": { "source": "35", "label": "neg", "target": "33" },
+        "mod": { "source": "35", "label": "advmod", "target": "34" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960503_0775_59",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "nsubj", "target": "1" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960503_0735_16",
+    "matching": {
+      "nodes": { "NEG": "33", "ADV": "34", "ADJ": "35" },
+      "edges": {
+        "neg": { "source": "35", "label": "neg", "target": "33" },
+        "mod": { "source": "35", "label": "advmod", "target": "34" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_19960502_0398_59",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "nsubj", "target": "1" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  }
+]
