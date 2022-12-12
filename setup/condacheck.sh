@@ -21,26 +21,18 @@ for p in "${pypackages[@]}"; do
   pip show ${p} || conda install ${p}
   echo ""
 done
+shpackages=('opam' 'wget' 'm4' 'unzip' 'curl' 'bubblewrap')
+for p in "${shpackages[@]}"; do
+  echo "> ${p}"
+  which ${p} || conda install ${p}
+  echo ""
+done
 
 echo "# opam installs"
-if [[ ! `which grew` ]]
-then
+if [[ ! `which grew` ]]; then
   echo "installing grew..."
 
-  shpackages=('opam' 'wget' 'm4' 'unzip' 'curl' 'bubblewrap')
-  for p in "${shpackages[@]}"; do
-    echo "> ${p}"
-    which ${p} || conda install ${p}
-    echo ""
-  done
-
-
-  if [[ ! `which bubblewrap` ]]; then
-    conda install bubblewrap
-  fi
-
-  if [[ ! $(echo "`opam --version`") =~ 2.* ]]
-  then
+  if [[ ! $(echo "`opam --version`") =~ 2.* ]]; then
     echo "opam version obsolete"
     conda update opam=2.*
   fi
@@ -67,7 +59,7 @@ then
   opam install grew grewpy
   pip install grew
 
- if [[ $(echo "`grew version | cut -d " " -f 2 | head -1`") != "1.10.0" ]]; then
+ elif [[ $(echo "`grew version | cut -d " " -f 2 | head -1`") != "1.10.0" ]]; then
   echo "grew installation is out of date. Upgrading..."
   echo "updating prerequisites..."
   echo "apt-get update && apt-get upgrade"
