@@ -21,12 +21,18 @@ for p in "${pypackages[@]}"; do
   pip show ${p} || conda install ${p}
   echo ""
 done
-shpackages=('opam' 'wget' 'm4' 'unzip' 'curl' 'bubblewrap')
+
+shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
 for p in "${shpackages[@]}"; do
   echo "> ${p}"
   which ${p} || conda install ${p}
   echo ""
 done
+
+BUBBLE="$(conda list bubblewrap)"
+if [[ ${BUBBLE:(-7)} == "Channel" ]]; then
+  conda install bubblewrap
+fi
 
 echo "# opam installs"
 if [[ ! `which grew` ]]; then
@@ -40,16 +46,16 @@ if [[ ! `which grew` ]]; then
   echo "opam init"
   opam init
 
-  echo "opam switch create 4.14.1 4.14.1"
-  opam switch create 4.14.1 4.14.1
-  echo "eval $(opam env --switch=4.14.1)"
-  eval $(opam env --switch=4.14.1) 
+  echo "opam switch create 4.14.0 4.14.0"
+  opam switch create 4.14.0 4.14.0
+  echo "eval $(opam env --switch=4.14.0)"
+  eval $(opam env --switch=4.14.0) 
 
   # if [[ "`ocamlc -v | cut -d " " -f 5 | head -1`" -le 4.1 ]]; then
-  #   echo "opam switch create 4.13.1 4.13.1" 
-  #   opam switch create 4.13.1 4.13.1
-  #   echo "eval $(opam env --switch=4.13.1)"
-  #   eval $(opam env --switch=4.13.1) 
+  #   echo "opam switch create 4.14.0 4.14.0" 
+  #   opam switch create 4.14.0 4.14.0
+  #   echo "eval $(opam env --switch=4.14.0)"
+  #   eval $(opam env --switch=4.14.0) 
   # fi
 
   echo "opam remote add grew \"http://opam.grew.fr\""
@@ -74,10 +80,10 @@ if [[ ! `which grew` ]]; then
   echo "opam init"
   opam init
 
-  echo "opam switch create 4.14.1 4.14.1"
-  opam switch create 4.14.1 4.14.1
-  echo "eval $(opam env --switch=4.14.1)"
-  eval $(opam env --switch=4.14.1) 
+  echo "opam switch create 4.14.0 4.14.0"
+  opam switch create 4.14.0 4.14.0
+  echo "eval $(opam env --switch=4.14.0)"
+  eval $(opam env --switch=4.14.0) 
 
   echo "opam update"  
   opam update
