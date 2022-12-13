@@ -51,7 +51,7 @@ echo "   - partition: $SLURM_JOB_PARTITION"
 echo "   - node: $SLURM_JOB_NODELIST"
 echo "   - 1 of $SLURM_ARRAY_TASK_COUNT"
 
-SOURCE_DIR=/home/arh234/projects/sanpi
+SOURCE_DIR=/share/compling/projects/sanpi
 # // PAT_DIR=${SOURCE_DIR}/Pat/${PAT}
 
 SEED=$((SLURM_ARRAY_TASK_ID))
