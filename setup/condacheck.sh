@@ -10,13 +10,14 @@ LOG_PATH=${SETUP_DIR}/${ENV}_check.log
 echo -e "> log will be saved to: ${LOG_PATH}\n..."
 exec 1>${LOG_PATH} 2>&1
 echo "Checking ${ENV} env for requirements..."
+echo "Started at $(date)"
 
 # TODO : see if this is actually relevant for off-cluster
 #! must create `sanpi` env from yml file first
 # activate conda environment
 eval "$(conda shell.bash hook)"
-echo "conda activate ${ENV} || cat ${SETUP_DIR}/${ENV}_env.yml && conda env create -f ${SETUP_DIR}/${ENV}_env.yml -y "
-conda activate ${ENV} || cat ${SETUP_DIR}/${ENV}_env.yml && conda env create  -f ${SETUP_DIR}/${ENV}_env.yml -y
+echo "conda activate ${ENV} || cat ${SETUP_DIR}/${ENV}_env.yml && conda env create -f ${SETUP_DIR}/${ENV}_env.yml "
+conda activate ${ENV} || cat ${SETUP_DIR}/${ENV}_env.yml && conda env create -f ${SETUP_DIR}/${ENV}_env.yml
 conda info | head -3 | tail -2
 
 ACTIVE_PATH="$(conda info | head -3 | tail -1 | cut -d ':' -f 2 | tr -d '[:space:]')"
@@ -33,14 +34,14 @@ pypackages=('pyconll' 'pandas' 'scipy' 'more-itertools' 'bubblewrap')
 for p in "${pypackages[@]}"; do
   echo -e "\n> ${p}"
   #// pip3 show ${p} || conda install ${p}
-  echo "pip3 show ${p} || (ls ${ACTIVE_PATH}/*/*${p}* && conda list ${p}) || conda install ${p}"
-  pip3 show ${p} || (ls ${ACTIVE_PATH}/*/*${p}* && conda list ${p}) || conda install ${p}
+  echo "pip3 show ${p} || (ls ${ACTIVE_PATH}/*/*${p}* && conda list ${p}) || conda install -y ${p}"
+  pip3 show ${p} || (ls ${ACTIVE_PATH}/*/*${p}* && conda list ${p}) || conda install -y ${p}
 done
 
 shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
 for p in "${shpackages[@]}"; do
   echo -e "\n> ${p}"
-  which ${p} || conda install ${p}
+  which ${p} || conda install -y ${p}
 done
 
 #// # BUBBLE="$(conda list bubblewrap)"
@@ -57,7 +58,7 @@ if [[ ! `which grew` ]]; then
 
   if [[ ! $(echo "`opam --version`") =~ 2.* ]]; then
     echo "opam version obsolete"
-    conda update opam=2.*
+    conda update -y opam=2.*
   fi
 
   echo "opam -y init"
@@ -89,7 +90,7 @@ elif [[ $(echo "`grew version | cut -d ' ' -f 2 | head -1`") != "1.10.0" ]]; the
 
   if [[ ! $(echo "`opam --version`") =~ 2.* ]]; then
     echo "opam installation is out of date. updating..."
-    conda update opam=2.*
+    conda update -y opam=2.*
   fi
 
   echo -e "\nopam -y init"
