@@ -27,7 +27,7 @@
         },
         // * Pipeline
         {
-            "name": "pipeline puddin val contig",
+            "name": "pipeline puddin val contig rerun",
             "type": "python",
             "request": "launch",
             "program": "run_pipeline.py",
@@ -38,7 +38,26 @@
                 "-c",
                 "/home/arh234/data/puddin/PccVa.conll/",
                 "-p",
-                "Pat/scoped"
+                "Pat/contig", 
+                "--rerun_grew_search"
+            ]
+        },
+        {
+            "name": "pipeline exactly-test contig",
+            "type": "python",
+            "request": "attach",
+            "program": "run_pipeline.py",
+            "console": "integratedTerminal",
+            // "cwd": "${workspaceFolder}",
+            "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+            //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
+            "args": [
+                "-c",
+                "/share/compling/data/sanpi/subsets/exactly_test",
+                "-p",
+                "Pat/contig", 
+                "--grew_output_dir", 
+                "/share/compling/data/sanpi/1_json_grew-matches"
             ]
         },
         {
@@ -57,7 +76,7 @@
                 "-p",
                 "Pat/raised"
             ], 
-            "justMyCode": false
+
         },
         {
             "name": "pipeline puddin val env-check",
