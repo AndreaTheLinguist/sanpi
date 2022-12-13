@@ -16,11 +16,11 @@ echo "Started at $(date)"
 #! must create `sanpi` env from yml file first
 # activate conda environment
 eval "$(conda shell.bash hook)"
-echo "conda activate ${ENV} || cat ${SETUP_DIR}/${ENV}_env.yml && conda env create -f ${SETUP_DIR}/${ENV}_env.yml "
-conda activate ${ENV} || cat ${SETUP_DIR}/${ENV}_env.yml && conda env create -f ${SETUP_DIR}/${ENV}_env.yml
+echo "conda activate ${ENV}" 
+conda activate ${ENV} || echo -e "${ENV} env does not exist! Create by running\n $ conda env create -f ${SETUP_DIR}/${ENV}_env.yml "
 conda info | head -3 | tail -2
 
-ACTIVE_PATH="$(conda info | head -3 | tail -1 | cut -d ':' -f 2 | tr -d '[:space:]')"
+ACTIVE_PATH=$(conda info | head -3 | tail -1 | cut -d ":" -f 2 | tr -d "[:space:]")
 
 echo -e "\nChecking channel list..."
 (conda info | egrep conda-forge) || conda config --append channels conda-forge
@@ -111,4 +111,4 @@ fi
 
 echo "$(echo "`grew version | tail -1`"), located in $(echo "`which grew`")"
 
-Finished at $(date)
+echo "Finished at $(date)"
