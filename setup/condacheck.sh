@@ -22,25 +22,23 @@ for p in "${pypackages[@]}"; do
   echo ""
 done
 
+shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
+for p in "${shpackages[@]}"; do
+  echo "> ${p}"
+  which ${p} || conda install ${p}
+  echo ""
+done
+
+BUBBLE="$(conda list bubblewrap)"
+if [[ ${BUBBLE:(-7)} == "Channel" ]]; then
+  conda install bubblewrap
+fi
+
 echo "# opam installs"
-if [[ -z $( echo "`which grew`" ) ]]
-then
+if [[ ! `which grew` ]]; then
   echo "installing grew..."
 
-  shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
-  for p in "${shpackages[@]}"; do
-    echo "> ${p}"
-    which ${p} || conda install ${p}
-    echo ""
-  done
-
-  BUBBLE="$(conda list bubblewrap)"
-  if [[ ${BUBBLE:(-7)} == "Channel" ]]; then
-  conda install bubblewrap
-  fi
-
-  if [[ ! $(echo "`opam --version`") =~ 2.* ]]
-  then
+  if [[ ! $(echo "`opam --version`") =~ 2.* ]]; then
     echo "opam version obsolete"
     conda update opam=2.*
   fi
@@ -48,16 +46,16 @@ then
   echo "opam init"
   opam init
 
-  echo "opam switch create 4.13.1 4.13.1"
-  opam switch create 4.13.1 4.13.1
-  echo "eval $(opam env --switch=4.13.1)"
-  eval $(opam env --switch=4.13.1) 
+  echo "opam switch create 4.14.0 4.14.0"
+  opam switch create 4.14.0 4.14.0
+  echo "eval $(opam env --switch=4.14.0)"
+  eval $(opam env --switch=4.14.0) 
 
   # if [[ "`ocamlc -v | cut -d " " -f 5 | head -1`" -le 4.1 ]]; then
-  #   echo "opam switch create 4.13.1 4.13.1" 
-  #   opam switch create 4.13.1 4.13.1
-  #   echo "eval $(opam env --switch=4.13.1)"
-  #   eval $(opam env --switch=4.13.1) 
+  #   echo "opam switch create 4.14.0 4.14.0" 
+  #   opam switch create 4.14.0 4.14.0
+  #   echo "eval $(opam env --switch=4.14.0)"
+  #   eval $(opam env --switch=4.14.0) 
   # fi
 
   echo "opam remote add grew \"http://opam.grew.fr\""
@@ -67,15 +65,25 @@ then
   opam install grew grewpy
   pip install grew
 
-elif [[ $(echo "`grew version | cut -d " " -f 2 | head -1`") < 1.7 ]]
-then
-  echo "grew version is out of date. Upgrading..."
-  
+ elif [[ $(echo "`grew version | cut -d " " -f 2 | head -1`") != "1.10.0" ]]; then
+  echo "grew installation is out of date. Upgrading..."
+  echo "updating prerequisites..."
+  echo "apt-get update && apt-get upgrade"
+  (apt-get update && apt-get upgrade ) || echo "Insufficient permissions to update prerequisites. In case of error, contact admin."
+
   if [[ ! $(echo "`opam --version`") =~ 2.* ]]
   then
-    echo "opam version obsolete. Updating."
+    echo "opam installation is out of date. Updating."
     conda update opam=2.*
   fi
+
+  echo "opam init"
+  opam init
+
+  echo "opam switch create 4.14.0 4.14.0"
+  opam switch create 4.14.0 4.14.0
+  echo "eval $(opam env --switch=4.14.0)"
+  eval $(opam env --switch=4.14.0) 
 
   echo "opam update"  
   opam update
@@ -87,6 +95,6 @@ then
 fi
 
 echo "making sure python module is installed"
-pip install grew
+pip3 install grew
 
 echo "$(echo "`grew version | tail -1`"), located in $(echo "`which grew`")"

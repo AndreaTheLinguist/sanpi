@@ -10,9 +10,6 @@ _LOGGER.setLevel(30)  # warning
 # _LOGGER.setLevel(20)  # info
 # _LOGGER.setLevel(10) # debug
 
-# not sure this makes sense, but it's been done
-# // TODO : make default to not overwrite existing (non-empty) raw.json files; otherwise need to have new pat directories for any added patterns (to avoid needing to redo all the searches already run)
-
 def grew_search(corpus_dir: Path,
                 pat_file: Path,
                 match_dir: Path,
@@ -30,7 +27,7 @@ def grew_search(corpus_dir: Path,
           f'{Path(*corpus_dir.parts[-3:])}/ with {cpus} CPUs...')
     _start = time.perf_counter()
 
-    with multiprocessing.Pool(processes=cpus) as pool:
+    with multiprocessing.Pool(processes=min(15, cpus)) as pool:
 
         # NOTE: if `starmap` method used instead, call `_seek_pat_in_file` directly (and no need to print)
         results = pool.imap_unordered(
