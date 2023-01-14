@@ -16,6 +16,7 @@ set -o errexit
 echo ">>=======================================<<"
 echo "JOB ID: ${SLURM_ARRAY_JOB_ID}"
 echo "started @ $(date) from $(pwd)"
+echo "slurm script: /share/compling/projects/sanpi/exactly-array.slurm.sh"
 echo ""
 # activate conda environment
 eval "$(conda shell.bash hook)"
@@ -56,16 +57,16 @@ SEED=$((SLURM_ARRAY_TASK_ID))
 echo "Array Index = ${SEED}"
 
 if [ $SEED == 0 ]; then
-    echo "  Task ID ${SEED} assigned to exactly_puddin"
+    echo "  Task ID ${SEED} assigned to 'exactly_puddin'"
     SEED="exactly_puddin"
 elif [ $SEED == 1 ]; then
-    echo "  Task ID ${SEED} assigned to 'exactly_nyt' dataset"
+    echo "  Task ID ${SEED} assigned to 'exactly_nyt'"
     SEED="exactly_nyt"
 elif [ $SEED == 2 ]; then
-    echo "  Task ID ${SEED} assigned to 'exactly_apw' dataset"
+    echo "  Task ID ${SEED} assigned to 'exactly_apw'"
     SEED="exactly_apw"
 else 
-    echo "  Task ID ${SEED} assigned to 'exactly_test' dataset"
+    echo "  Task ID ${SEED} assigned to 'exactly_test'"
     SEED="exactly_test"
 fi
 
@@ -80,7 +81,7 @@ if [[ -d $SEED_CORPUS && -d ${PAT_DIR} ]]; then
     LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}-${SEED}_${DATE}.log
     echo "Combined log will be appended to ${LOG_FILE}"
 
-    echo "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}"
+    echo -e "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}\n-g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1"
     time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR} -g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1
 
 else
