@@ -27,10 +27,10 @@ def _parse_args():
     return parser.parse_args()
 
 
-def tabulate_hits(match_dir:Path):
+def tabulate_hits(match_dir: Path):
     start_time = time.perf_counter()
     time.strftime("%Y-%m-%d_%I:%M%p")
-    log_dir = Path(*match_dir.parents._parts[:-3],'logs', match_dir.name)
+    log_dir = Path(*match_dir.parents._parts[:-3], 'logs', match_dir.name)
     if not log_dir.is_dir():
         log_dir.mkdir(parents=True)
     log_file = log_dir.joinpath(f'tabulate_{time.strftime("%Y-%m-%d_%R")}.log')
@@ -56,16 +56,18 @@ def tabulate_hits(match_dir:Path):
     hit_count = len(hit_data)
     if hit_count > 0:
         logging.info(
-            '\n^_^ Finished tabulating data for %i matching hit(s) from all json files in %s/\n-> Writing tables to csv files...',
-                     hit_count,
-                     str(match_dir))
+            ('\n^_^ Finished tabulating data for %i matching hit(s) '
+             'from all json files in %s/\n-> Writing tables to csv files...'),
+            hit_count,
+            str(match_dir))
         print(f'\n^_^ Finished tabulating data for {hit_count}'
               f' matching hit(s) from all json files in {match_dir}/\n'
               '-> Writing tables to csv files...')
 
         _create_output(hit_data, match_dir, start_time)
     else:
-        logging.warning('No valid hits found. No hits table created. => Make sure this is because no matches were found!')
+        logging.warning('No valid hits found. No hits table created. '
+                        '=> Make sure this is because no matches were found!')
         print('No valid hits found. No hits table created.')
         sys.exit()
 
@@ -101,7 +103,7 @@ def _get_hit_data(json_dir):
                 print('--> File is empty. Skipping.')
                 continue
 
-            # > i.e. default/raw 'matching' entry replace in matchin info processing
+            # > i.e. default/raw 'matching' entry replace in `fill_match_info`
             # >      so if it's in the dictionaries here, something went wrong
             if 'matching' in json_dicts[0].keys():
                 raw_path = json_file.with_suffix('.raw.json')
@@ -141,7 +143,9 @@ def _get_hit_data(json_dir):
         # > `hit_id` ->  NEG-ADV-ADJ
         # > `colloc_id` ->  ADV-ADJ (only)
         df = df.assign(hit_id=df.sent_id+':'+df.match_ix,
-                        colloc_id=df.sent_id+':'+df.adv_index.astype('string')+'-' + df.adj_index.astype('string'),
+                       colloc_id=df.sent_id+':' +
+                       df.adv_index.astype('string')+'-' +
+                       df.adj_index.astype('string'),
                        colloc=collocs)
 
         df_from_json = pd.concat([df, df_from_json])
@@ -167,8 +171,7 @@ def _remove_redundant(df: pd.DataFrame()):
         print('-> Warning: unfilled nonduplicate rows remaining in dataframe.')
 
     # then also remove any full duplicates
-    #! `neg_index` required because `hit_id` is: SENT-ADV-ADJ
-    keep_df = fdf.loc[~fdf.duplicated(['hit_id', 'neg_index', 'token_str']), :]
+    keep_df = fdf.loc[~fdf.duplicated(['hit_id', 'token_str']), :]
     return keep_df
 
 
@@ -227,26 +230,26 @@ def _process_ix(df):
     return df
 
 
-#// def _generate_window(df):
-    #// 
-    #// for row in df.index:
-    #//     # hit_start_ix = df.at[row, 'hit_start_ix']
-    #//     # hit_final_ix = df.at[row, 'hit_final_ix']
-    #//     go_back_2 = df.hit_start_ix[row] - 2
-    #//     go_forward_2 = df.hit_final_ix[row] + 2
-    #//
-    #//     w0 = max(0, go_back_2)
-    #//     w1 = min(df.utt_len[row],
-    #//              go_forward_2) + 1
-    #//
-    #//     yield ' '.join(df.token_str[row].split()[w0:w1])
+# // def _generate_window(df):
+    # //
+    # // for row in df.index:
+    # //     # hit_start_ix = df.at[row, 'hit_start_ix']
+    # //     # hit_final_ix = df.at[row, 'hit_final_ix']
+    # //     go_back_2 = df.hit_start_ix[row] - 2
+    # //     go_forward_2 = df.hit_final_ix[row] + 2
+    # //
+    # //     w0 = max(0, go_back_2)
+    # //     w1 = min(df.utt_len[row],
+    # //              go_forward_2) + 1
+    # //
+    # //     yield ' '.join(df.token_str[row].split()[w0:w1])
 
 
 def _create_output(hits_df, match_dir, start_time):
     logging.info('creating outputs...')
     # home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay
     pat_category = match_dir.parent.name
-    output_dir = Path(*(match_dir.parts[:-3] + ('2_csv_hits', pat_category)))
+    output_dir = Path(*(match_dir.parts[:-3] + ('2_hit_tables', pat_category)))
 
     if not output_dir.exists():
         output_dir.mkdir(parents=True)
@@ -266,7 +269,13 @@ def _create_output(hits_df, match_dir, start_time):
     # if col not in hit_cols:
     #     hits_df[col] = '?'
     # mem_init = hits_df.memory_usage(deep=True)
+    # TODO: update this to avoid future error
+    # ^  FutureWarning: In a future version, `df.iloc[:, i] = newvals` will
+    # ^  attempt to set the values inplace instead of always setting a new array.
+    # ^  To retain the old behavior, use either `df[df.columns[i]] = newvals`
+    # ^  or, if columns are non-unique, `df.isetitem(i, newvals)`
     hits_df.loc[:, catcols] = hits_df.loc[:, catcols].astype('category')
+
     # mem_cat=hits_df.memory_usage(deep=True)
     numeric_cols = hit_cols.str.endswith(('_len', 'index'))
     hits_df.loc[:, numeric_cols] = hits_df.loc[:, numeric_cols].apply(pd.to_numeric,
@@ -286,16 +295,19 @@ def _create_output(hits_df, match_dir, start_time):
     fstem = f"{match_dir.name.replace('.', '_')}_hits"
     hits_df.to_csv(output_dir.joinpath(f'{fstem}.csv'))
     #! psv/pipe delimited (`|`) required because table includes commas (`,`)
+    # ? Is this true? ^^
     hits_df.to_csv(output_dir.joinpath(f'{fstem}.psv'), sep='|')
     hits_df.to_pickle(output_dir.joinpath(f'{fstem}.pkl.gz'))
 
     view_sample_size = min(5, len(hits_df))
-
+    print_cols = hits_df.columns[hits_df.columns.isin(
+        ('neg_form', 'colloc', 'sent_text'))]
     try:
-        print_table = hits_df[['neg_form', 'colloc', 'sent_text']].sample(
+        print_table = hits_df[print_cols].sample(
             view_sample_size).to_markdown()
+
     except ImportError:
-        print_table = hits_df[['neg_form', 'colloc', 'sent_text']].sample(
+        print_table = hits_df[print_cols].sample(
             view_sample_size).to_string()
 
     logging.info('Sample of Tabulated Data:\n%s\n', print_table)
@@ -305,7 +317,7 @@ def _create_output(hits_df, match_dir, start_time):
     finish_time = time.perf_counter()
     dur_str = dur_round(finish_time - start_time)
     print(f'Time to tabulate hits: {dur_str}')
-    logging.info('Tabulation Step Complete! Time elapsed: %s',dur_str)
+    logging.info('Tabulation Step Complete! Time elapsed: %s', dur_str)
 
 
 def dur_round(time_dur: float):

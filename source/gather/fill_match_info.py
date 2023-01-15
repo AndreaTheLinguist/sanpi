@@ -7,9 +7,29 @@ from pathlib import Path
 
 import pyconll
 
-_dep_tuple = namedtuple('dependency', ['source', 'target', 'relation'])
-_tok_tuple = namedtuple('token', ['lemma', 'ix', 'xpos', 'deprel', 'head'])
-
+TOK_TUPLE = namedtuple('token', ['lemma', 'ix', 'xpos'])
+DEP_TUPLE = namedtuple('dependency', ['node', 'contiguous', 'relation', 
+                                      'head', 'target'])
+_contractions = {
+    " 'm": "'m", 
+    " 's": "'s", 
+    " 'd": "'d", 
+    " 'll": "'ll", 
+    " 've": "'ve", 
+    " 're": "'re", 
+    " 'd've": "'d've", 
+    " n't": "n't", 
+    " .": ".", 
+    " ,": ",", 
+    " ;": ";", 
+    " ?": "?", 
+    " !": "!", 
+    "( ": "(",
+    " )": ")",
+    "[ ": "[",
+    " ]": "]",
+    }
+  
 
 def fill_json(conllu_dir: Path,
               raw_dir: Path,
@@ -23,10 +43,11 @@ def fill_json(conllu_dir: Path,
     for data_stem, paths_pair in paired_paths.items():
         file_start = time.perf_counter()
         json_fpath = paths_pair.raw_json
-        filled_json_path = json_fpath.with_name(json_fpath.name.replace('.raw', ''))
+        filled_json_path = json_fpath.with_name(
+            json_fpath.name.replace('.raw', ''))
         if not rewrite and filled_json_path.exists():
-            print(
-                f'-> {data_stem} data was previously processed: Skipping.\n     Output in {filled_json_path}')
+            print(f'-> {data_stem} data was previously processed: Skipping.\n'
+                  f'     Output in {filled_json_path}')
             continue
 
         print(f'-> Processing {data_stem}...')
@@ -51,19 +72,33 @@ def fill_json(conllu_dir: Path,
             context_dict['next_id'] = context_sent_ids[sent_id].next_id
             context_dict['next_sent'] = ''
             hit_dict['context'] = context_dict
-            #TODO: fix this non-unique identifier bug
-            #! Using this as the dict key is the source of the empty hits later on: if 2
-            #!   matches have the same `ADV` and `ADJ` nodes, but different `NEG` nodes, only 1
-            #!   is processed. That is, the second hit overwrites the first in the dictionary.
+
             node_id_dict = hit_dict['matching']['nodes']
-            # > add hit id
-            # >   format: [sentence id]-[ADV node id]-[ADJ node id]
-            #       (where `sentence id` = [doc_id]_[sentence index])
-            hit_id = f"{sent_id}:{node_id_dict['NEG']}-{node_id_dict['ADV']}-{node_id_dict['ADJ']}"
+            # > add hit_id, colloc_id, and match_id
+            #    format: [sentence id]:[match_id]
+            #       (where `sentence id` = [doc_id]_[sentence index]
+            #          and `match_id` = '-' delineated zfilled node indexes--all nodes!)
+            # Note: this means that different patterns will have different length hit_ids
+            #    2 = advadj
+            #    3 = contig
+            #    4 = scoped
+            #    5 = raised
+            # * `colloc_id` (only mod node indices) will still be necessary to identify overlap between patterns
+            # *     > for advadj hits, `colloc_id` and `hit_id` will be identical
+            zlen = max([len(v) for v in node_id_dict.values()])
+            node_id_dict = {k: v.zfill(zlen) for k, v in node_id_dict.items()}
+
+            node_ix_strings = list(node_id_dict.values())
+            node_ix_strings.sort()
+            match_id = '-'.join(node_ix_strings)
+
+            hit_id = f"{sent_id}:{match_id}"
             # > add additional top layer to json to order by hit id, rather than int index
+            hit_dict['match_id'] = match_id
+            hit_dict['colloc_id'] = f"{sent_id}:{node_id_dict['ADV']}-{node_id_dict['ADJ']}"
+
             hits_by_id[hit_id] = hit_dict
             hit_dict['hit_id'] = hit_id
-
 
         hits_by_id, json_entry_count, conll_count = _add_conll_info(
             hits_by_id, paths_pair.conllu, context_sent_ids)
@@ -114,7 +149,7 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
     for conllu in conll_gen:
 
         current_id = conllu.id
-        sent_text = conllu.text
+        sent_text = _collapse_contractions(conllu)
 
         id_to_ix = conllu._ids_to_indexes
         tok_dicts = conllu._tokens
@@ -142,6 +177,9 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
 
                 hit_dict['deps'] = _get_deps(raw_match_info['edges'],
                                              tok_dicts, id_to_ix)
+                # print(hit_dict['text'])
+                # print(hit_dict['token_str'])
+                # print('')
                 json_entry_count += 1
             elif current_id == hit_dict['context']['prev_id']:
                 hit_dict['context']['prev_sent'] = sent_text
@@ -158,6 +196,14 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
           f'= {conll_count} conllu sentence objects')
 
     return hits_by_id, json_entry_count, conll_count
+
+
+def _collapse_contractions(conllu):
+    sent_text = conllu.text
+    for k, v in _contractions.items(): 
+        if k in sent_text:
+            sent_text = sent_text.replace(k, v)
+    return sent_text
 
 
 # def _fill_context(hits: dict, ids_dict: dict, conllu_fpath: Path):
@@ -214,22 +260,23 @@ def _include_context(hits):
     # // return hit_ids, prev_ids, next_ids
 
 
-#// def _get_context_id(sid, position: int):
+# // def _get_context_id(sid, position: int):
 
-    #// if '_' in sid:
-    #//     parts = sid.rsplit('_', 1)
-    #//     cix = f'{parts[0]}_{int(parts[1]) + position}'
-    #//
-    #// else:
-    #//     cix = ''
-    #//
-    #// return cix
+    # // if '_' in sid:
+    # //     parts = sid.rsplit('_', 1)
+    # //     cix = f'{parts[0]}_{int(parts[1]) + position}'
+    # //
+    # // else:
+    # //     cix = ''
+    # //
+    # // return cix
 
 
 def _update_tokens(info, tok_dict_list, id_to_ix, hit, raw_match_info):
     nodes = raw_match_info['nodes']
 
-    tok_lemmas = tok_forms = {}
+    tok_lemmas = {}
+    tok_forms = {}
 
     for k, v in nodes.items():
         try:
@@ -286,7 +333,7 @@ def _check_dirs(raw: Path, conllu: Path, output: Path = None):
         sys.exit(
             'Error: specified conll directory and json directory do not exist'
             ' in the base directory.')
-        
+
     if raw.stem != conllu.stem:
         sys.exit(
             'Error: specified conll directory and json directory do not match.')
@@ -308,32 +355,45 @@ def _check_dirs(raw: Path, conllu: Path, output: Path = None):
     return paired_paths_dict, output_dir
 
 
-def _get_deps(edges, tok_dicts, id_to_ix):
+def _get_deps(edge_dict, tok_pyconlls, id_to_ix):
     deps = {}
-    for edge, parts in edges.items():
+    for edge, info in edge_dict.items():
 
-        source_tok = _process_edge(parts['source'], tok_dicts, id_to_ix)
-        target_tok = _process_edge(parts['target'], tok_dicts, id_to_ix)
+        #// label = parts['label']
+        #// # TODO: change to `isinstance()`
+        #// if type(label) == dict:
+        #//     label = label.get('1', '_')
 
-        label = parts['label']
-        ## TODO: change to `isinstance()`
-        if type(label) == dict:
-            label = label.get('1', '_')
+        target_tok = _process_dep(edge, info['target'], 
+                                  tok_pyconlls, id_to_ix)
 
-        deps[edge] = _dep_tuple(source_tok._asdict(),
-                                target_tok._asdict(),
-                                label)._asdict()
+        deps[edge] = target_tok._asdict()
 
     return deps
 
 
-def _process_edge(id, tok_dicts, id_to_ix):
-    ix = _get_ix(id_to_ix, id)
-    tok = tok_dicts[ix]
-    head = tok_dicts[_get_ix(id_to_ix, tok.head)].lemma
+def _process_dep(label, _id, pyconll_toks, id_to_ix):
 
-    tokt = _tok_tuple(tok.lemma, ix, tok.xpos, tok.deprel, head)
-    return tokt
+    targ_ix = _get_ix(id_to_ix, _id)
+    targ_pyconll = pyconll_toks[targ_ix]
+
+    head_ix = _get_ix(id_to_ix, targ_pyconll.head)
+    head_pyconll = pyconll_toks[head_ix]
+
+    targ_tok = _fill_tok(targ_ix, targ_pyconll)
+    head_tok = _fill_tok(head_ix, head_pyconll)
+
+    is_contiguous = abs(head_ix - targ_ix) == 1
+
+    return DEP_TUPLE(node=label,
+                      contiguous=is_contiguous,
+                      relation=targ_pyconll.deprel,
+                      head=head_tok._asdict(),
+                      target=targ_tok._asdict())
+
+
+def _fill_tok(ix, tok):
+    return TOK_TUPLE(tok.lemma, ix, tok.xpos)
 
 
 def _get_ix(id_to_ix, id):

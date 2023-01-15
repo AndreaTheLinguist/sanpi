@@ -74,10 +74,12 @@ def _seek_pat_in_file(corpus, pat, out):
 
     f_start = time.perf_counter()
     # > append ' 2>/dev/null' for debugging
-    grew_cmd_str = (f'grew grep -pattern {pat} -i {corpus} > {out}')
+    # NOTE: -pattern changed to -request 
+    #   per WARNING: -pattern and -patterns comman line args are deprecated, replaced by -request and -requests
+    grew_cmd_str = (f'grew grep -request {pat} -i {corpus} > {out}')
 
-    # ^ TODO: update this to use `subprocess` module instead,
-    # ^   so that grew warnings/errors can be handled better
+    #TODO: update this to use `subprocess` module instead,
+    #   so that grew warnings/errors can be handled better
     os.system(grew_cmd_str)
 
     dur = dur_round(time.perf_counter() - f_start)
