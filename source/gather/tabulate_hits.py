@@ -29,7 +29,7 @@ def _parse_args():
 
 def tabulate_hits(match_dir: Path):
     start_time = time.perf_counter()
-    time.strftime("%Y-%m-%d_%I:%M%p")
+    print(time.strftime("%Y-%m-%d_%I:%M%p"))
     log_dir = Path(*match_dir.parents._parts[:-3], 'logs', match_dir.name)
     if not log_dir.is_dir():
         log_dir.mkdir(parents=True)
