@@ -103,6 +103,7 @@ elif [[ $(echo "`grew version | cut -d ' ' -f 2 | head -1`") != "1.10.0" ]]; the
   echo "opam -y update"  
   opam -y update
   echo -e "\nopam -y upgrade"
+  # TODO: don't think this is reached every time it should be
   opam -y upgrade
   echo -e "\npip3 install grew --upgrade"
   pip3 install grew --upgrade
