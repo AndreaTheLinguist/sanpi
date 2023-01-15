@@ -3,16 +3,18 @@
     "sent_id": "nyt_eng_19960513_0064_4",
     "context": {
       "prev_id": "nyt_eng_19960513_0064_3",
-      "prev_sent": "It is , in plain fact , degenerate .",
+      "prev_sent": "It is, in plain fact, degenerate.",
       "next_id": "nyt_eng_19960513_0064_5",
-      "next_sent": "Market forces , including the usual anticipated summertime increase in driving , are pushing up gasoline prices , as they do every year about this time ."
+      "next_sent": "Market forces, including the usual anticipated summertime increase in driving, are pushing up gasoline prices, as they do every year about this time."
     },
-    "hit_id": "nyt_eng_19960513_0064_4:14-18-19",
-    "text": "The history of American politics is not exactly unblemished by pandering , but few examples are quite as craven as this one .",
+    "match_id": "14-15-18-19",
+    "colloc_id": "nyt_eng_19960513_0064_4:18-19",
+    "hit_id": "nyt_eng_19960513_0064_4:14-15-18-19",
+    "text": "The history of American politics is not exactly unblemished by pandering, but few examples are quite as craven as this one.",
     "token_str": "the history of American politics is not exactly unblemished by pandering , but few examples are quite as craven as this one .",
     "lemma_str": "the history of american politics be not exactly unblemished by pandering , but few example be quite as craven as this one .",
     "lemmas": {
-      "RELAY": "examples",
+      "RELAY": "example",
       "NEG": "few",
       "ADV": "as",
       "ADJ": "craven"
@@ -31,55 +33,49 @@
     },
     "deps": {
       "relay": {
-        "source": {
+        "node": "relay",
+        "contiguous": false,
+        "relation": "nsubj",
+        "head": {
           "lemma": "craven",
           "ix": 18,
-          "xpos": "JJ",
-          "deprel": "conj",
-          "head": "unblemished"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "example",
           "ix": 14,
-          "xpos": "NNS",
-          "deprel": "nsubj",
-          "head": "craven"
-        },
-        "relation": "nsubj"
+          "xpos": "NNS"
+        }
       },
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": true,
+        "relation": "amod",
+        "head": {
           "lemma": "example",
           "ix": 14,
-          "xpos": "NNS",
-          "deprel": "nsubj",
-          "head": "craven"
+          "xpos": "NNS"
         },
         "target": {
           "lemma": "few",
           "ix": 13,
-          "xpos": "JJ",
-          "deprel": "amod",
-          "head": "example"
-        },
-        "relation": "amod"
+          "xpos": "JJ"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "craven",
           "ix": 18,
-          "xpos": "JJ",
-          "deprel": "conj",
-          "head": "unblemished"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "as",
           "ix": 17,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "craven"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   }

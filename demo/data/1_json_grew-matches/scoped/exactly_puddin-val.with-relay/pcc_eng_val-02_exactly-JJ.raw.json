@@ -1,0 +1,13 @@
+[
+  {
+    "sent_id": "pcc_eng_val_2.05937_x25809_09",
+    "matching": {
+      "nodes": { "RELAY": "11", "NEG": "9", "ADV": "13", "ADJ": "14" },
+      "edges": {
+        "relay": { "source": "14", "label": "nsubj", "target": "11" },
+        "neg": { "source": "11", "label": "det", "target": "9" },
+        "mod": { "source": "14", "label": "advmod", "target": "13" }
+      }
+    }
+  }
+]

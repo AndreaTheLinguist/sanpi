@@ -7,12 +7,14 @@
       "next_id": "pcc_eng_27_070.9917_x1131694_06",
       "next_sent": "\"Everybody wants an answer that nobody has an answer to right now,\" said Stewart, who starts eighth Sunday."
     },
+    "match_id": "3-4-5",
+    "colloc_id": "pcc_eng_27_070.9917_x1131694_05:4-5",
     "hit_id": "pcc_eng_27_070.9917_x1131694_05:3-4-5",
     "text": "Stewart isn't exactly worried about it just yet, but it's clear Smoke would love to figure out the new Gen-6 car in time to celebrate a third win in four years at Fontana heading into NASCAR's off week.",
     "token_str": "Stewart is n't exactly worried about it just yet , but it 's clear Smoke would love to figure out the new Gen - 6 car in time to celebrate a third win in four years at Fontana heading into NASCAR 's off week .",
     "lemma_str": "Stewart be not exactly worried about it just yet , but it be clear Smoke would love to figure out the new Gen - 6 car in time to celebrate a third win in four year at Fontana head into NASCAR 's off week .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "worried"
     },
@@ -28,38 +30,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "worried",
           "ix": 4,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 2,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "worried"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "worried",
           "ix": 4,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 3,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "worried"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -71,12 +69,14 @@
       "next_id": "pcc_eng_27_070.8877_x1130027_07",
       "next_sent": "I went over options in my head..."
     },
+    "match_id": "1-2-3",
+    "colloc_id": "pcc_eng_27_070.8877_x1130027_06:2-3",
     "hit_id": "pcc_eng_27_070.8877_x1130027_06:1-2-3",
     "text": "Not exactly stylish.",
     "token_str": "Not exactly stylish .",
     "lemma_str": "not exactly stylish .",
     "lemmas": {
-      "NEG": "Not",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "stylish"
     },
@@ -92,38 +92,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "stylish",
           "ix": 2,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 0,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "stylish"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "stylish",
           "ix": 2,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 1,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "stylish"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -135,12 +131,14 @@
       "next_id": "pcc_eng_27_070.8645_x1129662_5",
       "next_sent": "GLORY announced today that Kongolo is no longer fighting Holzken, although no concrete reason was given, and that his replacement is Russian fighter Alim Nabiyev."
     },
+    "match_id": "25-26-27",
+    "colloc_id": "pcc_eng_27_070.8645_x1129662_4:26-27",
     "hit_id": "pcc_eng_27_070.8645_x1129662_4:25-26-27",
     "text": "So Nieky Holzken vs. Yoann Kongolo at GLORY 45 was a decent fight, but a fight that we've already seen and weren't exactly excited about seeing again.",
     "token_str": "So Nieky Holzken vs. Yoann Kongolo at GLORY 45 was a decent fight , but a fight that we 've already seen and were n't exactly excited about seeing again .",
     "lemma_str": "so Nieky Holzken vs. Yoann Kongolo at GLORY 45 be a decent fight , but a fight that we have already see and be not exactly excited about see again .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "excited"
     },
@@ -156,38 +154,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "excited",
           "ix": 26,
-          "xpos": "JJ",
-          "deprel": "conj",
-          "head": "fight"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 24,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "excited"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "excited",
           "ix": 26,
-          "xpos": "JJ",
-          "deprel": "conj",
-          "head": "fight"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 25,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "excited"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -199,6 +193,8 @@
       "next_id": "pcc_eng_27_070.8552_x1129516_5",
       "next_sent": "Found in the \"Hommes International\" issue of Paris Vogue, this ad renders Clive positively poreless."
     },
+    "match_id": "3-4-5",
+    "colloc_id": "pcc_eng_27_070.8552_x1129516_4:4-5",
     "hit_id": "pcc_eng_27_070.8552_x1129516_4:3-4-5",
     "text": "He's not exactly craggy or jowly but he is NOT the smooth, baby-faced manbot seen in this Lancome ad.",
     "token_str": "He 's not exactly craggy or jowly but he is NOT the smooth , baby - faced manbot seen in this Lancome ad .",
@@ -220,38 +216,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "craggy",
           "ix": 4,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 2,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "craggy"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "craggy",
           "ix": 4,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 3,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "craggy"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -263,6 +255,8 @@
       "next_id": "pcc_eng_27_070.7120_x1127229_19",
       "next_sent": "Either way if anyone else has a day free and is feeling as crazy as I am drop me a line on twitter or send me an email."
     },
+    "match_id": "3-4-5",
+    "colloc_id": "pcc_eng_27_070.7120_x1127229_18:4-5",
     "hit_id": "pcc_eng_27_070.7120_x1127229_18:3-4-5",
     "text": "I'm not exactly sure why I want to do this.",
     "token_str": "I 'm not exactly sure why I want to do this .",
@@ -284,38 +278,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "sure",
           "ix": 4,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 2,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "sure"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "sure",
           "ix": 4,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 3,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "sure"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -327,6 +317,8 @@
       "next_id": "pcc_eng_27_070.6674_x1126483_065",
       "next_sent": "There's not that kind of question about gift cards."
     },
+    "match_id": "15-16-17",
+    "colloc_id": "pcc_eng_27_070.6674_x1126483_064:16-17",
     "hit_id": "pcc_eng_27_070.6674_x1126483_064:15-16-17",
     "text": "That's unlike if you're bidding on a TV, where you're not exactly sure what features it might have.",
     "token_str": "That 's unlike if you 're bidding on a TV , where you 're not exactly sure what features it might have .",
@@ -348,38 +340,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "sure",
           "ix": 16,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "be"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 14,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "sure"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "sure",
           "ix": 16,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "be"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 15,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "sure"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -391,12 +379,14 @@
       "next_id": "pcc_eng_27_070.4888_x1123515_214",
       "next_sent": "So that's where we started thinking, \"hey, why not we just make this a pretty clear UI option where it's like you go into the dungeon and it's either in normal or Heroic mode?\""
     },
+    "match_id": "24-25-26",
+    "colloc_id": "pcc_eng_27_070.4888_x1123515_213:25-26",
     "hit_id": "pcc_eng_27_070.4888_x1123515_213:24-25-26",
     "text": "There was some weirdness there with Ulduar, like it was our first time doing it, so in some cases it wasn't exactly clear how you started some of these hard modes.",
     "token_str": "There was some weirdness there with Ulduar , like it was our first time doing it , so in some cases it was n't exactly clear how you started some of these hard modes .",
     "lemma_str": "there be some weirdness there with Ulduar , like it be we first time do it , so in some case it be not exactly clear how you start some of this hard mode .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "clear"
     },
@@ -412,38 +402,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "clear",
           "ix": 25,
-          "xpos": "JJ",
-          "deprel": "parataxis",
-          "head": "be"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 23,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "clear"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "clear",
           "ix": 25,
-          "xpos": "JJ",
-          "deprel": "parataxis",
-          "head": "be"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 24,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "clear"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -455,12 +441,14 @@
       "next_id": "pcc_eng_27_070.2970_x1120419_21",
       "next_sent": "That he is obnoxious is a given."
     },
+    "match_id": "13-14-15",
+    "colloc_id": "pcc_eng_27_070.2970_x1120419_20:14-15",
     "hit_id": "pcc_eng_27_070.2970_x1120419_20:13-14-15",
     "text": "Tortorella, and we're trying to be diplomatic here, isn't exactly consistent with that message.",
     "token_str": "Tortorella , and we 're trying to be diplomatic here , is n't exactly consistent with that message .",
     "lemma_str": "Tortorella , and we be try to be diplomatic here , be not exactly consistent with that message .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "consistent"
     },
@@ -476,38 +464,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "consistent",
           "ix": 14,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 12,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "consistent"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "consistent",
           "ix": 14,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 13,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "consistent"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -519,12 +503,14 @@
       "next_id": "pcc_eng_27_070.1968_x1118821_7",
       "next_sent": "Were they ever really friends?"
     },
-    "hit_id": "pcc_eng_27_070.1968_x1118821_6:9-10-11",
+    "match_id": "09-10-11",
+    "colloc_id": "pcc_eng_27_070.1968_x1118821_6:10-11",
+    "hit_id": "pcc_eng_27_070.1968_x1118821_6:09-10-11",
     "text": "When Sean meets Scarlet, his thoughts aren't exactly chivalrous, and neither are hers.",
     "token_str": "When Sean meets Scarlet , his thoughts are n't exactly chivalrous , and neither are hers .",
     "lemma_str": "when Sean meet Scarlet , he thought be not exactly chivalrous , and neither be hers .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "chivalrous"
     },
@@ -540,38 +526,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "chivalrous",
           "ix": 10,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 8,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "chivalrous"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "chivalrous",
           "ix": 10,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 9,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "chivalrous"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -583,12 +565,14 @@
       "next_id": "pcc_eng_27_070.1123_x1117444_07",
       "next_sent": "Considering our pop culture has no shortage of suggestions (wink), this confusion may be of no"
     },
+    "match_id": "17-18-19",
+    "colloc_id": "pcc_eng_27_070.1123_x1117444_06:18-19",
     "hit_id": "pcc_eng_27_070.1123_x1117444_06:17-18-19",
     "text": "Ever since I started providing empowerment coaching I've come to find that many women aren't exactly sure about what it means to be or to live \"empowered\".",
     "token_str": "Ever since I started providing empowerment coaching I 've come to find that many women are n't exactly sure about what it means to be or to live \" empowered \" .",
     "lemma_str": "ever since I start provide empowerment coaching I have come to find that many woman be not exactly sure about what it mean to be or to live \" empower \" .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "sure"
     },
@@ -604,38 +588,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "sure",
           "ix": 18,
-          "xpos": "JJ",
-          "deprel": "ccomp",
-          "head": "find"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 16,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "sure"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "sure",
           "ix": 18,
-          "xpos": "JJ",
-          "deprel": "ccomp",
-          "head": "find"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 17,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "sure"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -647,6 +627,8 @@
       "next_id": "pcc_eng_27_070.0776_x1116894_05",
       "next_sent": "Saturday's 103-97 mad scramble to get past the Utah Jazz is the latest and most glaring example."
     },
+    "match_id": "23-24-25",
+    "colloc_id": "pcc_eng_27_070.0776_x1116894_04:24-25",
     "hit_id": "pcc_eng_27_070.0776_x1116894_04:23-24-25",
     "text": "Cuban expressed concern that his team sometimes falls into default mode, doing just enough to win, an issue that's not exactly new regarding the Mavs' killer instinct.",
     "token_str": "Cuban expressed concern that his team sometimes falls into default mode , doing just enough to win , an issue that 's not exactly new regarding the Mavs ' killer instinct .",
@@ -668,38 +650,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "new",
           "ix": 24,
-          "xpos": "JJ",
-          "deprel": "acl:relcl",
-          "head": "issue"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 22,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "new"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "new",
           "ix": 24,
-          "xpos": "JJ",
-          "deprel": "acl:relcl",
-          "head": "issue"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 23,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "new"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -711,12 +689,14 @@
       "next_id": "pcc_eng_27_070.0367_x1116208_05",
       "next_sent": "Passionate and fiery yet down to earth, he was well-liked during his short stay in Boston."
     },
+    "match_id": "1-2-3",
+    "colloc_id": "pcc_eng_27_070.0367_x1116208_04:2-3",
     "hit_id": "pcc_eng_27_070.0367_x1116208_04:1-2-3",
     "text": "Not exactly serene on the sidelines, the 42-year old probably spends more nights than he'd like to nursing a sore throat.",
     "token_str": "Not exactly serene on the sidelines , the 42 - year old probably spends more nights than he'd like to nursing a sore throat .",
     "lemma_str": "not exactly serene on the sideline , the 42 - year old probably spend more night than ho'd like to nurse a sore throat .",
     "lemmas": {
-      "NEG": "Not",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "serene"
     },
@@ -732,38 +712,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "serene",
           "ix": 2,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "spend"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 0,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "serene"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "serene",
           "ix": 2,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "spend"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 1,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "serene"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -775,6 +751,8 @@
       "next_id": "pcc_eng_27_070.0315_x1116118_17",
       "next_sent": "Having a choice between a 4-course Kaze or 8-course Hana menu, we both selected the Hana with accompanying sake pairings for MW."
     },
+    "match_id": "2-3-4",
+    "colloc_id": "pcc_eng_27_070.0315_x1116118_16:3-4",
     "hit_id": "pcc_eng_27_070.0315_x1116118_16:2-3-4",
     "text": "While not exactly empty, the restaurant was quite tranquil, exuding a zen-like ambiance as we observed Chef Nishihara prepare each dish from behind the counter.",
     "token_str": "While not exactly empty , the restaurant was quite tranquil , exuding a zen-like ambiance as we observed Chef Nishihara prepare each dish from behind the counter .",
@@ -796,38 +774,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "empty",
           "ix": 3,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "tranquil"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 1,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "empty"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "empty",
           "ix": 3,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "tranquil"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 2,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "empty"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -839,12 +813,14 @@
       "next_id": "pcc_eng_27_070.0202_x1115929_107",
       "next_sent": "The mechanic basically distracts from the rest of the games content and fails really badly to fit in with the rest of the game."
     },
+    "match_id": "11-12-13",
+    "colloc_id": "pcc_eng_27_070.0202_x1115929_106:12-13",
     "hit_id": "pcc_eng_27_070.0202_x1115929_106:11-12-13",
     "text": "High or my neighbor is a yandere ecchi games aren't exactly appropriate in Yan Sim because it's not trying to appeal to an audience who just wants to get off.",
     "token_str": "High or my neighbor is a yandere ecchi games are n't exactly appropriate in Yan Sim because it 's not trying to appeal to an audience who just wants to get off .",
     "lemma_str": "high or my neighbor be a yandere ecchi game be not exactly appropriate in Yan Sim because it be not try to appeal to a audience who just want to get off .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "appropriate"
     },
@@ -860,38 +836,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "appropriate",
           "ix": 12,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 10,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "appropriate"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "appropriate",
           "ix": 12,
-          "xpos": "JJ",
-          "deprel": "root",
-          "head": "."
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 11,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "appropriate"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   },
@@ -903,12 +875,14 @@
       "next_id": "pcc_eng_27_070.0055_x1115700_025",
       "next_sent": "Nothing seemed to redress the predominance of the heathland expanse, the road being the only evidence of civilization for a good 15 miles."
     },
+    "match_id": "7-8-9",
+    "colloc_id": "pcc_eng_27_070.0055_x1115700_024:8-9",
     "hit_id": "pcc_eng_27_070.0055_x1115700_024:7-8-9",
     "text": "Whilst Shetland as a whole isn't exactly civilized away from Lerwick, the dearth of cottages and 'huts' to the north seemed immediately more obvious.",
     "token_str": "Whilst Shetland as a whole is n't exactly civilized away from Lerwick , the dearth of cottages and ' huts ' to the north seemed immediately more obvious .",
     "lemma_str": "whilst Shetland as a whole be not exactly civilized away from Lerwick , the dearth of cottage and ' hut ' to the north seem immediately more obvious .",
     "lemmas": {
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "civilized"
     },
@@ -924,38 +898,34 @@
     },
     "deps": {
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
           "lemma": "civilized",
           "ix": 8,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "seem"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "not",
           "ix": 6,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "civilized"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "civilized",
           "ix": 8,
-          "xpos": "JJ",
-          "deprel": "advcl",
-          "head": "seem"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 7,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "civilized"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   }

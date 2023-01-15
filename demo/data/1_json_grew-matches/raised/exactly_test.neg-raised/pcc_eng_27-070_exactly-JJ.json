@@ -7,13 +7,15 @@
       "next_id": "pcc_eng_27_070.9565_x1131118_17",
       "next_sent": "It has been suprisingly focused on low-skill, male workers."
     },
-    "hit_id": "pcc_eng_27_070.9565_x1131118_16:7-14-15",
+    "match_id": "07-08-14-15",
+    "colloc_id": "pcc_eng_27_070.9565_x1131118_16:14-15",
+    "hit_id": "pcc_eng_27_070.9565_x1131118_16:07-08-14-15",
     "text": "Let me add that I don't think pre-recession wage stagnation has been exactly widespread.",
     "token_str": "Let me add that I do n't think pre-recession wage stagnation has been exactly widespread .",
     "lemma_str": "let I add that I do not think pre-recession wage stagnation have be exactly widespread .",
     "lemmas": {
       "NR": "think",
-      "NEG": "n't",
+      "NEG": "not",
       "ADV": "exactly",
       "ADJ": "widespread"
     },
@@ -31,55 +33,49 @@
     },
     "deps": {
       "negraise": {
-        "source": {
+        "node": "negraise",
+        "contiguous": false,
+        "relation": "ccomp",
+        "head": {
           "lemma": "think",
           "ix": 7,
-          "xpos": "VB",
-          "deprel": "ccomp",
-          "head": "add"
+          "xpos": "VB"
         },
         "target": {
           "lemma": "widespread",
           "ix": 14,
-          "xpos": "JJ",
-          "deprel": "ccomp",
-          "head": "think"
-        },
-        "relation": "ccomp"
+          "xpos": "JJ"
+        }
       },
       "neg": {
-        "source": {
+        "node": "neg",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "think",
           "ix": 7,
-          "xpos": "VB",
-          "deprel": "ccomp",
-          "head": "add"
+          "xpos": "VB"
         },
         "target": {
           "lemma": "not",
           "ix": 6,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "think"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       },
       "mod": {
-        "source": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
           "lemma": "widespread",
           "ix": 14,
-          "xpos": "JJ",
-          "deprel": "ccomp",
-          "head": "think"
+          "xpos": "JJ"
         },
         "target": {
           "lemma": "exactly",
           "ix": 13,
-          "xpos": "RB",
-          "deprel": "advmod",
-          "head": "widespread"
-        },
-        "relation": "advmod"
+          "xpos": "RB"
+        }
       }
     }
   }

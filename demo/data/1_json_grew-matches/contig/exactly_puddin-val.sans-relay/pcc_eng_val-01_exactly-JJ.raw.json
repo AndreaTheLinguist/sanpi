@@ -1,0 +1,202 @@
+[
+  {
+    "sent_id": "pcc_eng_val_1.9647_x15655_04",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "5", "ADJ": "6" },
+      "edges": {
+        "neg": { "source": "6", "label": "advmod", "target": "4" },
+        "mod": { "source": "6", "label": "advmod", "target": "5" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.9036_x14657_63",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "2", "ADJ": "3" },
+      "edges": {
+        "neg": { "source": "3", "label": "advmod", "target": "1" },
+        "mod": { "source": "3", "label": "advmod", "target": "2" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.8886_x14420_11",
+    "matching": {
+      "nodes": { "NEG": "24", "ADV": "25", "ADJ": "26" },
+      "edges": {
+        "neg": { "source": "26", "label": "advmod", "target": "24" },
+        "mod": { "source": "26", "label": "advmod", "target": "25" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.8343_x13568_102",
+    "matching": {
+      "nodes": { "NEG": "13", "ADV": "14", "ADJ": "15" },
+      "edges": {
+        "neg": { "source": "15", "label": "advmod", "target": "13" },
+        "mod": { "source": "15", "label": "advmod", "target": "14" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7725_x12552_4",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "advmod", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7658_x12434_248",
+    "matching": {
+      "nodes": { "NEG": "7", "ADV": "8", "ADJ": "9" },
+      "edges": {
+        "neg": { "source": "9", "label": "advmod", "target": "7" },
+        "mod": { "source": "9", "label": "advmod", "target": "8" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7517_x12198_174",
+    "matching": {
+      "nodes": { "NEG": "6", "ADV": "7", "ADJ": "8" },
+      "edges": {
+        "neg": { "source": "8", "label": "advmod", "target": "6" },
+        "mod": { "source": "8", "label": "advmod", "target": "7" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7517_x12198_019",
+    "matching": {
+      "nodes": { "NEG": "15", "ADV": "16", "ADJ": "17" },
+      "edges": {
+        "neg": { "source": "17", "label": "advmod", "target": "15" },
+        "mod": { "source": "17", "label": "advmod", "target": "16" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7185_x11652_047",
+    "matching": {
+      "nodes": { "NEG": "12", "ADV": "13", "ADJ": "14" },
+      "edges": {
+        "neg": { "source": "14", "label": "advmod", "target": "12" },
+        "mod": { "source": "14", "label": "advmod", "target": "13" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7010_x11358_16",
+    "matching": {
+      "nodes": { "NEG": "5", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "advmod", "target": "5" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.5250_x08580_53",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "5", "ADJ": "6" },
+      "edges": {
+        "neg": { "source": "6", "label": "advmod", "target": "4" },
+        "mod": { "source": "6", "label": "advmod", "target": "5" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.5017_x08202_269",
+    "matching": {
+      "nodes": { "NEG": "9", "ADV": "10", "ADJ": "11" },
+      "edges": {
+        "neg": { "source": "11", "label": "advmod", "target": "9" },
+        "mod": { "source": "11", "label": "advmod", "target": "10" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.4159_x06768_05",
+    "matching": {
+      "nodes": { "NEG": "1", "ADV": "2", "ADJ": "3" },
+      "edges": {
+        "neg": { "source": "3", "label": "advmod", "target": "1" },
+        "mod": { "source": "3", "label": "advmod", "target": "2" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.3131_x05104_36",
+    "matching": {
+      "nodes": { "NEG": "37", "ADV": "38", "ADJ": "39" },
+      "edges": {
+        "neg": { "source": "39", "label": "advmod", "target": "37" },
+        "mod": { "source": "39", "label": "advmod", "target": "38" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.2998_x04887_04",
+    "matching": {
+      "nodes": { "NEG": "10", "ADV": "11", "ADJ": "12" },
+      "edges": {
+        "neg": { "source": "12", "label": "advmod", "target": "10" },
+        "mod": { "source": "12", "label": "advmod", "target": "11" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.2346_x03794_08",
+    "matching": {
+      "nodes": { "NEG": "11", "ADV": "12", "ADJ": "13" },
+      "edges": {
+        "neg": { "source": "13", "label": "advmod", "target": "11" },
+        "mod": { "source": "13", "label": "advmod", "target": "12" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.1876_x03046_43",
+    "matching": {
+      "nodes": { "NEG": "5", "ADV": "6", "ADJ": "7" },
+      "edges": {
+        "neg": { "source": "7", "label": "advmod", "target": "5" },
+        "mod": { "source": "7", "label": "advmod", "target": "6" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.1187_x01959_50",
+    "matching": {
+      "nodes": { "NEG": "31", "ADV": "32", "ADJ": "33" },
+      "edges": {
+        "neg": { "source": "33", "label": "advmod", "target": "31" },
+        "mod": { "source": "33", "label": "advmod", "target": "32" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.0278_x00461_18",
+    "matching": {
+      "nodes": { "NEG": "7", "ADV": "8", "ADJ": "9" },
+      "edges": {
+        "neg": { "source": "9", "label": "advmod", "target": "7" },
+        "mod": { "source": "9", "label": "advmod", "target": "8" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.0271_x00447_056",
+    "matching": {
+      "nodes": { "NEG": "36", "ADV": "37", "ADJ": "38" },
+      "edges": {
+        "neg": { "source": "38", "label": "advmod", "target": "36" },
+        "mod": { "source": "38", "label": "advmod", "target": "37" }
+      }
+    }
+  }
+]

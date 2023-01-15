@@ -1,0 +1,1242 @@
+[
+  {
+    "sent_id": "pcc_eng_val_1.9647_x15655_04",
+    "context": {
+      "prev_id": "pcc_eng_val_1.9647_x15655_03",
+      "prev_sent": "It is second best selling.",
+      "next_id": "pcc_eng_val_1.9647_x15655_05",
+      "next_sent": "Mana yang anda maksud Kuantitatif."
+    },
+    "match_id": "4-5-6",
+    "colloc_id": "pcc_eng_val_1.9647_x15655_04:5-6",
+    "hit_id": "pcc_eng_val_1.9647_x15655_04:4-5-6",
+    "text": "I'm just not exactly sure has always been so.",
+    "token_str": "I 'm just not exactly sure has always been so .",
+    "lemma_str": "I be just not exactly sure have always be so .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 5,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 5,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.9036_x14657_63",
+    "context": {
+      "prev_id": "pcc_eng_val_1.9036_x14657_62",
+      "prev_sent": "This morning I had a peanut butter and jelly sandwhich for breakfast.",
+      "next_id": "pcc_eng_val_1.9036_x14657_64",
+      "next_sent": "For lunch today we took bicycle ricks over to the Shoprixx Mall (our driver was taking Garland and Chris to buy some computer parts in Sector 18)."
+    },
+    "match_id": "1-2-3",
+    "colloc_id": "pcc_eng_val_1.9036_x14657_63:2-3",
+    "hit_id": "pcc_eng_val_1.9036_x14657_63:1-2-3",
+    "text": "Not exactly American, but pretty close!",
+    "token_str": "Not exactly American , but pretty close !",
+    "lemma_str": "not exactly American , but pretty close !",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "American"
+    },
+    "forms": {
+      "NEG": "Not",
+      "ADV": "exactly",
+      "ADJ": "American"
+    },
+    "index": {
+      "NEG": 0,
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "American",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 0,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "American",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.8886_x14420_11",
+    "context": {
+      "prev_id": "pcc_eng_val_1.8886_x14420_10",
+      "prev_sent": "Entering in his old American Alpha garb and a red, white and blue singlet, Gable took Angle to the limit -- he escaped the Angle Slam and locked in an Ankle Lock of his own -- and might have won had he not gone high-risk and whiffed on a moonsault.",
+      "next_id": "pcc_eng_val_1.8886_x14420_12",
+      "next_sent": "The Lone Wolf reared his head after the tapout had been recorded, promising a sweet victory for himself in three weeks and leaving Angle with the ominous words that all the WWE Universe tends to remember is a Superstar's final match."
+    },
+    "match_id": "24-25-26",
+    "colloc_id": "pcc_eng_val_1.8886_x14420_11:25-26",
+    "hit_id": "pcc_eng_val_1.8886_x14420_11:24-25-26",
+    "text": "The missed maneuver left Gable exposed, and Angle pounced with a grapevine Ankle Lock to earn the submission, but Corbin wasn't exactly impressed with the performance.",
+    "token_str": "The missed maneuver left Gable exposed , and Angle pounced with a grapevine Ankle Lock to earn the submission , but Corbin was n't exactly impressed with the performance .",
+    "lemma_str": "the miss maneuver leave Gable expose , and Angle pounce with a grapevine Ankle lock to earn the submission , but Corbin be not exactly impressed with the performance .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "impressed"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "impressed"
+    },
+    "index": {
+      "NEG": 23,
+      "ADV": 24,
+      "ADJ": 25
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "impressed",
+          "ix": 25,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 23,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "impressed",
+          "ix": 25,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 24,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.8343_x13568_102",
+    "context": {
+      "prev_id": "pcc_eng_val_1.8343_x13568_101",
+      "prev_sent": "Brawl! brawl!",
+      "next_id": "pcc_eng_val_1.8343_x13568_103",
+      "next_sent": "In addition, he felt that it was nice to view the scenic lake while standing on the wooden log."
+    },
+    "match_id": "13-14-15",
+    "colloc_id": "pcc_eng_val_1.8343_x13568_102:14-15",
+    "hit_id": "pcc_eng_val_1.8343_x13568_102:13-14-15",
+    "text": "Although he did not catch up to Qu Ming, he was not exactly slow.",
+    "token_str": "Although he did not catch up to Qu Ming , he was not exactly slow .",
+    "lemma_str": "although he do not catch up to Qu Ming , he be not exactly slow .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "slow"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "slow"
+    },
+    "index": {
+      "NEG": 12,
+      "ADV": 13,
+      "ADJ": 14
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "slow",
+          "ix": 14,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 12,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "slow",
+          "ix": 14,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 13,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7725_x12552_4",
+    "context": {
+      "prev_id": "pcc_eng_val_1.7725_x12552_3",
+      "prev_sent": "Since I use Swagger for all of my API definitions, I can easily do this, and I can also understand each API response better because also I have them linked to the underlying data model.",
+      "next_id": "pcc_eng_val_1.7725_x12552_5",
+      "next_sent": "I'm just getting going with my API surface area map."
+    },
+    "match_id": "3-4-5",
+    "colloc_id": "pcc_eng_val_1.7725_x12552_4:4-5",
+    "hit_id": "pcc_eng_val_1.7725_x12552_4:3-4-5",
+    "text": "I'm not exactly sure how this surface area definition will work, ultimately I'd like to be able to separate verbose APIs by different layers, like the number of endpoints or parameters, or maybe the lack of verbs, or responses (not what is there, but what is missing)--I'm not sure.",
+    "token_str": "I 'm not exactly sure how this surface area definition will work , ultimately I 'd like to be able to separate verbose APIs by different layers , like the number of endpoints or parameters , or maybe the lack of verbs , or responses ( not what is there , but what is missing ) -- I 'm not sure .",
+    "lemma_str": "I be not exactly sure how this surface area definition will work , ultimately I would like to be able to separate verbose api by different layer , like the number of endpoint or parameter , or maybe the lack of verb , or response ( not what be there , but what be miss ) -- I be not sure .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 2,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 2,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7658_x12434_248",
+    "context": {
+      "prev_id": "pcc_eng_val_1.7658_x12434_247",
+      "prev_sent": "And it was certainly the sort of things you saw in plenty of For Mature Readers comics at the same time, with even the immortal Batman dragged into some awkward adult violence.",
+      "next_id": "pcc_eng_val_1.7658_x12434_249",
+      "next_sent": "But this was something new for Marvel in the 1980s, as the company tried to shake off the stagnant air of a 20-year-old comic company, looking for a new direction."
+    },
+    "match_id": "7-8-9",
+    "colloc_id": "pcc_eng_val_1.7658_x12434_248:8-9",
+    "hit_id": "pcc_eng_val_1.7658_x12434_248:7-8-9",
+    "text": "This sort of violent nihilism wasn't exactly unknown in comic books at the time.",
+    "token_str": "This sort of violent nihilism was n't exactly unknown in comic books at the time .",
+    "lemma_str": "this sort of violent nihilism be not exactly unknown in comic book at the time .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "unknown"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "unknown"
+    },
+    "index": {
+      "NEG": 6,
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "unknown",
+          "ix": 8,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "unknown",
+          "ix": 8,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 7,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7517_x12198_174",
+    "context": {
+      "prev_id": "pcc_eng_val_1.7517_x12198_173",
+      "prev_sent": "He could feel her scowling when she added, \"The next time I decide to do this, stop me.\"",
+      "next_id": "pcc_eng_val_1.7517_x12198_175",
+      "next_sent": "\"I'm pretty sure I did try to do that."
+    },
+    "match_id": "6-7-8",
+    "colloc_id": "pcc_eng_val_1.7517_x12198_174:7-8",
+    "hit_id": "pcc_eng_val_1.7517_x12198_174:6-7-8",
+    "text": "Although he knew it wasn't exactly appropriate, given her mood, he couldn't help but be irritated by her comment.",
+    "token_str": "Although he knew it was n't exactly appropriate , given her mood , he could n't help but be irritated by her comment .",
+    "lemma_str": "although he know it be not exactly appropriate , give she mood , he could not help but be irritate by she comment .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "appropriate"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "appropriate"
+    },
+    "index": {
+      "NEG": 5,
+      "ADV": 6,
+      "ADJ": 7
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "appropriate",
+          "ix": 7,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 5,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "appropriate",
+          "ix": 7,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 6,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7517_x12198_019",
+    "context": {
+      "prev_id": "pcc_eng_val_1.7517_x12198_018",
+      "prev_sent": "Even from his vantage point in the dining room, House could hear the sound of accusation in Arlene's distinctive voice.",
+      "next_id": "pcc_eng_val_1.7517_x12198_020",
+      "next_sent": "Accusation and disapproval were her constant companions, judgment her default position."
+    },
+    "match_id": "15-16-17",
+    "colloc_id": "pcc_eng_val_1.7517_x12198_019:16-17",
+    "hit_id": "pcc_eng_val_1.7517_x12198_019:15-16-17",
+    "text": "But he supposed, as he hid himself from view, that that wasn't exactly shocking.",
+    "token_str": "But he supposed , as he hid himself from view , that that was n't exactly shocking .",
+    "lemma_str": "but he suppose , as he hide himself from view , that that be not exactly shocking .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "shocking"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "shocking"
+    },
+    "index": {
+      "NEG": 14,
+      "ADV": 15,
+      "ADJ": 16
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "shocking",
+          "ix": 16,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 14,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "shocking",
+          "ix": 16,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 15,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7185_x11652_047",
+    "context": {
+      "prev_id": "pcc_eng_val_1.7185_x11652_046",
+      "prev_sent": "Who hasn't shot a glance at her pussy, and brought it to me and asked if it at all as she engulfed it with her turned around.",
+      "next_id": "pcc_eng_val_1.7185_x11652_048",
+      "next_sent": "Walking into the modest house, it was closer to my nipple and he sucks and nibbles it while he pulls his fingers out of her mouth with 1 smooth motion, what she couldn't fit her are backpage escorts safe hand all the backpage escorts is back forward, my nipples against his bare back, pressing against his butt, and reaching around to fondle his where do i find escorts with no backpage for a bit stopping every time she drove her hips down."
+    },
+    "match_id": "12-13-14",
+    "colloc_id": "pcc_eng_val_1.7185_x11652_047:13-14",
+    "hit_id": "pcc_eng_val_1.7185_x11652_047:12-13-14",
+    "text": "I feel his hand wrap around my dick - I'm not exactly sure of the abbreviations for the without backpage where to find escorts included.",
+    "token_str": "I feel his hand wrap around my dick - I 'm not exactly sure of the abbreviations for the without backpage where to find escorts included .",
+    "lemma_str": "I feel he hand wrap around my dick - I be not exactly sure of the abbreviation for the without backpage where to find escort include .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 11,
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 13,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 11,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 13,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 12,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.7010_x11358_16",
+    "context": {
+      "prev_id": "pcc_eng_val_1.7010_x11358_15",
+      "prev_sent": "These trepidations were certainly tempered on account of the meal being paid for by an alum, but I was still hoping for something good.",
+      "next_id": "pcc_eng_val_1.7010_x11358_17",
+      "next_sent": "Sure, other Middle Eastern food seems to be everywhere, but it's not often you come across pide, or the word \"kebab.\""
+    },
+    "match_id": "5-6-7",
+    "colloc_id": "pcc_eng_val_1.7010_x11358_16:6-7",
+    "hit_id": "pcc_eng_val_1.7010_x11358_16:5-6-7",
+    "text": "Genuine Turkish food isn't exactly easy to find.",
+    "token_str": "Genuine Turkish food is n't exactly easy to find .",
+    "lemma_str": "genuine Turkish food be not exactly easy to find .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "easy"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "easy"
+    },
+    "index": {
+      "NEG": 4,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "easy",
+          "ix": 6,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 4,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "easy",
+          "ix": 6,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.5250_x08580_53",
+    "context": {
+      "prev_id": "pcc_eng_val_1.5250_x08580_52",
+      "prev_sent": "",
+      "next_id": "pcc_eng_val_1.5250_x08580_54",
+      "next_sent": "But the Cheshire Cat doesn't have to be exactly helpful to make things better for Alice."
+    },
+    "match_id": "4-5-6",
+    "colloc_id": "pcc_eng_val_1.5250_x08580_53:5-6",
+    "hit_id": "pcc_eng_val_1.5250_x08580_53:4-5-6",
+    "text": "\"I'm not always sure he's doing it on purpose.\"",
+    "token_str": "\" I 'm not always sure he 's doing it on purpose . \"",
+    "lemma_str": "\" I be not always sure he be do it on purpose . \"",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "always",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "always",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 3,
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 5,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 5,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "always",
+          "ix": 4,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.5017_x08202_269",
+    "context": {
+      "prev_id": "pcc_eng_val_1.5017_x08202_268",
+      "prev_sent": "I sort of assumed, just by its name, that it was a werewolf movie, but it's not that at all.",
+      "next_id": "pcc_eng_val_1.5017_x08202_270",
+      "next_sent": "I also assumed that Ronny Cox would play a huge dick in it, because that's what Ronny Cox does."
+    },
+    "match_id": "09-10-11",
+    "colloc_id": "pcc_eng_val_1.5017_x08202_269:10-11",
+    "hit_id": "pcc_eng_val_1.5017_x08202_269:09-10-11",
+    "text": "After having watched it, I'm still not exactly sure what it's all about.",
+    "token_str": "After having watched it , I 'm still not exactly sure what it 's all about .",
+    "lemma_str": "after have watch it , I be still not exactly sure what it be all about .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "NEG": 8,
+      "ADV": 9,
+      "ADJ": 10
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 10,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 8,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 10,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 9,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.4159_x06768_05",
+    "context": {
+      "prev_id": "pcc_eng_val_1.4159_x06768_04",
+      "prev_sent": "The first update to Half-Life 2 since... - well, Update that has made me want to play through the campaign again.",
+      "next_id": "pcc_eng_val_1.4159_x06768_06",
+      "next_sent": "There's that, and there's going to be a handful more of updates, so maybe that hollowness will eventually be filled up further."
+    },
+    "match_id": "1-2-3",
+    "colloc_id": "pcc_eng_val_1.4159_x06768_05:2-3",
+    "hit_id": "pcc_eng_val_1.4159_x06768_05:1-2-3",
+    "text": "Not exactly perfect, but for the most part it does what it has to do.",
+    "token_str": "Not exactly perfect , but for the most part it does what it has to do .",
+    "lemma_str": "not exactly perfect , but for the most part it do what it have to do .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "perfect"
+    },
+    "forms": {
+      "NEG": "Not",
+      "ADV": "exactly",
+      "ADJ": "perfect"
+    },
+    "index": {
+      "NEG": 0,
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "perfect",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 0,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "perfect",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.3131_x05104_36",
+    "context": {
+      "prev_id": "pcc_eng_val_1.3131_x05104_35",
+      "prev_sent": "Most of those funds were not affected by the Stafford Loan rate change.",
+      "next_id": "pcc_eng_val_1.3131_x05104_37",
+      "next_sent": "\"There are a lot of options with a Stafford Loan when you are having trouble making payments,\" Cardwell said."
+    },
+    "match_id": "37-38-39",
+    "colloc_id": "pcc_eng_val_1.3131_x05104_36:38-39",
+    "hit_id": "pcc_eng_val_1.3131_x05104_36:37-38-39",
+    "text": "And while the student loan bubble has been compared to the housing loan bubble, which played a significant role in the 2008 financial crisis, Cardwell said she doesn't believe the two markets aren't exactly comparable as federal student loans are unlikely to burst.",
+    "token_str": "And while the student loan bubble has been compared to the housing loan bubble , which played a significant role in the 2008 financial crisis , Cardwell said she does n't believe the two markets are n't exactly comparable as federal student loans are unlikely to burst .",
+    "lemma_str": "and while the student loan bubble have be compare to the housing loan bubble , which play a significant role in the 2008 financial crisis , Cardwell say she do not believe the two market be not exactly comparable as federal student loan be unlikely to burst .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "comparable"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "comparable"
+    },
+    "index": {
+      "NEG": 36,
+      "ADV": 37,
+      "ADJ": 38
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "comparable",
+          "ix": 38,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 36,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "comparable",
+          "ix": 38,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 37,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.2998_x04887_04",
+    "context": {
+      "prev_id": "pcc_eng_val_1.2998_x04887_03",
+      "prev_sent": "You can get started with a career in football at a late age, but you have to be perseverant.",
+      "next_id": "pcc_eng_val_1.2998_x04887_05",
+      "next_sent": "You have to train all the time and of course play 5-a-side football."
+    },
+    "match_id": "10-11-12",
+    "colloc_id": "pcc_eng_val_1.2998_x04887_04:11-12",
+    "hit_id": "pcc_eng_val_1.2998_x04887_04:10-11-12",
+    "text": "While the path to becoming a professional player is not exactly difficult, is it simple either.",
+    "token_str": "While the path to becoming a professional player is not exactly difficult , is it simple either .",
+    "lemma_str": "while the path to become a professional player be not exactly difficult , be it simple either .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "difficult"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "difficult"
+    },
+    "index": {
+      "NEG": 9,
+      "ADV": 10,
+      "ADJ": 11
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "difficult",
+          "ix": 11,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 9,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "difficult",
+          "ix": 11,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 10,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.2346_x03794_08",
+    "context": {
+      "prev_id": "pcc_eng_val_1.2346_x03794_07",
+      "prev_sent": "Barenboim builds the scene on vast waves, with seamless transitions, and maintains intensity in the swelling, roiling intervals, thanks to the brilliant strings of the Staatskapelle Berlin.",
+      "next_id": "pcc_eng_val_1.2346_x03794_09",
+      "next_sent": "He summons a broad, regal tone, with a firm edge in the staccato thrusts (\"ein brautliches Feuer\") to complement his absolute command of the intimate lines leading to the final farewell."
+    },
+    "match_id": "11-12-13",
+    "colloc_id": "pcc_eng_val_1.2346_x03794_08:12-13",
+    "hit_id": "pcc_eng_val_1.2346_x03794_08:11-12-13",
+    "text": "Pape, a self-styled \"basso cantante,\" is not exactly typecast in Wotan's rugged music.",
+    "token_str": "Pape , a self-styled \" basso cantante , \" is not exactly typecast in Wotan 's rugged music .",
+    "lemma_str": "Pape , a self-style \" basso cantante , \" be not exactly typecast in Wotan 's rugged music .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "typecast"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "typecast"
+    },
+    "index": {
+      "NEG": 10,
+      "ADV": 11,
+      "ADJ": 12
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "typecast",
+          "ix": 12,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 10,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "typecast",
+          "ix": 12,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 11,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.1876_x03046_43",
+    "context": {
+      "prev_id": "pcc_eng_val_1.1876_x03046_42",
+      "prev_sent": "Poor dialogue.",
+      "next_id": "pcc_eng_val_1.1876_x03046_44",
+      "next_sent": "Pointless dialogue."
+    },
+    "match_id": "5-6-7",
+    "colloc_id": "pcc_eng_val_1.1876_x03046_43:6-7",
+    "hit_id": "pcc_eng_val_1.1876_x03046_43:5-6-7",
+    "text": "Though good dialogue isn't exactly teachable, there are some simple beginner mistakes to avoid when your characters speak.",
+    "token_str": "Though good dialogue is n't exactly teachable , there are some simple beginner mistakes to avoid when your characters speak .",
+    "lemma_str": "though good dialogue be not exactly teachable , there be some simple beginner mistake to avoid when you character speak .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "teachable"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "teachable"
+    },
+    "index": {
+      "NEG": 4,
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "teachable",
+          "ix": 6,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 4,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "teachable",
+          "ix": 6,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 5,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.1187_x01959_50",
+    "context": {
+      "prev_id": "pcc_eng_val_1.1187_x01959_49",
+      "prev_sent": "One area where things haven't improved from last year is in the length of the single player campaign.",
+      "next_id": "pcc_eng_val_1.1187_x01959_51",
+      "next_sent": "It's a shame and does take a small amount of gloss off the experience if for no other reason that like all good things you wish it could last forever."
+    },
+    "match_id": "31-32-33",
+    "colloc_id": "pcc_eng_val_1.1187_x01959_50:32-33",
+    "hit_id": "pcc_eng_val_1.1187_x01959_50:31-32-33",
+    "text": "As great as it is while it lasts it doesn't last anywhere near long enough, not even as long as the one in the original game which wasn't exactly epic in length itself.",
+    "token_str": "As great as it is while it lasts it does n't last anywhere near long enough , not even as long as the one in the original game which was n't exactly epic in length itself .",
+    "lemma_str": "as great as it be while it last it do not last anywhere near long enough , not even as long as the one in the original game which be not exactly epic in length itself .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "epic"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "epic"
+    },
+    "index": {
+      "NEG": 30,
+      "ADV": 31,
+      "ADJ": 32
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "epic",
+          "ix": 32,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 30,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "epic",
+          "ix": 32,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 31,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.0278_x00461_18",
+    "context": {
+      "prev_id": "pcc_eng_val_1.0278_x00461_17",
+      "prev_sent": "Every time Ana's about to call time on caning-as-foreplay, she gets a whiff of Christian Grey's \"expensive body wash\" and is on all fours.",
+      "next_id": "pcc_eng_val_1.0278_x00461_19",
+      "next_sent": "(it's likely not Dove for Men Extra Fresh.)"
+    },
+    "match_id": "7-8-9",
+    "colloc_id": "pcc_eng_val_1.0278_x00461_18:8-9",
+    "hit_id": "pcc_eng_val_1.0278_x00461_18:7-8-9",
+    "text": "In the book, she's not exactly strong on detail so you'll have to work out what it might be for yourself.",
+    "token_str": "In the book , she 's not exactly strong on detail so you 'll have to work out what it might be for yourself .",
+    "lemma_str": "in the book , she be not exactly strong on detail so you will have to work out what it might be for yourself .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "strong"
+    },
+    "forms": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "strong"
+    },
+    "index": {
+      "NEG": 6,
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "strong",
+          "ix": 8,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 6,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "strong",
+          "ix": 8,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 7,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_1.0271_x00447_056",
+    "context": {
+      "prev_id": "pcc_eng_val_1.0271_x00447_055",
+      "prev_sent": "Songya Mudan is a classification of Fujianese white tea with fewer buds than Bai Mudan.",
+      "next_id": "pcc_eng_val_1.0271_x00447_057",
+      "next_sent": "Instead, the amount of bud in the tea will affect the character of the brewed tea."
+    },
+    "match_id": "36-37-38",
+    "colloc_id": "pcc_eng_val_1.0271_x00447_056:37-38",
+    "hit_id": "pcc_eng_val_1.0271_x00447_056:36-37-38",
+    "text": "It's important to note that the main classifications of white tea are based mostly on the ratio of buds to leaves, Silver Needle, White Peony, etc., and that they aren't exactly related to quality of the tea.",
+    "token_str": "It 's important to note that the main classifications of white tea are based mostly on the ratio of buds to leaves , Silver Needle , White Peony , etc. , and that they are n't exactly related to quality of the tea .",
+    "lemma_str": "it be important to note that the main classification of white tea be base mostly on the ratio of bud to leave , Silver Needle , White Peony , etc. , and that they be not exactly related to quality of the tea .",
+    "lemmas": {
+      "NEG": "not",
+      "ADV": "exactly",
+      "ADJ": "related"
+    },
+    "forms": {
+      "NEG": "n't",
+      "ADV": "exactly",
+      "ADJ": "related"
+    },
+    "index": {
+      "NEG": 35,
+      "ADV": 36,
+      "ADJ": 37
+    },
+    "deps": {
+      "neg": {
+        "node": "neg",
+        "contiguous": false,
+        "relation": "advmod",
+        "head": {
+          "lemma": "related",
+          "ix": 37,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 35,
+          "xpos": "RB"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "related",
+          "ix": 37,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 36,
+          "xpos": "RB"
+        }
+      }
+    }
+  }
+]
