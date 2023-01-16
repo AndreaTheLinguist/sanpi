@@ -11,6 +11,8 @@
 #SBATCH --time 10:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --array 0-2
+#SBATCH --chdir=/share/compling/projects/sanpi/logs # to allow running `sbatch` cmd from anywhere and still put .out and .err in ../logs/ dir
+
 
 set -o errexit
 echo ">>=======================================<<"
