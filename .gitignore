@@ -385,9 +385,11 @@ sandbox/
 playground
 demo/**/x20_*
 demo/**/PccX9*
-demo/data/corpora/puddin/PccB2.conll
-demo/**/subset*
+demo/data/corpora/puddin
 demo/**/Pcc*.conll/*conllu
 demo/**/*tar
 demo/**/*.py
+
+demo/data/corpora/nyt5.conll
+demo/data/corpora/gitrepo_puddin/PccTe.conll/subset_advadj/pcc*.conllu
 
