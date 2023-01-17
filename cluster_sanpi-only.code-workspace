@@ -1,13 +1,24 @@
 {
 	"folders": [
 		{
-			"path": "/share/compling/projects/sanpi"
+			"path": "/share/compling/projects/sanpi", 
+			"name": "code-sanpi"
 		},
 		{
-			"path": "/share/compling/data/puddin"
+			"path": "/share/compling/data/puddin", 
+			"name": "data-puddin"
 		},
 		{
-			"path": "/share/compling/data/sanpi"
+			"path": "/share/compling/data/sanpi", 
+			"name": "data-sanpi"
+		}, 
+		{
+			"path": "/share/compling/data/new_york_times",
+			"name": "data-nyt"
+		},
+		{
+			"path": "/share/compling/data/assoc_press",
+			"name": "data-apw", 
 		}
 	],
 	"settings": {
@@ -47,6 +58,7 @@
 	"launch": {
 		"version": "0.2.0",
 		"configurations": [
+		
 			{
 				"name": "Python: create_match_conllu",
 				"type": "python",
