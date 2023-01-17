@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH -N1
-#SBATCH -n4
-#SBATCH --mem-per-cpu=10G
-#SBATCH --partition=compling
-#SBATCH -o %x_%j.out
-#SBATCH -e %x_%j.err
+#SBATCH -n5
+#SBATCH --mem-per-cpu=20G
+##SBATCH --partition=compling
+#SBATCH -o %x_%j.demo.out
+#SBATCH -e %x_%j.demo.err
 #SBATCH --time 1:00:00
 #SBATCH -J pipe-test
 #SBATCH --chdir=/share/compling/projects/sanpi/demo/logs
@@ -29,7 +29,7 @@ eval "$(conda shell.bash hook)"
 conda activate dev-sanpi
 DEMO_DIR="/share/compling/projects/sanpi/demo"
 
-CORP_IN=${1:-"puddin/PccX5.conll"}
+CORP_IN=${1:-"nyt5.conll"}
 CORP_ARG="${DEMO_DIR}/data/corpora/${CORP_IN}"
 
 PAT_IN=${2:-"contig"}
