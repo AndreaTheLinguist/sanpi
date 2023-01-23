@@ -1,12 +1,11 @@
 #!/bin/bash
 #SBATCH -N1
-##SBATCH -n5
-#SBATCH --mem=12G
+#SBATCH --mem=10G
 ##SBATCH --partition=compling
 #SBATCH -o %x_%j.demo.out
 #SBATCH -e %x_%j.demo.err
 #SBATCH --time 1:00:00
-#SBATCH -J pipe-test
+#SBATCH -J pipe-test-T(abulate)
 #SBATCH --chdir=/share/compling/projects/sanpi/demo/logs
 
 # bash script to start batch slurm job to run **demo/** grew_search with cluster resources
@@ -14,9 +13,9 @@
 #     sbatch [slurm flags addtions/overrides] slurm_pipeline_test.sh \
 #         [path of corpus dir relative to ..sanpi/demo/data/corpora/] \
 #         [path of pattern dir relative to ..sanpi/demo/Pat/ (= name of dir containing .pat files)] \
-# *   defaults to: `-c ../demo/data/corpora/nyt5.conll -p ../demo/Pat/contig`
+#   *Note: includes -T flag automatically (will jump directly to `tabulate_hits()`)
 
-echo 'running slurm script: `../sanpi/demo/slurm_pipeline_test.sh`'
+echo 'Running slurm script: `../sanpi/demo/slurm_pipeline_test-T.sh`'
 echo "JOB ID: ${SLURM_JOB_ID}"
 echo "JOB NAME: ${SLURM_JOB_NAME}"
 echo "started @ $(date '+%F %X') from $(pwd)"
@@ -36,5 +35,5 @@ CORP_ARG="${DEMO_DIR}/data/corpora/${CORP_IN}"
 PAT_IN=${2:-"contig"}
 PAT_ARG="${DEMO_DIR}/Pat/${PAT_IN}"
 
-echo "time python ${DEMO_DIR}/run_pipeline.py -c ${CORP_ARG} -p ${PAT_ARG} -g ${DEMO_DIR}/data/1_json_grew-matches"
-time python ${DEMO_DIR}/run_pipeline.py -c ${CORP_ARG} -p ${PAT_ARG} -g ${DEMO_DIR}/data/1_json_grew-matches
+echo "time python ${DEMO_DIR}/run_pipeline.py -T -c ${CORP_ARG} -p ${PAT_ARG} -g ${DEMO_DIR}/data/1_json_grew-matches"
+time python ${DEMO_DIR}/run_pipeline.py -T -c ${CORP_ARG} -p ${PAT_ARG} -g ${DEMO_DIR}/data/1_json_grew-matches
