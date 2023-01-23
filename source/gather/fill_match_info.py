@@ -134,7 +134,8 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
     # //                      if i.id in set(prev_ids + next_ids)}
 
     # > create full hit generator object from conllu file
-    conll_gen = (sent for sent in pyconll.load.iter_from_file(conllu_fpath)
+    conll_gen = (sent for sent 
+                 in pyconll.load.iter_from_file(str(conllu_fpath))
                  if sent.id in id_set)
     # conll_gen = (c for c in pyconll.load.iter_from_file(conllu_fpath)
     #              if c.id in sent_with_hit)
@@ -168,7 +169,7 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
 
             if current_id == hit_dict['sent_id']:
                 raw_match_info = hit_dict.pop('matching')
-                hit_dict['text'] = sent_text
+                hit_dict['sent_text'] = sent_text
                 hit_dict['token_str'] = ' '.join(t.form for t in tok_dicts)
                 hit_dict['lemma_str'] = ' '.join(t.lemma for t in tok_dicts)
 
