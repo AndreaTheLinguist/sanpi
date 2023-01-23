@@ -25,7 +25,7 @@ conda activate sanpi
 conda info | head -2 | tail -1
 
 #! pattern directory arg should be specified as directory name
-PAT_DIR_NAME=$1
+PAT_DIR_NAME=${1:-"contig"}
 echo "Pattern Type: ${PAT_DIR_NAME##*/}"
 DEMO_DIR=/share/compling/projects/sanpi/demo
 OUT_DIR=${DEMO_DIR}/data

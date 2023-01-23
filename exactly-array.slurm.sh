@@ -6,9 +6,9 @@
 #SBATCH -e %x_%2a.%j.err                # Name of stderr output log file (%j expands to jobID)
 #SBATCH --open-mode=append
 #SBATCH -N 1                            # Total number of nodes requested
-#SBATCH -n 10                            # Total number of cores requested
-#SBATCH --mem-per-cpu=10G                     # Total amount of (real) memory requested (per node)
-#SBATCH --time 10:00:00                  # Time limit (hh:mm:ss)
+#SBATCH -n 12                            # Total number of cores requested
+#SBATCH --mem=50G                     # Total amount of (real) memory requested (per node)
+#SBATCH --time 2:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --array 0-2
 #SBATCH --chdir=/share/compling/projects/sanpi/logs # to allow running `sbatch` cmd from anywhere and still put .out and .err in ../logs/ dir
@@ -26,7 +26,7 @@ conda activate parallel-sanpi
 conda info | head -2 | tail -1
 
 # pattern directory should be specified as directory name
-PAT_DIR_NAME=$1
+PAT_DIR_NAME=${1:-"contig"}
 echo "Pattern Type: ${PAT_DIR_NAME##*/}"
 DATA_DIR=/share/compling/data
 if [[ ! -d ${DATA_DIR} ]]; then
