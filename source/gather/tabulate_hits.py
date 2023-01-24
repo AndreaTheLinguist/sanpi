@@ -9,8 +9,14 @@ import time
 from pathlib import Path
 
 import pandas as pd
-pd.set_option('display.max_columns', 10, 'display.width', 120)
-DATA_DIR = Path.home().joinpath('data')
+pd.set_option('display.max_columns', 10)
+pd.set_option('display.width', 120)
+DATA_DIR = Path.cwd().joinpath('data')
+if not DATA_DIR.is_dir():
+    DATA_DIR = Path.home().joinpath('data')
+    if not DATA_DIR.is_dir():
+        DATA_DIR.mkdir()
+TIMESTAMP = time.perf_counter
 
 
 def _parse_args():
@@ -28,22 +34,29 @@ def _parse_args():
 
 
 def tabulate_hits(match_dir: Path):
-    start_time = time.perf_counter()
-    print(time.strftime("%Y-%m-%d_%I:%M%p"))
-    log_dir = Path(*match_dir.parents._parts[:-3], 'logs', match_dir.name)
+    start_time = TIMESTAMP()
+    print(time.strftime("%Y-%m-%d @ %I:%M%p"))
+    print(f' ~ Grew Match Directory: {match_dir}')
+    log_dir = Path(*match_dir.parts[:-3], 'logs', 'tabulate', match_dir.name)
+    # print(f'Tabulate log destination: {log_dir}')
     if not log_dir.is_dir():
         log_dir.mkdir(parents=True)
     log_file = log_dir.joinpath(f'tabulate_{time.strftime("%Y-%m-%d_%R")}.log')
-    print(f'Log will be saved to: {log_file}')
-    # logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    logging.basicConfig(filename=log_file, encoding='utf-8', level=logging.INFO,
+    print(f'Log will be saved to: `{log_file}`')
+    """ Logging snippets:
+        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logging.debug('This message should NOT go to the log file')
+        logging.info('So should this')
+        logging.warning('And this, too')
+        logging.error('And non-ASCII stuff, too, like Øresund and Malmö'
+    """
+    logging.basicConfig(filename=log_file, encoding='utf-8',
+                        # level=logging.DEBUG,
+                        level=logging.INFO,
+                        # level=logging.WARNING,
                         format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p')
-    # logging.debug('This message should NOT go to the log file')
-    # logging.info('So should this')
-    # logging.warning('And this, too')
-    # logging.error('And non-ASCII stuff, too, like Øresund and Malmö')
+
     logging.info('Tabulating hits from json files in %s', str(match_dir))
-    # json_dir = args.grew_match_dir
     if not match_dir.exists():
         logging.error('Specified json directory does not exist.')
         sys.exit('Error: Specified json directory does not exist.')
@@ -52,17 +65,16 @@ def tabulate_hits(match_dir: Path):
         sys.exit('Error: Specified json path is not a directory.')
 
     hit_data = _get_hit_data(match_dir)
-
     hit_count = len(hit_data)
     if hit_count > 0:
         logging.info(
-            ('\n^_^ Finished tabulating data for %i matching hit(s) '
-             'from all json files in %s/\n-> Writing tables to csv files...'),
+            ('\n✔ Finished tabulating data for %i matching hit(s) '
+             'from all json files in %s/\n-> Writing tables to files...'),
             hit_count,
             str(match_dir))
-        print(f'\n^_^ Finished tabulating data for {hit_count}'
+        print(f'\n✔ Finished tabulating data for {hit_count}'
               f' matching hit(s) from all json files in {match_dir}/\n'
-              '-> Writing tables to csv files...')
+              '-> Writing tables to files...')
 
         _create_output(hit_data, match_dir, start_time)
     else:
@@ -75,7 +87,7 @@ def tabulate_hits(match_dir: Path):
 def _get_hit_data(json_dir):
 
     file_count = 0
-    df_from_json = pd.DataFrame()
+    json_dir_df = pd.DataFrame()
 
     # check if there are any files other than the ...raw.json files
     # processed_files = tuple(json_dir.glob('**/*[!w].json'))
@@ -92,14 +104,18 @@ def _get_hit_data(json_dir):
         file_count += 1
 
         logging.info('-> Processing %s...', json_file.name)
-        # print(f'-> Processing {json_file.name}...')
+        print(f'-> Processing {json_file.name}...')
 
         with open(json_file, 'r', encoding='utf-8') as j:
 
+            jl0 = TIMESTAMP()
             json_dicts = json.load(j)
+            jl1 = TIMESTAMP()
+            jl_time = f'  Time to load json: {dur_round(jl1-jl0)}'
+            logging.info(jl_time)
+            # print(jl_time)
 
             if len(json_dicts) < 1:
-
                 print('--> File is empty. Skipping.')
                 continue
 
@@ -114,121 +130,196 @@ def _get_hit_data(json_dir):
                       f'{raw_path.name} and then try again.')
                 continue
 
-        df = pd.json_normalize(json_dicts, max_level=2)
+        df = pd.json_normalize(json_dicts, sep='_', max_level=1)
 
-        df.columns = (df.columns.str.replace('.', '_', regex=False)
-                      .str.replace('s_', '_', regex=False))
+        #* since `hit_id` is now added in previous module, it can be moved to the index immediately.
+        df = df.convert_dtypes().set_index('hit_id')
 
-        df = (df.rename(columns={'text': 'sent_text'})
-              .assign(json_source=json_file.stem))
+        df.columns = (df.columns.str.replace('s_', '_', regex=False))
+
+        df = df.assign(json_source=json_file)
 
         invert_pat = re.compile(r'(\w+)_([A-Z]+)')
-        df.columns = [invert_pat.sub(r'\2_\1', label).lower()
+        df.columns = [invert_pat.sub(r'\2_\1', str(label)).lower()
                       for label in df.columns]
 
-        df = _remove_redundant(df)
+        rr0 = TIMESTAMP()
 
+        df = _remove_redundant(df, json_file)
+        rr1 = TIMESTAMP()
+        logging.info('Time to remove redundant entries: %s',
+                     dur_round(rr1-rr0))
+
+        pi0 = TIMESTAMP()
         df = _process_ix(df)
+        pi1 = TIMESTAMP()
+        logging.info('Time to process indices: %s', dur_round(pi1-pi0))
 
         df = df.convert_dtypes()
 
-        # Note: This does not check that the adv and adj are actually true collocates
+        #Note: This does not check that the adv and adj are actually true collocates
         if 'adv_form' in df.columns and 'adj_form' in df.columns:
             collocs = df.adv_form + '_' + df.adj_form
         else:
             collocs = ''
 
-        #   (having both adv and adj is unnecessary since they are required to be contiguous with ADV first,
-        #    but I'm sure I'd get confused about which token it is if only 1 was included)
-        # > `hit_id` ->  NEG-ADV-ADJ
+        # (having both adv and adj is unnecessary
+        #  since they are required to be contiguous with ADV first,
+        #  but I'm sure I'd get confused about which token it is
+        #  if only 1 was included)
+        # // > `hit_id` ->  NEG-ADV-ADJ
+        # > (update) `hit_id` -> all nodes delineated by -
         # > `colloc_id` ->  ADV-ADJ (only)
-        df = df.assign(hit_id=df.sent_id+':'+df.match_ix,
-                       colloc_id=df.sent_id+':' +
-                       df.adv_index.astype('string')+'-' +
-                       df.adj_index.astype('string'),
-                       colloc=collocs)
+        df = df.assign(
+            # // hit_id=df.sent_id+':'+df.match_ix,
+            # // colloc_id=(df.sent_id + ':' + df.adv_index.astype('string')
+            # //            + '-' + df.adj_index.astype('string')),
+            colloc=collocs)
 
-        df_from_json = pd.concat([df, df_from_json])
+        json_dir_df = pd.concat([df, json_dir_df])
 
-    return df_from_json
+    return json_dir_df
 
 
-def _remove_redundant(df: pd.DataFrame()):
+def _remove_redundant(df, json_path):
+
+    #TODO: remove? Don't think this is still necessary since indexing was fixed.
     logging.info('removing redundant pattern matches...')
-    is_unfilled = df.sent_text.isna()
-    unfilled_rows = df.loc[is_unfilled, :]
-    unfilled_ids = unfilled_rows.hit_id
-    filled_ids = df.hit_id[~is_unfilled].unique()
-    # reconfigure dataframe to be:
-    #   all filled rows
-    #   + all unfilled rows representing an otherwise unaccounted hit (not in filled rows)
-    unaccounted_raw = unfilled_rows.loc[~unfilled_ids.isin(filled_ids), :]
-    fdf = pd.concat([df.loc[~is_unfilled, :], unaccounted_raw])
-    if unaccounted_raw.empty:
-        fdf = fdf.loc[:, fdf.columns[~fdf.columns.str.contains('matching_')]]
-    else:
-        logging.warning('Unfilled nonduplicate rows remaining in dataframe.')
-        print('-> Warning: unfilled nonduplicate rows remaining in dataframe.')
+    # is_unfilled = df.sent_text.isna()
+    # unfilled_rows = df.loc[is_unfilled, :]
+    # unfilled_ids = unfilled_rows.reset_index().hit_id
+    # filled_ids = df.reset_index().hit_id[~is_unfilled].unique()
+    # # > reconfigure dataframe to be:
+    # # >   all filled rows
+    # # >   + all unfilled rows representing an otherwise unaccounted hit (not in filled rows)
+    # unaccounted_raw = unfilled_rows.loc[~unfilled_ids.isin(filled_ids), :]
+    # fdf = pd.concat([df.loc[~is_unfilled, :], unaccounted_raw])
+    # if unaccounted_raw.empty:
+    #     fdf = fdf.loc[:, fdf.columns[~fdf.columns.str.contains('matching_')]]
+    #     logging.warning('Unfilled nonduplicate rows remaining in dataframe.')
+    # #! cheating, for now, because I'm not certain the above should be removed yet.
+    fdf = df
+    # > then also remove any full duplicates
+    dep_cols = fdf.columns[fdf.columns.str.startswith('dep')].to_list()
+    dup_assess_cols = ['match_id', 'sent_text', 'context_prev_sent',
+                       'context_next_sent'] + dep_cols
+    # dictionaries are not hashable types, so will crash with duplicated()
+    # fdf.loc[:, dep_cols] = fdf.loc[:, dep_cols].astype('string')
+    fdf_hashable = fdf.copy()
+    fdf_hashable[dep_cols] = fdf_hashable[dep_cols].astype('string')
+    keep_duplicate = fdf_hashable.duplicated(
+        subset=dup_assess_cols, keep='first')
+    #! use copy to create boolean indexer, but pull data from original
+    keep_df = fdf.loc[~keep_duplicate, :]
 
-    # then also remove any full duplicates
-    keep_df = fdf.loc[~fdf.duplicated(['hit_id', 'token_str']), :]
+    if len(keep_df) < len(fdf):
+
+        logging.warning('%d duplicate hits removed from dataframe',
+                        len(fdf) - len(keep_df))
+        # TODO: remove -- tmp print
+        print(f'{len(fdf) - len(keep_df)} duplicate hits removed from dataframe')
+        is_duplicate = fdf_hashable.duplicated(subset=dup_assess_cols, keep=False)
+        all_dup_df = fdf.loc[is_duplicate, :]
+        
+        flat_deps_frame = pd.json_normalize(all_dup_df[dep_cols].to_dict(
+            orient='records'), sep='_', max_level=1)
+        flat_deps_frame = flat_deps_frame.loc[:, flat_deps_frame.columns.str.endswith(
+            ('head', 'target', 'relation'))]
+        all_dup_flat = all_dup_df.loc[:, ~all_dup_df.columns.str.startswith(
+            'dep')].join(flat_deps_frame)
+        # all_dup_df = all_dup_df[
+        #     ['hit_id', 'json_source', 'sent_id', 'match_id','context_prev_sent', 'sent_text', 'context_next_sent']
+        #     ].join(flatten_deps_df)
+        all_dup_flat = (all_dup_flat
+                        .assign(kept=all_dup_flat.index.isin(keep_df.index))
+                        .sort_values('kept', ascending=False)
+                        .sort_values('sent_text'))
+        if logging.getLogger().getEffectiveLevel() < 20:
+            DEBUG_OUT = DATA_DIR.joinpath('debug')
+            if not DEBUG_OUT.is_dir(): 
+                DEBUG_OUT.mkdir()
+            for obj_name, df_obj in (('df', df), ('fdf', fdf), ('all-dup', all_dup_df), ('all-dup_dep-flat', all_dup_flat)):
+                df_obj.to_pickle(DATA_DIR.joinpath('debug', f'err_{obj_name}.pkl'))
+                df_obj.to_csv(DEBUG_OUT.joinpath(f'err_{obj_name}.csv')) 
+        logging.info('\n%s', all_dup_flat.to_markdown())
+        # TODO: fix bug -- slurm `segmentation fault`. this is where the log stops. 👇
+        #! running following line in debug  console just crashed everything...? doe these things not exist?
+        #? commenting out this line eliminates the segmentation fault, but I have no idea why?
+        # logging.info(all_dup_flat.loc[~all_dup_flat.kept, :].to_json(
+        #     orient='records', indent=4))
+        dup_csv_path = json_path.with_suffix('.duplicates.csv')
+        all_dup_df.to_csv(dup_csv_path)
+        # print(all_dup_df.to_json(orient='records', indent=3))
+        logging.info('Duplicate hit info saved to %s', str(dup_csv_path))
+
+    else:
+        logging.info('No duplicated hits in %s', str(json_path.parts[-3:]))
+
     return keep_df
 
 
 def _process_ix(df):
     if any(df.token_str.isna()):
         logging.warning('Empty token string(s) in json data.')
+        
+    #? Are .fillna() applications necessary here?? they shouldn't be. These should all have values...
     df = df.assign(token_str=df.token_str.astype('string').fillna(''))
-    # TODO: instead of calculating this from the string, pull value from length of tokens object in previous module (add utt len to json file)
     utt_len = pd.to_numeric(df.token_str.apply(lambda x: len(x.split())),
                             downcast='integer')
     ix_df = df.loc[:, df.columns.str.endswith(('index'))]
     ix_df = ix_df.fillna(0).apply(pd.to_numeric, downcast='integer')
 
-    ix_df = ix_df.assign(hit_start_ix=pd.to_numeric(ix_df.apply(min, axis=1), downcast='integer'),
+    ix_df = ix_df.assign(hit_start_ix=pd.to_numeric(ix_df.apply(min, axis=1), downcast='unsigned'),
                          hit_final_ix=pd.to_numeric(ix_df.apply(
-                             max, axis=1), downcast='integer') + 1,
+                             max, axis=1), downcast='unsigned'),
                          utt_len=utt_len,
                          token_str=df.token_str)
+    # ix_df = ix_df.assign(hit_start_ix=pd.to_numeric(ix_df.apply(min, axis=1), downcast='integer'),
+    #                      hit_final_ix=pd.to_numeric(ix_df.apply(
+    #                          max, axis=1), downcast='integer') + 1,
+    #                      utt_len=utt_len,
+    #                      token_str=df.token_str)
 
-    # > same hit_id but one is unprocessed for some reason (unresolved bug in fill_match_info)
-    # duplicate_hits = ix_df.loc[ix_df.duplicated(['token_str', 'hit_start_ix', 'hit_final_ix'], keep=False),ix_df.columns.str.endswith(('index', 'str'))].sort_values('token_str')
-    # windows = list(_generate_window(ix_df))
+    # // duplicate_hits = ix_df.loc[ix_df.duplicated(['token_str', 'hit_start_ix', 'hit_final_ix'], keep=False),ix_df.columns.str.endswith(('index', 'str'))].sort_values('token_str')
+    # // windows = list(_generate_window(ix_df))
     # ^ trying this a new way:
-    win_df = ix_df.assign(ix_3_before=ix_df.hit_start_ix - 3,
-                          #! +4 instead of +3 because indexing works as [start, end).
-                          #    That is, start is included in selection, but end is not,
-                          #    so to get e.g. word 4 through word 8, must use words[4:9]
-                          ix_3_after=ix_df.hit_final_ix + 4)
-    #! similarly, utt_len (len(token_str)) is fine as is
-    #   (do not need to adjust for 0 indexing with `utt_len - 1`
-    #   because end is not included)
-    win_df = win_df.assign(win_start_ix=win_df.ix_3_before.apply(lambda x: max(x, 0)),
-                           win_final_ix=win_df.loc[:, ['ix_3_after', 'utt_len']].min(axis=1))
+    # win_df = ix_df.assign(
+    #     ix_3_before=ix_df.hit_start_ix - 3,
+    #     #// ! +4 instead of +3 because indexing works as [start, end).
+    #     #//    That is, start is included in selection, but end is not,
+    #     #//    so to get e.g. word 4 through word 8, must use words[4:9]
+    #     #^ rather than worry about all this implicitly, just adjust getting range
+    #     ix_3_after=ix_df.hit_final_ix + 3)
 
-    win_df = win_df.assign(
-        win_str=pd.Series(win_df.index).apply(
-            lambda i: ' '.join(win_df.at[i, 'token_str']
-                               .split()[win_df.win_start_ix[i]:win_df.win_final_ix[i]])
-        ),
-        hit_str=pd.Series(win_df.index).apply(
-            lambda i: ' '.join(win_df.at[i, 'token_str']
-                               .split()[win_df.hit_start_ix[i]:win_df.hit_final_ix[i]])
+    #// ! similarly, utt_len (len(token_str)) is fine as is
+    #//   (do not need to adjust for 0 indexing with `utt_len - 1`
+    #//   because end is not included)
+    ix_df = ix_df.assign(
+        win_start_ix=ix_df.hit_start_ix.apply(lambda x: max(x - 3, 0)),
+        # testing for end of string is unnecessary. going over the len() value doesn't do anything
+        win_final_ix=ix_df.hit_final_ix + 3
         )
-    )
 
-    # ? Is this still used/needed? Pretty sure the hit_id column already exists at this point now
-    # ? Are the numbers different than the hit id numbers? i.e. actual index values?
-    # select index int columns to be used in creating hit id
-    tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
-        ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
+    win_strs = tuple(_gen_excerpt(ix_df.token_str, ix_df.win_start_ix, ix_df.win_final_ix))
+    hit_strs = tuple(_gen_excerpt(ix_df.token_str, ix_df.hit_start_ix, ix_df.hit_final_ix))
 
-    df = df.assign(match_ix=tok_ix_df.apply(lambda x: '-'.join(x), axis=1),
-                   hit_text=win_df.hit_str,
-                   text_window=win_df.win_str,
-                   utt_len=win_df.utt_len)
+    # hit_id and match_id already exists at this point now
+    # // select index int columns to be used in creating hit id
+    # // tok_ix_df = ix_df.loc[:, ix_df.columns.str.startswith(
+    # //     ('neg', 'adv', 'adj'))].apply(lambda c: c.astype('string'))
+
+    df = df.assign(
+        # // match_ix=tok_ix_df.apply(lambda x: '-'.join(x), axis=1),
+        hit_text=hit_strs,
+        text_window=win_strs,
+        utt_len=ix_df.utt_len)
     return df
 
+
+def _gen_excerpt(text_iter, start_iter, final_iter):
+    for full_string, start, final in zip(text_iter, start_iter, final_iter):
+        yield ' '.join(full_string.split()[start:1 + final])
+    
 
 # // def _generate_window(df):
     # //
@@ -254,7 +345,8 @@ def _create_output(hits_df, match_dir, start_time):
     if not output_dir.exists():
         output_dir.mkdir(parents=True)
 
-    hits_df = hits_df.set_index('hit_id')
+    #! already done. Will cause KeyError now
+    #// hits_df = hits_df.set_index('hit_id')
     hits_df = hits_df.assign(category=pat_category).convert_dtypes()
     hit_cols = hits_df.columns
 
@@ -301,7 +393,7 @@ def _create_output(hits_df, match_dir, start_time):
 
     view_sample_size = min(5, len(hits_df))
     print_cols = hits_df.columns[hits_df.columns.isin(
-        ('neg_form', 'colloc', 'sent_text'))]
+        ('neg_form', 'colloc', 'text_window'))]
     try:
         print_table = hits_df[print_cols].sample(
             view_sample_size).to_markdown()
@@ -314,10 +406,10 @@ def _create_output(hits_df, match_dir, start_time):
     print('\n#### Data Sample ####\n')
     print(print_table+'\n')
 
-    finish_time = time.perf_counter()
+    finish_time = TIMESTAMP()
     dur_str = dur_round(finish_time - start_time)
     print(f'Time to tabulate hits: {dur_str}')
-    logging.info('Tabulation Step Complete! Time elapsed: %s', dur_str)
+    logging.info('Tabulation Complete! Time elapsed: %s', dur_str)
 
 
 def dur_round(time_dur: float):
@@ -348,12 +440,12 @@ def dur_round(time_dur: float):
 
 
 if __name__ == '__main__':
-    absStart = time.perf_counter()
+    absStart = TIMESTAMP()
     # print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = _parse_args()
 
     tabulate_hits(*args)
 
-    absFinish = time.perf_counter()
+    absFinish = TIMESTAMP()
     print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
           '====================================\n')
