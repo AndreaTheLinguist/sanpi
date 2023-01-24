@@ -146,19 +146,6 @@
 				]
 			},
 			{
-				"name": "process exactly_test contig",
-				"type": "python",
-				"request": "launch",
-				"program": "source/analyze/processTables.py",
-				"console": "integratedTerminal",
-				"cwd": "/share/compling/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-d",
-					"data",
-				]
-			},
-			{
 				"name": "run_pipeline exactly_test contig TABULATE",
 				"type": "python",
 				"request": "launch",
@@ -170,6 +157,24 @@
 					"-T",
 					"-c",
 					"data/corpora/subsets/exactly_test",
+					"-p",
+					"Pat/contig",
+					"--grew_output_dir",
+					"data/1_json_grew-matches"
+				]
+			},
+			{
+				"name": "run_pipeline exactly_puddin-val contig TABULATE",
+				"type": "python",
+				"request": "launch",
+				"program": "run_pipeline.py",
+				"console": "integratedTerminal",
+				"cwd": "/home/arh234/projects/sanpi/demo",
+				"justMyCode": true,
+				"args": [
+					"-T",
+					"-c",
+					"data/corpora/subsets/exactly_puddin-val",
 					"-p",
 					"Pat/contig",
 					"--grew_output_dir",

@@ -45,13 +45,32 @@
         {
             "name": "pipeline exactly-test contig",
             "type": "python",
-            "request": "attach",
+            "request": "launch",
             "program": "run_pipeline.py",
             "console": "integratedTerminal",
             // "cwd": "${workspaceFolder}",
-            "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+            // "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
             //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
             "args": [
+                "-c",
+                "/share/compling/data/sanpi/subsets/exactly_test",
+                "-p",
+                "Pat/contig", 
+                "--grew_output_dir", 
+                "/share/compling/data/sanpi/1_json_grew-matches"
+            ]
+        },
+        {
+            "name": "pipeline exactly-test contig-TABULATE",
+            "type": "python",
+            "request": "launch",
+            "program": "run_pipeline.py",
+            "console": "integratedTerminal",
+            // "cwd": "${workspaceFolder}",
+            // "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+            //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
+            "args": [
+                "-T",
                 "-c",
                 "/share/compling/data/sanpi/subsets/exactly_test",
                 "-p",
