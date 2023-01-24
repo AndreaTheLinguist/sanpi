@@ -1,11 +1,23 @@
 # %%
 import pandas as pd
+from json import dumps
 from pathlib import Path
 from collections import namedtuple
 from pprint import pprint
 pd.set_option('display.width', 120, 'display.max_colwidth', 40)
 _TIE_STR = '->'
+_FILEGLOB = 'exactly_apw*hits.pkl.gz'
+pd.set_option('display.max_columns', 10)
+pd.set_option('display.width', 100)
 # %%
+def print_iter(iter_obj):
+    print(' ▸ '+'\n ▸ '.join(iter_obj))
+    
+# %% [markdown]
+# Select dataframes to be crosstabulated
+#
+# ```{python}
+# # %%
 # * one pickled dataframe only (i.e. no NaN values)
 # # > scoped sample
 # # df_path = Path('/home/arh234/projects/sanpi/demo/data/2_csv_hits/'
@@ -14,26 +26,35 @@ _TIE_STR = '->'
 # # df_path = Path('/home/arh234/projects/sanpi/demo/data/2_csv_hits/'
 # #               'raised/exactly_test_neg-raised_hits.pkl.gz')
 # # > contig sample
-# df_path = Path('/home/arh234/projects/sanpi/demo/data/2_csv_hits/'
-#                'contig/exactly_test_sans-relay_hits.pkl.gz')
+# #df_path = Path('/home/arh234/projects/sanpi/demo/data/2_csv_hits/'
+# #               'contig/exactly_test_sans-relay_hits.pkl.gz')
 
-# df = pd.read_pickle(df_path)
+# #df = pd.read_pickle(df_path)
 
-# %%
-# * multiple pickled dataframes concatenated into a single frame
-# > hits for more than 1 pattern type ==> NaN values in optional columns
-pickles_from_paths = (Path('/home/arh234/projects/sanpi/demo/data/2_csv_hits').joinpath(dataset_path)
-           for dataset_path
-           in ('contig/exactly_test_sans-relay_hits.pkl.gz',
-               'scoped/exactly_test_with-relay_hits.pkl.gz',
-               'raised/exactly_test_neg-raised_hits.pkl.gz')
-           )
+# # %%
+# # * multiple pickled dataframes concatenated into a single frame
+# # > hits for more than 1 pattern type ==> NaN values in optional columns
+# # pickles_from_paths = (Path('/share/compling/data/sanpi/demo/data/2_hit_tables').joinpath(dataset_path)
+# #            for dataset_path
+# #            in ('contig/exactly_test_sans-relay_hits.pkl.gz',
+# #                'scoped/exactly_test_with-relay_hits.pkl.gz',
+# #                'raised/exactly_test_neg-raised_hits.pkl.gz')
+# #            )
+# ```
+
 # %% 
 #> data inputs could also be a glob expression for a directory
-pickles_from_dir = Path('/home/arh234/projects/sanpi/demo/data/2_csv_hits').rglob('exactly*hits.pkl.gz')
+pickles_from_dir = Path('/share/compling/data/sanpi/2_hit_tables').rglob(_FILEGLOB)
 
-pickles = pickles_from_dir
+pickles = tuple(pickles_from_dir)
+print(f'{len(pickles)} paths matching {_FILEGLOB} found.')
+print_iter([f'../{Path(*p.parts[-3:])}' for p in pickles])
 # pickles = pickles_from_paths
+
+# %% [markdown]
+# Read in all indicated dataframes and concatonate
+
+# %% 
 df = pd.concat((pd.read_pickle(p) for p in pickles))
 
 # %% [markdown]
@@ -41,64 +62,87 @@ df = pd.concat((pd.read_pickle(p) for p in pickles))
 # Almost everything needed for dep path is in in the `dep_[label]_target` columns but the index of the head token is not. This can be retrieved from the `source` columns though, and then everything is contained in a single set of dictionaries
 
 # %%
-all_dep_fields = ['head_ix', 'head_lemma', 'head_xpos',
-                  'target_ix', 'target_lemma', 'target_xpos',
-                  'relation', 'node']
-dep_info = namedtuple('dependency_ix', all_dep_fields)
+# all_dep_fields = ['head_ix', 'head_lemma', 'head_xpos',
+#                   'target_ix', 'target_lemma', 'target_xpos',
+#                   'relation', 'node']
+# dep_info = namedtuple('dependency_ix', all_dep_fields)
 dep_identifiers = ['node', 'target_lemma', 'head_lemma']
 final_dep = namedtuple('dependency', dep_identifiers)
-target_cols = df.columns[df.columns.str.endswith('target')].to_list()
-print('TARGET columns')
-pprint(target_cols)
-labels = [c.split('_')[1] for c in target_cols]
-print('labels')
-pprint(labels)
-source_cols = [f"dep_{L}_source" for L in labels]
-print('SOURCE columns')
-pprint(source_cols)
+dep_cols = df.columns[df.columns.str.startswith('dep')].to_list()
+print('## dependency info columns')
+print_iter(dep_cols)
+#// target_cols = df.columns[df.columns.str.endswith('target')].to_list()
+#// print('## dep TARGET columns')
+#// print_iter(target_cols)
+
+labels = [c.split('_')[1] for c in dep_cols]
+print('## labels')
+print_iter(labels)
+
+# no longer necessary with new structure
+#// head_cols = [f"dep_{L}_head" for L in labels]
+#// print('## dep HEAD columns')
+#// print_iter(head_cols)
 
 # %%
-full_deps_info = {}
-dep_ix_str = {}
-dep_str = {}
-dep_mask_str = {}
-dep_dicts = {}
-dep_dict_values = {}
-dep_tuples = {}
+# full_deps_info = {}
+# dep_ix_str = {}
+# dep_str = {}
+# dep_mask_str = {}
+# dep_dicts = {}
+# dep_dict_values = {}
+# dep_tuples = {}
+
+#TODO: 📌 update this to use `json_normalize()` and skip `namedtuple()`
 for ix in df.index:
     # for c, ix in enumerate(df.index):
     # if c > 1:
     #     break
-    row = df.loc[ix, ['category'] + target_cols + source_cols].fillna('n/a')
+    #? is `fillna('n/a') necessary?`
+    row = df.loc[ix, ['category'] + dep_cols].fillna('n/a')
+    
+    print(f'## row {ix} values')
+    print_iter(f'{x}\n    {row[x]}' 
+               for x in row.index 
+               if not isinstance(row[x], dict))
+    print_iter(f'{x}\n    {pd.Series(row[x])}\n' 
+               for x in row.index 
+               if isinstance(row[x], dict))
     # print(row.to_markdown())
-    deps = {}
+    deps = pd.DataFrame()
     # ^ with multiple patterns concatenated, there will be NaN values for some "target" cols.
     # ? Is it better to simply skip those, or include them with empty values?
-    for t_col, s_col, label in zip(target_cols, source_cols, labels):
+    for dep_col, label in zip(dep_cols, labels):
         # > first trying it with a simple `continue`... 🤞
-        if row[t_col] == 'n/a':
+        if row.at[dep_col] == 'n/a':
             continue
 
         dep = None
-        adds = {'node': label}
-        t_dict = row[t_col]
-        s_dict = row[s_col]
-        if not (s_dict != 'n/a' and t_dict['head'] == s_dict['lemma']):
-            print(
-                f'ERROR: mismatch between target and source info for {label} node dependency for hit {ix}')
-            continue
-        # fields = ['head_ix', 'head_lemma', 'head_xpos',
-        #           'target_ix', 'target_lemma', 'target_xpos',
-        #           'relation', 'node']
-        dep = dep_info(head_ix=s_dict.get('ix', -1),
-                       head_lemma=t_dict['head'],
-                       head_xpos=s_dict.get('xpos', '_'),
-                       target_ix=t_dict['ix'],
-                       target_lemma=t_dict['lemma'],
-                       target_xpos=t_dict['xpos'],
-                       relation=t_dict['deprel'],
-                       node=label)
-
+        ## already in dep_col value dict
+        #// adds = {'node': label}
+        # t_dict = row[dep_col]['target']
+        # h_dict = row[dep_col]['head']
+        #// s_dict = row[s_col]
+        #// if not (s_dict != 'n/a' and t_dict['head'] == s_dict['lemma']):
+        #//     print(
+        #//         f'ERROR: mismatch between target and source info for {label} node dependency for hit {ix}')
+        #//     continue
+        
+        #// fields = ['head_ix', 'head_lemma', 'head_xpos',
+        #//           'target_ix', 'target_lemma', 'target_xpos',
+        #//           'relation', 'node']
+        #// dep = dep_info(head_ix=h_dict['ix'],
+        #//                head_lemma=h_dict['lemma'],
+        #//                head_xpos=s_dict.get('xpos', '_'),
+        #//                target_ix=t_dict['ix'],
+        #//                target_lemma=t_dict['lemma'],
+        #//                target_xpos=t_dict['xpos'],
+        #//                relation=t_dict['deprel'],
+        #//                node=label)
+        # dep = pd.json_normalize(row[dep_col], sep='_').to_dict()[0]
+        # deps['dep_info_' + label] = dep
+        
+        dep = pd.json_normalize(row[dep_col], sep='_')
         deps['dep_info_' + label] = dep
 
     hit_deps = pd.DataFrame(deps, index=all_dep_fields
