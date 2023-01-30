@@ -4,6 +4,8 @@ from json import dumps
 from pathlib import Path
 from pprint import pprint
 
+from source.utils.dataframes import balance_sample
+
 import pandas as pd
 
 # pd.set_option('display.max_colwidth', 40)
@@ -11,7 +13,7 @@ pd.set_option('display.max_columns', 10)
 pd.set_option('display.width', 100)
 
 _TIE_STR = '>'
-_FILEGLOB = 'exactly_test*hits.pkl.gz'
+_FILEGLOB = 'exactly_[pna]*hits.pkl.gz'
 _DEP = namedtuple('dep_info', ['node', 'head_ix', 'head_lemma',
                                'target_ix', 'target_lemma', 'relation'])
 
@@ -164,7 +166,7 @@ print_iter(labels)
 all_hits_df = pd.DataFrame()
 
 # > for testing loop
-# df = pd.concat(balance_sample(df, column_name='category', sample_per_value=8))
+# df = balance_sample(df, column_name='category', sample_per_value=8)
 
 # %%
 # > for testing outside of loop
@@ -338,6 +340,10 @@ print(print_df.loc[~print_df.dep_str.isna(), [
 print(df[['dep_str_mask', 'colloc', 'dep_str', 'hit_text']]
       .value_counts().to_frame().rename(columns={0: 'count'})
       .reset_index().head(10).to_markdown())
+
+# %%
+
+df.to_pickle(f'/share/compling/data/sanpi/2_hit_tables/{_FILEGLOB.split("*")[0]}_dependencies.pkl.gz')
 
 # %% [markdown]
 # ## Construct boolean table for dep_str
