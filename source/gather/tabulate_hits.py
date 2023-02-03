@@ -362,10 +362,10 @@ def _create_output(hits_df, match_dir, start_time):
     #     hits_df[col] = '?'
     # mem_init = hits_df.memory_usage(deep=True)
     # TODO: update this to avoid future error
-    # ^  FutureWarning: In a future version, `df.iloc[:, i] = newvals` will
-    # ^  attempt to set the values inplace instead of always setting a new array.
-    # ^  To retain the old behavior, use either `df[df.columns[i]] = newvals`
-    # ^  or, if columns are non-unique, `df.isetitem(i, newvals)`
+      """ FutureWarning: In a future version, `df.iloc[:, i] = newvals` will
+      attempt to set the values inplace instead of always setting a new array.
+      To retain the old behavior, use either `df[df.columns[i]] = newvals`
+      or, if columns are non-unique, `df.isetitem(i, newvals)` """
     hits_df.loc[:, catcols] = hits_df.loc[:, catcols].astype('category')
 
     # mem_cat=hits_df.memory_usage(deep=True)
