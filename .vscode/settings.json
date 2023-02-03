@@ -10,5 +10,6 @@
         "**/Thumbs.db": true,
         "**/venv": true
     },
-    "explorerExclude.backup": null
+    "explorerExclude.backup": null,
+    "python.linting.enabled": true
 }

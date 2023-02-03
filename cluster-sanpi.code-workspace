@@ -5,13 +5,13 @@
 			"name": "code-sanpi"
 		},
 		{
-			"path": "/share/compling/data/puddin", 
-			"name": "data-puddin"
-		},
-		{
 			"path": "/share/compling/data/sanpi", 
 			"name": "data-sanpi"
 		}, 
+		{
+			"path": "/share/compling/data/puddin", 
+			"name": "data-puddin"
+		},
 		{
 			"path": "/share/compling/data/new_york_times",
 			"name": "data-nyt"
@@ -29,19 +29,6 @@
 			"/share/compling/projects/*/logs/*/*": true
 		},
 		"files.exclude": {
-			"**/.git": false,
-			"**/.svn": false,
-			"**/.hg": false,
-			"**/CVS": false,
-			"**/.DS_Store": false,
-			"**/Thumbs.db": false,
-			"**/.[^b]*": false,
-			"**/.bash_[hl]*": false,
-			"**/*conda3": false,
-			"**/stanza_resources": false,
-			"**/*kaldi*": false
-		},
-		"explorerExclude.backup": {
 			"**/.git": true,
 			"**/.svn": true,
 			"**/.hg": true,
@@ -53,52 +40,73 @@
 			"**/*conda3": true,
 			"**/stanza_resources": true,
 			"**/*kaldi*": true
-		}
+		},
+		"explorerExclude.backup": {},
+		"todo-tree.tree.scanMode": "open files",
+		"files.autoSave": "afterDelay"
 	},
 	"launch": {
 		"version": "0.2.0",
 		"configurations": [
-		
-			{
-				"name": "Python: create_match_conllu",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
-				"cwd": "/share/compling/projects/sanpi",
-				"args": [
-					"-c",
-					"/share/compling/data/puddin/Pcc29.conll/pcc_eng_29-108.conllu"
-				]
-			},
-			{
-				"name": "Python: exactly subset 29-108",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
-				"cwd": "/share/compling/projects/sanpi",
-				"args": [
-					"-c",
-					"/share/compling/data/puddin/Pcc29.conll/pcc_eng_29-108.conllu",
-					"-p",
-					"/share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
-				]
-			},
-			{
-				"name": "Python: create_match_conllu DIR",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
-				"cwd": "/share/compling/projects/sanpi"
-			},
+		        // * Deps
+				{
+					"name": "analyze_deps apw -v",
+					"type": "python",
+					"request": "launch",
+					"program": "analyze_deps${defaultBuildTask}.py",
+					"console": "integratedTerminal",
+					// "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+					//usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+										  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+										  // [-n NAME] [-v]
+					"args": [
+						"-g", 
+						"*apw*hits.pkl.gz", 
+						"-n", 
+						"test_apw", 
+						"-v"
+					]
+				},
+			// {
+			// 	"name": "Python: create_match_conllu",
+			// 	"type": "python",
+			// 	"request": "launch",
+			// 	"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
+			// 	"console": "integratedTerminal",
+			// 	"justMyCode": true,
+			// 	"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+			// 	"cwd": "/share/compling/projects/sanpi",
+			// 	"args": [
+			// 		"-c",
+			// 		"/share/compling/data/puddin/Pcc29.conll/pcc_eng_29-108.conllu"
+			// 	]
+			// },
+			// {
+			// 	"name": "Python: exactly subset 29-108",
+			// 	"type": "python",
+			// 	"request": "launch",
+			// 	"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
+			// 	"console": "integratedTerminal",
+			// 	"justMyCode": true,
+			// 	"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+			// 	"cwd": "/share/compling/projects/sanpi",
+			// 	"args": [
+			// 		"-c",
+			// 		"/share/compling/data/puddin/Pcc29.conll/pcc_eng_29-108.conllu",
+			// 		"-p",
+			// 		"/share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
+			// 	]
+			// },
+			// {
+			// 	"name": "Python: create_match_conllu DIR",
+			// 	"type": "python",
+			// 	"request": "launch",
+			// 	"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
+			// 	"console": "integratedTerminal",
+			// 	"justMyCode": true,
+			// 	"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+			// 	"cwd": "/share/compling/projects/sanpi"
+			// },
 		]
 	}
 }
