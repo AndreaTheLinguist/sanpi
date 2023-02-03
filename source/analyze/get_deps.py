@@ -7,9 +7,9 @@ from pprint import pprint
 
 import pandas as pd
 
-from crosstab_deps import crosstabulate_variants as ct_var
-from utils.dataframes import balance_sample, cols_by_str
-from utils.general import print_iter, dur_round
+from analyze.crosstab_deps import crosstabulate_variants as ct_var
+from analyze.utils.dataframes import balance_sample, cols_by_str
+from analyze.utils.general import print_iter, dur_round
 
 # pd.set_option('display.max_colwidth', 40)
 pd.set_option('display.max_columns', 10)
@@ -29,54 +29,60 @@ _DF_SAVE_PATH = _DF_SAVE_DIR.joinpath(
 _TIE_STR = '>'
 _VERBOSE = False
 
+# ! moved to utils/dataframes
+# // def concat_pkls(data_dir: Path(), fname_glob: str):
+# //     pickles = tuple(data_dir.rglob(fname_glob))
+# //     print(f'{len(pickles)} paths matching {fname_glob} found.')
+# //     print_iter([f'../{Path(*p.parts[-3:])}' for p in pickles])
+# //     df = pd.concat((pd.read_pickle(p) for p in pickles))
+# //     return df
 
-def concat_pkls():
-    # TODO: change path and glob to arguments
-    pickles = tuple(_DATA_DIR.rglob(_FILEGLOB))
-    print(f'{len(pickles)} paths matching {_FILEGLOB} found.')
-    print_iter([f'../{Path(*p.parts[-3:])}' for p in pickles])
 
-    df = pd.concat((pd.read_pickle(p) for p in pickles))
+def get_deps(df: pd.DataFrame(),
+             df_save_path: Path() = None,
+             sample_size: int = None,
+             verbose: bool = False):
+
+    proc_t0 = pd.Timestamp.now()
+    if not df_save_path:
+        print('⚠️ Warning: No output path given. Resultant dataframe will not be saved to file.')
+    df = process_dep_info(df, sample_size=sample_size, verbose=verbose)
+    proc_t1 = pd.Timestamp.now()
+    print(
+        f'\nTime to process dep info: {dur_round((proc_t1 - proc_t0).seconds)}')
+
+    if verbose:
+        print_df = df.sample(15) if len(df) > 15 else df
+        print(print_df.loc[~print_df.dep_str.isna(),
+                           ['category', 'hit_text'] + cols_by_str(print_df, 'dep_str')].to_markdown())
+
+    print(df[['hit_text', 'dep_str', 'dep_str_mask', 'neg_lemma', 'colloc']]
+            .value_counts().to_frame().rename(columns={0: 'count'}).sort_values('colloc').nlargest(10, 'count').reset_index().to_markdown())
+        
+    # TODO: modify to process pickles individually, then concatonate. Means changing the `df_save_path` argument maybe?
+    if not df_save_path:
+        print('\nNo output path given. Dataframe with dependency string identifiers not saved to file.')
+    else:
+        print('\nwriting dataframe with added dependency string variants',
+              f'to {df_save_path}...')
+        df.to_pickle(df_save_path)
+        print(' ✔️ finished saving file')
 
     return df
 
 
-def get_deps(df: pd.DataFrame()):
-    df = process_dep_info(df)
-
-    print_df = df.sample(15) if len(df) > 15 else df
-    print(print_df.loc[~print_df.dep_str.isna(),
-                       ['category', 'colloc', 'hit_text'] + cols_by_str(print_df, 'dep_str')].to_markdown())
-
-    print(df[['dep_str_mask', 'colloc', 'dep_str', 'hit_text']]
-          .value_counts().to_frame().rename(columns={0: 'count'})
-          .reset_index().head(10).to_markdown())
-
-    df.to_pickle(_DF_SAVE_PATH)
-
-    return df
-
-
-def process_dep_info(df: pd.DataFrame()):
-
-    dep_cols = cols_by_str(df, start_str='dep_')
-    labels = (c.split('_')[1] for c in dep_cols)
-
-    if _VERBOSE:
-
-        print('## dependency info columns')
-        print_iter(dep_cols)
-
-        print('## labels')
-        print_iter(labels)
-
-    all_hits_df = pd.DataFrame()
+def process_dep_info(df: pd.DataFrame(), sample_size: int = None, verbose=False):
 
     # * Testing Options
     # > for testing loop
-    df, sampling_info = balance_sample(df, column_name='category',
-                                       sample_per_value=8, verbose=True)
-    print(sampling_info)
+    if sample_size is not None:
+        df, sampling_info = balance_sample(
+            df, column_name='category',
+            sample_per_value=sample_size, verbose=True)
+        if verbose:
+            print(sampling_info)
+        else: 
+            print(f'data limited to at most {sample_size} per (pattern)category')
 
     # > for testing outside of loop
     # ix = df.sample(1).index[0]
@@ -85,10 +91,23 @@ def process_dep_info(df: pd.DataFrame()):
     # print('Testing Single Random Hit:',ix)
     # pprint(df.dep_neg[ix])
 
+    dep_cols = cols_by_str(df, start_str='dep_')
+    labels = (c.split('_')[1] for c in dep_cols)
+
+    if verbose:
+
+        print('## dependency info columns')
+        print_iter(dep_cols)
+
+        print('## labels')
+        print_iter(labels)
+
+    # TODO: currently, nothing is done with this. Either use it or remove it
+    all_hits_df = pd.DataFrame()
     # %%
     for hit_id in df.index:
         row = df.loc[hit_id, dep_cols]
-        deps_in_hit = _process_deps_in_hit(row)
+        deps_in_hit = _process_deps_in_hit(row, verbose)
 
         # %%
         # > add string identifiers, with & without index, but sorted by index
@@ -112,19 +131,20 @@ def process_dep_info(df: pd.DataFrame()):
             lambda c: ';'.join(c), axis=0)
         df.loc[hit_id, str_cols] = joined_strs
 
-        if _VERBOSE:
+        if verbose:
             print('\n⁂ Combined string representations of dependencies for match', hit_id)
             print_iter(f'{x} ↣ {joined_strs[x]}' for x in joined_strs.index)
 
     return df
 
 
-def _process_deps_in_hit(row):
+def _process_deps_in_hit(row: pd.Series(dtype='object'),
+                         verbose: bool = False):
     # ? is `fillna('n/a') necessary?`
     row = row.fillna('n/a')
 
-    if _VERBOSE:
-        print(f'## row {row.name} values')
+    if verbose:
+        print(f'\n## row {row.name} values')
         print_iter(f'{x}\n    {row[x]}'
                    for x in row.index
                    if not isinstance(row[x], dict))
@@ -163,7 +183,8 @@ def _get_dep_tuples(df):
     return _DEP._make(row)
 
 
-def _add_dep_strs(deps_in_hit: pd.DataFrame()):
+def _add_dep_strs(deps_in_hit: pd.DataFrame(),
+                  verbose: bool = False):
 
     str_deps_df = deps_in_hit.assign(
 
@@ -205,46 +226,46 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame()):
         dep_str_mask_rel=str_deps_df[
             ['dep_str_mask', 'relation']].apply(_add_relation, axis=1))
 
-    if _VERBOSE:
+    if verbose:
         print(str_deps_df.squeeze())
 
     return str_deps_df
 
 
-def _mask_dep_str(_df: pd.DataFrame()):
+def _mask_dep_str(df: pd.DataFrame()):
 
     # * for mod, use both xpos
     # * for relay, use both xpos
-    if 'node' not in _df.columns:
+    if 'node' not in df.columns:
         print('Error: "node" column is not set.')
-        return _df.assign(dep_str_mask='').dep_str_mask
+        return df.assign(dep_str_mask='').dep_str_mask
 
     # > this one doesn't need an existence check because `mod` always exists
     # > but doing it anyway, in case that changes 🤷‍♀️
-    is_mod_or_relay = _df.node.isin(('mod', 'relay'))
+    is_mod_or_relay = df.node.isin(('mod', 'relay'))
     if any(is_mod_or_relay):
-        _df.loc[is_mod_or_relay, 'dep_str_mask'] = (
-            _df.loc[is_mod_or_relay, 'head_xpos']
+        df.loc[is_mod_or_relay, 'dep_str_mask'] = (
+            df.loc[is_mod_or_relay, 'head_xpos']
             + _TIE_STR
-            + _df.loc[is_mod_or_relay, 'target_xpos'])
+            + df.loc[is_mod_or_relay, 'target_xpos'])
 
     # * for neg, use target_lemma and head_xpos (keep neg token)
-    is_neg = _df.node == 'neg'
+    is_neg = df.node == 'neg'
     if any(is_neg):
-        _df.loc[is_neg, 'dep_str_mask'] = (
-            _df.loc[is_neg, 'head_xpos']
+        df.loc[is_neg, 'dep_str_mask'] = (
+            df.loc[is_neg, 'head_xpos']
             + _TIE_STR
-            + _df.loc[is_neg, 'target_lemma'])
+            + df.loc[is_neg, 'target_lemma'])
 
     # * for negraise, use target_xpos and head_lemma (keep NR token)
-    is_raised = _df.node == 'negraise'
+    is_raised = df.node == 'negraise'
     if any(is_raised):
-        _df.loc[is_raised, 'dep_str_mask'] = (
-            _df.loc[is_raised, 'head_lemma']
+        df.loc[is_raised, 'dep_str_mask'] = (
+            df.loc[is_raised, 'head_lemma']
             + _TIE_STR
-            + _df.loc[is_raised, 'target_xpos'])
+            + df.loc[is_raised, 'target_xpos'])
 
-    return _df.dep_str_mask
+    return df.dep_str_mask
 
 
 def _add_relation(_row):
@@ -261,42 +282,43 @@ def _add_relation(_row):
 # %%
 if __name__ == '__main__':
     proc_t0 = pd.Timestamp.now()
-    df = concat_pkls()
-    df = get_deps(df)
+    df = concat_pkls(_DATA_DIR, _FILEGLOB, True)
+    df = get_deps(df, _DF_SAVE_PATH)
     proc_t1 = pd.Timestamp.now()
     print(
         f'Time to get dependency identifier strings: {dur_round((proc_t1 - proc_t0).seconds)}')
 
 
-# %%
-# can save this here, or call crosstab method directly
-# df.to_pickle(f'/share/compling/data/sanpi/2_hit_tables/{_FILEGLOB.split("*")[0]}_dep.pkl.gz')
-# df = pd.read_pickle(
-#     f'{_DATA_DIR}{_FILEGLOB.split("*")[0]}_dep.pkl.gz')
+#################################################################
+# # %%
+# # can save this here, or call crosstab method directly
+# # df.to_pickle(f'/share/compling/data/sanpi/2_hit_tables/{_FILEGLOB.split("*")[0]}_dep.pkl.gz')
+# # df = pd.read_pickle(
+# #     f'{_DATA_DIR}{_FILEGLOB.split("*")[0]}_dep.pkl.gz')
 
-# * Crosstabulate Dependency Strings
-# * (1) `hit_id`
-# TODO: add arg for cross-column to crosstabulate method
-ct_hit_id = ct_var(df)
-boolean_hits = ct_hit_dep.loc[ct_hit_dep.index != 'All',
-                              ct_hit_dep.columns != 'All'].astype('boolean')
+# # * Crosstabulate Dependency Strings
+# # * (1) `hit_id`
+# # TODO: add arg for cross-column to crosstabulate method
+# ct_hit_id = ct_var(df)
+# boolean_hits = ct_hit_dep.loc[ct_hit_dep.index != 'All',
+#                               ct_hit_dep.columns != 'All'].astype('boolean')
 
-# %% [markdown]
-# I think it may be interesting to see a crosstabulation of the dependency paths with the exact lemmas collapsed.
-# For example, instead of `'standard>not_neg; standard>exactly_mod'`, have a series of `'ADJ>not_neg; ADJ>ADV_mod'`
-# and crosstabulate that with the collocations (i.e. the `ADJ` and `ADV` token lemmas)
-#
-# - [x] added this as `dep_str_mask`
+# # %% [markdown]
+# # I think it may be interesting to see a crosstabulation of the dependency paths with the exact lemmas collapsed.
+# # For example, instead of `'standard>not_neg; standard>exactly_mod'`, have a series of `'ADJ>not_neg; ADJ>ADV_mod'`
+# # and crosstabulate that with the collocations (i.e. the `ADJ` and `ADV` token lemmas)
+# #
+# # - [x] added this as `dep_str_mask`
 
-# %%
-ct_colloc_mask = pd.crosstab(df.colloc, df.dep_str_mask, margins=True)
-ct_colloc_mask
-# %%
-df = df.assign(neg_lemma=df.neg_lemma.str.lower()
-               ).loc[df.adv_lemma == 'exactly', :]
-df.groupby('dep_str_mask')['colloc', 'dep_str'].value_counts()
+# # %%
+# ct_colloc_mask = pd.crosstab(df.colloc, df.dep_str_mask, margins=True)
+# ct_colloc_mask
+# # %%
+# df = df.assign(neg_lemma=df.neg_lemma.str.lower()
+#                ).loc[df.adv_lemma == 'exactly', :]
+# df.groupby('dep_str_mask')['colloc', 'dep_str'].value_counts()
 
-# %%
-ct_mask_colloc = pd.crosstab(df.dep_str_mask, df.colloc,  margins=True)
-ct_mask_colloc
-# %%
+# # %%
+# ct_mask_colloc = pd.crosstab(df.dep_str_mask, df.colloc,  margins=True)
+# ct_mask_colloc
+# # %%
