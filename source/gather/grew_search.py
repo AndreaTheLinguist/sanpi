@@ -24,12 +24,12 @@ def grew_search(corpus_dir: Path,
 
     # > set pool `processes` argument to number of _available_ cpus
     # > OR number of files to be searched, whichever is smaller
-    cpus = min(len(os.sched_getaffinity(0)), file_count)
+    cpus = min(len(os.sched_getaffinity(0)), file_count, 15)
     print(f'\n> searching {file_count} files in ../'
           f'{Path(*corpus_dir.parts[-3:])}/ with {cpus} CPUs...')
     _start = time.perf_counter()
 
-    with multiprocessing.Pool(processes=min(15, cpus)) as pool:
+    with multiprocessing.Pool(processes=cpus) as pool:
 
         # NOTE: if `starmap` method used instead, call `_seek_pat_in_file` directly (and no need to print)
         results = pool.imap_unordered(
