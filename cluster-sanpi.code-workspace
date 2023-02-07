@@ -42,8 +42,7 @@
 			"**/*kaldi*": true
 		},
 		"explorerExclude.backup": {},
-		"todo-tree.tree.scanMode": "open files",
-		"files.autoSave": "afterDelay"
+		"todo-tree.tree.scanMode": "open files"
 	},
 	"launch": {
 		"version": "0.2.0",

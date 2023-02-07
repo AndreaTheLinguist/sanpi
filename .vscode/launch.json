@@ -27,7 +27,47 @@
         },
         // * Deps
         {
-            "name": "analyze_deps apw -v -s 20",
+            "name": "analyze_deps NEG puddin -s 0 -t",
+            "type": "python",
+            "request": "launch",
+            "program": "source/analyze_deps.py",
+            "console": "integratedTerminal",
+            // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+            //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            "args": [
+                "-g", 
+                "*[!j]/*exactly*puddin*hits.pkl.gz", 
+                "-n", 
+                "NEG-exactly-puddin",
+                "-s",
+                "0", 
+                "-t"
+            ]
+        },
+        {
+            "name": "analyze_deps NEG ALL -s 0 -t",
+            "type": "python",
+            "request": "launch",
+            "program": "source/analyze_deps.py",
+            "console": "integratedTerminal",
+            // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+            //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            "args": [
+                "-g", 
+                "*[!j]/*exactly*hits.pkl.gz", 
+                "-n", 
+                "NEG-exactly",
+                "-s",
+                "0", 
+                "-t"
+            ]
+        },
+        {
+            "name": "analyze_deps apw -v -s 25 -t",
             "type": "python",
             "request": "launch",
             "program": "source/analyze_deps.py",
@@ -40,10 +80,11 @@
                 "-g", 
                 "*apw*hits.pkl.gz", 
                 "-n", 
-                "TESTapw",
+                "TESTapw-min",
                 "-s",
-                "20", 
+                "25", 
                 "-v",
+                "-t"
             ]
         },
         {

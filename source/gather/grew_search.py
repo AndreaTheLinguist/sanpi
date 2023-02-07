@@ -72,6 +72,10 @@ def grew_search(corpus_dir: Path,
           '============================')
 
 
+def _star_seek_pat(args):
+    return _seek_pat_in_file(*args)
+
+
 def _seek_pat_in_file(corpus, pat, out):
 
     f_start = time.perf_counter()
@@ -133,10 +137,6 @@ def _size_round(size: int):
         power = 0
 
     return f'{round(size / (10**power), 1):.1f} {unit}B'
-
-
-def _star_seek_pat(args):
-    return _seek_pat_in_file(*args)
 
 
 def _arg_paths_generator(file_glob,

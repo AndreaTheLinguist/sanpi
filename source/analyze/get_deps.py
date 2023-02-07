@@ -1,19 +1,17 @@
 # coding=utf-8
-# %%
 from collections import namedtuple
 from json import dumps
 from pathlib import Path
 from pprint import pprint
-
 import pandas as pd
 
-from analyze.crosstab_deps import crosstabulate_variants as ct_var
+# from analyze.crosstab_deps import crosstabulate_variants as ct_var
 from analyze.utils.dataframes import balance_sample, cols_by_str
-from analyze.utils.general import print_iter, dur_round
+from analyze.utils.general import print_iter, dur_round, run_pool
 
 # pd.set_option('display.max_colwidth', 40)
-pd.set_option('display.max_columns', 10)
-pd.set_option('display.width', 100)
+pd.set_option('display.max_columns', 8)
+pd.set_option('display.width', 120)
 
 _DEP = namedtuple('dep_info', ['node', 'head_ix', 'head_lemma',
                                'target_ix', 'target_lemma', 'relation'])
@@ -38,40 +36,86 @@ _VERBOSE = False
 # //     return df
 
 
-def get_deps(df: pd.DataFrame(),
-             df_save_path: Path() = None,
+def parallel_process_deps(in_paths, out_paths, df_sample):
+    zip_sample = [df_sample] * len(in_paths)
+    run_pool(_star_make_dep_dfs,
+             zip(in_paths, out_paths, zip_sample))
+
+
+def _star_make_dep_dfs(zipped_args):
+    return make_dep_dfs(*zipped_args)
+
+
+def make_dep_dfs(in_path, out_path, df_sample: int):
+    proc_t0 = pd.Timestamp.now()
+    dep_result = []
+    # proc_t0 = time.perf_counter()
+    # print(f'Time to perform process: {dur_round(proc_t1 - proc_t0)}')
+    if out_path.is_file() and out_path.stat().st_size > 0:
+        dep_result.append('Prior dep processing found:'
+                          + f'../{Path(*out_path.parts[-3:])}...',)
+
+    else:
+        sdf = pd.read_pickle(in_path)
+        # * This wil only save processed dataframe to file (no returned df)
+        dep_result = list(get_deps(df=sdf,
+                                   df_save_path=out_path,
+                                   sample_size=df_sample,
+                                   parallel_run=True,
+                                   verbose=False))
+
+    proc_t1 = pd.Timestamp.now()
+    # proc_t1 = time.perf_counter()
+    dep_result.append(f'Total Time: {dur_round((proc_t1 - proc_t0).seconds)}')
+    return dep_result
+
+
+def get_deps(df: pd.DataFrame,
+             df_save_path: Path = None,
              sample_size: int = None,
-             verbose: bool = False):
+             verbose: bool = False,
+             parallel_run: bool = False):
 
     proc_t0 = pd.Timestamp.now()
-    if not df_save_path:
+    if not df_save_path and verbose:
         print('⚠️ Warning: No output path given. Resultant dataframe will not be saved to file.')
     df = process_dep_info(df, sample_size=sample_size, verbose=verbose)
     proc_t1 = pd.Timestamp.now()
-    print(
-        f'\nTime to process dep info: {dur_round((proc_t1 - proc_t0).seconds)}')
+
+    dep_proc_time = f'Time to process dep info: {dur_round((proc_t1 - proc_t0).seconds)}'
 
     if verbose:
-        print_df = df.sample(15) if len(df) > 15 else df
+        print('\n', dep_proc_time)
+
+        print_df = df.sample(10) if len(df) > 10 else df
         print(print_df.loc[~print_df.dep_str.isna(),
                            ['category', 'hit_text'] + cols_by_str(print_df, 'dep_str')].to_markdown())
 
-    print(df[['hit_text', 'dep_str', 'dep_str_mask', 'neg_lemma', 'colloc']]
-            .value_counts().to_frame().rename(columns={0: 'count'}).sort_values('colloc').nlargest(10, 'count').reset_index().to_markdown())
-        
-    # TODO: modify to process pickles individually, then concatonate. Means changing the `df_save_path` argument maybe?
-    if not df_save_path:
+    counts_md_str = (f'\n### `{df_save_path.stem}` Top 5\n'+df.loc[:, df.columns
+                                            #  .isin(('hit_text', 'dep_str', 'dep_str_mask', 'neg_lemma', 'colloc'))]
+                                            .isin(('dep_str', 'dep_str_mask', 'neg_lemma', 'colloc'))]
+                     .value_counts().to_frame().rename(columns={0: 'count'})
+                     .sort_values('colloc').nlargest(5, 'count').reset_index()
+                     .to_markdown())
+
+    if not df_save_path and verbose:
         print('\nNo output path given. Dataframe with dependency string identifiers not saved to file.')
     else:
-        print('\nwriting dataframe with added dependency string variants',
-              f'to {df_save_path}...')
+        if verbose:
+            print('\nwriting dataframe with added dependency string variants',
+                  f'to {df_save_path}...')
         df.to_pickle(df_save_path)
-        print(' ✔️ finished saving file')
+        if verbose:
+            print(' ✔️ finished saving file')
 
-    return df
+    if parallel_run:
+        return dep_proc_time, df_save_path, counts_md_str
+    else:
+        print(counts_md_str)
+        return df
 
 
-def process_dep_info(df: pd.DataFrame(), sample_size: int = None, verbose=False):
+def process_dep_info(df: pd.DataFrame, sample_size: int = None, verbose=False):
 
     # * Testing Options
     # > for testing loop
@@ -79,10 +123,14 @@ def process_dep_info(df: pd.DataFrame(), sample_size: int = None, verbose=False)
         df, sampling_info = balance_sample(
             df, column_name='category',
             sample_per_value=sample_size, verbose=True)
+        # TODO: this may not work exactly right! have not tested yet...
+        sample_limit = sample_size if sample_size else int(
+            df.category.value_counts().min())
         if verbose:
             print(sampling_info)
-        else: 
-            print(f'data limited to at most {sample_size} per (pattern)category')
+        else:
+            print('data limited to at most',
+                  sample_limit, 'per (pattern) category')
 
     # > for testing outside of loop
     # ix = df.sample(1).index[0]
@@ -183,7 +231,7 @@ def _get_dep_tuples(df):
     return _DEP._make(row)
 
 
-def _add_dep_strs(deps_in_hit: pd.DataFrame(),
+def _add_dep_strs(deps_in_hit: pd.DataFrame,
                   verbose: bool = False):
 
     str_deps_df = deps_in_hit.assign(
@@ -232,7 +280,7 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame(),
     return str_deps_df
 
 
-def _mask_dep_str(df: pd.DataFrame()):
+def _mask_dep_str(df: pd.DataFrame):
 
     # * for mod, use both xpos
     # * for relay, use both xpos

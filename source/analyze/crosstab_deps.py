@@ -17,10 +17,10 @@ def _get_read_path():
     parser = argparse.ArgumentParser(
         description=(
             '''
-                Create crosstabulations for all dependency string variants by `hit_id` (default), or another specified column. 
-                
-                Note: Data file is specified either by full path 
-                OR by just a filename interpeted as relative to `/share/compling/data/sanpi/2_hit_tables/`. 
+                Create crosstabulations for all dependency string variants by `hit_id` (default), or another specified column.
+
+                Note: Data file is specified either by full path
+                OR by just a filename interpeted as relative to `/share/compling/data/sanpi/2_hit_tables/`.
                 ** If both are given, filename argument will be ignored.
             '''
         ),
@@ -38,7 +38,7 @@ def _get_read_path():
         type=str,
         default='exactly_nyt_deps.pkl.gz',
         help=('''
-              name (only) of data file relative to `/share/compling/data/sanpi/3_dep_info/`. 
+              name (only) of data file relative to `/share/compling/data/sanpi/3_dep_info/`.
               **Will be ignored if `-f`/`--full_path` is specified.**
               Note: If string does not end in `.pkl(.[compression_suffix])`, program will attempt to find the file by appending `.pkl` or `.pkl.gz`.
               ''')
@@ -101,7 +101,7 @@ def _depstr_cols(_df):
 
 # %%
 # TODO: add argument for "cross" column (to crosstabulate dep strings with more than just `hit_id`)
-def crosstabulate_variants(df: pd.DataFrame(),
+def crosstabulate_variants(df: pd.DataFrame,
                            cross_col: str = 'hit_id',
                            out_label: str = None,
                            dep_dir=Path(
@@ -115,9 +115,9 @@ def crosstabulate_variants(df: pd.DataFrame(),
     lines = [
         # TODO: change this line as well once it's not just `hit_id`
         f'# All dependency string identifier variants crosstabulated with `{cross_col}`\n',
-        # pd.Timestamp.now().strftime("%Y-%m-%d %I:%M%p")
-        pd.Timestamp.now().ctime()
-        ]
+        pd.Timestamp.now().strftime("%Y-%m-%d %I:%M%p")
+        # pd.Timestamp.now().ctime()
+    ]
 
     crosstab_dir = dep_dir.joinpath('crosstab')
     if not crosstab_dir.is_dir():
@@ -128,8 +128,9 @@ def crosstabulate_variants(df: pd.DataFrame(),
     if sample_per_category is not None:
         ct_out_fstem += '-sample'
 
-        df, sample_info = balance_sample(df,column_name='category', 
-                                         sample_per_value=sample_per_category, verbose=True)
+        df, sample_info = balance_sample(df, column_name='category',
+                                         sample_per_value=sample_per_category,
+                                         verbose=True)
         lines.append(sample_info)
 
     _ct_cols = _select_columns(df, include_extra)
@@ -143,20 +144,21 @@ def crosstabulate_variants(df: pd.DataFrame(),
         ctdf.to_csv(csv_path)
 
         lines.append(f'\n\n## `{ct_col}`')
-        lines.append(f"\n*Defined for {ctdf.pop('SUM').loc['SUM']} hits*")
+        lines.append(f"\n- *Defined for {ctdf.pop('SUM').loc['SUM']} hits*")
         lines.append(
-            f"\nFull crosstabulation dataframe saved to\n`{csv_path}`")
+            f"\n- Full crosstabulation dataframe saved to\n  `{csv_path}`")
         lines.append(f'\n### {n_largest} most common `{ct_col}` values\n')
         lines.append(ctdf.transpose().SUM.nlargest(n_largest).to_markdown())
 
     md_info_path = crosstab_dir.joinpath(f'{ct_out_fstem}_info.md')
-    print(f'Depencency crosstab info overview saved to:\n`{md_info_path}`')
+    print('- Depencency crosstab info overview saved to:\\')
+    print(f'  `{md_info_path}`')
     md_info_path.write_text('\n'.join(lines))
 
 
-def get_crosstabs(df: pd.DataFrame(), 
-                  columns: list = [], 
-                  cross: str='hit_id'):
+def get_crosstabs(df: pd.DataFrame,
+                  columns: list = [],
+                  cross: str = 'hit_id'):
     crosstab_dict = {}
     df = df.reset_index()
     if not columns:
