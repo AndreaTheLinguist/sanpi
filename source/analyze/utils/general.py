@@ -73,7 +73,7 @@ def run_pool(process_to_run, inputs, log_level: int = 30):
     # > OR
     # > (b) number of inputs to be processed,
     # > whichever is less
-    cpus = min(mp.cpu_count(), input_count)
+    cpus = min(mp.cpu_count(), input_count, 15)
     print(f'\n> processing {input_count} inputs with {cpus} CPUs...')
     _start = datetime.now()
 
@@ -134,8 +134,8 @@ def run_pool(process_to_run, inputs, log_level: int = 30):
 
     _end = datetime.now()
     total_time = _end - _start
-    print('## Parallel Processing Complete:', _end.time.strftime("%Y-%m-%d @ %I:%M%p"),
-          '\nTotal time elapsed:', dur_round(total_time.total_seconds()))
+    print('## Parallel Processing Complete\n- Timestamp:', _end.strftime("%Y-%m-%d @ %I:%M%p"),
+          '\n- Total time elapsed:', dur_round(total_time.total_seconds()))
 
 
 def print_iter(iter_obj, bullet: str = '▸'):
