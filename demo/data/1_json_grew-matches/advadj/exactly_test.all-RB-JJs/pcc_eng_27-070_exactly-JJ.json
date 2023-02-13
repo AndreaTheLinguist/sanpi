@@ -1,0 +1,1322 @@
+[
+  {
+    "sent_id": "pcc_eng_27_070.9917_x1131694_05",
+    "context": {
+      "prev_id": "pcc_eng_27_070.9917_x1131694_04",
+      "prev_sent": "Wrecks, bad tires and simply unfortunate breaks have combined to keep Stewart way down in 24th place in the overall points standings next to the three-time Sprint Cup series champion's similarly placed teammates, Ryan Newman (23rd) and rookie Danica Patrick (28th).",
+      "next_id": "pcc_eng_27_070.9917_x1131694_06",
+      "next_sent": "\"Everybody wants an answer that nobody has an answer to right now,\" said Stewart, who starts eighth Sunday."
+    },
+    "match_id": "4-5",
+    "colloc_id": "pcc_eng_27_070.9917_x1131694_05:4-5",
+    "hit_id": "pcc_eng_27_070.9917_x1131694_05:4-5",
+    "sent_text": "Stewart isn't exactly worried about it just yet, but it's clear Smoke would love to figure out the new Gen-6 car in time to celebrate a third win in four years at Fontana heading into NASCAR's off week.",
+    "token_str": "Stewart is n't exactly worried about it just yet , but it 's clear Smoke would love to figure out the new Gen - 6 car in time to celebrate a third win in four years at Fontana heading into NASCAR 's off week .",
+    "lemma_str": "Stewart be not exactly worried about it just yet , but it be clear Smoke would love to figure out the new Gen - 6 car in time to celebrate a third win in four year at Fontana head into NASCAR 's off week .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "worried"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "worried"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "worried",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.9565_x1131118_16",
+    "context": {
+      "prev_id": "pcc_eng_27_070.9565_x1131118_15",
+      "prev_sent": "The data we want will not be available for several years, especially since period immediately following the financial crisis will be very atypical*, and therefore not useful in assessing the longer term trend.",
+      "next_id": "pcc_eng_27_070.9565_x1131118_17",
+      "next_sent": "It has been suprisingly focused on low-skill, male workers."
+    },
+    "match_id": "14-15",
+    "colloc_id": "pcc_eng_27_070.9565_x1131118_16:14-15",
+    "hit_id": "pcc_eng_27_070.9565_x1131118_16:14-15",
+    "sent_text": "Let me add that I don't think pre-recession wage stagnation has been exactly widespread.",
+    "token_str": "Let me add that I do n't think pre-recession wage stagnation has been exactly widespread .",
+    "lemma_str": "let I add that I do not think pre-recession wage stagnation have be exactly widespread .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "widespread"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "widespread"
+    },
+    "index": {
+      "ADV": 13,
+      "ADJ": 14
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "widespread",
+          "ix": 14,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 13,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.9565_x1131118_15",
+    "context": {
+      "prev_id": "pcc_eng_27_070.9565_x1131118_14",
+      "prev_sent": "",
+      "next_id": "pcc_eng_27_070.9565_x1131118_16",
+      "next_sent": "Let me add that I don't think pre-recession wage stagnation has been exactly widespread."
+    },
+    "match_id": "23-24",
+    "colloc_id": "pcc_eng_27_070.9565_x1131118_15:23-24",
+    "hit_id": "pcc_eng_27_070.9565_x1131118_15:23-24",
+    "sent_text": "The data we want will not be available for several years, especially since period immediately following the financial crisis will be very atypical*, and therefore not useful in assessing the longer term trend.",
+    "token_str": "The data we want will not be available for several years , especially since period immediately following the financial crisis will be very atypical * , and therefore not useful in assessing the longer term trend .",
+    "lemma_str": "the datum we want will not be available for several year , especially since period immediately follow the financial crisis will be very atypical * , and therefore not useful in assess the long term trend .",
+    "lemmas": {
+      "ADV": "very",
+      "ADJ": "atypical"
+    },
+    "forms": {
+      "ADV": "very",
+      "ADJ": "atypical"
+    },
+    "index": {
+      "ADV": 22,
+      "ADJ": 23
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "atypical",
+          "ix": 23,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "very",
+          "ix": 22,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.9565_x1131118_15",
+    "context": {
+      "prev_id": "pcc_eng_27_070.9565_x1131118_14",
+      "prev_sent": "",
+      "next_id": "pcc_eng_27_070.9565_x1131118_16",
+      "next_sent": "Let me add that I don't think pre-recession wage stagnation has been exactly widespread."
+    },
+    "match_id": "29-30",
+    "colloc_id": "pcc_eng_27_070.9565_x1131118_15:29-30",
+    "hit_id": "pcc_eng_27_070.9565_x1131118_15:29-30",
+    "sent_text": "The data we want will not be available for several years, especially since period immediately following the financial crisis will be very atypical*, and therefore not useful in assessing the longer term trend.",
+    "token_str": "The data we want will not be available for several years , especially since period immediately following the financial crisis will be very atypical * , and therefore not useful in assessing the longer term trend .",
+    "lemma_str": "the datum we want will not be available for several year , especially since period immediately follow the financial crisis will be very atypical * , and therefore not useful in assess the long term trend .",
+    "lemmas": {
+      "ADV": "not",
+      "ADJ": "useful"
+    },
+    "forms": {
+      "ADV": "not",
+      "ADJ": "useful"
+    },
+    "index": {
+      "ADV": 28,
+      "ADJ": 29
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "useful",
+          "ix": 29,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "not",
+          "ix": 28,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8877_x1130027_06",
+    "context": {
+      "prev_id": "pcc_eng_27_070.8877_x1130027_05",
+      "prev_sent": "The only problem.... well, did you look at that picture up there?",
+      "next_id": "pcc_eng_27_070.8877_x1130027_07",
+      "next_sent": "I went over options in my head..."
+    },
+    "match_id": "2-3",
+    "colloc_id": "pcc_eng_27_070.8877_x1130027_06:2-3",
+    "hit_id": "pcc_eng_27_070.8877_x1130027_06:2-3",
+    "sent_text": "Not exactly stylish.",
+    "token_str": "Not exactly stylish .",
+    "lemma_str": "not exactly stylish .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "stylish"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "stylish"
+    },
+    "index": {
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "stylish",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8645_x1129662_4",
+    "context": {
+      "prev_id": "pcc_eng_27_070.8645_x1129662_3",
+      "prev_sent": "On the latest episode of the Liver Kick Podcast Jay and myself talk about how GLORY's weight classes feel a bit stale near the top of the division, with the same few fighters going at it without much variation.",
+      "next_id": "pcc_eng_27_070.8645_x1129662_5",
+      "next_sent": "GLORY announced today that Kongolo is no longer fighting Holzken, although no concrete reason was given, and that his replacement is Russian fighter Alim Nabiyev."
+    },
+    "match_id": "26-27",
+    "colloc_id": "pcc_eng_27_070.8645_x1129662_4:26-27",
+    "hit_id": "pcc_eng_27_070.8645_x1129662_4:26-27",
+    "sent_text": "So Nieky Holzken vs. Yoann Kongolo at GLORY 45 was a decent fight, but a fight that we've already seen and weren't exactly excited about seeing again.",
+    "token_str": "So Nieky Holzken vs. Yoann Kongolo at GLORY 45 was a decent fight , but a fight that we 've already seen and were n't exactly excited about seeing again .",
+    "lemma_str": "so Nieky Holzken vs. Yoann Kongolo at GLORY 45 be a decent fight , but a fight that we have already see and be not exactly excited about see again .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "excited"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "excited"
+    },
+    "index": {
+      "ADV": 25,
+      "ADJ": 26
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "excited",
+          "ix": 26,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 25,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8552_x1129516_5",
+    "context": {
+      "prev_id": "pcc_eng_27_070.8552_x1129516_4",
+      "prev_sent": "He's not exactly craggy or jowly but he is NOT the smooth, baby-faced manbot seen in this Lancome ad.",
+      "next_id": "pcc_eng_27_070.8552_x1129516_6",
+      "next_sent": ""
+    },
+    "match_id": "17-18",
+    "colloc_id": "pcc_eng_27_070.8552_x1129516_5:17-18",
+    "hit_id": "pcc_eng_27_070.8552_x1129516_5:17-18",
+    "sent_text": "Found in the \"Hommes International\" issue of Paris Vogue, this ad renders Clive positively poreless.",
+    "token_str": "Found in the \" Hommes International \" issue of Paris Vogue , this ad renders Clive positively poreless .",
+    "lemma_str": "find in the \" Hommes International \" issue of Paris Vogue , this ad render Clive positively poreless .",
+    "lemmas": {
+      "ADV": "positively",
+      "ADJ": "poreless"
+    },
+    "forms": {
+      "ADV": "positively",
+      "ADJ": "poreless"
+    },
+    "index": {
+      "ADV": 16,
+      "ADJ": 17
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "poreless",
+          "ix": 17,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "positively",
+          "ix": 16,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.8552_x1129516_4",
+    "context": {
+      "prev_id": "pcc_eng_27_070.8552_x1129516_3",
+      "prev_sent": "And hot!",
+      "next_id": "pcc_eng_27_070.8552_x1129516_5",
+      "next_sent": "Found in the \"Hommes International\" issue of Paris Vogue, this ad renders Clive positively poreless."
+    },
+    "match_id": "4-5",
+    "colloc_id": "pcc_eng_27_070.8552_x1129516_4:4-5",
+    "hit_id": "pcc_eng_27_070.8552_x1129516_4:4-5",
+    "sent_text": "He's not exactly craggy or jowly but he is NOT the smooth, baby-faced manbot seen in this Lancome ad.",
+    "token_str": "He 's not exactly craggy or jowly but he is NOT the smooth , baby - faced manbot seen in this Lancome ad .",
+    "lemma_str": "he be not exactly craggy or jowly but he be not the smooth , baby - face manbot see in this Lancome ad .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "craggy"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "craggy"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "craggy",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.7120_x1127229_19",
+    "context": {
+      "prev_id": "pcc_eng_27_070.7120_x1127229_18",
+      "prev_sent": "I'm not exactly sure why I want to do this.",
+      "next_id": "pcc_eng_27_070.7120_x1127229_20",
+      "next_sent": ""
+    },
+    "match_id": "13-14",
+    "colloc_id": "pcc_eng_27_070.7120_x1127229_19:13-14",
+    "hit_id": "pcc_eng_27_070.7120_x1127229_19:13-14",
+    "sent_text": "Either way if anyone else has a day free and is feeling as crazy as I am drop me a line on twitter or send me an email.",
+    "token_str": "Either way if anyone else has a day free and is feeling as crazy as I am drop me a line on twitter or send me an email .",
+    "lemma_str": "either way if anyone else have a day free and be feel as crazy as I be drop I a line on twitter or send I a email .",
+    "lemmas": {
+      "ADV": "as",
+      "ADJ": "crazy"
+    },
+    "forms": {
+      "ADV": "as",
+      "ADJ": "crazy"
+    },
+    "index": {
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "crazy",
+          "ix": 13,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "as",
+          "ix": 12,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.7120_x1127229_18",
+    "context": {
+      "prev_id": "pcc_eng_27_070.7120_x1127229_17",
+      "prev_sent": "I am curious as to how many times someone could complete the game in one day.",
+      "next_id": "pcc_eng_27_070.7120_x1127229_19",
+      "next_sent": "Either way if anyone else has a day free and is feeling as crazy as I am drop me a line on twitter or send me an email."
+    },
+    "match_id": "4-5",
+    "colloc_id": "pcc_eng_27_070.7120_x1127229_18:4-5",
+    "hit_id": "pcc_eng_27_070.7120_x1127229_18:4-5",
+    "sent_text": "I'm not exactly sure why I want to do this.",
+    "token_str": "I 'm not exactly sure why I want to do this .",
+    "lemma_str": "I be not exactly sure why I want to do this .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.6674_x1126483_064",
+    "context": {
+      "prev_id": "pcc_eng_27_070.6674_x1126483_063",
+      "prev_sent": "Other sites don't have a good selection, and with a gift card you really know what you're getting, which is essentially cash.",
+      "next_id": "pcc_eng_27_070.6674_x1126483_065",
+      "next_sent": "There's not that kind of question about gift cards."
+    },
+    "match_id": "16-17",
+    "colloc_id": "pcc_eng_27_070.6674_x1126483_064:16-17",
+    "hit_id": "pcc_eng_27_070.6674_x1126483_064:16-17",
+    "sent_text": "That's unlike if you're bidding on a TV, where you're not exactly sure what features it might have.",
+    "token_str": "That 's unlike if you 're bidding on a TV , where you 're not exactly sure what features it might have .",
+    "lemma_str": "that be unlike if you be bid on a tv , where you be not exactly sure what feature it might have .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 15,
+      "ADJ": 16
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 16,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 15,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4888_x1123515_214",
+    "context": {
+      "prev_id": "pcc_eng_27_070.4888_x1123515_213",
+      "prev_sent": "There was some weirdness there with Ulduar, like it was our first time doing it, so in some cases it wasn't exactly clear how you started some of these hard modes.",
+      "next_id": "pcc_eng_27_070.4888_x1123515_215",
+      "next_sent": ""
+    },
+    "match_id": "19-20",
+    "colloc_id": "pcc_eng_27_070.4888_x1123515_214:19-20",
+    "hit_id": "pcc_eng_27_070.4888_x1123515_214:19-20",
+    "sent_text": "So that's where we started thinking, \"hey, why not we just make this a pretty clear UI option where it's like you go into the dungeon and it's either in normal or Heroic mode?\"",
+    "token_str": "So that 's where we started thinking , \" hey , why not we just make this a pretty clear UI option where it 's like you go into the dungeon and it 's either in normal or Heroic mode ? \"",
+    "lemma_str": "so that be where we start think , \" hey , why not we just make this a pretty clear UI option where it be like you go into the dungeon and it be either in normal or Heroic mode ? \"",
+    "lemmas": {
+      "ADV": "pretty",
+      "ADJ": "clear"
+    },
+    "forms": {
+      "ADV": "pretty",
+      "ADJ": "clear"
+    },
+    "index": {
+      "ADV": 18,
+      "ADJ": 19
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "clear",
+          "ix": 19,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "pretty",
+          "ix": 18,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4888_x1123515_213",
+    "context": {
+      "prev_id": "pcc_eng_27_070.4888_x1123515_212",
+      "prev_sent": "We've got players that come in, have fun fighting Flame Leviathan and the first few bosses in there; and then we've got challenges for the best of the best.",
+      "next_id": "pcc_eng_27_070.4888_x1123515_214",
+      "next_sent": "So that's where we started thinking, \"hey, why not we just make this a pretty clear UI option where it's like you go into the dungeon and it's either in normal or Heroic mode?\""
+    },
+    "match_id": "25-26",
+    "colloc_id": "pcc_eng_27_070.4888_x1123515_213:25-26",
+    "hit_id": "pcc_eng_27_070.4888_x1123515_213:25-26",
+    "sent_text": "There was some weirdness there with Ulduar, like it was our first time doing it, so in some cases it wasn't exactly clear how you started some of these hard modes.",
+    "token_str": "There was some weirdness there with Ulduar , like it was our first time doing it , so in some cases it was n't exactly clear how you started some of these hard modes .",
+    "lemma_str": "there be some weirdness there with Ulduar , like it be we first time do it , so in some case it be not exactly clear how you start some of this hard mode .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "index": {
+      "ADV": 24,
+      "ADJ": 25
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "clear",
+          "ix": 25,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 24,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4223_x1122456_13",
+    "context": {
+      "prev_id": "pcc_eng_27_070.4223_x1122456_12",
+      "prev_sent": "Many of us be about three important goods that frames Psychic Source except for different Psychic marketing networks.",
+      "next_id": "pcc_eng_27_070.4223_x1122456_14",
+      "next_sent": "Furthermore, the particular Psychic Source networking system indeed suggests patrons which will pace their specific psychic books along with employs these facts to correct their website along with maintain a record of their specific fortune tellers to capabilities in an attempt to keep max conditions prospective."
+    },
+    "match_id": "41-42",
+    "colloc_id": "pcc_eng_27_070.4223_x1122456_13:41-42",
+    "hit_id": "pcc_eng_27_070.4223_x1122456_13:41-42",
+    "sent_text": "To start with, they can screen ability fortune tellers right before permitting them to enter their specific networking system leaving consumers using a compilation of trials that has been speculated to weed out the particular phony Fortune tellers and exactly finest and very proper Fortune tellers so that the prospect is truly sure to find a real and learning.",
+    "token_str": "To start with , they can screen ability fortune tellers right before permitting them to enter their specific networking system leaving consumers using a compilation of trials that has been speculated to weed out the particular phony Fortune tellers and exactly finest and very proper Fortune tellers so that the prospect is truly sure to find a real and learning .",
+    "lemma_str": "to start with , they can screen ability fortune teller right before permit they to enter they specific networking system leave consumer use a compilation of trial that have be speculate to weed out the particular phony fortune teller and exactly fine and very proper fortune teller so that the prospect be truly sure to find a real and learning .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "fine"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "finest"
+    },
+    "index": {
+      "ADV": 40,
+      "ADJ": 41
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "fine",
+          "ix": 41,
+          "xpos": "JJS"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 40,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4223_x1122456_13",
+    "context": {
+      "prev_id": "pcc_eng_27_070.4223_x1122456_12",
+      "prev_sent": "Many of us be about three important goods that frames Psychic Source except for different Psychic marketing networks.",
+      "next_id": "pcc_eng_27_070.4223_x1122456_14",
+      "next_sent": "Furthermore, the particular Psychic Source networking system indeed suggests patrons which will pace their specific psychic books along with employs these facts to correct their website along with maintain a record of their specific fortune tellers to capabilities in an attempt to keep max conditions prospective."
+    },
+    "match_id": "44-45",
+    "colloc_id": "pcc_eng_27_070.4223_x1122456_13:44-45",
+    "hit_id": "pcc_eng_27_070.4223_x1122456_13:44-45",
+    "sent_text": "To start with, they can screen ability fortune tellers right before permitting them to enter their specific networking system leaving consumers using a compilation of trials that has been speculated to weed out the particular phony Fortune tellers and exactly finest and very proper Fortune tellers so that the prospect is truly sure to find a real and learning.",
+    "token_str": "To start with , they can screen ability fortune tellers right before permitting them to enter their specific networking system leaving consumers using a compilation of trials that has been speculated to weed out the particular phony Fortune tellers and exactly finest and very proper Fortune tellers so that the prospect is truly sure to find a real and learning .",
+    "lemma_str": "to start with , they can screen ability fortune teller right before permit they to enter they specific networking system leave consumer use a compilation of trial that have be speculate to weed out the particular phony fortune teller and exactly fine and very proper fortune teller so that the prospect be truly sure to find a real and learning .",
+    "lemmas": {
+      "ADV": "very",
+      "ADJ": "proper"
+    },
+    "forms": {
+      "ADV": "very",
+      "ADJ": "proper"
+    },
+    "index": {
+      "ADV": 43,
+      "ADJ": 44
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "proper",
+          "ix": 44,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "very",
+          "ix": 43,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4223_x1122456_13",
+    "context": {
+      "prev_id": "pcc_eng_27_070.4223_x1122456_12",
+      "prev_sent": "Many of us be about three important goods that frames Psychic Source except for different Psychic marketing networks.",
+      "next_id": "pcc_eng_27_070.4223_x1122456_14",
+      "next_sent": "Furthermore, the particular Psychic Source networking system indeed suggests patrons which will pace their specific psychic books along with employs these facts to correct their website along with maintain a record of their specific fortune tellers to capabilities in an attempt to keep max conditions prospective."
+    },
+    "match_id": "53-54",
+    "colloc_id": "pcc_eng_27_070.4223_x1122456_13:53-54",
+    "hit_id": "pcc_eng_27_070.4223_x1122456_13:53-54",
+    "sent_text": "To start with, they can screen ability fortune tellers right before permitting them to enter their specific networking system leaving consumers using a compilation of trials that has been speculated to weed out the particular phony Fortune tellers and exactly finest and very proper Fortune tellers so that the prospect is truly sure to find a real and learning.",
+    "token_str": "To start with , they can screen ability fortune tellers right before permitting them to enter their specific networking system leaving consumers using a compilation of trials that has been speculated to weed out the particular phony Fortune tellers and exactly finest and very proper Fortune tellers so that the prospect is truly sure to find a real and learning .",
+    "lemma_str": "to start with , they can screen ability fortune teller right before permit they to enter they specific networking system leave consumer use a compilation of trial that have be speculate to weed out the particular phony fortune teller and exactly fine and very proper fortune teller so that the prospect be truly sure to find a real and learning .",
+    "lemmas": {
+      "ADV": "truly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "truly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 52,
+      "ADJ": 53
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 53,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "truly",
+          "ix": 52,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.4027_x1122147_18",
+    "context": {
+      "prev_id": "pcc_eng_27_070.4027_x1122147_17",
+      "prev_sent": "Large competitors have to stick to rigid guidelines, satisfy dozens of constituencies in the install-base and within their own organization, and optimize for the masses.",
+      "next_id": "pcc_eng_27_070.4027_x1122147_19",
+      "next_sent": "2. Juice the comp plan: if you want capable, blood-thirsty reps, build a comp plan short on guarantees and big on incentives."
+    },
+    "match_id": "16-17",
+    "colloc_id": "pcc_eng_27_070.4027_x1122147_18:16-17",
+    "hit_id": "pcc_eng_27_070.4027_x1122147_18:16-17",
+    "sent_text": "A startup's essential promise isn't to be like Hertz, which gets everything exactly right, but to be like Avis: we try harder.",
+    "token_str": "A startup 's essential promise is n't to be like Hertz , which gets everything exactly right , but to be like Avis : we try harder .",
+    "lemma_str": "a startup 's essential promise be not to be like Hertz , which get everything exactly right , but to be like Avis : we try hard .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "index": {
+      "ADV": 15,
+      "ADJ": 16
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "right",
+          "ix": 16,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 15,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.3525_x1121336_119",
+    "context": {
+      "prev_id": "pcc_eng_27_070.3525_x1121336_118",
+      "prev_sent": "BERMAN: After he's already --",
+      "next_id": "pcc_eng_27_070.3525_x1121336_120",
+      "next_sent": "BERMAN: -- his own memory and his own documentation of what happened."
+    },
+    "match_id": "5-6",
+    "colloc_id": "pcc_eng_27_070.3525_x1121336_119:5-6",
+    "hit_id": "pcc_eng_27_070.3525_x1121336_119:5-6",
+    "sent_text": "BUMP: That's exactly right.",
+    "token_str": "BUMP : That 's exactly right .",
+    "lemma_str": "bump : that be exactly right .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "index": {
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "right",
+          "ix": 5,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.2970_x1120419_20",
+    "context": {
+      "prev_id": "pcc_eng_27_070.2970_x1120419_19",
+      "prev_sent": "True, those slogans had a Hallmark feel to them but, in good times, they sent the message that in the city and the province we're all invested in the Canucks; that the team conducted itself in a certain manner, played in a certain way, represented certain values.",
+      "next_id": "pcc_eng_27_070.2970_x1120419_21",
+      "next_sent": "That he is obnoxious is a given."
+    },
+    "match_id": "14-15",
+    "colloc_id": "pcc_eng_27_070.2970_x1120419_20:14-15",
+    "hit_id": "pcc_eng_27_070.2970_x1120419_20:14-15",
+    "sent_text": "Tortorella, and we're trying to be diplomatic here, isn't exactly consistent with that message.",
+    "token_str": "Tortorella , and we 're trying to be diplomatic here , is n't exactly consistent with that message .",
+    "lemma_str": "Tortorella , and we be try to be diplomatic here , be not exactly consistent with that message .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "consistent"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "consistent"
+    },
+    "index": {
+      "ADV": 13,
+      "ADJ": 14
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "consistent",
+          "ix": 14,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 13,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.1968_x1118821_6",
+    "context": {
+      "prev_id": "pcc_eng_27_070.1968_x1118821_5",
+      "prev_sent": "In the prologue of the bestselling Forever and Always Series, we see the start of their friendship and their first meeting.",
+      "next_id": "pcc_eng_27_070.1968_x1118821_7",
+      "next_sent": "Were they ever really friends?"
+    },
+    "match_id": "10-11",
+    "colloc_id": "pcc_eng_27_070.1968_x1118821_6:10-11",
+    "hit_id": "pcc_eng_27_070.1968_x1118821_6:10-11",
+    "sent_text": "When Sean meets Scarlet, his thoughts aren't exactly chivalrous, and neither are hers.",
+    "token_str": "When Sean meets Scarlet , his thoughts are n't exactly chivalrous , and neither are hers .",
+    "lemma_str": "when Sean meet Scarlet , he thought be not exactly chivalrous , and neither be hers .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "chivalrous"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "chivalrous"
+    },
+    "index": {
+      "ADV": 9,
+      "ADJ": 10
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "chivalrous",
+          "ix": 10,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 9,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.1123_x1117444_06",
+    "context": {
+      "prev_id": "pcc_eng_27_070.1123_x1117444_05",
+      "prev_sent": "Do you know what it means to live empowered?",
+      "next_id": "pcc_eng_27_070.1123_x1117444_07",
+      "next_sent": "Considering our pop culture has no shortage of suggestions (wink), this confusion may be of no"
+    },
+    "match_id": "18-19",
+    "colloc_id": "pcc_eng_27_070.1123_x1117444_06:18-19",
+    "hit_id": "pcc_eng_27_070.1123_x1117444_06:18-19",
+    "sent_text": "Ever since I started providing empowerment coaching I've come to find that many women aren't exactly sure about what it means to be or to live \"empowered\".",
+    "token_str": "Ever since I started providing empowerment coaching I 've come to find that many women are n't exactly sure about what it means to be or to live \" empowered \" .",
+    "lemma_str": "ever since I start provide empowerment coaching I have come to find that many woman be not exactly sure about what it mean to be or to live \" empower \" .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 17,
+      "ADJ": 18
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 18,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 17,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0776_x1116894_05",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0776_x1116894_04",
+      "prev_sent": "Cuban expressed concern that his team sometimes falls into default mode, doing just enough to win, an issue that's not exactly new regarding the Mavs' killer instinct.",
+      "next_id": "pcc_eng_27_070.0776_x1116894_06",
+      "next_sent": ""
+    },
+    "match_id": "16-17",
+    "colloc_id": "pcc_eng_27_070.0776_x1116894_05:16-17",
+    "hit_id": "pcc_eng_27_070.0776_x1116894_05:16-17",
+    "sent_text": "Saturday's 103-97 mad scramble to get past the Utah Jazz is the latest and most glaring example.",
+    "token_str": "Saturday 's 103-97 mad scramble to get past the Utah Jazz is the latest and most glaring example .",
+    "lemma_str": "Saturday 's 103-97 mad scramble to get past the Utah Jazz be the late and most glaring example .",
+    "lemmas": {
+      "ADV": "most",
+      "ADJ": "glaring"
+    },
+    "forms": {
+      "ADV": "most",
+      "ADJ": "glaring"
+    },
+    "index": {
+      "ADV": 15,
+      "ADJ": 16
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "glaring",
+          "ix": 16,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "most",
+          "ix": 15,
+          "xpos": "RBS"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0776_x1116894_04",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0776_x1116894_03",
+      "prev_sent": "In fact, the owner's words never rang truer after his club put on a dizzying rendition of The Best & The Worst of the Dallas Mavericks.",
+      "next_id": "pcc_eng_27_070.0776_x1116894_05",
+      "next_sent": "Saturday's 103-97 mad scramble to get past the Utah Jazz is the latest and most glaring example."
+    },
+    "match_id": "14-15",
+    "colloc_id": "pcc_eng_27_070.0776_x1116894_04:14-15",
+    "hit_id": "pcc_eng_27_070.0776_x1116894_04:14-15",
+    "sent_text": "Cuban expressed concern that his team sometimes falls into default mode, doing just enough to win, an issue that's not exactly new regarding the Mavs' killer instinct.",
+    "token_str": "Cuban expressed concern that his team sometimes falls into default mode , doing just enough to win , an issue that 's not exactly new regarding the Mavs ' killer instinct .",
+    "lemma_str": "Cuban express concern that he team sometimes fall into default mode , do just enough to win , a issue that be not exactly new regard the Mavs 's killer instinct .",
+    "lemmas": {
+      "ADV": "just",
+      "ADJ": "enough"
+    },
+    "forms": {
+      "ADV": "just",
+      "ADJ": "enough"
+    },
+    "index": {
+      "ADV": 13,
+      "ADJ": 14
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "enough",
+          "ix": 14,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "just",
+          "ix": 13,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0776_x1116894_04",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0776_x1116894_03",
+      "prev_sent": "In fact, the owner's words never rang truer after his club put on a dizzying rendition of The Best & The Worst of the Dallas Mavericks.",
+      "next_id": "pcc_eng_27_070.0776_x1116894_05",
+      "next_sent": "Saturday's 103-97 mad scramble to get past the Utah Jazz is the latest and most glaring example."
+    },
+    "match_id": "24-25",
+    "colloc_id": "pcc_eng_27_070.0776_x1116894_04:24-25",
+    "hit_id": "pcc_eng_27_070.0776_x1116894_04:24-25",
+    "sent_text": "Cuban expressed concern that his team sometimes falls into default mode, doing just enough to win, an issue that's not exactly new regarding the Mavs' killer instinct.",
+    "token_str": "Cuban expressed concern that his team sometimes falls into default mode , doing just enough to win , an issue that 's not exactly new regarding the Mavs ' killer instinct .",
+    "lemma_str": "Cuban express concern that he team sometimes fall into default mode , do just enough to win , a issue that be not exactly new regard the Mavs 's killer instinct .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "new"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "new"
+    },
+    "index": {
+      "ADV": 23,
+      "ADJ": 24
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "new",
+          "ix": 24,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 23,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0367_x1116208_04",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0367_x1116208_03",
+      "prev_sent": "Lawrence Frank: Most recently the Detroit Pistons head coach, Frank spent one season as the Celtics' de facto defensive coordinator.",
+      "next_id": "pcc_eng_27_070.0367_x1116208_05",
+      "next_sent": "Passionate and fiery yet down to earth, he was well-liked during his short stay in Boston."
+    },
+    "match_id": "2-3",
+    "colloc_id": "pcc_eng_27_070.0367_x1116208_04:2-3",
+    "hit_id": "pcc_eng_27_070.0367_x1116208_04:2-3",
+    "sent_text": "Not exactly serene on the sidelines, the 42-year old probably spends more nights than he'd like to nursing a sore throat.",
+    "token_str": "Not exactly serene on the sidelines , the 42 - year old probably spends more nights than he'd like to nursing a sore throat .",
+    "lemma_str": "not exactly serene on the sideline , the 42 - year old probably spend more night than ho'd like to nurse a sore throat .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "serene"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "serene"
+    },
+    "index": {
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "serene",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0315_x1116118_16",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0315_x1116118_15",
+      "prev_sent": "Like many Japanese restaurants, Kajitsu has a minimalistic aesthetic, helping focus one's attention solely on the food.",
+      "next_id": "pcc_eng_27_070.0315_x1116118_17",
+      "next_sent": "Having a choice between a 4-course Kaze or 8-course Hana menu, we both selected the Hana with accompanying sake pairings for MW."
+    },
+    "match_id": "3-4",
+    "colloc_id": "pcc_eng_27_070.0315_x1116118_16:3-4",
+    "hit_id": "pcc_eng_27_070.0315_x1116118_16:3-4",
+    "sent_text": "While not exactly empty, the restaurant was quite tranquil, exuding a zen-like ambiance as we observed Chef Nishihara prepare each dish from behind the counter.",
+    "token_str": "While not exactly empty , the restaurant was quite tranquil , exuding a zen-like ambiance as we observed Chef Nishihara prepare each dish from behind the counter .",
+    "lemma_str": "while not exactly empty , the restaurant be quite tranquil , exude a zen-like ambiance as we observe Chef Nishihara prepare each dish from behind the counter .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "empty"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "empty"
+    },
+    "index": {
+      "ADV": 2,
+      "ADJ": 3
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "empty",
+          "ix": 3,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 2,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0315_x1116118_16",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0315_x1116118_15",
+      "prev_sent": "Like many Japanese restaurants, Kajitsu has a minimalistic aesthetic, helping focus one's attention solely on the food.",
+      "next_id": "pcc_eng_27_070.0315_x1116118_17",
+      "next_sent": "Having a choice between a 4-course Kaze or 8-course Hana menu, we both selected the Hana with accompanying sake pairings for MW."
+    },
+    "match_id": "09-10",
+    "colloc_id": "pcc_eng_27_070.0315_x1116118_16:09-10",
+    "hit_id": "pcc_eng_27_070.0315_x1116118_16:09-10",
+    "sent_text": "While not exactly empty, the restaurant was quite tranquil, exuding a zen-like ambiance as we observed Chef Nishihara prepare each dish from behind the counter.",
+    "token_str": "While not exactly empty , the restaurant was quite tranquil , exuding a zen-like ambiance as we observed Chef Nishihara prepare each dish from behind the counter .",
+    "lemma_str": "while not exactly empty , the restaurant be quite tranquil , exude a zen-like ambiance as we observe Chef Nishihara prepare each dish from behind the counter .",
+    "lemmas": {
+      "ADV": "quite",
+      "ADJ": "tranquil"
+    },
+    "forms": {
+      "ADV": "quite",
+      "ADJ": "tranquil"
+    },
+    "index": {
+      "ADV": 8,
+      "ADJ": 9
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "tranquil",
+          "ix": 9,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "quite",
+          "ix": 8,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0202_x1115929_106",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0202_x1115929_105",
+      "prev_sent": "Ok first things first mechanics from games like Natsuiro",
+      "next_id": "pcc_eng_27_070.0202_x1115929_107",
+      "next_sent": "The mechanic basically distracts from the rest of the games content and fails really badly to fit in with the rest of the game."
+    },
+    "match_id": "12-13",
+    "colloc_id": "pcc_eng_27_070.0202_x1115929_106:12-13",
+    "hit_id": "pcc_eng_27_070.0202_x1115929_106:12-13",
+    "sent_text": "High or my neighbor is a yandere ecchi games aren't exactly appropriate in Yan Sim because it's not trying to appeal to an audience who just wants to get off.",
+    "token_str": "High or my neighbor is a yandere ecchi games are n't exactly appropriate in Yan Sim because it 's not trying to appeal to an audience who just wants to get off .",
+    "lemma_str": "high or my neighbor be a yandere ecchi game be not exactly appropriate in Yan Sim because it be not try to appeal to a audience who just want to get off .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "appropriate"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "appropriate"
+    },
+    "index": {
+      "ADV": 11,
+      "ADJ": 12
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "appropriate",
+          "ix": 12,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 11,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0055_x1115700_024",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0055_x1115700_023",
+      "prev_sent": "No sooner were we north of Lerwick was I struck by the domination of moorland and the comparative lack of 'civilization' here in comparison with the south of the island.",
+      "next_id": "pcc_eng_27_070.0055_x1115700_025",
+      "next_sent": "Nothing seemed to redress the predominance of the heathland expanse, the road being the only evidence of civilization for a good 15 miles."
+    },
+    "match_id": "8-9",
+    "colloc_id": "pcc_eng_27_070.0055_x1115700_024:8-9",
+    "hit_id": "pcc_eng_27_070.0055_x1115700_024:8-9",
+    "sent_text": "Whilst Shetland as a whole isn't exactly civilized away from Lerwick, the dearth of cottages and 'huts' to the north seemed immediately more obvious.",
+    "token_str": "Whilst Shetland as a whole is n't exactly civilized away from Lerwick , the dearth of cottages and ' huts ' to the north seemed immediately more obvious .",
+    "lemma_str": "whilst Shetland as a whole be not exactly civilized away from Lerwick , the dearth of cottage and ' hut ' to the north seem immediately more obvious .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "civilized"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "civilized"
+    },
+    "index": {
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "civilized",
+          "ix": 8,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 7,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_27_070.0055_x1115700_024",
+    "context": {
+      "prev_id": "pcc_eng_27_070.0055_x1115700_023",
+      "prev_sent": "No sooner were we north of Lerwick was I struck by the domination of moorland and the comparative lack of 'civilization' here in comparison with the south of the island.",
+      "next_id": "pcc_eng_27_070.0055_x1115700_025",
+      "next_sent": "Nothing seemed to redress the predominance of the heathland expanse, the road being the only evidence of civilization for a good 15 miles."
+    },
+    "match_id": "27-28",
+    "colloc_id": "pcc_eng_27_070.0055_x1115700_024:27-28",
+    "hit_id": "pcc_eng_27_070.0055_x1115700_024:27-28",
+    "sent_text": "Whilst Shetland as a whole isn't exactly civilized away from Lerwick, the dearth of cottages and 'huts' to the north seemed immediately more obvious.",
+    "token_str": "Whilst Shetland as a whole is n't exactly civilized away from Lerwick , the dearth of cottages and ' huts ' to the north seemed immediately more obvious .",
+    "lemma_str": "whilst Shetland as a whole be not exactly civilized away from Lerwick , the dearth of cottage and ' hut ' to the north seem immediately more obvious .",
+    "lemmas": {
+      "ADV": "more",
+      "ADJ": "obvious"
+    },
+    "forms": {
+      "ADV": "more",
+      "ADJ": "obvious"
+    },
+    "index": {
+      "ADV": 26,
+      "ADJ": 27
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "obvious",
+          "ix": 27,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "more",
+          "ix": 26,
+          "xpos": "RBR"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,1454 @@
+[
+  {
+    "sent_id": "nyt_eng_20050430_0069_39",
+    "context": {
+      "prev_id": "nyt_eng_20050430_0069_38",
+      "prev_sent": "And anybody who claims the Meadowlands and Flatbush are in the same universe has never tried to negotiate the ghastly traffic and construction blockades on both sides of the river.",
+      "next_id": "nyt_eng_20050430_0069_40",
+      "next_sent": ""
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050430_0069_39:4-5",
+    "hit_id": "nyt_eng_20050430_0069_39:4-5",
+    "sent_text": "Brooklyn is not exactly L.A. From the Meadowlands, it will seem that way.",
+    "token_str": "Brooklyn is not exactly L.A. From the Meadowlands , it will seem that way .",
+    "lemma_str": "Brooklyn be not exactly l.a. from the Meadowlands , it will seem that way .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "l.a."
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "L.A."
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "l.a.",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050429_0169_23",
+    "context": {
+      "prev_id": "nyt_eng_20050429_0169_22",
+      "prev_sent": "The Champions Tour, of course, has commissioned yet another survey, one that will exhaustively interview golfers, sponsors, fans, doctors, probably even the BCS commissioners.",
+      "next_id": "nyt_eng_20050429_0169_24",
+      "next_sent": "Don't tell the sponsors these are meaningless exhibitions."
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050429_0169_23:4-5",
+    "hit_id": "nyt_eng_20050429_0169_23:4-5",
+    "sent_text": "No one is exactly clear on the rationale behind the ban, whether it was done for aesthetic or competitive reasons or both? Did the Tour kick the tires off the course to produce a cleaner look and project a healthier image or did it do it to kick the over-the-hill golfers off the course altogether?",
+    "token_str": "no one is exactly clear on the rationale behind the ban , whether it was done for aesthetic or competitive reasons or both ? Did the Tour kick the tires off the course to produce a cleaner look and project a healthier image or did it do it to kick the over-the-hill golfers off the course altogether ?",
+    "lemma_str": "no one be exactly clear on the rationale behind the ban , whether it was do for aesthetic or competitive reason or both ? do the Tour kick the tire off the course to produce a cleaner look and project a healthier image or did it do it to kick the over-the-hill golfer off the course altogether ?",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "clear",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050428_0097_246",
+    "context": {
+      "prev_id": "nyt_eng_20050428_0097_245",
+      "prev_sent": "-LBQ-  Miss Congenialty 2  -COL-  Armed and Fabulous  -RDQ-  \\/ C -",
+      "next_id": "nyt_eng_20050428_0097_247",
+      "next_sent": "Bullock returns as FBI agent Gracie Hart, now glammed up to do P.R. as  -LBQ-  the new face of the FBI.  -RDQ-"
+    },
+    "match_id": "2-3",
+    "colloc_id": "nyt_eng_20050428_0097_246:2-3",
+    "hit_id": "nyt_eng_20050428_0097_246:2-3",
+    "sent_text": "Not exactly fabulous, but the irresistible Sandra Bullock does her best to keep things going, in the face of a silly, slapped-together script.",
+    "token_str": "not exactly fabulous , but the irresistible Sandra Bullock does her best to keep things going , in the face of a silly , slapped-together script .",
+    "lemma_str": "not exactly fabulous , but the irresistible Sandra Bullock do she best to keep thing go , in the face of a silly , slapped-together script .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "fabulous"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "fabulous"
+    },
+    "index": {
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "fabulous",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050428_0097_233",
+    "context": {
+      "prev_id": "nyt_eng_20050428_0097_232",
+      "prev_sent": "In Pine's version, she deals with Chloe Sevigny and Chjwetel Ejiofor; in Pine's, it's Will Ferrell and Amanda Peet.",
+      "next_id": "nyt_eng_20050428_0097_234",
+      "next_sent": "But there are some funny lines, and the cast is fun to watch."
+    },
+    "match_id": "23-24",
+    "colloc_id": "nyt_eng_20050428_0097_233:23-24",
+    "hit_id": "nyt_eng_20050428_0097_233:23-24",
+    "sent_text": "The two halves never coalesce into a compelling whole, and the message -- life is comedy and tragedy -- isn't exactly earthshaking.",
+    "token_str": "the two halves never coalesce into a compelling whole , and the message -- life is comedy and tragedy -- is n't exactly earthshaking .",
+    "lemma_str": "the two half never coalesce into a compelling whole , and the message -- life be comedy and tragedy -- be not exactly earthshaking .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "earthshaking"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "earthshaking"
+    },
+    "index": {
+      "ADV": 22,
+      "ADJ": 23
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "earthshaking",
+          "ix": 23,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 22,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050427_0144_6",
+    "context": {
+      "prev_id": "nyt_eng_20050427_0144_5",
+      "prev_sent": "Another, called Repairwear, boasts  -LBQ-  a unique peptide complex.  -RDQ-",
+      "next_id": "nyt_eng_20050427_0144_7",
+      "next_sent": "It's easy to be skeptical."
+    },
+    "match_id": "5-6",
+    "colloc_id": "nyt_eng_20050427_0144_6:5-6",
+    "hit_id": "nyt_eng_20050427_0144_6:5-6",
+    "sent_text": "-LBQ-  I'm not exactly sure what they're made from, but they get into the Langerhans cells under the skin and plump them up,  -RDQ-  said Davis, a tall young woman dressed in a white lab coat, which allowed her to talk about things like Langerhans cells with breezy confidence.",
+    "token_str": "`` I 'm not exactly sure what they 're made from , but they get into the Langerhans cells under the skin and plump them up , '' said Davis , a tall young woman dressed in a white lab coat , which allowed her to talk about things like Langerhans cells with breezy confidence .",
+    "lemma_str": "`` I be not exactly sure what they 're make from , but they get into the Langerhans cell under the skin and plump they up , '' say Davis , a tall young woman dress in a white lab coat , which allow she to talk about thing like Langerhans cell with breezy confidence .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 4,
+      "ADJ": 5
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 5,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 4,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0098_41",
+    "context": {
+      "prev_id": "nyt_eng_20050425_0098_40",
+      "prev_sent": "It's a message they particularly want to get out in the waning days of April, which is Autism Awareness Month.",
+      "next_id": "nyt_eng_20050425_0098_42",
+      "next_sent": "-LBQ-  The best way to think of it is in terms of brain plasticity,  -RDQ-  explained Wendy Stone, professor of pediatrics at Vanderbilt University Medical Center in Nashville and director of the Treatment and Research Institute on Autism Spectrum Disorder."
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050425_0098_41:4-5",
+    "hit_id": "nyt_eng_20050425_0098_41:4-5",
+    "sent_text": "Researchers are not exactly sure why early intervention is resulting in huge strides, but they have some theories.",
+    "token_str": "researchers are not exactly sure why early intervention is resulting in huge strides , but they have some theories .",
+    "lemma_str": "researcher be not exactly sure why early intervention is result in huge stride , but they have some theory .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0098_41",
+    "context": {
+      "prev_id": "nyt_eng_20050425_0098_40",
+      "prev_sent": "It's a message they particularly want to get out in the waning days of April, which is Autism Awareness Month.",
+      "next_id": "nyt_eng_20050425_0098_42",
+      "next_sent": "-LBQ-  The best way to think of it is in terms of brain plasticity,  -RDQ-  explained Wendy Stone, professor of pediatrics at Vanderbilt University Medical Center in Nashville and director of the Treatment and Research Institute on Autism Spectrum Disorder."
+    },
+    "match_id": "6-7",
+    "colloc_id": "nyt_eng_20050425_0098_41:6-7",
+    "hit_id": "nyt_eng_20050425_0098_41:6-7",
+    "sent_text": "Researchers are not exactly sure why early intervention is resulting in huge strides, but they have some theories.",
+    "token_str": "researchers are not exactly sure why early intervention is resulting in huge strides , but they have some theories .",
+    "lemma_str": "researcher be not exactly sure why early intervention is result in huge stride , but they have some theory .",
+    "lemmas": {
+      "ADV": "why",
+      "ADJ": "early"
+    },
+    "forms": {
+      "ADV": "why",
+      "ADJ": "early"
+    },
+    "index": {
+      "ADV": 5,
+      "ADJ": 6
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "early",
+          "ix": 6,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "why",
+          "ix": 5,
+          "xpos": "WRB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0091_10",
+    "context": {
+      "prev_id": "nyt_eng_20050425_0091_09",
+      "prev_sent": "",
+      "next_id": "nyt_eng_20050425_0091_11",
+      "next_sent": "John Sexton says that the town could have gone down in history -- if 200 sticks of dynamite attached to the Humboldt River bridge had gone off in 1932 when President Herbert Hoover was traveling above it."
+    },
+    "match_id": "25-26",
+    "colloc_id": "nyt_eng_20050425_0091_10:25-26",
+    "hit_id": "nyt_eng_20050425_0091_10:25-26",
+    "sent_text": "But judging from the stories spun by the Sextons -- whose veracity has yet to be established -- Palisade's brief existence wasn't exactly dull.",
+    "token_str": "but judging from the stories spun by the Sextons -- whose veracity has yet to be established -- Palisade 's brief existence was n't exactly dull .",
+    "lemma_str": "but judge from the story spin by the Sextons -- whose veracity have yet to be establish -- Palisade 's brief existence be not exactly dull .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "dull"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "dull"
+    },
+    "index": {
+      "ADV": 24,
+      "ADJ": 25
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "dull",
+          "ix": 25,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 24,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0034_1",
+    "context": {
+      "prev_id": "nyt_eng_20050425_0034_0",
+      "prev_sent": "",
+      "next_id": "nyt_eng_20050425_0034_2",
+      "next_sent": "Just place it in a pot of water with your eggs and the indicator lets you know when your they are soft, medium or hard-boiled."
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050425_0034_1:4-5",
+    "hit_id": "nyt_eng_20050425_0034_1:4-5",
+    "sent_text": "It's not exactly high-tech, but the Norpro egg timer is a cool tool for the kitchen.",
+    "token_str": "it 's not exactly high-tech , but the Norpro egg timer is a cool tool for the kitchen .",
+    "lemma_str": "it be not exactly high-tech , but the Norpro egg timer be a cool tool for the kitchen .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "high-tech"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "high-tech"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "high-tech",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050421_0105_198",
+    "context": {
+      "prev_id": "nyt_eng_20050421_0105_197",
+      "prev_sent": "-LBQ-  Miss Congenialty 2  -COL-  Armed and Fabulous  -RDQ-  \\/ C -",
+      "next_id": "nyt_eng_20050421_0105_199",
+      "next_sent": "Bullock returns as FBI agent Gracie Hart, now glammed up to do P.R. as  -LBQ-  the new face of the FBI.  -RDQ-"
+    },
+    "match_id": "2-3",
+    "colloc_id": "nyt_eng_20050421_0105_198:2-3",
+    "hit_id": "nyt_eng_20050421_0105_198:2-3",
+    "sent_text": "Not exactly fabulous, but the irresistible Sandra Bullock does her best to keep things going, in the face of a silly, slapped-together script.",
+    "token_str": "not exactly fabulous , but the irresistible Sandra Bullock does her best to keep things going , in the face of a silly , slapped-together script .",
+    "lemma_str": "not exactly fabulous , but the irresistible Sandra Bullock do she best to keep thing go , in the face of a silly , slapped-together script .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "fabulous"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "fabulous"
+    },
+    "index": {
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "fabulous",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050421_0105_185",
+    "context": {
+      "prev_id": "nyt_eng_20050421_0105_184",
+      "prev_sent": "In Pine's version, she deals with Chloe Sevigny and Chjwetel Ejiofor; in Pine's, it's Will Ferrell and Amanda Peet.",
+      "next_id": "nyt_eng_20050421_0105_186",
+      "next_sent": "But there are some funny lines, and the cast is fun to watch."
+    },
+    "match_id": "23-24",
+    "colloc_id": "nyt_eng_20050421_0105_185:23-24",
+    "hit_id": "nyt_eng_20050421_0105_185:23-24",
+    "sent_text": "The two halves never coalesce into a compelling whole, and the message -- life is comedy and tragedy -- isn't exactly earthshaking.",
+    "token_str": "the two halves never coalesce into a compelling whole , and the message -- life is comedy and tragedy -- is n't exactly earthshaking .",
+    "lemma_str": "the two half never coalesce into a compelling whole , and the message -- life be comedy and tragedy -- be not exactly earthshaking .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "earthshaking"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "earthshaking"
+    },
+    "index": {
+      "ADV": 22,
+      "ADJ": 23
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "earthshaking",
+          "ix": 23,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 22,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050421_0060_29",
+    "context": {
+      "prev_id": "nyt_eng_20050421_0060_28",
+      "prev_sent": "Not that the Sycamores would have much use for a radio.",
+      "next_id": "nyt_eng_20050421_0060_30",
+      "next_sent": "-LBQ-  Your mother believes in spiritualism because it's fashionable, and your father raises orchids because he can afford to,  -RDQ-  a tearful Alice tells Tony, trying to explain why the Sycamores and Kirbys can never unite."
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050421_0060_29:4-5",
+    "hit_id": "nyt_eng_20050421_0060_29:4-5",
+    "sent_text": "They're not exactly world-wise, and they favor making their own music.",
+    "token_str": "they 're not exactly world-wise , and they favor making their own music .",
+    "lemma_str": "they be not exactly world-wise , and they favor make they own music .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "world-wise"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "world-wise"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "world-wise",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050420_0318_19",
+    "context": {
+      "prev_id": "nyt_eng_20050420_0318_18",
+      "prev_sent": "Rather than mold pure form out of clay -- there was little challenge in that -- he painstakingly coaxed it from unforgiving hunks of metal.",
+      "next_id": "nyt_eng_20050420_0318_20",
+      "next_sent": "-LRB- For Meadmore, a visit to friends who did not share his eye for composition could be torture."
+    },
+    "match_id": "52-53",
+    "colloc_id": "nyt_eng_20050420_0318_19:52-53",
+    "hit_id": "nyt_eng_20050420_0318_19:52-53",
+    "sent_text": "Working at his kitchen table with small-scale maquettes of rigid polyester, Meadmore might labor over a sculpture for as long as a year, changing the angle of a bend ever so slightly, turning the model over and over in his hands until he was satisfied its proportions were exactly right.",
+    "token_str": "working at his kitchen table with small-scale maquettes of rigid polyester , Meadmore might labor over a sculpture for as long as a year , changing the angle of a bend ever so slightly , turning the model over and over in his hands until he was satisfied its proportions were exactly right .",
+    "lemma_str": "work at he kitchen table with small-scale maquette of rigid polyester , Meadmore might labor over a sculpture for as long as a year , change the angle of a bend ever so slightly , turn the model over and over in he hand until he be satisfy its proportion be exactly right .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "index": {
+      "ADV": 51,
+      "ADJ": 52
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "right",
+          "ix": 52,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 51,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050420_0176_11",
+    "context": {
+      "prev_id": "nyt_eng_20050420_0176_10",
+      "prev_sent": "So why do business people -- especially mid-level managers -- say things like  -LBQ-  mission critical  -RDQ-  -LRB- instead of  -LBQ-  important project  -RDQ-  -RRB-,  -LBQ-  re-engineer  -RDQ-  -LRB- instead of  -LBQ-  change  -RDQ-  -RRB- or  -LBQ-  client-focused  -RDQ-  which the book described as one of those cliches  -LBQ-  that make you wonder what businesses were doing the rest of the time.  -RDQ-",
+      "next_id": "nyt_eng_20050420_0176_12",
+      "next_sent": "It's not chemistry or physics."
+    },
+    "match_id": "21-22",
+    "colloc_id": "nyt_eng_20050420_0176_11:21-22",
+    "hit_id": "nyt_eng_20050420_0176_11:21-22",
+    "sent_text": "Maybe it's part of a basic insecurity that business, any way you look at it, isn't exactly scientific.",
+    "token_str": "maybe it 's part of a basic insecurity that business , any way you look at it , is n't exactly scientific .",
+    "lemma_str": "maybe it be part of a basic insecurity that business , any way you look at it , be not exactly scientific .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "scientific"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "scientific"
+    },
+    "index": {
+      "ADV": 20,
+      "ADJ": 21
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "scientific",
+          "ix": 21,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 20,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050419_0022_25",
+    "context": {
+      "prev_id": "nyt_eng_20050419_0022_24",
+      "prev_sent": "NY-PATAKI-POLITICS -LRB- Albany, N.Y. -RRB-",
+      "next_id": "nyt_eng_20050419_0022_26",
+      "next_sent": "Pataki is not expected to announce his future political plans until next month at the earliest, but he's increasingly being viewed as a lame duck."
+    },
+    "match_id": "48-49",
+    "colloc_id": "nyt_eng_20050419_0022_25:48-49",
+    "hit_id": "nyt_eng_20050419_0022_25:48-49",
+    "sent_text": "-- When Gov. George E. Pataki held his 10th annual Governor's Reception fund-raiser at the South Street Seaport last week, the guests -- who paid $ 10,000 to dine with him, or $ 1,000 to have their pictures taken with him -- were not exactly sure what their contributions would end up being used for.",
+    "token_str": "-- When Gov. George E. Pataki held his 10th annual Governor 's Reception fund-raiser at the South Street Seaport last week , the guests -- who paid $ 10,000 to dine with him , or $ 1,000 to have their pictures taken with him -- were not exactly sure what their contributions would end up being used for .",
+    "lemma_str": "-- when Gov. George E. Pataki hold he 10th annual Governor 's Reception fund-raiser at the South Street Seaport last week , the guest -- who pay $ 10,000 to dine with he , or $ 1,000 to have they picture take with he -- be not exactly sure what they contribution would end up being use for .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 47,
+      "ADJ": 48
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 48,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 47,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050418_0144_64",
+    "context": {
+      "prev_id": "nyt_eng_20050418_0144_63",
+      "prev_sent": "NY-PATAKI-POLITICS -LRB- Albany, N.Y. -RRB-",
+      "next_id": "nyt_eng_20050418_0144_65",
+      "next_sent": "Pataki is not expected to announce his future political plans until next month at the earliest, but he's increasingly being viewed as a lame duck."
+    },
+    "match_id": "48-49",
+    "colloc_id": "nyt_eng_20050418_0144_64:48-49",
+    "hit_id": "nyt_eng_20050418_0144_64:48-49",
+    "sent_text": "-- When Gov. George E. Pataki held his 10th annual Governor's Reception fund-raiser at the South Street Seaport last week, the guests -- who paid $ 10,000 to dine with him, or $ 1,000 to have their pictures taken with him -- were not exactly sure what their contributions would end up being used for.",
+    "token_str": "-- When Gov. George E. Pataki held his 10th annual Governor 's Reception fund-raiser at the South Street Seaport last week , the guests -- who paid $ 10,000 to dine with him , or $ 1,000 to have their pictures taken with him -- were not exactly sure what their contributions would end up being used for .",
+    "lemma_str": "-- when Gov. George E. Pataki hold he 10th annual Governor 's Reception fund-raiser at the South Street Seaport last week , the guest -- who pay $ 10,000 to dine with he , or $ 1,000 to have they picture take with he -- be not exactly sure what they contribution would end up being use for .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "sure"
+    },
+    "index": {
+      "ADV": 47,
+      "ADJ": 48
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "sure",
+          "ix": 48,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 47,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050418_0026_32",
+    "context": {
+      "prev_id": "nyt_eng_20050418_0026_31",
+      "prev_sent": "-LBQ-  That tells me at the moment, no one feels the pricing is more irrational than it normally is.  -RDQ-",
+      "next_id": "nyt_eng_20050418_0026_33",
+      "next_sent": "At a recent meeting with analysts, Dell CEO Kevin Rollins compared the consumer market with a plane flying 50 feet off the ground."
+    },
+    "match_id": "09-10",
+    "colloc_id": "nyt_eng_20050418_0026_32:09-10",
+    "hit_id": "nyt_eng_20050418_0026_32:09-10",
+    "sent_text": "But profit margins in consumer PCs are not exactly fat, either.",
+    "token_str": "but profit margins in consumer PCs are not exactly fat , either .",
+    "lemma_str": "but profit margin in consumer pc be not exactly fat , either .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "fat"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "fat"
+    },
+    "index": {
+      "ADV": 8,
+      "ADJ": 9
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "fat",
+          "ix": 9,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 8,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050418_0026_31",
+    "context": {
+      "prev_id": "nyt_eng_20050418_0026_30",
+      "prev_sent": "",
+      "next_id": "nyt_eng_20050418_0026_32",
+      "next_sent": "But profit margins in consumer PCs are not exactly fat, either."
+    },
+    "match_id": "15-16",
+    "colloc_id": "nyt_eng_20050418_0026_31:15-16",
+    "hit_id": "nyt_eng_20050418_0026_31:15-16",
+    "sent_text": "-LBQ-  That tells me at the moment, no one feels the pricing is more irrational than it normally is.  -RDQ-",
+    "token_str": "`` That tells me at the moment , no one feels the pricing is more irrational than it normally is . ''",
+    "lemma_str": "`` that tell I at the moment , no one feel the pricing be more irrational than it normally be . ''",
+    "lemmas": {
+      "ADV": "more",
+      "ADJ": "irrational"
+    },
+    "forms": {
+      "ADV": "more",
+      "ADJ": "irrational"
+    },
+    "index": {
+      "ADV": 14,
+      "ADJ": 15
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "irrational",
+          "ix": 15,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "more",
+          "ix": 14,
+          "xpos": "RBR"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050416_0176_9",
+    "context": {
+      "prev_id": "nyt_eng_20050416_0176_8",
+      "prev_sent": "Kerrey confirmed that conversation.",
+      "next_id": "nyt_eng_20050416_0176_10",
+      "next_sent": "But he said that he began having second thoughts almost as soon as he had accepted."
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050416_0176_9:4-5",
+    "hit_id": "nyt_eng_20050416_0176_9:4-5",
+    "sent_text": "-LBQ-  That is exactly right,  -RDQ-  he said Saturday night.",
+    "token_str": "`` That is exactly right , '' he said Saturday night .",
+    "lemma_str": "`` that be exactly right , '' he say Saturday night .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "right"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "right",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050413_0042_13",
+    "context": {
+      "prev_id": "nyt_eng_20050413_0042_12",
+      "prev_sent": "Bits about Bill Clinton and Monica Lewinsky may not be exactly timely, but the point of the jokes -- in which Clinton is, at 2 -COL- 30 a.m., telephoning congressmen, eating pizza and being pleasured by the intern all at once -- is how busy the guy was.",
+      "next_id": "nyt_eng_20050413_0042_14",
+      "next_sent": ""
+    },
+    "match_id": "11-12",
+    "colloc_id": "nyt_eng_20050413_0042_13:11-12",
+    "hit_id": "nyt_eng_20050413_0042_13:11-12",
+    "sent_text": "Besides, as Maher says,  -LBQ-  Men are only as loyal as their options.  -RDQ-",
+    "token_str": "besides , as Maher says , `` Men are only as loyal as their options . ''",
+    "lemma_str": "besides , as Maher say , `` man be only as loyal as they option . ''",
+    "lemmas": {
+      "ADV": "as",
+      "ADJ": "loyal"
+    },
+    "forms": {
+      "ADV": "as",
+      "ADJ": "loyal"
+    },
+    "index": {
+      "ADV": 10,
+      "ADJ": 11
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "loyal",
+          "ix": 11,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "as",
+          "ix": 10,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050413_0042_12",
+    "context": {
+      "prev_id": "nyt_eng_20050413_0042_11",
+      "prev_sent": "If only he knew.",
+      "next_id": "nyt_eng_20050413_0042_13",
+      "next_sent": "Besides, as Maher says,  -LBQ-  Men are only as loyal as their options.  -RDQ-"
+    },
+    "match_id": "11-12",
+    "colloc_id": "nyt_eng_20050413_0042_12:11-12",
+    "hit_id": "nyt_eng_20050413_0042_12:11-12",
+    "sent_text": "Bits about Bill Clinton and Monica Lewinsky may not be exactly timely, but the point of the jokes -- in which Clinton is, at 2 -COL- 30 a.m., telephoning congressmen, eating pizza and being pleasured by the intern all at once -- is how busy the guy was.",
+    "token_str": "bits about Bill Clinton and Monica Lewinsky may not be exactly timely , but the point of the jokes -- in which Clinton is , at 2:30 a.m. , telephoning congressmen , eating pizza and being pleasured by the intern all at once -- is how busy the guy was .",
+    "lemma_str": "bit about Bill Clinton and Monica Lewinsky may not be exactly timely , but the point of the joke -- in which Clinton be , at 2:30 a.m. , telephone congressman , eat pizza and being pleasure by the intern all at once -- be how busy the guy be .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "timely"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "timely"
+    },
+    "index": {
+      "ADV": 10,
+      "ADJ": 11
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "timely",
+          "ix": 11,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 10,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050413_0042_12",
+    "context": {
+      "prev_id": "nyt_eng_20050413_0042_11",
+      "prev_sent": "If only he knew.",
+      "next_id": "nyt_eng_20050413_0042_13",
+      "next_sent": "Besides, as Maher says,  -LBQ-  Men are only as loyal as their options.  -RDQ-"
+    },
+    "match_id": "46-47",
+    "colloc_id": "nyt_eng_20050413_0042_12:46-47",
+    "hit_id": "nyt_eng_20050413_0042_12:46-47",
+    "sent_text": "Bits about Bill Clinton and Monica Lewinsky may not be exactly timely, but the point of the jokes -- in which Clinton is, at 2 -COL- 30 a.m., telephoning congressmen, eating pizza and being pleasured by the intern all at once -- is how busy the guy was.",
+    "token_str": "bits about Bill Clinton and Monica Lewinsky may not be exactly timely , but the point of the jokes -- in which Clinton is , at 2:30 a.m. , telephoning congressmen , eating pizza and being pleasured by the intern all at once -- is how busy the guy was .",
+    "lemma_str": "bit about Bill Clinton and Monica Lewinsky may not be exactly timely , but the point of the joke -- in which Clinton be , at 2:30 a.m. , telephone congressman , eat pizza and being pleasure by the intern all at once -- be how busy the guy be .",
+    "lemmas": {
+      "ADV": "how",
+      "ADJ": "busy"
+    },
+    "forms": {
+      "ADV": "how",
+      "ADJ": "busy"
+    },
+    "index": {
+      "ADV": 45,
+      "ADJ": 46
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "busy",
+          "ix": 46,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "how",
+          "ix": 45,
+          "xpos": "WRB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050412_0296_12",
+    "context": {
+      "prev_id": "nyt_eng_20050412_0296_11",
+      "prev_sent": "Times three, no less.",
+      "next_id": "nyt_eng_20050412_0296_13",
+      "next_sent": "And a kind of classic payback."
+    },
+    "match_id": "12-13",
+    "colloc_id": "nyt_eng_20050412_0296_12:12-13",
+    "hit_id": "nyt_eng_20050412_0296_12:12-13",
+    "sent_text": "Then we get guilt -- over what, I'm not exactly certain.",
+    "token_str": "then we get guilt -- over what , I 'm not exactly certain .",
+    "lemma_str": "then we get guilt -- over what , I be not exactly certain .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "certain"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "certain"
+    },
+    "index": {
+      "ADV": 11,
+      "ADJ": 12
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "certain",
+          "ix": 12,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 11,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050411_0068_26",
+    "context": {
+      "prev_id": "nyt_eng_20050411_0068_25",
+      "prev_sent": "Sedna, that frozen planetoid beyond Pluto, has never been considered exactly normal since it was discovered a year ago.",
+      "next_id": "nyt_eng_20050411_0068_27",
+      "next_sent": ""
+    },
+    "match_id": "8-9",
+    "colloc_id": "nyt_eng_20050411_0068_26:8-9",
+    "hit_id": "nyt_eng_20050411_0068_26:8-9",
+    "sent_text": "For one thing, it's about as red as Mars; for another, it takes roughly 40 times as long as Pluto to orbit the Sun -LRB- about 10,500 years -RRB-.",
+    "token_str": "for one thing , it 's about as red as Mars ; for another , it takes roughly 40 times as long as Pluto to orbit the Sun -LRB- about 10,500 years -RRB- .",
+    "lemma_str": "for one thing , it be about as red as Mars ; for another , it take roughly 40 time as long as Pluto to orbit the Sun -lrb- about 10,500 year -rrb- .",
+    "lemmas": {
+      "ADV": "as",
+      "ADJ": "red"
+    },
+    "forms": {
+      "ADV": "as",
+      "ADJ": "red"
+    },
+    "index": {
+      "ADV": 7,
+      "ADJ": 8
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "red",
+          "ix": 8,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "as",
+          "ix": 7,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050411_0068_26",
+    "context": {
+      "prev_id": "nyt_eng_20050411_0068_25",
+      "prev_sent": "Sedna, that frozen planetoid beyond Pluto, has never been considered exactly normal since it was discovered a year ago.",
+      "next_id": "nyt_eng_20050411_0068_27",
+      "next_sent": ""
+    },
+    "match_id": "21-22",
+    "colloc_id": "nyt_eng_20050411_0068_26:21-22",
+    "hit_id": "nyt_eng_20050411_0068_26:21-22",
+    "sent_text": "For one thing, it's about as red as Mars; for another, it takes roughly 40 times as long as Pluto to orbit the Sun -LRB- about 10,500 years -RRB-.",
+    "token_str": "for one thing , it 's about as red as Mars ; for another , it takes roughly 40 times as long as Pluto to orbit the Sun -LRB- about 10,500 years -RRB- .",
+    "lemma_str": "for one thing , it be about as red as Mars ; for another , it take roughly 40 time as long as Pluto to orbit the Sun -lrb- about 10,500 year -rrb- .",
+    "lemmas": {
+      "ADV": "as",
+      "ADJ": "long"
+    },
+    "forms": {
+      "ADV": "as",
+      "ADJ": "long"
+    },
+    "index": {
+      "ADV": 20,
+      "ADJ": 21
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "long",
+          "ix": 21,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "as",
+          "ix": 20,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050411_0068_25",
+    "context": {
+      "prev_id": "nyt_eng_20050411_0068_24",
+      "prev_sent": "UPON FURTHER REVIEW",
+      "next_id": "nyt_eng_20050411_0068_26",
+      "next_sent": "For one thing, it's about as red as Mars; for another, it takes roughly 40 times as long as Pluto to orbit the Sun -LRB- about 10,500 years -RRB-."
+    },
+    "match_id": "13-14",
+    "colloc_id": "nyt_eng_20050411_0068_25:13-14",
+    "hit_id": "nyt_eng_20050411_0068_25:13-14",
+    "sent_text": "Sedna, that frozen planetoid beyond Pluto, has never been considered exactly normal since it was discovered a year ago.",
+    "token_str": "Sedna , that frozen planetoid beyond Pluto , has never been considered exactly normal since it was discovered a year ago .",
+    "lemma_str": "Sedna , that frozen planetoid beyond Pluto , has never been consider exactly normal since it was discover a year ago .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "normal"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "normal"
+    },
+    "index": {
+      "ADV": 12,
+      "ADJ": 13
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "normal",
+          "ix": 13,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 12,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050411_0017_46",
+    "context": {
+      "prev_id": "nyt_eng_20050411_0017_45",
+      "prev_sent": "Gov. Mario M. Cuomo's administration and the Legislature struck a bargain with the hospital industry  -COL-  The rates the state set would cover the hospitals ' costs, but they would have very slim profit margins and would not be allowed to accumulate big cash cushions.",
+      "next_id": "nyt_eng_20050411_0017_47",
+      "next_sent": "-LBQ-  If a hospital managed itself well and generated a surplus, then that hospital was punished with lower rates, whereas if a hospital was inefficient, they found ways to give it more money and cover its costs.  -RDQ-"
+    },
+    "match_id": "4-5",
+    "colloc_id": "nyt_eng_20050411_0017_46:4-5",
+    "hit_id": "nyt_eng_20050411_0017_46:4-5",
+    "sent_text": "-LBQ-  It was exactly backwards,  -RDQ-  said Steven Malanga, a senior fellow at the Manhattan Institute, a conservative policy group, and a persistent critic of both the hospitals and the state.",
+    "token_str": "`` It was exactly backwards , '' said Steven Malanga , a senior fellow at the Manhattan Institute , a conservative policy group , and a persistent critic of both the hospitals and the state .",
+    "lemma_str": "`` it be exactly backwards , '' say Steven Malanga , a senior fellow at the Manhattan Institute , a conservative policy group , and a persistent critic of both the hospital and the state .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "backwards"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "backwards"
+    },
+    "index": {
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "backwards",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050411_0017_45",
+    "context": {
+      "prev_id": "nyt_eng_20050411_0017_44",
+      "prev_sent": "",
+      "next_id": "nyt_eng_20050411_0017_46",
+      "next_sent": "-LBQ-  It was exactly backwards,  -RDQ-  said Steven Malanga, a senior fellow at the Manhattan Institute, a conservative policy group, and a persistent critic of both the hospitals and the state."
+    },
+    "match_id": "34-35",
+    "colloc_id": "nyt_eng_20050411_0017_45:34-35",
+    "hit_id": "nyt_eng_20050411_0017_45:34-35",
+    "sent_text": "Gov. Mario M. Cuomo's administration and the Legislature struck a bargain with the hospital industry  -COL-  The rates the state set would cover the hospitals ' costs, but they would have very slim profit margins and would not be allowed to accumulate big cash cushions.",
+    "token_str": "Gov. Mario M. Cuomo 's administration and the Legislature struck a bargain with the hospital industry : The rates the state set would cover the hospitals ' costs , but they would have very slim profit margins and would not be allowed to accumulate big cash cushions .",
+    "lemma_str": "Gov. Mario M. Cuomo 's administration and the Legislature strike a bargain with the hospital industry : the rate the state set would cover the hospital ' cost , but they would have very slim profit margin and would not be allow to accumulate big cash cushion .",
+    "lemmas": {
+      "ADV": "very",
+      "ADJ": "slim"
+    },
+    "forms": {
+      "ADV": "very",
+      "ADJ": "slim"
+    },
+    "index": {
+      "ADV": 33,
+      "ADJ": 34
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "slim",
+          "ix": 34,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "very",
+          "ix": 33,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050407_0117_137",
+    "context": {
+      "prev_id": "nyt_eng_20050407_0117_136",
+      "prev_sent": "-LBQ-  Miss Congenialty 2  -COL-  Armed and Fabulous  -RDQ-  \\/ C -",
+      "next_id": "nyt_eng_20050407_0117_138",
+      "next_sent": "Bullock returns as FBI agent Gracie Hart, now glammed up to do P.R. as  -LBQ-  the new face of the FBI.  -RDQ-"
+    },
+    "match_id": "2-3",
+    "colloc_id": "nyt_eng_20050407_0117_137:2-3",
+    "hit_id": "nyt_eng_20050407_0117_137:2-3",
+    "sent_text": "Not exactly fabulous, but the irresistible Sandra Bullock does her best to keep things going, in the face of a silly, slapped-together script.",
+    "token_str": "not exactly fabulous , but the irresistible Sandra Bullock does her best to keep things going , in the face of a silly , slapped-together script .",
+    "lemma_str": "not exactly fabulous , but the irresistible Sandra Bullock do she best to keep thing go , in the face of a silly , slapped-together script .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "fabulous"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "fabulous"
+    },
+    "index": {
+      "ADV": 1,
+      "ADJ": 2
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "fabulous",
+          "ix": 2,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 1,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050407_0117_29",
+    "context": {
+      "prev_id": "nyt_eng_20050407_0117_28",
+      "prev_sent": "In Pine's version, she deals with Chloe Sevigny and Chjwetel Ejiofor; in Pine's, it's Will Ferrell and Amanda Peet.",
+      "next_id": "nyt_eng_20050407_0117_30",
+      "next_sent": "But there are some funny lines, and the cast is fun to watch."
+    },
+    "match_id": "23-24",
+    "colloc_id": "nyt_eng_20050407_0117_29:23-24",
+    "hit_id": "nyt_eng_20050407_0117_29:23-24",
+    "sent_text": "The two halves never coalesce into a compelling whole, and the message -- life is comedy and tragedy -- isn't exactly earthshaking.",
+    "token_str": "the two halves never coalesce into a compelling whole , and the message -- life is comedy and tragedy -- is n't exactly earthshaking .",
+    "lemma_str": "the two half never coalesce into a compelling whole , and the message -- life be comedy and tragedy -- be not exactly earthshaking .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "earthshaking"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "earthshaking"
+    },
+    "index": {
+      "ADV": 22,
+      "ADJ": 23
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "earthshaking",
+          "ix": 23,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 22,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050406_0148_2",
+    "context": {
+      "prev_id": "nyt_eng_20050406_0148_1",
+      "prev_sent": "It is a problem that might have puzzled the great physicist himself  -COL-  how to conduct an author tour when the author is, well, not exactly available.",
+      "next_id": "nyt_eng_20050406_0148_3",
+      "next_sent": ""
+    },
+    "match_id": "35-36",
+    "colloc_id": "nyt_eng_20050406_0148_2:35-36",
+    "hit_id": "nyt_eng_20050406_0148_2:35-36",
+    "sent_text": "The author and physicist in this case are one and the same  -COL-  Richard P. Feynman, the Nobel Prize laureate who, next to Albert Einstein, is one of the world's most recognizable scientists and one of the few whose written works have consistently made the best-seller lists.",
+    "token_str": "the author and physicist in this case are one and the same : Richard P. Feynman , the Nobel Prize laureate who , next to Albert Einstein , is one of the world 's most recognizable scientists and one of the few whose written works have consistently made the best-seller lists .",
+    "lemma_str": "the author and physicist in this case be one and the same : Richard P. Feynman , the Nobel Prize laureate who , next to Albert Einstein , be one of the world 's most recognizable scientist and one of the few whose write work have consistently make the best-seller list .",
+    "lemmas": {
+      "ADV": "most",
+      "ADJ": "recognizable"
+    },
+    "forms": {
+      "ADV": "most",
+      "ADJ": "recognizable"
+    },
+    "index": {
+      "ADV": 34,
+      "ADJ": 35
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "recognizable",
+          "ix": 35,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "most",
+          "ix": 34,
+          "xpos": "RBS"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050406_0148_1",
+    "context": {
+      "prev_id": "nyt_eng_20050406_0148_0",
+      "prev_sent": "",
+      "next_id": "nyt_eng_20050406_0148_2",
+      "next_sent": "The author and physicist in this case are one and the same  -COL-  Richard P. Feynman, the Nobel Prize laureate who, next to Albert Einstein, is one of the world's most recognizable scientists and one of the few whose written works have consistently made the best-seller lists."
+    },
+    "match_id": "28-29",
+    "colloc_id": "nyt_eng_20050406_0148_1:28-29",
+    "hit_id": "nyt_eng_20050406_0148_1:28-29",
+    "sent_text": "It is a problem that might have puzzled the great physicist himself  -COL-  how to conduct an author tour when the author is, well, not exactly available.",
+    "token_str": "it is a problem that might have puzzled the great physicist himself : how to conduct an author tour when the author is , well , not exactly available .",
+    "lemma_str": "it be a problem that might have puzzle the great physicist himself : how to conduct a author tour when the author be , well , not exactly available .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "available"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "available"
+    },
+    "index": {
+      "ADV": 27,
+      "ADJ": 28
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "available",
+          "ix": 28,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 27,
+          "xpos": "RB"
+        }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050404_0114_1",
+    "context": {
+      "prev_id": "nyt_eng_20050404_0114_0",
+      "prev_sent": "",
+      "next_id": "nyt_eng_20050404_0114_2",
+      "next_sent": "The nation was in recession."
+    },
+    "match_id": "27-28",
+    "colloc_id": "nyt_eng_20050404_0114_1:27-28",
+    "hit_id": "nyt_eng_20050404_0114_1:27-28",
+    "sent_text": "In the years after the first canoe came off the Coleman Co. assembly line here on April 1, 1980, the economic waters were not exactly calm.",
+    "token_str": "in the years after the first canoe came off the Coleman Co. assembly line here on April 1 , 1980 , the economic waters were not exactly calm .",
+    "lemma_str": "in the year after the first canoe come off the Coleman Co. assembly line here on April 1 , 1980 , the economic water be not exactly calm .",
+    "lemmas": {
+      "ADV": "exactly",
+      "ADJ": "calm"
+    },
+    "forms": {
+      "ADV": "exactly",
+      "ADJ": "calm"
+    },
+    "index": {
+      "ADV": 26,
+      "ADJ": 27
+    },
+    "deps": {
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "calm",
+          "ix": 27,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 26,
+          "xpos": "RB"
+        }
+      }
+    }
+  }
+]

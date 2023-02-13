@@ -1,0 +1,189 @@
+[
+  {
+    "sent_id": "pcc_eng_val_3.10936_x52202_02",
+    "matching": {
+      "nodes": { "ADV": "21", "ADJ": "22" },
+      "edges": {
+        "mod": { "source": "22", "label": "advmod", "target": "21" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.10294_x51165_08",
+    "matching": {
+      "nodes": { "ADV": "28", "ADJ": "29" },
+      "edges": {
+        "mod": { "source": "29", "label": "advmod", "target": "28" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.10294_x51165_07",
+    "matching": {
+      "nodes": { "ADV": "12", "ADJ": "13" },
+      "edges": {
+        "mod": { "source": "13", "label": "advmod", "target": "12" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.10294_x51165_07",
+    "matching": {
+      "nodes": { "ADV": "18", "ADJ": "19" },
+      "edges": {
+        "mod": { "source": "19", "label": "advmod", "target": "18" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.08137_x47680_127",
+    "matching": {
+      "nodes": { "ADV": "6", "ADJ": "7" },
+      "edges": { "mod": { "source": "7", "label": "advmod", "target": "6" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.08137_x47680_126",
+    "matching": {
+      "nodes": { "ADV": "7", "ADJ": "8" },
+      "edges": { "mod": { "source": "8", "label": "advmod", "target": "7" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.07737_x47048_08",
+    "matching": {
+      "nodes": { "ADV": "6", "ADJ": "7" },
+      "edges": { "mod": { "source": "7", "label": "advmod", "target": "6" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.07526_x46713_08",
+    "matching": {
+      "nodes": { "ADV": "6", "ADJ": "7" },
+      "edges": { "mod": { "source": "7", "label": "advmod", "target": "6" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.07526_x46713_07",
+    "matching": {
+      "nodes": { "ADV": "17", "ADJ": "18" },
+      "edges": {
+        "mod": { "source": "18", "label": "advmod", "target": "17" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.07369_x46463_25",
+    "matching": {
+      "nodes": { "ADV": "9", "ADJ": "10" },
+      "edges": {
+        "mod": { "source": "10", "label": "advmod", "target": "9" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.07369_x46463_07",
+    "matching": {
+      "nodes": { "ADV": "9", "ADJ": "10" },
+      "edges": {
+        "mod": { "source": "10", "label": "advmod", "target": "9" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.06425_x44932_20",
+    "matching": {
+      "nodes": { "ADV": "8", "ADJ": "9" },
+      "edges": { "mod": { "source": "9", "label": "advmod", "target": "8" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.06425_x44932_19",
+    "matching": {
+      "nodes": { "ADV": "11", "ADJ": "12" },
+      "edges": {
+        "mod": { "source": "12", "label": "advmod", "target": "11" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.06330_x44770_50",
+    "matching": {
+      "nodes": { "ADV": "6", "ADJ": "7" },
+      "edges": { "mod": { "source": "7", "label": "advmod", "target": "6" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.05704_x43769_08",
+    "matching": {
+      "nodes": { "ADV": "20", "ADJ": "21" },
+      "edges": {
+        "mod": { "source": "21", "label": "advmod", "target": "20" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.05704_x43769_07",
+    "matching": {
+      "nodes": { "ADV": "24", "ADJ": "25" },
+      "edges": {
+        "mod": { "source": "25", "label": "advmod", "target": "24" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.04934_x42578_6",
+    "matching": {
+      "nodes": { "ADV": "20", "ADJ": "21" },
+      "edges": {
+        "mod": { "source": "21", "label": "advmod", "target": "20" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.04934_x42578_5",
+    "matching": {
+      "nodes": { "ADV": "13", "ADJ": "14" },
+      "edges": {
+        "mod": { "source": "14", "label": "advmod", "target": "13" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.03493_x40234_100",
+    "matching": {
+      "nodes": { "ADV": "5", "ADJ": "6" },
+      "edges": { "mod": { "source": "6", "label": "advmod", "target": "5" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.03005_x39438_12",
+    "matching": {
+      "nodes": { "ADV": "5", "ADJ": "6" },
+      "edges": { "mod": { "source": "6", "label": "advmod", "target": "5" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.01469_x36935_25",
+    "matching": {
+      "nodes": { "ADV": "19", "ADJ": "20" },
+      "edges": {
+        "mod": { "source": "20", "label": "advmod", "target": "19" }
+      }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.00161_x34797_2",
+    "matching": {
+      "nodes": { "ADV": "6", "ADJ": "7" },
+      "edges": { "mod": { "source": "7", "label": "advmod", "target": "6" } }
+    }
+  },
+  {
+    "sent_id": "pcc_eng_val_3.00087_x34668_27",
+    "matching": {
+      "nodes": { "ADV": "4", "ADJ": "5" },
+      "edges": { "mod": { "source": "5", "label": "advmod", "target": "4" } }
+    }
+  }
+]
