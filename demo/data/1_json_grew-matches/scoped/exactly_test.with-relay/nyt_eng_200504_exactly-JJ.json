@@ -1,0 +1,82 @@
+[
+  {
+    "sent_id": "nyt_eng_20050429_0169_23",
+    "context": {
+      "prev_id": "nyt_eng_20050429_0169_22",
+      "prev_sent": "The Champions Tour, of course, has commissioned yet another survey, one that will exhaustively interview golfers, sponsors, fans, doctors, probably even the BCS commissioners.",
+      "next_id": "nyt_eng_20050429_0169_24",
+      "next_sent": "Don't tell the sponsors these are meaningless exhibitions."
+    },
+    "match_id": "1-2-4-5",
+    "colloc_id": "nyt_eng_20050429_0169_23:4-5",
+    "hit_id": "nyt_eng_20050429_0169_23:1-2-4-5",
+    "sent_text": "No one is exactly clear on the rationale behind the ban, whether it was done for aesthetic or competitive reasons or both? Did the Tour kick the tires off the course to produce a cleaner look and project a healthier image or did it do it to kick the over-the-hill golfers off the course altogether?",
+    "token_str": "no one is exactly clear on the rationale behind the ban , whether it was done for aesthetic or competitive reasons or both ? Did the Tour kick the tires off the course to produce a cleaner look and project a healthier image or did it do it to kick the over-the-hill golfers off the course altogether ?",
+    "lemma_str": "no one be exactly clear on the rationale behind the ban , whether it was do for aesthetic or competitive reason or both ? do the Tour kick the tire off the course to produce a cleaner look and project a healthier image or did it do it to kick the over-the-hill golfer off the course altogether ?",
+    "lemmas": {
+      "RELAY": "one",
+      "NEG": "no",
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "forms": {
+      "RELAY": "one",
+      "NEG": "no",
+      "ADV": "exactly",
+      "ADJ": "clear"
+    },
+    "index": {
+      "RELAY": 1,
+      "NEG": 0,
+      "ADV": 3,
+      "ADJ": 4
+    },
+    "deps": {
+      "relay": {
+        "node": "relay",
+        "contiguous": false,
+        "relation": "nsubj",
+        "head": {
+          "lemma": "clear",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "one",
+          "ix": 1,
+          "xpos": "NN"
+        }
+      },
+      "neg": {
+        "node": "neg",
+        "contiguous": true,
+        "relation": "det",
+        "head": {
+          "lemma": "one",
+          "ix": 1,
+          "xpos": "NN"
+        },
+        "target": {
+          "lemma": "no",
+          "ix": 0,
+          "xpos": "DT"
+        }
+      },
+      "mod": {
+        "node": "mod",
+        "contiguous": true,
+        "relation": "advmod",
+        "head": {
+          "lemma": "clear",
+          "ix": 4,
+          "xpos": "JJ"
+        },
+        "target": {
+          "lemma": "exactly",
+          "ix": 3,
+          "xpos": "RB"
+        }
+      }
+    }
+  }
+]
