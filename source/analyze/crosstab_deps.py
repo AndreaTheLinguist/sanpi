@@ -93,6 +93,8 @@ def _depstr_cols(_df):
     return cols_by_str(_df, 'dep_str')
 
 # TODO: add argument for "cross" column (to crosstabulate dep strings with more than just `hit_id`)
+
+
 def crosstabulate_variants(df: pd.DataFrame,
                            cross_col: str = 'hit_id',
                            out_label: str = None,
@@ -130,7 +132,7 @@ def crosstabulate_variants(df: pd.DataFrame,
     ct_tables = get_crosstabs(df, _ct_cols)
 
     for ct_col, ctdf in ct_tables.items():
-        #TODO: change paths to include info on "cross" column once added
+        # TODO: change paths to include info on "cross" column once added
         csv_path = crosstab_dir.joinpath(
             f'{ct_out_fstem}_{ct_col.replace("_", "-")}.csv')
         ctdf.to_csv(csv_path)

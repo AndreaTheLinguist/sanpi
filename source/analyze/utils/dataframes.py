@@ -2,7 +2,7 @@
 from pathlib import Path
 
 import pandas as pd
-from analyze.utils.general import find_files #pylint: disable=import-error
+from analyze.utils.general import find_files  # pylint: disable=import-error
 
 
 def balance_sample(full_df: pd.DataFrame,
@@ -20,17 +20,17 @@ def balance_sample(full_df: pd.DataFrame,
     #       not sure if groupby will produce desired output
     for __, sdf in full_df.groupby(column_name):
         # take sample if 1+ and less than length of full dataframe
-        if len(sdf) > sample_per_value > 0: 
+        if len(sdf) > sample_per_value > 0:
             sdf = sdf.sample(sample_per_value)
         sub_samples.append(sdf)
-        
-    #> trim all "by column" sub dfs to length of shortest if -1 given
+
+    # > trim all "by column" sub dfs to length of shortest if -1 given
     if sample_per_value == -1:
         trim_len = int(min(len(sdf) for sdf in sub_samples))
         sub_samples = [sdf.sample(trim_len)
                        for sdf in sub_samples]
 
-    #TODO: make sure this still has category/`column_name` column
+    # TODO: make sure this still has category/`column_name` column
     b_sample = pd.concat(sub_samples)
 
     if verbose:
@@ -42,8 +42,8 @@ def balance_sample(full_df: pd.DataFrame,
                     .value_counts(column_name, normalize=True)
                     .round(2) * 100)
             .to_markdown())
-        label = (full_df.hits_df_pkl[0].stem + ' ' 
-                 if 'hits_df_pkl' in full_df.columns 
+        label = (full_df.hits_df_pkl[0].stem + ' '
+                 if 'hits_df_pkl' in full_df.columns
                  else '')
         info_message = (f'\n## {column_name} representation in {label}sample\n'
                         + subset_info_table)

@@ -132,7 +132,7 @@ def _get_hit_data(json_dir):
 
         df = pd.json_normalize(json_dicts, sep='_', max_level=1)
 
-        #* since `hit_id` is now added in previous module, it can be moved to the index immediately.
+        # * since `hit_id` is now added in previous module, it can be moved to the index immediately.
         df = df.convert_dtypes().set_index('hit_id')
 
         df.columns = (df.columns.str.replace('s_', '_', regex=False))
@@ -157,7 +157,7 @@ def _get_hit_data(json_dir):
 
         df = df.convert_dtypes()
 
-        #Note: This does not check that the adv and adj are actually true collocates
+        # Note: This does not check that the adv and adj are actually true collocates
         if 'adv_form' in df.columns and 'adj_form' in df.columns:
             collocs = df.adv_form + '_' + df.adj_form
         else:
@@ -183,7 +183,7 @@ def _get_hit_data(json_dir):
 
 def _remove_redundant(df, json_path):
 
-    #TODO: remove? Don't think this is still necessary since indexing was fixed.
+    # TODO: remove? Don't think this is still necessary since indexing was fixed.
     logging.info('removing redundant pattern matches...')
     # is_unfilled = df.sent_text.isna()
     # unfilled_rows = df.loc[is_unfilled, :]
@@ -218,9 +218,10 @@ def _remove_redundant(df, json_path):
                         len(fdf) - len(keep_df))
         # TODO: remove -- tmp print
         print(f'{len(fdf) - len(keep_df)} duplicate hits removed from dataframe')
-        is_duplicate = fdf_hashable.duplicated(subset=dup_assess_cols, keep=False)
+        is_duplicate = fdf_hashable.duplicated(
+            subset=dup_assess_cols, keep=False)
         all_dup_df = fdf.loc[is_duplicate, :]
-        
+
         flat_deps_frame = pd.json_normalize(all_dup_df[dep_cols].to_dict(
             orient='records'), sep='_', max_level=1)
         flat_deps_frame = flat_deps_frame.loc[:, flat_deps_frame.columns.str.endswith(
@@ -236,15 +237,19 @@ def _remove_redundant(df, json_path):
                         .sort_values('sent_text'))
         if logging.getLogger().getEffectiveLevel() < 20:
             DEBUG_OUT = DATA_DIR.joinpath('debug')
-            if not DEBUG_OUT.is_dir(): 
+            if not DEBUG_OUT.is_dir():
                 DEBUG_OUT.mkdir()
-            for obj_name, df_obj in (('df', df), ('fdf', fdf), ('all-dup', all_dup_df), ('all-dup_dep-flat', all_dup_flat)):
-                df_obj.to_pickle(DATA_DIR.joinpath('debug', f'err_{obj_name}.pkl'))
-                df_obj.to_csv(DEBUG_OUT.joinpath(f'err_{obj_name}.csv')) 
+            for obj_name, df_obj in [('df', df),
+                                     ('fdf', fdf),
+                                     ('all-dup', all_dup_df),
+                                     ('all-dup_dep-flat', all_dup_flat)]:
+                df_obj.to_pickle(DATA_DIR.joinpath(
+                    'debug', f'err_{obj_name}.pkl'))
+                df_obj.to_csv(DEBUG_OUT.joinpath(f'err_{obj_name}.csv'))
         logging.info('\n%s', all_dup_flat.to_markdown())
-        # TODO: fix bug -- slurm `segmentation fault`. this is where the log stops. 👇
+        # BUG: slurm `segmentation fault`. this is where the log stops. 👇
         #! running following line in debug  console just crashed everything...? doe these things not exist?
-        #? commenting out this line eliminates the segmentation fault, but I have no idea why?
+        # ? commenting out this line eliminates the segmentation fault, but I have no idea why?
         # logging.info(all_dup_flat.loc[~all_dup_flat.kept, :].to_json(
         #     orient='records', indent=4))
         dup_csv_path = json_path.with_suffix('.duplicates.csv')
@@ -261,8 +266,8 @@ def _remove_redundant(df, json_path):
 def _process_ix(df):
     if any(df.token_str.isna()):
         logging.warning('Empty token string(s) in json data.')
-        
-    #? Are .fillna() applications necessary here?? they shouldn't be. These should all have values...
+
+    # ? Are .fillna() applications necessary here?? they shouldn't be. These should all have values...
     df = df.assign(token_str=df.token_str.astype('string').fillna(''))
     utt_len = pd.to_numeric(df.token_str.apply(lambda x: len(x.split())),
                             downcast='integer')
@@ -291,17 +296,19 @@ def _process_ix(df):
     #     #^ rather than worry about all this implicitly, just adjust getting range
     #     ix_3_after=ix_df.hit_final_ix + 3)
 
-    #// ! similarly, utt_len (len(token_str)) is fine as is
-    #//   (do not need to adjust for 0 indexing with `utt_len - 1`
-    #//   because end is not included)
+    # // ! similarly, utt_len (len(token_str)) is fine as is
+    # //   (do not need to adjust for 0 indexing with `utt_len - 1`
+    # //   because end is not included)
     ix_df = ix_df.assign(
         win_start_ix=ix_df.hit_start_ix.apply(lambda x: max(x - 3, 0)),
         # testing for end of string is unnecessary. going over the len() value doesn't do anything
         win_final_ix=ix_df.hit_final_ix + 3
-        )
+    )
 
-    win_strs = tuple(_gen_excerpt(ix_df.token_str, ix_df.win_start_ix, ix_df.win_final_ix))
-    hit_strs = tuple(_gen_excerpt(ix_df.token_str, ix_df.hit_start_ix, ix_df.hit_final_ix))
+    win_strs = tuple(_gen_excerpt(
+        ix_df.token_str, ix_df.win_start_ix, ix_df.win_final_ix))
+    hit_strs = tuple(_gen_excerpt(
+        ix_df.token_str, ix_df.hit_start_ix, ix_df.hit_final_ix))
 
     # hit_id and match_id already exists at this point now
     # // select index int columns to be used in creating hit id
@@ -319,7 +326,7 @@ def _process_ix(df):
 def _gen_excerpt(text_iter, start_iter, final_iter):
     for full_string, start, final in zip(text_iter, start_iter, final_iter):
         yield ' '.join(full_string.split()[start:1 + final])
-    
+
 
 # // def _generate_window(df):
     # //
@@ -346,7 +353,7 @@ def _create_output(hits_df, match_dir, start_time):
         output_dir.mkdir(parents=True)
 
     #! already done. Will cause KeyError now
-    #// hits_df = hits_df.set_index('hit_id')
+    # // hits_df = hits_df.set_index('hit_id')
     hits_df = hits_df.assign(category=pat_category).convert_dtypes()
     hit_cols = hits_df.columns
 
@@ -362,10 +369,12 @@ def _create_output(hits_df, match_dir, start_time):
     #     hits_df[col] = '?'
     # mem_init = hits_df.memory_usage(deep=True)
     # TODO: update this to avoid future error
-      """ FutureWarning: In a future version, `df.iloc[:, i] = newvals` will
-      attempt to set the values inplace instead of always setting a new array.
-      To retain the old behavior, use either `df[df.columns[i]] = newvals`
-      or, if columns are non-unique, `df.isetitem(i, newvals)` """
+    #   ```
+    #   FutureWarning: In a future version, `df.iloc[:, i] = newvals` will
+    #    attempt to set the values inplace instead of always setting a new array.
+    #    To retain the old behavior, use either `df[df.columns[i]] = newvals`
+    #    or, if columns are non-unique, `df.isetitem(i, newvals)`
+    #   ```
     hits_df.loc[:, catcols] = hits_df.loc[:, catcols].astype('category')
 
     # mem_cat=hits_df.memory_usage(deep=True)

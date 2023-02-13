@@ -136,8 +136,8 @@ def parallel_process_deps(args_df: pd.DataFrame,
     return results
 
 
-#// def _star_make_dep_dfs(zipped_args):
-#//     return _make_dep_dfs(zipped_args)
+# // def _star_make_dep_dfs(zipped_args):
+# //     return _make_dep_dfs(zipped_args)
 
 
 def _make_dep_dfs(arg_series):
@@ -186,7 +186,7 @@ def get_deps(hits_df: pd.DataFrame,
 
     dep_proc_time = dur_round((_t1 - _t0).seconds)
     if new_hits_df is None:
-        
+
         overview_str = f"❗ERROR: Unparsable input data. No dependency processing completed for `{input_path}`"
 
     else:
@@ -223,7 +223,7 @@ def get_deps(hits_df: pd.DataFrame,
                        + f'to `{dep_node_path}`...')
             display_message(message, logger)
             all_nodes_df.to_pickle(dep_node_path)
-            
+
             message_done = f'✔️ `{input_name}` dataframes saved. {pd.Timestamp.now().ctime()}'
             display_message(message_done, logger)
 
@@ -314,17 +314,19 @@ def _process_dep_info(hits_df: pd.DataFrame,
 
         if verbose and not in_parallel:
             print_iter(
-                iter_obj=(f'{x} ↣ {joined_strs[x]}' for x in joined_strs.index), 
+                iter_obj=(
+                    f'{x} ↣ {joined_strs[x]}' for x in joined_strs.index),
                 bullet=_BULLET,
                 header=f'⁂ Combined string representations of dependencies for match {hit_id}')
-    if verbose or in_parallel: 
+    if verbose or in_parallel:
         display_message(message=f'## New columns added to `{input_path.name}`\n'
-                        +hits_df.loc[:, 'hits_df_path':].iloc[0, :].to_markdown(), 
+                        + hits_df.loc[:, 'hits_df_path':].iloc[0,
+                                                               :].to_markdown(),
                         logger=logger)
-        
+
     #! namedtuple `dep_info` can't be pickled, so convert `dep_tuple` to dict type
     all_nodes_df = all_nodes_df.assign(
-        dep_dict = all_nodes_df.dep_tuple.apply(lambda t: t._asdict()))
+        dep_dict=all_nodes_df.dep_tuple.apply(lambda t: t._asdict()))
     all_nodes_df.pop('dep_tuple')
     return hits_df, all_nodes_df
 
@@ -340,13 +342,13 @@ def _process_deps_in_hit(row: pd.Series(dtype='object'),
         print_iter((f'{x}\n    {row[x]}'
                    for x in row.index
                    if not isinstance(row[x], dict)),
-                   bullet=_BULLET, logger=logger, level=10, 
+                   bullet=_BULLET, logger=logger, level=10,
                    header=f'\n## row {row.name} non-dictionary values'
                    )
         print_iter((f'{x}\n{pd.Series(row[x])}\n'
                    for x in row.index
-                   if isinstance(row[x], dict)), 
-                   bullet=_BULLET, logger=logger, level=10, 
+                   if isinstance(row[x], dict)),
+                   bullet=_BULLET, logger=logger, level=10,
                    header=f'\n## row {row.name} non-dictionary values')
         display_message(row.to_markdown(), logger, level=10)
 

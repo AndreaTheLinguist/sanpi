@@ -65,86 +65,86 @@ def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
     if verbose:
         path_iter = tuple(path_iter)
         print_iter(
-            [f'../{p.relative_to(data_dir)}' for p in path_iter], bullet='-', 
+            [f'../{p.relative_to(data_dir)}' for p in path_iter], bullet='-',
             header=f'### {len(path_iter)} paths matching {fname_glob} found in {data_dir}')
     return path_iter
 
 
-#> moved to `get_deps.parallel_process_deps()` directly
-#// def run_pool(process_to_run, inputs, log_level: int = 30):
-#//     mp.set_start_method('forkserver')
-#//     # logger = mp.get_logger()
-#//     logger = mp.log_to_stderr()
-#//     logger.setLevel(log_level)  # 20=info, 30=warning, 10=debug
-#//
-#//     inputs = tuple(inputs)
-#//     input_count = len(inputs)
-#//     # > set pool `processes` argument to
-#//     # > (a) number of _available_ cpus
-#//     # > OR
-#//     # > (b) number of inputs to be processed,
-#//     # > whichever is less
-#//     cpus = min(mp.cpu_count(), input_count, 15)
-#//     print(f'\n> processing {input_count} inputs with {cpus} CPUs...')
-#//     _start = datetime.now()
-#//
-#//     with mp.Pool(processes=cpus) as pool:
-#//
-#//         # NOTE: if process function takes more than 1 argument:
-#//         #       use (a) snippet "expand_argument_inputs" and `imap(_unordered)`
-#//         #       or  (b) `starmap` -> does not require printing step after, but slower
-#//         results = tuple(pool.imap_unordered(process_to_run,
-#//                                             inputs)
-#//                         )
-#//
-#//         # zfill_len = len(str(file_count))
-#//         # in_sz_w = 7
-#//         # out_sz_w = 8
-#//         # in_name_w = len(list(corpus_dir.glob('*conllu'))[0].stem)+1
-#//         # print(('  task  |  time  \tin size\tout size\t'
-#//         #         f'{"in data".ljust(in_name_w)}\t'
-#//         #         ' out data\n'
-#//         #         f' ------ | ------ \t'
-#//         #         f'{"-"*in_sz_w}\t'
-#//         #         f'{"-"*out_sz_w}\t'
-#//         #         f'{"-"*in_name_w}\t'
-#//         #         f'{"-"*40}'
-#//         #         ).expandtabs(3))
-#//
-#//         #! this is required to actually get the processes to run
-#//         i = 0
-#//         for result in results:
-#//             i += 1
-#//             print(f'## Input {i}')
-#//             logger.info(f'({i})')
-#//             # dur, in_name, in_size, out_name, out_size = result
-#//             # print((f'{str(i).zfill(zfill_len).center(8)}|{dur.rjust(7)} \t'
-#//             #         f'{in_size.center(in_sz_w)}\t'
-#//             #         f'{out_size.center(out_sz_w)}\t'
-#//             #         f'{in_name.ljust(in_name_w)}\t'
-#//             #         f'{out_name}').expandtabs(3))
-#//             if not isinstance(result, (int, str, float)):
-#//
-#//                 try:
-#//                     print_iter(iter_obj=result, bullet='-')
-#//                 except:
-#//                     pass
-#//                 else:
-#//                     continue
-#//
-#//             print(result)
-#//             logger.info(result)
-#//
-#//         # total_inputs_processed = i
-#//         # print(total_inputs_processed, 'inputs processed')
-#//
-#//         # print_iter(results)
-#//
-#//         # ? Is there a better way to do this? ^^ Like, some "run" or "start" or "join" method?
-#//     _end = datetime.now()
-#//     total_time = _end - _start
-#//     print('## Parallel Processing Complete\n- Timestamp:', _end.strftime("%Y-%m-%d @ %I:%M%p"),
-#//           '\n- Total time elapsed:', dur_round(total_time.total_seconds()))
+# > moved to `get_deps.parallel_process_deps()` directly
+# // def run_pool(process_to_run, inputs, log_level: int = 30):
+# //     mp.set_start_method('forkserver')
+# //     # logger = mp.get_logger()
+# //     logger = mp.log_to_stderr()
+# //     logger.setLevel(log_level)  # 20=info, 30=warning, 10=debug
+# //
+# //     inputs = tuple(inputs)
+# //     input_count = len(inputs)
+# //     # > set pool `processes` argument to
+# //     # > (a) number of _available_ cpus
+# //     # > OR
+# //     # > (b) number of inputs to be processed,
+# //     # > whichever is less
+# //     cpus = min(mp.cpu_count(), input_count, 15)
+# //     print(f'\n> processing {input_count} inputs with {cpus} CPUs...')
+# //     _start = datetime.now()
+# //
+# //     with mp.Pool(processes=cpus) as pool:
+# //
+# //         # NOTE: if process function takes more than 1 argument:
+# //         #       use (a) snippet "expand_argument_inputs" and `imap(_unordered)`
+# //         #       or  (b) `starmap` -> does not require printing step after, but slower
+# //         results = tuple(pool.imap_unordered(process_to_run,
+# //                                             inputs)
+# //                         )
+# //
+# //         # zfill_len = len(str(file_count))
+# //         # in_sz_w = 7
+# //         # out_sz_w = 8
+# //         # in_name_w = len(list(corpus_dir.glob('*conllu'))[0].stem)+1
+# //         # print(('  task  |  time  \tin size\tout size\t'
+# //         #         f'{"in data".ljust(in_name_w)}\t'
+# //         #         ' out data\n'
+# //         #         f' ------ | ------ \t'
+# //         #         f'{"-"*in_sz_w}\t'
+# //         #         f'{"-"*out_sz_w}\t'
+# //         #         f'{"-"*in_name_w}\t'
+# //         #         f'{"-"*40}'
+# //         #         ).expandtabs(3))
+# //
+# //         #! this is required to actually get the processes to run
+# //         i = 0
+# //         for result in results:
+# //             i += 1
+# //             print(f'## Input {i}')
+# //             logger.info(f'({i})')
+# //             # dur, in_name, in_size, out_name, out_size = result
+# //             # print((f'{str(i).zfill(zfill_len).center(8)}|{dur.rjust(7)} \t'
+# //             #         f'{in_size.center(in_sz_w)}\t'
+# //             #         f'{out_size.center(out_sz_w)}\t'
+# //             #         f'{in_name.ljust(in_name_w)}\t'
+# //             #         f'{out_name}').expandtabs(3))
+# //             if not isinstance(result, (int, str, float)):
+# //
+# //                 try:
+# //                     print_iter(iter_obj=result, bullet='-')
+# //                 except:
+# //                     pass
+# //                 else:
+# //                     continue
+# //
+# //             print(result)
+# //             logger.info(result)
+# //
+# //         # total_inputs_processed = i
+# //         # print(total_inputs_processed, 'inputs processed')
+# //
+# //         # print_iter(results)
+# //
+# //         # ? Is there a better way to do this? ^^ Like, some "run" or "start" or "join" method?
+# //     _end = datetime.now()
+# //     total_time = _end - _start
+# //     print('## Parallel Processing Complete\n- Timestamp:', _end.strftime("%Y-%m-%d @ %I:%M%p"),
+# //           '\n- Total time elapsed:', dur_round(total_time.total_seconds()))
 
 
 def print_iter(iter_obj,
