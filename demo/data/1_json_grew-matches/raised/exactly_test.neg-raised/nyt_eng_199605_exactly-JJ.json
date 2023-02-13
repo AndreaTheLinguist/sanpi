@@ -10,7 +10,7 @@
     "match_id": "14-21-22-23",
     "colloc_id": "nyt_eng_19960522_0120_19:22-23",
     "hit_id": "nyt_eng_19960522_0120_19:14-21-22-23",
-    "text": "As it should in a movie that is really a live-action cartoon, nothing in  -LBQ-  Mission  -COL-  Impossible  -RDQ-  looks exactly real.",
+    "sent_text": "As it should in a movie that is really a live-action cartoon, nothing in  -LBQ-  Mission  -COL-  Impossible  -RDQ-  looks exactly real.",
     "token_str": "as it should in a movie that is really a live-action cartoon , nothing in `` Mission : Impossible '' looks exactly real .",
     "lemma_str": "as it should in a movie that be really a live-action cartoon , nothing in `` Mission : impossible '' look exactly real .",
     "lemmas": {
@@ -90,7 +90,7 @@
     "match_id": "14-21-22-23",
     "colloc_id": "nyt_eng_19960521_0549_19:22-23",
     "hit_id": "nyt_eng_19960521_0549_19:14-21-22-23",
-    "text": "As it should in a movie that is really a live-action cartoon, nothing in  -LBQ-  Mission  -COL-  Impossible  -RDQ-  looks exactly real.",
+    "sent_text": "As it should in a movie that is really a live-action cartoon, nothing in  -LBQ-  Mission  -COL-  Impossible  -RDQ-  looks exactly real.",
     "token_str": "as it should in a movie that is really a live-action cartoon , nothing in `` Mission : Impossible '' looks exactly real .",
     "lemma_str": "as it should in a movie that be really a live-action cartoon , nothing in `` Mission : impossible '' look exactly real .",
     "lemmas": {
