@@ -2,10 +2,11 @@
 
 # %%
 import argparse
-from analyze.utils.dataframes import balance_sample, cols_by_str
-import pandas as pd
 from pathlib import Path
-from pprint import pprint
+
+import pandas as pd
+from analyze.utils.dataframes import (  # pylint: disable=import-error
+    balance_sample, cols_by_str)
 
 _DATA_DIR = Path('/share/compling/data/sanpi')
 _READ_PATH = _DATA_DIR.joinpath('3_dep_info/exactly_nyt_deps.pkl.gz')
@@ -80,11 +81,9 @@ def _get_read_path():
     return parser.parse_args()
 
 
-# %%
-
 def _select_columns(_df, extra: bool = True):
     _col_list = _df.columns[_df.columns.str.endswith(
-        ('category', 'colloc_id', 'colloc', 'hit_text', 'lemma'))
+        ('category', 'corpus', 'colloc_id', 'colloc', 'hit_text', 'lemma'))
     ].to_list() + _depstr_cols(_df) if extra else _depstr_cols(_df)
 
     return _col_list
@@ -93,20 +92,13 @@ def _select_columns(_df, extra: bool = True):
 def _depstr_cols(_df):
     return cols_by_str(_df, 'dep_str')
 
-
-# %% [markdown]
-# ## Crosstabulate data
-# Create dictionary of dataframe index (`hit_id`) crosstabulated with each
-# "dep_str" variant
-
-# %%
 # TODO: add argument for "cross" column (to crosstabulate dep strings with more than just `hit_id`)
 def crosstabulate_variants(df: pd.DataFrame,
                            cross_col: str = 'hit_id',
                            out_label: str = None,
                            dep_dir=Path(
                                '/share/compling/data/sanpi/3_dep_info'),
-                           sample_per_category: int = None,
+                           n_per_category: int = None,
                            include_extra: bool = True,
                            n_largest: int = 5):
     if out_label is None:
@@ -125,11 +117,11 @@ def crosstabulate_variants(df: pd.DataFrame,
 
     ct_out_fstem = f'{out_label}_ct'
 
-    if sample_per_category is not None:
+    if n_per_category is not None:
         ct_out_fstem += '-sample'
 
         df, sample_info = balance_sample(df, column_name='category',
-                                         sample_per_value=sample_per_category,
+                                         sample_per_value=n_per_category,
                                          verbose=True)
         lines.append(sample_info)
 
@@ -138,7 +130,7 @@ def crosstabulate_variants(df: pd.DataFrame,
     ct_tables = get_crosstabs(df, _ct_cols)
 
     for ct_col, ctdf in ct_tables.items():
-        # TODO: change paths to include info on "cross" column once added
+        #TODO: change paths to include info on "cross" column once added
         csv_path = crosstab_dir.joinpath(
             f'{ct_out_fstem}_{ct_col.replace("_", "-")}.csv')
         ctdf.to_csv(csv_path)
@@ -153,11 +145,11 @@ def crosstabulate_variants(df: pd.DataFrame,
     md_info_path = crosstab_dir.joinpath(f'{ct_out_fstem}_info.md')
     print('- Depencency crosstab info overview saved to:\\')
     print(f'  `{md_info_path}`')
-    md_info_path.write_text('\n'.join(lines))
+    md_info_path.write_text('\n'.join(lines), encoding='utf8')
 
 
 def get_crosstabs(df: pd.DataFrame,
-                  columns: list = [],
+                  columns: list = None,
                   cross: str = 'hit_id'):
     crosstab_dict = {}
     df = df.reset_index()
@@ -176,9 +168,6 @@ if __name__ == '__main__':
     # _READ_PATH = _get_read_path()
     dep_df = pd.read_pickle(_READ_PATH)
 
-    crosstabulate_variants(dep_df, sample_per_category=5)
+    crosstabulate_variants(dep_df, n_per_category=5)
 
-    # %%
     crosstabulate_variants(dep_df)
-
-# %%

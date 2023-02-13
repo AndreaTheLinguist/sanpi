@@ -4,30 +4,10 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "create_match_conllu",
-            "type": "python",
-            "request": "launch",
-            "program": "script/create_match_conllu.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            // "justMyCode": false,
-            "args": [
-                "-c",
-                "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-01.conllu",
-            ]
-        },
+
         // * Deps
         {
-            "name": "analyze_deps NEG puddin -s 0 -t",
+            "name": "analyze_deps NEG puddin -s -1 -t",
             "type": "python",
             "request": "launch",
             "program": "source/analyze_deps.py",
@@ -42,12 +22,32 @@
                 "-n", 
                 "NEG-exactly-puddin",
                 "-s",
-                "0", 
+                "-1", 
                 "-t"
             ]
         },
         {
-            "name": "analyze_deps NEG ALL -s 0 -t",
+            "name": "analyze_deps NEG puddin -s 50 -t",
+            "type": "python",
+            "request": "launch",
+            "program": "source/analyze_deps.py",
+            "console": "integratedTerminal",
+            // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+            //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            "args": [
+                "-g", 
+                "*[!j]/*exactly*puddin*hits.pkl.gz", 
+                "-n", 
+                "NEG-exactly-puddin",
+                "-s",
+                "50", 
+                "-t"
+            ]
+        },
+        {
+            "name": "analyze_deps NEG ALL -s 50 -t",
             "type": "python",
             "request": "launch",
             "program": "source/analyze_deps.py",
@@ -62,12 +62,12 @@
                 "-n", 
                 "NEG-exactly",
                 "-s",
-                "0", 
+                "50", 
                 "-t"
             ]
         },
         {
-            "name": "analyze_deps apw -v -s 25 -t",
+            "name": "analyze_deps apw -s -1 -t -v",
             "type": "python",
             "request": "launch",
             "program": "source/analyze_deps.py",
@@ -82,7 +82,7 @@
                 "-n", 
                 "TESTapw-min",
                 "-s",
-                "25", 
+                "-1", 
                 "-v",
                 "-t"
             ]
@@ -118,7 +118,24 @@
                 "-g", 
                 "*[gd]/exactly*apw*hits.pkl.gz", 
                 "-n", 
-                "NEG-exactly-apw"
+                "NEG-exactly-apw", 
+            ]
+        },
+        {
+            "name": "analyze_deps scoped-raised-ONLY exactly*apw",
+            "type": "python",
+            "request": "launch",
+            "program": "source/analyze_deps.py",
+            "console": "integratedTerminal",
+            // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+            //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            "args": [
+                "-g", 
+                "*[d]/exactly*apw*hits.pkl.gz", 
+                "-n", 
+                "NEG-exactly-apw", 
             ]
         },
         {
@@ -242,6 +259,28 @@
                 "-p",
                 "Pat/contig",
                 "--env_check"
+            ]
+        },
+        // * Misc
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "create_match_conllu",
+            "type": "python",
+            "request": "launch",
+            "program": "script/create_match_conllu.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            // "justMyCode": false,
+            "args": [
+                "-c",
+                "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-01.conllu",
             ]
         },
         // * Grew Search

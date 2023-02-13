@@ -2,7 +2,7 @@
 from pathlib import Path
 
 import pandas as pd
-from analyze.utils.general import print_iter, dur_round, find_files
+from analyze.utils.general import find_files #pylint: disable=import-error
 
 
 def balance_sample(full_df: pd.DataFrame,
@@ -11,29 +11,30 @@ def balance_sample(full_df: pd.DataFrame,
                    verbose: bool = False):
     '''
     create sample with no more than n rows satisfying each unique value
-    of the given column. A value of 0 for `sample_per_value` will limit
+    of the given column. A value of -1 for `sample_per_value` will limit
     all values' results to the minimum count per value.
     '''
     info_message = ''
     sub_samples = []
-    n = 5 if not sample_per_value else sample_per_value
-
-    for c in full_df.loc[:, column_name].unique():
-        sdf = (
-            full_df.loc[full_df[column_name] == c, :]
-            .sample(min(full_df.value_counts(subset=column_name)[c],
-                        n))
-        )
+    # TODO: test this. made changes to how this was done.
+    #       not sure if groupby will produce desired output
+    for __, sdf in full_df.groupby(column_name):
+        # take sample if 1+ and less than length of full dataframe
+        if len(sdf) > sample_per_value > 0: 
+            sdf = sdf.sample(sample_per_value)
         sub_samples.append(sdf)
-    if not sample_per_value:
-        trim_len = min(len(sdf) for sdf in sub_samples)
-        sub_samples = [sdf.iloc[:trim_len, :]
+        
+    #> trim all "by column" sub dfs to length of shortest if -1 given
+    if sample_per_value == -1:
+        trim_len = int(min(len(sdf) for sdf in sub_samples))
+        sub_samples = [sdf.sample(trim_len)
                        for sdf in sub_samples]
 
+    #TODO: make sure this still has category/`column_name` column
     b_sample = pd.concat(sub_samples)
 
     if verbose:
-        subset_info = (
+        subset_info_table = (
             b_sample
             .value_counts(subset=column_name)
             .to_frame(name='count')
@@ -41,8 +42,11 @@ def balance_sample(full_df: pd.DataFrame,
                     .value_counts(column_name, normalize=True)
                     .round(2) * 100)
             .to_markdown())
-
-        info_message = f'\n## {column_name} representation in sample:\n{subset_info}'
+        label = (full_df.hits_df_pkl[0].stem + ' ' 
+                 if 'hits_df_pkl' in full_df.columns 
+                 else '')
+        info_message = (f'\n## {column_name} representation in {label}sample\n'
+                        + subset_info_table)
 
     return b_sample, info_message
 

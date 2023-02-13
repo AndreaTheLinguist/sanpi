@@ -1,76 +1,67 @@
+"""generate crosstabulations of hit dependencies by hit_id or other attributes
+    #TODO: finish description?
+    Returns:
+        _type_: _description_
+    """
 # coding=utf-8
 import argparse
-from pathlib import Path
 import textwrap
+from collections import namedtuple
+from pathlib import Path
+from sys import exit as sys_exit
 
 import pandas as pd
-from analyze.crosstab_deps import crosstabulate_variants as ct_var
-from analyze.get_deps import make_dep_dfs, parallel_process_deps
-from analyze.utils import dataframes as udf
-from analyze.utils import general as ugen
+from analyze.crosstab_deps import (  # pylint: disable=import-error
+    crosstabulate_variants as ct_var)
+from analyze.get_deps import (  # pylint: disable=import-error
+    parallel_process_deps)
+from analyze.utils import dataframes as udf  # pylint: disable=import-error
+from analyze.utils import general as ugen  # pylint: disable=import-error
 
 
 def _main():
     args = _parse_args()
     n_per_category = args.sample_size
-
     # * if path to processed df given, jump straight to crosstab and pull output info from input path
     if args.dep_df:
         input_path = args.dep_df
 
-        ct_label = input_path.name.split('.')[0].replace('_deps', '')
-
-        if n_per_category is not None:
+        # > should drop "_deps.pkl.gz" and keep whatever precedes it
+        ct_label = input_path.name.rsplit('_', 1)[-1]
+        # > default is now `0`, so will always be defined
+        if n_per_category > 0:
             ct_label = f'{ct_label}-n{n_per_category}'
+        elif n_per_category < -1:
+            ct_label = f'{ct_label}-min'
 
         ct_var(df=pd.read_pickle(input_path),
                out_label=ct_label,
                dep_dir=input_path.parent,
-               sample_per_category=n_per_category)
+               n_per_category=n_per_category)
         return
 
     # * otherwise, follow normal processing
     verbose = args.verbose
-    deps_dir = args.output_dir
-    out_label = args.name
-    df_sample = None
-    sample_tag = ''
 
-    if not deps_dir.parent.is_dir():
-        deps_dir = args.input_dir.parent.joinpath('3_dep_info')
-
-    if out_label is None:
-        out_label = pd.Timestamp.now().strftime("%Y-%m-%d_%H:%M")
-    if n_per_category is not None and args.test:
-        sample_tag = f'n{int(n_per_category*2)}'
-        out_label = f'{out_label}-{sample_tag}'
-
-        # > used below
-        df_sample = int(2*n_per_category)
-
-    # out_dir = deps_dir.joinpath(out_label)
-    # if not out_dir.is_dir():
-    #     out_dir.mkdir(parents=True)
-    # TODO: test this!!
     # *** trying new approach: run get_deps() on individual files
-    df_file_suffix = f'_{sample_tag}deps.pkl.gz'
     # all_deps_df_save = out_dir.joinpath(out_label+df_file_suffix)
-    in_sdf_paths = tuple(
-        p for p in ugen.find_files(data_dir=args.input_dir,
-                                   fname_glob=args.glob_expr)
-        if '.pkl' in p.suffixes)
-    out_sdf_paths = tuple(_get_save_path(p, deps_dir, df_file_suffix)
-                          for p in in_sdf_paths)
-    if verbose:
-        print('Corresponding Paths for dependency processed dataframes:')
-        ugen.print_iter(out_sdf_paths)
+    # if verbose:
+    #     print('## File Processing Info')
 
-    # # TODO: employ multiprocessing here
-    # for zipped in zip(in_sdf_paths, out_sdf_paths):
-    #     _in_path, _out_path = zipped
-    #     make_dep_dfs(_in_path, _out_path, df_sample)
-    parallel_process_deps(in_sdf_paths, out_sdf_paths, df_sample)
-    df = udf.concat_pkls(pickles=out_sdf_paths, verbose=verbose)
+    dep_args_df = _get_dep_args(args)
+    # _gen_path_info yields _PATH_INFO namedtuple
+    # create dataframe from generator of these namedtuples for each input path
+
+    log_level = 20 if verbose else 30
+    parallel_process_deps(dep_args_df, log_level)
+
+    # to get debug messages:
+    # parallel_process_deps(in_sdf_paths, out_sdf_paths, df_sample, log_level=10)
+
+    # * concatonate dataframes with deps processing
+    dfs_with_dep_paths = dep_args_df.by_hit.to_list()
+    df = udf.concat_pkls(pickles=dfs_with_dep_paths,
+                         verbose=verbose)  # pylint: disable=invalid-name
 
     # // # * only run `get_deps()` if no prior output exists
     # // if dep_df_save.is_file():
@@ -80,53 +71,125 @@ def _main():
 
     # // # * process dataframe for dependency info
     # // else:
-    # // # TODO: modify to process pickles individually, then concatonate. Means changing the `df_save_path` argument maybe?
     # // print('No prior dep processing found. Creating dependency string identifiers...')
     # // df = udf.concat_pkls(args.input_dir,
     # //                      fname_glob=args.glob_expr,
     # //                      verbose=True)
-
     # // df = get_deps(df,
     # //               df_save_path=dep_df_save,
     # //               sample_size=df_sample,
     # //               verbose=verbose)
+    # * crosstabulate data
     print('## Crosstabulate by `hit_id`')
-    ct_var(df, out_label=out_label,
-           sample_per_category=n_per_category)
+    df_fname = dfs_with_dep_paths[0].name
+    if '[' in df_fname:
+        df_sample_tag = f"[{df_fname.split('[', 1)[1].split(']',1)[0]}]"
+    else:
+        df_sample_tag = ''
+    ct_out_label = _get_crosstab_label(args.name, df_sample_tag)
+
+    ct_var(df, out_label=ct_out_label,
+           n_per_category=n_per_category,
+           dep_dir=dfs_with_dep_paths[0].parent.parent)
 
 # > moved to get_deps.py
-# def make_dep_dfs(zipped):
-#     in_path, out_path, df_sample = zipped
-#     if out_path.is_file() and out_path.stat().st_size > 0:
-#         print('Prior dep processing found:',
-#                     f'../{Path(*out_path.parts[-3:])}...')
+# // def make_dep_dfs(zipped):
+# //     in_path, out_path, df_sample = zipped
+# //     if out_path.is_file() and out_path.stat().st_size > 0:
+# //         print('Prior dep processing found:',
+# //                     f'../{Path(*out_path.parts[-3:])}...')
+# //     else:
+# //         sdf = pd.read_pickle(in_path)
+# //             # * This wil only save processed dataframe to file (no returned df)
+# //         get_deps(df=sdf,
+# //                         df_save_path=out_path,
+# //                         sample_size=df_sample,
+# //                         return_df=False,
+# //                         verbose=False)
 
-#     else:
-#         sdf = pd.read_pickle(in_path)
-#             # * This wil only save processed dataframe to file (no returned df)
-#         get_deps(df=sdf,
-#                         df_save_path=out_path,
-#                         sample_size=df_sample,
-#                         return_df=False,
-#                         verbose=False)
+
+def _get_dep_args(args):
+
+    # * identify input paths
+    input_paths = tuple(
+        p for p in ugen.find_files(data_dir=args.input_dir,
+                                   fname_glob=args.glob_expr)
+        if '.pkl' in p.suffixes)
+    if not input_paths:
+        sys_exit('No input files found. Exiting.')
+
+    # * set `dep_info_dir` (output dataframes with subdir for `crosstab` tables)
+    dep_info_dir = args.output_dir
+    if not dep_info_dir.relative_to(args.input_dir.parent.parent):
+        dep_info_dir = args.input_dir.parent.joinpath('3_dep_info')
+    if not dep_info_dir.is_dir():
+        dep_info_dir.mkdir()
+
+    # * set sample size for (test) dataframe with dependency identifier strings
+    # > if test dataframe is to be created, use given sample size
+    df_sample = args.sample_size if args.test else 0
+    # > if sample size is negative, get minimum length across all selected input dataframes
+    if df_sample < 0:
+        df_sample = min(len(pd.read_pickle(i)) for i in input_paths)
+    # > multiply by 2 for sample size of test dataframe
+    df_sample = int(2 * df_sample)
+
+    sample_tag = f'[n{df_sample}]' if df_sample else ''
+
+    # * generate output paths for input paths and convert to dataframe
+    paths_df = pd.DataFrame(gen_out_paths(
+        input_paths, dep_info_dir, sample_tag))
+
+    if args.verbose:
+        print_paths = paths_df.assign(
+            dataset=paths_df.input.apply(lambda p: Path(p).name.split('.', 1)[0]))
+        print_paths = print_paths.set_index('dataset')
+        for i in print_paths.index:
+            row = print_paths.loc[i, :]
+            row = row.apply(lambda p: Path(*p.parts[-3:]))
+            print_paths.loc[i, :] = row
+        print('\n## Dependency Processing Path Info\n'
+              + print_paths.transpose().to_markdown())
+
+    args_df = paths_df.assign(sample_size=df_sample)
+    return args_df
 
 
-def _get_save_path(pkl_path, out_dir, fname_suffix):
-    sdf_save_path = (
-        out_dir
-        .joinpath(pkl_path.parent.name)
-        .joinpath(
-            # exactly_puddin_with-relay_hits.pkl.gz
-            # ↪ exactly_puddin_with-relay_hits
-            #    ↪ exactly_puddin_with-relay
-            #       ↪ exactly_puddin_with-relay_deps.pkl.gz)
-            pkl_path.name.split('.')[0].replace('_hits', '')
-            + fname_suffix)
-    )
-    if not sdf_save_path.parent.is_dir():
-        sdf_save_path.parent.mkdir()
+def gen_out_paths(input_paths, dep_info_dir, sample_tag):
 
-    return sdf_save_path
+    path_tuple = namedtuple('path_info', ['input', 'by_hit', 'by_node'])
+
+    for input_path in input_paths:
+        df_save_dir = (
+            # ../3_dep_info/
+            dep_info_dir
+            # ../2_hit_tables/scoped/exactly_puddin_with-relay_hits.pkl.gz
+            # ↪ scoped
+            #     ↪ ../3_dep_info/scoped
+            .joinpath(input_path.parent.name))
+        # exactly_puddin_with-relay_hits.pkl.gz
+        # ↪ exactly_puddin_with-relay_hits
+        #   ↪ exactly_puddin_with-relay_hits[n40]
+        df_stem_prefix = input_path.name.split('.', 1)[0] + sample_tag
+
+        # exactly_puddin_with-relay_hits[n40]+deps.pkl.gz)
+        hit_df_path = df_save_dir.joinpath(df_stem_prefix + '+deps.pkl.gz')
+
+        # exactly_puddin_with-relay_hits[n40]_dep-node-info.pkl.gz
+        node_df_path = df_save_dir.joinpath(
+            df_stem_prefix + '_dep-node-info.pkl.gz')
+        if not df_save_dir.is_dir():
+            df_save_dir.mkdir(parents=True)
+        yield path_tuple(input_path, hit_df_path, node_df_path)
+
+
+def _get_crosstab_label(name, df_sample_label=None):
+    ct_out_label = (name if name
+                    else pd.Timestamp.now().strftime("%Y-%m-%d_%H:%M"))
+    sample_tag = df_sample_label if df_sample_label else ''
+    ct_out_label += sample_tag
+
+    return ct_out_label
 
 
 def _parse_args():
@@ -178,10 +241,14 @@ def _parse_args():
     parser.add_argument(
         '-s', '--sample_size',
         type=int,
-        default=None,
-        help=(textwrap.dedent('''\
-              option to produce sample crosstabulation with at most this number of hits per category.
-              * When combined with `--test` option, will limit dataframe output to at most 2x this number.'''))
+        # Note: changed from None to 0 to make tests easier
+        default=0,
+        help=(
+            textwrap.dedent('''\
+                Option to produce sample crosstabulation with at most this number of hits per category.
+                * When combined with `--test` option, 
+                  this will limit dataframe output to at most **2x** this number.
+                '''))
     )
 
     parser.add_argument(
@@ -214,15 +281,18 @@ def _parse_args():
         '-t', '--test',
         action='store_true',
         default=False,
-        help=('option to limit dataframe processing as well as crosstab output. will create sample of dataframe, rather than just giving a sample output for crosstabulation.')
+        help=('option to limit dataframe processing as well as crosstab output. '
+              'will create sample of dataframe, rather than just using sample for `crosstab()`.')
     )
     # TODO: add argument for "cross column" in crosstabulate step
-    # TODO: (?) add argument to run only dependency processing? or modify `get_deps` to run dataframes separately, then concatonate *after* adding dep_str columns?
+    # ^ (?) add argument to run only dependency processing?
+    # ^ or modify `get_deps` to run dataframes separately,
+    # ^     then concatonate *after* adding dep_str columns?
 
     args = parser.parse_args()
     if '.pkl' not in args.glob_expr:
-        print(
-            f'⚠️ Warning: search string (glob expression) {args.glob_expr} not explicitly restricted to ".pkl" formats. May lead to errors.')
+        print(f'⚠️ Warning: search string (glob expression) {args.glob_expr}',
+              'not explicitly restricted to ".pkl" formats. May lead to errors.')
     return args
 
 
