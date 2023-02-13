@@ -10,7 +10,7 @@
     "match_id": "20-22-23",
     "colloc_id": "pcc_eng_02_002.9137_x0030933_37:22-23",
     "hit_id": "pcc_eng_02_002.9137_x0030933_37:20-22-23",
-    "text": "Although Stephan Bosshard was born (on August 6, 1960) and raised in Switzerland, it wouldn't be quite appropriate to call him the typical Swiss.",
+    "sent_text": "Although Stephan Bosshard was born (on August 6, 1960) and raised in Switzerland, it wouldn't be quite appropriate to call him the typical Swiss.",
     "token_str": "Although Stephan Bosshard was born ( on August 6 , 1960 ) and raised in Switzerland , it would n't be quite appropriate to call him the typical Swiss .",
     "lemma_str": "although Stephan Bosshard be bear ( on August 6 , 1960 ) and raise in Switzerland , it would not be quite appropriate to call he the typical Swiss .",
     "lemmas": {
@@ -72,7 +72,7 @@
     "match_id": "4-5-6",
     "colloc_id": "pcc_eng_02_002.7501_x0028305_09:5-6",
     "hit_id": "pcc_eng_02_002.7501_x0028305_09:4-5-6",
-    "text": "The cupboard's not exactly bare, but take a team's top two pitchers and top two hitters out of the lineup and see what happens.",
+    "sent_text": "The cupboard's not exactly bare, but take a team's top two pitchers and top two hitters out of the lineup and see what happens.",
     "token_str": "The cupboard 's not exactly bare , but take a team 's top two pitchers and top two hitters out of the lineup and see what happens .",
     "lemma_str": "the cupboard be not exactly bare , but take a team 's top two pitcher and top two hitter out of the lineup and see what happen .",
     "lemmas": {
@@ -134,7 +134,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_02_002.5336_x0024817_16:4-5",
     "hit_id": "pcc_eng_02_002.5336_x0024817_16:3-4-5",
-    "text": "Still isn't exactly alarming, also my urine test proved fine as well.",
+    "sent_text": "Still isn't exactly alarming, also my urine test proved fine as well.",
     "token_str": "Still is n't exactly alarming , also my urine test proved fine as well .",
     "lemma_str": "still be not exactly alarming , also my urine test prove fine as well .",
     "lemmas": {
@@ -196,7 +196,7 @@
     "match_id": "08-09-10",
     "colloc_id": "pcc_eng_02_002.4430_x0023370_37:09-10",
     "hit_id": "pcc_eng_02_002.4430_x0023370_37:08-09-10",
-    "text": "Worth noting here: Western religion is not exactly welcome in North Korea, a secular state where Christians have long been persecuted.",
+    "sent_text": "Worth noting here: Western religion is not exactly welcome in North Korea, a secular state where Christians have long been persecuted.",
     "token_str": "Worth noting here : Western religion is not exactly welcome in North Korea , a secular state where Christians have long been persecuted .",
     "lemma_str": "worth note here : western religion be not exactly welcome in North Korea , a secular state where Christian have long be persecute .",
     "lemmas": {
@@ -258,7 +258,7 @@
     "match_id": "12-13-14",
     "colloc_id": "pcc_eng_02_002.3765_x0022291_05:13-14",
     "hit_id": "pcc_eng_02_002.3765_x0022291_05:12-13-14",
-    "text": "\"Excuse me, Chapter Master, I know this isn't exactly necessary to know to carry out our mission, but I can't help but wonder how these wretched things first came to be?",
+    "sent_text": "\"Excuse me, Chapter Master, I know this isn't exactly necessary to know to carry out our mission, but I can't help but wonder how these wretched things first came to be?",
     "token_str": "\" Excuse me , Chapter Master , I know this is n't exactly necessary to know to carry out our mission , but I ca n't help but wonder how these wretched things first came to be ?",
     "lemma_str": "\" excuse I , Chapter master , I know this be not exactly necessary to know to carry out we mission , but I can not help but wonder how this wretched thing first come to be ?",
     "lemmas": {
@@ -320,7 +320,7 @@
     "match_id": "13-14-15",
     "colloc_id": "pcc_eng_02_002.3652_x0022086_04:14-15",
     "hit_id": "pcc_eng_02_002.3652_x0022086_04:13-14-15",
-    "text": "I don't know if we're better equipped, I'm not exactly sure how to rate that.",
+    "sent_text": "I don't know if we're better equipped, I'm not exactly sure how to rate that.",
     "token_str": "I do n't know if we 're better equipped , I 'm not exactly sure how to rate that .",
     "lemma_str": "I do not know if we be well equip , I be not exactly sure how to rate that .",
     "lemmas": {
@@ -382,7 +382,7 @@
     "match_id": "25-26-27",
     "colloc_id": "pcc_eng_02_002.3360_x0021609_007:26-27",
     "hit_id": "pcc_eng_02_002.3360_x0021609_007:25-26-27",
-    "text": "Sure, that first Summit, unleashed on the western market for the 1994 season, was nose heavy and kind of bulky and not exactly easy on the eyes (at least compared to today's machines), but look at what we have now, a dozen years later.",
+    "sent_text": "Sure, that first Summit, unleashed on the western market for the 1994 season, was nose heavy and kind of bulky and not exactly easy on the eyes (at least compared to today's machines), but look at what we have now, a dozen years later.",
     "token_str": "Sure , that first Summit , unleashed on the western market for the 1994 season , was nose heavy and kind of bulky and not exactly easy on the eyes ( at least compared to today 's machines ) , but look at what we have now , a dozen years later .",
     "lemma_str": "sure , that first Summit , unleash on the western market for the 1994 season , be nose heavy and kind of bulky and not exactly easy on the eye ( at least compare to today 's machine ) , but look at what we have now , a dozen year late .",
     "lemmas": {
@@ -444,7 +444,7 @@
     "match_id": "25-26-27",
     "colloc_id": "pcc_eng_02_002.2391_x0020034_09:26-27",
     "hit_id": "pcc_eng_02_002.2391_x0020034_09:25-26-27",
-    "text": "This film takes all the usual 80s tropes that are doing the rounds of late (yes, that Stranger Things reference above wasn't exactly subtle was it?) but somehow gets away with it.",
+    "sent_text": "This film takes all the usual 80s tropes that are doing the rounds of late (yes, that Stranger Things reference above wasn't exactly subtle was it?) but somehow gets away with it.",
     "token_str": "This film takes all the usual 80s tropes that are doing the rounds of late ( yes , that Stranger Things reference above was n't exactly subtle was it ? ) but somehow gets away with it .",
     "lemma_str": "this film take all the usual 80s trope that be do the round of late ( yes , that Strange Thing reference above be not exactly subtle be it ? ) but somehow get away with it .",
     "lemmas": {
@@ -506,7 +506,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_02_002.0716_x0017333_018:4-5",
     "hit_id": "pcc_eng_02_002.0716_x0017333_018:3-4-5",
-    "text": "I am not exactly sure how that happens...",
+    "sent_text": "I am not exactly sure how that happens...",
     "token_str": "I am not exactly sure how that happens ...",
     "lemma_str": "I be not exactly sure how that happen ...",
     "lemmas": {
@@ -568,7 +568,7 @@
     "match_id": "16-17-18",
     "colloc_id": "pcc_eng_02_002.0449_x0016906_3:17-18",
     "hit_id": "pcc_eng_02_002.0449_x0016906_3:16-17-18",
-    "text": "You'll definitely need your terminal open for this one, and the result isn't exactly flawless--no https support, problems with pop-ups, and a bit slower than you'd get in Windows--but it is a neat way for dedicated Linux users to check out what all the fuss is about.",
+    "sent_text": "You'll definitely need your terminal open for this one, and the result isn't exactly flawless--no https support, problems with pop-ups, and a bit slower than you'd get in Windows--but it is a neat way for dedicated Linux users to check out what all the fuss is about.",
     "token_str": "You 'll definitely need your terminal open for this one , and the result is n't exactly flawless -- no https support , problems with pop-ups , and a bit slower than you 'd get in Windows -- but it is a neat way for dedicated Linux users to check out what all the fuss is about .",
     "lemma_str": "you will definitely need you terminal open for this one , and the result be not exactly flawless -- no https support , problem with pop-up , and a bit slow than you would get in window -- but it be a neat way for dedicate Linux user to check out what all the fuss be about .",
     "lemmas": {

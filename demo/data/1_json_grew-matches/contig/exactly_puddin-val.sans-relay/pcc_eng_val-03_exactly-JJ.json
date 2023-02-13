@@ -10,7 +10,7 @@
     "match_id": "20-21-22",
     "colloc_id": "pcc_eng_val_3.10936_x52202_02:21-22",
     "hit_id": "pcc_eng_val_3.10936_x52202_02:20-21-22",
-    "text": "Sitting for over 13 hours a day, sleeping for 8 more, and moving for just 3 isn't exactly healthy or in your best interest as an individual.",
+    "sent_text": "Sitting for over 13 hours a day, sleeping for 8 more, and moving for just 3 isn't exactly healthy or in your best interest as an individual.",
     "token_str": "Sitting for over 13 hours a day , sleeping for 8 more , and moving for just 3 is n't exactly healthy or in your best interest as an individual .",
     "lemma_str": "sit for over 13 hour a day , sleep for 8 more , and move for just 3 be not exactly healthy or in you good interest as a individual .",
     "lemmas": {
@@ -72,7 +72,7 @@
     "match_id": "6-7-8",
     "colloc_id": "pcc_eng_val_3.08137_x47680_126:7-8",
     "hit_id": "pcc_eng_val_3.08137_x47680_126:6-7-8",
-    "text": "English around the globe is not exactly monochromatic.",
+    "sent_text": "English around the globe is not exactly monochromatic.",
     "token_str": "English around the globe is not exactly monochromatic .",
     "lemma_str": "English around the globe be not exactly monochromatic .",
     "lemmas": {
@@ -134,7 +134,7 @@
     "match_id": "5-6-7",
     "colloc_id": "pcc_eng_val_3.07737_x47048_08:6-7",
     "hit_id": "pcc_eng_val_3.07737_x47048_08:5-6-7",
-    "text": "But if you aren't exactly sure who that is, you'll be forgiven.",
+    "sent_text": "But if you aren't exactly sure who that is, you'll be forgiven.",
     "token_str": "But if you are n't exactly sure who that is , you 'll be forgiven .",
     "lemma_str": "but if you be not exactly sure who that be , you will be forgiven .",
     "lemmas": {
@@ -196,7 +196,7 @@
     "match_id": "16-17-18",
     "colloc_id": "pcc_eng_val_3.07526_x46713_07:17-18",
     "hit_id": "pcc_eng_val_3.07526_x46713_07:16-17-18",
-    "text": "Honest Abe has been in the public mind a lot lately, and we're not exactly sure why.",
+    "sent_text": "Honest Abe has been in the public mind a lot lately, and we're not exactly sure why.",
     "token_str": "Honest Abe has been in the public mind a lot lately , and we 're not exactly sure why .",
     "lemma_str": "honest Abe have be in the public mind a lot lately , and we be not exactly sure why .",
     "lemmas": {
@@ -258,7 +258,7 @@
     "match_id": "10-11-12",
     "colloc_id": "pcc_eng_val_3.06425_x44932_19:11-12",
     "hit_id": "pcc_eng_val_3.06425_x44932_19:10-11-12",
-    "text": "Today kindly pointed out, we college kids are not exactly stable in the area of finances.",
+    "sent_text": "Today kindly pointed out, we college kids are not exactly stable in the area of finances.",
     "token_str": "Today kindly pointed out , we college kids are not exactly stable in the area of finances .",
     "lemma_str": "today kindly point out , we college kid be not exactly stable in the area of finances .",
     "lemmas": {
@@ -320,7 +320,7 @@
     "match_id": "5-6-7",
     "colloc_id": "pcc_eng_val_3.06330_x44770_50:6-7",
     "hit_id": "pcc_eng_val_3.06330_x44770_50:5-6-7",
-    "text": "\"My neighborhood isn't exactly quiet at night (and my dog snores), so I use a white-noise app to make sure I actually get my beauty sleep.",
+    "sent_text": "\"My neighborhood isn't exactly quiet at night (and my dog snores), so I use a white-noise app to make sure I actually get my beauty sleep.",
     "token_str": "\" My neighborhood is n't exactly quiet at night ( and my dog snores ) , so I use a white - noise app to make sure I actually get my beauty sleep .",
     "lemma_str": "\" my neighborhood be not exactly quiet at night ( and my dog snore ) , so I use a white - noise app to make sure I actually get my beauty sleep .",
     "lemmas": {
@@ -382,7 +382,7 @@
     "match_id": "23-24-25",
     "colloc_id": "pcc_eng_val_3.05704_x43769_07:24-25",
     "hit_id": "pcc_eng_val_3.05704_x43769_07:23-24-25",
-    "text": "The Huffington Post brought aggregation to the masses, the idea of culling professional and industry news for a niche audience wasn't exactly revolutionary.",
+    "sent_text": "The Huffington Post brought aggregation to the masses, the idea of culling professional and industry news for a niche audience wasn't exactly revolutionary.",
     "token_str": "The Huffington Post brought aggregation to the masses , the idea of culling professional and industry news for a niche audience was n't exactly revolutionary .",
     "lemma_str": "the Huffington Post bring aggregation to the mass , the idea of cull professional and industry news for a niche audience be not exactly revolutionary .",
     "lemmas": {
@@ -444,7 +444,7 @@
     "match_id": "12-13-14",
     "colloc_id": "pcc_eng_val_3.04934_x42578_5:13-14",
     "hit_id": "pcc_eng_val_3.04934_x42578_5:12-13-14",
-    "text": "News front page editorial said it all, \" Tea Parties not exactly non-partisan.\"",
+    "sent_text": "News front page editorial said it all, \" Tea Parties not exactly non-partisan.\"",
     "token_str": "News front page editorial said it all , \" Tea Parties not exactly non-partisan . \"",
     "lemma_str": "news front page editorial say it all , \" tea party not exactly non-partisan . \"",
     "lemmas": {
@@ -506,7 +506,7 @@
     "match_id": "4-5-6",
     "colloc_id": "pcc_eng_val_3.03493_x40234_100:5-6",
     "hit_id": "pcc_eng_val_3.03493_x40234_100:4-5-6",
-    "text": "If you aren't exactly sure or nothing really sticks out, open up your EQ of choice and starting moving around the bands, boosting and cutting aggressively so that you can hear what isolated areas of the mix sound like.",
+    "sent_text": "If you aren't exactly sure or nothing really sticks out, open up your EQ of choice and starting moving around the bands, boosting and cutting aggressively so that you can hear what isolated areas of the mix sound like.",
     "token_str": "If you are n't exactly sure or nothing really sticks out , open up your EQ of choice and starting moving around the bands , boosting and cutting aggressively so that you can hear what isolated areas of the mix sound like .",
     "lemma_str": "if you be not exactly sure or nothing really stick out , open up you eq of choice and start move around the band , boost and cut aggressively so that you can hear what isolate area of the mix sound like .",
     "lemmas": {
@@ -568,7 +568,7 @@
     "match_id": "4-5-6",
     "colloc_id": "pcc_eng_val_3.03005_x39438_12:5-6",
     "hit_id": "pcc_eng_val_3.03005_x39438_12:4-5-6",
-    "text": "The fundamentals aren't exactly wonderful either.",
+    "sent_text": "The fundamentals aren't exactly wonderful either.",
     "token_str": "The fundamentals are n't exactly wonderful either .",
     "lemma_str": "the fundamental be not exactly wonderful either .",
     "lemmas": {
@@ -630,7 +630,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_val_3.00087_x34668_27:4-5",
     "hit_id": "pcc_eng_val_3.00087_x34668_27:3-4-5",
-    "text": "I'm not exactly clear on Bennett's romantic standing at this point, but I do know that he's awesome.",
+    "sent_text": "I'm not exactly clear on Bennett's romantic standing at this point, but I do know that he's awesome.",
     "token_str": "I 'm not exactly clear on Bennett 's romantic standing at this point , but I do know that he 's awesome .",
     "lemma_str": "I be not exactly clear on Bennett 's romantic standing at this point , but I do know that he be awesome .",
     "lemmas": {

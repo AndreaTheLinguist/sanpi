@@ -10,7 +10,7 @@
     "match_id": "3-4-5",
     "colloc_id": "nyt_eng_19960526_0027_22:4-5",
     "hit_id": "nyt_eng_19960526_0027_22:3-4-5",
-    "text": "Sorenstam isn't exactly sure why the rule includes compasses because  -LBQ-  North is always north.",
+    "sent_text": "Sorenstam isn't exactly sure why the rule includes compasses because  -LBQ-  North is always north.",
     "token_str": "Sorenstam is n't exactly sure why the rule includes compasses because `` North is always north .",
     "lemma_str": "Sorenstam be not exactly sure why the rule include compass because `` North be always north .",
     "lemmas": {
@@ -72,7 +72,7 @@
     "match_id": "08-09-10",
     "colloc_id": "nyt_eng_19960521_0276_26:09-10",
     "hit_id": "nyt_eng_19960521_0276_26:08-09-10",
-    "text": "And in any event, splits aren't exactly overwhelming in number.",
+    "sent_text": "And in any event, splits aren't exactly overwhelming in number.",
     "token_str": "and in any event , splits are n't exactly overwhelming in number .",
     "lemma_str": "and in any event , splits be not exactly overwhelming in number .",
     "lemmas": {
@@ -134,7 +134,7 @@
     "match_id": "18-19-20",
     "colloc_id": "nyt_eng_19960515_0521_23:19-20",
     "hit_id": "nyt_eng_19960515_0521_23:18-19-20",
-    "text": "The score, by Neil Young, grates like an electric guitar juiced on prairie lightning... not exactly listenable as music, but appropriate to the film's grim drolleries.",
+    "sent_text": "The score, by Neil Young, grates like an electric guitar juiced on prairie lightning... not exactly listenable as music, but appropriate to the film's grim drolleries.",
     "token_str": "the score , by Neil Young , grates like an electric guitar juiced on prairie lightning ... not exactly listenable as music , but appropriate to the film 's grim drolleries .",
     "lemma_str": "the score , by Neil Young , grate like a electric guitar juice on prairie lightning ... not exactly listenable as music , but appropriate to the film 's grim drollery .",
     "lemmas": {
@@ -196,7 +196,7 @@
     "match_id": "4-5-6",
     "colloc_id": "nyt_eng_19960515_0268_28:5-6",
     "hit_id": "nyt_eng_19960515_0268_28:4-5-6",
-    "text": "-LBQ-  It wasn't exactly clear what the court decision entailed,  -RDQ-  said Atilla Yesilada, the director of research at Global Securities, in a written statement.",
+    "sent_text": "-LBQ-  It wasn't exactly clear what the court decision entailed,  -RDQ-  said Atilla Yesilada, the director of research at Global Securities, in a written statement.",
     "token_str": "`` It was n't exactly clear what the court decision entailed , '' said Atilla Yesilada , the director of research at Global Securities , in a written statement .",
     "lemma_str": "`` it be not exactly clear what the court decision entail , '' say Atilla Yesilada , the director of research at Global Securities , in a written statement .",
     "lemmas": {
@@ -258,7 +258,7 @@
     "match_id": "4-5-6",
     "colloc_id": "nyt_eng_19960515_0101_19:5-6",
     "hit_id": "nyt_eng_19960515_0101_19:4-5-6",
-    "text": "-LBQ-  It wasn't exactly clear what the court decision entailed,  -RDQ-  said Atilla Yesilada, the director of research at Global Securities, in a written statement.",
+    "sent_text": "-LBQ-  It wasn't exactly clear what the court decision entailed,  -RDQ-  said Atilla Yesilada, the director of research at Global Securities, in a written statement.",
     "token_str": "`` It was n't exactly clear what the court decision entailed , '' said Atilla Yesilada , the director of research at Global Securities , in a written statement .",
     "lemma_str": "`` it be not exactly clear what the court decision entail , '' say Atilla Yesilada , the director of research at Global Securities , in a written statement .",
     "lemmas": {
@@ -320,7 +320,7 @@
     "match_id": "7-8-9",
     "colloc_id": "nyt_eng_19960513_0064_4:8-9",
     "hit_id": "nyt_eng_19960513_0064_4:7-8-9",
-    "text": "The history of American politics is not exactly unblemished by pandering, but few examples are quite as craven as this one.",
+    "sent_text": "The history of American politics is not exactly unblemished by pandering, but few examples are quite as craven as this one.",
     "token_str": "the history of American politics is not exactly unblemished by pandering , but few examples are quite as craven as this one .",
     "lemma_str": "the history of american politics be not exactly unblemished by pandering , but few example be quite as craven as this one .",
     "lemmas": {
@@ -382,7 +382,7 @@
     "match_id": "3-4-5",
     "colloc_id": "nyt_eng_19960511_0508_4:4-5",
     "hit_id": "nyt_eng_19960511_0508_4:3-4-5",
-    "text": "Lovullo is not exactly fast, but manager Art Howe wants to be careful with McGwire's troublesome right foot.",
+    "sent_text": "Lovullo is not exactly fast, but manager Art Howe wants to be careful with McGwire's troublesome right foot.",
     "token_str": "Lovullo is not exactly fast , but manager Art Howe wants to be careful with McGwire 's troublesome right foot .",
     "lemma_str": "Lovullo be not exactly fast , but manager Art Howe want to be careful with McGwire 's troublesome right foot .",
     "lemmas": {
@@ -444,7 +444,7 @@
     "match_id": "30-31-32",
     "colloc_id": "nyt_eng_19960508_0501_7:31-32",
     "hit_id": "nyt_eng_19960508_0501_7:30-31-32",
-    "text": "Canned mushrooms, onion salt, ground beef, iceberg lettuce, Jell-O _ the larders stocked by most small-town Midwestern families in the '60s and '70s _ weren't exactly adventurous.",
+    "sent_text": "Canned mushrooms, onion salt, ground beef, iceberg lettuce, Jell-O _ the larders stocked by most small-town Midwestern families in the '60s and '70s _ weren't exactly adventurous.",
     "token_str": "canned mushrooms , onion salt , ground beef , iceberg lettuce , Jell-O _ the larders stocked by most small-town Midwestern families in the '60s and '70s _ were n't exactly adventurous .",
     "lemma_str": "can mushroom , onion salt , ground beef , iceberg lettuce , Jell-O _ the larder stock by most small-town midwestern family in the '60 and '70 _ be not exactly adventurous .",
     "lemmas": {
@@ -506,7 +506,7 @@
     "match_id": "1-6-7",
     "colloc_id": "nyt_eng_19960508_0310_59:6-7",
     "hit_id": "nyt_eng_19960508_0310_59:1-6-7",
-    "text": "None of this software is exactly cheap, but the price is bound to fall over time.",
+    "sent_text": "None of this software is exactly cheap, but the price is bound to fall over time.",
     "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
     "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
     "lemmas": {
@@ -568,7 +568,7 @@
     "match_id": "3-4-5",
     "colloc_id": "nyt_eng_19960506_0773_18:4-5",
     "hit_id": "nyt_eng_19960506_0773_18:3-4-5",
-    "text": "That's not exactly true.",
+    "sent_text": "That's not exactly true.",
     "token_str": "that 's not exactly true .",
     "lemma_str": "that be not exactly true .",
     "lemmas": {
@@ -630,7 +630,7 @@
     "match_id": "7-8-9",
     "colloc_id": "nyt_eng_19960506_0773_17:8-9",
     "hit_id": "nyt_eng_19960506_0773_17:7-8-9",
-    "text": "-LBQ-  Building a stadium is just not that dramatic,  -RDQ-  she says, adding that everyone designing the Atlanta stadium gets along just fine.",
+    "sent_text": "-LBQ-  Building a stadium is just not that dramatic,  -RDQ-  she says, adding that everyone designing the Atlanta stadium gets along just fine.",
     "token_str": "`` Building a stadium is just not that dramatic , '' she says , adding that everyone designing the Atlanta stadium gets along just fine .",
     "lemma_str": "`` building a stadium be just not that dramatic , '' she say , add that everyone design the Atlanta stadium get along just fine .",
     "lemmas": {
@@ -692,7 +692,7 @@
     "match_id": "3-4-5",
     "colloc_id": "nyt_eng_19960506_0771_18:4-5",
     "hit_id": "nyt_eng_19960506_0771_18:3-4-5",
-    "text": "That's not exactly true.",
+    "sent_text": "That's not exactly true.",
     "token_str": "that 's not exactly true .",
     "lemma_str": "that be not exactly true .",
     "lemmas": {
@@ -754,7 +754,7 @@
     "match_id": "7-8-9",
     "colloc_id": "nyt_eng_19960506_0771_17:8-9",
     "hit_id": "nyt_eng_19960506_0771_17:7-8-9",
-    "text": "-LBQ-  Building a stadium is just not that dramatic,  -RDQ-  she says, adding that everyone designing the Atlanta stadium gets along just fine.",
+    "sent_text": "-LBQ-  Building a stadium is just not that dramatic,  -RDQ-  she says, adding that everyone designing the Atlanta stadium gets along just fine.",
     "token_str": "`` Building a stadium is just not that dramatic , '' she says , adding that everyone designing the Atlanta stadium gets along just fine .",
     "lemma_str": "`` building a stadium be just not that dramatic , '' she say , add that everyone design the Atlanta stadium get along just fine .",
     "lemmas": {
@@ -816,7 +816,7 @@
     "match_id": "4-6-7",
     "colloc_id": "nyt_eng_19960506_0122_14:6-7",
     "hit_id": "nyt_eng_19960506_0122_14:4-6-7",
-    "text": "If he has never been exactly gabby when it comes to his home life, however, Eastwood will happily talk moviemaking.",
+    "sent_text": "If he has never been exactly gabby when it comes to his home life, however, Eastwood will happily talk moviemaking.",
     "token_str": "if he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
     "lemma_str": "if he has never be exactly gabby when it come to he home life , however , Eastwood will happily talk moviemaking .",
     "lemmas": {
@@ -878,7 +878,7 @@
     "match_id": "4-6-7",
     "colloc_id": "nyt_eng_19960506_0067_14:6-7",
     "hit_id": "nyt_eng_19960506_0067_14:4-6-7",
-    "text": "If he has never been exactly gabby when it comes to his home life, however, Eastwood will happily talk moviemaking.",
+    "sent_text": "If he has never been exactly gabby when it comes to his home life, however, Eastwood will happily talk moviemaking.",
     "token_str": "if he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
     "lemma_str": "if he has never be exactly gabby when it come to he home life , however , Eastwood will happily talk moviemaking .",
     "lemmas": {
@@ -940,7 +940,7 @@
     "match_id": "4-6-7",
     "colloc_id": "nyt_eng_19960505_0102_14:6-7",
     "hit_id": "nyt_eng_19960505_0102_14:4-6-7",
-    "text": "If he has never been exactly gabby when it comes to his home life, however, Eastwood will happily talk moviemaking.",
+    "sent_text": "If he has never been exactly gabby when it comes to his home life, however, Eastwood will happily talk moviemaking.",
     "token_str": "if he has never been exactly gabby when it comes to his home life , however , Eastwood will happily talk moviemaking .",
     "lemma_str": "if he has never be exactly gabby when it come to he home life , however , Eastwood will happily talk moviemaking .",
     "lemmas": {
@@ -1002,7 +1002,7 @@
     "match_id": "1-6-7",
     "colloc_id": "nyt_eng_19960504_0091_59:6-7",
     "hit_id": "nyt_eng_19960504_0091_59:1-6-7",
-    "text": "None of this software is exactly cheap, but the price is bound to fall over time.",
+    "sent_text": "None of this software is exactly cheap, but the price is bound to fall over time.",
     "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
     "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
     "lemmas": {
@@ -1064,7 +1064,7 @@
     "match_id": "33-34-35",
     "colloc_id": "nyt_eng_19960504_0071_16:34-35",
     "hit_id": "nyt_eng_19960504_0071_16:33-34-35",
-    "text": "Even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation, the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering.",
+    "sent_text": "Even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation, the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering.",
     "token_str": "even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering .",
     "lemma_str": "even if Ms. Karan stay on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interview that go into the magazine article be not exactly standard for a corporate road show lead up to a offering .",
     "lemmas": {
@@ -1126,7 +1126,7 @@
     "match_id": "1-6-7",
     "colloc_id": "nyt_eng_19960503_0775_59:6-7",
     "hit_id": "nyt_eng_19960503_0775_59:1-6-7",
-    "text": "None of this software is exactly cheap, but the price is bound to fall over time.",
+    "sent_text": "None of this software is exactly cheap, but the price is bound to fall over time.",
     "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
     "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
     "lemmas": {
@@ -1188,7 +1188,7 @@
     "match_id": "33-34-35",
     "colloc_id": "nyt_eng_19960503_0735_16:34-35",
     "hit_id": "nyt_eng_19960503_0735_16:33-34-35",
-    "text": "Even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation, the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering.",
+    "sent_text": "Even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation, the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering.",
     "token_str": "even if Ms. Karan stayed on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interviews that went into the magazine article are not exactly standard for a corporate road show leading up to an offering .",
     "lemma_str": "even if Ms. Karan stay on the right side of the fine line between harmless chitchat and a regulatory violation , the series of interview that go into the magazine article be not exactly standard for a corporate road show lead up to a offering .",
     "lemmas": {
@@ -1250,7 +1250,7 @@
     "match_id": "1-6-7",
     "colloc_id": "nyt_eng_19960502_0398_59:6-7",
     "hit_id": "nyt_eng_19960502_0398_59:1-6-7",
-    "text": "None of this software is exactly cheap, but the price is bound to fall over time.",
+    "sent_text": "None of this software is exactly cheap, but the price is bound to fall over time.",
     "token_str": "none of this software is exactly cheap , but the price is bound to fall over time .",
     "lemma_str": "none of this software be exactly cheap , but the price is bind to fall over time .",
     "lemmas": {

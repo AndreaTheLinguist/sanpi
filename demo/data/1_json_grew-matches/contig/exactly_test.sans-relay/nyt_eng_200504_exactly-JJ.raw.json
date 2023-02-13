@@ -1,0 +1,162 @@
+[
+  {
+    "sent_id": "nyt_eng_20050430_0069_39",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050428_0097_233",
+    "matching": {
+      "nodes": { "NEG": "22", "ADV": "23", "ADJ": "24" },
+      "edges": {
+        "neg": { "source": "24", "label": "neg", "target": "22" },
+        "mod": { "source": "24", "label": "advmod", "target": "23" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050427_0144_6",
+    "matching": {
+      "nodes": { "NEG": "4", "ADV": "5", "ADJ": "6" },
+      "edges": {
+        "neg": { "source": "6", "label": "neg", "target": "4" },
+        "mod": { "source": "6", "label": "advmod", "target": "5" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0098_41",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0091_10",
+    "matching": {
+      "nodes": { "NEG": "24", "ADV": "25", "ADJ": "26" },
+      "edges": {
+        "neg": { "source": "26", "label": "neg", "target": "24" },
+        "mod": { "source": "26", "label": "advmod", "target": "25" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050425_0034_1",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050421_0105_185",
+    "matching": {
+      "nodes": { "NEG": "22", "ADV": "23", "ADJ": "24" },
+      "edges": {
+        "neg": { "source": "24", "label": "neg", "target": "22" },
+        "mod": { "source": "24", "label": "advmod", "target": "23" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050421_0060_29",
+    "matching": {
+      "nodes": { "NEG": "3", "ADV": "4", "ADJ": "5" },
+      "edges": {
+        "neg": { "source": "5", "label": "neg", "target": "3" },
+        "mod": { "source": "5", "label": "advmod", "target": "4" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050420_0176_11",
+    "matching": {
+      "nodes": { "NEG": "20", "ADV": "21", "ADJ": "22" },
+      "edges": {
+        "neg": { "source": "22", "label": "neg", "target": "20" },
+        "mod": { "source": "22", "label": "advmod", "target": "21" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050419_0022_25",
+    "matching": {
+      "nodes": { "NEG": "47", "ADV": "48", "ADJ": "49" },
+      "edges": {
+        "neg": { "source": "49", "label": "neg", "target": "47" },
+        "mod": { "source": "49", "label": "advmod", "target": "48" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050418_0144_64",
+    "matching": {
+      "nodes": { "NEG": "47", "ADV": "48", "ADJ": "49" },
+      "edges": {
+        "neg": { "source": "49", "label": "neg", "target": "47" },
+        "mod": { "source": "49", "label": "advmod", "target": "48" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050418_0026_32",
+    "matching": {
+      "nodes": { "NEG": "8", "ADV": "9", "ADJ": "10" },
+      "edges": {
+        "neg": { "source": "10", "label": "neg", "target": "8" },
+        "mod": { "source": "10", "label": "advmod", "target": "9" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050413_0042_12",
+    "matching": {
+      "nodes": { "NEG": "9", "ADV": "11", "ADJ": "12" },
+      "edges": {
+        "neg": { "source": "12", "label": "neg", "target": "9" },
+        "mod": { "source": "12", "label": "advmod", "target": "11" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050412_0296_12",
+    "matching": {
+      "nodes": { "NEG": "11", "ADV": "12", "ADJ": "13" },
+      "edges": {
+        "neg": { "source": "13", "label": "neg", "target": "11" },
+        "mod": { "source": "13", "label": "advmod", "target": "12" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050407_0117_29",
+    "matching": {
+      "nodes": { "NEG": "22", "ADV": "23", "ADJ": "24" },
+      "edges": {
+        "neg": { "source": "24", "label": "neg", "target": "22" },
+        "mod": { "source": "24", "label": "advmod", "target": "23" }
+      }
+    }
+  },
+  {
+    "sent_id": "nyt_eng_20050406_0148_1",
+    "matching": {
+      "nodes": { "NEG": "27", "ADV": "28", "ADJ": "29" },
+      "edges": {
+        "neg": { "source": "29", "label": "neg", "target": "27" },
+        "mod": { "source": "29", "label": "advmod", "target": "28" }
+      }
+    }
+  }
+]

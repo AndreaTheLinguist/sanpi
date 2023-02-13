@@ -10,7 +10,7 @@
     "match_id": "4-5-6",
     "colloc_id": "pcc_eng_val_1.9647_x15655_04:5-6",
     "hit_id": "pcc_eng_val_1.9647_x15655_04:4-5-6",
-    "text": "I'm just not exactly sure has always been so.",
+    "sent_text": "I'm just not exactly sure has always been so.",
     "token_str": "I 'm just not exactly sure has always been so .",
     "lemma_str": "I be just not exactly sure have always be so .",
     "lemmas": {
@@ -72,7 +72,7 @@
     "match_id": "1-2-3",
     "colloc_id": "pcc_eng_val_1.9036_x14657_63:2-3",
     "hit_id": "pcc_eng_val_1.9036_x14657_63:1-2-3",
-    "text": "Not exactly American, but pretty close!",
+    "sent_text": "Not exactly American, but pretty close!",
     "token_str": "Not exactly American , but pretty close !",
     "lemma_str": "not exactly American , but pretty close !",
     "lemmas": {
@@ -134,7 +134,7 @@
     "match_id": "24-25-26",
     "colloc_id": "pcc_eng_val_1.8886_x14420_11:25-26",
     "hit_id": "pcc_eng_val_1.8886_x14420_11:24-25-26",
-    "text": "The missed maneuver left Gable exposed, and Angle pounced with a grapevine Ankle Lock to earn the submission, but Corbin wasn't exactly impressed with the performance.",
+    "sent_text": "The missed maneuver left Gable exposed, and Angle pounced with a grapevine Ankle Lock to earn the submission, but Corbin wasn't exactly impressed with the performance.",
     "token_str": "The missed maneuver left Gable exposed , and Angle pounced with a grapevine Ankle Lock to earn the submission , but Corbin was n't exactly impressed with the performance .",
     "lemma_str": "the miss maneuver leave Gable expose , and Angle pounce with a grapevine Ankle lock to earn the submission , but Corbin be not exactly impressed with the performance .",
     "lemmas": {
@@ -196,7 +196,7 @@
     "match_id": "13-14-15",
     "colloc_id": "pcc_eng_val_1.8343_x13568_102:14-15",
     "hit_id": "pcc_eng_val_1.8343_x13568_102:13-14-15",
-    "text": "Although he did not catch up to Qu Ming, he was not exactly slow.",
+    "sent_text": "Although he did not catch up to Qu Ming, he was not exactly slow.",
     "token_str": "Although he did not catch up to Qu Ming , he was not exactly slow .",
     "lemma_str": "although he do not catch up to Qu Ming , he be not exactly slow .",
     "lemmas": {
@@ -258,7 +258,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_val_1.7725_x12552_4:4-5",
     "hit_id": "pcc_eng_val_1.7725_x12552_4:3-4-5",
-    "text": "I'm not exactly sure how this surface area definition will work, ultimately I'd like to be able to separate verbose APIs by different layers, like the number of endpoints or parameters, or maybe the lack of verbs, or responses (not what is there, but what is missing)--I'm not sure.",
+    "sent_text": "I'm not exactly sure how this surface area definition will work, ultimately I'd like to be able to separate verbose APIs by different layers, like the number of endpoints or parameters, or maybe the lack of verbs, or responses (not what is there, but what is missing)--I'm not sure.",
     "token_str": "I 'm not exactly sure how this surface area definition will work , ultimately I 'd like to be able to separate verbose APIs by different layers , like the number of endpoints or parameters , or maybe the lack of verbs , or responses ( not what is there , but what is missing ) -- I 'm not sure .",
     "lemma_str": "I be not exactly sure how this surface area definition will work , ultimately I would like to be able to separate verbose api by different layer , like the number of endpoint or parameter , or maybe the lack of verb , or response ( not what be there , but what be miss ) -- I be not sure .",
     "lemmas": {
@@ -320,7 +320,7 @@
     "match_id": "7-8-9",
     "colloc_id": "pcc_eng_val_1.7658_x12434_248:8-9",
     "hit_id": "pcc_eng_val_1.7658_x12434_248:7-8-9",
-    "text": "This sort of violent nihilism wasn't exactly unknown in comic books at the time.",
+    "sent_text": "This sort of violent nihilism wasn't exactly unknown in comic books at the time.",
     "token_str": "This sort of violent nihilism was n't exactly unknown in comic books at the time .",
     "lemma_str": "this sort of violent nihilism be not exactly unknown in comic book at the time .",
     "lemmas": {
@@ -382,7 +382,7 @@
     "match_id": "6-7-8",
     "colloc_id": "pcc_eng_val_1.7517_x12198_174:7-8",
     "hit_id": "pcc_eng_val_1.7517_x12198_174:6-7-8",
-    "text": "Although he knew it wasn't exactly appropriate, given her mood, he couldn't help but be irritated by her comment.",
+    "sent_text": "Although he knew it wasn't exactly appropriate, given her mood, he couldn't help but be irritated by her comment.",
     "token_str": "Although he knew it was n't exactly appropriate , given her mood , he could n't help but be irritated by her comment .",
     "lemma_str": "although he know it be not exactly appropriate , give she mood , he could not help but be irritate by she comment .",
     "lemmas": {
@@ -444,7 +444,7 @@
     "match_id": "15-16-17",
     "colloc_id": "pcc_eng_val_1.7517_x12198_019:16-17",
     "hit_id": "pcc_eng_val_1.7517_x12198_019:15-16-17",
-    "text": "But he supposed, as he hid himself from view, that that wasn't exactly shocking.",
+    "sent_text": "But he supposed, as he hid himself from view, that that wasn't exactly shocking.",
     "token_str": "But he supposed , as he hid himself from view , that that was n't exactly shocking .",
     "lemma_str": "but he suppose , as he hide himself from view , that that be not exactly shocking .",
     "lemmas": {
@@ -506,7 +506,7 @@
     "match_id": "12-13-14",
     "colloc_id": "pcc_eng_val_1.7185_x11652_047:13-14",
     "hit_id": "pcc_eng_val_1.7185_x11652_047:12-13-14",
-    "text": "I feel his hand wrap around my dick - I'm not exactly sure of the abbreviations for the without backpage where to find escorts included.",
+    "sent_text": "I feel his hand wrap around my dick - I'm not exactly sure of the abbreviations for the without backpage where to find escorts included.",
     "token_str": "I feel his hand wrap around my dick - I 'm not exactly sure of the abbreviations for the without backpage where to find escorts included .",
     "lemma_str": "I feel he hand wrap around my dick - I be not exactly sure of the abbreviation for the without backpage where to find escort include .",
     "lemmas": {
@@ -568,7 +568,7 @@
     "match_id": "5-6-7",
     "colloc_id": "pcc_eng_val_1.7010_x11358_16:6-7",
     "hit_id": "pcc_eng_val_1.7010_x11358_16:5-6-7",
-    "text": "Genuine Turkish food isn't exactly easy to find.",
+    "sent_text": "Genuine Turkish food isn't exactly easy to find.",
     "token_str": "Genuine Turkish food is n't exactly easy to find .",
     "lemma_str": "genuine Turkish food be not exactly easy to find .",
     "lemmas": {
@@ -630,7 +630,7 @@
     "match_id": "4-5-6",
     "colloc_id": "pcc_eng_val_1.5250_x08580_53:5-6",
     "hit_id": "pcc_eng_val_1.5250_x08580_53:4-5-6",
-    "text": "\"I'm not always sure he's doing it on purpose.\"",
+    "sent_text": "\"I'm not always sure he's doing it on purpose.\"",
     "token_str": "\" I 'm not always sure he 's doing it on purpose . \"",
     "lemma_str": "\" I be not always sure he be do it on purpose . \"",
     "lemmas": {
@@ -692,7 +692,7 @@
     "match_id": "09-10-11",
     "colloc_id": "pcc_eng_val_1.5017_x08202_269:10-11",
     "hit_id": "pcc_eng_val_1.5017_x08202_269:09-10-11",
-    "text": "After having watched it, I'm still not exactly sure what it's all about.",
+    "sent_text": "After having watched it, I'm still not exactly sure what it's all about.",
     "token_str": "After having watched it , I 'm still not exactly sure what it 's all about .",
     "lemma_str": "after have watch it , I be still not exactly sure what it be all about .",
     "lemmas": {
@@ -754,7 +754,7 @@
     "match_id": "1-2-3",
     "colloc_id": "pcc_eng_val_1.4159_x06768_05:2-3",
     "hit_id": "pcc_eng_val_1.4159_x06768_05:1-2-3",
-    "text": "Not exactly perfect, but for the most part it does what it has to do.",
+    "sent_text": "Not exactly perfect, but for the most part it does what it has to do.",
     "token_str": "Not exactly perfect , but for the most part it does what it has to do .",
     "lemma_str": "not exactly perfect , but for the most part it do what it have to do .",
     "lemmas": {
@@ -816,7 +816,7 @@
     "match_id": "37-38-39",
     "colloc_id": "pcc_eng_val_1.3131_x05104_36:38-39",
     "hit_id": "pcc_eng_val_1.3131_x05104_36:37-38-39",
-    "text": "And while the student loan bubble has been compared to the housing loan bubble, which played a significant role in the 2008 financial crisis, Cardwell said she doesn't believe the two markets aren't exactly comparable as federal student loans are unlikely to burst.",
+    "sent_text": "And while the student loan bubble has been compared to the housing loan bubble, which played a significant role in the 2008 financial crisis, Cardwell said she doesn't believe the two markets aren't exactly comparable as federal student loans are unlikely to burst.",
     "token_str": "And while the student loan bubble has been compared to the housing loan bubble , which played a significant role in the 2008 financial crisis , Cardwell said she does n't believe the two markets are n't exactly comparable as federal student loans are unlikely to burst .",
     "lemma_str": "and while the student loan bubble have be compare to the housing loan bubble , which play a significant role in the 2008 financial crisis , Cardwell say she do not believe the two market be not exactly comparable as federal student loan be unlikely to burst .",
     "lemmas": {
@@ -878,7 +878,7 @@
     "match_id": "10-11-12",
     "colloc_id": "pcc_eng_val_1.2998_x04887_04:11-12",
     "hit_id": "pcc_eng_val_1.2998_x04887_04:10-11-12",
-    "text": "While the path to becoming a professional player is not exactly difficult, is it simple either.",
+    "sent_text": "While the path to becoming a professional player is not exactly difficult, is it simple either.",
     "token_str": "While the path to becoming a professional player is not exactly difficult , is it simple either .",
     "lemma_str": "while the path to become a professional player be not exactly difficult , be it simple either .",
     "lemmas": {
@@ -940,7 +940,7 @@
     "match_id": "11-12-13",
     "colloc_id": "pcc_eng_val_1.2346_x03794_08:12-13",
     "hit_id": "pcc_eng_val_1.2346_x03794_08:11-12-13",
-    "text": "Pape, a self-styled \"basso cantante,\" is not exactly typecast in Wotan's rugged music.",
+    "sent_text": "Pape, a self-styled \"basso cantante,\" is not exactly typecast in Wotan's rugged music.",
     "token_str": "Pape , a self-styled \" basso cantante , \" is not exactly typecast in Wotan 's rugged music .",
     "lemma_str": "Pape , a self-style \" basso cantante , \" be not exactly typecast in Wotan 's rugged music .",
     "lemmas": {
@@ -1002,7 +1002,7 @@
     "match_id": "5-6-7",
     "colloc_id": "pcc_eng_val_1.1876_x03046_43:6-7",
     "hit_id": "pcc_eng_val_1.1876_x03046_43:5-6-7",
-    "text": "Though good dialogue isn't exactly teachable, there are some simple beginner mistakes to avoid when your characters speak.",
+    "sent_text": "Though good dialogue isn't exactly teachable, there are some simple beginner mistakes to avoid when your characters speak.",
     "token_str": "Though good dialogue is n't exactly teachable , there are some simple beginner mistakes to avoid when your characters speak .",
     "lemma_str": "though good dialogue be not exactly teachable , there be some simple beginner mistake to avoid when you character speak .",
     "lemmas": {
@@ -1064,7 +1064,7 @@
     "match_id": "31-32-33",
     "colloc_id": "pcc_eng_val_1.1187_x01959_50:32-33",
     "hit_id": "pcc_eng_val_1.1187_x01959_50:31-32-33",
-    "text": "As great as it is while it lasts it doesn't last anywhere near long enough, not even as long as the one in the original game which wasn't exactly epic in length itself.",
+    "sent_text": "As great as it is while it lasts it doesn't last anywhere near long enough, not even as long as the one in the original game which wasn't exactly epic in length itself.",
     "token_str": "As great as it is while it lasts it does n't last anywhere near long enough , not even as long as the one in the original game which was n't exactly epic in length itself .",
     "lemma_str": "as great as it be while it last it do not last anywhere near long enough , not even as long as the one in the original game which be not exactly epic in length itself .",
     "lemmas": {
@@ -1126,7 +1126,7 @@
     "match_id": "7-8-9",
     "colloc_id": "pcc_eng_val_1.0278_x00461_18:8-9",
     "hit_id": "pcc_eng_val_1.0278_x00461_18:7-8-9",
-    "text": "In the book, she's not exactly strong on detail so you'll have to work out what it might be for yourself.",
+    "sent_text": "In the book, she's not exactly strong on detail so you'll have to work out what it might be for yourself.",
     "token_str": "In the book , she 's not exactly strong on detail so you 'll have to work out what it might be for yourself .",
     "lemma_str": "in the book , she be not exactly strong on detail so you will have to work out what it might be for yourself .",
     "lemmas": {
@@ -1188,7 +1188,7 @@
     "match_id": "36-37-38",
     "colloc_id": "pcc_eng_val_1.0271_x00447_056:37-38",
     "hit_id": "pcc_eng_val_1.0271_x00447_056:36-37-38",
-    "text": "It's important to note that the main classifications of white tea are based mostly on the ratio of buds to leaves, Silver Needle, White Peony, etc., and that they aren't exactly related to quality of the tea.",
+    "sent_text": "It's important to note that the main classifications of white tea are based mostly on the ratio of buds to leaves, Silver Needle, White Peony, etc., and that they aren't exactly related to quality of the tea.",
     "token_str": "It 's important to note that the main classifications of white tea are based mostly on the ratio of buds to leaves , Silver Needle , White Peony , etc. , and that they are n't exactly related to quality of the tea .",
     "lemma_str": "it be important to note that the main classification of white tea be base mostly on the ratio of bud to leave , Silver Needle , White Peony , etc. , and that they be not exactly related to quality of the tea .",
     "lemmas": {

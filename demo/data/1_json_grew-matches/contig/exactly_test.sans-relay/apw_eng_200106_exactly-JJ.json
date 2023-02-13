@@ -10,7 +10,7 @@
     "match_id": "4-5-6",
     "colloc_id": "apw_eng_20010628_1604_15:5-6",
     "hit_id": "apw_eng_20010628_1604_15:4-5-6",
-    "text": "-LBQ-  Fragrance is not exactly buoyant at this juncture,  -RDQ-  he noted, adding, however, that he does expect some growth next year.",
+    "sent_text": "-LBQ-  Fragrance is not exactly buoyant at this juncture,  -RDQ-  he noted, adding, however, that he does expect some growth next year.",
     "token_str": "`` Fragrance is not exactly buoyant at this juncture , '' he noted , adding , however , that he does expect some growth next year .",
     "lemma_str": "`` Fragrance be not exactly buoyant at this juncture , '' he note , add , however , that he does expect some growth next year .",
     "lemmas": {
@@ -72,7 +72,7 @@
     "match_id": "4-5-6",
     "colloc_id": "apw_eng_20010628_1030_15:5-6",
     "hit_id": "apw_eng_20010628_1030_15:4-5-6",
-    "text": "-LBQ-  Fragrance is not exactly buoyant at this juncture,  -RDQ-  he noted, adding, however, that he does expect some growth next year.",
+    "sent_text": "-LBQ-  Fragrance is not exactly buoyant at this juncture,  -RDQ-  he noted, adding, however, that he does expect some growth next year.",
     "token_str": "`` Fragrance is not exactly buoyant at this juncture , '' he noted , adding , however , that he does expect some growth next year .",
     "lemma_str": "`` Fragrance be not exactly buoyant at this juncture , '' he note , add , however , that he does expect some growth next year .",
     "lemmas": {
@@ -134,7 +134,7 @@
     "match_id": "7-8-9",
     "colloc_id": "apw_eng_20010616_0013_13:8-9",
     "hit_id": "apw_eng_20010616_0013_13:7-8-9",
-    "text": "Arrowsmith and Cunningham say that's not exactly true.",
+    "sent_text": "Arrowsmith and Cunningham say that's not exactly true.",
     "token_str": "Arrowsmith and Cunningham say that 's not exactly true .",
     "lemma_str": "Arrowsmith and Cunningham say that be not exactly true .",
     "lemmas": {
@@ -196,7 +196,7 @@
     "match_id": "3-4-5",
     "colloc_id": "apw_eng_20010614_0420_19:4-5",
     "hit_id": "apw_eng_20010614_0420_19:3-4-5",
-    "text": "Julin wasn't exactly sure when the appeals process would begin, but said it would probably start at the Fifth District Court of Appeals in a week or two.",
+    "sent_text": "Julin wasn't exactly sure when the appeals process would begin, but said it would probably start at the Fifth District Court of Appeals in a week or two.",
     "token_str": "Julin was n't exactly sure when the appeals process would begin , but said it would probably start at the Fifth District Court of Appeals in a week or two .",
     "lemma_str": "Julin be not exactly sure when the appeal process would begin , but say it would probably start at the Fifth District Court of Appeals in a week or two .",
     "lemmas": {
@@ -258,7 +258,7 @@
     "match_id": "3-4-5",
     "colloc_id": "apw_eng_20010614_0326_17:4-5",
     "hit_id": "apw_eng_20010614_0326_17:3-4-5",
-    "text": "Julin wasn't exactly sure when the appeals process would begin, but said it would probably start at the Fifth District Court of Appeals in a week or two.",
+    "sent_text": "Julin wasn't exactly sure when the appeals process would begin, but said it would probably start at the Fifth District Court of Appeals in a week or two.",
     "token_str": "Julin was n't exactly sure when the appeals process would begin , but said it would probably start at the Fifth District Court of Appeals in a week or two .",
     "lemma_str": "Julin be not exactly sure when the appeal process would begin , but say it would probably start at the Fifth District Court of Appeals in a week or two .",
     "lemmas": {
@@ -320,7 +320,7 @@
     "match_id": "12-13-14",
     "colloc_id": "apw_eng_20010609_0285_23:13-14",
     "hit_id": "apw_eng_20010609_0285_23:12-13-14",
-    "text": "While scientists think they know how glaciers surge, they're not exactly sure why.",
+    "sent_text": "While scientists think they know how glaciers surge, they're not exactly sure why.",
     "token_str": "while scientists think they know how glaciers surge , they 're not exactly sure why .",
     "lemma_str": "while scientist think they know how glacier surge , they be not exactly sure why .",
     "lemmas": {
@@ -382,7 +382,7 @@
     "match_id": "12-13-14",
     "colloc_id": "apw_eng_20010608_1251_22:13-14",
     "hit_id": "apw_eng_20010608_1251_22:12-13-14",
-    "text": "While scientists think they know how glaciers surge, they're not exactly sure why.",
+    "sent_text": "While scientists think they know how glaciers surge, they're not exactly sure why.",
     "token_str": "while scientists think they know how glaciers surge , they 're not exactly sure why .",
     "lemma_str": "while scientist think they know how glacier surge , they be not exactly sure why .",
     "lemmas": {
@@ -444,7 +444,7 @@
     "match_id": "12-13-14",
     "colloc_id": "apw_eng_20010602_0234_1:13-14",
     "hit_id": "apw_eng_20010602_0234_1:12-13-14",
-    "text": "The beginning of Leelee Sobieski and Paul Walker's friendship wasn't exactly smooth.",
+    "sent_text": "The beginning of Leelee Sobieski and Paul Walker's friendship wasn't exactly smooth.",
     "token_str": "the beginning of Leelee Sobieski and Paul Walker 's friendship was n't exactly smooth .",
     "lemma_str": "the beginning of Leelee Sobieski and Paul Walker 's friendship be not exactly smooth .",
     "lemmas": {

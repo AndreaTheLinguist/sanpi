@@ -10,7 +10,7 @@
     "match_id": "6-7-8",
     "colloc_id": "pcc_eng_val_2.11125_x34256_28:7-8",
     "hit_id": "pcc_eng_val_2.11125_x34256_28:6-7-8",
-    "text": "I know Washington state isn't exactly diverse, but it's pretty astonishing that it took the state until 2014 years after the birth of Jesus to acknowledge the existence of non-Christian holidays.",
+    "sent_text": "I know Washington state isn't exactly diverse, but it's pretty astonishing that it took the state until 2014 years after the birth of Jesus to acknowledge the existence of non-Christian holidays.",
     "token_str": "I know Washington state is n't exactly diverse , but it 's pretty astonishing that it took the state until 2014 years after the birth of Jesus to acknowledge the existence of non-Christian holidays .",
     "lemma_str": "I know Washington state be not exactly diverse , but it be pretty astonish that it take the state until 2014 year after the birth of Jesus to acknowledge the existence of non-Christian holiday .",
     "lemmas": {
@@ -72,7 +72,7 @@
     "match_id": "6-7-8",
     "colloc_id": "pcc_eng_val_2.11125_x34256_18:7-8",
     "hit_id": "pcc_eng_val_2.11125_x34256_18:6-7-8",
-    "text": "I know Washington state isn't exactly diverse, but it's pretty astonishing that it took the state until 2014 years after the birth of Jesus to acknowledge the existence of non-Christian holidays.",
+    "sent_text": "I know Washington state isn't exactly diverse, but it's pretty astonishing that it took the state until 2014 years after the birth of Jesus to acknowledge the existence of non-Christian holidays.",
     "token_str": "I know Washington state is n't exactly diverse , but it 's pretty astonishing that it took the state until 2014 years after the birth of Jesus to acknowledge the existence of non-Christian holidays .",
     "lemma_str": "I know Washington state be not exactly diverse , but it be pretty astonish that it take the state until 2014 year after the birth of Jesus to acknowledge the existence of non-Christian holiday .",
     "lemmas": {
@@ -134,7 +134,7 @@
     "match_id": "5-6-7",
     "colloc_id": "pcc_eng_val_2.10994_x34060_44:6-7",
     "hit_id": "pcc_eng_val_2.10994_x34060_44:5-6-7",
-    "text": "Mr Ogier himself is not exactly typical of triallers though.",
+    "sent_text": "Mr Ogier himself is not exactly typical of triallers though.",
     "token_str": "Mr Ogier himself is not exactly typical of triallers though .",
     "lemma_str": "Mr Ogier himself be not exactly typical of trialler though .",
     "lemmas": {
@@ -196,7 +196,7 @@
     "match_id": "5-6-7",
     "colloc_id": "pcc_eng_val_2.10994_x34060_17:6-7",
     "hit_id": "pcc_eng_val_2.10994_x34060_17:5-6-7",
-    "text": "Mr Ogier himself is not exactly typical of triallers though.",
+    "sent_text": "Mr Ogier himself is not exactly typical of triallers though.",
     "token_str": "Mr Ogier himself is not exactly typical of triallers though .",
     "lemma_str": "Mr Ogier himself be not exactly typical of trialler though .",
     "lemmas": {
@@ -258,7 +258,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_val_2.10827_x33807_12:4-5",
     "hit_id": "pcc_eng_val_2.10827_x33807_12:3-4-5",
-    "text": "I am not exactly sure how much land we will have available at this stage.",
+    "sent_text": "I am not exactly sure how much land we will have available at this stage.",
     "token_str": "I am not exactly sure how much land we will have available at this stage .",
     "lemma_str": "I be not exactly sure how much land we will have available at this stage .",
     "lemmas": {
@@ -320,7 +320,7 @@
     "match_id": "10-11-12",
     "colloc_id": "pcc_eng_val_2.10767_x33718_39:11-12",
     "hit_id": "pcc_eng_val_2.10767_x33718_39:10-11-12",
-    "text": "The \"laws\" on that last point aren't exactly clear just yet.",
+    "sent_text": "The \"laws\" on that last point aren't exactly clear just yet.",
     "token_str": "The \" laws \" on that last point are n't exactly clear just yet .",
     "lemma_str": "the \" law \" on that last point be not exactly clear just yet .",
     "lemmas": {
@@ -382,7 +382,7 @@
     "match_id": "1-2-3",
     "colloc_id": "pcc_eng_val_2.10513_x33306_177:2-3",
     "hit_id": "pcc_eng_val_2.10513_x33306_177:1-2-3",
-    "text": "Not exactly sure just what the motif of your book really is do you in some cases paint on your own into corners as well as have to go back and do tons of rewriting just to obtain back on course.",
+    "sent_text": "Not exactly sure just what the motif of your book really is do you in some cases paint on your own into corners as well as have to go back and do tons of rewriting just to obtain back on course.",
     "token_str": "Not exactly sure just what the motif of your book really is do you in some cases paint on your own into corners as well as have to go back and do tons of rewriting just to obtain back on course .",
     "lemma_str": "not exactly sure just what the motif of you book really be do you in some case paint on you own into corner as well as have to go back and do ton of rewrite just to obtain back on course .",
     "lemmas": {
@@ -444,7 +444,7 @@
     "match_id": "1-2-3",
     "colloc_id": "pcc_eng_val_2.09397_x31496_46:2-3",
     "hit_id": "pcc_eng_val_2.09397_x31496_46:1-2-3",
-    "text": "Not exactly sure.",
+    "sent_text": "Not exactly sure.",
     "token_str": "Not exactly sure .",
     "lemma_str": "not exactly sure .",
     "lemmas": {
@@ -506,7 +506,7 @@
     "match_id": "4-5-6",
     "colloc_id": "pcc_eng_val_2.09071_x30942_02:5-6",
     "hit_id": "pcc_eng_val_2.09071_x30942_02:4-5-6",
-    "text": "Creating Infographics is not exactly hard, but it can sometimes be a pain if you have to do everything manually.",
+    "sent_text": "Creating Infographics is not exactly hard, but it can sometimes be a pain if you have to do everything manually.",
     "token_str": "Creating Infographics is not exactly hard , but it can sometimes be a pain if you have to do everything manually .",
     "lemma_str": "create infographics be not exactly hard , but it can sometimes be a pain if you have to do everything manually .",
     "lemmas": {
@@ -568,7 +568,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_val_2.07000_x27582_096:4-5",
     "hit_id": "pcc_eng_val_2.07000_x27582_096:3-4-5",
-    "text": "He wasn't exactly sure where they were, but he was sure he could find it.",
+    "sent_text": "He wasn't exactly sure where they were, but he was sure he could find it.",
     "token_str": "He was n't exactly sure where they were , but he was sure he could find it .",
     "lemma_str": "he be not exactly sure where they be , but he be sure he could find it .",
     "lemmas": {
@@ -630,7 +630,7 @@
     "match_id": "19-20-21",
     "colloc_id": "pcc_eng_val_2.06188_x26238_09:20-21",
     "hit_id": "pcc_eng_val_2.06188_x26238_09:19-20-21",
-    "text": "But before you crack open a can to kickstart your day, keep in mind that they aren't exactly good for your health.",
+    "sent_text": "But before you crack open a can to kickstart your day, keep in mind that they aren't exactly good for your health.",
     "token_str": "But before you crack open a can to kickstart your day , keep in mind that they are n't exactly good for your health .",
     "lemma_str": "but before you crack open a can to kickstart you day , keep in mind that they be not exactly good for you health .",
     "lemmas": {
@@ -692,7 +692,7 @@
     "match_id": "6-7-8",
     "colloc_id": "pcc_eng_val_2.05602_x25284_64:7-8",
     "hit_id": "pcc_eng_val_2.05602_x25284_64:6-7-8",
-    "text": "Now, the cover isn't exactly ugly, but it does look like a plain, cheap science fiction paperback-which, to be fair, it is.",
+    "sent_text": "Now, the cover isn't exactly ugly, but it does look like a plain, cheap science fiction paperback-which, to be fair, it is.",
     "token_str": "Now , the cover is n't exactly ugly , but it does look like a plain , cheap science fiction paperback - which , to be fair , it is .",
     "lemma_str": "now , the cover be not exactly ugly , but it do look like a plain , cheap science fiction paperback - which , to be fair , it be .",
     "lemmas": {
@@ -754,7 +754,7 @@
     "match_id": "7-8-9",
     "colloc_id": "pcc_eng_val_2.03295_x21553_04:8-9",
     "hit_id": "pcc_eng_val_2.03295_x21553_04:7-8-9",
-    "text": "I have to admit I was not exactly shocked by the revelation when I saw it on 60 minutes the other night.",
+    "sent_text": "I have to admit I was not exactly shocked by the revelation when I saw it on 60 minutes the other night.",
     "token_str": "I have to admit I was not exactly shocked by the revelation when I saw it on 60 minutes the other night .",
     "lemma_str": "I have to admit I be not exactly shocked by the revelation when I see it on 60 minute the other night .",
     "lemmas": {
@@ -816,7 +816,7 @@
     "match_id": "7-8-9",
     "colloc_id": "pcc_eng_val_2.01649_x18884_04:8-9",
     "hit_id": "pcc_eng_val_2.01649_x18884_04:7-8-9",
-    "text": "Sure, continuity and logic aren't exactly important in a Deadpool movie, but there are still some questions we'd love to have answered even if those answers have absolutely no meaning.",
+    "sent_text": "Sure, continuity and logic aren't exactly important in a Deadpool movie, but there are still some questions we'd love to have answered even if those answers have absolutely no meaning.",
     "token_str": "Sure , continuity and logic are n't exactly important in a Deadpool movie , but there are still some questions we 'd love to have answered even if those answers have absolutely no meaning .",
     "lemma_str": "sure , continuity and logic be not exactly important in a Deadpool movie , but there be still some question we would love to have answer even if that answer have absolutely no meaning .",
     "lemmas": {
@@ -878,7 +878,7 @@
     "match_id": "20-21-22",
     "colloc_id": "pcc_eng_val_2.00741_x17372_31:21-22",
     "hit_id": "pcc_eng_val_2.00741_x17372_31:20-21-22",
-    "text": "But as a Wall Street Journal article from earlier this month showed, the robots being deployed there aren't exactly perfect.",
+    "sent_text": "But as a Wall Street Journal article from earlier this month showed, the robots being deployed there aren't exactly perfect.",
     "token_str": "But as a Wall Street Journal article from earlier this month showed , the robots being deployed there are n't exactly perfect .",
     "lemma_str": "but as a Wall Street Journal article from early this month show , the robot be deploy there be not exactly perfect .",
     "lemmas": {
@@ -940,7 +940,7 @@
     "match_id": "3-4-5",
     "colloc_id": "pcc_eng_val_2.00090_x16356_132:4-5",
     "hit_id": "pcc_eng_val_2.00090_x16356_132:3-4-5",
-    "text": "They were not exactly keen to having a new foreign queen.",
+    "sent_text": "They were not exactly keen to having a new foreign queen.",
     "token_str": "They were not exactly keen to having a new foreign queen .",
     "lemma_str": "they be not exactly keen to have a new foreign queen .",
     "lemmas": {
