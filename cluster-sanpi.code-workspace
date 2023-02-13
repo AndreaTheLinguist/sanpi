@@ -1,111 +1,59 @@
 {
-	"folders": [
-		{
-			"path": "/share/compling/projects/sanpi", 
-			"name": "code-sanpi"
-		},
-		{
-			"path": "/share/compling/data/sanpi", 
-			"name": "data-sanpi"
-		}, 
-		{
-			"path": "/share/compling/data/puddin", 
-			"name": "data-puddin"
-		},
-		{
-			"path": "/share/compling/data/new_york_times",
-			"name": "data-nyt"
-		},
-		{
-			"path": "/share/compling/data/assoc_press",
-			"name": "data-apw", 
-		}
-	],
-	"settings": {
-		"files.watcherExclude": {
-			"/share/compling/projects/.history": true,
-			"/share/compling/data/sanpi": true,
-			"/share/compling/data/puddin": true,
-			"/share/compling/projects/*/logs/*/*": true
-		},
-		"files.exclude": {
-			"**/.git": true,
-			"**/.svn": true,
-			"**/.hg": true,
-			"**/CVS": true,
-			"**/.DS_Store": true,
-			"**/Thumbs.db": true,
-			"**/.[^b]*": true,
-			"**/.bash_[hl]*": true,
-			"**/*conda3": true,
-			"**/stanza_resources": true,
-			"**/*kaldi*": true
-		},
-		"explorerExclude.backup": {},
-		"todo-tree.tree.scanMode": "open files"
-	},
-	"launch": {
-		"version": "0.2.0",
-		"configurations": [
-		        // * Deps
-				{
-					"name": "analyze_deps apw -v",
-					"type": "python",
-					"request": "launch",
-					"program": "analyze_deps${defaultBuildTask}.py",
-					"console": "integratedTerminal",
-					// "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
-					//usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-										  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-										  // [-n NAME] [-v]
-					"args": [
-						"-g", 
-						"*apw*hits.pkl.gz", 
-						"-n", 
-						"test_apw", 
-						"-v"
-					]
-				},
-			// {
-			// 	"name": "Python: create_match_conllu",
-			// 	"type": "python",
-			// 	"request": "launch",
-			// 	"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-			// 	"console": "integratedTerminal",
-			// 	"justMyCode": true,
-			// 	"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
-			// 	"cwd": "/share/compling/projects/sanpi",
-			// 	"args": [
-			// 		"-c",
-			// 		"/share/compling/data/puddin/Pcc29.conll/pcc_eng_29-108.conllu"
-			// 	]
-			// },
-			// {
-			// 	"name": "Python: exactly subset 29-108",
-			// 	"type": "python",
-			// 	"request": "launch",
-			// 	"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-			// 	"console": "integratedTerminal",
-			// 	"justMyCode": true,
-			// 	"python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
-			// 	"cwd": "/share/compling/projects/sanpi",
-			// 	"args": [
-			// 		"-c",
-			// 		"/share/compling/data/puddin/Pcc29.conll/pcc_eng_29-108.conllu",
-			// 		"-p",
-			// 		"/share/compling/projects/sanpi/Pat/filter/exactly-JJ.pat"
-			// 	]
-			// },
-			// {
-			// 	"name": "Python: create_match_conllu DIR",
-			// 	"type": "python",
-			// 	"request": "launch",
-			// 	"program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-			// 	"console": "integratedTerminal",
-			// 	"justMyCode": true,
-			// 	"python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
-			// 	"cwd": "/share/compling/projects/sanpi"
-			// },
-		]
-	}
-}
+    "folders": [
+        {
+            "name": "code-sanpi",
+            "path": "/share/compling/projects/sanpi"
+        },
+        {
+            "name": "data-sanpi",
+            "path": "/share/compling/data/sanpi"
+        }
+    ],
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            // * Deps
+            {
+                "name": "analyze_deps apw -v",
+                "type": "python",
+                "request": "launch",
+                "program": "analyze_deps${defaultBuildTask}.py",
+                "console": "integratedTerminal",
+                // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+                //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                // [-n NAME] [-v]
+                "args": [
+                    "-g",
+                    "*apw*hits.pkl.gz",
+                    "-n",
+                    "test_apw",
+                    "-v"
+                ]
+            }
+        ],
+        "settings": {
+            "explorerExclude.backup": {},
+            "files.exclude": {
+                "**/*conda3": true,
+                "**/*kaldi*": true,
+                "**/.[^b]*": true,
+                "**/.bash_[hl]*": true,
+                "**/.DS_Store": true,
+                "**/.git": true,
+                "**/.hg": true,
+                "**/.svn": true,
+                "**/__init__.py": true,
+                "**/CVS": true,
+                "**/stanza_resources": true,
+                "**/Thumbs.db": true
+            },
+            "files.watcherExclude": {
+                "/share/compling/data/puddin": true,
+                "/share/compling/data/sanpi": true,
+                "/share/compling/projects/*/logs/*/*": true,
+                "/share/compling/projects/.history": true
+            },
+            "todo-tree.tree.scanMode": "open files"
+        }
+    }

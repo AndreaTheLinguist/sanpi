@@ -1,265 +1,302 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"python.linting.pylintEnabled": true, 
-		"pylint.args": [
-			"--ignore=notebooks",
-			"--ignore=*.ipynb",
-			"--disable=undefined-variable",
-			"--disable=protected-access",
-			"--disable=invalid-name",
-			"--disable=line-too-long",
-			"--disable=trailing-whitespace",
-			"--disable=missing-module-docstring",
-			"--disable=missing-final-newline",
-			"--disable=pointless-statement",
-			"--disable=missing-function-docstring"
-		],
-		"files.exclude": {
-			"**/.git": false,
-			"**/.svn": false,
-			"**/.hg": false,
-			"**/CVS": false,
-			"**/.DS_Store": false,
-			"**/Thumbs.db": false,
-			"**/.[^b]*": false,
-			"**/.bash_[hl]*": false,
-			"**/*conda3": false,
-			"**/stanza_resources": false,
-			"**/*kaldi*": false
-		},
-		"explorerExclude.backup": {
-			"**/.git": true,
-			"**/.svn": true,
-			"**/.hg": true,
-			"**/CVS": true,
-			"**/.DS_Store": true,
-			"**/Thumbs.db": true,
-			"**/.[^b]*": true,
-			"**/.bash_[hl]*": true,
-			"**/*conda3": true,
-			"**/stanza_resources": true,
-			"**/*kaldi*": true
-		},
-	},
-	"launch": {
-		"version": "0.2.0",
-		"configurations": [
-			// current file
-			{
-				"name": "Python: Current File",
-				"type": "python",
-				"request": "launch",
-				"program": "${file}",
-				"console": "integratedTerminal",
-				"justMyCode": true
-			},
-			// run_pipeline PccX2 contig
-			{
-				"name": "run_pipeline PccX2 contig",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/home/arh234/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					// ! for ../demo/ launch configs, give relative paths
-					"-c",
-					"data/corpora/puddin/PccX2.conll",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "pipeline exactly_puddin-val contig",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/share/compling/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/subsets/exactly_puddin-val",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "pipeline exactly_test contig",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/share/compling/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/subsets/exactly_test",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "pipeline exactly_test negraise",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/share/compling/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/subsets/exactly_test",
-					"-p",
-					"Pat/raised",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "pipeline exactly_test scoped",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/share/compling/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/subsets/exactly_test",
-					"-p",
-					"Pat/scoped",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "run_pipeline exactly_test contig TABULATE",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/home/arh234/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-T",
-					"-c",
-					"data/corpora/subsets/exactly_test",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "run_pipeline exactly_puddin-val contig TABULATE",
-				"type": "python",
-				"request": "launch",
-				"program": "run_pipeline.py",
-				"console": "integratedTerminal",
-				"cwd": "/home/arh234/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-T",
-					"-c",
-					"data/corpora/subsets/exactly_puddin-val",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches"
-				]
-			},
-			{
-				"name": "process exactly_test contig",
-				"type": "python",
-				"request": "launch",
-				"program": "source/analyze/processTables.py",
-				"console": "integratedTerminal",
-				"cwd": "/share/compling/projects/sanpi/demo",
-				"justMyCode": true,
-				"args": [
-					"-d",
-					"data",
-				]
-			},
-			{
-				"name": "run_pipeline PccX9 contig",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/run_pipeline.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/puddin/PccX9.conll",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches",
-				]
-			},
-			{
-				"name": "pipeline x5_exactly contig TABULATE",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/run_pipeline.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"args": [
-					"-T",
-					"-c",
-					"data/corpora/puddin/x5_subset_exactly",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches",
-				]
-			},
-			{
-				"name": "pipeline x5_exactly contig",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/run_pipeline.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/puddin/x5_subset_exactly",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches",
-				]
-			},
-			{
-				"name": "pipeline x20_exactly contig",
-				"type": "python",
-				"request": "launch",
-				"program": "/share/compling/projects/sanpi/run_pipeline.py",
-				"console": "integratedTerminal",
-				"justMyCode": true,
-				"args": [
-					"-c",
-					"data/corpora/puddin/x20_subset_exactly",
-					"-p",
-					"Pat/contig",
-					"--grew_output_dir",
-					"data/1_json_grew-matches",
-				]
-			},
-		],
-		"compounds": []
-	}
+    "folders": [
+        {
+            "path": "/share/compling/projects/sanpi/demo"
+        }
+    ],
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            // current file
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "Python: Current File",
+                "program": "${file}",
+                "request": "launch",
+                "type": "python"
+            },
+            //* dependency analysis
+            {
+                "console": "integratedTerminal",
+                "name": "analyze_deps demo sample 5",
+                "program": "source/analyze_deps.py",
+                "request": "launch",
+                "type": "python",
+                // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+                //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
+                "args": [
+                    "-i",
+                    "data/2_hit_tables",
+                    "-n",
+                    "demo_sample5",
+                    "-o",
+                    "data/3",
+                    "-s",
+                    "5",
+                    "-t",
+                    "-v",
+                ]
+            },
+            {
+                "console": "integratedTerminal",
+                "name": "analyze_deps demo *exactly* sample 5",
+                "program": "/share/compling/projects/sanpi/source/analyze_deps.py",
+                "request": "launch",
+                "type": "python",
+                // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
+                //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
+                // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+                // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
+                "args": [
+                    "-g",
+                    "*exactly*hits.pkl*",
+                    "-i",
+                    "data/2_hit_tables",
+                    "-o",
+                    "data/3_deps_info",
+                    "-s",
+                    "5",
+                    "-n",
+                    "demo_exactly_n5",
+                    "-t",
+                    "-v",
+                ]
+            },
+            // run_pipeline PccX2 contig
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline PccX2 contig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/puddin/PccX2.conll",
+                    "-p",
+                    "Pat/contig"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline exactly_puddin-val contig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/exactly_puddin-val",
+                    "-p",
+                    "Pat/contig"
+                ],
+                "cwd": "/share/compling/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline exactly_test contig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/exactly_test",
+                    "-p",
+                    "Pat/contig"
+                ],
+                "cwd": "/share/compling/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline exactly_test negraise",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/exactly_test",
+                    "-p",
+                    "Pat/raised"
+                ],
+                "cwd": "/share/compling/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline exactly_test scoped",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/exactly_test",
+                    "-p",
+                    "Pat/scoped"
+                ],
+                "cwd": "/share/compling/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline exactly_test contig TABULATE",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "-T",
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/exactly_test",
+                    "-p",
+                    "Pat/contig"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline exactly_puddin-val contig TABULATE",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "-T",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/exactly_puddin-val",
+                    "-p",
+                    "Pat/contig"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "process exactly_test contig",
+                "program": "source/analyze/processTables.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "-d",
+                    "data"
+                ],
+                "cwd": "/share/compling/projects/sanpi/demo"
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline PccX9 contig",
+                "program": "/share/compling/projects/sanpi/run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/puddin/PccX9.conll",
+                    "-p",
+                    "Pat/contig"
+                ]
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline x5_exactly contig TABULATE",
+                "program": "/share/compling/projects/sanpi/run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "-T",
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/puddin/x5_subset_exactly",
+                    "-p",
+                    "Pat/contig"
+                ]
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline x5_exactly contig",
+                "program": "/share/compling/projects/sanpi/run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/puddin/x5_subset_exactly",
+                    "-p",
+                    "Pat/contig"
+                ]
+            },
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "pipeline x20_exactly contig",
+                "program": "/share/compling/projects/sanpi/run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/puddin/x20_subset_exactly",
+                    "-p",
+                    "Pat/contig"
+                ]
+            }
+        ],
+    },
+    "settings": {
+        "editor.fontFamily": "Roboto Mono, Consolas, 'Courier New', monospace",
+        "editor.fontSize": 13,
+        "explorerExclude.backup": {},
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/*conda3": true,
+            "**/*kaldi*": true,
+            "**/.[^b]*": true,
+            "**/.bash_[hl]*": true,
+            "**/stanza_resources": true,
+            "**/__pycache__": true,
+            "**/__init__.py": true
+        },
+        "python.linting.banditEnabled": false,
+        "python.linting.cwd": "/share/compling/projects/sanpi/demo",
+        "python.linting.flake8Enabled": false,
+        "python.linting.mypyEnabled": false,
+        "python.linting.prospectorEnabled": false,
+        "solarizedCustomTheme.accentColor": "Cyan",
+        "terminal.integrated.minimumContrastRatio": 5,
+        "window.autoDetectColorScheme": true,
+        "workbench.preferredDarkColorTheme": "Developers Theme - Ocean",
+        "workbench.preferredLightColorTheme": "Solarized Custom Light",
+        "workbench.colorTheme": "Developers Theme - Ocean"
+    }
 }

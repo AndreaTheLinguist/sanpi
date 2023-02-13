@@ -66,7 +66,7 @@ echo "Processing..."
 echo "  ${SEED_CORPUS}"
 echo "  ${PAT_DIR}"
 
-if [[ -d $SEED_CORPUS && -d ${PAT_DIR} ]]; then
+if [[ -d ${SEED_CORPUS} && -d ${PAT_DIR} ]]; then
     # run script and send both stdout and stderr to log file
     DATE="$(date -I)"
     LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}-${SEED}_${DATE}.log

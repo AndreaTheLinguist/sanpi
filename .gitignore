@@ -393,3 +393,14 @@ demo/**/*.py
 demo/data/corpora/nyt5.conll
 demo/data/corpora/gitrepo_puddin/PccTe.conll/subset_advadj/pcc*.conllu
 
+demo/data/debug/err_all-dup_dep-flat.csv
+demo/data/debug/err_all-dup_dep-flat.pkl
+demo/data/debug/err_all-dup.csv
+demo/data/debug/err_all-dup.pkl
+demo/data/debug/err_df.csv
+demo/data/debug/err_df.pkl
+demo/data/debug/err_fdf.csv
+demo/data/debug/err_fdf.pkl
+demo/data/debug/investigate_duplicates.ipynb
+demo/data/debug/segfault_df.pkl
+demo/data/debug/segfault_fdf.pkl
