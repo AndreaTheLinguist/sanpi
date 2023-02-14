@@ -181,8 +181,8 @@ def get_deps(hits_df: pd.DataFrame,
     else:
         counts_md_table = (
             new_hits_df.loc[:, new_hits_df.columns.isin(
-                # ('dep_str', 'dep_str_mask', 'neg_lemma', 'colloc'))]
-                ('hit_text', 'dep_str', 'dep_str_mask'))]
+                ('dep_str', 'dep_str_mask', 'neg_lemma', 'colloc'))]
+                # ('hit_text', 'dep_str', 'dep_str_mask'))]
             .value_counts().to_frame().rename(columns={0: 'count'})
             .sort_values('colloc').nlargest(5, 'count').reset_index()
             .to_markdown())
