@@ -25,13 +25,14 @@ def _get_read_path():
                 ** If both are given, filename argument will be ignored.
             '''
         ),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter
     )
 
     parser.add_argument(
         '-p', '--full_path',
-        type=Path, default=None,
-        help=('full path to `.pkl` file storing hits dataframe with dependency string identifiers (starting with `dep_str`)')
+        type=Path, default=None
+        help=('full path to `.pkl` file storing hits dataframe '
+              'with dependency string identifiers (starting with `dep_str`)')
     )
 
     parser.add_argument(
@@ -41,14 +42,15 @@ def _get_read_path():
         help=('''
               name (only) of data file relative to `/share/compling/data/sanpi/3_dep_info/`.
               **Will be ignored if `-f`/`--full_path` is specified.**
-              Note: If string does not end in `.pkl(.[compression_suffix])`, program will attempt to find the file by appending `.pkl` or `.pkl.gz`.
+              Note: If string does not end in `.pkl(.[compression_suffix])`, 
+                    program will attempt to find the file by appending `.pkl` or `.pkl.gz`.
               ''')
     )
 
     args = parser.parse_args()
 
     if args.full_path:
-        return args.full_path
+        path = args.full_path
 
     else:
         dir_path = Path('/share/compling/data/sanpi/3_dep_info/')
@@ -59,27 +61,26 @@ def _get_read_path():
 
         if '.pkl' in fpath.suffixes:
             if fpath.is_file():
-                return fpath
+                path = fpath
             else:
                 gzpath = fpath.with_name(fpath.name + '.gz')
                 if gzpath.is_file():
-                    return gzpath
+                    path = gzpath
                 else:
                     exit(f'Pickled dataframe {fpath} not found.')
         elif not fpath.suffixes:
             if fpath.with_suffix('.pkl.gz').is_file():
-                return fpath.with_suffix('.pkl.gz')
+                path = fpath.with_suffix('.pkl.gz')
             elif fpath.with_suffix('.pkl').is_file():
-                return fpath.with_suffix('.pkl')
+                path =  fpath.with_suffix('.pkl')
             else:
                 exit(
                     f'Name {args.filename} does not point to existing pickled dataframe.')
         else:
             exit(
                 f'Input data must be in pickle format. Invalid input: {fpath}')
-
-    return parser.parse_args()
-
+            
+    return path
 
 def _select_columns(_df, extra: bool = True):
     _col_list = _df.columns[_df.columns.str.endswith(
@@ -92,8 +93,6 @@ def _select_columns(_df, extra: bool = True):
 def _depstr_cols(_df):
     return cols_by_str(_df, 'dep_str')
 
-# TODO: add argument for "cross" column (to crosstabulate dep strings with more than just `hit_id`)
-
 
 def crosstabulate_variants(df: pd.DataFrame,
                            cross_col: str = 'hit_id',
@@ -103,6 +102,8 @@ def crosstabulate_variants(df: pd.DataFrame,
                            n_per_category: int = None,
                            include_extra: bool = True,
                            n_largest: int = 5):
+    # TODO: add argument for "cross" column (to crosstabulate by more than just `hit_id`)
+    
     if out_label is None:
         out_label = pd.Timestamp.now().strftime("%Y-%m-%d_%H%M")
 
@@ -165,11 +166,10 @@ def get_crosstabs(df: pd.DataFrame,
     return crosstab_dict
 
 
-# %%
 if __name__ == '__main__':
     # _READ_PATH = _get_read_path()
     dep_df = pd.read_pickle(_READ_PATH)
 
+    #FIXME: These calls are obsolete
     crosstabulate_variants(dep_df, n_per_category=5)
-
     crosstabulate_variants(dep_df)

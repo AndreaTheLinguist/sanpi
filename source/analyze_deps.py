@@ -63,22 +63,6 @@ def _main():
     df = udf.concat_pkls(pickles=dfs_with_dep_paths,
                          verbose=verbose)  # pylint: disable=invalid-name
 
-    # // # * only run `get_deps()` if no prior output exists
-    # // if dep_df_save.is_file():
-    # // print('Prior dep processing found. Loading from ',
-    # //       f'../{dep_df_save.relative_to(deps_dir.parent)}...')
-    # // df = pd.read_pickle(dep_df_save)
-
-    # // # * process dataframe for dependency info
-    # // else:
-    # // print('No prior dep processing found. Creating dependency string identifiers...')
-    # // df = udf.concat_pkls(args.input_dir,
-    # //                      fname_glob=args.glob_expr,
-    # //                      verbose=True)
-    # // df = get_deps(df,
-    # //               df_save_path=dep_df_save,
-    # //               sample_size=df_sample,
-    # //               verbose=verbose)
     # * crosstabulate data
     print('## Crosstabulate by `hit_id`')
     df_fname = dfs_with_dep_paths[0].name
@@ -91,21 +75,6 @@ def _main():
     ct_var(df, out_label=ct_out_label,
            n_per_category=n_per_category,
            dep_dir=dfs_with_dep_paths[0].parent.parent)
-
-# > moved to get_deps.py
-# // def make_dep_dfs(zipped):
-# //     in_path, out_path, df_sample = zipped
-# //     if out_path.is_file() and out_path.stat().st_size > 0:
-# //         print('Prior dep processing found:',
-# //                     f'../{Path(*out_path.parts[-3:])}...')
-# //     else:
-# //         sdf = pd.read_pickle(in_path)
-# //             # * This wil only save processed dataframe to file (no returned df)
-# //         get_deps(df=sdf,
-# //                         df_save_path=out_path,
-# //                         sample_size=df_sample,
-# //                         return_df=False,
-# //                         verbose=False)
 
 
 def _get_dep_args(args):
