@@ -31,29 +31,30 @@
                     "-v"
                 ]
             }
-        ],
-        "settings": {
-            "explorerExclude.backup": {},
-            "files.exclude": {
-                "**/*conda3": true,
-                "**/*kaldi*": true,
-                "**/.[^b]*": true,
-                "**/.bash_[hl]*": true,
-                "**/.DS_Store": true,
-                "**/.git": true,
-                "**/.hg": true,
-                "**/.svn": true,
-                "**/__init__.py": true,
-                "**/CVS": true,
-                "**/stanza_resources": true,
-                "**/Thumbs.db": true
-            },
-            "files.watcherExclude": {
-                "/share/compling/data/puddin": true,
-                "/share/compling/data/sanpi": true,
-                "/share/compling/projects/*/logs/*/*": true,
-                "/share/compling/projects/.history": true
-            },
-            "todo-tree.tree.scanMode": "open files"
-        }
+        ]
+    },
+    "settings": {
+        "explorerExclude.backup": {},
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/*conda3": true,
+            "**/*kaldi*": true,
+            "**/.[^b]*": true,
+            "**/.bash_[hl]*": true,
+            "**/__init__.py": true,
+            "**/stanza_resources": true
+        },
+        "files.watcherExclude": {
+            "/share/compling/data/puddin": true,
+            "/share/compling/data/sanpi": true,
+            "/share/compling/projects/*/logs/*/*": true,
+            "/share/compling/projects/.history": true
+        },
+        "todo-tree.tree.scanMode": "open files"
     }
+}
