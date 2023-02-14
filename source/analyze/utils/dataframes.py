@@ -15,23 +15,20 @@ def balance_sample(full_df: pd.DataFrame,
     all values' results to the minimum count per value.
     '''
     info_message = ''
-    sub_samples = []
-    # TODO: test this. made changes to how this was done.
-    #       not sure if groupby will produce desired output
-    for __, sdf in full_df.groupby(column_name):
+    subsamples = []
+    for __, col_val_df in full_df.groupby(column_name):
         # take sample if 1+ and less than length of full dataframe
-        if len(sdf) > sample_per_value > 0:
-            sdf = sdf.sample(sample_per_value)
-        sub_samples.append(sdf)
+        if len(col_val_df) > sample_per_value > 0:
+            subsample_df = col_val_df.sample(sample_per_value)
+        subsamples.append(subsample_df)
 
     # > trim all "by column" sub dfs to length of shortest if -1 given
     if sample_per_value == -1:
-        trim_len = int(min(len(sdf) for sdf in sub_samples))
-        sub_samples = [sdf.sample(trim_len)
-                       for sdf in sub_samples]
+        trim_len = int(min(len(sdf) for sdf in subsamples))
+        subsamples = [sdf.sample(trim_len)
+                       for sdf in subsamples]
 
-    # TODO: make sure this still has category/`column_name` column
-    b_sample = pd.concat(sub_samples)
+    b_sample = pd.concat(subsamples)
 
     if verbose:
         subset_info_table = (
