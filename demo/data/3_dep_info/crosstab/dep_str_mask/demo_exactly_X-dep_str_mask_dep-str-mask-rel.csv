@@ -1,0 +1,19 @@
+dep_str_mask,CD>[det]>no; JJ>[nsubj]>CD; JJ>[advmod]>RB,JJ>[advmod]>JJ,JJ>[advmod]>RB,JJ>[advmod]>RBR,JJ>[advmod]>RBS,JJ>[advmod]>WRB,JJ>[advmod]>not; JJ>[advmod]>RB,JJ>[neg]>never; JJ>[advmod]>RB,JJ>[neg]>not; JJ>[advmod]>RB,JJ>[nsubj]>none; JJ>[advmod]>RB,JJR>[advmod]>RB,JJS>[advmod]>RB,NN>[det]>no; JJ>[nsubj]>NN; JJ>[advmod]>RB,NNS>[amod]>few; JJ>[nsubj]>NNS; JJ>[advmod]>RB,NNS>[det]>no; JJ>[nsubj]>NNS; JJ>[advmod]>RB,VB>[advmod]>not; JJ>[advmod]>RB; believe>[ccomp]>JJ,VB>[advmod]>not; JJ>[advmod]>RB; think>[ccomp]>JJ,VBZ>[nsubj]>nothing; JJ>[advmod]>RB; look>[acomp]>JJ,SUM
+CD>no; JJ>CD; JJ>RB,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+JJ>JJ,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+JJ>RB,0,0,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,179
+JJ>RBR,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3
+JJ>RBS,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4
+JJ>WRB,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,2
+JJ>never; JJ>RB,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1
+JJ>none; JJ>RB,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1
+JJ>not; JJ>RB,0,0,0,0,0,0,71,0,29,0,0,0,0,0,0,0,0,0,100
+JJR>RB,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,3
+JJS>RB,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1
+NN>no; JJ>NN; JJ>RB,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1
+NNS>few; JJ>NNS; JJ>RB,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1
+NNS>no; JJ>NNS; JJ>RB,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1
+VB>not; JJ>RB; believe>JJ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1
+VB>not; JJ>RB; think>JJ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1
+VBZ>nothing; JJ>RB; look>JJ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+SUM,1,1,179,3,4,2,71,1,29,1,3,1,1,1,1,1,1,1,302

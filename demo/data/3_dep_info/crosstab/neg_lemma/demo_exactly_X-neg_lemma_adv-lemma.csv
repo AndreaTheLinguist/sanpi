@@ -1,0 +1,8 @@
+neg_lemma,always,as,exactly,quite,that,SUM
+few,0,1,0,0,0,1
+never,0,0,1,0,0,1
+no,0,0,3,0,0,3
+none,0,0,1,0,0,1
+not,1,0,99,1,1,102
+nothing,0,0,1,0,0,1
+SUM,1,1,105,1,1,109

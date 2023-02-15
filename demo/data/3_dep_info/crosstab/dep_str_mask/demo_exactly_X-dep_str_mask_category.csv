@@ -1,0 +1,19 @@
+dep_str_mask,advadj,contig,raised,scoped,SUM
+CD>no; JJ>CD; JJ>RB,0,0,0,1,1
+JJ>JJ,1,0,0,0,1
+JJ>RB,179,0,0,0,179
+JJ>RBR,3,0,0,0,3
+JJ>RBS,4,0,0,0,4
+JJ>WRB,2,0,0,0,2
+JJ>never; JJ>RB,0,1,0,0,1
+JJ>none; JJ>RB,0,1,0,0,1
+JJ>not; JJ>RB,0,100,0,0,100
+JJR>RB,3,0,0,0,3
+JJS>RB,1,0,0,0,1
+NN>no; JJ>NN; JJ>RB,0,0,0,1,1
+NNS>few; JJ>NNS; JJ>RB,0,0,0,1,1
+NNS>no; JJ>NNS; JJ>RB,0,0,0,1,1
+VB>not; JJ>RB; believe>JJ,0,0,1,0,1
+VB>not; JJ>RB; think>JJ,0,0,1,0,1
+VBZ>nothing; JJ>RB; look>JJ,0,0,1,0,1
+SUM,193,102,3,4,302

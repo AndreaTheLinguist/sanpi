@@ -1,0 +1,6 @@
+category,CD>no; JJ>CD; JJ>RB,JJ>JJ,JJ>RB,JJ>RBR,JJ>RBS,JJ>WRB,JJ>never; JJ>RB,JJ>none; JJ>RB,JJ>not; JJ>RB,JJR>RB,JJS>RB,NN>no; JJ>NN; JJ>RB,NNS>few; JJ>NNS; JJ>RB,NNS>no; JJ>NNS; JJ>RB,VB>not; JJ>RB; believe>JJ,VB>not; JJ>RB; think>JJ,VBZ>nothing; JJ>RB; look>JJ,SUM
+advadj,0,1,179,3,4,2,0,0,0,3,1,0,0,0,0,0,0,193
+contig,0,0,0,0,0,0,1,1,100,0,0,0,0,0,0,0,0,102
+raised,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,3
+scoped,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,4
+SUM,1,1,179,3,4,2,1,1,100,3,1,1,1,1,1,1,1,302

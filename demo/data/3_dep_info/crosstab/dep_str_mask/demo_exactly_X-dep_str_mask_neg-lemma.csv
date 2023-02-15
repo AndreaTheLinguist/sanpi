@@ -1,0 +1,12 @@
+dep_str_mask,few,never,no,none,not,nothing,SUM
+CD>no; JJ>CD; JJ>RB,0,0,1,0,0,0,1
+JJ>never; JJ>RB,0,1,0,0,0,0,1
+JJ>none; JJ>RB,0,0,0,1,0,0,1
+JJ>not; JJ>RB,0,0,0,0,100,0,100
+NN>no; JJ>NN; JJ>RB,0,0,1,0,0,0,1
+NNS>few; JJ>NNS; JJ>RB,1,0,0,0,0,0,1
+NNS>no; JJ>NNS; JJ>RB,0,0,1,0,0,0,1
+VB>not; JJ>RB; believe>JJ,0,0,0,0,1,0,1
+VB>not; JJ>RB; think>JJ,0,0,0,0,1,0,1
+VBZ>nothing; JJ>RB; look>JJ,0,0,0,0,0,1,1
+SUM,1,1,3,1,102,1,109

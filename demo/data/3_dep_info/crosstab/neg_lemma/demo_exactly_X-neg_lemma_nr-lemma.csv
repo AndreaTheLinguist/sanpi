@@ -1,0 +1,4 @@
+neg_lemma,believe,look,think,SUM
+not,1,0,1,2
+nothing,0,1,0,1
+SUM,1,1,1,3

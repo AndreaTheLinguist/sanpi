@@ -1,0 +1,5 @@
+adj_lemma,example,one,piece,two,SUM
+alike,0,0,1,1,2
+clear,0,1,0,0,1
+craven,1,0,0,0,1
+SUM,1,1,1,1,4

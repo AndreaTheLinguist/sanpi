@@ -1,0 +1,5 @@
+colloc,example,one,piece,two,SUM
+as_craven,1,0,0,0,1
+exactly_alike,0,0,1,1,2
+exactly_clear,0,1,0,0,1
+SUM,1,1,1,1,4

@@ -1,0 +1,5 @@
+adj_lemma,believe,look,think,SUM
+comparable,1,0,0,1
+real,0,1,0,1
+widespread,0,0,1,1
+SUM,1,1,1,3

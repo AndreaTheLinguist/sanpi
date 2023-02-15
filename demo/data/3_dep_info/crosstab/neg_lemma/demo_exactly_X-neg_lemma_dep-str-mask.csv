@@ -1,0 +1,8 @@
+neg_lemma,CD>no; JJ>CD; JJ>RB,JJ>never; JJ>RB,JJ>none; JJ>RB,JJ>not; JJ>RB,NN>no; JJ>NN; JJ>RB,NNS>few; JJ>NNS; JJ>RB,NNS>no; JJ>NNS; JJ>RB,VB>not; JJ>RB; believe>JJ,VB>not; JJ>RB; think>JJ,VBZ>nothing; JJ>RB; look>JJ,SUM
+few,0,0,0,0,0,1,0,0,0,0,1
+never,0,1,0,0,0,0,0,0,0,0,1
+no,1,0,0,0,1,0,1,0,0,0,3
+none,0,0,1,0,0,0,0,0,0,0,1
+not,0,0,0,100,0,0,0,1,1,0,102
+nothing,0,0,0,0,0,0,0,0,0,1,1
+SUM,1,1,1,100,1,1,1,1,1,1,109
