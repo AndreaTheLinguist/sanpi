@@ -20,7 +20,9 @@ def balance_sample(full_df: pd.DataFrame,
         # take sample if 1+ and less than length of full dataframe
         if len(col_val_df) > sample_per_value > 0:
             subsample_df = col_val_df.sample(sample_per_value)
-        subsamples.append(subsample_df)
+            subsamples.append(subsample_df)
+        else: 
+            subsamples.append(col_val_df)
 
     # > trim all "by column" sub dfs to length of shortest if -1 given
     if sample_per_value == -1:
