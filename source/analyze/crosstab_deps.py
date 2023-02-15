@@ -30,7 +30,7 @@ def _get_read_path():
 
     parser.add_argument(
         '-p', '--full_path',
-        type=Path, default=None
+        type=Path, default=None,
         help=('full path to `.pkl` file storing hits dataframe '
               'with dependency string identifiers (starting with `dep_str`)')
     )
@@ -95,33 +95,33 @@ def _depstr_cols(_df):
 
 
 def crosstabulate_variants(df: pd.DataFrame,
-                           cross_col: str = 'hit_id',
+                           cross: str = 'hit_id',
                            out_label: str = None,
                            dep_dir=Path(
                                '/share/compling/data/sanpi/3_dep_info'),
                            n_per_category: int = None,
                            include_extra: bool = True,
                            n_largest: int = 5):
-    # TODO: add argument for "cross" column (to crosstabulate by more than just `hit_id`)
     
+    # TODO: add argument for "cross" column (to crosstabulate by more than just `hit_id`)
     if out_label is None:
         out_label = pd.Timestamp.now().strftime("%Y-%m-%d_%H%M")
 
     lines = [
         # TODO: change this line as well once it's not just `hit_id`
-        f'# All dependency string identifier variants crosstabulated with `{cross_col}`\n',
+        f'# All dependency string identifier variants crosstabulated by `{cross}`\n',
         pd.Timestamp.now().strftime("%Y-%m-%d %I:%M%p")
         # pd.Timestamp.now().ctime()
     ]
 
-    crosstab_dir = dep_dir.joinpath('crosstab')
+    crosstab_dir = dep_dir.joinpath('crosstab',cross)
     if not crosstab_dir.is_dir():
         crosstab_dir.mkdir(parents=True)
 
-    ct_out_fstem = f'{out_label}_ct'
+    ct_out_fstem = f'{out_label}_X-{cross}'
 
-    if n_per_category is not None:
-        ct_out_fstem += '-sample'
+    if n_per_category:
+        ct_out_fstem += f'[n{n_per_category}]'
 
         df, sample_info = balance_sample(df, column_name='category',
                                          sample_per_value=n_per_category,
@@ -129,8 +129,11 @@ def crosstabulate_variants(df: pd.DataFrame,
         lines.append(sample_info)
 
     _ct_cols = _select_columns(df, include_extra)
+    # > to avoid "crosstab by self"
+    if cross in _ct_cols: 
+        _ct_cols.pop(_ct_cols.index(cross))
     _ct_cols.sort()
-    ct_tables = get_crosstabs(df, _ct_cols)
+    ct_tables = get_crosstabs(df, _ct_cols, cross=cross)
 
     for ct_col, ctdf in ct_tables.items():
         # TODO: change paths to include info on "cross" column once added
@@ -138,8 +141,8 @@ def crosstabulate_variants(df: pd.DataFrame,
             f'{ct_out_fstem}_{ct_col.replace("_", "-")}.csv')
         ctdf.to_csv(csv_path)
 
-        lines.append(f'\n\n## `{ct_col}`')
-        lines.append(f"\n- *Defined for {ctdf.pop('SUM').loc['SUM']} hits*")
+        lines.append(f'\n\n## `{ct_col}` x `{cross}`')
+        lines.append(f"\n- *both values defined for {ctdf.pop('SUM').loc['SUM']} rows*")
         lines.append(
             f"\n- Full crosstabulation dataframe saved to\n  `{csv_path}`")
         lines.append(f'\n### {n_largest} most common `{ct_col}` values\n')

@@ -12,7 +12,7 @@ from sys import exit as sys_exit
 
 import pandas as pd
 from analyze.crosstab_deps import (  # pylint: disable=import-error
-    crosstabulate_variants as ct_var)
+    crosstabulate_variants)
 from analyze.get_deps import (  # pylint: disable=import-error
     parallel_process_deps)
 from analyze.utils import dataframes as udf  # pylint: disable=import-error
@@ -34,10 +34,10 @@ def _main():
         elif n_per_category < -1:
             ct_label = f'{ct_label}-min'
 
-        ct_var(df=pd.read_pickle(input_path),
-               out_label=ct_label,
-               dep_dir=input_path.parent,
-               n_per_category=n_per_category)
+        crosstabulate_variants(df=pd.read_pickle(input_path),
+                               out_label=ct_label,
+                               dep_dir=input_path.parent,
+                               n_per_category=n_per_category)
         return
 
     # * otherwise, follow normal processing
@@ -52,8 +52,9 @@ def _main():
     # _gen_path_info yields _PATH_INFO namedtuple
     # create dataframe from generator of these namedtuples for each input path
 
-    log_level = 20 if verbose else 30
-    parallel_process_deps(dep_args_df, log_level)
+    if any(dep_args_df.by_hit.apply(lambda p: not p.is_file())):
+        log_level = 20 if verbose else 30
+        parallel_process_deps(dep_args_df, log_level)
 
     # to get debug messages:
     # parallel_process_deps(in_sdf_paths, out_sdf_paths, df_sample, log_level=10)
@@ -64,7 +65,6 @@ def _main():
                          verbose=verbose)  # pylint: disable=invalid-name
 
     # * crosstabulate data
-    print('## Crosstabulate by `hit_id`')
     df_fname = dfs_with_dep_paths[0].name
     if '[' in df_fname:
         df_sample_tag = f"[{df_fname.split('[', 1)[1].split(']',1)[0]}]"
@@ -72,9 +72,21 @@ def _main():
         df_sample_tag = ''
     ct_out_label = _get_crosstab_label(args.name, df_sample_tag)
 
-    ct_var(df, out_label=ct_out_label,
-           n_per_category=n_per_category,
-           dep_dir=dfs_with_dep_paths[0].parent.parent)
+    crosses = ('hit_id', 'colloc_id', 'colloc', 'category', 'dep_str_mask', 'neg_lemma', 'adj_lemma')
+    for cross_col in crosses: 
+        print(f'## Crosstabulating by `{cross_col}`')
+        proc_t0 = pd.Timestamp.now()
+
+        crosstabulate_variants(
+            df=df,
+            cross=cross_col,
+            out_label=ct_out_label,
+            n_per_category=n_per_category,
+            dep_dir=dfs_with_dep_paths[0].parent.parent)
+        
+        proc_t1 = pd.Timestamp.now()
+        print(f'\n   total time elapsed: `{ugen.dur_round((proc_t1 - proc_t0).seconds)}`')
+
 
 
 def _get_dep_args(args):
