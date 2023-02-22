@@ -39,7 +39,7 @@ def __main__():
     if not sample_dir.is_dir():
         sample_dir.mkdir()
 
-    hits_dir=data_dir.joinpath('2_csv_hits')
+    hits_dir=data_dir.joinpath('2_hit_tables')
     if not hits_dir.is_dir(): 
         sys.exit(f'No input csv hit files found. Directory {hits_dir} does not exist.')
 
