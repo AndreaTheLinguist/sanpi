@@ -32,3 +32,9 @@ The idea is that certain adv-adj pairs which are commonly used to create litotes
 
 Corpus frequency data is derived from grew-match searches run on dependency annotated corpora (currently the New York Times, and soon the Associated Press)
 
+## Helpful Links
+
+- [CoNLL-U viewer](https://urd2.let.rug.nl/~kleiweg/conllu/)
+- `grew` documentation: 
+  - [command line](https://grew.fr/usage/cli/)
+  - [pattern syntax](https://grew.fr/doc/request/)
