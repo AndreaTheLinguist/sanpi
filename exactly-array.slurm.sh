@@ -10,7 +10,7 @@
 #SBATCH --mem=50G                     # Total amount of (real) memory requested (per node)
 #SBATCH --time 2:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
-#SBATCH --array 0-2
+#SBATCH --array 0-1
 #SBATCH --chdir=/share/compling/projects/sanpi/logs # to allow running `sbatch` cmd from anywhere and still put .out and .err in ../logs/ dir
 
 
@@ -62,9 +62,12 @@ if [ $SEED == 0 ]; then
     echo "  Task ID ${SEED} assigned to 'exactly_puddin'"
     SEED="exactly_puddin"
 elif [ $SEED == 1 ]; then
+    echo "  Task ID ${SEED} assigned to 'exactly_news'"
+    SEED="exactly_news"
+elif [ $SEED == 2 ]; then
     echo "  Task ID ${SEED} assigned to 'exactly_nyt'"
     SEED="exactly_nyt"
-elif [ $SEED == 2 ]; then
+elif [ $SEED == 3 ]; then
     echo "  Task ID ${SEED} assigned to 'exactly_apw'"
     SEED="exactly_apw"
 else 
