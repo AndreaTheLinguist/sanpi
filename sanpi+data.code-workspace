@@ -1,44 +1,45 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../../data"
-		}
-	],
-	"settings": {
-		"settings": {
-			"files.watcherExclude": {
-				"./.untracked/**": true,
-				"./**/.history/**": true,
-				"./demo/data/corpora/**": true,
-				"./.git/**": true,
-				"./*/.vscode/**": true,
-				"./setup/**": true,
-				"./*data_samples*/**": true
-			},
-			"python.linting.pylintArgs": [
-				"--disable:protected-access"
-			],
-			"editor.defaultFormatter": "ms-python.python",
-			"todo-tree.tree.scanMode": "current file"
-		},
-		"files.exclude": {
-			"**/.git": false,
-			"**/.svn": false,
-			"**/.hg": false,
-			"**/CVS": false,
-			"**/.DS_Store": false,
-			"**/Thumbs.db": false
-		},
-		"explorerExclude.backup": {
-			"**/.git": true,
-			"**/.svn": true,
-			"**/.hg": true,
-			"**/CVS": true,
-			"**/.DS_Store": true,
-			"**/Thumbs.db": true
-		},
-	}
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../../data"
+        }
+    ],
+    "settings": {
+        // "workbench.editor.defaultFormatter": "ms-python.python",
+		"workbench.preferredDarkColorTheme": "The Warmother",
+		"workbench.preferredLightColorTheme": "Winter is Coming (Light)",
+        "todo-tree.tree.scanMode": "current file",
+        "explorerExclude.backup": {
+            "**/.DS_Store": true,
+            "**/.git": true,
+            "**/.hg": true,
+            "**/.svn": true,
+            "**/CVS": true,
+            "**/Thumbs.db": true
+        },
+        "files.exclude": {
+            "**/.DS_Store": false,
+            "**/.git": false,
+            "**/.hg": false,
+            "**/.svn": false,
+            "**/CVS": false,
+            "**/Thumbs.db": false
+        },
+        "files.watcherExclude": {
+            "./.git/**": true,
+            "./.untracked/**": true,
+            "./**/.history/**": true,
+            "./*/.vscode/**": true,
+            "./*data_samples*/**": true,
+            "./demo/data/corpora/**": true,
+            "./setup/**": true
+        },
+        "python.linting.pylintArgs": [
+            "--disable:protected-access"
+		],
+		"workbench.colorTheme": "The Warmother"
+    }
 }
