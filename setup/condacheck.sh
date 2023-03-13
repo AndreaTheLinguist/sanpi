@@ -86,7 +86,7 @@ if [[ ! `which grew` ]]; then
   echo -e "\nopam -y install grew"
   opam -y install grew
   eval $(opam env)
-  echo -e "\nopam -y update && opam install grewpy_backend"
+  echo -e "\nopam -y update && opam -y install grewpy_backend"
   opam -y update && opam -y install grewpy_backend
   eval $(opam env)
   echo -e "\npip3 install grewpy"
@@ -120,8 +120,8 @@ elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
   opam -y upgrade grew
   eval $(opam env)
 
-  echo -e "\nopam install grewpy_backend"
-  opam -y update && opam install grewpy_backend
+  echo -e "\nopam -y install grewpy_backend"
+  opam -y install grewpy_backend || opam -y upgrade grewpy_backend
   eval $(opam env)
   echo -e "\npip3 install grewpy --upgrade"
   pip3 install grewpy --upgrade
@@ -130,7 +130,7 @@ fi
 
 echo -e '\ngrewpy_backend version should be >= 0.1.3'
 if [[ -z "`opam list | grep grewpy`" ]]; then
-  opam -y update && opam install grewpy_backend
+  opam -y install grewpy_backend
   eval $(opam env)
 else
   echo "opam list | grep grewpy"
