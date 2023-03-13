@@ -6,8 +6,8 @@ SETUP_DIR=${0%/*}
 if [[ -f ${SETUP_DIR} ]]; then
   SETUP_DIR="$(pwd)"
 fi
-echo "Checking ${ENV} env for requirements"
-LOG_PATH=${SETUP_DIR}/${ENV}_check.log
+echo "Checking ${ENV} env for requirements:"
+LOG_PATH="${SETUP_DIR}/${ENV}_check.`date +'%Y-%m-%d_%R'`.log"
 echo -e "> log will be saved to: ${LOG_PATH}\n..."
 exec 1>${LOG_PATH} 2>&1
 echo "Checking ${ENV} env for requirements..."
@@ -68,8 +68,9 @@ if [[ ! `which grew` ]]; then
   echo "opam -y init"
   opam -y init
 
-  echo 'eval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)'
-  eval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)
+  # echo 'eval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)'
+  echo 'eval $(opam env --switch=4.14.0 --set-switch) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0 --set-switch)'
+  eval $(opam env --switch=4.14.0 --set-switch) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0 --set-switch)
 
   # if [[ "`ocamlc -v | cut -d " " -f 5 | head -1`" -le 4.1 ]]; then
   #   echo "opam switch create 4.14.0 4.14.0" 
@@ -78,15 +79,17 @@ if [[ ! `which grew` ]]; then
   #   eval $(opam env --switch=4.14.0) 
   # fi
   opam repository set-url default https://opam.ocaml.org
-  echo "opam remote add grew \"http://opam.grew.fr\""
+  echo -e "\nopam remote add grew \"http://opam.grew.fr\""
   opam -y remote add grew "http://opam.grew.fr"
   opam -y repository add grew --all-switches --set-default
 
-  echo "opam -y install grew"
+  echo -e "\nopam -y install grew"
   opam -y install grew
-  echo "\nopam -y update && opam install grewpy_backend"
+  eval $(opam env)
+  echo -e "\nopam -y update && opam install grewpy_backend"
   opam -y update && opam -y install grewpy_backend
-  echo "pip3 install grewpy"
+  eval $(opam env)
+  echo -e "\npip3 install grewpy"
   pip3 install grewpy
 
 elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
@@ -104,8 +107,9 @@ elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
   echo -e "\nopam -y init"
   opam -y init
 
-  echo -e '\neval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)'
-  eval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)
+  # echo -e '\neval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)'
+  echo 'eval $(opam env --switch=4.14.0 --set-switch) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0 --set-switch)'
+  eval $(opam env --switch=4.14.0 --set-switch) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0 --set-switch)
   
   opam repository set-url default https://opam.ocaml.org
   echo "opam -y update"  
@@ -114,23 +118,26 @@ elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
   echo -e "\nopam -y upgrade grew"
   # TODO: don't think this is reached every time it should be
   opam -y upgrade grew
+  eval $(opam env)
 
   echo -e "\nopam install grewpy_backend"
   opam -y update && opam install grewpy_backend
+  eval $(opam env)
   echo -e "\npip3 install grewpy --upgrade"
   pip3 install grewpy --upgrade
   
 fi
 
-echo 'grewpy_backend version should be >= 0.1.3'
-echo "opam list | grep grewpy"
+echo -e '\ngrewpy_backend version should be >= 0.1.3'
 if [[ -z "`opam list | grep grewpy`" ]]; then
   opam -y update && opam install grewpy_backend
+  eval $(opam env)
 else
+  echo "opam list | grep grewpy"
   opam list | grep grewpy
 fi
 
-echo 'grewpy should be >= 0.1.2'
+echo -e '\ngrewpy should be >= 0.1.2'
 echo "pip3 show grewpy"
 pip3 show grewpy || pip3 install grewpy
 
