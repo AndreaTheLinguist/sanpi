@@ -1,5 +1,6 @@
 #!/bin/bash
 # condacheck.sh
+VERSION="1.11.0"
 ENV=${1:-sanpi}
 SETUP_DIR=${0%/*}
 if [[ -f ${SETUP_DIR} ]]; then
@@ -38,10 +39,13 @@ for p in "${pypackages[@]}"; do
   pip3 show ${p} || (ls ${ACTIVE_PATH}/*/*${p}* && conda list ${p}) || conda install -y ${p}
 done
 
+#! 'librsvg2-bin' is supposedly required, but cannot get it through conda
+#   however, it seems to be for generating svg images
+#   "librsvg2-bin - command-line utility to convert SVG files"
 shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
 for p in "${shpackages[@]}"; do
   echo -e "\n> ${p}"
-  which ${p} || conda install -y ${p}
+  ( which ${p} || conda install -y ${p} ) || echo "⚠️ failed to install $p"
 done
 
 #// # BUBBLE="$(conda list bubblewrap)"
@@ -73,16 +77,20 @@ if [[ ! `which grew` ]]; then
   #   echo "eval $(opam env --switch=4.14.0)"
   #   eval $(opam env --switch=4.14.0) 
   # fi
-
+  opam repository set-url default https://opam.ocaml.org
   echo "opam remote add grew \"http://opam.grew.fr\""
   opam -y remote add grew "http://opam.grew.fr"
   opam -y repository add grew --all-switches --set-default
-  echo "opam install grew grewpy"
-  opam -y install grew grewpy
-  echo "pip3 install grew"
-  pip3 install grew
 
-elif [[ $(echo "`grew version | cut -d ' ' -f 2 | head -1`") != "1.10.0" ]]; then
+  echo "opam -y install grew"
+  opam -y install grew
+  echo "\nopam -y update && opam install grewpy_backend"
+  opam -y update && opam -y install grewpy_backend
+  echo "pip3 install grewpy"
+  pip3 install grewpy
+
+elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
+# elif [[ $(echo "`grew version | cut -d ' ' -f 2 | head -1`") != "${VERSION}" ]]; then
   echo "grew installation is out of date. Upgrading..."
   echo "updating prerequisites..."
   echo "sudo apt-get update && sudo apt-get upgrade"
@@ -98,18 +106,35 @@ elif [[ $(echo "`grew version | cut -d ' ' -f 2 | head -1`") != "1.10.0" ]]; the
 
   echo -e '\neval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)'
   eval $(opam env --switch=4.14.0) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0)
-
-
+  
+  opam repository set-url default https://opam.ocaml.org
   echo "opam -y update"  
   opam -y update
-  echo -e "\nopam -y upgrade"
+
+  echo -e "\nopam -y upgrade grew"
   # TODO: don't think this is reached every time it should be
-  opam -y upgrade
-  echo -e "\npip3 install grew --upgrade"
-  pip3 install grew --upgrade
+  opam -y upgrade grew
+
+  echo -e "\nopam install grewpy_backend"
+  opam -y update && opam install grewpy_backend
+  echo -e "\npip3 install grewpy --upgrade"
+  pip3 install grewpy --upgrade
   
 fi
 
-echo "$(echo "`grew version | tail -1`"), located in $(echo "`which grew`")"
+echo 'grewpy_backend version should be >= 0.1.3'
+echo "opam list | grep grewpy"
+if [[ -z "`opam list | grep grewpy`" ]]; then
+  opam -y update && opam install grewpy_backend
+else
+  opam list | grep grewpy
+fi
+
+echo 'grewpy should be >= 0.1.2'
+echo "pip3 show grewpy"
+pip3 show grewpy || pip3 install grewpy
+
+
+echo "`grew version | tail -1`, located in `which grew`"
 
 echo "Finished at $(date)"
