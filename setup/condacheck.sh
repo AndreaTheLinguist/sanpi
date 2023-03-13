@@ -60,6 +60,8 @@ echo -e "\n### opam installs ###"
 if [[ ! `which grew` ]]; then
   echo "installing grew..."
 
+  #*install or upgrade opam (conda)
+  opam --version || conda install -y opam=2.*
   if [[ ! $(echo "`opam --version`") =~ 2.* ]]; then
     echo "opam version obsolete"
     conda update -y opam=2.*
@@ -79,6 +81,9 @@ if [[ ! `which grew` ]]; then
   #   eval $(opam env --switch=4.14.0) 
   # fi
   opam repository set-url default https://opam.ocaml.org
+  opam -y update && opam -y upgrade
+
+  #* install grew (opam)
   echo -e "\nopam remote add grew \"http://opam.grew.fr\""
   opam -y remote add grew "http://opam.grew.fr"
   opam -y repository add grew --all-switches --set-default
@@ -86,9 +91,15 @@ if [[ ! `which grew` ]]; then
   echo -e "\nopam -y install grew"
   opam -y install grew
   eval $(opam env)
+  eval $(opam env)
+  grew version || opam -y install grew
+
+  #* install grewpy_backend (opam)
   echo -e "\nopam -y update && opam -y install grewpy_backend"
   opam -y update && opam -y install grewpy_backend
   eval $(opam env)
+  
+  #* install grewpy (pip)
   echo -e "\npip3 install grewpy"
   pip3 install grewpy
 
@@ -97,7 +108,7 @@ elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
   echo "grew installation is out of date. Upgrading..."
   echo "updating prerequisites..."
   echo "sudo apt-get update && sudo apt-get upgrade"
-  sudo apt-get update && sudo apt-get upgrade || echo -e "\nInsufficient permissions to update prerequisites. In case of error, contact admin."
+  ( sudo apt-get update && sudo apt-get upgrade ) || echo -e "\nInsufficient permissions to update prerequisites. In case of error, contact admin."
 
   if [[ ! $(echo "`opam --version`") =~ 2.* ]]; then
     echo "opam installation is out of date. updating..."
@@ -111,18 +122,23 @@ elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
   echo 'eval $(opam env --switch=4.14.0 --set-switch) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0 --set-switch)'
   eval $(opam env --switch=4.14.0 --set-switch) || opam switch create 4.14.0 4.14.0 && eval $(opam env --switch=4.14.0 --set-switch)
   
+  #* update opam package list
   opam repository set-url default https://opam.ocaml.org
-  echo "opam -y update"  
-  opam -y update
+  echo "opam -y update && opam -y upgrade"  
+  opam -y update && opam -y upgrade
 
+  #* upgrade grew (opam)
   echo -e "\nopam -y upgrade grew"
   # TODO: don't think this is reached every time it should be
   opam -y upgrade grew
   eval $(opam env)
 
+  #* upgrade grewpy_backend (opam)
   echo -e "\nopam -y install grewpy_backend"
   opam -y install grewpy_backend || opam -y upgrade grewpy_backend
   eval $(opam env)
+
+  #* upgrade grewpy (pip3)
   echo -e "\npip3 install grewpy --upgrade"
   pip3 install grewpy --upgrade
   
