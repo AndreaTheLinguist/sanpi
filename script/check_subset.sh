@@ -25,10 +25,10 @@
 #         'data/sanpi/logs/subsets' by slurm
 SUBSET_TAG=${1:-exactly}
 PUDDIN_DIR=/share/compling/data/puddin
-DATA_DIR=${2:-${PUDDIN_DIR}}
-echo -e "Searching ${DATA_DIR} for \`${SUBSET_TAG}\` subset .conllu files"
+CORPUS_DIR=${2:-${PUDDIN_DIR}}
+echo -e "Searching ${CORPUS_DIR} for \`${SUBSET_TAG}\` subset .conllu files"
 
-INFO_DIR=${DATA_DIR}/info/${SUBSET_TAG}_subset
+INFO_DIR=${CORPUS_DIR}/info/${SUBSET_TAG}_subset
 mkdir -p ${INFO_DIR}
 
 function move_prev() {
@@ -50,13 +50,18 @@ function check_conll_dir() {
     # arg 2 = subset tag
     # arg 3 = info (output) dir
     CONLL_DIR=$1
+    echo "CONLL_DIR = $CONLL_DIR"
     #? does this overwrite global??
-    DATA_DIR=$(dirname ${CONLL_DIR})
+    CORPUS_DIR=$(dirname ${CONLL_DIR})
     SUBSET_TAG=$2
     OUT_DIR=$3
+    echo "OUT_DIR = $OUT_DIR"
     SUBSET_META=$4
     echo -e "\n=== $(basename ${CONLL_DIR}) ===\n$(date +"%D @ %R")"
+    
     OUT_LABEL="$(basename ${CONLL_DIR%.*})_${SUBSET_TAG}"
+    echo "OUT_LABEL = $OUT_LABEL"
+
     CONLL_WITHOUT_SUBSET=${OUT_DIR}/${OUT_LABEL}-subset-missing.txt
     SUBSET_FILES=${OUT_DIR}/${OUT_LABEL}-paths.txt
     #// echo -e "DEBUG INFO (66):\nCONLL_DIR = ${CONLL_DIR}\nOUT_LABEL = ${OUT_LABEL}\nOUT_DIR = ${OUT_DIR}\nCONLL_WITHOUT_SUBSET = ${CONLL_WITHOUT_SUBSET}\nSUBSET_FILES = ${SUBSET_FILES}"
@@ -64,14 +69,18 @@ function check_conll_dir() {
     move_prev ${CONLL_WITHOUT_SUBSET}
     move_prev ${SUBSET_FILES}
     #! There is a bug here where conllus that have no matches for a pattern are always flagged as "missing", so the slurm script for creating the subsets goes into an infinite loop rechecking the same matchless files over and over and over until the job gets cancelled.
+    #   ^ This may be fixed now (all searched files now get an output. No matches gets "No matches found.")
     if [[ $(find ${CONLL_DIR} -type d -name "subset*") ]]; then
         echo "= Checking files..."
         for FILE in ${CONLL_DIR}/*.conllu; do
             #> look for subset file
             #> > if found, append *subset* path to confirmed list
             #> > else, append *original* path to missing list
+            # echo 'find ${CONLL_DIR} -maxdepth 2 | egrep "$(basename ${FILE%.conllu}).*${SUBSET_TAG}.*conllu" >>${SUBSET_FILES} || echo ${FILE} >>${CONLL_WITHOUT_SUBSET}'
+            # echo "find ${CONLL_DIR} -maxdepth 2 | egrep \"$(basename ${FILE%.conllu}).*${SUBSET_TAG}.*conllu\" >>${SUBSET_FILES} || echo ${FILE} >>${CONLL_WITHOUT_SUBSET}"
             find ${CONLL_DIR} -maxdepth 2 | egrep "$(basename ${FILE%.conllu}).*${SUBSET_TAG}.*conllu" >>${SUBSET_FILES} || echo ${FILE} >>${CONLL_WITHOUT_SUBSET}
         done
+
     #! if subset code has *never* been run previously, put all paths in "without" list
     else
         for FILE in ${CONLL_DIR}/*.conllu; do
@@ -81,7 +90,7 @@ function check_conll_dir() {
     #> add info to meta csv output
     echo "${CONLL_DIR},${SUBSET_TAG},$(date '+%F'),$(date '+%X'),${CONLL_WITHOUT_SUBSET},${SUBSET_FILES}" >>${SUBSET_META}
 
-    echo -e "Files without corresponding subset files saved to: \n  >  ..${CONLL_WITHOUT_SUBSET##${DATA_DIR}}\nCurrent subset file paths saved to:\n  >  ..${SUBSET_FILES##${DATA_DIR}}"
+    echo -e "Files without corresponding subset files saved to: \n  >  ..${CONLL_WITHOUT_SUBSET##${CORPUS_DIR}}\nCurrent subset file paths saved to:\n  >  ..${SUBSET_FILES##${CORPUS_DIR}}"
 }
 export -f check_conll_dir
 
@@ -89,10 +98,11 @@ export -f check_conll_dir
 SUBSET_META=${INFO_DIR}/${SUBSET_TAG}_check-meta-info.csv
 echo "CONLL_DIR,SUBSET_TAG,DATE,TIME,CONLL_WITHOUT_SUBSET_PATH,SUBSET_FILES_PATH" >${SUBSET_META}
 
+# echo "find ${CORPUS_DIR} -maxdepth 1 -type d -name '*.conll' | sort"
 #> >>> run all conll dirs in parallel
 #>      set number of jobs to number of available cpus (i.e. slurm `-n` flag)
-# echo "parallel -j$(nproc) --keep-order "check_conll_dir {} ${SUBSET_TAG} ${INFO_DIR} ${SUBSET_META}" ::: $(find ${DATA_DIR} -maxdepth 1 -type d -name "*.conll" | sort)"
-parallel -j$(nproc) --keep-order "check_conll_dir {} ${SUBSET_TAG} ${INFO_DIR} ${SUBSET_META}" ::: $(find ${DATA_DIR} -maxdepth 1 -type d -name "*.conll" | sort)
+# echo "parallel -j$(nproc) --keep-order "check_conll_dir {} ${SUBSET_TAG} ${INFO_DIR} ${SUBSET_META}" ::: $(find ${CORPUS_DIR} -maxdepth 1 -type d -name "*.conll" | sort)"
+parallel -j$(nproc) --keep-order "check_conll_dir {} ${SUBSET_TAG} ${INFO_DIR} ${SUBSET_META}" ::: $(find ${CORPUS_DIR} -maxdepth 1 -name "*.conll" | sort)
 
 SUBSET_TOTALS=${INFO_DIR}/${SUBSET_TAG}_total-missing-files.tsv
 move_prev ${SUBSET_TOTALS}
@@ -124,7 +134,7 @@ if [[ $(egrep -s "conll" ${INFO_DIR}/*missing.txt) ]]; then
     egrep -h "conllu" ${INFO_DIR}/*missing.txt >${ALL_FILE}
 
 elif [[ -d "${INFO_DIR}/prev" ]]; then
-    echo -e "\n--------------\n>>> \"${SUBSET_TAG}\" subset for ${DATA_DIR}/ is complete. <<<"
+    echo -e "\n--------------\n>>> \"${SUBSET_TAG}\" subset for ${CORPUS_DIR}/ is complete. <<<"
     echo "None" >${ALL_FILE}
 else
     echo "!! Warning! No previous output, but no missing subsets found. !!"
