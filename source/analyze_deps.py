@@ -62,7 +62,6 @@ def _main():
     # * concatonate dataframes with deps processing
     dfs_with_dep_paths = dep_args_df.by_hit.to_list()
     df = udf.concat_pkls(pickles=dfs_with_dep_paths,
-                         convert_dtypes=True,
                          verbose=verbose, 
                          convert_dtypes=True)  # pylint: disable=invalid-name
     
@@ -173,7 +172,7 @@ def _get_dep_args(args):
         print_paths = print_paths.set_index('dataset')
         for i in print_paths.index:
             row = print_paths.loc[i, :]
-            row = row.apply(lambda p: Path(*p.parts[-3:]))
+            row = row.apply(lambda p: Path(*p.parts[-3:])) # type: ignore
             print_paths.loc[i, :] = row
         print('\n## Dependency Processing Path Info\n'
               + print_paths.transpose().to_markdown())
