@@ -8,7 +8,7 @@ from analyze.utils.general import find_files  # pylint: disable=import-error
 def balance_sample(full_df: pd.DataFrame,
                    column_name: str,
                    sample_per_value: int = 5,
-                   verbose: bool = False):
+                   verbose: bool = False) -> tuple:
     '''
     create sample with no more than n rows satisfying each unique value
     of the given column. A value of -1 for `sample_per_value` will limit
@@ -53,7 +53,8 @@ def balance_sample(full_df: pd.DataFrame,
 def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables'),
                 fname_glob: str = '*.pkl.gz',
                 pickles=None,
-                verbose: bool = True):
+                convert_dtypes=False,
+                verbose: bool = True) -> pd.DataFrame:
     if not pickles:
         pickles = find_files(data_dir, fname_glob, verbose)
 
@@ -63,13 +64,15 @@ def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables')
 
     dup_check_cols = cols_by_str(df, end_str=('text', 'id', 'sent'))
     df = (df.loc[~df.duplicated(dup_check_cols), :])
-    df = make_cats(df, (['corpus'] + cols_by_str(df, start_str=('nr', 'neg', 'adv'),
-                                                 end_str=('lemma', 'form'))))
-
+    if convert_dtypes: 
+        df = df.convert_dtypes()
+        df = make_cats(df, (['corpus'] + cols_by_str(df, start_str=('nr', 'neg', 'adv'),
+                                                    end_str=('lemma', 'form'))))
+    
     return df
 
 
-def cols_by_str(df: pd.DataFrame, start_str=None, end_str=None):
+def cols_by_str(df: pd.DataFrame, start_str=None, end_str=None) -> list:
     if end_str:
         cols = df.columns[df.columns.str.endswith(end_str)]
         if start_str:
@@ -82,13 +85,13 @@ def cols_by_str(df: pd.DataFrame, start_str=None, end_str=None):
     return cols.to_list()
 
 
-def make_cats(df, columns: list = None):
-
+def make_cats(orig_df:pd.DataFrame, columns: list = None) -> pd.DataFrame: # type: ignore
+    df = orig_df.copy()
     if columns is None:
         cat_suff = ("code", "name", "path", "stem")
-        columns = df.columns.str.endswith(cat_suff)
+        columns = df.columns.str.endswith(cat_suff) # type: ignore
 
     df.loc[:, columns] = df.loc[:, columns].astype(
-        'string').astype('category')
+        'string').astype('category') # type: ignore
 
     return df

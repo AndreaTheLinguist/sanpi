@@ -108,14 +108,14 @@ def fill_json(conllu_dir: Path,
         finish = time.perf_counter()
 
         print(f'    + {json_entry_count} hit results filled from {conll_count} total original '
-              f'sentences in {round(finish - file_start, 2)} seconds')
+              f'sentences in {dur_round(finish - file_start)}')
 
         _write_new(filled_json_path, hits_json)
 
     print('Finished processing all corresponding json and conll files.')
     absFinish = time.perf_counter()
     print(
-        f'\nTime elapsed: {round((absFinish - dir_start)/60, 2)} minutes\n'
+        f'\nTime elapsed: {dur_round(absFinish - dir_start)}\n'
         '====================================\n')
 
 
@@ -481,6 +481,33 @@ def _skipFiles(prefix, directory, rewrite):
             if skipResponse.lower() == 'n':
                 return False
     return False
+
+
+def dur_round(time_dur: float):
+    """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits
+
+    Args:
+        dur (float): seconds value
+
+    Returns:
+        str: value converted and rounded with unit label of 's','m', or 'h'
+    """
+    unit = "s"
+
+    if time_dur >= 60:
+        time_dur = time_dur / 60
+        unit = "m"
+
+        if time_dur >= 60:
+            time_dur = time_dur / 60
+            unit = "h"
+
+    if time_dur < 10:
+        dur_str = f"{round(time_dur, 2):.2f}{unit}"
+    else:
+        dur_str = f"{round(time_dur, 1):.1f}{unit}"
+
+    return dur_str
 
 
 if __name__ == '__main__':
