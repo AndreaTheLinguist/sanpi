@@ -1,13 +1,18 @@
 #!/bin/bash
 # condacheck.sh
 VERSION="1.11.0"
-ENV=${1:-sanpi}
-SETUP_DIR=${0%/*}
-if [[ -f ${SETUP_DIR} ]]; then
+ENV=${1:-"sanpi"}
+echo "Checking ${ENV} env for requirements:"
+OPTION=${2:-""}
+SETUP_DIR="${0%/*}"
+if [[ ! -d ${SETUP_DIR} ]]; then
   SETUP_DIR="$(pwd)"
 fi
-echo "Checking ${ENV} env for requirements:"
-LOG_PATH="${SETUP_DIR}/${ENV}_check.`date +'%Y-%m-%d_%R'`.log"
+LOG_DIR="${SETUP_DIR}/env-check_logs"
+if [[ ! -d $LOG_DIR ]]; then
+  mkdir $LOG_DIR
+fi
+LOG_PATH="${LOG_DIR}/${ENV}_`date +'%Y-%m-%d_%R'`.log"
 echo -e "> log will be saved to: ${LOG_PATH}\n..."
 exec 1>${LOG_PATH} 2>&1
 echo "Checking ${ENV} env for requirements..."
@@ -42,7 +47,13 @@ done
 #! 'librsvg2-bin' is supposedly required, but cannot get it through conda
 #   however, it seems to be for generating svg images
 #   "librsvg2-bin - command-line utility to convert SVG files"
-shpackages=('opam' 'wget' 'm4' 'unzip' 'curl')
+shpackages=('opam' 'wget' 'm4' 'unzip' 'curl' 'libcairo2-dev' 'pkg-config')
+
+if [[ $ENV == "parallel-sanpi" ]]; then
+  shpackages=("${shpackages[@]}" "parallel")
+  echo "${shpackages[@]}"
+fi
+
 for p in "${shpackages[@]}"; do
   echo -e "\n> ${p}"
   ( which ${p} || conda install -y ${p} ) || echo "⚠️ failed to install $p"
@@ -56,8 +67,8 @@ done
 #//   conda install bubblewrap
 #// fi
 
-echo -e "\n### opam installs ###"
-if [[ ! `which grew` ]]; then
+echo -e "\n### checking opam installs ###"
+if [[ -z "`which grew`" || $OPTION == '--force' ]]; then
   echo "installing grew..."
 
   #*install or upgrade opam (conda)
@@ -101,7 +112,7 @@ if [[ ! `which grew` ]]; then
   
   #* install grewpy (pip)
   echo -e "\npip3 install grewpy"
-  pip3 install grewpy
+  pip3 install grewpy --upgrade
 
 elif [[ `grew version | tail -1 | cut -d ' ' -f 2` != "${VERSION}" ]]; then
 # elif [[ $(echo "`grew version | cut -d ' ' -f 2 | head -1`") != "${VERSION}" ]]; then
