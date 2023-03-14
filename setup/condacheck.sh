@@ -47,7 +47,8 @@ done
 #! 'librsvg2-bin' is supposedly required, but cannot get it through conda
 #   however, it seems to be for generating svg images
 #   "librsvg2-bin - command-line utility to convert SVG files"
-shpackages=('opam' 'wget' 'm4' 'unzip' 'curl' 'libcairo2-dev' 'pkg-config')
+#? maybe needed but wasn't specificed in grew docs...: 'libcairo2-dev'
+shpackages=('opam' 'wget' 'm4' 'unzip' 'curl' 'pkg-config')
 
 if [[ $ENV == "parallel-sanpi" ]]; then
   shpackages=("${shpackages[@]}" "parallel")
