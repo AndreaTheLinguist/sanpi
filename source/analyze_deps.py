@@ -62,9 +62,13 @@ def _main():
     # * concatonate dataframes with deps processing
     dfs_with_dep_paths = dep_args_df.by_hit.to_list()
     df = udf.concat_pkls(pickles=dfs_with_dep_paths,
-                         verbose=verbose)  # pylint: disable=invalid-name
-
-    # * crosstabulate data
+                         convert_dtypes=True,
+                         verbose=verbose, 
+                         convert_dtypes=True)  # pylint: disable=invalid-name
+    
+    df = _optimize_df(df)
+    
+    # * run crosstabulation code
     df_fname = dfs_with_dep_paths[0].name
     if '[' in df_fname:
         df_sample_tag = f"[{df_fname.split('[', 1)[1].split(']',1)[0]}]"
@@ -72,8 +76,9 @@ def _main():
         df_sample_tag = ''
     ct_out_label = _get_crosstab_label(args.name, df_sample_tag)
 
-    crosses = ('hit_id', 'colloc_id', 'colloc', 'category', 'dep_str_mask', 'neg_lemma', 'adj_lemma')
-    for cross_col in crosses: 
+    crosses = ('hit_id', 'colloc_id', 'colloc', 'category',
+               'dep_str_mask', 'neg_lemma', 'adj_lemma')
+    for cross_col in crosses:
         print(f'## Crosstabulating by `{cross_col}`')
         proc_t0 = pd.Timestamp.now()
 
@@ -83,10 +88,51 @@ def _main():
             out_label=ct_out_label,
             n_per_category=n_per_category,
             dep_dir=dfs_with_dep_paths[0].parent.parent)
-        
-        proc_t1 = pd.Timestamp.now()
-        print(f'\n   total time elapsed: `{ugen.dur_round((proc_t1 - proc_t0).seconds)}`')
 
+        proc_t1 = pd.Timestamp.now()
+        print(
+            f'\n   total time elapsed: `{ugen.dur_round((proc_t1 - proc_t0).seconds)}`')
+
+
+def _optimize_df(df:pd.DataFrame): 
+    
+    print('Original Dataframe:')
+    df.info(memory_usage='deep')
+    
+    # * clean up dataframe a bit
+    # drop unneeded string columns
+    for c in udf.cols_by_str(df, start_str=('context', 'text', 'sent_text', 'token')):
+        df.pop(c)
+    # select only non-`object` dtype columns
+    relevant_cols = df.columns[~df.dtypes.astype(
+        'string').str.endswith(('object'))]
+    # limit df to `relevant_cols`
+    df = df[relevant_cols]
+    # create empty dataframe with `relevant_cols` as index/rows
+    df_info = pd.DataFrame(index=relevant_cols)
+
+    df_info = df_info.assign(
+        mem0=df.memory_usage(deep=True),
+        dtype0=df.dtypes.astype('string'),
+        defined_values=df.count(),
+        unique_values=df.apply(pd.unique, axis=0).apply(len))
+    df_info = df_info.assign(
+        ratio_unique = (df_info.unique_values/df_info.defined_values).round(2))
+
+    cat_candidates = df_info.loc[df_info.ratio_unique < 0.8, :].loc[df_info.dtype0!='category'].index.to_list()
+    catted_df = udf.make_cats(df.copy(), cat_candidates)
+    
+    df_info = df_info.assign(dtype1=catted_df.dtypes, mem1=catted_df.memory_usage(deep=True))
+    df_info = df_info.assign(mem_change= df_info.mem1-df_info.mem0)
+    print(df_info.sort_values(['mem_change', 'ratio_unique', 'dtype0']).to_markdown())
+    mem_improved = df_info.loc[df_info.mem_change < 0, :].index.to_list()
+    for c in df.columns[~df.columns.isin(mem_improved)]: 
+        print(c, '\t', df.loc[:, c].dtype)
+    df.loc[:, mem_improved] = catted_df.loc[:, mem_improved]
+    print('Category Converted dataframe:')
+    df.info(memory_usage='deep')
+    
+    return df
 
 
 def _get_dep_args(args):
