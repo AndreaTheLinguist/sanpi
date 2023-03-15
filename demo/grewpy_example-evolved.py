@@ -32,6 +32,7 @@ def docs(expr):
 
 # %%
 conllu_path = Path(
+    # "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-03.conllu"
     "data/corpora/gitrepo_puddin/2smallest.conll/apw_eng_199911.conllu"
     # "data/corpora/gitrepo_puddin/2smallest.conll/nyt_eng_200405.conllu"
     )
@@ -151,12 +152,12 @@ conllu_gen = gen_conllus(match_list, co)
 subset_dir = conllu_path.parent.joinpath(f'subset_{pat_path.parent.stem}')
 if not subset_dir.is_dir(): 
     subset_dir.mkdir()
-    
-subset_path = subset_dir.joinpath(f'{pat_path.stem}+{conllu_path.name}')
+label = pat_path.stem.replace('-','')
+subset_path = subset_dir.joinpath(f'{conllu_path.stem}:{label}.conllu')
 subset_path.write_text('\n'.join(conllu_gen), encoding='utf8')
 
 # %%
-advadj_subset = corpus_from_path(subset_path)
+# advadj_subset = corpus_from_path(subset_path)
 
 # %%[markdown]
 # ## modifier bigram only
@@ -396,7 +397,7 @@ print("\n---\n")
 print(meta_info.iloc[-1, :].squeeze().to_markdown())
 
 # %% 
-meta_info.to_csv(subset_dir.joinpath(conllu_path.stem+'+meta.psv'), sep='|')
+meta_info.to_csv(subset_dir.joinpath(f'{conllu_path.stem}:{label}_context.psv'), sep='|')
 
 # %%
 neg_df.loc[:, ['sent_text', 'conllu_id', 'doc_id']] =  neg_df.sent_id.apply(
