@@ -46,7 +46,7 @@ def _parse_args():
         '-n', '--subset_name', 
         type=str, default=None,
         help=('optional string to use as output file label for subset. '
-              'If none given, `pat_path` filestem will be used.'
+              'If none given, `pat_path` filestem will be used. '
               'Output path template: [conllu_path parent]/subset_[label]/[label]:[conllu_path stem].{context.psv, conllu}')
     )
 
