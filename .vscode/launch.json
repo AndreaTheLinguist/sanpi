@@ -4,6 +4,15 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "DEMO: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/demo"
+        },
+
         //* `grewpy` subsets
         {
             "name": "NEW subset - smallest puddin",
@@ -437,7 +446,6 @@
                 "temp"
             ]
         },
-        // * subset
         // * Get Frequencies
         {
             "name": "getFrequecies abs",
