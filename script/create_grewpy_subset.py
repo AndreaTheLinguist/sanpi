@@ -1,27 +1,23 @@
 # %%
 """new script to create corpora subsets using newly released version of GREW python module, `grewpy`.
    Branched from `demo/create_grewpy_subset.interactive.py` (was just `demo/create_grewpy_subset.py`)"""
+import argparse
 import enum
 import os
-import sys
 from collections import namedtuple
 from pathlib import Path
-from pprint import pprint
-import argparse
+
 import pandas as pd
 from grewpy import Corpus, Request
 from grewpy.grew import GrewError as GrewError
 
 # sys.path.insert(0, os.path.abspath(os.path.join( os.path.dirname(__file__), "../"))) # Use local grew lib
-
-# TODO: add input argument processing for: `conllu_path`, `pat_path`, and `(out)label`
+os.system("eval $(opam env)")
 
 # *Define functions
-
 _META_TUP = namedtuple(
     'meta_info',
     ['sent_id', 'doc_id', 'sent_int', 'sent_text', 'prev_id', 'prev_text', 'next_id', 'next_text'])
-
 
 def _parse_args():
 
@@ -85,8 +81,13 @@ def corpus_from_path(path):
     return Corpus(str(path))
 
 
-def grewpize_pat(raw_text):
-    return ''.join(line.strip() for line in raw_text.split('{', 1)[1].split('}', 1)[0].strip().splitlines())
+def grewpize_pat_path(pat_path) -> Request:
+    pat_text = pat_path.read_text(encoding='utf8')
+    return Request(
+        ''.join(line.strip()
+                for line in pat_text
+                .split('{', 1)[1].split('}', 1)[0]
+                .strip().splitlines()))
 
 
 def parse_sent(sent_id, corpus):
@@ -155,64 +156,30 @@ def fileSize(filePath, size_type, decimals=1):
     size = os.path.getsize(filePath)
     return round(unitConvertor(size, size_type), decimals)
 
-
+#%%
 def _main():
     # * Set input arguments
-    # TODO: add argument parsing (at least `argv` if not `argparse`)
-    # pat_path = Path('Pat/advadj/all-RB-JJs.pat')
-
-    # # pat_paths = Path.cwd().glob('Pat/[acsr]*/*.pat')
-    # # for pat_path in pat_paths:
-    # #     print(str(pat_path))
-
-    # conllu_path = Path(
-    #     # "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-03.conllu"
-    #     # "/home/arh234/projects/sanpi/demo/data/corpora/gitrepo_puddin/2smallest.conll/apw_eng_199911.conllu"
-    #     # "data/corpora/gitrepo_puddin/2smallest.conll/apw_eng_199911.conllu"
-    #     "data/corpora/gitrepo_puddin/2smallest.conll/nyt_eng_200405.conllu"
-    # )
-
     conllu_path, pat_path, subset_name = _parse_args()
     print(f'# Creating `{subset_name}` subset of {conllu_path.name}: all sentences matching {pat_path.name}')
+    
     # * Get corpus object from `conllu_path`
     file_size = fileSize(conllu_path, sizeUnit.MB)
-    print(f'Loading corpus from {conllu_path} ({file_size} MB)...')
+    print(f'Loading corpus from `{conllu_path}` ({file_size} MB)...')
+    proc_t0 = pd.Timestamp.now()
     co = corpus_from_path(conllu_path)
+    proc_t1 = pd.Timestamp.now()
+    print(f'\nTime to load corpus: {dur_round((proc_t1 - proc_t0).seconds)}')
+
 
     # * Describing the corpus (`co`)
     print('## Loaded (full-size) corpus info')
-    counts_df = pd.DataFrame(index=['total'], columns=[
-        'file_size', 'sentences', 'tokens', 'ADV', 'ADJ', 'NEG'])
-    counts_df['file_size'] = f'{file_size} MB'
-    counts_df['sentences'] = len(co)
-    counts_df['tokens'] = sum(len(sent) for sent in co)
-
-    for name, spec in (
-        ('ADV', 'xpos=re"RB.*"'),
-        ('ADJ', 'xpos=re"JJ.*"'),
-         # TODO: add neg raising lemma node
-         #  ('N-R', ()),
-        ('NEG', ('lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|'
-                 '"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"'))):
-
-        req = Request(f'X[{spec}]')
-        total_count = co.count(req)
-        counts_df[name] = total_count
-
-        print(f"\nTotal {name} in {conllu_path.name} by exact POS:\n")
-        print(table_counts_by(co, req, ["X.xpos"], total_count).to_markdown(), '\n')
-
-        print(f"\nTop 10 {name} lemma in {conllu_path.name}\n")
-        print(table_counts_by(co, req, ["X.lemma"], total_count).nlargest(
-            10, 'total').to_markdown(), '\n')
-
-    print(f"### {conllu_path.name} overview\n")
-    print(counts_df.transpose().to_markdown())
-    print('\n======================================\n')
+    counts_df = describe_corpus(conllu_path, co)
+    
     # * `ADV ADJ` bigrams/collocations
     print(f'## Assessing {conllu_path.name} for {Path(*pat_path.resolve().parts[-3:])}')
+    
     # > get request from pattern file
-    req = Request(grewpize_pat(pat_path.read_text(encoding='utf8')))
+    req = Request(grewpize_pat_path(pat_path))
     print('\n```')
     pprint_pat(req)
     print('```\n')
@@ -241,7 +208,9 @@ def _main():
 
     context_info = context_info[['conllu_id', 'doc_id', 'sent_int',
                                  'prev_id', 'next_id', 'prev_text', 'sent_text', 'next_text']]
-
+    print(f'*Total sentences in subset: **{len(context_info)}**\n                           ',
+          round(len(context_info)/counts_df.at["total", "sentences"]*100, 1), 
+          '% of input sentences')
     # *Save `context_info` dataframe as .psv
     subset_dir = conllu_path.parent.joinpath(f'subset_{subset_name}')
     if not subset_dir.is_dir():
@@ -264,10 +233,41 @@ def _main():
     print(f'✓  {subset_name} subset of {conllu_path.name} saved as:\n'
         f'     {subset_path}')
 
-# %% 
+def describe_corpus(conllu_path, co):
+    file_size = fileSize(conllu_path, sizeUnit.MB)
+    counts_df = pd.DataFrame(index=['total'], columns=[
+        'file_size', 'sentences', 'tokens', 'ADV', 'ADJ', 'NEG'])
+    counts_df['file_size'] = f'{file_size} MB'
+    counts_df['sentences'] = len(co)
+    counts_df['tokens'] = sum(len(sent) for sent in co)
+
+    for name, spec in (
+        ('ADV', 'xpos=re"RB.*"'),
+        ('ADJ', 'xpos=re"JJ.*"'),
+         # TODO: add neg raising lemma node
+         #  ('N-R', ()),
+        ('NEG', ('lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|'
+                 '"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"'))):
+        req = Request(f'X[{spec}]')
+        total_count = co.count(req)
+        counts_df[name] = total_count
+
+        print(f"\nTotal {name} in {conllu_path.name} by exact POS:\n")
+        print(table_counts_by(co, req, ["X.xpos"], total_count).to_markdown(), '\n')
+
+        print(f"\nTop 10 {name} lemma in {conllu_path.name}\n")
+        print(table_counts_by(co, req, ["X.lemma"], total_count).nlargest(
+            10, 'total').to_markdown(), '\n')
+
+    print(f"### {conllu_path.name} overview\n")
+    print(counts_df.transpose().to_markdown())
+    print('\n*******************************************\n')
+    return counts_df
+
+
 if __name__ == '__main__':
     proc_t0 = pd.Timestamp.now()
     _main()
     proc_t1 = pd.Timestamp.now()
     print(f'\nTime to create subset: {dur_round((proc_t1 - proc_t0).seconds)}')
-# %%
+

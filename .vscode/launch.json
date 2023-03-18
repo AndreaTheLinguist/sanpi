@@ -4,6 +4,51 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        //* `grewpy` subsets
+        {
+            "name": "NEW subset - smallest puddin",
+            "type": "python",
+            "request": "launch",
+            "program": "script/create_grewpy_subset.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/share/compling/projects/sanpi/demo/data/corpora/puddin/PccX2.conll/pcc_eng_29-109.conllu",
+                "-p",
+                "Pat/advadj/all-RB-JJs.pat",
+                "-n", 
+                "bigram"
+            ]
+        },
+        {
+            "name": "NEW subset - nyt200303",
+            "type": "python",
+            "request": "launch",
+            "program": "script/create_grewpy_subset.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/share/compling/data/sanpi/corpora_shortcuts/testing/smallest20.conll/nyt_eng_200303.conllu",
+                "-p",
+                "Pat/advadj/all-RB-JJs.pat",
+                "-n", 
+                "bigram"
+            ]
+        },
+        // > old subset code
+        // {
+        //     "name": "python subset",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
+        //     "console": "integratedTerminal",
+        //     "cwd": "${workspaceFolder}",
+        //     // "justMyCode": false,
+        //     "args": [
+        //         "-c",
+        //         "/share/compling/data/sanpi/corpora_shortcuts/testing/small/small.conll/apw_eng_199911.conllu",
+        //         "-p",
+        //         "/share/compling/projects/sanpi/Pat/advadj/all-RB-JJs.pat"
+        //     ]
+        // },
 
         // * Deps
         {
@@ -14,15 +59,15 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*[!j]/*exactly*puddin*hits.pkl.gz", 
-                "-n", 
+                "-g",
+                "*[!j]/*exactly*puddin*hits.pkl.gz",
+                "-n",
                 "NEG-exactly-puddin",
                 "-s",
-                "-1", 
+                "-1",
                 "-t"
             ]
         },
@@ -34,15 +79,15 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*[!j]/*exactly*puddin*hits.pkl.gz", 
-                "-n", 
+                "-g",
+                "*[!j]/*exactly*puddin*hits.pkl.gz",
+                "-n",
                 "NEG-exactly-puddin",
                 "-s",
-                "50", 
+                "50",
                 "-t"
             ]
         },
@@ -54,15 +99,15 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*[!j]/*exactly*hits.pkl.gz", 
-                "-n", 
+                "-g",
+                "*[!j]/*exactly*hits.pkl.gz",
+                "-n",
                 "NEG-exactly",
                 "-s",
-                "50", 
+                "50",
                 "-t"
             ]
         },
@@ -74,15 +119,15 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*apw*hits.pkl.gz", 
-                "-n", 
+                "-g",
+                "*apw*hits.pkl.gz",
+                "-n",
                 "TESTapw-min",
                 "-s",
-                "-1", 
+                "-1",
                 "-v",
                 "-t"
             ]
@@ -95,12 +140,12 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*exactly*apw*hits.pkl.gz", 
-                "-n", 
+                "-g",
+                "*exactly*apw*hits.pkl.gz",
+                "-n",
                 "exactly-apw"
             ]
         },
@@ -112,13 +157,13 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*[gd]/exactly*apw*hits.pkl.gz", 
-                "-n", 
-                "NEG-exactly-apw", 
+                "-g",
+                "*[gd]/exactly*apw*hits.pkl.gz",
+                "-n",
+                "NEG-exactly-apw",
             ]
         },
         {
@@ -129,13 +174,13 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*[d]/exactly*apw*hits.pkl.gz", 
-                "-n", 
-                "NEG-exactly-apw", 
+                "-g",
+                "*[d]/exactly*apw*hits.pkl.gz",
+                "-n",
+                "NEG-exactly-apw",
             ]
         },
         {
@@ -146,12 +191,12 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-g", 
-                "*[!j]/exactly*nyt*hits.pkl.gz", 
-                "-n", 
+                "-g",
+                "*[!j]/exactly*nyt*hits.pkl.gz",
+                "-n",
                 "NEG-exactly-nyt"
             ]
         },
@@ -163,13 +208,13 @@
             "console": "integratedTerminal",
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                                  // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                                  // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-g GLOB_EXPR] [-o OUTPUT_DIR]
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
             "args": [
-                "-d", 
-                "/share/compling/data/sanpi/3_dep_info/exactly-apw_deps.pkl.gz", 
-                "-s", 
-                "50", 
+                "-d",
+                "/share/compling/data/sanpi/3_dep_info/exactly-apw_deps.pkl.gz",
+                "-s",
+                "50",
                 "-v"
             ]
         },
@@ -186,7 +231,7 @@
                 "-c",
                 "/home/arh234/data/puddin/PccVa.conll/",
                 "-p",
-                "Pat/contig", 
+                "Pat/contig",
                 "--rerun_grew_search"
             ]
         },
@@ -203,8 +248,8 @@
                 "-c",
                 "/share/compling/data/sanpi/subsets/exactly_test",
                 "-p",
-                "Pat/contig", 
-                "--grew_output_dir", 
+                "Pat/contig",
+                "--grew_output_dir",
                 "/share/compling/data/sanpi/1_json_grew-matches"
             ]
         },
@@ -222,8 +267,8 @@
                 "-c",
                 "/share/compling/data/sanpi/subsets/exactly_test",
                 "-p",
-                "Pat/contig", 
-                "--grew_output_dir", 
+                "Pat/contig",
+                "--grew_output_dir",
                 "/share/compling/data/sanpi/1_json_grew-matches"
             ]
         },
@@ -242,8 +287,7 @@
                 // "Pat/scoped", 
                 "-p",
                 "Pat/raised"
-            ], 
-
+            ],
         },
         {
             "name": "pipeline puddin val env-check",
