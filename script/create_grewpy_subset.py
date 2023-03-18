@@ -66,7 +66,7 @@ def _main():
           '% of input sentences', sep='')
 
     # *Save `context_info` dataframe as .psv
-    subset_dir = conllu_path.parent.joinpath(f'subset_`{subset_name}`')
+    subset_dir = conllu_path.parent.joinpath(f'subset_{subset_name}')
     if not subset_dir.is_dir():
         subset_dir.mkdir()
 
