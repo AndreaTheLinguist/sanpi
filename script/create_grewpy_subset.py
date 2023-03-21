@@ -23,8 +23,8 @@ _META_TUP = namedtuple(
 def _main():
     # * Set input arguments
     conllu_path, pat_path, subset_name = _parse_args()
-    print(
-        f'# Creating `{subset_name}` subset of `{conllu_path.name}`: all sentences matching `{pat_path.name}`')
+    print(f'# Creating `{subset_name}` subset of `{conllu_path.name}`:',
+          f'all sentences matching `{pat_path.name}`')
 
     # * Get corpus object from `conllu_path`
     file_size = fileSize(conllu_path, sizeUnit.MB)
@@ -32,15 +32,27 @@ def _main():
     proc_t0 = pd.Timestamp.now()
     co = corpus_from_path(conllu_path)
     proc_t1 = pd.Timestamp.now()
-    print(f'\nTime to load corpus: {dur_round((proc_t1 - proc_t0).seconds)}')
+    t_comp = (proc_t1 - proc_t0).components
+    time_str = (":".join(str(c).zfill(2) for c
+                         in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+                + f'.{round(t_comp.microseconds, 1)}')
+    print(f'\nTime to load corpus: {time_str}')
+    # print(f'\nTime to load corpus: {dur_round((proc_t1 - proc_t0).seconds)}')
 
     # * Describing the corpus (`co`)
     print('## Loaded (full-size) corpus info')
     counts_df = describe_corpus(conllu_path, co)
 
     # * `ADV ADJ` bigrams/collocations
-    print(
-        f'## Assessing `{conllu_path.name}` for `{Path(*pat_path.resolve().parts[-3:])}`')
+    print(f'## Assessing `{conllu_path.name}` for',
+          f'`{Path(*pat_path.resolve().parts[-3:])}`')
+
+    # > create output directory and shared stem for output files
+    subset_dir = conllu_path.parent.joinpath(f'subset_{subset_name}')
+    if not subset_dir.is_dir():
+        subset_dir.mkdir()
+    out_stem = f"{(subset_name).upper()}.{conllu_path.stem}"
+    print(f'stem for output files: `{out_stem}`')
 
     # > get request from pattern file
     req = Request(grewpize_pat_path(pat_path))
@@ -54,67 +66,123 @@ def _main():
     # * Collect context info
     print('\n## Compiling Context Info...')
     proc_t0 = pd.Timestamp.now()
-    context_info = build_context(conllu_path, co, req)
+    context_info = build_context(co, req, conllu_path)
     proc_t1 = pd.Timestamp.now()
-    print(
-        f'Time to build context dataframe: {dur_round((proc_t1 - proc_t0).seconds)}')
+    t_comp = (proc_t1 - proc_t0).components
+    time_str = (
+        ":".join(str(c).zfill(2) for c
+                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+        + f'.{round(t_comp.microseconds, 1)}')
+    print(f'+ Time to build context dataframe: {time_str}')
+    #   dur_round((proc_t1 - proc_t0).seconds))
 
-    print(f'\n+ *total sentences in subset = **',
-          len(context_info), '***\n+ ',
-          round(len(context_info)
-                / counts_df.at["total", "sentences"]*100, 1),
-          '% of input sentences', sep='')
+    subset_sent_total = len(context_info)
+    print('+ Subset Size:\n',
+          f'  + number of sentences: {subset_sent_total}\n',
+          f'  + {round(subset_sent_total / counts_df.at["total", "sentences"]*100, 1)}%',
+          'of input sentences')
 
     # *Save `context_info` dataframe as .psv
-    subset_dir = conllu_path.parent.joinpath(f'subset_{subset_name}')
-    if not subset_dir.is_dir():
-        subset_dir.mkdir()
-
     context_path = subset_dir.joinpath(
-        f'{subset_name}:{conllu_path.stem}.context.psv')
+        f'{out_stem}.context.psv')
+    _t0 = pd.Timestamp.now()
     context_info.to_csv(context_path, sep='|')
-    print(f'\n✓  context info for `{subset_name}` subset of `{conllu_path.name}` saved as:\n'
-          f'     `{context_path}`')
+    _t1 = pd.Timestamp.now()
+    t_comp = (_t1 - _t0).components
+    time_str = (
+        ":".join(str(c).zfill(2) for c
+                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+        + f'.{round(t_comp.microseconds, 1)}')
+
+    print(f'\n✓  context info for `{subset_name}` subset of',
+          f'`{conllu_path.name}` saved as:\n',
+          f'> `{context_path.relative_to(conllu_path.parent)}`')
+    print('+ Time to save context info as file:',  time_str)
 
     # *Create subset conllu and save to file
     print('\n## Creating subset conllu file...')
-
-    subset_path = subset_dir.joinpath(f'{subset_name}:{conllu_path.name}')
+    sub_conllu_path = subset_dir.joinpath(f'{out_stem}.conllu')
 
     proc_t0 = pd.Timestamp.now()
-    create_subset_conllu(co, context_info, subset_path)
+    create_subset_conllu(co, context_info.index,
+                         sub_conllu_path)
     proc_t1 = pd.Timestamp.now()
-    print(
-        f'Time to build context dataframe: {dur_round((proc_t1 - proc_t0).seconds)}')
+    t_comp = (proc_t1 - proc_t0).components
+    time_str = (
+        ":".join(str(c).zfill(2) for c
+                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+        + f'.{round(t_comp.microseconds, 1)}')
+    # f'Total time to create conllu output: {dur_round((proc_t1 - proc_t0).seconds)}')
     print(f'\n✓  `{subset_name}` subset of `{conllu_path.name}` saved as:\n'
-          f'     `{subset_path}`')
+          f'  > `{sub_conllu_path.resolve().relative_to(conllu_path.parent)}`')
+    print(f'+ Total time to create conllu output: `{time_str}`')
 
 
-def show_req_counts(co, req, conllu_path, subset_name):
-    total_hits = co.count(req)
-    print(f"total `ADV ADJ` bigrams in {conllu_path.name}: {total_hits}")
+def show_req_counts(corpus: Corpus,
+                    req: Request,
+                    conllu_path: Path,
+                    subset_name: str) -> None:
+
+    total_hits = corpus.count(req)
+    print(f"total `{subset_name}` matches in {conllu_path.name}: {total_hits}")
 
     # > counts by adverb lemma
-    print(f"\n### `{subset_name}` matches in `{conllu_path.name}` with clustering")
+    print(f"\n### `{subset_name}` matches in",
+          f"`{conllu_path.name}` with clustering")
     print(f"\n`{subset_name}` matches by ADV lemma: Top 10\n")
-    print(table_counts_by(co, req, ["ADV.lemma"], total_hits).nlargest(
+    print(table_counts_by(corpus, req, ["ADV.lemma"], total_hits).nlargest(
         10, 'total').to_markdown())
 
     # > counts by bigram/collocation
-    print(
-        f"\nTop 5 `ADV ADJ` bigrams in `{conllu_path.name}` `{subset_name}` matches\n")
-    print(table_counts_by(co, req, ["ADV.lemma", "ADJ.lemma"],
+    print(f"\nTop 5 `ADV ADJ` bigrams in `{conllu_path.name}`",
+          f"`{subset_name}` matches\n")
+    print(table_counts_by(corpus, req, ["ADV.lemma", "ADJ.lemma"],
                           total_hits).nlargest(5, 'total').to_markdown())
 
 
-def create_subset_conllu(co, context_info, subset_path):
-    subset_path.write_text('\n'.join((co.get(id).to_conll()
-                           for id in context_info.index)), encoding='utf8')
+def create_subset_conllu(
+        corpus: Corpus, sent_ids,
+        sub_conllu_path: Path) -> None:
+
+    _t0s = pd.Timestamp.now()
+    conllu_output = '\n'.join(
+        corpus.get(x).to_conll()
+        for x
+        in sent_ids)
+    _t1s = pd.Timestamp.now()
+    t_comp = (_t1s - _t0s).components
+    time_str = (
+        ":".join(str(c).zfill(2) for c
+                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+        + f'.{round(t_comp.microseconds, 1)}')
+    print('+ Time to create conllu string:',
+          #   dur_round((_t1s - _t0s).seconds))
+          time_str)
+
+    # print(f'\n### First sentence in `{sub_conllu_path.name}`',
+    #       ('> ```{conllu}\n'
+    #        + conllu_output.split('\n\n', 1)[0] + '\n```'
+    #        ).replace('\n', '\n> '),
+    #       sep='\n')
+
+    _t0w = pd.Timestamp.now()
+    sub_conllu_path.write_text(conllu_output, encoding='utf8')
+    _t1w = pd.Timestamp.now()
+    t_comp = (_t1w - _t0w).components
+    time_str = (":".join(str(c).zfill(2) for c
+                         in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+                + f'.{round(t_comp.microseconds, 1)}')
+    print(f'+ Time to save `{sub_conllu_path.name}`: `{time_str}`')
+    #   dur_round((_t1w - _t0w).seconds))
 
 
-def build_context(conllu_path, co, req):
-    context_info = pd.concat(pd.DataFrame(parse_sent(
-        match['sent_id'], co)) for match in co.search(req))
+def build_context(corpus: Corpus,
+                  req: Request,
+                  conllu_path: Path) -> pd.DataFrame:
+    sent_ids = pd.Series(match['sent_id'] for match in corpus.search(req)).unique()
+    context_info = pd.concat(pd.DataFrame(parse_sent(sid, corpus))
+                             for sid in sent_ids)
+    # context_info = context_info.drop_duplicates()
     context_info = context_info.assign(
         conllu_id=conllu_path.stem).set_index('sent_id')
 
@@ -122,6 +190,29 @@ def build_context(conllu_path, co, req):
                                  'prev_id', 'next_id', 'prev_text', 'sent_text', 'next_text']]
 
     return context_info
+
+
+def parse_sent(sent_id: str, corpus: Corpus) -> _META_TUP:
+
+    doc_id, ordinal_str = sent_id.rsplit('_', 1)
+    ordinal_int = int(ordinal_str)
+
+    row = (sent_id, doc_id, ordinal_int, corpus.get(sent_id).meta['text'])
+    for context_ix in (ordinal_int + i for i in (-1, 1)):
+        c_text = ''
+        c_id = ''
+        # > conllu doc sentence numbering starts at 1
+        if context_ix > 0:
+            c_id = f'{doc_id}_{context_ix}'
+            try:
+                c_obj = corpus.get(c_id)
+            except GrewError:
+                c_id = ''
+            else:
+                c_text = c_obj.meta['text']
+        row += (c_id, c_text)
+
+    yield _META_TUP._make(row)
 
 
 def _parse_args():
@@ -195,28 +286,6 @@ def grewpize_pat_path(pat_path) -> Request:
                 .strip().splitlines()))
 
 
-def parse_sent(sent_id, corpus):
-    doc_id, ordinal_str = sent_id.rsplit('_', 1)
-    ordinal_int = int(ordinal_str)
-
-    row = (sent_id, doc_id, ordinal_int, corpus.get(sent_id).meta['text'])
-    for context_ix in (ordinal_int + i for i in (-1, 1)):
-        c_text = ''
-        c_id = ''
-        # > conllu doc sentence numbering starts at 1
-        if context_ix > 0:
-            c_id = f'{doc_id}_{context_ix}'
-            try:
-                c_obj = corpus.get(c_id)
-            except GrewError:
-                c_id = ''
-            else:
-                c_text = c_obj.meta['text']
-        row += (c_id, c_text)
-
-    yield _META_TUP._make(row)
-
-
 def pprint_pat(request):
     print(str(request).replace(';', ';\n\t '))
 
@@ -246,7 +315,7 @@ class sizeUnit(enum.Enum):
 
 
 def unitConvertor(sizeInBytes, unit):
-    # Cinverts the file unit
+    # Converts the file unit
     if unit == sizeUnit.KB:
         return sizeInBytes/1024
     elif unit == sizeUnit.MB:
@@ -298,8 +367,14 @@ def describe_corpus(conllu_path, co):
 
 
 if __name__ == '__main__':
-    proc_t0 = pd.Timestamp.now()
+    _t0 = pd.Timestamp.now()
     _main()
-    proc_t1 = pd.Timestamp.now()
-    print(
-        f'\nTotal time to create subset: {dur_round((proc_t1 - proc_t0).seconds)}')
+    _t1 = pd.Timestamp.now()
+    t_comp = (_t1 - _t0).components
+    time_str = (
+        ":".join(str(c).zfill(2) for c
+                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+        + f'.{round(t_comp.microseconds, 1)}')
+
+    print(f'\n## Subset creation complete!✨ \nTotal time elapsed: **`{time_str}`**')
+    #   dur_round((proc_t1 - proc_t0).seconds))
