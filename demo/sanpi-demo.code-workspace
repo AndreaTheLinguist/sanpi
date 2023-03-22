@@ -16,6 +16,19 @@
                 "request": "launch",
                 "type": "python"
             },
+            //* grewpy subsets
+            {
+                "name": "subset - nyt200405",
+                "type": "python",
+                "request": "launch",
+                "program": "script/create_grewpy_subset.py",
+                "console": "integratedTerminal",
+                "args": [
+                    "-n", 
+                    "bigram",
+                    "data/corpora/gitrepo_puddin/2smallest.conll/nyt_eng_200405.conllu",
+                ]
+            },
             //* dependency analysis
             {
                 "console": "integratedTerminal",
@@ -296,7 +309,7 @@
         "terminal.integrated.minimumContrastRatio": 5,
         "window.autoDetectColorScheme": true,
         "workbench.preferredDarkColorTheme": "Developers Theme - Ocean",
-        "workbench.preferredLightColorTheme": "Solarized Custom Light",
+        "workbench.preferredLightColorTheme": "Solarized-light-fjs",
         "workbench.colorTheme": "Developers Theme - Ocean"
     }
 }
