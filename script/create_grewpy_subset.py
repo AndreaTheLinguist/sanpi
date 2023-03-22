@@ -134,8 +134,7 @@ def show_req_counts(corpus: Corpus,
         10, 'total').to_markdown())
 
     # > counts by bigram/collocation
-    print(f"\nTop 5 `ADV ADJ` bigrams in `{conllu_path.name}`",
-          f"`{subset_name}` matches\n")
+    print(f"\nTop 5 `{subset_name}` matches in `{conllu_path.name}`\n")
     print(table_counts_by(corpus, req, ["ADV.lemma", "ADJ.lemma"],
                           total_hits).nlargest(5, 'total').to_markdown())
 
@@ -188,7 +187,6 @@ def build_context(corpus: Corpus,
 
     context_info = context_info[['conllu_id', 'doc_id', 'sent_int',
                                  'prev_id', 'next_id', 'prev_text', 'sent_text', 'next_text']]
-
     return context_info
 
 
