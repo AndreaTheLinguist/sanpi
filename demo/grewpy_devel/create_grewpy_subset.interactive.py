@@ -11,7 +11,7 @@ import pandas as pd
 from grewpy import Corpus, Request
 from grewpy.grew import GrewError as GrewError
 
-# > this was in the original examples file 
+# > this was in the original examples file
 # >     but it never seemed required/caused an error on at least one occasion
 # sys.path.insert(0, os.path.abspath(os.path.join( os.path.dirname(__file__), "../"))) # Use local grew lib
 
@@ -20,7 +20,7 @@ from grewpy.grew import GrewError as GrewError
 # %%[markdown]
 
 # ## Define functions
-
+# %%
 _META_TUP = namedtuple(
     'meta_info',
     ['sent_id', 'doc_id', 'sent_int', 'sent_text', 'prev_id', 'prev_text', 'next_id', 'next_text'])
@@ -32,6 +32,7 @@ def corpus_from_path(path):
 
 def grewpize_pat(raw_text):
     return ''.join(line.strip() for line in raw_text.split('{', 1)[1].split('}', 1)[0].strip().splitlines())
+
 
 def parse_sent(sent_id):
     doc_id, ordinal_str = sent_id.rsplit('_', 1)
@@ -58,6 +59,7 @@ def parse_sent(sent_id):
 def pprint_pat(request):
     print(str(request).replace(';', ';\n\t '))
 
+
 def table_by_1(corpus: Corpus, pattern_request: Request, cluster: list, total_hits):
 
     df = pd.Series(corpus.count(pattern_request, cluster)).to_frame().rename(
@@ -67,18 +69,18 @@ def table_by_1(corpus: Corpus, pattern_request: Request, cluster: list, total_hi
 
     return df
 
+
 def table_by_2(corpus, request, cluster, total_hits):
     df = pd.json_normalize(corpus.count(request, cluster), sep='_').transpose(
     ).rename(columns={0: 'total'})
     df = df.assign(percent=(df.total / total_hits * 100).round(1))
     df = df.sort_values('total', ascending=False)
-    
+
     return df
 
 
 # %%
 # Program to Get file size in human-readable units like KB, MB, GB, TB
-
 class sizeUnit(enum.Enum):
     # class to store the various units
     BYTES = 1
@@ -122,9 +124,9 @@ conllu_path = Path(
     # "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-03.conllu"
     # "/home/arh234/projects/sanpi/demo/data/corpora/gitrepo_puddin/2smallest.conll/apw_eng_199911.conllu"
     # "data/corpora/gitrepo_puddin/2smallest.conll/apw_eng_199911.conllu"
-    "./data/corpora/gitrepo_puddin/2smallest.conll/nyt_eng_200405.conllu"
+    "data/corpora/gitrepo_puddin/2smallest.conll/nyt_eng_200405.conllu"
 )
-file_size = fileSize(conllu_path,sizeUnit.MB)
+file_size = fileSize(conllu_path, sizeUnit.MB)
 print(f'Loading corpus from {conllu_path} ({file_size} MB)...')
 co = corpus_from_path(conllu_path)
 
@@ -159,6 +161,7 @@ for name, spec in (
     print(table_by_1(co, req, ["X.lemma"], total_count).nlargest(
         10, 'total').to_markdown(), '\n')
 
+# %%
 print(f"# {conllu_path.name} overview\n")
 print(counts_df.transpose().to_markdown())
 
@@ -188,18 +191,21 @@ print(table_by_2(co, req, ["ADV.lemma", "ADJ.lemma"],
 # %% [markdown]
 # ### Collect context info
 
-#%%
+# %%
 context_info = pd.concat(pd.DataFrame(parse_sent(
                          match['sent_id'])) for match in co.search(req))
-context_info = context_info.assign(conllu_id=conllu_path.stem).set_index('sent_id')
+context_info = context_info.assign(
+    conllu_id=conllu_path.stem).set_index('sent_id')
 
-context_info = context_info[['conllu_id', 'doc_id', 'sent_int',
-                       'prev_id', 'next_id', 'prev_text', 'sent_text', 'next_text']]
+context_info = context_info[
+    ['conllu_id', 'doc_id', 'sent_int',
+     'prev_id', 'next_id', 
+     'prev_text', 'sent_text', 'next_text']]
 
 # %%[markdown]
 # ### Save `context_info` dataframe as .psv
 
-# Example row: 
+# Example row:
 # |           | apw_eng_19991101_0021_10                                                                                                                                                                                                                                     |
 # |:----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 # | conllu_id | apw_eng_199911                                                                                                                                                                                                                                               |
@@ -227,8 +233,8 @@ print(f'✔️ context info for {label} subset of {conllu_path.name} saved as:\n
 # ## Create subset conllu and save to file
 # %%
 subset_path = subset_dir.joinpath(f'{label}:{conllu_path.name}')
-subset_path.write_text('\n'.join(co.get(id).to_conll() for id in context_info.index), encoding='utf8')
+subset_path.write_text('\n'.join(co.get(id).to_conll()
+                       for id in context_info.index), encoding='utf8')
 
 print(f'✔️ {label} subset of {conllu_path.name} saved as:\n'
       f'     {subset_path}')
-
