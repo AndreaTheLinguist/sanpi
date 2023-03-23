@@ -55,7 +55,7 @@
             },
             {
                 "console": "integratedTerminal",
-                "name": "analyze_deps demo *exactly* sample 5",
+                "name": "analyze_deps demo *exactly* full",
                 "program": "/share/compling/projects/sanpi/source/analyze_deps.py",
                 "request": "launch",
                 "type": "python",
@@ -69,13 +69,11 @@
                     "-i",
                     "data/2_hit_tables",
                     "-o",
-                    "data/3_deps_info",
-                    "-s",
-                    "5",
+                    "data/3_dep_info",
+                
                     "-n",
-                    "demo_exactly_n5",
-                    "-t",
-                    "-v",
+                    "demo_exactly",
+    
                 ]
             },
             // run_pipeline PccX2 contig
@@ -308,8 +306,8 @@
         "solarizedCustomTheme.accentColor": "Cyan",
         "terminal.integrated.minimumContrastRatio": 5,
         "window.autoDetectColorScheme": true,
-        "workbench.preferredDarkColorTheme": "Developers Theme - Ocean",
-        "workbench.preferredLightColorTheme": "Solarized-light-fjs",
-        "workbench.colorTheme": "Developers Theme - Ocean"
+        "workbench.preferredDarkColorTheme": "vscode carbon theme",
+        "workbench.preferredLightColorTheme": "Ayu Light Bordered",
+        "workbench.colorTheme": "vscode carbon theme",
     }
 }

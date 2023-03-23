@@ -34,20 +34,23 @@
         ]
     },
     "settings": {
+        "debug.console.fontFamily": "iosevka term ss02",
+        "debug.console.wordWrap": false,
+        "debug.inlineValues": "off",
         "explorerExclude.backup": {},
         "files.exclude": {
-            "**/.git": true,
-            "**/.svn": true,
-            "**/.hg": true,
-            "**/CVS": true,
-            "**/.DS_Store": true,
-            "**/Thumbs.db": true,
             "**/*conda3": true,
             "**/*kaldi*": true,
             "**/.[^b]*": true,
             "**/.bash_[hl]*": true,
+            "**/.DS_Store": true,
+            "**/.git": true,
+            "**/.hg": true,
+            "**/.svn": true,
             "**/__init__.py": true,
-            "**/stanza_resources": true
+            "**/CVS": true,
+            "**/stanza_resources": true,
+            "**/Thumbs.db": true
         },
         "files.watcherExclude": {
             "/share/compling/data/puddin": true,
