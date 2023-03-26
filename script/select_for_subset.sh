@@ -77,6 +77,7 @@ function inspectSubset() {
   TAG=${SUBSET_DIR##*subset_}
   CONLL_DIR=$(dirname $SUBSET_DIR)
   INFO_DIR=${SUBSET_DIR}/info
+  mkdir -p $INFO_DIR
   #// MISSING_STEM=${INFO_DIR}/subset-${TAG}_missing
   #// COMPLETE_STEM=${INFO_DIR}/subset-${TAG}_complete
   RECENT_MISSING=${INFO_DIR}/subset-${TAG}_missing.$(date +%F_%H%M).txt
@@ -149,9 +150,21 @@ function checkCorpusStatus() {
 
 }
 
+
 #* INPUTS
 CORPUS_DIR=${1:-'/share/compling/projects/sanpi/demo/data/corpora/testing'}
 TAG=${2:-'bigram'}
+if [[ $3 == "--status_check" ]]; then
+  echo "Checking status of $TAG subset"
+  echo "for $CORPUS_DIR ..."
+  echo 
+  checkCorpusStatus $CORPUS_DIR $TAG
+  echo 
+  showDate
+  echo "Status check complete. Closing script."
+  exit 0
+fi
+
 SLURM_ARG=${3:-'--mem=15G --t1:00:00'}
 LOG_DIR="/share/compling/projects/sanpi/logs/grewpy_subsets/`basename $CORPUS_DIR`"
 mkdir -p $LOG_DIR
@@ -181,7 +194,7 @@ for CONLL_DIR in ${CORPUS_DIR}/*conll; do
 
     for FILE in ${CONLL_DIR}/*conllu; do
       echo '-------------------'
-      submitJob $FILE $TAG $SLURM_FLAGS
+      submitJob $FILE $TAG "$SLURM_FLAGS"
     done
 
   #> check for any "missing" records indicating completion
@@ -200,7 +213,7 @@ for CONLL_DIR in ${CORPUS_DIR}/*conll; do
         echo "✓ $(basename $FILE) $TAG subset already completed."
 
       else
-        submitJob $FILE $TAG $SLURM_FLAGS
+        submitJob $FILE $TAG "$SLURM_FLAGS"
       fi
 
     done
