@@ -6,7 +6,7 @@ import enum
 import os
 from collections import namedtuple
 from pathlib import Path
-
+import json
 import pandas as pd
 from grewpy import Corpus, Request
 from grewpy.grew import GrewError as GrewError
@@ -32,27 +32,24 @@ def _main():
     proc_t0 = pd.Timestamp.now()
     co = corpus_from_path(conllu_path)
     proc_t1 = pd.Timestamp.now()
-    t_comp = (proc_t1 - proc_t0).components
-    time_str = (":".join(str(c).zfill(2) for c
-                         in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-                + f'.{round(t_comp.microseconds, 1)}')
+    time_str = get_time_str(proc_t0, proc_t1)
     print(f'\nTime to load corpus: {time_str}')
-    # print(f'\nTime to load corpus: {dur_round((proc_t1 - proc_t0).seconds)}')
-
-    # * Describing the corpus (`co`)
-    print('## Loaded (full-size) corpus info')
-    counts_df = describe_corpus(conllu_path, co)
-
-    # * `ADV ADJ` bigrams/collocations
-    print(f'## Assessing `{conllu_path.name}` for',
-          f'`{Path(*pat_path.resolve().parts[-3:])}`')
 
     # > create output directory and shared stem for output files
     subset_dir = conllu_path.parent.joinpath(f'subset_{subset_name}')
     if not subset_dir.is_dir():
         subset_dir.mkdir()
     out_stem = f"{(subset_name).upper()}.{conllu_path.stem}"
+
     print(f'stem for output files: `{out_stem}`')
+    # * Describing the corpus (`co`)
+    print('## Loaded (full-size) corpus info')
+    # counts_df = describe_corpus(conllu_path, co)
+    counts_df = describe_corpus_json(conllu_path, co)
+
+    # * `ADV ADJ` bigrams/collocations
+    print(f'## Assessing `{conllu_path.name}` for',
+          f'`{Path(*pat_path.resolve().parts[-3:])}`')
 
     # > get request from pattern file
     req = Request(grewpize_pat_path(pat_path))
@@ -68,13 +65,8 @@ def _main():
     proc_t0 = pd.Timestamp.now()
     context_info = build_context(co, req, conllu_path)
     proc_t1 = pd.Timestamp.now()
-    t_comp = (proc_t1 - proc_t0).components
-    time_str = (
-        ":".join(str(c).zfill(2) for c
-                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-        + f'.{round(t_comp.microseconds, 1)}')
+    time_str = get_time_str(proc_t0, proc_t1)
     print(f'+ Time to build context dataframe: {time_str}')
-    #   dur_round((proc_t1 - proc_t0).seconds))
 
     subset_sent_total = len(context_info)
     print('+ Subset Size:\n',
@@ -88,11 +80,7 @@ def _main():
     _t0 = pd.Timestamp.now()
     context_info.to_csv(context_path, sep='|')
     _t1 = pd.Timestamp.now()
-    t_comp = (_t1 - _t0).components
-    time_str = (
-        ":".join(str(c).zfill(2) for c
-                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-        + f'.{round(t_comp.microseconds, 1)}')
+    time_str = get_time_str(_t0, _t1)
 
     print(f'\n✓  context info for `{subset_name}` subset of',
           f'`{conllu_path.name}` saved as:\n',
@@ -107,16 +95,24 @@ def _main():
     create_subset_conllu(co, context_info.index,
                          sub_conllu_path)
     proc_t1 = pd.Timestamp.now()
-    t_comp = (proc_t1 - proc_t0).components
-    time_str = (
-        ":".join(str(c).zfill(2) for c
-                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-        + f'.{round(t_comp.microseconds, 1)}')
-    # f'Total time to create conllu output: {dur_round((proc_t1 - proc_t0).seconds)}')
+    time_str = get_time_str(proc_t0, proc_t1)
+
     print(f'\n✓  `{subset_name}` subset of `{conllu_path.name}` saved as:\n'
           f'  > `{sub_conllu_path.resolve().relative_to(conllu_path.parent)}`')
-    print(f'+ Total time to create conllu output: `{time_str}`')
-
+    print(f'+ Total time to create new conllu output: `{time_str}`\n\n'
+          '*******************************************\n')
+    
+    print(f'## Subset Counts: {sub_conllu_path.name}')
+    totals = pd.DataFrame()
+    totals['input'] = counts_df.squeeze()
+    totals['subset']= describe_corpus_json(sub_conllu_path, 
+                             corpus_from_path(sub_conllu_path)).squeeze()
+    totals['change'] = totals.subset - totals.input
+    totals = totals.astype('int')
+    totals['%_of_input'] = (totals.subset / totals.input * 100).round(1)
+    print(f'\n## Corpus Size Comparison: `{conllu_path.stem}` ⇢  `{out_stem}`\n')
+    print(totals.to_markdown(floatfmt=',.0f'))
+   
 
 def show_req_counts(corpus: Corpus,
                     req: Request,
@@ -131,12 +127,12 @@ def show_req_counts(corpus: Corpus,
           f"`{conllu_path.name}` with clustering")
     print(f"\n`{subset_name}` matches by ADV lemma: Top 10\n")
     print(table_counts_by(corpus, req, ["ADV.lemma"], total_hits).nlargest(
-        10, 'total').to_markdown())
+        10, 'total').to_markdown(floatfmt=',.0f'))
 
     # > counts by bigram/collocation
     print(f"\nTop 5 `{subset_name}` matches in `{conllu_path.name}`\n")
     print(table_counts_by(corpus, req, ["ADV.lemma", "ADJ.lemma"],
-                          total_hits).nlargest(5, 'total').to_markdown())
+                          total_hits).nlargest(5, 'total').to_markdown(floatfmt=',.0f'))
 
 
 def create_subset_conllu(
@@ -149,14 +145,8 @@ def create_subset_conllu(
         for x
         in sent_ids)
     _t1s = pd.Timestamp.now()
-    t_comp = (_t1s - _t0s).components
-    time_str = (
-        ":".join(str(c).zfill(2) for c
-                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-        + f'.{round(t_comp.microseconds, 1)}')
-    print('+ Time to create conllu string:',
-          #   dur_round((_t1s - _t0s).seconds))
-          time_str)
+    time_str = get_time_str(_t0s, _t1s)
+    print(f'+ Time to create conllu string: `{time_str}`')
 
     # print(f'\n### First sentence in `{sub_conllu_path.name}`',
     #       ('> ```{conllu}\n'
@@ -167,10 +157,7 @@ def create_subset_conllu(
     _t0w = pd.Timestamp.now()
     sub_conllu_path.write_text(conllu_output, encoding='utf8')
     _t1w = pd.Timestamp.now()
-    t_comp = (_t1w - _t0w).components
-    time_str = (":".join(str(c).zfill(2) for c
-                         in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-                + f'.{round(t_comp.microseconds, 1)}')
+    time_str = get_time_str(_t0w, _t1w)
     print(f'+ Time to save `{sub_conllu_path.name}`: `{time_str}`')
     #   dur_round((_t1w - _t0w).seconds))
 
@@ -178,10 +165,10 @@ def create_subset_conllu(
 def build_context(corpus: Corpus,
                   req: Request,
                   conllu_path: Path) -> pd.DataFrame:
-    sent_ids = pd.Series(match['sent_id'] for match in corpus.search(req)).unique()
+    sent_ids = pd.Series(match['sent_id']
+                         for match in corpus.search(req)).unique()
     context_info = pd.concat(pd.DataFrame(parse_sent(sid, corpus))
                              for sid in sent_ids)
-    # context_info = context_info.drop_duplicates()
     context_info = context_info.assign(
         conllu_id=conllu_path.stem).set_index('sent_id')
 
@@ -244,33 +231,6 @@ def _parse_args():
     return args.conllu_path, args.pat_path, args.subset_name
 
 
-def dur_round(time_dur: float):
-    """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits
-
-    Args:
-        dur (float): seconds value
-
-    Returns:
-        str: value converted and rounded with unit label of 's','m', or 'h'
-    """
-    unit = "s"
-
-    if time_dur >= 60:
-        time_dur = time_dur / 60
-        unit = "m"
-
-        if time_dur >= 60:
-            time_dur = time_dur / 60
-            unit = "h"
-
-    if time_dur < 10:
-        dur_str = f"{round(time_dur, 2):.2f}{unit}"
-    else:
-        dur_str = f"{round(time_dur, 1):.1f}{unit}"
-
-    return dur_str
-
-
 def corpus_from_path(path):
     return Corpus(str(path))
 
@@ -289,9 +249,10 @@ def pprint_pat(request):
 
 
 def table_counts_by(corpus: Corpus, request: Request, cluster: list, total_hits):
-
+    #? # LATER: `total_hits` could be calculated by getting sum of counts column?
     if len(cluster) == 1:
-        df = pd.Series(corpus.count(request, cluster)).to_frame().rename(
+        df = pd.Series(corpus.count(request, cluster)
+                       ).to_frame().rename(
             columns={0: 'total'})
     else:
         df = (pd.json_normalize(corpus.count(request, cluster), sep='_')
@@ -330,49 +291,126 @@ def fileSize(filePath, size_type, decimals=1):
     return round(unitConvertor(size, size_type), decimals)
 
 
-def describe_corpus(conllu_path, co):
-    file_size = fileSize(conllu_path, sizeUnit.MB)
+def describe_corpus_json(conllu_path: Path,
+                         corpus: Corpus):
+    _t0 = pd.Timestamp.now()
+    file_size = fileSize(conllu_path, sizeUnit.MB, decimals=2)
     counts_df = pd.DataFrame(
         index=['total'],
-        columns=['file_size', 'sentences', 'tokens', 'ADV', 'ADJ', 'NEG'])
-    counts_df['file_size'] = f'{file_size} MB'
-    counts_df['sentences'] = len(co)
-    counts_df['tokens'] = sum(len(sent) for sent in co)
-
+        columns=['file_MB', 'sentences', 'tokens'])
+    counts_df['file_MB'] = file_size
+    counts_df['sentences'] = int(len(corpus))
+    counts_df['tokens'] = int(sum(len(sent) for sent in corpus))
+    
+    json_dict = dict.fromkeys(['total', 'ADV', 'ADJ', 'NEG', 'NR'])
     for name, spec in (
         ('ADV', 'xpos=re"RB.*"'),
         ('ADJ', 'xpos=re"JJ.*"'),
-        # TODO: add neg raising lemma node
-        #  ('N-R', ()),
         ('NEG', ('lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|'
-                 '"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"'))):
+                 '"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"')),
+        ('NR', ('lemma="think"|"believe"|"want"|"seem"|"suppose"|"expect"'
+                '|"imagine"|"likely"|"probable"|"appear"|"look"|"intend"'
+                '|"choose"|"plan"|"wish"|"suggest"|"advise"|"advisable"'
+                '|"desirable"|"should"|"ought"|"better"|"most"|"usually"'))):
         req = Request(f'X[{spec}]')
-        total_count = co.count(req)
-        counts_df[name] = total_count
-
+        total_count = corpus.count(req)
+        counts_df[f'{name}_tokens'] = total_count
+        
+        node_counts={}
+        
+        xpos_df = table_counts_by(corpus, req, ["X.xpos"], total_count)
+        node_counts['by_xpos'] = xpos_df.to_dict(orient='index')
+        counts_df[f'{name}_xpos']=len(xpos_df)
         print(f"\nTotal {name} in `{conllu_path.name}` by exact POS:\n")
-        print(table_counts_by(co, req, ["X.xpos"],
-              total_count).to_markdown(), '\n')
+        print(xpos_df.to_markdown(floatfmt=',.0f'), '\n')
 
-        print(f"\nTop 10 {name} lemma in `{conllu_path.name}`\n")
-        print(table_counts_by(co, req, ["X.lemma"], total_count).nlargest(
-            10, 'total').to_markdown(), '\n')
+        lemma_df = table_counts_by(corpus, req, ["X.lemma"], total_count)
+        node_counts['by_lemma'] = lemma_df.to_dict(orient='index')
+        counts_df[f'{name}_lemmas']=len(lemma_df)
+        print(f"\nTop 10 {name} lemmas in `{conllu_path.name}`\n")
+        print(lemma_df.nlargest(10, 'total').to_markdown(floatfmt=',.0f'), '\n')
+        
+        form_df = table_counts_by(corpus, req, ["X.form"], total_count)
+        node_counts['by_form'] = form_df.to_dict(orient='index')
+        counts_df[f'{name}_forms']=len(form_df)
+        print(f"\nTop 10 {name} forms in `{conllu_path.name}`\n")
+        print(form_df.nlargest(10, 'total').to_markdown(floatfmt=',.0f'), '\n')
+        
+        json_dict[name] = node_counts
+        
 
-    print(f"### `{conllu_path.name}` overview\n")
-    print(counts_df.transpose().to_markdown())
-    print('\n*******************************************\n')
+    json_dict.update(counts_df.to_dict(orient="index"))
+    
+    info_dir=conllu_path.with_name('info')
+    if not info_dir.is_dir():
+        info_dir.mkdir()
+        
+    json_path=info_dir.joinpath(f'{conllu_path.stem}.counts.json')
+    json_path.write_text(json.dumps(json_dict, indent=4), encoding='utf8')
+    
+    print(f"\n### `{conllu_path.name}` overview\n")
+    print(counts_df.transpose().to_markdown(floatfmt=',.0f'))
+    print(f'\n+ Counts info saved to: `../{json_path.relative_to(conllu_path.parent.parent)}`')
+    
+    _t1 = pd.Timestamp.now()
+    time_str = get_time_str(_t0, _t1)
+    print(f'+ Time to gather counts: `{time_str}`\n\n'
+          '*******************************************\n')
     return counts_df
+
+
+# def describe_corpus(conllu_path, co):
+#     file_size = fileSize(conllu_path, sizeUnit.MB, decimals=2)
+#     counts_df = pd.DataFrame(
+#         index=['total'],
+#         columns=['file_MB', 'sentences', 'tokens', 'ADV', 'ADJ', 'NEG', 'NR'])
+#     counts_df['file_MB'] = file_size
+#     counts_df['sentences'] = len(co)
+#     counts_df['tokens'] = sum(len(sent) for sent in co)
+
+#     for name, spec in (
+#         ('ADV', 'xpos=re"RB.*"'),
+#         ('ADJ', 'xpos=re"JJ.*"'),
+#         ('NEG', ('lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|'
+#                  '"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"')),
+#         ('NR', ('lemma="think"|"believe"|"want"|"seem"|"suppose"|"expect"'
+#                 '|"imagine"|"likely"|"probable"|"appear"|"look"|"intend"'
+#                 '|"choose"|"plan"|"wish"|"suggest"|"advise"|"advisable"'
+#                 '|"desirable"|"should"|"ought"|"better"|"most"|"usually"'))):
+#         req = Request(f'X[{spec}]')
+#         total_count = co.count(req)
+#         counts_df[name] = total_count
+
+#         print(f"\nTotal {name} in `{conllu_path.name}` by exact POS:\n")
+#         print(table_counts_by(co, req, ["X.xpos"],
+#               total_count).to_markdown(floatfmt=',.0f'), '\n')
+
+#         print(f"\nTop 10 {name} lemma in `{conllu_path.name}`\n")
+#         print(table_counts_by(co, req, ["X.lemma"], total_count).nlargest(
+#             10, 'total').to_markdown(floatfmt=',.0f'), '\n')
+
+#     print(f"### `{conllu_path.name}` overview\n")
+#     print(counts_df.transpose().to_markdown(floatfmt=',.0f'))
+#     print('\n*******************************************\n')
+#     return counts_df
+
+
+def get_time_str(start: pd.Timestamp,
+                 finish: pd.Timestamp) -> str:
+    t_comp = (finish - start).components
+    time_str = (
+        ":".join(str(c).zfill(2)
+                 for c
+                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
+        + f'.{str(t_comp.microseconds).zfill(3)}')
+
+    return time_str
 
 
 if __name__ == '__main__':
     _t0 = pd.Timestamp.now()
     _main()
     _t1 = pd.Timestamp.now()
-    t_comp = (_t1 - _t0).components
-    time_str = (
-        ":".join(str(c).zfill(2) for c
-                 in (t_comp.hours, t_comp.minutes, t_comp.seconds))
-        + f'.{round(t_comp.microseconds, 1)}')
-
-    print(f'\n## Subset creation complete!✨ \nTotal time elapsed: **`{time_str}`**')
-    #   dur_round((proc_t1 - proc_t0).seconds))
+    time_str = get_time_str(_t0, _t1)
+    print(f'\n## Subset creation complete!✨ \n'
+          f'Total time elapsed: **`{time_str}`**')
