@@ -152,7 +152,10 @@ function checkCorpusStatus() {
 #* INPUTS
 CORPUS_DIR=${1:-'/share/compling/projects/sanpi/demo/data/corpora/testing'}
 TAG=${2:-'bigram'}
-SLURM_FLAGS=${3:-'--mem=15G --t1:00:00'}
+SLURM_ARG=${3:-'--mem=15G --t1:00:00'}
+LOG_DIR="/share/compling/projects/sanpi/logs/grewpy_subsets/`basename $CORPUS_DIR`"
+mkdir -p $LOG_DIR
+SLURM_FLAGS="$SLURM_ARG --chdir=$LOG_DIR"
 
 echo "Starting $0"
 date
@@ -166,7 +169,6 @@ for CONLL_DIR in ${CORPUS_DIR}/*conll; do
   CONLL_HEADER=">> ../$(basename $CORPUS_DIR)/$(basename $CONLL_DIR)/"
   LINE="$(echo $CONLL_HEADER | tr -d '\n' | tr -c '[:alnum:]' '=' | tr '[:alnum:]' '=')"
   echo -e "\n$LINE\n$CONLL_HEADER\n$LINE"
-
   SUBSET_DIR=${CONLL_DIR}/subset_${TAG}
   INFO_DIR=${SUBSET_DIR}/info
   MISSING_INDEX_GLOB="${INFO_DIR}/subset-${TAG}_missing*"
