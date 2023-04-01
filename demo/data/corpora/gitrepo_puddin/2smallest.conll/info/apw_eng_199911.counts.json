@@ -1,0 +1,7223 @@
+{
+    "total": {
+        "file_MB": 1.16,
+        "sentences": 1147,
+        "tokens": 27017,
+        "ADV_tokens": 840,
+        "ADV_xpos": 3,
+        "ADV_lemmas": 185,
+        "ADV_forms": 195,
+        "ADJ_tokens": 1809,
+        "ADJ_xpos": 3,
+        "ADJ_lemmas": 648,
+        "ADJ_forms": 653,
+        "NEG_tokens": 214,
+        "NEG_xpos": 7,
+        "NEG_lemmas": 11,
+        "NEG_forms": 16,
+        "NR_tokens": 188,
+        "NR_xpos": 15,
+        "NR_lemmas": 18,
+        "NR_forms": 38
+    },
+    "ADV": {
+        "by_xpos": {
+            "RB": {
+                "total": 798,
+                "percent": 95.0
+            },
+            "RBR": {
+                "total": 32,
+                "percent": 3.8
+            },
+            "RBS": {
+                "total": 10,
+                "percent": 1.2
+            }
+        },
+        "by_lemma": {
+            "not": {
+                "total": 126,
+                "percent": 15.0
+            },
+            "also": {
+                "total": 43,
+                "percent": 5.1
+            },
+            "now": {
+                "total": 24,
+                "percent": 2.9
+            },
+            "as": {
+                "total": 21,
+                "percent": 2.5
+            },
+            "only": {
+                "total": 21,
+                "percent": 2.5
+            },
+            "more": {
+                "total": 18,
+                "percent": 2.1
+            },
+            "just": {
+                "total": 18,
+                "percent": 2.1
+            },
+            "however": {
+                "total": 17,
+                "percent": 2.0
+            },
+            "still": {
+                "total": 17,
+                "percent": 2.0
+            },
+            "so": {
+                "total": 16,
+                "percent": 1.9
+            },
+            "too": {
+                "total": 15,
+                "percent": 1.8
+            },
+            "later": {
+                "total": 14,
+                "percent": 1.7
+            },
+            "even": {
+                "total": 13,
+                "percent": 1.5
+            },
+            "ago": {
+                "total": 12,
+                "percent": 1.4
+            },
+            "early": {
+                "total": 12,
+                "percent": 1.4
+            },
+            "nearly": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "up": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "well": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "never": {
+                "total": 10,
+                "percent": 1.2
+            },
+            "long": {
+                "total": 10,
+                "percent": 1.2
+            },
+            "already": {
+                "total": 10,
+                "percent": 1.2
+            },
+            "abroad": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "first": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "most": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "here": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "once": {
+                "total": 8,
+                "percent": 1.0
+            },
+            "very": {
+                "total": 8,
+                "percent": 1.0
+            },
+            "instead": {
+                "total": 7,
+                "percent": 0.8
+            },
+            "really": {
+                "total": 7,
+                "percent": 0.8
+            },
+            "down": {
+                "total": 7,
+                "percent": 0.8
+            },
+            "possibly": {
+                "total": 6,
+                "percent": 0.7
+            },
+            "then": {
+                "total": 6,
+                "percent": 0.7
+            },
+            "earlier": {
+                "total": 6,
+                "percent": 0.7
+            },
+            "publicly": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "immediately": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "right": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "ever": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "twice": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "about": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "lawfully": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "soon": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "ahead": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "seasonally": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "late": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "quickly": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "back": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "eventually": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "certainly": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "almost": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "meanwhile": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "before": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "forward": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "apparently": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "normally": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "officially": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "narrowly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "yet": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "recently": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "maybe": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "thereby": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "undoubtedly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "reportedly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "together": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "significantly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "clearly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "somewhat": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "again": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "efficiently": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "elsewhere": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "materially": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "likely": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "enough": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "widely": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "drastically": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "clear": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "currently": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "faster": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "fatally": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "cautiously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "fully": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "heavily": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "home": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "increasingly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "closer": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "desperately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "often": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "better": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "slowly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "quite": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "best": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "repeatedly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "roughly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "separately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "seriously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "shortly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "allegedly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "proudly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "sometimes": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "there": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "through": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "ultimately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "unconstitutionally": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "unfortunately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "unsuccessfully": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "quietly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "always": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "easier": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "much": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "nervously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "badly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "away": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "perhaps": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "pretty": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "besides": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "mostly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "previously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "apart": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "newly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "brightly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "east": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "behind": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aboard": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aggressively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "commonly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "barely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deliberately": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deep": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "anywhere": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aside": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "continuously": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "alone": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "constitutionally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "consequently": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "completely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "customarily": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "less": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "effectively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "obviously": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "out": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overnight": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overseas": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overwhelmingly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "partially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "positively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "probably": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "promptly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "racially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "randomly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "rather": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "regardless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slightly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "solely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "somehow": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sometime": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sparingly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "substantially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "traditionally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "truly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "weekly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "on": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nationally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "either": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mournfully": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "entirely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "especially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ethnically": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "everywhere": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "exactly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "exclusively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "far": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fast": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "forth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "generally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "genuinely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hereby": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "illegally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "independently": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "informally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "initially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "justifiably": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "keenly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "little": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "merely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mistakenly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "a.m.": {
+                "total": 1,
+                "percent": 0.1
+            }
+        },
+        "by_form": {
+            "not": {
+                "total": 86,
+                "percent": 10.2
+            },
+            "also": {
+                "total": 43,
+                "percent": 5.1
+            },
+            "n't": {
+                "total": 39,
+                "percent": 4.6
+            },
+            "now": {
+                "total": 24,
+                "percent": 2.9
+            },
+            "only": {
+                "total": 21,
+                "percent": 2.5
+            },
+            "as": {
+                "total": 21,
+                "percent": 2.5
+            },
+            "more": {
+                "total": 18,
+                "percent": 2.1
+            },
+            "just": {
+                "total": 17,
+                "percent": 2.0
+            },
+            "still": {
+                "total": 17,
+                "percent": 2.0
+            },
+            "however": {
+                "total": 16,
+                "percent": 1.9
+            },
+            "too": {
+                "total": 15,
+                "percent": 1.8
+            },
+            "later": {
+                "total": 14,
+                "percent": 1.7
+            },
+            "so": {
+                "total": 14,
+                "percent": 1.7
+            },
+            "ago": {
+                "total": 12,
+                "percent": 1.4
+            },
+            "up": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "well": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "nearly": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "early": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "even": {
+                "total": 11,
+                "percent": 1.3
+            },
+            "already": {
+                "total": 10,
+                "percent": 1.2
+            },
+            "long": {
+                "total": 10,
+                "percent": 1.2
+            },
+            "first": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "here": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "abroad": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "never": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "most": {
+                "total": 9,
+                "percent": 1.1
+            },
+            "very": {
+                "total": 8,
+                "percent": 1.0
+            },
+            "once": {
+                "total": 8,
+                "percent": 1.0
+            },
+            "instead": {
+                "total": 7,
+                "percent": 0.8
+            },
+            "down": {
+                "total": 7,
+                "percent": 0.8
+            },
+            "really": {
+                "total": 7,
+                "percent": 0.8
+            },
+            "earlier": {
+                "total": 6,
+                "percent": 0.7
+            },
+            "then": {
+                "total": 6,
+                "percent": 0.7
+            },
+            "possibly": {
+                "total": 6,
+                "percent": 0.7
+            },
+            "about": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "publicly": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "right": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "ahead": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "twice": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "lawfully": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "immediately": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "soon": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "ever": {
+                "total": 5,
+                "percent": 0.6
+            },
+            "seasonally": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "quickly": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "forward": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "almost": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "before": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "eventually": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "certainly": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "late": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "meanwhile": {
+                "total": 4,
+                "percent": 0.5
+            },
+            "back": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "clearly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "normally": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "apparently": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "narrowly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "officially": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "yet": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "somewhat": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "undoubtedly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "together": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "recently": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "again": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "significantly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "thereby": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "reportedly": {
+                "total": 3,
+                "percent": 0.4
+            },
+            "better": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "through": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "fully": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "best": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "heavily": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "besides": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "home": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "there": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "increasingly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "badly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "sometimes": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "fatally": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "cautiously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "faster": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "widely": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "Even": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "clear": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "ultimately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "unconstitutionally": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "closer": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "enough": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "elsewhere": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "efficiently": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "easier": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "unfortunately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "unsuccessfully": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "drastically": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "desperately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "away": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "perhaps": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "currently": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "apart": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "quite": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "newly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "quietly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "nervously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "So": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "always": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "repeatedly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "much": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "often": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "mostly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "roughly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "separately": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "seriously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "shortly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "maybe": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "materially": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "proudly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "previously": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "likely": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "pretty": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "slowly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "allegedly": {
+                "total": 2,
+                "percent": 0.2
+            },
+            "aboard": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "constitutionally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "continuously": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "completely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "alone": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Consequently": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "commonly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Maybe": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "customarily": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "a.m.": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Early": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Never": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "anywhere": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "behind": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Not": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Exactly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "However": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "barely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aside": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aggressively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Just": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "brightly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "keenly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deep": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "randomly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "on": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "out": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overnight": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overseas": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overwhelmingly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "partially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "positively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "probably": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "promptly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "racially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "rather": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nationally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "regardless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slightly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "solely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "somehow": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sometime": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sparingly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "substantially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "traditionally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "truly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "weekly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "obviously": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mournfully": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deliberately": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "forth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "east": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "effectively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "either": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "entirely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "especially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ethnically": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "everywhere": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "exclusively": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "far": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fast": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "generally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mistakenly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "genuinely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hereby": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "illegally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "independently": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "informally": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "initially": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "justifiably": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "less": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "little": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "merely": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Back": {
+                "total": 1,
+                "percent": 0.1
+            }
+        }
+    },
+    "ADJ": {
+        "by_xpos": {
+            "JJ": {
+                "total": 1688,
+                "percent": 93.3
+            },
+            "JJR": {
+                "total": 66,
+                "percent": 3.6
+            },
+            "JJS": {
+                "total": 55,
+                "percent": 3.0
+            }
+        },
+        "by_lemma": {
+            "first": {
+                "total": 54,
+                "percent": 3.0
+            },
+            "last": {
+                "total": 45,
+                "percent": 2.5
+            },
+            "other": {
+                "total": 37,
+                "percent": 2.0
+            },
+            "more": {
+                "total": 30,
+                "percent": 1.7
+            },
+            "new": {
+                "total": 29,
+                "percent": 1.6
+            },
+            "many": {
+                "total": 21,
+                "percent": 1.2
+            },
+            "local": {
+                "total": 17,
+                "percent": 0.9
+            },
+            "next": {
+                "total": 17,
+                "percent": 0.9
+            },
+            "federal": {
+                "total": 16,
+                "percent": 0.9
+            },
+            "most": {
+                "total": 15,
+                "percent": 0.8
+            },
+            "economic": {
+                "total": 15,
+                "percent": 0.8
+            },
+            "former": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "such": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "few": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "american": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "possible": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "several": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "foreign": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "early": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "international": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "higher": {
+                "total": 12,
+                "percent": 0.7
+            },
+            "russian": {
+                "total": 11,
+                "percent": 0.6
+            },
+            "second": {
+                "total": 11,
+                "percent": 0.6
+            },
+            "modern": {
+                "total": 11,
+                "percent": 0.6
+            },
+            "public": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "major": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "final": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "european": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "recent": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "japanese": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "domestic": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "political": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "top": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "financial": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "late": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "bad": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "latest": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "strong": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "large": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "ethnic": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "close": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "chief": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "least": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "high-speed": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "important": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "presidential": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "iraqi": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "main": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "great": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "israeli": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "good": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "long": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "palestinian": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "biggest": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "private": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "democratic": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "big": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "egyptian": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "benchmark": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "juvenile": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "own": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "overseas": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "regulatory": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "highest": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "open": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "daily": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "same": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "british": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "national": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "brief": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "much": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "key": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "third": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "joint": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "total": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "largest": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "regular": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "stronger": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "further": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "necessary": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "special": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "specific": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "short": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "high": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "serious": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "previous": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "gay": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "faster": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "albanian": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "prime": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "safe": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "historic": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "free": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "central": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "huge": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "direct": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "dead": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "decisive": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "unaware": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "old": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "personal": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "digital": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "educational": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "french": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "quad": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "little": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "unlikely": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "black": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "heavy": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "human": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "future": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "only": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "white": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "mobile": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "global": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "young": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "mexican": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "preliminary": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "military": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "available": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "low": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "german": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "convinced": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "positive": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "current": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "republican": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "eager": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "dark": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "nuclear": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "cruel": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "swiss": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "truthful": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "illegal": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "after-school": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "fragile": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "electronic": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "chinese-language": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "conservative": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "electrical": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "poor": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "17-member": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "violent": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "11th": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "corporate": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "immediate": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "invasion-of-privacy": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "moderate": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "aware": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "hard": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "battered": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "complete": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "difficult": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "typical": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "prepared": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "written": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "blue": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "internet": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "legal": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "east": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "internal": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "likely": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "able": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "euro": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "artistic": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "monetary": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "10-month-old": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "potential": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "unavoidable": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "sexual": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "consistent": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "peaceful": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "costly": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "pink": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "constitutional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "keys": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "enough": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "elected": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "younger": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "dutch-born": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "information-based": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "initial": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "massive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "due": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "disgraced": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "makeshift": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "investment-management": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "israeli-palestinian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "monthly": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "longtime": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "elusive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "plastic": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "multimillion-dollar": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "multiple": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "logical": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "different": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "destructive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "limited": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "normal": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "norwegian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "legitimate": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "jewish": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "one-room": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "emotional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "oral": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "original": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "last-minute": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "criminal": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "largest-ever": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "innocent": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "credible": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "pleasant": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "religious": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "fiscal": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "annual": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "three-way": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "admired": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "adventurous": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "third-largest": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "thick": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "tense": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "alive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "televised": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "symbolic": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "amazing": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "angry": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "superb": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "better": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "suburban": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "arduous": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "stuart": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "government-controlled": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "artificial": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "government-supervised": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "gray": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "fair": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "gross": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "congressional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "half-hour": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "timely": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "traditional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "trans-atlantic": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "general": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "wonderful": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "wireless": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "willing": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "western": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "15-month": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "varied": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "18-month-old": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "valuable": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "fiery": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "unusual": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "3-2": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "30-hour": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "4-year-old": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "friend-of-the-court": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "feathered": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "favorite": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "ultranationalist": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "u.s.-based": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "abstract": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "active": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "two-day": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "acute": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "triple": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "best": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "electric": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "sluggish": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "civilian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "responsible": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "cellular": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "expensive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "residential": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "chilly": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "relevant": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "chunkiness": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "hostile": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "civil": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "real": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "careful": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "ready": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "clear": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "quick": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "question-and-answer": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "closer": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "prominent": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "pretax": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "premature": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "concerned": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "homeless": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "cheaper": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "shoulder-length": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "satellite-based": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "sick": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "simple": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "capital": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "short-term": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "high-tech": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "senior": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "significant": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "secret": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "busy": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "blocky": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "hard-line": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "hilltop": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "revered": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "similar": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "ethical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "equitable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "first-degree": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "facial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "export-oriented": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "exaggerated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "equal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "electric-powered": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fake": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "enhanced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fellow": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "excessive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fast-diminishing": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "english-language": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "famous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "explosive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "empty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "expressiveness": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "exchangeable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "famed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "experienced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "extensive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "youthful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "elective": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "attempted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "admirable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "affluent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aggressive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "alleged": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "apparent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "armed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "asian": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "assistant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "atlanta-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "attractive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bright": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "average": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bare": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "baseband": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "basic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "belated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bigger": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bitter": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bloodless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "blue-chip": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "adjacent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "additional": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "actual": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "acrobatics": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "10-year": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "100-share": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "11-year-long": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "111-day": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "14-day": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "14-year-old": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "1998-99": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "20-day": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "21-year-old": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "225-issue": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "256-color": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "4-3": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "40-page": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "468": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "51-member": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "52-year": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "55-nation": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "67-year-old": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "absolute": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "brazilian": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "broad": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "egyptair": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "diminished": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "counterintuitive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "coveted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "crime-fighting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "crime-prevention": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "crucial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cumulative": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deadly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deliberate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "delightful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "disabled": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "broader": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "disciplinary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "diverse": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "double": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "dutch": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "duty-free": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "earlier": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "easy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "effective": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "efficient": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "corrupt": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "coronary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cool": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "controversial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "brutal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cairo-bound": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "calif.-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "canadian": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "catastrophic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "center-right": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cerebral": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "city-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "clean": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "closed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "code-division": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "colorful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "coming": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "communist": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "computer-helped": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "confidential": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "conflicting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "contentious": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "continuous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "first-letter": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "known": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "five-mile": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "forced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shocked": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shocking": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shoddy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shortsighted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "simulated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sixth-largest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slack": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slavery-like": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slight": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slim": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sloppy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "small": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "smaller": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "smooth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "social": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sole": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "solid": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "south": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "southern": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "speedy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "splashy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "spotless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sprained": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "square": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "standard": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "separate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "secondary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "seasoned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "remote": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "quadruple": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "radar": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ram": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "rampant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "real-world": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reckless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reduced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "refreshing": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "relentless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reliant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reluctant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "renewed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "salchow-triple": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "repatriated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "respectful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "respiratory": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "restricted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "resulting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "retaliatory": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "right": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "risky": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "robust": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "routine": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sacrilegious": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "state-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "statistical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "steady": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "useless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unemployed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unheard-of": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "uninstall": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unknown": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unofficial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unrelated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unsubstantiated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unsupportable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unsure": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unwanted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unworthy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "vacant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unchanged": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "value-added": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "various": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "visible": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "weaker": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "web": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "weekly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "welcome": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "well-behaved": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "whole": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "worth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "yen-selling": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "uncontrollable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "steep": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "terrifying": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "stiff": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "strongest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "stunned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "successful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "supervised": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "surprising": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sweeping": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "swollen": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sympathetic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "temporary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "terrified": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "terrorist": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "u.s.-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "theoretical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "thirteen": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "three-time": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "tough": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "traumatic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "tremendous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "true": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "turbulent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "two-hour": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "two-minute": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "two-term": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "quad-speed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "public-records": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "protracted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "irresponsible": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "inaccurate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "inclement": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "independent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "indianapolis-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "industrial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ineffective": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "injured": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "instant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "interim": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "investigative": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "irreparable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "judicial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "impossible": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "jurisdictional": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "kashmir": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "keen": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "laggard": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "lasting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "later": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "leading": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "less": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "libelous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "live": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "london-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "in-flight": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "illinois-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "lower": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fundamental": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "foreign-generated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "foreign-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "formal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "four-revolution": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fourth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "free-press": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "frequent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "friendlier": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "front-page": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "frustrated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "full": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "funeral": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hothead": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "generous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "get-out-the-vote": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "green": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "grown": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "guilty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "happy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hefty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "high-technology": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "highest-order": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "homosexual": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hopeful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "long-term": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "loyal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "prosperous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "petty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overall": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "panhandling": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "parent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "parliamentary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "part-time": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "partial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "passionate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "past": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "patient": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "perfect": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "permanent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "physical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "other-worldly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "pitiful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "plane": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "planned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "poorest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "popular": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "post-saddam": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "postwar": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "powerful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "precluded": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "preferential": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "professional": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "outlying": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "opposite": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "lucky": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "narrower": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mass": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mayoral": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mechanical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "medical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mere": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "meritless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "migraine": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "minimum": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "motivated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "municipal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "muslim": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "neighboring": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ongoing": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "newest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "next-most-senior": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nice": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nongovernmental": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "northeastern": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "northern": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "noteworthy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nuisance": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "obvious": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "official": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "one-on-one": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "10-month": {
+                "total": 1,
+                "percent": 0.1
+            }
+        },
+        "by_form": {
+            "first": {
+                "total": 54,
+                "percent": 3.0
+            },
+            "last": {
+                "total": 44,
+                "percent": 2.4
+            },
+            "other": {
+                "total": 37,
+                "percent": 2.0
+            },
+            "more": {
+                "total": 30,
+                "percent": 1.7
+            },
+            "new": {
+                "total": 29,
+                "percent": 1.6
+            },
+            "many": {
+                "total": 21,
+                "percent": 1.2
+            },
+            "next": {
+                "total": 17,
+                "percent": 0.9
+            },
+            "local": {
+                "total": 17,
+                "percent": 0.9
+            },
+            "federal": {
+                "total": 16,
+                "percent": 0.9
+            },
+            "most": {
+                "total": 15,
+                "percent": 0.8
+            },
+            "economic": {
+                "total": 15,
+                "percent": 0.8
+            },
+            "such": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "possible": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "former": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "few": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "American": {
+                "total": 14,
+                "percent": 0.8
+            },
+            "foreign": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "international": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "early": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "several": {
+                "total": 13,
+                "percent": 0.7
+            },
+            "higher": {
+                "total": 12,
+                "percent": 0.7
+            },
+            "second": {
+                "total": 11,
+                "percent": 0.6
+            },
+            "modern": {
+                "total": 11,
+                "percent": 0.6
+            },
+            "recent": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "public": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "major": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "European": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "final": {
+                "total": 10,
+                "percent": 0.6
+            },
+            "domestic": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "Japanese": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "financial": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "top": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "political": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "late": {
+                "total": 9,
+                "percent": 0.5
+            },
+            "strong": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "least": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "important": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "close": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "presidential": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "latest": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "bad": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "large": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "high-speed": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "chief": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "ethnic": {
+                "total": 8,
+                "percent": 0.4
+            },
+            "long": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "Iraqi": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "main": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "good": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "biggest": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "big": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "Israeli": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "private": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "Palestinian": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "Russian": {
+                "total": 7,
+                "percent": 0.4
+            },
+            "same": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "highest": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "brief": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "own": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "national": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "daily": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "regulatory": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "overseas": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "much": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "joint": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "juvenile": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "great": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "total": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "Democratic": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "benchmark": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "British": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "largest": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "open": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "key": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "third": {
+                "total": 6,
+                "percent": 0.3
+            },
+            "high": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "dead": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "Albanian": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "specific": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "historic": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "prime": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "free": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "faster": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "necessary": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "previous": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "special": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "huge": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "direct": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "stronger": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "Egyptian": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "safe": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "further": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "serious": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "regular": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "central": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "short": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "gay": {
+                "total": 5,
+                "percent": 0.3
+            },
+            "military": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "heavy": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "personal": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "mobile": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "young": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "russian": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "unlikely": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "future": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "educational": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "preliminary": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "little": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "human": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "available": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "black": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "only": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "decisive": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "French": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "low": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "quad": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "white": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "unaware": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "digital": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "global": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "Mexican": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "old": {
+                "total": 4,
+                "percent": 0.2
+            },
+            "blue": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "after-school": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "artistic": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "prepared": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "aware": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "complete": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "nuclear": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "battered": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "positive": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "hard": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "potential": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "poor": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "eager": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "Swiss": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "likely": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "fragile": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "convinced": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "typical": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "Internet": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "illegal": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "violent": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "17-member": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "German": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "corporate": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "current": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "immediate": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "cruel": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "electrical": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "Chinese-language": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "electronic": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "unavoidable": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "legal": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "difficult": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "dark": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "truthful": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "invasion-of-privacy": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "able": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "10-month-old": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "sexual": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "east": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "written": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "Republican": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "moderate": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "conservative": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "monetary": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "11th": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "euro": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "internal": {
+                "total": 3,
+                "percent": 0.2
+            },
+            "initial": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "disgraced": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "careful": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "chilly": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "different": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "last-minute": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "largest-ever": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "cheaper": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "younger": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "destructive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "criminal": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "innocent": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "keys": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "cellular": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "investment-management": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "homeless": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "credible": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "makeshift": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "multiple": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "multimillion-dollar": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "monthly": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "congressional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "consistent": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "constitutional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "hilltop": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "busy": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "normal": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "closer": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "hostile": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "massive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "clear": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "original": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "longtime": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "civilian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "logical": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "civil": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "one-room": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "high-tech": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "limited": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "concerned": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "chunkiness": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "costly": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "legitimate": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "oral": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "capital": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "information-based": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "peaceful": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "suburban": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "timely": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "three-way": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "third-largest": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "thick": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "Dutch-born": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "tense": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "televised": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "symbolic": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "electric": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "superb": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "Israeli-Palestinian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "similar": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "Jewish": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "elected": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "egyptian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "Norwegian": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "friend-of-the-court": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "expensive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "sluggish": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "U.S.-based": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "abstract": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "active": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "traditional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "trans-Atlantic": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "fiscal": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "elusive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "wonderful": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "wireless": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "willing": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "western": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "fair": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "15-month": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "varied": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "18-month-old": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "valuable": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "enough": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "unusual": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "3-2": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "30-hour": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "favorite": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "4-year-old": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "feathered": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "fiery": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "ultranationalist": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "two-day": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "emotional": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "triple": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "simple": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "Stuart": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "significant": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "ready": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "residential": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "artificial": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "religious": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "government-controlled": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "relevant": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "pleasant": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "government-supervised": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "gray": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "real": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "due": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "responsible": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "half-hour": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "quick": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "question-and-answer": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "gross": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "best": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "better": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "prominent": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "blocky": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "pretax": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "arduous": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "plastic": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "admired": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "adventurous": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "sick": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "shoulder-length": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "short-term": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "acute": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "senior": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "hard-line": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "pink": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "secret": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "premature": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "satellite-based": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "alive": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "general": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "amazing": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "revered": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "angry": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "annual": {
+                "total": 2,
+                "percent": 0.1
+            },
+            "exaggerated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "diverse": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deliberate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "excessive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ethical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "double": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "delightful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "disciplinary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "equitable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "equal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "democratic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "enhanced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "empty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "diminished": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "duty-free": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "disabled": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "electric-powered": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "elective": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "efficient": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "effective": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "earlier": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "easy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "youthful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "broader": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "deadly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Cairo-bound": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Canadian": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Dutch": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "EgyptAir": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "English-language": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Great": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Illinois-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Indianapolis-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Kashmir": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Last": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "London-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Muslim": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Plane": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "RAM": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "South": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "U.S.-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "absolute": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "acrobatics": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "actual": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "additional": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Calif.-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Brazilian": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "admirable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Atlanta-based": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "10-year": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "100-share": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "11-year-long": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "111-day": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "14-day": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "14-year-old": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "1998-99": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "20-day": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "21-year-old": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "225-issue": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "256-color": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "4-3": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "40-page": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "468": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "51-member": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "52-year": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "55-nation": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "67-year-old": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "Asian": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "adjacent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "affluent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cumulative": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "city-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "closed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "code-division": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "colorful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "coming": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "communist": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "computer-helped": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "confidential": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "conflicting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "contentious": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "continuous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "controversial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cool": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "coronary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "corrupt": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "counterintuitive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "coveted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "crime-fighting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "crime-prevention": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "crucial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "clean": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "cerebral": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "aggressive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "center-right": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "alleged": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "apparent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "armed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "assistant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "attempted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "attractive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "average": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bare": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "baseband": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "basic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "belated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bigger": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bitter": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bloodless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "blue-chip": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "bright": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "broad": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "brutal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "catastrophic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "exchangeable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "interim": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "experienced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sacrilegious": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "seasoned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "secondary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "separate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shocked": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shocking": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shoddy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "shortsighted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "simulated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sixth-largest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slack": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slavery-like": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slight": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "slim": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sloppy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "small": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "smaller": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "smooth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "social": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sole": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "solid": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "southern": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "speedy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "splashy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "spotless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sprained": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "salchow-triple": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "routine": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "explosive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "robust": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "professional": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "prosperous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "protracted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "public-records": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "quad-speed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "quadruple": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "radar": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "rampant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "real-world": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reckless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reduced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "refreshing": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "relentless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reliant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "reluctant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "remote": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "renewed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "repatriated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "respectful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "respiratory": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "restricted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "resulting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "retaliatory": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "right": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "risky": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "square": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "standard": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "state-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "statistical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "uncontrollable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unemployed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unheard-of": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "uninstall": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unknown": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unofficial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unrelated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unsubstantiated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unsupportable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unsure": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unwanted": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unworthy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "useless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "vacant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "value-added": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "various": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "visible": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "weaker": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "web": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "weekly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "welcome": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "well-behaved": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "whole": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "worth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "yen-selling": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unchanged": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "unable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "two-term": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "temporary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "steady": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "steep": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "stiff": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "strongest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "stunned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "successful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "supervised": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "surprising": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sweeping": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "swollen": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "sympathetic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "terrified": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "two-minute": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "terrifying": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "terrorist": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "theoretical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "thirteen": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "three-time": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "tough": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "traumatic": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "tremendous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "true": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "turbulent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "two-hour": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "preferential": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "precluded": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "powerful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "laggard": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "green": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "grown": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "guilty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "happy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hefty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "high-technology": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "highest-order": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "homosexual": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hopeful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "hothead": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "impossible": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "in-flight": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "inaccurate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "inclement": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "independent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "industrial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ineffective": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "injured": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "instant": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "investigative": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "irreparable": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "irresponsible": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "judicial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "jurisdictional": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "keen": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "get-out-the-vote": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "generous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "funeral": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "five-mile": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "export-oriented": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "expressiveness": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "extensive": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "facial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fake": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "famed": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "famous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fast-diminishing": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fellow": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "first-degree": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "first-letter": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "forced": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fundamental": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "foreign-generated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "foreign-owned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "formal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "four-revolution": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "fourth": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "free-press": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "frequent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "friendlier": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "front-page": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "frustrated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "full": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "known": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "lasting": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "postwar": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "later": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "obvious": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "official": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "one-on-one": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "ongoing": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "opposite": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "other-worldly": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "outlying": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "overall": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "panhandling": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "parent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "parliamentary": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "part-time": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "partial": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "passionate": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "past": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "patient": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "perfect": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "permanent": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "petty": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "physical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "pitiful": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "planned": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "poorest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "popular": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "post-Saddam": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nuisance": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "noteworthy": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "northern": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "medical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "leading": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "less": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "libelous": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "live": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "long-term": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "lower": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "loyal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "lucky": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mass": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mayoral": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mechanical": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "mere": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "northeastern": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "meritless": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "migraine": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "minimum": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "motivated": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "municipal": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "narrower": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "neighboring": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "newest": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "next-most-senior": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nice": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "nongovernmental": {
+                "total": 1,
+                "percent": 0.1
+            },
+            "10-month": {
+                "total": 1,
+                "percent": 0.1
+            }
+        }
+    },
+    "NEG": {
+        "by_xpos": {
+            "RB": {
+                "total": 137,
+                "percent": 64.0
+            },
+            "DT": {
+                "total": 31,
+                "percent": 14.5
+            },
+            "NN": {
+                "total": 14,
+                "percent": 6.5
+            },
+            "JJ": {
+                "total": 14,
+                "percent": 6.5
+            },
+            "IN": {
+                "total": 13,
+                "percent": 6.1
+            },
+            "CC": {
+                "total": 4,
+                "percent": 1.9
+            },
+            "UH": {
+                "total": 1,
+                "percent": 0.5
+            }
+        },
+        "by_lemma": {
+            "not": {
+                "total": 126,
+                "percent": 58.9
+            },
+            "no": {
+                "total": 30,
+                "percent": 14.0
+            },
+            "few": {
+                "total": 14,
+                "percent": 6.5
+            },
+            "without": {
+                "total": 13,
+                "percent": 6.1
+            },
+            "never": {
+                "total": 10,
+                "percent": 4.7
+            },
+            "nothing": {
+                "total": 9,
+                "percent": 4.2
+            },
+            "neither": {
+                "total": 4,
+                "percent": 1.9
+            },
+            "nobody": {
+                "total": 3,
+                "percent": 1.4
+            },
+            "nor": {
+                "total": 2,
+                "percent": 0.9
+            },
+            "none": {
+                "total": 2,
+                "percent": 0.9
+            },
+            "barely": {
+                "total": 1,
+                "percent": 0.5
+            }
+        },
+        "by_form": {
+            "not": {
+                "total": 86,
+                "percent": 40.2
+            },
+            "n't": {
+                "total": 39,
+                "percent": 18.2
+            },
+            "no": {
+                "total": 26,
+                "percent": 12.1
+            },
+            "few": {
+                "total": 14,
+                "percent": 6.5
+            },
+            "without": {
+                "total": 13,
+                "percent": 6.1
+            },
+            "never": {
+                "total": 9,
+                "percent": 4.2
+            },
+            "nothing": {
+                "total": 7,
+                "percent": 3.3
+            },
+            "neither": {
+                "total": 4,
+                "percent": 1.9
+            },
+            "No": {
+                "total": 4,
+                "percent": 1.9
+            },
+            "nobody": {
+                "total": 3,
+                "percent": 1.4
+            },
+            "nor": {
+                "total": 2,
+                "percent": 0.9
+            },
+            "none": {
+                "total": 2,
+                "percent": 0.9
+            },
+            "Nothing": {
+                "total": 2,
+                "percent": 0.9
+            },
+            "barely": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "Not": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "Never": {
+                "total": 1,
+                "percent": 0.5
+            }
+        }
+    },
+    "NR": {
+        "by_xpos": {
+            "VBD": {
+                "total": 26,
+                "percent": 13.8
+            },
+            "VBZ": {
+                "total": 25,
+                "percent": 13.3
+            },
+            "VB": {
+                "total": 25,
+                "percent": 13.3
+            },
+            "VBP": {
+                "total": 24,
+                "percent": 12.8
+            },
+            "MD": {
+                "total": 16,
+                "percent": 8.5
+            },
+            "JJS": {
+                "total": 15,
+                "percent": 8.0
+            },
+            "VBN": {
+                "total": 14,
+                "percent": 7.4
+            },
+            "VBG": {
+                "total": 9,
+                "percent": 4.8
+            },
+            "RBS": {
+                "total": 9,
+                "percent": 4.8
+            },
+            "NNS": {
+                "total": 9,
+                "percent": 4.8
+            },
+            "NN": {
+                "total": 7,
+                "percent": 3.7
+            },
+            "RB": {
+                "total": 3,
+                "percent": 1.6
+            },
+            "JJ": {
+                "total": 3,
+                "percent": 1.6
+            },
+            "JJR": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "RBR": {
+                "total": 1,
+                "percent": 0.5
+            }
+        },
+        "by_lemma": {
+            "plan": {
+                "total": 39,
+                "percent": 20.7
+            },
+            "want": {
+                "total": 28,
+                "percent": 14.9
+            },
+            "most": {
+                "total": 24,
+                "percent": 12.8
+            },
+            "think": {
+                "total": 18,
+                "percent": 9.6
+            },
+            "believe": {
+                "total": 15,
+                "percent": 8.0
+            },
+            "should": {
+                "total": 15,
+                "percent": 8.0
+            },
+            "expect": {
+                "total": 11,
+                "percent": 5.9
+            },
+            "look": {
+                "total": 7,
+                "percent": 3.7
+            },
+            "seem": {
+                "total": 7,
+                "percent": 3.7
+            },
+            "likely": {
+                "total": 5,
+                "percent": 2.7
+            },
+            "better": {
+                "total": 4,
+                "percent": 2.1
+            },
+            "choose": {
+                "total": 4,
+                "percent": 2.1
+            },
+            "appear": {
+                "total": 4,
+                "percent": 2.1
+            },
+            "intend": {
+                "total": 3,
+                "percent": 1.6
+            },
+            "imagine": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "ought": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "suggest": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "wish": {
+                "total": 1,
+                "percent": 0.5
+            }
+        },
+        "by_form": {
+            "most": {
+                "total": 24,
+                "percent": 12.8
+            },
+            "should": {
+                "total": 15,
+                "percent": 8.0
+            },
+            "plans": {
+                "total": 15,
+                "percent": 8.0
+            },
+            "think": {
+                "total": 14,
+                "percent": 7.4
+            },
+            "want": {
+                "total": 11,
+                "percent": 5.9
+            },
+            "planned": {
+                "total": 10,
+                "percent": 5.3
+            },
+            "wanted": {
+                "total": 9,
+                "percent": 4.8
+            },
+            "plan": {
+                "total": 9,
+                "percent": 4.8
+            },
+            "wants": {
+                "total": 8,
+                "percent": 4.3
+            },
+            "expected": {
+                "total": 8,
+                "percent": 4.3
+            },
+            "believe": {
+                "total": 7,
+                "percent": 3.7
+            },
+            "look": {
+                "total": 5,
+                "percent": 2.7
+            },
+            "planning": {
+                "total": 5,
+                "percent": 2.7
+            },
+            "believed": {
+                "total": 5,
+                "percent": 2.7
+            },
+            "likely": {
+                "total": 5,
+                "percent": 2.7
+            },
+            "seems": {
+                "total": 4,
+                "percent": 2.1
+            },
+            "better": {
+                "total": 4,
+                "percent": 2.1
+            },
+            "believes": {
+                "total": 3,
+                "percent": 1.6
+            },
+            "looking": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "expect": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "intend": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "chose": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "appear": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "seem": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "thought": {
+                "total": 2,
+                "percent": 1.1
+            },
+            "intended": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "imagine": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "expects": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "ought": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "seemed": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "chooses": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "choose": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "suggesting": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "thinking": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "thinks": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "appears": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "appeared": {
+                "total": 1,
+                "percent": 0.5
+            },
+            "wished": {
+                "total": 1,
+                "percent": 0.5
+            }
+        }
+    }
+}
