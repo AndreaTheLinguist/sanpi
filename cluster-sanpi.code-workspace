@@ -58,6 +58,9 @@
             "/share/compling/projects/*/logs/*/*": true,
             "/share/compling/projects/.history": true
         },
-        "todo-tree.tree.scanMode": "open files"
+        "todo-tree.tree.scanMode": "open files",
+        "todo-tree.general.periodicRefreshInterval": 2,
+        "todo-tree.general.showActivityBarBadge": true,
+        "todo-tree.general.statusBar": "current file"
     }
 }

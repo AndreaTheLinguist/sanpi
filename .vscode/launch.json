@@ -18,30 +18,6 @@
             ]
         },
         {
-            "name": "TEST grewpy subset - apw199911",
-            "type": "python",
-            "request": "launch",
-            "program": "script/create_grewpy_subset.1.py",
-            "console": "integratedTerminal",
-            "args": [
-                "/share/compling/data/sanpi/corpora_shortcuts/testing/small/small.conll/apw_eng_199911.conllu",
-                "-n", 
-                "bigram-1"
-            ]
-        },
-        {
-            "name": "TEST grewpy subset - nyt200303",
-            "type": "python",
-            "request": "launch",
-            "program": "script/create_grewpy_subset.1.py",
-            "console": "integratedTerminal",
-            "args": [
-                "/share/compling/data/sanpi/corpora_shortcuts/testing/smallest20.conll/nyt_eng_200303.conllu",
-                "-n", 
-                "bigram-1"
-            ]
-        },
-        {
             "name": "grewpy subset - apw199911",
             "type": "python",
             "request": "launch",
@@ -49,6 +25,18 @@
             "console": "integratedTerminal",
             "args": [
                 "/share/compling/data/sanpi/corpora_shortcuts/testing/small/small.conll/apw_eng_199911.conllu",
+                "-n", 
+                "bigram"
+            ]
+        },
+        {
+            "name": "grewpy subset - long number",
+            "type": "python",
+            "request": "launch",
+            "program": "script/create_grewpy_subset.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/share/compling/data/sanpi/corpora_shortcuts/testing/smallest20.conll/nyt_eng_200311.conllu",
                 "-n", 
                 "bigram"
             ]
