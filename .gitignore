@@ -400,3 +400,4 @@ demo/data/pre23-02-08*
 tmp/
 logs/
 demo/run_pipeline.py
+demo/data/corpora/small/mixed10.conll/*.conllu
