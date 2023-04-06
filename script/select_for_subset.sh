@@ -1,6 +1,5 @@
 #!/usr/bin/bash
 
-# set -o errexit
 set -o pipefail
 set -o nounset
 
@@ -9,64 +8,51 @@ function showDate() {
   date "+%a %-m/%-d/%y @ %-I:%M%#p"
 }
 
-# function probeFileMatch() {
-#   TARGET_DIR=$2
-#   TARGET_FILE=$1
-#   TARGET=$(basename ${TARGET_FILE%.*})
-#   echo "@target: $TARGET"
-#   # echo "find $TARGET_DIR -name "'"*'"${TARGET}"'*"'
-#   if [[ $(find $TARGET_DIR -name "*${TARGET}*") ]]; then
-#     # echo "FOUND: `du -h --time $TARGET_DIR/*$TARGET* `"
-#     find $TARGET_DIR -name "*${TARGET}*" | cut -d/ -f7-
-#   else
-#     echo "'"'*'"$TARGET"'*'"' not found in ../${TARGET_DIR#*conll/}/ "
-#   fi
-# }
 
 function submitJob() {
   F=$1
   TAG=$2
   SLURM_FLAGS=$3
-  echo "▶ $(basename $F)"
 
   #! wait if there are quite a few jobs already
-  if [[ $(squeue | egrep -c "arh234") -gt 30 ]]; then
-
+  if [[ $(squeue | egrep -c "arh234") -gt 33 ]]; then
+    echo "... $(squeue | egrep -c arh234) jobs running @ $(date +%R)..."
     for i in $(seq 5); do
       if [[ $(squeue | egrep -c "arh234") -gt 35 ]]; then
-        echo "sleep 1m"
-        sleep 1m
+        echo "$(squeue | egrep -c arh234) jobs running ↠ sleep 30"
+        sleep 30
       elif [[ $(squeue | egrep -c "arh234") -gt 40 ]]; then
-        echo 'sleep 3m'
-        sleep 3m
+        echo "$(squeue | egrep -c arh234) jobs running ↠ sleep 1m"
+        sleep 1m
       elif [[ $(squeue | egrep -c "arh234") -gt 50 ]]; then
-        echo 'sleep 5m'
-        sleep 5m
+        echo "$(squeue | egrep -c arh234) jobs running ↠ sleep 3m"
+        sleep 3m
       elif [[ $(squeue | egrep -c "arh234") -gt 60 ]]; then
-        echo "sleep 10m"
-        sleep 10m
+        echo "$(squeue | egrep -c arh234) jobs running ↠ sleep 5m"
+        sleep 5m
       fi
     done
+    echo "... $(squeue | egrep -c arh234) jobs running @ $(date +%R)..."
   else
-    echo "sleep 1"
-    sleep 1
+    echo "... $(squeue | egrep -c arh234) jobs running @ $(date +%R)..."
   fi
 
   #* run subset job on $F
   F_NAME="$(basename $F)"
+  echo "▶ $F_NAME"
   STEM=${F_NAME%.conllu}
   J_NAME="-J ${STEM/_eng_/}-${TAG}_$(date +%y%m%d-%H%M)"
   echo -e "sbatch $J_NAME $SLURM_FLAGS /share/compling/projects/sanpi/grewpy_subset.slurm.sh $TAG $F"
   showDate
-  sbatch $J_NAME $SLURM_FLAGS /share/compling/projects/sanpi/grewpy_subset.slurm.sh $TAG $F #! #HACK: temp -- uncomment!
-  # echo 'NOTHING SUBMITTED! -- sbatch line commented out'
+  sbatch $J_NAME $SLURM_FLAGS /share/compling/projects/sanpi/grewpy_subset.slurm.sh $TAG $F
+
   echo "sleep 3"
   sleep 3
 
 }
 
 function ifQueueEmptyExit() {
-  if [[ "$(squeue | egrep -c "arh234")" == "0" ]]; then
+  if [[ "$(squeue | egrep -c arh234)" == "0" ]]; then
     echo -e "\n⋄ No jobs running. Quitting script."
     echo "⟪ script closed: $(showDate) ⟫"
     exit
@@ -80,10 +66,9 @@ function inspectSubset() {
   SUBSET_DIR=$1
   TAG=${2:-"${SUBSET_DIR##*subset_}"}
   CONLL_DIR=${SUBSET_DIR%/*}
-  CONLL_NAME=`basename ${CONLL_DIR}`
+  CONLL_NAME=$(basename ${CONLL_DIR})
   echo -e "\n## ..${CONLL_DIR#*compling}/"
   CORPUS_DIR=${CONLL_DIR%/*}
-  # echo "corpus ↦ $CORPUS_DIR"
   TOP_INFO_DIR=${CONLL_DIR}/info
   mkdir -p $TOP_INFO_DIR
   SUB_INFO_DIR=${SUBSET_DIR}/info
@@ -105,7 +90,6 @@ function inspectSubset() {
   for IN_CONLLU in ${CONLL_DIR}/*conllu; do
     NAME="${IN_CONLLU##*/}"
     STEM=${NAME%.conllu}
-    # echo "@ seeking: $STEM"
     IN_COUNTS=''
     SUB_COUNTS=''
     SUB_CONLLU=''
@@ -115,33 +99,29 @@ function inspectSubset() {
     #>> subset .conllu
     if [[ $(find $SUBSET_DIR -name "*${NAME}") ]]; then
       SUB_CONLLU=$(find $SUBSET_DIR -name "*${NAME}")
-      # echo "subset conllu path: ..${SUB_CONLLU#${CORPUS_DIR}}"
     fi
 
-    #>> subset context.json
+    #>> subset context.psv
     if [[ $(find $SUBSET_DIR -name "*${STEM}.context*") ]]; then
       SUB_CONTEXT=$(find $SUBSET_DIR -name "*${STEM}.context*")
-      # echo "subset context path: ..${SUB_CONTEXT#${CORPUS_DIR}}"
+    fi
+
+    #>> subset counts.json
+    if [[ $(find $SUB_INFO_DIR -name "*${STEM}.counts*") ]]; then
+      SUB_COUNTS=$(find $SUB_INFO_DIR -name "*${STEM}.counts*")
     fi
 
     #>> input counts
     if [[ $(find $TOP_INFO_DIR -name "${STEM}.counts*") ]]; then
       IN_COUNTS=$(find $TOP_INFO_DIR -name "${STEM}.counts*")
-      # echo "input counts path: ..${IN_COUNTS#*${CORPUS_DIR}}"
     fi
 
     #> look for subset counts (least likely to exist)
-    if [[ $(find $SUB_INFO_DIR -name "*${STEM}.counts*") ]]; then
+    if [[ -n $IN_COUNTS && -n $SUB_COUNTS && -n $SUB_CONLLU && -n $SUB_CONTEXT ]]; then
 
       #* append input conllu name to "complete" index
-      # echo " ✓ ${STEM}: $SUB_CONLLU"
-      # echo "    $(du -h ${SUB_CONLLU} | cut -f1)   $(du --time ${SUB_CONLLU} | cut -f2)"
       echo " ✓ ${STEM} found"
-      # echo "    $(du -h --time ${SUB_CONLLU})"
       echo $IN_CONLLU >>$RECENT_COMPLETE
-
-      SUB_COUNTS=$(find $SUB_INFO_DIR -name "*${STEM}.counts*")
-      # echo "subset counts path: ..${SUB_COUNTS#*${CORPUS_DIR}}"
 
     #> if not there, mark as missing and queue IN_CONLLU for job submission
     else
@@ -172,10 +152,8 @@ function inspectSubset() {
   echo "  unfinished:  $(egrep -c conllu $RECENT_MISSING)"
   echo "    (partial:  $(egrep -c 'counts.*, ?$' $RECENT_INDEX))"
   echo
-  du -ch --time ${SUBSET_DIR}/*conllu
+  du -ch --time ${SUBSET_DIR}/*conllu | column -t -n
   echo -e "\n↦ full subset processing paths index saved as:\n   $RECENT_INDEX"
-  # column -t -s, $RECENT_INDEX
-  # tree -tlh --noreport $CONLL_DIR
   echo '*************************'
 }
 
@@ -193,7 +171,6 @@ function checkCorpusStatus() {
 
     MISSING_INDEX_GLOB="${MISSING_STEM}*"
 
-    # echo -e "\nChecking ../$(basename $CONLL_DIR)/$(basename $SUBSET_DIR)/ for previous processing..."
     #> check this subset's previous file index records
     # Note: This could fail either because no files match the glob,
     #       or because no lines match the grep. No need to distinguish.
@@ -235,7 +212,6 @@ if [[ $CHECK == "--status_check" ]]; then
   showDate
   exit 0
 fi
-
 
 #* SELECT FILES AND SUBMIT JOBS
 for CONLL_DIR in ${CORPUS_DIR}/*conll; do
