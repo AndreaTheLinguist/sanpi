@@ -1,15 +1,18 @@
+```
 running slurm script: /share/compling/projects/sanpi/slurm/compare-adv-by-scale.slurm.sh
 JOB ID: 222753
 JOB NAME: scale-compare
 started @ 2023-04-19 20:14:28 from /share/compling/projects/sanpi/notebooks/scale_comparison/logs
 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+```
 running on luxlab-cpu-03 with 1 cores
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+```
 time python $PROG $N_FILES
 time python /share/compling/projects/sanpi/notebooks/scale_comparison/compare-adv-by-scale.py 35
 Comparing Adverbs by Scale Type for:
 35 files & a frequency threshold of 17500
-
+```
 ## loading data...
   + ../sanpi/2_hit_tables/advadj/with-context/bigram-PccVa_all-RB-JJs_hits.pkl.gz
   + ../sanpi/2_hit_tables/advadj/with-context/bigram-PccTe_all-RB-JJs_hits.pkl.gz
@@ -123,6 +126,7 @@ removing duplicates
 | kinda           |   0.685 |  1.112 |       0.936 |      0.406 |       0.415 |         0     |          3129 |
 | sorta           |   2.077 |  0.917 |       1.611 |      1.217 |       0.872 |         0     |           172 |
 
+```
 Most divergent adjectives (of 50% most frequent) for each scale type:
  ¤ actually
  ¤ all
@@ -139,6 +143,7 @@ Most divergent adjectives (of 50% most frequent) for each scale type:
  ¤ totally
  ¤ truly
  ¤ unusually
+
 Heatmap saved to:
   /share/compling/projects/sanpi/notebooks/scale_comparison/images/scale-type_examples_35-17500.heat-ex.png
 Heatmap saved to:
@@ -153,3 +158,4 @@ Heatmap saved to:
 real	30m35.368s
 user	26m46.358s
 sys	1m55.338s
+```
