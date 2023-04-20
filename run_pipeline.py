@@ -16,9 +16,9 @@ import time
 import sys
 from pathlib import Path
 
-from source.gather.grew_search import grew_search
-from source.gather.fill_match_info import fill_json
-from source.gather.tabulate_hits import tabulate_hits
+from source.gather.grew_search import grew_search  # pylint: disable=import-error
+from source.gather.fill_match_info import fill_json  # pylint: disable=import-error
+from source.gather.tabulate_hits import tabulate_hits  # pylint: disable=import-error
 
 THIS_DIR = Path(sys.argv[0]).parent
 DATA_DIR = Path('/share/compling/data')
@@ -43,19 +43,19 @@ def _main():
     rewrite_files = args.rerun_grew_search
     for patdir in patdirs:
         # skip any directories without at least one .pat file
-        if not list(patdir.glob('*.pat')):
+        if not bool(list(patdir.glob('*.pat'))):
             continue
-        
+
         for corpus in corpora:
             corpus = corpus.resolve()
-            
+
             verb = 'process' if tab_only else 'search'
             print(
                 f'>> {verb}ing `{corpus}` data for '
                 f'patterns specified in `{patdir}`...')
 
             for pat_path in patdir.iterdir():
-                
+                print(f'. . . . . . . . . . . . . . . . . . . . .\n↯ Processing {pat_path.name} matches...')
                 # > can use "corpus.stem" for corpus subset name
                 # >     because pathlib treats ".conll" of dir name as suffix
                 grew_json_dir = (args.grew_output_dir
@@ -64,7 +64,8 @@ def _main():
 
                 if not grew_json_dir.is_dir():
                     if tab_only:
-                        print('ERROR: "tabulate_only" option specificed, but no hit files exist for given pattern and corpus. Run full pipeline.')
+                        print('ERROR: "tabulate_only" option specificed, but no hit files', 
+                              'exist for given pattern and corpus. Run full pipeline.')
                     else:
                         grew_json_dir.mkdir(parents=True)
 
@@ -74,13 +75,13 @@ def _main():
 
                     # * add word/token info to raw jsons from conllus
                     fill_json(conllu_dir=corpus,
-                            raw_dir=grew_json_dir,
-                            rewrite=rewrite_files)
+                              raw_dir=grew_json_dir,
+                              rewrite=rewrite_files)
 
                 # * run tabulate
-                tabulate_hits(match_dir=grew_json_dir, 
-                            #   pat_path=pat_path, 
-                            #   output_prefix=output_prefix
+                tabulate_hits(match_dir=grew_json_dir,
+                              #   pat_path=pat_path,
+                              #   output_prefix=output_prefix
                               )
 
 

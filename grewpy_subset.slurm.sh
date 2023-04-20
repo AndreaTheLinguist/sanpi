@@ -7,8 +7,8 @@
 ##SBATCH --open-mode=append
 #SBATCH --nodes=1               # Total number of nodes requested
 #SBATCH --ntasks=1              # Total number of tasks (defaults to 1 cpu/task, but overrride with -c)
-#SBATCH --mem=16G               # Total amount of (real) memory requested (per node)
-#SBATCH --time 1:00:00          # Time limit (hh:mm:ss)
+#SBATCH --mem=38G               # Total amount of (real) memory requested (per node)
+#SBATCH --time 3:00:00          # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --chdir=/share/compling/projects/sanpi/logs/grewpy_subsets     # change working directory to this before execution
 
