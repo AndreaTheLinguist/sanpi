@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# shell script to submit array slurm jobs to run pipeline on full corpora directories. Calls 'sbatch /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh'.
+# shell script to submit array slurm jobs to run pipeline on full corpora directories. Calls 'sbatch /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh'.
 #
 #  1 of the following can be passed to specify pattern directories to run (directories in ./Pat/) If none is given, '--neg' will be used.
 #
@@ -10,7 +10,7 @@
 #
 #      --neg
 #          all main negated patterns:
-#              'PATS=("contig" "scoped" "raised" "advadj")'
+#              'PATS=("contig" "scoped" "raised")'
 #
 #      --noncontig
 #          main negated patterns excluding 'contig':
@@ -19,10 +19,16 @@
 #      [directory name]
 #          any (single) directory name in "./Pat/"
 
-# (which grew && grew version) && (date; echo 'pats=("contig" "scoped" "raised" "advadj");for pat in "${pats[@]}"; do sbatch -J ${pat}DEMO exactly-array.demo-slurm.sh ${pat}; done'; pats=("contig" "scoped" "raised" "advadj"); for pat in "${pats[@]}"; do echo "# ${pat}"; echo "sbatch -J ${pat}DEMO exactly-array.demo-slurm.sh ${pat}"; sbatch -J ${pat}DEMO exactly-array.demo-slurm.sh ${pat}; done)
+# example: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi contig --array=35-36
+# EVERYTHING: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi --all_pat
 
-echo "Running /share/compling/projects/sanpi/run_sanpi-array-slurm.sh"
+CPUS=10
+CPU_MEM=5G
 
+echo "Running /share/compling/projects/sanpi/run_bigram-array-slurm.sh"
+date
+LOG_DIR=/share/compling/projects/sanpi/logs/bigram-pipeline_`date "+%y-%m-%d"`
+mkdir -p $LOG_DIR
 MODE=$1
 PAT_FLAG=${2:-"--neg"}
 echo "PAT_FLAG: $PAT_FLAG"
@@ -36,12 +42,12 @@ if [[ $(which grew && grew version) ]]; then
         PATS=("contig" "scoped" "raised" "advadj")
 
     elif [[ $PAT_FLAG == '--neg' ]]; then
-        PATS=("contig" "scoped" "raised" "advadj")
+        PATS=("contig" "scoped" "raised")
 
     elif [[ $PAT_FLAG == '--noncontig' ]]; then
         PATS=("scoped" "raised")
 
-    elif [[ -d "Pat/$PAT_FLAG" ]]; then
+    elif [[ -d "/share/compling/projects/sanpi/Pat/$PAT_FLAG" ]]; then
         PATS=("$PAT_FLAG")
 
     else
@@ -55,16 +61,16 @@ if [[ $(which grew && grew version) ]]; then
     for PAT in "${PATS[@]}"; do
 
         echo -e "\n# $PAT"
-
+        JOB_NAME="-J bigram-${PAT}_$(date +%y-%m-%d_%H%M)"
         if [[ $MODE == 'multi' ]]; then
-            # echo 'sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT'
-            echo "sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT"
-            sbatch -J $PAT $ARRAY -n 12 --mem-per-cpu=14G /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh $PAT
+            # echo 'sbatch ${JOB_NAME} $ARRAY ./bigram-array.slurm.sh $PAT'
+            echo "sbatch ${JOB_NAME} $ARRAY --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=$LOG_DIR bigram-array.slurm.sh $PAT"
+            sbatch ${JOB_NAME} $ARRAY --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=$LOG_DIR /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh $PAT
 
         elif [[ $MODE == 'solo' ]]; then
-            # echo 'sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT'
-            echo "sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT"
-            sbatch -J $PAT $ARRAY -n 1 --mem=10G /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh $PAT
+            # echo 'sbatch ${JOB_NAME} $ARRAY ./bigram-array.slurm.sh $PAT'
+            echo "sbatch ${JOB_NAME} $ARRAY -n 1 --mem=15G --chdir=$LOG_DIR bigram-array.slurm.sh $PAT"
+            sbatch ${JOB_NAME} $ARRAY -n 1 --mem=15G --chdir=$LOG_DIR  /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh $PAT
         else
             echo -e  "No valid cpu mode given. First argument should be one of the following strings:\n+ 'solo' for 1 core/cpu\n~or~\n+ 'multi' for multiple cores/cpus"
         fi
