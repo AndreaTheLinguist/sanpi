@@ -379,7 +379,7 @@ tags
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 .untracked/
 sandbox/
-*.[0-9]*
+*.[0-9]+.*
 *.err
 *.out
 playground/
@@ -402,3 +402,4 @@ logs/
 demo/run_pipeline.py
 demo/data/corpora/small/mixed10.conll/*.conllu
 demo/data/corpora/git_commit/*/subset_advadj/
+**.tar*

@@ -1,0 +1,148 @@
+
+Number of Clusters 6
+Number of Features 2
+------------------------
+Cluster 0	0.280397
+Feature 0
+	very	0.475964
+	really	0.0999999
+	pretty	0.0592992
+	as	0.0534348
+	so	0.041227
+	extremely	0.03268
+	quite	0.0267755
+	relatively	0.024475
+	always	0.0141083
+	super	0.0140762
+Feature 1
+	good	0.117126
+	important	0.0410754
+	easy	0.0267709
+	difficult	0.0237237
+	different	0.0233324
+	high	0.0231005
+	little	0.0224386
+	happy	0.020921
+	simple	0.0196782
+	strong	0.0190975
+------------------------
+Cluster 5	0.265843
+Feature 0
+	more	0.370209
+	most	0.367946
+	less	0.0440506
+	very	0.0435344
+	highly	0.0271354
+	as	0.0225238
+	extremely	0.0149547
+	increasingly	0.0129748
+	particularly	0.0109935
+	also	0.0107302
+Feature 1
+	important	0.109277
+	likely	0.0750489
+	popular	0.0473728
+	common	0.0347096
+	effective	0.0323732
+	difficult	0.0313756
+	recent	0.0303848
+	expensive	0.0252144
+	powerful	0.0250376
+	successful	0.0183813
+------------------------
+Cluster 4	0.191304
+Feature 0
+	so	0.371415
+	too	0.304911
+	as	0.177621
+	how	0.0870465
+	not	0.025433
+	pretty	0.0120915
+	very	0.0103519
+	that	0.00657049
+	even	0.00153466
+	still	0.000334745
+Feature 1
+	many	0.260689
+	much	0.218657
+	good	0.0292089
+	bad	0.0267725
+	big	0.0207002
+	high	0.0197022
+	close	0.0186626
+	easy	0.017669
+	little	0.0167605
+	late	0.0154074
+------------------------
+Cluster 2	0.110123
+Feature 0
+	not	0.635763
+	well	0.0372472
+	pretty	0.0282843
+	quite	0.0269148
+	almost	0.025146
+	really	0.0223032
+	always	0.0205498
+	even	0.0171826
+	just	0.0159829
+	also	0.0144049
+Feature 1
+	sure	0.134639
+	enough	0.0685396
+	able	0.0459219
+	worth	0.0333083
+	good	0.0322118
+	easy	0.0319766
+	aware	0.0313218
+	possible	0.031058
+	available	0.0289865
+	true	0.0285548
+------------------------
+Cluster 3	0.0812506
+Feature 0
+	much	0.397822
+	even	0.183433
+	far	0.0897083
+	no	0.0563406
+	slightly	0.0468235
+	significantly	0.0295326
+	well	0.0257779
+	partly	0.0249991
+	not	0.0162635
+	relatively	0.0116523
+Feature 1
+	more	0.225023
+	good	0.140225
+	easy	0.049279
+	high	0.049093
+	less	0.0455381
+	bad	0.0447046
+	different	0.0364069
+	great	0.0355688
+	large	0.0312714
+	big	0.0273582
+------------------------
+Cluster 1	0.0710815
+Feature 0
+	also	0.111321
+	still	0.0804025
+	completely	0.0803656
+	now	0.0717655
+	only	0.0545042
+	just	0.0501118
+	all	0.0467051
+	more	0.0459544
+	totally	0.0446783
+	entirely	0.0434687
+Feature 1
+	available	0.138377
+	different	0.0741599
+	new	0.0452828
+	free	0.0359387
+	possible	0.034197
+	clear	0.0341122
+	able	0.0296964
+	fine	0.0290025
+	open	0.026734
+	right	0.0261995
+

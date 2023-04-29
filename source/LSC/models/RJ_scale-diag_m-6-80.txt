@@ -1,0 +1,148 @@
+
+Number of Clusters 6
+Number of Features 2
+------------------------
+Cluster 2	0.246705
+Feature 0
+	very	0.451494
+	too	0.170192
+	relatively	0.135036
+	so	0.0579223
+	as	0.0554433
+	extremely	0.0497817
+	slightly	0.0320989
+	quite	0.0288361
+	just	0.0103829
+	most	0.00577615
+Feature 1
+	small	0.184919
+	high	0.160487
+	little	0.15691
+	low	0.130497
+	easy	0.0920201
+	short	0.0883624
+	large	0.0846542
+	poor	0.0248531
+	safe	0.0127035
+	soft	0.0115186
+------------------------
+Cluster 5	0.222385
+Feature 0
+	very	0.558131
+	really	0.231816
+	so	0.0758154
+	as	0.0470026
+	quite	0.0265791
+	particularly	0.0139277
+	extremely	0.0108167
+	just	0.0100212
+	perfectly	0.00734954
+	slightly	0.00601341
+Feature 1
+	good	0.68614
+	hard	0.110287
+	difficult	0.064497
+	easy	0.032562
+	little	0.0199362
+	clean	0.0117781
+	poor	0.0116295
+	rich	0.0106982
+	big	0.00915204
+	large	0.00895525
+------------------------
+Cluster 4	0.21996
+Feature 0
+	as	0.44018
+	very	0.266701
+	so	0.14961
+	too	0.104222
+	slightly	0.0140546
+	particularly	0.00936547
+	really	0.00722746
+	quite	0.00395245
+	more	0.00297338
+	least	0.000839039
+Feature 1
+	good	0.318808
+	little	0.12297
+	bad	0.115687
+	high	0.110511
+	easy	0.0974713
+	big	0.0915517
+	large	0.0464142
+	low	0.0139652
+	smooth	0.0119564
+	tall	0.0116331
+------------------------
+Cluster 3	0.15734
+Feature 0
+	more	0.389738
+	very	0.223983
+	most	0.188323
+	extremely	0.0641144
+	too	0.039283
+	so	0.0225831
+	quite	0.0191983
+	particularly	0.0171938
+	as	0.0167251
+	less	0.0146357
+Feature 1
+	difficult	0.564397
+	dangerous	0.196407
+	open	0.0681426
+	good	0.0284893
+	high	0.0248296
+	transparent	0.020496
+	small	0.0121196
+	large	0.0094043
+	big	0.00933571
+	easy	0.0081635
+------------------------
+Cluster 1	0.120943
+Feature 0
+	too	0.334303
+	so	0.302002
+	really	0.206418
+	very	0.0431274
+	just	0.0247198
+	more	0.0217677
+	extremely	0.0209058
+	quite	0.0189288
+	particularly	0.0169552
+	less	0.00609533
+Feature 1
+	bad	0.254224
+	big	0.165425
+	hard	0.142468
+	easy	0.116705
+	high	0.0490728
+	small	0.047789
+	good	0.0362225
+	full	0.0302594
+	short	0.0292988
+	dangerous	0.0189713
+------------------------
+Cluster 0	0.0326662
+Feature 0
+	more	0.172249
+	completely	0.146804
+	as	0.138217
+	absolutely	0.0909282
+	so	0.0826129
+	less	0.0617645
+	perfectly	0.0536358
+	just	0.0462879
+	fully	0.0431489
+	most	0.0402583
+Feature 1
+	safe	0.211517
+	open	0.154694
+	fantastic	0.0816382
+	gorgeous	0.0758606
+	transparent	0.0727033
+	clean	0.0512171
+	full	0.0480783
+	dead	0.0446862
+	smooth	0.0426644
+	empty	0.0421387
+
