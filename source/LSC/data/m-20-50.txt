@@ -1,0 +1,484 @@
+
+Number of Clusters 20
+Number of Features 2
+------------------------
+Cluster 16	0.0848023
+Feature 0
+	have	0.76972
+	offer	0.0250336
+	maintain	0.012939
+	express	0.0123443
+	recognize	0.0112523
+	choose	0.00968507
+	expand	0.00751866
+	fill	0.00716271
+	improve	0.00547672
+	exercise	0.00516913
+Feature 1
+	share	0.0187631
+	loss	0.0173475
+	damage	0.0168148
+	sale	0.0157119
+	time	0.0152881
+	effect	0.0148579
+	impact	0.0147819
+	interest	0.0135682
+	right	0.0130425
+	problem	0.0126771
+------------------------
+Cluster 9	0.0767707
+Feature 0
+	buy	0.198592
+	sell	0.169803
+	include	0.062662
+	provide	0.0616643
+	give	0.037771
+	hold	0.0317792
+	acquire	0.0301726
+	purchase	0.0301449
+	own	0.0234155
+	visit	0.01848
+Feature 1
+	share	0.0753832
+	stake	0.0363647
+	stock	0.0318069
+	stocks	0.029826
+	operation	0.0205505
+	service	0.0198696
+	bond	0.0197093
+	%	0.0189964
+	security	0.0148762
+	unit	0.0143053
+------------------------
+Cluster 19	0.0660314
+Feature 0
+	raise	0.111496
+	increase	0.0922492
+	reduce	0.0831158
+	face	0.0548929
+	cut	0.0427755
+	boost	0.0413779
+	cover	0.0361648
+	lower	0.0275421
+	exceed	0.0173773
+	pay	0.0161188
+Feature 1
+	price	0.0566479
+	rate	0.04376
+	cost	0.0388683
+	problem	0.0324463
+	value	0.0307767
+	stake	0.0219445
+	tax	0.0205725
+	rating	0.0167008
+	number	0.0154878
+	debt	0.0130905
+------------------------
+Cluster 7	0.0649594
+Feature 0
+	receive	0.0934855
+	pay	0.0887079
+	approve	0.0433581
+	need	0.0350591
+	pass	0.0248024
+	finance	0.0245133
+	oppose	0.0241161
+	require	0.0188648
+	avoid	0.0170066
+	win	0.01682
+Feature 1
+	bill	0.04217
+	plan	0.0279896
+	approval	0.0268025
+	contract	0.0266183
+	order	0.0243452
+	debt	0.0210006
+	dividend	0.0187594
+	attention	0.0150623
+	offer	0.012436
+	increase	0.0115721
+------------------------
+Cluster 10	0.0570698
+Feature 0
+	report	0.142817
+	post	0.0847294
+	build	0.0583839
+	expect	0.0500216
+	include	0.0401401
+	have	0.0363658
+	shake	0.0296217
+	attribute	0.022711
+	achieve	0.0184657
+	suffer	0.0170885
+Feature 1
+	loss	0.107234
+	gain	0.0634434
+	earnings	0.0510546
+	profit	0.0451532
+	decline	0.0392079
+	increase	0.0348316
+	head	0.0279537
+	result	0.0263262
+	drop	0.0255349
+	growth	0.0191314
+------------------------
+Cluster 3	0.0563927
+Feature 0
+	make	0.451718
+	put	0.112698
+	complete	0.0435695
+	change	0.0306927
+	end	0.0298018
+	lead	0.0189401
+	block	0.0172299
+	withdraw	0.0108495
+	release	0.00986879
+	test	0.00799004
+Feature 1
+	bid	0.0324626
+	money	0.0288987
+	offer	0.025737
+	decision	0.0244675
+	sense	0.0201608
+	acquisition	0.0149164
+	sale	0.0127477
+	mind	0.0127265
+	statement	0.0126795
+	move	0.0119653
+------------------------
+Cluster 1	0.0509885
+Feature 0
+	see	0.153095
+	show	0.097043
+	carry	0.0829993
+	file	0.0498611
+	send	0.0494059
+	draw	0.0346654
+	indicate	0.0271738
+	prevent	0.0237753
+	cite	0.0196983
+	settle	0.0191118
+Feature 1
+	suit	0.0273265
+	sign	0.0229028
+	growth	0.0192268
+	face	0.0150046
+	report	0.0144359
+	change	0.0121702
+	case	0.0119744
+	coupon	0.00916056
+	picture	0.00869039
+	return	0.00814201
+------------------------
+Cluster 12	0.0492849
+Feature 0
+	get	0.275727
+	lose	0.0931894
+	yield	0.0864812
+	own	0.0637354
+	hold	0.0304914
+	win	0.0283598
+	control	0.0277783
+	provide	0.0267248
+	continue	0.0219792
+	pursue	0.0177302
+Feature 1
+	%	0.200959
+	money	0.028209
+	interest	0.0212173
+	job	0.0149724
+	support	0.0134172
+	case	0.0128535
+	finance	0.0101292
+	share	0.00979155
+	cash	0.00885465
+	contract	0.00847225
+------------------------
+Cluster 11	0.0479151
+Feature 0
+	run	0.0696274
+	involve	0.0458869
+	launch	0.0374539
+	consider	0.0353383
+	saw	0.0348766
+	watch	0.0328289
+	handle	0.0313559
+	accept	0.0282382
+	start	0.0249719
+	establish	0.0212369
+Feature 1
+	programme	0.0296311
+	offer	0.0187334
+	account	0.0185162
+	man	0.016068
+	proposal	0.0140776
+	strategy	0.0133268
+	bid	0.0127965
+	business	0.0121169
+	image	0.00958398
+	career	0.00935585
+------------------------
+Cluster 2	0.0475394
+Feature 0
+	tell	0.118493
+	reach	0.0927313
+	hit	0.0503334
+	enter	0.0495433
+	succeed	0.0471876
+	attract	0.0419443
+	hold	0.0369678
+	serve	0.0288354
+	approach	0.0175511
+	name	0.0168951
+Feature 1
+	market	0.0808475
+	investor	0.0321472
+	agreement	0.0198192
+	customer	0.0136312
+	people	0.0105442
+	level	0.00948123
+	reporter	0.00889331
+	official	0.00887079
+	government	0.00881058
+	audience	0.00876774
+------------------------
+Cluster 6	0.0469335
+Feature 0
+	take	0.561347
+	wear	0.0542706
+	know	0.0442726
+	read	0.0300558
+	assume	0.0245387
+	clean	0.0127458
+	fill	0.00925092
+	drink	0.00902828
+	retain	0.00836506
+	hold	0.00706966
+Feature 1
+	place	0.0334225
+	step	0.0333541
+	position	0.031391
+	action	0.0175609
+	look	0.016791
+	time	0.0145496
+	charge	0.01385
+	advantage	0.0117991
+	post	0.011133
+	effect	0.0109555
+------------------------
+Cluster 17	0.0465929
+Feature 0
+	do	0.179442
+	seek	0.0946942
+	add	0.0595891
+	hear	0.0593803
+	want	0.0504913
+	say	0.0460064
+	obtain	0.0222866
+	find	0.0194783
+	know	0.0193515
+	arrange	0.0145565
+Feature 1
+	trade	0.0567168
+	anything	0.0562414
+	something	0.0544577
+	thing	0.0527373
+	work	0.031126
+	nothing	0.030743
+	business	0.0278544
+	job	0.0206089
+	word	0.0202965
+	finance	0.0163115
+------------------------
+Cluster 14	0.0447885
+Feature 0
+	leave	0.11597
+	turn	0.0765213
+	call	0.0450628
+	begin	0.0349133
+	include	0.030645
+	announce	0.0283553
+	support	0.0242856
+	deliver	0.0221425
+	resume	0.021147
+	lack	0.0153051
+Feature 1
+	effort	0.0174566
+	plan	0.0172063
+	operation	0.014066
+	product	0.0137076
+	policy	0.0135013
+	computer	0.0106351
+	company	0.0104541
+	family	0.00945386
+	room	0.00903728
+	note	0.00824485
+------------------------
+Cluster 4	0.0431417
+Feature 0
+	use	0.22212
+	produce	0.105125
+	follow	0.0752558
+	write	0.0398334
+	break	0.0389216
+	violate	0.0288876
+	study	0.0275303
+	sign	0.0270915
+	supply	0.0197486
+	return	0.0197024
+Feature 1
+	law	0.0259156
+	letter	0.0202693
+	rule	0.019035
+	call	0.0114341
+	agreement	0.00986029
+	provision	0.00955654
+	technique	0.00835265
+	water	0.00816045
+	lead	0.0074325
+	word	0.00664124
+------------------------
+Cluster 18	0.0421877
+Feature 0
+	find	0.148419
+	set	0.113332
+	keep	0.0864258
+	develop	0.0811992
+	introduce	0.0432204
+	give	0.0329852
+	require	0.030015
+	promote	0.020917
+	match	0.0148924
+	extend	0.0137048
+Feature 1
+	way	0.0615949
+	life	0.0258607
+	system	0.0187369
+	name	0.0139001
+	standard	0.0131551
+	date	0.0128297
+	technology	0.0123557
+	product	0.0114603
+	figure	0.0112153
+	eye	0.0109333
+------------------------
+Cluster 13	0.0375416
+Feature 0
+	re-present	0.0958343
+	acquire	0.0926142
+	spend	0.0796723
+	gain	0.0527347
+	form	0.0405
+	place	0.0340486
+	total	0.02853
+	share	0.0263215
+	help	0.022714
+	question	0.0170373
+Feature 1
+	company	0.0603739
+	share	0.0404754
+	time	0.0330195
+	%	0.0276477
+	money	0.0184607
+	lot	0.0170582
+	power	0.0168538
+	control	0.0162143
+	group	0.0158931
+	point	0.012125
+------------------------
+Cluster 0	0.0356247
+Feature 0
+	bring	0.152627
+	reflect	0.103847
+	pick	0.0510716
+	cut	0.0494447
+	issue	0.0462929
+	catch	0.0398484
+	stop	0.0258684
+	cite	0.0222952
+	trigger	0.0219344
+	monitor	0.0199296
+Feature 1
+	number	0.0248977
+	dividend	0.0141891
+	development	0.0117516
+	change	0.011538
+	eye	0.00988888
+	weakness	0.00865682
+	statement	0.00832586
+	cost	0.00817388
+	conversation	0.00758346
+	opposition	0.00718765
+------------------------
+Cluster 15	0.0348192
+Feature 0
+	create	0.105325
+	cause	0.071461
+	push	0.0480598
+	hold	0.0435485
+	ease	0.0414853
+	remember	0.0365082
+	get	0.0357731
+	mean	0.0314289
+	cast	0.018612
+	blame	0.0183356
+Feature 1
+	hand	0.0547052
+	price	0.0195259
+	trouble	0.0149331
+	vote	0.0147964
+	problem	0.0132317
+	idea	0.0127838
+	asset	0.0108584
+	man	0.00948631
+	grippe	0.0094036
+	way	0.00935743
+------------------------
+Cluster 8	0.0342194
+Feature 0
+	meet	0.110253
+	play	0.103432
+	join	0.0823086
+	ask	0.0546292
+	pull	0.0524277
+	remove	0.0378765
+	throw	0.0306724
+	love	0.0298641
+	win	0.0277378
+	lift	0.0264186
+Feature 1
+	role	0.0439195
+	question	0.0402647
+	part	0.0204613
+	game	0.0203521
+	arm	0.0199067
+	demand	0.0185641
+	requirement	0.0134337
+	force	0.0113357
+	lip	0.010662
+	standard	0.010425
+------------------------
+Cluster 5	0.0323965
+Feature 0
+	open	0.11156
+	close	0.0638586
+	kill	0.0500096
+	replace	0.0483654
+	describe	0.0356413
+	deny	0.0353914
+	strike	0.0325555
+	attend	0.0315446
+	protect	0.0281307
+	shut	0.0223101
+Feature 1
+	door	0.0566348
+	people	0.0351532
+	plant	0.0274094
+	eye	0.0160373
+	issue	0.0122248
+	meeting	0.0120949
+	market	0.0108297
+	allegation	0.00994904
+	wrongdoing	0.00923257
+	blow	0.00869765
+
