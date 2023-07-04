@@ -70,13 +70,15 @@ def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
     return path_iter
 
 
+
 def print_iter(iter_obj,
                bullet: str = '▸',
                logger: logging.Logger = None,
                level: int = 20,
-               header: str = ''):
-
-    bullet_str = f'\n{bullet} '
+               header: str = '', 
+               indent:int = 0):
+    
+    bullet_str = f'\n{" " * indent}{bullet} '
 
     iter_str = bullet_str.join(f'{i}' for i in iter_obj)
 

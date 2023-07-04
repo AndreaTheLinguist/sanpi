@@ -2,7 +2,7 @@
 from pathlib import Path
 
 import pandas as pd
-from analyze.utils.general import find_files  # pylint: disable=import-error
+from utils.general import find_files  # pylint: disable=import-error
 
 
 def balance_sample(full_df: pd.DataFrame,
@@ -85,6 +85,20 @@ def cols_by_str(df: pd.DataFrame, start_str=None, end_str=None) -> list:
     return cols.to_list()
 
 
+def count_uniq(series:pd.Series) -> int:
+    return len(series.unique())
+
+
+def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
+    t_comp = (end - start).components
+    time_str = (":".join(
+        str(c).zfill(2)
+        for c in (t_comp.hours, t_comp.minutes, t_comp.seconds)) +
+                f'.{round(t_comp.microseconds, 1)}')
+
+    return time_str
+
+
 def make_cats(orig_df:pd.DataFrame, columns: list = None) -> pd.DataFrame: # type: ignore
     df = orig_df.copy()
     if columns is None:
@@ -95,3 +109,64 @@ def make_cats(orig_df:pd.DataFrame, columns: list = None) -> pd.DataFrame: # typ
         'string').astype('category') # type: ignore
 
     return df
+
+
+def save_table(df: pd.DataFrame,
+               path_str:str,
+               df_name: str = '',
+               formats: list = ['pickle']):
+    # df_name += ' '
+    out_dir = Path(path_str).parent
+    if not out_dir.is_dir():
+        out_dir.mkdir(parents=True)
+    
+    for form in formats:
+        print(f'~ Saving {df_name} as {form}...')
+        t0 = pd.Timestamp.now()
+            
+        if form == 'pickle':
+            out_path = str(path_str) + '.pkl.gz'
+            df.to_pickle(out_path)
+        elif form == 'csv':
+            out_path = str(path_str) + '.csv'
+            df.to_csv(out_path)
+        elif form == 'psv':
+            out_path = str(path_str) + '.csv'
+            df.to_csv(out_path, sep='|')
+        elif form == 'tsv':
+            out_path = str(path_str) + '.tsv'
+            df.to_csv(out_path, sep='\t')
+        t1 = pd.Timestamp.now()
+        print(f'   >> successfully saved as {out_path}\n' +
+              f'      (time elapsed: {get_proc_time(t0, t1)})')
+
+
+def sort_by_margins(crosstab_df, margins_name='SUM'):
+    crosstab_df = (crosstab_df.sort_values(
+        margins_name,
+        ascending=False).transpose().sort_values(margins_name,
+                                                 ascending=False).transpose())
+    return crosstab_df
+
+
+def unpack_dict(input_dict: dict,
+                values_name: str = 'adj',
+                keys_name: str = 'type',
+                return_df=True,
+                return_dict=False):
+    scale_df = (pd.Series(input_dict).to_frame().reset_index().rename(
+        columns={
+            0: values_name,
+            'index': keys_name
+        }))
+    explodf = scale_df.explode(values_name).set_index(values_name)
+    inv_flat_dict = explodf.to_dict()[keys_name]
+    flat_unq_vals = list(set(inv_flat_dict.keys()))
+    flat_unq_vals.sort()
+    returns = (flat_unq_vals, )
+    if return_df:
+        returns += (explodf, )
+    if return_dict:
+        returns += (inv_flat_dict, )
+
+    return returns
