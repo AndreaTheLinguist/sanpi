@@ -403,3 +403,7 @@ demo/run_pipeline.py
 demo/data/corpora/small/mixed10.conll/*.conllu
 demo/data/corpora/git_commit/*/subset_advadj/
 **.tar*
+backups
+old/
+**/Notes*
+source/analyze/get_deps.1.py
