@@ -10,8 +10,6 @@ from utils.general import print_iter
 from utils.LexicalCategories import SAMPLE_ADJ, SAMPLE_ADV
 from utils.visualize import heatmap
 
-N_EX = 3
-
 
 def _main():
     print(pd.Timestamp.now().ctime())
@@ -57,7 +55,11 @@ def _main():
             _print_uniq_lemma_count(df, updated=False)
             print(_describe_str_lemma_counts(
                 df).round().to_markdown(floatfmt=',.0f'))
+            clean_t0 = pd.Timestamp.now()
             df = _clean_data(df)
+            clean_t1 = pd.Timestamp.now()
+            print('\n[ Time to clean combined hits dataframe:',
+                  get_proc_time(clean_t0, clean_t1), ']')
             if n_files < 15:
                 save_table(df,
                            str(clean_bigrams_pkl).split('.pkl', 1)[0],
@@ -69,7 +71,7 @@ def _main():
         save_table(
             df,
             str(th_bigrams_pkl).split('.pkl', 1)[0],
-            f'restrictred bigrams ({tok_thresh_c}+ frequency threshold)')
+            f'frequency restrictred bigrams ({tok_thresh_c}+ frequency threshold)')
 
     print(df.describe().transpose().to_markdown(floatfmt=',.0f'))
     _t1 = pd.Timestamp.now()
@@ -81,7 +83,7 @@ def _main():
     # > uncomment below line ↓ to analyze subset of lemmas as described by `SAMPLE_ADJ` & `SAMPLE_ADV`
     # _make_freq_tables(frq_out_dir, df, tok_thresh_c, n_files, group_code='JxR')
     _t1 = pd.Timestamp.now()
-    print('Time to get frequencies:', get_proc_time(_t0, _t1))
+    print('[ Time to process frequencies:', get_proc_time(_t0, _t1), ']')
 
 
 def _parse_args():
@@ -131,7 +133,7 @@ def _parse_args():
 
     args = parser.parse_args()
 
-    return args.n_files, tok_thresh, args.post_proc_dir, args.frq_out_dir
+    return args.n_files, args.percent_hits_threshold, args.post_proc_dir, args.frq_out_dir
 
 
 def _load_data(n_files: int) -> pd.DataFrame:
@@ -200,30 +202,45 @@ def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
           'long sentences, strange orthography, and random capitals.')
     starting_token_count = len(df)
     ts = pd.Timestamp.now()
-    # > removing duplicates
+    # > removing implausibly long, then duplicate sentences
     if 'token_str' in df.columns and 'text_window' in df.columns:
+        _t0 = pd.Timestamp.now()
         df = _drop_long_sents(df)
+        _t1 = pd.Timestamp.now()
+        print('[ Time to drop implausible "sentences":',
+              get_proc_time(_t0, _t1), ']')
+
+        _t0 = pd.Timestamp.now()
         df = _drop_duplicate_sents(df)
+        _t1 = pd.Timestamp.now()
+        print('[ Time to drop duplicated sentences:',
+              get_proc_time(_t0, _t1), ']')
 
     valid_token_count = len(df)
-    print(
-        f'\n> {starting_token_count - valid_token_count} hits from invalid sentences removed.'
-    )
-    print('~ unique lemmas for hits in valid sentences:')
-    _print_uniq_lemma_count(df)
+    print(f'\n> {starting_token_count - valid_token_count}',
+          'hits from invalid sentences (too long or duplicated) removed.')
+    _print_uniq_lemma_count(df, label='valid', head_mark='~')
     print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
 
     # > set dtype to string and remove random capitalizations
+    ts = pd.Timestamp.now()
     print('\nNormalizing lemma case (making everything lower case)...')
     df = df.assign(adv_lemma=df.adv_lemma.str.lower(),
                    adj_lemma=df.adj_lemma.str.lower())
+    te = pd.Timestamp.now()
     _print_uniq_lemma_count(df)
+    print('[ Time to normalize lemma case:',
+          get_proc_time(ts, te), ']')
 
     # > drop lemmas with abnormal orthography
+
+    ts = pd.Timestamp.now()
+    prior_len = len(df)
     df = _drop_odd_orth(df)
     te = pd.Timestamp.now()
-    print(f'> {(starting_token_count - len(df)):,} total suspect hits',
-          f' removed in {get_proc_time(ts, te)}')
+    print(f'> {(prior_len - len(df)):,} hits',
+          'removed due to abnormal orthography in',
+          get_proc_time(ts, te))
     _print_uniq_lemma_count(df)
     print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
 
@@ -369,10 +386,10 @@ def _drop_infreq(df, token_percent) -> pd.DataFrame:
 
             # > if _too many_ hits were dropped...
             if (n_remain < must_keep
-                    # keep at least 20 unique adverbs
-                    or count_uniq(update_df.adv_lemma) < 20
-                    # keep at least 40 unique adjectives
-                        or count_uniq(update_df.adj_lemma) < 40
+                        # keep at least 20 unique adverbs
+                        or count_uniq(update_df.adv_lemma) < 20
+                        # keep at least 40 unique adjectives
+                    or count_uniq(update_df.adj_lemma) < 40
                     ):
 
                 if not filter_applied and filter_attempt < 5:
@@ -594,7 +611,13 @@ if __name__ == '__main__':
     global_start_time = pd.Timestamp.now()
     _main()
     global_end_time = pd.Timestamp.now()
-
-    print('Total Run Time:',
-          get_proc_time(start=global_start_time,
-                        end=global_end_time))
+    finish_str = ('✓ Finished @ '
+                  + global_end_time.strftime("%Y-%m-%d %I:%M%p"))
+    w = len(finish_str)+1
+    print('',
+          '.'*w,
+          finish_str,
+          sep='\n')
+    time_str = '== Total Run Time =='
+    print(time_str)
+    print(get_proc_time(global_start_time, global_end_time).center(len(time_str)))
