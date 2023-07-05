@@ -4,11 +4,11 @@ from pathlib import Path
 
 # import numpy as np
 import pandas as pd
-from utils.dataframes import (count_uniq, get_proc_time, save_table,
-                              sort_by_margins, unpack_dict)
-from utils.general import print_iter
-from utils.LexicalCategories import SAMPLE_ADJ, SAMPLE_ADV
-from utils.visualize import heatmap
+
+from utils import (print_iter, # pylint: disable=import-error
+    count_uniq, get_proc_time, save_table, sort_by_margins, unpack_dict)
+from utils.LexicalCategories import SAMPLE_ADJ, SAMPLE_ADV # pylint: disable=import-error
+from utils.visualize import heatmap # pylint: disable=import-error
 
 
 def _main():
@@ -39,7 +39,7 @@ def _main():
 
     else:
 
-        if (clean_bigrams_pkl.is_file() 
+        if (clean_bigrams_pkl.is_file()
             # and n_files < 15
             ):
             print(' * Found previous output.',
@@ -53,16 +53,17 @@ def _main():
                 df = df.set_index('hit_id')
             print(f'\n> {len(df):,} initial hits')
             _print_uniq_lemma_count(df, updated=False)
-            print(_describe_str_lemma_counts(df).round().to_markdown(floatfmt=',.0f'))
+            print(_describe_str_lemma_counts(
+                df).round().to_markdown(floatfmt=',.0f'))
             clean_t0 = pd.Timestamp.now()
             df = _clean_data(df)
             clean_t1 = pd.Timestamp.now()
             print('\n[ Time to clean combined hits dataframe:',
                   get_proc_time(clean_t0, clean_t1), ']')
             # if n_files < 15:
-                # save_table(df,
-                        #    str(clean_bigrams_pkl).split('.pkl', 1)[0],
-                        #    "cleaned bigram hits")
+            # save_table(df,
+            #    str(clean_bigrams_pkl).split('.pkl', 1)[0],
+            #    "cleaned bigram hits")
             save_table(df,
                        str(clean_bigrams_pkl).split('.pkl', 1)[0],
                        "cleaned bigram hits")
@@ -237,7 +238,7 @@ def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
           'hits from invalid sentences (too long or duplicated) removed.')
     _print_uniq_lemma_count(df, label='valid', head_mark='~')
     print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
-    
+
     # * remove random capitalizations
     ts = pd.Timestamp.now()
     print('\nNormalizing lemma case (making everything lower case)...')
@@ -309,14 +310,14 @@ def _drop_duplicate_sents(df: pd.DataFrame) -> pd.DataFrame:
     print(f'\n≎ Removing {(definite_duplicate.value_counts()[True]):,}',
           'duplicate hits between input tables',
           '(provided sentence is longer than 10 tokens).')
-    singletons = df.loc[~definite_duplicate, 
+    singletons = df.loc[~definite_duplicate,
                         ['adv_lemma', 'adj_lemma', 'token_str']]
     # init_sent_counts=df.token_str.value_counts(sort=False).sort_index()
     # filter_sent_counts=singletons.token_str.value_counts(sort=False).sort_index()
     # sent_diff = init_sent_counts - filter_sent_counts
     # sent_with_dup = len(sent_diff[sent_diff != 0].index)
     # print(f'  ⨳ {sent_with_dup:,} initial sentences had 1+ duplicates')
-    
+
     # all_dup = df.duplicated(['token_str', 'text_window'], keep=False)
     # print('Examples of duplication:')
     # print((df.loc[all_dup & over_10_tok,
@@ -327,7 +328,7 @@ def _drop_duplicate_sents(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _drop_odd_orth(df: pd.DataFrame) -> pd.DataFrame:
-    
+
     print('\nRemoving lemmas with abnormal orthography...')
     # full_df = df
     # df = df[['adv_lemma', 'adj_lemma']]
@@ -388,7 +389,7 @@ def _drop_infreq(df, token_percent) -> pd.DataFrame:
         #! use `n_remain` to evaluate because `n_dropped` is only for CURRENT attempt
         # > or if median count for either lemma type is less than 5
         if (n_remain >= 0.975 * clean_token_count
-            or any(_describe_str_lemma_counts(update_df).T['50%'] < 5)):
+                or any(_describe_str_lemma_counts(update_df).T['50%'] < 5)):
             # > raise percentage threshold --> increase by 1/4
             adjust_str = '◔ Insufficient Reduction: 🔺raising'
             token_percent *= 1.25
@@ -400,10 +401,12 @@ def _drop_infreq(df, token_percent) -> pd.DataFrame:
         elif n_dropped > 0:
 
             # > if _too many_ hits were dropped...
-            if ((n_remain < must_keep) 
-                or (count_uniq(update_df.adv_lemma) < 20)  # keep at least 20 unique adv
-                or (count_uniq(update_df.adj_lemma) < 40)  # keep at least 40 unique adj
-               ):
+            if ((n_remain < must_keep)
+                        # keep at least 20 unique adv
+                        or (count_uniq(update_df.adv_lemma) < 20)
+                        # keep at least 40 unique adj
+                    or (count_uniq(update_df.adj_lemma) < 40)
+                    ):
 
                 if not filter_applied and filter_attempt < 5:
                     # > lower percentage threshold --> reduce by 1/4
@@ -461,8 +464,9 @@ def _get_update(df, token_thresh):
     indexers = []
     # print('Initial (clean) distribution info')
     # print(_describe_lemma_counts(df).to_markdown())
-    for col in df.columns:
-        print(f'\nFiltering {col.upper()}...')
+    print('Compiling frequency table update:')
+    for i, col in enumerate(df.columns):
+        print(f'  ({i+1}) restricting `{col}` column...')
         col_counts = df[col].value_counts()
 
         lemmas_over_thresh = col_counts[col_counts >= token_thresh].index
