@@ -111,6 +111,25 @@ def make_cats(orig_df:pd.DataFrame, columns: list = None) -> pd.DataFrame: # typ
     return df
 
 
+def save_in_lsc_format(frq_df, lsc_tsv_path, numeric_label='frequency'):
+    new_col_name = f'{numeric_label}_frq'
+    # new_col_name = 'adv_mn_std_freq' if adv_mean else 'adj_mn_std_freq'
+    lsc_format = frq_df.stack().to_frame(new_col_name)
+    # lsc_format.columns = [new_col_name]
+    lsc_format = lsc_format.reset_index().loc[:, [new_col_name, 'adv_lemma', 'adj_lemma']]
+    lsc_format = (
+        lsc_format
+        .sort_values(['adv_lemma', 'adj_lemma'])
+        .sort_values(new_col_name, ascending=False))
+    lsc_counts = lsc_format.to_csv(sep="\t", index=False).splitlines()[1:]
+    lsc_lines = ['2'] + [x.strip() for x in lsc_counts]
+    print('\nFormatted Output Sample (top 20 bigrams):')
+    print('\n'.join(lsc_lines[:20] + ['...']))
+    lsc_tsv_path.write_text('\n'.join(lsc_lines), encoding='utf8')
+    print('Counts formatted to train lsc model saved as:', 
+        str(lsc_tsv_path))
+
+
 def save_table(df: pd.DataFrame,
                path_str:str,
                df_name: str = '',
