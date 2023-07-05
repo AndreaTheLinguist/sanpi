@@ -39,10 +39,11 @@ def _main():
 
     else:
 
-        if clean_bigrams_pkl.is_file() and n_files < 15:
-            print(
-                f' * Found previous output. Loading data from {clean_bigrams_pkl}'
-            )
+        if (clean_bigrams_pkl.is_file() 
+            # and n_files < 15
+            ):
+            print(' * Found previous output.',
+                  f'Loading data from {clean_bigrams_pkl}')
             df = pd.read_pickle(clean_bigrams_pkl)
             if df.index.name != 'hit_id':
                 df = df.set_index('hit_id')
@@ -51,19 +52,20 @@ def _main():
             if df.index.name != 'hit_id':
                 df = df.set_index('hit_id')
             print(f'\n> {len(df):,} initial hits')
-            # print('= intial unique lemmas:')
             _print_uniq_lemma_count(df, updated=False)
-            print(_describe_str_lemma_counts(
-                df).round().to_markdown(floatfmt=',.0f'))
+            print(_describe_str_lemma_counts(df).round().to_markdown(floatfmt=',.0f'))
             clean_t0 = pd.Timestamp.now()
             df = _clean_data(df)
             clean_t1 = pd.Timestamp.now()
             print('\n[ Time to clean combined hits dataframe:',
                   get_proc_time(clean_t0, clean_t1), ']')
-            if n_files < 15:
-                save_table(df,
-                           str(clean_bigrams_pkl).split('.pkl', 1)[0],
-                           "cleaned bigram hits")
+            # if n_files < 15:
+                # save_table(df,
+                        #    str(clean_bigrams_pkl).split('.pkl', 1)[0],
+                        #    "cleaned bigram hits")
+            save_table(df,
+                       str(clean_bigrams_pkl).split('.pkl', 1)[0],
+                       "cleaned bigram hits")
 
         # > drop infrequent adv & adj lemmas
         df = _drop_infreq(df, tok_thresh_p)
@@ -198,42 +200,11 @@ def _select_cols(df: pd.DataFrame,
 
 def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # > print overview of initial data
-    print('\nCleaning up hits: removing duplicated or exceptionally',
+    print('\n## Cleaning up hits: removing duplicated or exceptionally',
           'long sentences, strange orthography, and random capitals.')
     starting_token_count = len(df)
-    ts = pd.Timestamp.now()
-    # > removing implausibly long, then duplicate sentences
-    if 'token_str' in df.columns and 'text_window' in df.columns:
-        _t0 = pd.Timestamp.now()
-        df = _drop_long_sents(df)
-        _t1 = pd.Timestamp.now()
-        print('[ Time to drop implausible "sentences":',
-              get_proc_time(_t0, _t1), ']')
 
-        _t0 = pd.Timestamp.now()
-        df = _drop_duplicate_sents(df)
-        _t1 = pd.Timestamp.now()
-        print('[ Time to drop duplicated sentences:',
-              get_proc_time(_t0, _t1), ']')
-
-    valid_token_count = len(df)
-    print(f'\n> {starting_token_count - valid_token_count}',
-          'hits from invalid sentences (too long or duplicated) removed.')
-    _print_uniq_lemma_count(df, label='valid', head_mark='~')
-    print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
-
-    # > set dtype to string and remove random capitalizations
-    ts = pd.Timestamp.now()
-    print('\nNormalizing lemma case (making everything lower case)...')
-    df = df.assign(adv_lemma=df.adv_lemma.str.lower(),
-                   adj_lemma=df.adj_lemma.str.lower())
-    te = pd.Timestamp.now()
-    _print_uniq_lemma_count(df)
-    print('[ Time to normalize lemma case:',
-          get_proc_time(ts, te), ']')
-
-    # > drop lemmas with abnormal orthography
-
+    # * drop lemmas with abnormal orthography
     ts = pd.Timestamp.now()
     prior_len = len(df)
     df = _drop_odd_orth(df)
@@ -243,6 +214,39 @@ def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
           get_proc_time(ts, te))
     _print_uniq_lemma_count(df)
     print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
+
+    # * removing implausibly long, then duplicate sentences
+    if 'token_str' in df.columns and 'text_window' in df.columns:
+        # * too long
+        _t0 = pd.Timestamp.now()
+        df = _drop_long_sents(df)
+        _t1 = pd.Timestamp.now()
+        _print_uniq_lemma_count(df, label='natural', head_mark='~')
+        print('[ Time to drop implausible "sentences":',
+              get_proc_time(_t0, _t1), ']')
+
+        # * duplicates
+        _t0 = pd.Timestamp.now()
+        df = _drop_duplicate_sents(df)
+        _t1 = pd.Timestamp.now()
+        print('[ Time to drop duplicated sentences:',
+              get_proc_time(_t0, _t1), ']')
+
+    valid_token_count = len(df)
+    print(f'\n> {(starting_token_count - valid_token_count):,}',
+          'hits from invalid sentences (too long or duplicated) removed.')
+    _print_uniq_lemma_count(df, label='valid', head_mark='~')
+    print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
+    
+    # * remove random capitalizations
+    ts = pd.Timestamp.now()
+    print('\nNormalizing lemma case (making everything lower case)...')
+    df = df.assign(adv_lemma=df.adv_lemma.str.lower(),
+                   adj_lemma=df.adj_lemma.str.lower())
+    te = pd.Timestamp.now()
+    _print_uniq_lemma_count(df)
+    print('[ Time to normalize lemma case:',
+          get_proc_time(ts, te), ']')
 
     return df
 
@@ -287,13 +291,14 @@ def _drop_long_sents(df: pd.DataFrame) -> pd.DataFrame:
     too_long = df.tok_in_sent > sent_limit
     uniq_too_long = df.loc[too_long, :].index.str.split(":",
                                                         1).str.get(0).unique()
-    print(f'Dropping {too_long.value_counts()[True]} hits',
-          f'from {len(uniq_too_long)} "sentences" with',
+    print(f'Dropping {(too_long.value_counts()[True]):,} hits',
+          f'from {len(uniq_too_long):,} "sentences" with',
           f'{sent_limit}+ tokens. For example:\n```')
     print((starting_df.loc[df.index.str.startswith(tuple(uniq_too_long)),
                            ['token_str']]).sample(1).squeeze()[:550] +
           '...\n```')
     df = df.loc[~too_long, :]
+    _print_uniq_lemma_count(df)
     return df
 
 
@@ -301,42 +306,52 @@ def _drop_duplicate_sents(df: pd.DataFrame) -> pd.DataFrame:
     over_10_tok = df.tok_in_sent > 10
     is_duplicate_hit = df.duplicated(['token_str', 'text_window'])
     definite_duplicate = over_10_tok & is_duplicate_hit
-    print(f'\nↀ  Removing {definite_duplicate.value_counts()[True]}',
-          'duplicate hits between input tables (provided sentence is',
-          'over 10 tokens long). Examples:')
-    all_dup = df.duplicated(['token_str', 'text_window'], keep=False)
-    print((df.loc[all_dup & over_10_tok,
-                  ['tok_in_sent', 'token_str']]).sort_values(['token_str'
-                                                              ]).head(8))
-    df = df.loc[~definite_duplicate,
-                ['adv_lemma', 'adj_lemma']].astype('string')
+    print(f'\n≎ Removing {(definite_duplicate.value_counts()[True]):,}',
+          'duplicate hits between input tables',
+          '(provided sentence is longer than 10 tokens).')
+    singletons = df.loc[~definite_duplicate, 
+                        ['adv_lemma', 'adj_lemma', 'token_str']]
+    # init_sent_counts=df.token_str.value_counts(sort=False).sort_index()
+    # filter_sent_counts=singletons.token_str.value_counts(sort=False).sort_index()
+    # sent_diff = init_sent_counts - filter_sent_counts
+    # sent_with_dup = len(sent_diff[sent_diff != 0].index)
+    # print(f'  ⨳ {sent_with_dup:,} initial sentences had 1+ duplicates')
+    
+    # all_dup = df.duplicated(['token_str', 'text_window'], keep=False)
+    # print('Examples of duplication:')
+    # print((df.loc[all_dup & over_10_tok,
+    #               ['tok_in_sent', 'token_str']]).sort_values(['token_str'
+    #                                                           ]).head(8))
 
-    return df
+    return singletons[['adv_lemma', 'adj_lemma']].astype('string')
 
 
 def _drop_odd_orth(df: pd.DataFrame) -> pd.DataFrame:
+    
     print('\nRemoving lemmas with abnormal orthography...')
+    # full_df = df
+    # df = df[['adv_lemma', 'adj_lemma']]
     J = df.adj_lemma
     J_filter = ~pd.Series(
         J.str.startswith(('-', '&', '.'))
         | J.str.endswith(('-', '&'))
         | J.str.contains(r"[^-&\w\.][a-zA-Z]", regex=True))
-    print((J_filter.value_counts(
-        normalize=True).multiply(100).round(3).to_frame('%_of_adj').assign(
-            status=['kept', 'dropped'], adj_tokens=J_filter.value_counts()).
-        set_index('status').to_markdown()), '\n')
+    # print((J_filter.value_counts(
+    #     normalize=True).multiply(100).round(3).to_frame('%_of_adj').assign(
+    #         status=['kept', 'dropped'], adj_tokens=J_filter.value_counts()).
+    #     set_index('status').to_markdown()), '\n')
 
     R = df.adv_lemma
     R_filter = ~pd.Series(
         R.str.startswith(('-', '&', '.')) | R.str.endswith(('-', '&'))
         | R.str.contains(r"[^-&\w\.][a-zA-Z]", regex=True))
-    print((R_filter.value_counts(
-        normalize=True).multiply(100).round(3).to_frame("%_of_adv").assign(
-            status=['kept', 'dropped'], adv_tokens=R_filter.value_counts()).
-        set_index('status').to_markdown()), '\n')
+    # print((R_filter.value_counts(
+    #     normalize=True).multiply(100).round(3).to_frame("%_of_adv").assign(
+    #         status=['kept', 'dropped'], adv_tokens=R_filter.value_counts()).
+    #     set_index('status').to_markdown()), '\n')
 
-    df = df.loc[J_filter & R_filter, :]
-    return df
+    # return full_df.loc[J_filter & R_filter, :]
+    return df.loc[J_filter & R_filter, :]
 
 
 def _drop_infreq(df, token_percent) -> pd.DataFrame:
@@ -372,8 +387,8 @@ def _drop_infreq(df, token_percent) -> pd.DataFrame:
         # > if _no/too few_ hits were dropped (overall) ~ 95+% of initial hits remain...
         #! use `n_remain` to evaluate because `n_dropped` is only for CURRENT attempt
         # > or if median count for either lemma type is less than 5
-        if (n_remain >= 0.97 * clean_token_count
-                or any(_describe_str_lemma_counts(update_df).T['50%'] < 5)):
+        if (n_remain >= 0.975 * clean_token_count
+            or any(_describe_str_lemma_counts(update_df).T['50%'] < 5)):
             # > raise percentage threshold --> increase by 1/4
             adjust_str = '◔ Insufficient Reduction: 🔺raising'
             token_percent *= 1.25
@@ -385,12 +400,10 @@ def _drop_infreq(df, token_percent) -> pd.DataFrame:
         elif n_dropped > 0:
 
             # > if _too many_ hits were dropped...
-            if (n_remain < must_keep
-                        # keep at least 20 unique adverbs
-                        or count_uniq(update_df.adv_lemma) < 20
-                        # keep at least 40 unique adjectives
-                    or count_uniq(update_df.adj_lemma) < 40
-                    ):
+            if ((n_remain < must_keep) 
+                or (count_uniq(update_df.adv_lemma) < 20)  # keep at least 20 unique adv
+                or (count_uniq(update_df.adj_lemma) < 40)  # keep at least 40 unique adj
+               ):
 
                 if not filter_applied and filter_attempt < 5:
                     # > lower percentage threshold --> reduce by 1/4
@@ -434,7 +447,6 @@ def _drop_infreq(df, token_percent) -> pd.DataFrame:
         f'of initial hits) across {filter_applied} filtering pass(es).\n',
         f'[ time elapsed = {get_proc_time(ts, te)} ]')
 
-    _print_uniq_lemma_count(df)
     print(_describe_str_lemma_counts(df).to_markdown(floatfmt=',.0f'))
     print(f'\n>>> {len(df):,} total remaining hits <<<')
 
@@ -454,6 +466,7 @@ def _get_update(df, token_thresh):
         col_counts = df[col].value_counts()
 
         lemmas_over_thresh = col_counts[col_counts >= token_thresh].index
+
         indexers.append(df[col].isin(lemmas_over_thresh))
 
     update_df = df.loc[indexers[0] & indexers[1], :]
@@ -463,6 +476,7 @@ def _get_update(df, token_thresh):
              .assign(range=up_st['max'] - up_st['min'],
                      iqr=up_st['75%'] - up_st['25%'])
              .round())
+    print(f'{(len(df) - len(update_df)):,} potential removals')
     print(up_st[['mean', '50%', 'iqr', 'range']].to_markdown(floatfmt=',.0f'))
     _print_uniq_lemma_count(update_df)
 
