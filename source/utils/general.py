@@ -3,6 +3,11 @@ from pathlib import Path
 import logging
 
 
+def confirm_dir(dir_path: Path):
+    if not dir_path.is_dir():
+        dir_path.mkdir(parents=True)
+
+
 def display_message(message: str,
                     logger: logging.Logger = None,
                     level: int = 20):
@@ -70,14 +75,34 @@ def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
     return path_iter
 
 
+def find_glob_in_dir(dir_path: Path,
+                     glob_expr: str,
+                     recursive: bool=False,
+                     verbose: bool = False) -> Path:
+    path = None
+    if recursive: 
+        paths_iter = tuple(dir_path.rglob(glob_expr))
+        
+    else:
+        paths_iter = tuple(dir_path.glob(glob_expr))
+    if paths_iter:
+        path = paths_iter[0]
+    elif verbose:
+        print(f'Glob expression, "{glob_expr}", not found in {dir_path}/')
+    return path
+
+
+def percent_to_count(percent: float, total: int) -> int:
+    return int(round(total * (percent / 100)))
+
 
 def print_iter(iter_obj,
                bullet: str = '▸',
                logger: logging.Logger = None,
                level: int = 20,
-               header: str = '', 
-               indent:int = 0):
-    
+               header: str = '',
+               indent: int = 0):
+
     bullet_str = f'\n{" " * indent}{bullet} '
 
     iter_str = bullet_str.join(f'{i}' for i in iter_obj)

@@ -1,43 +1,28 @@
 # coding=utf-8
 from pathlib import Path
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def heatmap(df,
             columns=None,
             save_name=None,
             size=(8, 10),
-            save_dir: Path = None):
-
+            save_dir: Path = None, 
+            margin_name:'str'='SUM'):
+    #TODO: update this with code from `explore_stats.ipynb`
     plt.figure(figsize=size, dpi=100, facecolor="white")
-    margin_name = 'SUM'
-    try:
-        totals = df.pop(margin_name)
-    except AttributeError:
-        margin_name = 'total_count'
-        try:
-            totals = df.pop(margin_name)
-        except AttributeError:
-            margin_name = 'All'
-            try:
-                totals = df.pop(margin_name)
-            except AttributeError:
-                totals = df.sum(axis=1)
-            else:
-                # `margin_name` -> 'All'
-                rows = df.index != margin_name
-                totals = totals[totals.index != margin_name]
-        else: 
-            # `margin_name` -> 'total_count'
-            rows = df.index != margin_name
-            totals = totals[totals.index != margin_name]
-    else: 
-        # `margin_name` -> 'SUM'
-        rows = df.index != margin_name
-        totals = totals[totals.index != margin_name]
-
-    df = df.loc[rows, :]
-    row_labels = df.index + ' (' + totals.astype('string') + ')'
+    sum_col = pd.Series()
+    # sum_row = pd.Series()
+    if margin_name in df.columns:
+        sum_col = df.loc[df.index != margin_name, margin_name]
+    if margin_name in df.index: 
+        sum_row = df.loc[margin_name, df.columns != margin_name]
+    df = df.loc[df.index != margin_name, df.columns != margin_name]
+    #! #BUG:  `row_labels` are not appearin as tick marks
+    row_labels = df.index.to_series()
+    if not sum_col.empty:  
+        row_labels = row_labels + ' (' + sum_col.astype('string') + ')'
     if columns:
         df = df.loc[:, columns]
     df = df.astype('float')
@@ -57,7 +42,7 @@ def heatmap(df,
     # Assigning labels of y-axis
     # according to dataframe
     plt.yticks(range(len(df.index)), row_labels)
-
+    # TODO: add `rotation=20` etc. to plot
     # Displaying the figure
     plt.show()
 
