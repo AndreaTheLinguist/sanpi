@@ -1,9 +1,263 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
     "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        // * LSC
+        // > view_LSC
+        {
+            "name": "view_LSC 35f",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv"
+            ]
+        },
+        {
+            "name": "view_LSC 35f sqrt",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "/share/compling/projects/sanpi/results/transformed/sqrt_all-frq_thresh877.35f.csv"
+            ]
+        },
+        {
+            "name": "view_LSC 20f",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh478.20f.csv"
+            ]
+        },
+        {
+            "name": "view_LSC 15f",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "all-frq_thresh478.20f.csv"
+            ]
+        },
+        // > format_counts (for LSC)
+        // {
+        //     "name": "format_counts: ALL 35",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
+        //     "console": "integratedTerminal",
+        //     "justMyCode": true,
+        //     "args": [
+        //         "-i",
+        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh5.35f.csv",
+        //         "-f",
+        //         "75"
+        //     ]
+        // },
+        // {
+        //     "name": "format_counts: ALL 3",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
+        //     "console": "integratedTerminal",
+        //     "justMyCode": true,
+        //     "args": [
+        //         "-i",
+        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh5.3f.csv",
+        //         "-f",
+        //         "50"
+        //     ]
+        // },
+        // {
+        //     "name": "format_counts: ALL 6",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
+        //     "console": "integratedTerminal",
+        //     "justMyCode": true,
+        //     "args": [
+        //         "-i",
+        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh5.6f.csv"
+        //     ]
+        // },
+        // {
+        //     "name": "format_counts: JxR 35",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
+        //     "console": "integratedTerminal",
+        //     "justMyCode": true,
+        //     "args": [
+        //         "-i",
+        //         "/share/compling/projects/sanpi/results/freq_out/JxR-frq_thresh5.35f.csv",
+        //         "-f",
+        //         "20"
+        //     ]
+        // },
+        // * count bigrams
+        {
+            "name": "count_bigrams 3 0.01%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "3",
+                "-t",
+                "0.01"
+            ]
+        },
+        {
+            "name": "count_bigrams (2) 0.003%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-t",
+                "0.003"
+            ]
+        },
+        {
+            "name": "count_bigrams 4 (default%)",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "4"
+            ]
+        },
+        {
+            "name": "count_bigrams 4f 0.005%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "4",
+                "-t",
+                "0.005"
+            ]
+        },
+        {
+            "name": "EDIT count_bigrams 2f 0.005%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams-EDIT.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "2",
+                "-t",
+                "0.005"
+            ]
+        },
+        {
+            "name": "count_bigrams 5f 0.001%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "5",
+                "-t",
+                "0.001"
+            ]
+        },
+        {
+            "name": "count_bigrams 6 0.01%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "6",
+                "-t",
+                "0.01" // %! --> ratio = 0.00001
+            ]
+        },
+        {
+            "name": "count_bigrams 10f 0.001%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "10",
+                "-t",
+                "0.001" // %! --> ratio = 0.00001
+            ]
+        },
+        {
+            "name": "DEMO count_bigrams 5f 0.001%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "5",
+                "-t",
+                "0.001",
+                // "--post_proc_dir", 
+                // "/share/compling/projects/sanpi/demo/4_post-processed",
+                "--frq_out_dir",
+                "/share/compling/projects/sanpi/demo/results/freq_out"
+            ]
+        },
+        {
+            "name": "DEMO count_bigrams 10f 0.005%",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "10",
+                "-t",
+                "0.005",
+                // "--post_proc_dir", 
+                // "/share/compling/projects/sanpi/demo/4_post-processed",
+                "--frq_out_dir",
+                "/share/compling/projects/sanpi/demo/results/freq_out"
+            ]
+        },
         //* `grewpy` subsets
         {
             "name": "grewpy subset - smallest puddin pcc29-009",
@@ -13,7 +267,7 @@
             "console": "integratedTerminal",
             "args": [
                 "/share/compling/projects/sanpi/demo/data/corpora/puddin/PccX2.conll/pcc_eng_29-109.conllu",
-                "-n", 
+                "-n",
                 "bigram"
             ]
         },
@@ -24,8 +278,8 @@
             "program": "script/create_grewpy_subset.py",
             "console": "integratedTerminal",
             "args": [
-                "/share/compling/data/sanpi/corpora_shortcuts/testing/small/small.conll/apw_eng_199911.conllu",
-                "-n", 
+                "/share/compling/data/sanpi/corpora_shortcuts/debug/apw.conll/apw_eng_199911.conllu",
+                "-n",
                 "bigram"
             ]
         },
@@ -37,7 +291,7 @@
             "console": "integratedTerminal",
             "args": [
                 "/share/compling/data/sanpi/corpora_shortcuts/testing/smallest20.conll/nyt_eng_200311.conllu",
-                "-n", 
+                "-n",
                 "bigram"
             ]
         },
@@ -51,28 +305,11 @@
                 "/share/compling/data/sanpi/corpora_shortcuts/testing/smallest20.conll/nyt_eng_200303.conllu",
                 "-p",
                 "Pat/advadj/all-RB-JJs.pat",
-                "-n", 
+                "-n",
                 "bigram"
             ]
         },
-        // > old subset code
-        // {
-        //     "name": "python subset",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/script/make_subset_conllus.py",
-        //     "console": "integratedTerminal",
-        //     "cwd": "${workspaceFolder}",
-        //     // "justMyCode": false,
-        //     "args": [
-        //         "-c",
-        //         "/share/compling/data/sanpi/corpora_shortcuts/testing/small/small.conll/apw_eng_199911.conllu",
-        //         "-p",
-        //         "/share/compling/projects/sanpi/Pat/advadj/all-RB-JJs.pat"
-        //     ]
-        // },
-
-        // * Deps
+        // * Dependencies
         {
             "name": "analyze_deps NEG puddin -s -1 -t",
             "type": "python",
@@ -82,7 +319,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*[!j]/*exactly*puddin*hits.pkl.gz",
@@ -102,7 +339,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*[!j]/*exactly*puddin*hits.pkl.gz",
@@ -122,7 +359,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*[!j]/*exactly*hits.pkl.gz",
@@ -142,7 +379,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*apw*hits.pkl.gz",
@@ -163,7 +400,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*exactly*apw*hits.pkl.gz",
@@ -180,12 +417,12 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*[gd]/exactly*apw*hits.pkl.gz",
                 "-n",
-                "NEG-exactly-apw",
+                "NEG-exactly-apw"
             ]
         },
         {
@@ -197,12 +434,12 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*[d]/exactly*apw*hits.pkl.gz",
                 "-n",
-                "NEG-exactly-apw",
+                "NEG-exactly-apw"
             ]
         },
         {
@@ -214,7 +451,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-g",
                 "*[!j]/exactly*nyt*hits.pkl.gz",
@@ -231,7 +468,7 @@
             // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
             //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
             // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t] 
+            // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
             "args": [
                 "-d",
                 "/share/compling/data/sanpi/3_dep_info/exactly-apw_deps.pkl.gz",
@@ -276,6 +513,24 @@
             ]
         },
         {
+            "name": "pipeline DEBUG bigram",
+            "type": "python",
+            "request": "launch",
+            "program": "run_pipeline.py",
+            "console": "integratedTerminal",
+            // "cwd": "${workspaceFolder}",
+            // "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
+            //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
+            "args": [
+                "-c",
+                "/share/compling/data/sanpi/debug/bigram_debug/bigramJsonErr/",
+                "-p",
+                "Pat/advadj",
+                "--grew_output_dir",
+                "/share/compling/data/sanpi/debug/1_json_grew-matches/"
+            ]
+        },
+        {
             "name": "pipeline exactly-test contig-TABULATE",
             "type": "python",
             "request": "launch",
@@ -306,10 +561,10 @@
                 "-c",
                 "/home/arh234/data/puddin/PccVa.conll/subset_advadj",
                 // "-p",
-                // "Pat/scoped", 
+                // "Pat/scoped",
                 "-p",
                 "Pat/raised"
-            ],
+            ]
         },
         {
             "name": "pipeline puddin val env-check",
@@ -328,27 +583,18 @@
             ]
         },
         // * Misc
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "create_match_conllu",
-            "type": "python",
-            "request": "launch",
-            "program": "script/create_match_conllu.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            // "justMyCode": false,
-            "args": [
-                "-c",
-                "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-01.conllu",
-            ]
-        },
+        // {
+        //     "name": "create_match_conllu",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "script/create_match_conllu.py",
+        //     "console": "integratedTerminal",
+        //     "cwd": "${workspaceFolder}",
+        //     "args": [
+        //         "-c",
+        //         "/home/arh234/data/puddin/PccVa.conll/pcc_eng_val-01.conllu"
+        //     ]
+        // },
         // * Grew Search
         {
             "name": "apw grew relayed",
@@ -407,30 +653,15 @@
         },
         // * Fill Json
         {
-            "name": "FillJson testing contig-val",
+            "name": "fill_match_info",
             "type": "python",
             "request": "launch",
-            "program": "script/FillJson.py",
+            "program": "/share/compling/projects/sanpi/source/gather/fill_match_info.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            // args: [-h] CONLLU_DIR RAW_DIR [-o OUTPUT_DIR] 
-            //          ([-w {yes,no,check}] [-t {lemma,form}])
+            "justMyCode": true,
             "args": [
-                "/home/arh234/data/puddin/PccVa.conll/",
-                "/home/arh234/data/sanpi/1_json_grew-matches/contig/PccVa.sans-relay/"
-            ]
-        },
-        {
-            "name": "FillJson quicktest",
-            "type": "python",
-            "request": "launch",
-            "program": "script/FillJson.py",
-            "console": "integratedTerminal",
-            // args: [-h] CONLLU_DIR RAW_DIR [-o OUTPUT_DIR] 
-            //          ([-w {yes,no,check}] [-t {lemma,form}])
-            "args": [
-                "/home/arh234/data/devel/quicktest.conll",
-                "/home/arh234/data/contig/quicktest.sans-relay"
+                "conllu_dir",
+                "raw_dir"
             ]
         },
         // * Tabulate Hits
@@ -466,7 +697,7 @@
             "request": "launch",
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "getFrequecies",
@@ -474,8 +705,8 @@
             "request": "launch",
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-        },
+            "cwd": "${workspaceFolder}"
+        }
         // * simple view hits
         // {
         //     "name": "specified simple_view_hits",
@@ -518,4 +749,8 @@
         //     ]
         // },
     ],
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0"
 }
