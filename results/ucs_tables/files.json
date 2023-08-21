@@ -1,64 +1,369 @@
-[{"type":"directory","name": ".","contents":[
-    {"type":"file","name":"all-frq_thresh438.35f-min3x.ranks.gz","size":"66M","time":"Aug 14 14:19"},
-    {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort.gz","size":"64M","time":"Aug 14 14:20"},
-    {"type":"file","name":"all-frq_thresh877.35f-min3x.ranks.gz","size":"58M","time":"Aug 14 14:15"},
-    {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort.gz","size":"56M","time":"Aug 14 14:16"},
-    {"type":"file","name":"all-frq_thresh438.35f-min3x.scores.gz","size":"55M","time":"Aug 14 14:18"},
-    {"type":"file","name":"all-frq_thresh877.35f-min3x.scores.gz","size":"48M","time":"Aug 14 14:14"},
-    {"type":"file","name":"all-frq_thresh4384.35f-min3x.ranks.gz","size":"33M","time":"Aug 14 14:05"},
-    {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort.gz","size":"32M","time":"Aug 14 14:06"},
-    {"type":"file","name":"all-frq_thresh4384.35f-min3x.scores.gz","size":"27M","time":"Aug 14 14:05"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.ranks.gz","size":"21M","time":"Aug 14 14:32"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort.gz","size":"20M","time":"Aug 14 14:32"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.scores.gz","size":"17M","time":"Aug 14 14:31"},
-    {"type":"file","name":"all-frq_thresh438.35f-min3x.ds.gz","size":"8.4M","time":"Aug 11 20:20"},
-    {"type":"file","name":"tmp-ucs.ds.gz","size":"7.7M","time":"Aug 14 14:31"},
-    {"type":"file","name":"all-frq_thresh877.35f-min3x.ds.gz","size":"7.4M","time":"Aug 11 20:20"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.llr.gz","size":"4.9M","time":"Aug 11 23:29"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.llrs.gz","size":"4.6M","time":"Aug 11 23:31"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.ll.gz","size":"4.3M","time":"Aug 11 23:28"},
-    {"type":"file","name":"all-frq_thresh4384.35f-min3x.ds.gz","size":"4.1M","time":"Aug 11 20:20"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x.ds.gz","size":"2.5M","time":"Aug 14 00:21"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x_un-ADJ.llrs.gz","size":"80K","time":"Aug 11 22:33"},
-    {"type":"file","name":"processing-ucs_tables.redo.log","size":"70K","time":"Aug 12 00:00"},
-    {"type":"file","name":"all-frq_thresh8777.35f-min3x_slightly.llrs.gz","size":"20K","time":"Aug 11 22:39"},
-    {"type":"file","name":"processing-ucs_tables.log","size":"10K","time":"Aug 11 23:35"},
-    {"type":"directory","name":"readable","size":"4.0K","time":"Aug 21 06:32","contents":[
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view.txt","size":"143M","time":"Aug 21 05:30"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view.txt","size":"126M","time":"Aug 21 05:26"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view_am-only.txt","size":"104M","time":"Aug 21 05:32"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view.csv","size":"94M","time":"Aug 21 04:56"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view_am-only.txt","size":"92M","time":"Aug 21 05:27"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view_r-only.txt","size":"88M","time":"Aug 21 05:31"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view.csv","size":"83M","time":"Aug 21 04:56"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view_r-only.txt","size":"78M","time":"Aug 21 05:26"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view.txt","size":"72M","time":"Aug 21 05:22"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view_am-only.txt","size":"52M","time":"Aug 21 05:23"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view.csv","size":"47M","time":"Aug 21 04:56"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view.txt","size":"45M","time":"Aug 21 05:20"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view_r-only.txt","size":"44M","time":"Aug 21 05:23"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view_am-only.txt","size":"32M","time":"Aug 14 14:33"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view.csv","size":"30M","time":"Aug 21 04:56"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view_r-only.txt","size":"27M","time":"Aug 14 14:33"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view_top50000.csv","size":"8.4M","time":"Aug 21 04:49"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view_top50000.csv","size":"8.4M","time":"Aug 21 04:49"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view_top50000.csv","size":"8.4M","time":"Aug 21 04:49"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view_top50000.csv","size":"8.4M","time":"Aug 21 04:49"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view_top200.txt","size":"47K","time":"Aug 21 05:22"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view_top200.txt","size":"47K","time":"Aug 21 05:19"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view_top200.txt","size":"47K","time":"Aug 21 05:28"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view_top200.txt","size":"47K","time":"Aug 21 05:24"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view_top200.md","size":"30K","time":"Aug 21 03:53"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view_top200.md","size":"30K","time":"Aug 21 03:53"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view_top200.md","size":"30K","time":"Aug 21 03:53"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view_top200.md","size":"30K","time":"Aug 21 03:53"},
-      {"type":"file","name":"all-frq_thresh8777.35f-min3x.rsort-view_top200.csv","size":"23K","time":"Aug 21 05:20"},
-      {"type":"file","name":"all-frq_thresh4384.35f-min3x.rsort-view_top200.csv","size":"22K","time":"Aug 21 05:23"},
-      {"type":"file","name":"all-frq_thresh877.35f-min3x.rsort-view_top200.csv","size":"22K","time":"Aug 21 05:27"},
-      {"type":"file","name":"all-frq_thresh438.35f-min3x.rsort-view_top200.csv","size":"22K","time":"Aug 21 05:32"}
-    ]},
-    {"type":"file","name":"files_23-08-14.json","size":"3.2K","time":"Aug 13 23:37"},
-    {"type":"file","name":"files.json","size":"0","time":"Aug 21 06:35"}
-  ]},
-  {"type":"report","directories":1,"files":58}
+[
+  {
+    "type": "directory",
+    "name": ".",
+    "contents": [
+      {
+        "type": "file",
+        "name": "all-frq_thresh438.35f-min3x.ranks.gz",
+        "size": "66M",
+        "time": "Aug 14 14:19"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh438.35f-min3x.rsort.gz",
+        "size": "64M",
+        "time": "Aug 14 14:20"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh877.35f-min3x.ranks.gz",
+        "size": "58M",
+        "time": "Aug 14 14:15"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh877.35f-min3x.rsort.gz",
+        "size": "56M",
+        "time": "Aug 14 14:16"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh438.35f-min3x.scores.gz",
+        "size": "55M",
+        "time": "Aug 14 14:18"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh877.35f-min3x.scores.gz",
+        "size": "48M",
+        "time": "Aug 14 14:14"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh4384.35f-min3x.ranks.gz",
+        "size": "33M",
+        "time": "Aug 14 14:05"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh4384.35f-min3x.rsort.gz",
+        "size": "32M",
+        "time": "Aug 14 14:06"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh4384.35f-min3x.scores.gz",
+        "size": "27M",
+        "time": "Aug 14 14:05"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.ranks.gz",
+        "size": "21M",
+        "time": "Aug 14 14:32"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.rsort.gz",
+        "size": "20M",
+        "time": "Aug 14 14:32"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.scores.gz",
+        "size": "17M",
+        "time": "Aug 14 14:31"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh438.35f-min3x.ds.gz",
+        "size": "8.4M",
+        "time": "Aug 11 20:20"
+      },
+      {
+        "type": "file",
+        "name": "tmp-ucs.ds.gz",
+        "size": "7.7M",
+        "time": "Aug 14 14:31"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh877.35f-min3x.ds.gz",
+        "size": "7.4M",
+        "time": "Aug 11 20:20"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.llr.gz",
+        "size": "4.9M",
+        "time": "Aug 11 23:29"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.llrs.gz",
+        "size": "4.6M",
+        "time": "Aug 11 23:31"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.ll.gz",
+        "size": "4.3M",
+        "time": "Aug 11 23:28"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh4384.35f-min3x.ds.gz",
+        "size": "4.1M",
+        "time": "Aug 11 20:20"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x.ds.gz",
+        "size": "2.5M",
+        "time": "Aug 14 00:21"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x_un-ADJ.llrs.gz",
+        "size": "80K",
+        "time": "Aug 11 22:33"
+      },
+      {
+        "type": "file",
+        "name": "processing-ucs_tables.redo.log",
+        "size": "70K",
+        "time": "Aug 12 00:00"
+      },
+      {
+        "type": "file",
+        "name": "all-frq_thresh8777.35f-min3x_slightly.llrs.gz",
+        "size": "20K",
+        "time": "Aug 11 22:39"
+      },
+      {
+        "type": "file",
+        "name": "processing-ucs_tables.log",
+        "size": "10K",
+        "time": "Aug 11 23:35"
+      },
+      {
+        "type": "directory",
+        "name": "readable",
+        "size": "4.0K",
+        "time": "Aug 21 06:32",
+        "contents": [
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view.txt",
+            "size": "143M",
+            "time": "Aug 21 05:30"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view.txt",
+            "size": "126M",
+            "time": "Aug 21 05:26"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view_am-only.txt",
+            "size": "104M",
+            "time": "Aug 21 05:32"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view.csv",
+            "size": "94M",
+            "time": "Aug 21 04:56"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view_am-only.txt",
+            "size": "92M",
+            "time": "Aug 21 05:27"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view_r-only.txt",
+            "size": "88M",
+            "time": "Aug 21 05:31"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view.csv",
+            "size": "83M",
+            "time": "Aug 21 04:56"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view_r-only.txt",
+            "size": "78M",
+            "time": "Aug 21 05:26"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view.txt",
+            "size": "72M",
+            "time": "Aug 21 05:22"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view_am-only.txt",
+            "size": "52M",
+            "time": "Aug 21 05:23"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view.csv",
+            "size": "47M",
+            "time": "Aug 21 04:56"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view.txt",
+            "size": "45M",
+            "time": "Aug 21 05:20"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view_r-only.txt",
+            "size": "44M",
+            "time": "Aug 21 05:23"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view_am-only.txt",
+            "size": "32M",
+            "time": "Aug 14 14:33"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view.csv",
+            "size": "30M",
+            "time": "Aug 21 04:56"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view_r-only.txt",
+            "size": "27M",
+            "time": "Aug 14 14:33"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view_top50000.csv",
+            "size": "8.4M",
+            "time": "Aug 21 04:49"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view_top50000.csv",
+            "size": "8.4M",
+            "time": "Aug 21 04:49"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view_top50000.csv",
+            "size": "8.4M",
+            "time": "Aug 21 04:49"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view_top50000.csv",
+            "size": "8.4M",
+            "time": "Aug 21 04:49"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view_top200.txt",
+            "size": "47K",
+            "time": "Aug 21 05:22"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view_top200.txt",
+            "size": "47K",
+            "time": "Aug 21 05:19"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view_top200.txt",
+            "size": "47K",
+            "time": "Aug 21 05:28"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view_top200.txt",
+            "size": "47K",
+            "time": "Aug 21 05:24"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view_top200.md",
+            "size": "30K",
+            "time": "Aug 21 03:53"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view_top200.md",
+            "size": "30K",
+            "time": "Aug 21 03:53"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view_top200.md",
+            "size": "30K",
+            "time": "Aug 21 03:53"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view_top200.md",
+            "size": "30K",
+            "time": "Aug 21 03:53"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh8777.35f-min3x.rsort-view_top200.csv",
+            "size": "23K",
+            "time": "Aug 21 05:20"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh4384.35f-min3x.rsort-view_top200.csv",
+            "size": "22K",
+            "time": "Aug 21 05:23"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh877.35f-min3x.rsort-view_top200.csv",
+            "size": "22K",
+            "time": "Aug 21 05:27"
+          },
+          {
+            "type": "file",
+            "name": "all-frq_thresh438.35f-min3x.rsort-view_top200.csv",
+            "size": "22K",
+            "time": "Aug 21 05:32"
+          }
+        ]
+      },
+      {
+        "type": "file",
+        "name": "files_23-08-14.json",
+        "size": "3.2K",
+        "time": "Aug 13 23:37"
+      },
+      {
+        "type": "file",
+        "name": "files.json",
+        "size": "0",
+        "time": "Aug 21 06:35"
+      }
+    ]
+  },
+  {
+    "type": "report",
+    "directories": 1,
+    "files": 58
+  }
 ]
