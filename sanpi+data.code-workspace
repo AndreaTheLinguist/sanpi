@@ -5,28 +5,26 @@
         },
         {
             "path": "../../data"
+        },
+        {
+            "path": "../../UCS-0.6/doc", 
+            "name": "UCS-doc"
         }
     ],
     "settings": {
-        // "workbench.editor.defaultFormatter": "ms-python.python",
-		"workbench.preferredDarkColorTheme": "The Warmother",
-		"workbench.preferredLightColorTheme": "Winter is Coming (Light)",
-        "todo-tree.tree.scanMode": "current file",
-        "explorerExclude.backup": {
-            "**/.DS_Store": true,
-            "**/.git": true,
-            "**/.hg": true,
-            "**/.svn": true,
-            "**/CVS": true,
-            "**/Thumbs.db": true
-        },
+        "explorerExclude.backup": {},
         "files.exclude": {
-            "**/.DS_Store": false,
-            "**/.git": false,
-            "**/.hg": false,
-            "**/.svn": false,
-            "**/CVS": false,
-            "**/Thumbs.db": false
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/.vscode": true,
+            ".vscode": true,
+            "**/.history": true,
+            ".history": true,
+            ".git": true
         },
         "files.watcherExclude": {
             "./.git/**": true,
@@ -39,7 +37,26 @@
         },
         "python.linting.pylintArgs": [
             "--disable:protected-access"
-		],
-		"workbench.colorTheme": "The Warmother"
+        ],
+        "todo-tree.tree.scanMode": "current file",
+        // "workbench.editor.defaultFormatter": "ms-python.python",
+        // "workbench.preferredDarkColorTheme": "Zeonica",
+        // "workbench.preferredDarkColorTheme": "Solarized Sharp Darker",
+        "workbench.preferredDarkColorTheme": "Boundless",
+        // "workbench.preferredLightColorTheme": "Noctis Lux",
+        "workbench.preferredLightColorTheme": "Nord Light Brighter",
+        // "workbench.preferredLightColorTheme": "Solarized-light-fjs",
+        "files.autoSave": "afterDelay",
+        "files.associations": {
+            "*.err": "Log",
+            "*.log": "Log",
+            "*.out": "Log",
+            "*.pat": "OCaml",
+            "lsc-print.C": "cpp",
+            "lsc.C": "cpp"
+        },
+        "todo-tree.tree.showBadges": false,
+        "workbench.colorTheme": "Nord Light Brighter",
+        "markdown.updateLinksOnFileMove.enableForDirectories": false
     }
 }

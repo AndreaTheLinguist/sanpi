@@ -397,6 +397,7 @@ demo/data/corpora/gitrepo_puddin/PccTe.conll/subset_advadj/pcc*.conllu
 demo/data/debug
 demo/data/pre23-02-08*
 
+tmp*
 tmp/
 logs/
 demo/run_pipeline.py
@@ -407,3 +408,12 @@ backups
 old/
 **/Notes*
 source/analyze/get_deps.1.py
+**/ucs_tables/*.ll*
+**/ucs_tables/*8.*.scores.*
+**/ucs_tables/*.ranks.*
+# don't commit any of the `..view_r-only..` or `..view_am-only` files
+**/ucs_tables/readable/*-only*
+# exclude all full `.ranks.` and `.rsort` files for 877 & 438 thresh
+#   (including .txt & .csv file in `../ucs_tables/readable/`)
+**/ucs_tables/**/*h???.*.r*[tw].[tcmg]*
+**/ucs_tables/readable/*4384.*view.txt
