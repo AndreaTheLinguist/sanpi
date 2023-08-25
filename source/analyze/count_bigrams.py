@@ -43,120 +43,6 @@ def _main():
         _describe_counts(frq_df, frq_df_path)
 
 
-def _visualize_counts(frq_df, frq_df_path):
-    heat_dir = frq_df_path.parent.joinpath('images')
-    confirm_dir(heat_dir)
-    heat_fname = f'heatmap_{frq_df_path.stem}.png'
-    if len(frq_df) < 60 and len(frq_df.columns) < 40:
-        heatmap(frq_df,
-                save_name=heat_fname,
-                save_dir=heat_dir)
-    else:
-        heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30,len(frq_df.T))).T,
-                save_name=f'sample-{heat_fname}',
-                save_dir=heat_dir)
-
-
-def get_freq_info(df, n_files, frq_thresh, group, frq_out_dir):
-    print(f'\n## Processing Frequency data for {group} lemmas.')
-    if group != 'all':
-        frq_out_dir = frq_out_dir.joinpath(group)
-    confirm_dir(frq_out_dir)
-    frq_out_stem = get_freq_out_stem(frq_thresh, n_files, group)
-    # > method returns `None` if stem not found
-    frq_df_path = find_glob_in_dir(frq_out_dir, f'*{frq_out_stem}*csv')
-
-    # if crosstabulated frequency table is found
-    if frq_df_path:
-        print(f'\n* frequency table ({group}) found.')
-        frq_df = _load_frq_table(frq_df_path)
-    # if frequency table is not found;
-    #   i.e. `f` call returned None
-    else:
-        frq_df_path = frq_out_dir.joinpath(frq_out_stem + '.csv')
-        # sanity check
-        if not frq_df_path.name.endswith('f.csv'):
-            exit(f'frequency path error: {frq_df_path}')
-        frq_df = _build_frq_df(df, frq_df_path, group)
-    return frq_df, frq_df_path
-
-
-def _summarize_hits(df):
-    lemma_counts_summ = _describe_str_lemma_counts(df)
-    tok_thresh_c = int(lemma_counts_summ.loc['min', :].min())
-    print(f'    ⇟ minimum hits/lemma in data: {tok_thresh_c:,}')
-    print_md_table(df.describe().T, indent=2,
-                   title='Frequency Filtered Hits Summary')
-    print_md_table(lemma_counts_summ, indent=2,
-                   title='Frequency Filtered Lemma Distributions')
-
-    return tok_thresh_c
-
-
-def prepare_hit_table(n_files, tok_thresh_p, post_proc_dir):
-    sample_tag = 'sample' if n_files < 35 else ''
-    print(f"# Collecting {sample_tag} vocabulary frequencies for",
-          f"{n_files} *hits.pkl.gz hit tables")
-
-    pkl_suff = f'{n_files}f.pkl.gz'
-    confirm_dir(post_proc_dir)
-
-    clean_bigrams_pkl = post_proc_dir.joinpath(f'bigrams_clean.{pkl_suff}')
-    # print(f'Cleaned Hits Table Path:\n  >> {clean_bigrams_pkl}')
-
-    th_bigrams_pkl = post_proc_dir.joinpath(
-        f"bigrams-only_thr{str(tok_thresh_p).replace('.','-')}p.{pkl_suff}")
-
-    _t0 = pd.Timestamp.now()
-    print('\n## loading data...')
-    if th_bigrams_pkl.is_file():
-        print(
-            f'* Found previous output. Loading data from {th_bigrams_pkl}...')
-        df = pd.read_pickle(th_bigrams_pkl).convert_dtypes()
-
-    else:
-        if clean_bigrams_pkl.is_file():
-            print('* Found previous output.',
-                  f'Loading data from {clean_bigrams_pkl}')
-            df = pd.read_pickle(clean_bigrams_pkl)
-            if df.index.name != 'hit_id':
-                df = df.set_index('hit_id')
-            print_md_table(df.describe().T, indent=2, title='Clean Hits Summary')
-            print_md_table(_describe_str_lemma_counts(df),
-                           indent=2, title='Clean Lemma Counts Summary')
-
-        else:
-            df = _load_data(n_files)
-            if df.index.name != 'hit_id':
-                df = df.set_index('hit_id')
-            print(f'\n> {len(df):,} initial hits')
-            _print_uniq_lemma_count(df, updated=False)
-            print(_describe_str_lemma_counts(
-                df).round().to_markdown(floatfmt=',.0f'))
-            clean_t0 = pd.Timestamp.now()
-            df = _clean_data(df)
-            clean_t1 = pd.Timestamp.now()
-            print('\n[ Time to clean combined hits dataframe:',
-                  get_proc_time(clean_t0, clean_t1), ']')
-            print_md_table(_describe_str_lemma_counts(df))
-
-            save_table(df,
-                       str(clean_bigrams_pkl).split('.pkl', 1)[0],
-                       "cleaned bigram hits")
-
-        # > drop infrequent adv & adj lemmas
-        df = _drop_infreq(df, tok_thresh_p)
-        tok_thresh_c = int(_describe_str_lemma_counts(df).loc['min', :].min())
-        save_table(
-            df,
-            str(th_bigrams_pkl).split('.pkl', 1)[0],
-            f'frequency restrictred bigrams ({tok_thresh_c}+ frequency threshold)')
-
-    _t1 = pd.Timestamp.now()
-    print('✓ time:', get_proc_time(_t0, _t1))
-    return df
-
-
 def _parse_args():
 
     parser = argparse.ArgumentParser(
@@ -218,6 +104,80 @@ def _parse_args():
             args.post_proc_dir, args.frq_out_dir, set(args.frq_groups))
 
 
+def prepare_hit_table(n_files, tok_thresh_p, post_proc_dir):
+    sample_tag = 'sample' if n_files < 35 else ''
+    print(f"# Collecting {sample_tag} vocabulary frequencies for",
+          f"{n_files} *hits.pkl.gz hit tables")
+
+    pkl_suff = f'{n_files}f.pkl.gz'
+    confirm_dir(post_proc_dir)
+
+    clean_bigrams_pkl = post_proc_dir.joinpath(f'bigrams_clean.{pkl_suff}')
+    # print(f'Cleaned Hits Table Path:\n  >> {clean_bigrams_pkl}')
+
+    th_bigrams_pkl = post_proc_dir.joinpath(
+        f"bigrams-only_thr{str(tok_thresh_p).replace('.','-')}p.{pkl_suff}")
+
+    _t0 = pd.Timestamp.now()
+    print('\n## loading data...')
+    if th_bigrams_pkl.is_file():
+        print(
+            f'* Found previous output. Loading data from {th_bigrams_pkl}...')
+        df = pd.read_pickle(th_bigrams_pkl).convert_dtypes()
+
+    else:
+        if clean_bigrams_pkl.is_file():
+            print('* Found previous output.',
+                  f'Loading data from {clean_bigrams_pkl}')
+            df = pd.read_pickle(clean_bigrams_pkl)
+            if df.index.name != 'hit_id':
+                df = df.set_index('hit_id')
+            print_md_table(df.describe().T, indent=2,
+                           title='Clean Hits Summary')
+            print_md_table(_describe_str_lemma_counts(df),
+                           indent=2, title='Clean Lemma Counts Summary')
+
+        else:
+            df = _load_data(n_files)
+            if df.index.name != 'hit_id':
+                df = df.set_index('hit_id')
+            print(f'\n> {len(df):,} initial hits')
+            _print_uniq_lemma_count(df, updated=False)
+            print(_describe_str_lemma_counts(
+                df).round().to_markdown(floatfmt=',.0f'))
+            clean_t0 = pd.Timestamp.now()
+            df = _clean_data(df)
+            clean_t1 = pd.Timestamp.now()
+            print('\n[ Time to clean combined hits dataframe:',
+                  get_proc_time(clean_t0, clean_t1), ']')
+            print_md_table(_describe_str_lemma_counts(df))
+
+            save_table(df,
+                       str(clean_bigrams_pkl).split('.pkl', 1)[0],
+                       "cleaned bigram hits")
+
+        # > drop infrequent adv & adj lemmas
+        df = _drop_infreq(df, tok_thresh_p)
+        tok_thresh_c = int(_describe_str_lemma_counts(df).loc['min', :].min())
+        save_table(
+            df,
+            str(th_bigrams_pkl).split('.pkl', 1)[0],
+            f'frequency restrictred bigrams ({tok_thresh_c}+ frequency threshold)')
+
+    _t1 = pd.Timestamp.now()
+    print('✓ time:', get_proc_time(_t0, _t1))
+    return df
+
+
+def _describe_str_lemma_counts(df: pd.DataFrame) -> pd.DataFrame:
+    lemma_stats = (df.columns[df.columns.str.endswith('_lemma')]
+                   .to_series().apply(
+                       lambda c: df[c].value_counts().describe())
+                   ).T
+    lemma_stats.columns = lemma_stats.columns.str.replace('lemma', 'counts')
+    return lemma_stats.round()
+
+
 def _load_data(n_files: int) -> pd.DataFrame:
     pkl_paths = select_pickle_paths(n_files)
     _ts = pd.Timestamp.now()
@@ -241,17 +201,43 @@ def _load_data(n_files: int) -> pd.DataFrame:
             save_table(df,
                        str(simple_hits_pkl).split('.pkl', maxsplit=1)[0],
                        df_name='simplified hits')
-        print_md_table(df.describe().T.convert_dtypes(), indent=3, title=f'({i+1}) `{p.stem}` summary')
+        print_md_table(df.describe().T.convert_dtypes(),
+                       indent=3, title=f'({i+1}) `{p.stem}` summary')
         df_list.append(df)
 
     combined_df = pd.concat(df_list)
-    print_md_table(combined_df.describe().T.convert_dtypes(), title='Combined Raw Hits Summary')
+    print_md_table(combined_df.describe().T.convert_dtypes(),
+                   title='Combined Raw Hits Summary')
 
     _te = pd.Timestamp.now()
     print('> Time to create composite hits dataframe:',
           get_proc_time(_ts, _te))
 
     return combined_df
+
+
+def _print_uniq_lemma_count(df: pd.DataFrame,
+                            cols=None,
+                            updated: bool = True,
+                            label: str = '',
+                            head_mark: str = ''):
+    if not label:
+        label = 'updated' if updated else 'initial'
+    if not head_mark:
+        head_mark = '+' if updated else '='
+    if not cols:
+        cols = df.columns[df.columns.str.endswith('_lemma')]
+    counts_info = {
+        c.replace('_lemma', '').upper(): count_uniq(df[c])
+        for c in cols
+    }
+    str_len = len(max(counts_info.keys()))
+    num_len = len(str(max(counts_info.values()))) + 1
+    counts = ['{0:<{1}s}:  {2:>{3},d}'.format(k, str_len, v, num_len)  # pylint: disable=consider-using-f-string
+              for k, v in counts_info.items()]
+    print_iter(counts,
+               header=f'{head_mark} unique lemmas in {label} hits',
+               indent=2)
 
 
 def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -288,7 +274,7 @@ def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
         print_md_table(_describe_str_lemma_counts(df))
         df = _drop_duplicate_sents(df)
         _t1 = pd.Timestamp.now()
-        
+
         print('[ Time to drop duplicated sentences:',
               get_proc_time(_t0, _t1), ']')
 
@@ -313,37 +299,38 @@ def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _print_uniq_lemma_count(df: pd.DataFrame,
-                            cols=None,
-                            updated: bool = True,
-                            label: str = '',
-                            head_mark: str = ''):
-    if not label:
-        label = 'updated' if updated else 'initial'
-    if not head_mark:
-        head_mark = '+' if updated else '='
-    if not cols:
-        cols = df.columns[df.columns.str.endswith('_lemma')]
-    counts_info = {
-        c.replace('_lemma', '').upper(): count_uniq(df[c])
-        for c in cols
-    }
-    str_len = len(max(counts_info.keys()))
-    num_len = len(str(max(counts_info.values()))) + 1
-    counts = ['{0:<{1}s}:  {2:>{3},d}'.format(k, str_len, v, num_len)  # pylint: disable=consider-using-f-string
-              for k, v in counts_info.items()]
-    print_iter(counts,
-               header=f'{head_mark} unique lemmas in {label} hits',
-               indent=2)
+def _drop_odd_orth(df: pd.DataFrame,
+                   verbose=False) -> pd.DataFrame:
+
+    print('\nRemoving lemmas with abnormal orthography...')
+    J = df.adj_lemma
+    J_filter = ~odd_lemma_orth(J)
+    if verbose:
+        meta_df = (J_filter.value_counts(normalize=True)
+                   .multiply(100).round(3).to_frame('%_of_adj')
+                   .assign(status=['kept', 'dropped'],
+                           adj_tokens=J_filter.value_counts())
+                   . set_index('status'))
+        print_md_table(
+            meta_df, title='ADV orthography filter outcomes', n_dec=2)
+
+    R = df.adv_lemma
+    R_filter = ~odd_lemma_orth(R)
+    if verbose:
+        print((R_filter.value_counts(normalize=True)
+               .multiply(100).round(3).to_frame("%_of_adv")
+               .assign(status=['kept', 'dropped'],
+                       adv_tokens=R_filter.value_counts())
+               .set_index('status').to_markdown()), '\n')
+
+    return df.loc[J_filter & R_filter, :]
 
 
-def _describe_str_lemma_counts(df: pd.DataFrame) -> pd.DataFrame:
-    lemma_stats = (df.columns[df.columns.str.endswith('_lemma')]
-                   .to_series().apply(
-                       lambda c: df[c].value_counts().describe())
-                   ).T
-    lemma_stats.columns = lemma_stats.columns.str.replace('lemma', 'counts')
-    return lemma_stats.round()
+def odd_lemma_orth(lemmas: pd.Series) -> pd.Series:
+    return pd.Series(
+        lemmas.str.startswith(('-', '&', '.'))
+        | lemmas.str.endswith(('-', '&'))
+        | lemmas.str.contains(r"[^-&\w\.][a-zA-Z]", regex=True))
 
 
 def _drop_long_sents(df: pd.DataFrame) -> pd.DataFrame:
@@ -389,46 +376,12 @@ def _drop_duplicate_sents(df: pd.DataFrame, verbose: int = 0) -> pd.DataFrame:
     return singletons[['adv_lemma', 'adj_lemma']].astype('string')
 
 
-def _drop_odd_orth(df: pd.DataFrame,
-                   verbose=False) -> pd.DataFrame:
-
-    print('\nRemoving lemmas with abnormal orthography...')
-    J = df.adj_lemma
-    J_filter = ~odd_lemma_orth(J)
-    if verbose:
-        meta_df = (J_filter.value_counts(normalize=True)
-                   .multiply(100).round(3).to_frame('%_of_adj')
-                   .assign(status=['kept', 'dropped'],
-                           adj_tokens=J_filter.value_counts())
-                   . set_index('status'))
-        print_md_table(
-            meta_df, title='ADV orthography filter outcomes', n_dec=2)
-
-    R = df.adv_lemma
-    R_filter = ~odd_lemma_orth(R)
-    if verbose:
-        print((R_filter.value_counts(normalize=True)
-               .multiply(100).round(3).to_frame("%_of_adv")
-               .assign(status=['kept', 'dropped'],
-                       adv_tokens=R_filter.value_counts())
-               .set_index('status').to_markdown()), '\n')
-
-    return df.loc[J_filter & R_filter, :]
-
-
-def odd_lemma_orth(lemmas: pd.Series) -> pd.Series:
-    return pd.Series(
-        lemmas.str.startswith(('-', '&', '.'))
-        | lemmas.str.endswith(('-', '&'))
-        | lemmas.str.contains(r"[^-&\w\.][a-zA-Z]", regex=True))
-
-
 def _drop_infreq(df, percent) -> pd.DataFrame:
     print(f'## Removing hits where `{df.columns[0]}` and/or ',
           f'`{df.columns[1]}` do not meet the total hit threshold...')
 
     print_md_table(df.describe().T, title='Initial (clean) Summary')
-    print_md_table(_describe_str_lemma_counts(df), 
+    print_md_table(_describe_str_lemma_counts(df),
                    title='Initial (clean) distribution info')
     ts = pd.Timestamp.now()
     clean_total = len(df)
@@ -470,10 +423,10 @@ def _drop_infreq(df, percent) -> pd.DataFrame:
 
             # > if _too many_ hits were dropped...
             if ((n_remain < must_keep)
-                        # keep at least 20 unique adv
-                        or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
-                        # keep at least 40 unique adj
-                    or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
+                    # keep at least 20 unique adv
+                    or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
+                    # keep at least 40 unique adj
+                        or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
                     ):
 
                 if not filter_applied and filter_attempt < 5:
@@ -565,38 +518,44 @@ def _get_update(df, token_thresh):
     return update_df
 
 
-# def _make_freq_tables(frq_out_dir: Path,
-    #                   df: pd.DataFrame,
-    #                   frq_thresh,
-    #                   n_files: int,
-    #                   group_code: str = 'all') -> None:
-    # """locate or create frequency tables: crosstabulated `adv_lemma` x `adj_lemma` counts.
+def _summarize_hits(df):
+    lemma_counts_summ = _describe_str_lemma_counts(df)
+    tok_thresh_c = int(lemma_counts_summ.loc['min', :].min())
+    print(f'    ⇟ minimum hits/lemma in data: {tok_thresh_c:,}')
+    print_md_table(df.describe().T, indent=2,
+                   title='Frequency Filtered Hits Summary')
+    print_md_table(lemma_counts_summ, indent=2,
+                   title='Frequency Filtered Lemma Distributions')
 
-    # If file exists, load it and collect descriptive stats and, if it is small enough, create corresponding heatmap visualization.
+    return tok_thresh_c
 
-    # If it does not exist, run crosstabulation on `adv_lemma` and `adj_lemma` columns. The collect stats and create heatmap (if table is small enough).
 
-    # Args:
-    #     frq_out_dir (Path): location to save frequency tables, descriptive stats, and any heatmaps.
-    #     df (pd.DataFrame): dataframe containing `adv_lemma` and `adj_lemma` columns at the minimum
-    #     frq_thresh (_type_): minimum number of tokens per lemma in data
-    #     n_files (int): number of files the current data is sourced from (~ # corpus chunks)
-    #     group_code (str, optional): set to 'JxR' to filter df on subset of lemmas read in from `lexical_categories`. If 'JxR' is given, all output files will be saved to subdirectory, `../freq_out/JxR/`. Defaults to all.
-    # """
+def get_freq_info(df, n_files, frq_thresh, group, frq_out_dir):
+    print(f'\n## Processing Frequency data for {group} lemmas.')
+    if group != 'all':
+        frq_out_dir = frq_out_dir.joinpath(group)
+    confirm_dir(frq_out_dir)
+    frq_out_stem = get_freq_out_stem(frq_thresh, n_files, group)
+    # > method returns `None` if stem not found
+    frq_df_path = find_glob_in_dir(frq_out_dir, f'*{frq_out_stem}*csv')
 
-    # pass
+    # if crosstabulated frequency table is found
+    if frq_df_path:
+        print(f'\n* frequency table ({group}) found.')
+        frq_df = _load_frq_table(frq_df_path)
+    # if frequency table is not found;
+    #   i.e. `f` call returned None
+    else:
+        frq_df_path = frq_out_dir.joinpath(frq_out_stem + '.csv')
+        # sanity check
+        if not frq_df_path.name.endswith('f.csv'):
+            exit(f'frequency path error: {frq_df_path}')
+        frq_df = _build_frq_df(df, frq_df_path, group)
+    return frq_df, frq_df_path
 
 
 def get_freq_out_stem(frq_thresh, n_files, group_code):
     return f'{group_code}-frq_thresh{frq_thresh}.{n_files}f'
-
-
-# def _find_prior_freq_out(frq_out_dir: Path,
-    #                      frq_out_stem: str,
-    #                      group_code: str) -> pd.DataFrame:
-    # frq_df = pd.DataFrame()
-
-    # return frq_df
 
 
 def _load_frq_table(frq_df_path):
@@ -682,35 +641,8 @@ def _describe_counts(df: pd.DataFrame,
                 else:
                     most_var_adj = _select_lemmas(desc)
 
-    _visualize_counts(df.loc[['SUM'] + most_var_adj, ['SUM'] + most_var_adv], df_path)
-
-
-def _select_lemmas(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
-    nth = int(len(desc)/6)
-    trim = int(len(desc) * 0.01)
-    desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
-    top_means_metric = desc.loc[
-            (desc['mean'] > (desc_interior['mean'].median() * .75))
-            & 
-            (desc.total > (desc_interior['total'].median() * .75))
-            , metric]
-    # info_list = []
-    # for label, desc_df in {'interior': desc.iloc[5:, :], 'full': desc}.items():
-    #     top_means = desc_df.loc[
-    #         (desc_df['mean'] > (desc_df['mean'].median() + 0.5 * 1))
-    #         & 
-    #         (desc_df.total > (desc_df.total.median() * 1.1))
-    #         , [metric, 'mean', '50%', 'total', 'max', 'range']]
-    #     info = top_means.describe()
-    #     info.columns = info.columns.astype('string') + f'_{label}' 
-    #     info_list.append(info)
-    # print_md_table(info_list[0].join(info_list[1]).sort_index(axis=1).round(0), 
-    #                title='Compare descriptive stats')
-    if largest:
-        lemmas = top_means_metric.squeeze().nlargest(nth).index.to_list()
-    else:
-        lemmas = top_means_metric.squeeze().nsmallest(nth).index.to_list()
-    return lemmas
+    _visualize_counts(df.loc[['SUM'] + most_var_adj,
+                      ['SUM'] + most_var_adv], df_path)
 
 
 def _enhance_descrip(desc: pd.DataFrame,
@@ -733,14 +665,83 @@ def _enhance_descrip(desc: pd.DataFrame,
         else:
             desc.loc[:, col] = pd.to_numeric(desc[col], downcast='unsigned')
 
+    return desc
+
+def _select_lemmas(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
+    nth = int(len(desc)/6)
+    trim = int(len(desc) * 0.01)
+    desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
+    top_means_metric = desc.loc[
+        (desc['mean'] > (desc_interior['mean'].median() * .75))
+        &
+        (desc.total > (desc_interior['total'].median() * .75)), metric]
+    # info_list = []
+    # for label, desc_df in {'interior': desc.iloc[5:, :], 'full': desc}.items():
+    #     top_means = desc_df.loc[
+    #         (desc_df['mean'] > (desc_df['mean'].median() + 0.5 * 1))
+    #         &
+    #         (desc_df.total > (desc_df.total.median() * 1.1))
+    #         , [metric, 'mean', '50%', 'total', 'max', 'range']]
+    #     info = top_means.describe()
+    #     info.columns = info.columns.astype('string') + f'_{label}'
+    #     info_list.append(info)
+    # print_md_table(info_list[0].join(info_list[1]).sort_index(axis=1).round(0),
+    #                title='Compare descriptive stats')
+    if largest:
+        lemmas = top_means_metric.squeeze().nlargest(nth).index.to_list()
+    else:
+        lemmas = top_means_metric.squeeze().nsmallest(nth).index.to_list()
+    return lemmas
+
+
+
+def _visualize_counts(frq_df, frq_df_path):
+    heat_dir = frq_df_path.parent.joinpath('images')
+    confirm_dir(heat_dir)
+    heat_fname = f'heatmap_{frq_df_path.stem}.png'
+    if len(frq_df) < 60 and len(frq_df.columns) < 40:
+        heatmap(frq_df,
+                save_name=heat_fname,
+                save_dir=heat_dir)
+    else:
+        heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30, len(frq_df.T))).T,
+                save_name=f'sample-{heat_fname}',
+                save_dir=heat_dir)
+
+# def _make_freq_tables(frq_out_dir: Path,
+    #                   df: pd.DataFrame,
+    #                   frq_thresh,
+    #                   n_files: int,
+    #                   group_code: str = 'all') -> None:
+    # """locate or create frequency tables: crosstabulated `adv_lemma` x `adj_lemma` counts.
+
+    # If file exists, load it and collect descriptive stats and, if it is small enough, create corresponding heatmap visualization.
+
+    # If it does not exist, run crosstabulation on `adv_lemma` and `adj_lemma` columns. The collect stats and create heatmap (if table is small enough).
+
+    # Args:
+    #     frq_out_dir (Path): location to save frequency tables, descriptive stats, and any heatmaps.
+    #     df (pd.DataFrame): dataframe containing `adv_lemma` and `adj_lemma` columns at the minimum
+    #     frq_thresh (_type_): minimum number of tokens per lemma in data
+    #     n_files (int): number of files the current data is sourced from (~ # corpus chunks)
+    #     group_code (str, optional): set to 'JxR' to filter df on subset of lemmas read in from `lexical_categories`. If 'JxR' is given, all output files will be saved to subdirectory, `../freq_out/JxR/`. Defaults to all.
+    # """
+
+    # pass
+
+# def _find_prior_freq_out(frq_out_dir: Path,
+    #                      frq_out_stem: str,
+    #                      group_code: str) -> pd.DataFrame:
+    # frq_df = pd.DataFrame()
+
+    # return frq_df
+
     # mean_centr = no_sum_frame - no_sum_frame.mean()
     # mean_stand = no_sum_frame / no_sum_frame.mean()
     # mean_stand_centr = mean_stand - mean_stand.mean()
     # log2_trans = no_sum_frame.apply(np.log2)
     # log2_plus1_trans = no_sum_frame.add(1).apply(np.log2)
     # logn_plus1_trans = no_sum_frame.apply(np.log1p)
-
-    return desc
 
 
 if __name__ == '__main__':
