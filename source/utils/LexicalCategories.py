@@ -8,7 +8,6 @@ SAMPLE_ADJ = {
         'good', 'bad',
         'easy', 'difficult',
         'hard', 'soft',
-
     ),
     'lower_closed': (
         'bent', 'dirty', 'rough', 'dangerous'
@@ -18,7 +17,7 @@ SAMPLE_ADJ = {
     ),
     'totally_closed': (
         'transparent', 'opaque',
-        'full', 'empty', 
+        'full', 'empty',
         'open', 'closed'
     ),
     'extreme': (
@@ -30,7 +29,8 @@ SAMPLE_ADJ = {
     'nongradeable': (
         'existing', 'extinct',
         'missing',
-        'alive', 'dead',
+        'alive',
+        'dead',
         'pregnant',
         'locked',
         'geological'
@@ -43,8 +43,8 @@ SAMPLE_ADV = {
         'most',
         'less',
         'least',
-        'relatively',
         'as'
+        # 'relatively',
     ),
     'sufficient': (
         'so',
@@ -55,7 +55,7 @@ SAMPLE_ADV = {
         'very',
         'really',
         'quite',
-        'extremely', 
+        'extremely',
         'particularly'
     ),
     'min_threshold': (
@@ -64,221 +64,302 @@ SAMPLE_ADV = {
     ),
     'max_threshold': (
         'perfectly',
-        'fully', 
-        'completely' 
+        'fully',
+        'completely'
     ),
     'extreme': (
         'absolutely',
         'positively',
-        'downright', 
+        'downright',
         'just'
     ),
 }
 
-PPI_ADVERBS = [
-    'pretty',
-    'fairly',
-    'rather',
-    'somewhat',
-    'kinda',
-    'sorta'
-]
+ADV_OF_INTEREST = {
+    'sufficient': {
+        'so',
+        'too',
+        'enough'
+    },
+    
+    'min_threshold': {
+        'slightly',
+        'partially',
+    },
+    
+    'max_threshold': {
+        'perfectly',
+        'fully',
+        'completely'
+    },
 
-ADV_OF_INTEREST = [
-    'slightly',
-    'partially',
-    'minimally',
-    'marginally',
-    'weakly',
-    'modestly',
-    'moderately',
-    'underwhelmingly',
-    'acceptably',
-    'adequately',
-    'passingly',
-    'passing',
-    'satisfactorily',
-    'reasonably',
-    'tolerably',
-    'dubiously',
-    'supposedly',
+    'moderate':    {
+        'slightly',
+        'partially',
+        'minimally',
+        'marginally',
+        'weakly',
+        'modestly',
+        'moderately',
+        'underwhelmingly',
+        'acceptably',
+        'adequately',
+        'passingly',
+        'passing',
+        'satisfactorily',
+        'reasonably',
+        'tolerably',
+        'dubiously',
+        'supposedly',
+    },
 
-    'exactly',
-    'precisely',
+    'precise': {
+        'exactly',
+        'precisely'
+    },
 
-    'more',
-    'less',
-    'most',
-    'least',
+    'compare': {
+        'more',
+        'less',
+        'most',
+        'least',
+        'as',
+        'comparatively'  # ? #TODO does this pelong here?
+        # 'relatively'
+    },
 
-    'very',
-    'really',
-    'quite',
+    'weak_intense':    {
+        'very',
+        'really',
+        'quite'
+    },
 
-    'hugely',
-    'largely',
-    'greatly',
-    'highly',
-    'deeply',
-    'widely',
-    'strongly',
-    'super',
+    'meas_intense':    {
+        'hugely',
+        'largely',
+        'greatly',
+        'highly',
+        'deeply',
+        'widely',
+        'strongly',
+        'super'
+    },
 
-    'particularly',
-    'especially',
-    'entirely',
-    'extremely',
-    'notably',
+    'mod_intense': {
+        'particularly',
+        'especially',
+        'entirely',
+        'extremely',
+        'notably'
+    },
 
-    'amazingly',
-    'heartily',
-    'impressively',
-    'marvelously',
-    'extraordinarily',
-    'splendidly',
-    'gloriously',
-    'divinely',
-    'sensationally',
-    'wonderfully',
-    'fabulously',
-    'fantastically',
-    'delectably',
-    'deliciously',
+    'good_intense': {
+        'amazingly',
+        'heartily',
+        'impressively',
+        'marvelously',
+        'extraordinarily',
+        'splendidly',
+        'gloriously',
+        'divinely',
+        'sensationally',
+        'wonderfully',
+        'fabulously',
+        'fantastically',
+        'delectably',
+        'deliciously'
+    },
 
-    'positively',
-    'surely',
-    'certainly',
-    'actually',
-    'definitely',
-    'undoubtedly',
-    'certifiably',
-    'veritably',
-    'verifiably',
-    'truly',
-    'honestly',
-    'genuinely',
+    'epistemic': {
+        'positively',
+        'surely',
+        'certainly',
+        'actually',
+        'definitely',
+        'undoubtedly',
+        'certifiably',
+        'veritably',
+        'verifiably',
+        'truly',
+        'honestly',
+        'genuinely'
+    },
 
-    'seriously',
-    'sincerely',
-    'earnestly',
-    'hopelessly',
+    'serious_intense': {
+        'seriously',
+        'sincerely',
+        'earnestly',
+        'hopelessly'
+    },
 
-    'obviously',
-    'clearly',
-    'blatantly',
-    'openly',
+    'observable': {
+        'obviously',
+        'clearly',
+        'blatantly',
+        'openly'
+    },
 
-    'horribly',
-    'frightfully',
-    'scarily',
-    'creepily',
-    'eerily',
-    'spookily',
-    'terribly',
-    'dreadfully',
-    'dangerously',
-    'alarmingly',
-    'suspiciously',
-    'awfully',
-    'fucking',
+    'fear_intense': {
+        'horribly',
+        'frightfully',
+        'scarily',
+        'creepily',
+        'eerily',
+        'spookily',
+        'terribly',
+        'dreadfully',
+        'dangerously',
+        'alarmingly',
+        'suspiciously',
+        'awfully'
+    },
 
-    'disgustingly',
-    'morbidly',
-    'fatally',
-    'miserably',
-    'maddeningly',
-    'violently',
+    'taboo_intense': {
+        'fucking',
+        'disgustingly',
+        'morbidly',
+        'fatally',
+        'miserably',
+        'maddeningly',
+        'violently',
+        'insatiably',
+        'voraciously'
+    },
 
-    'peculiarly',
-    'strangely',
-    'freakishly',
-    'weirdly',
-    'oddly',
-    'ridiculously',
-    'bizarrely',
-    'absurdly',
+    'absurd_intense': {
+        'peculiarly',
+        'strangely',
+        'freakishly',
+        'freakily',
+        'weirdly',
+        'oddly',
+        'ridiculously',
+        'bizarrely',
+        'absurdly'
+    },
 
-    'crazy',
-    'crazily',
-    'insanely',
-    'madly',
-    'incredibly',
-    'unbelievably',
-    'impossibly',
+    'crazy_intense': {
+        'crazy',
+        'crazily',
+        'insanely',
+        'madly'
+    },
 
-    'disconcertingly',
-    'troublingly',
-    'worryingly',
-    'disturbingly',
+    'disbelief_intense': {
+        'incredibly',
+        'unbelievably',
+        'unfathomably',
+        'impossibly',
+        'inutterably',
+        'unspeakably'
+    },
 
-    'inordinately',
-    'excessively',
-    'overly',
-    'overwhelmingly',
-    'intolerably',
-    'unacceptably',
+    'unease_intense': {
+        'disconcertingly',
+        'troublingly',
+        'worryingly',
+        'disturbingly'
+    },
 
-    'utterly',
-    'completely',
-    'totally',
-    'maximally',
-    'perfectly',
+    'excess_intense': {
+        'inordinately',
+        'excessively',
+        'overly',
+        'overwhelmingly',
+        'intolerably',
+        'unacceptably'
+    },
+
+    'max_intense': {
+        'utterly',
+        'completely',
+        'totally',
+        'maximally',
+        'perfectly'
+    },
 
     # Morzycki's EDM
-    'simply',
-    'just',
-    'positively',
-    'absolutely',
-    'downright',
-    'outright',
-    'flat-out',
-    'full-on',
-    'out-and-out',
-    'straight-up',
-    'balls-out',
+    'EDM_Morzycki': {
+        'simply',
+        'just',
+        'positively',
+        'absolutely',
+        'downright',
+        'outright',
+        'flat-out',
+        'full-on',
+        'out-and-out',
+        'straight-up',
+        'balls-out'
+    },
 
     # M-modifiers (Solt & Wilson 2021)
-    'pretty',
-    'fairly',
-    'rather',
-    'somewhat',
-    'kinda',
-    'sorta',
+    'Mmod_SoltWilson': {
+        'pretty',
+        'fairly',
+        'rather',
+        'somewhat',
+        'kinda',
+        'sorta'
+    },
 
     # NegPol Triggers
-    'scarcely',
-    'barely',
-    'hardly',
-    'rarely',
-    # 'no',
-    'not',
-    'never',
+    'negative': {
+        'scarcely',
+        'barely',
+        'hardly',
+        'rarely',
+        # 'no',
+        'not',
+        'never'
+    },
 
     # minimal pairs?
-    'always',
-    'some',
-    'often',
-    'frequently',
-    'normally',
-    'usually',
-    'typically',
-    'commonly',
+    'positive': {
+        'always',
+        'some',
+        'often',
+        'frequently',
+        'normally',
+        'usually',
+        'typically',
+        'commonly'
+    },
 
     # NPI or "rescuer"
-    'yet',
-    'even',
-    'only',
-    'enough',
-    'too',
-]
+    'NPS': {
+        'yet',
+        'ever',
+        'exactly'
+    },
 
+    'PS_rescuer': {
+        'even',
+        'only',
+        'enough',
+        'too'
+    },
+
+    'PPS': {
+        'pretty',
+        'fairly',
+        'rather',
+        'somewhat',
+        'kinda',
+        'sorta',
+        'utterly'  # ? include this?
+    },
+}
+
+# ADV_OF_INTEREST.update({f'{k}_sample': set(v)
+#                        for k, v in SAMPLE_ADV.items() if not k.startswith('compar')})
 
 ADJ_BY_SCALE = {
     'NONGRADABLE': {'dead',
                     'alive',
                     'existing',
                     'extinct',
-                    'pregnant'
+                    'pregnant',
                     # Kennedy 2007
                     'wooden',
                     'hand-made',
@@ -308,7 +389,7 @@ ADJ_BY_SCALE = {
              'soft',
              'hard',
              'high',
-             'low'
+             'low',
              # Kennedy 2007
              'expensive',
              'inexpensive',
