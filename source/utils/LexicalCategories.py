@@ -81,12 +81,12 @@ ADV_OF_INTEREST = {
         'too',
         'enough'
     },
-    
+
     'min_threshold': {
         'slightly',
         'partially',
     },
-    
+
     'max_threshold': {
         'perfectly',
         'fully',
@@ -113,7 +113,7 @@ ADV_OF_INTEREST = {
         'supposedly',
     },
 
-    'precise': {
+    'precise_intense': {
         'exactly',
         'precisely'
     },
@@ -131,6 +131,7 @@ ADV_OF_INTEREST = {
     'weak_intense':    {
         'very',
         'really',
+        'real',
         'quite'
     },
 
@@ -140,9 +141,15 @@ ADV_OF_INTEREST = {
         'greatly',
         'highly',
         'deeply',
+        'steeply',
         'widely',
         'strongly',
-        'super'
+        'immensely',
+        'grossly',
+        'increasingly',
+        'purely', 
+        'tremendously', 
+        'monumentally'
     },
 
     'mod_intense': {
@@ -150,12 +157,15 @@ ADV_OF_INTEREST = {
         'especially',
         'entirely',
         'extremely',
-        'notably'
+        'super',
+        'intensely'
     },
 
     'good_intense': {
         'amazingly',
         'heartily',
+        'awesomely',
+        'phenomenally',
         'impressively',
         'marvelously',
         'extraordinarily',
@@ -170,13 +180,32 @@ ADV_OF_INTEREST = {
         'deliciously'
     },
 
+    'bad_intense': {
+        'badly', 
+        'dismally',
+        'disappointingly', 
+        'unfortunately'
+    },
+
+    'physical_intense': {
+        'physically',
+        'painfully',
+        'viscerally',
+        'sorely',
+        'excruciatingly'
+    },
+
     'epistemic': {
-        'positively',
+        # 'positively',
         'surely',
         'certainly',
         'actually',
         'definitely',
         'undoubtedly',
+        'incontravertably',
+        'undeniably',
+        'indubitably',
+        'doubtless',
         'certifiably',
         'veritably',
         'verifiably',
@@ -185,18 +214,67 @@ ADV_OF_INTEREST = {
         'genuinely'
     },
 
+    'reporting': {
+        'apparently',
+        'seemingly',
+        'reportedly',
+        'ostensibly',
+        'supposedly',
+        'supposed',
+        'allegedly',
+        'tentatively',
+        'potentially',
+        'evidently',
+        'perceived',
+        'theoretically',
+        'hypothetically'
+    },
+
     'serious_intense': {
         'seriously',
         'sincerely',
+        'severely',
         'earnestly',
-        'hopelessly'
+        'hopelessly',
+        'miserably',
+        'desperately',
+        'depressingly',
+        'sadly',
+        'profoundly',
+        'strictly',
+        'rigidly'
     },
-
+    'time': {
+        'eternally',
+        'always',
+        'infinitely',
+        'forever', 
+        'already', 
+        'eventually',
+        'now', 
+        'still', 
+        'soon', 
+        'previously', 
+        'formerly', 
+        'yet', 
+        'recently', 
+        'instantly'
+    },
     'observable': {
         'obviously',
+        'notably',
         'clearly',
+        'visibly',
+        'audibly',
         'blatantly',
-        'openly'
+        'flagrantly',
+        'openly',
+        'deliberately',
+        'distinctly',
+        'intentionally',
+        'decidedly', 
+        'uniquely', 
+        'significantly',  #not sure this is where this goes
     },
 
     'fear_intense': {
@@ -211,21 +289,40 @@ ADV_OF_INTEREST = {
         'dangerously',
         'alarmingly',
         'suspiciously',
-        'awfully'
+        'awfully',
+        'fiercely', 
+        'competitively'
     },
-
-    'taboo_intense': {
-        'fucking',
-        'disgustingly',
-        'morbidly',
-        'fatally',
-        'miserably',
-        'maddeningly',
-        'violently',
+    'consume_intense': {
         'insatiably',
-        'voraciously'
+        'voraciously',
+        'greedily'
     },
 
+    'curse_intense': {
+        'fucking',
+        'freaking',
+        'damned',
+        'bloody'
+    },
+    'taboo_intense': {
+        'disgustingly',
+        'grotesquely',
+        'morbidly',
+        'terminally',
+        'fatally',
+        'sickeningly',
+        'maddeningly',
+        'brutally',
+        'violently',
+        'belligerantly'
+    },
+    'round-up_intense': {
+        'virtually',
+        'practically',
+        'essentially',
+        'basically'
+    },
     'absurd_intense': {
         'peculiarly',
         'strangely',
@@ -235,30 +332,40 @@ ADV_OF_INTEREST = {
         'oddly',
         'ridiculously',
         'bizarrely',
-        'absurdly'
+        'absurdly',
+        'curiously'
     },
 
     'crazy_intense': {
         'crazy',
         'crazily',
         'insanely',
-        'madly'
+        'madly',
+        'wildly'
     },
 
-    'disbelief_intense': {
+    'expectation_intense': {
         'incredibly',
         'unbelievably',
+        'indescribably',
         'unfathomably',
         'impossibly',
         'inutterably',
-        'unspeakably'
+        'unspeakably',
+        'remarkably',
+        'exceptionally',
+        'unusually',
+        'unexpectedly',
+        'surprisingly',
+        'considerably'
     },
 
     'unease_intense': {
         'disconcertingly',
         'troublingly',
         'worryingly',
-        'disturbingly'
+        'disturbingly',
+        'alarmingly'
     },
 
     'excess_intense': {
@@ -271,11 +378,13 @@ ADV_OF_INTEREST = {
     },
 
     'max_intense': {
-        'utterly',
+        # 'utterly',
         'completely',
         'totally',
         'maximally',
-        'perfectly'
+        'perfectly',
+        'entirely',
+        'thoroughly'
     },
 
     # Morzycki's EDM
@@ -309,7 +418,7 @@ ADV_OF_INTEREST = {
         'barely',
         'hardly',
         'rarely',
-        # 'no',
+        'no',
         'not',
         'never'
     },
