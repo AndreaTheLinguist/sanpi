@@ -162,7 +162,7 @@
 62	.	.	PUNCT	.	_	2	punct	_	end_char=2036|start_char=2035
 
 # target = "ain't"
-# comment = false negative ain't case (want to match but did not)
+# comment = FIXED
 # sent_id = target_05
 # source_id = pcc_eng_08_108.8642_x1745216_65
 # text = It ain't that easy."
@@ -175,7 +175,7 @@
 7	"	"	PUNCT	''	_	5	punct	_	end_char=5716|start_char=5715
 
 # target = "ain't"
-# comment = false negative ain't case (want to match but did not)
+# comment = FIXED
 # sent_id = target_06
 # source_id = pcc_eng_08_107.1280_x1718468_56
 # text = It ain't so bad, really.
@@ -290,7 +290,7 @@
 23	''	''	_	''	_	0	-	0:-	_
 
 # target = "ain't"
-# comment = false negative ain't case (want to match but did not)
+# comment = FIXED
 # sent_id = target_11
 # source_id = nyt_eng_19961024_0025_35
 # text = Ai n't too proud to beg
@@ -993,7 +993,6 @@
 33	either	either	ADV	RB	_	30	advmod	_	end_char=541|start_char=535
 34	.	.	PUNCT	.	_	4	punct	_	end_char=542|start_char=541
 
-
 # target = "ain't"
 # comment = SUCCESS! contig match!!
 # sent_id = target_37
@@ -1008,7 +1007,6 @@
 7	for	for	ADP	IN	_	8	case	_	end_char=1160|start_char=1157
 8	you	you	PRON	PRP	Case=Acc|Person=2|PronType=Prs	6	obl	_	end_char=1164|start_char=1161
 9	.	.	PUNCT	.	_	6	punct	_	end_char=1165|start_char=1164
-
 
 # target = "ain't"
 # comment = SUCCESS! contig match!!
@@ -1036,7 +1034,6 @@
 19	fun	fun	ADJ	JJ	Degree=Pos	13	conj	_	end_char=5019|start_char=5016
 20	.	.	PUNCT	.	_	13	punct	_	end_char=5020|start_char=5019
 
-
 # target = "ain't"
 # comment = no contig match
 # sent_id = target_39
@@ -1059,9 +1056,8 @@
 15	.	.	PUNCT	.	_	7	punct	_	end_char=3415|start_char=3414
 16	"	"	PUNCT	''	_	7	punct	_	end_char=3416|start_char=3415
 
-
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_40
 # source_id = pcc_eng_24_093.8145_x1501164_12
 # text = That shit ain't even funny!
@@ -1140,7 +1136,7 @@
 14	.	.	PUNCT	.	_	3	punct	_	end_char=145|start_char=144
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_44
 # source_id = pcc_eng_24_074.0867_x1182295_210
 # text = He ain't that tough but staying away from him does help.
@@ -1159,7 +1155,7 @@
 13	.	.	PUNCT	.	_	5	punct	_	end_char=14983|start_char=14982
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_45
 # source_id = pcc_eng_24_070.6216_x1126103_303
 # text = "It ain't that bad." she called up to us.
@@ -1188,7 +1184,6 @@
 3	ain't	ain't	AUX	VBP	Mood=Ind|Tense=Pres|VerbForm=Fin	5	aux	_	end_char=222|start_char=217
 4	really	really	ADV	RB	_	5	advmod	_	end_char=229|start_char=223
 5	good	good	ADJ	JJ	Degree=Pos	0	root	_	end_char=234|start_char=230
-
 
 # target = "ain't"
 # comment = SUCCESS! contig match!!
@@ -1260,7 +1255,7 @@
 18	.	.	PUNCT	.	_	10	punct	_	end_char=3469|start_char=3468
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_50
 # source_id = pcc_eng_25_034.2154_x0537743_3
 # text = 'Course, injecting dyes into humans in order to receive interpretable signals ain't exactly new, but hydrogel is what makes this approach unique.
@@ -1317,7 +1312,6 @@
 18	clear	clear	ADJ	JJ	Degree=Pos	8	parataxis	_	end_char=2665|start_char=2660
 19	.	.	PUNCT	.	_	8	punct	_	end_char=2666|start_char=2665
 20	"	"	PUNCT	''	_	8	punct	_	end_char=2667|start_char=2666
-
 
 # target = "ain't"
 # comment = SUCCESS! contig match!!
@@ -1379,7 +1373,6 @@
 53	as	as	ADP	IN	_	54	case	_	end_char=600|start_char=598
 54	cannabis	cannabi	NOUN	NN	Number=Sing	52	obl	_	end_char=609|start_char=601
 
-
 # target = "ain't"
 # comment = no contig match
 # sent_id = target_53
@@ -1432,7 +1425,7 @@
 16	.	.	PUNCT	.	_	5	punct	_	end_char=303|start_char=302
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_56
 # source_id = pcc_eng_17_075.5304_x1204589_10
 # text = It ain't exactly healthy.
@@ -1444,7 +1437,7 @@
 6	.	.	PUNCT	.	_	5	punct	_	end_char=527|start_char=526
 
 # target = "ain't"; **bad parse example?** ("that" is likely not an adverb here)
-# comment = no contig match, but think that's good? 
+# comment = FIXED (assuming, of course, that it's *supposed* to match)
 # sent_id = target_57
 # source_id = pcc_eng_27_053.9167_x0855434_05
 # text = Ain't that typical....
@@ -1507,7 +1500,7 @@
 5	.	.	PUNCT	.	_	4	punct	_	end_char=2001|start_char=2000
 
 # target = "ain't"
-# comment = no contig match
+# comment = SUCCESS! Neg raising match 
 # sent_id = target_61
 # source_id = pcc_eng_17_015.8834_x0240703_159
 # text = But over at NBC things ain't looking so bright, because they've cut both Eva Longoria's HOT & BOTHERED sitcom and Ben Feldman's SUPERSTORE to 11 episodes being trimmed from the original 13 episode order for the upcoming mid/season comedies!
@@ -1581,7 +1574,7 @@
 16	.	.	PUNCT	.	_	3	punct	_	end_char=4479|start_char=4478
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_63
 # source_id = pcc_eng_07_105.0564_x1682070_59
 # text = The only problem with that is, my English ain't so good so it don't come off liken I means it.
@@ -1611,7 +1604,7 @@
 24	.	.	PUNCT	.	_	6	punct	_	end_char=3918|start_char=3917
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_64
 # source_id = pcc_eng_07_105.0407_x1681822_16
 # text = Initially, it's ain't so bad, but after a night of idle at the carpark, walking around Mustafa, the pain worsen and cannot walk normally...
@@ -1682,7 +1675,7 @@
 28	.	.	PUNCT	.	_	3	punct	_	end_char=479|start_char=478
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_66
 # source_id = pcc_eng_07_075.0485_x1196658_03
 # text = It ain't so simple with this one."
@@ -1698,7 +1691,7 @@
 10	"	"	PUNCT	''	_	5	punct	_	end_char=236|start_char=235
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_67
 # source_id = pcc_eng_07_065.8233_x1047761_085
 # text = If you have to say it so brightly and loudly it probably ain't completely true, just as the verbal attacks on the police aren't completely true either.
