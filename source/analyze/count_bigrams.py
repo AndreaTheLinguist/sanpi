@@ -23,10 +23,13 @@ _MIN_MEDIAN = 5
 
 def _main():
     print(pd.Timestamp.now().ctime())
-    (n_files, percent_thresh,
+    (n_files, percent_thresh, data_dir,
      post_proc_dir, frq_out_dir, frq_groups) = _parse_args()
-
-    df = prepare_hit_table(n_files, percent_thresh, post_proc_dir)
+    
+    df = prepare_hit_table(n_files=n_files, 
+                           tok_thresh_p=percent_thresh, 
+                           post_proc_dir=post_proc_dir, 
+                           data_dir=data_dir)
     frq_thresh = _summarize_hits(df)
 
     if not frq_groups:
@@ -72,6 +75,15 @@ def _parse_args():
               'the previous set of lemmas and their correpsonding bigram tokens are dropped.'))
 
     parser.add_argument(
+        '-d',
+        '--data_dir',
+        type=Path,
+        default=Path('/share/compling/data/sanpi/2_hit_tables/advadj'),
+        help=('Path to location of original hit tables. '
+              '(i.e. tables indexed by `hit_id`). '
+              '`n_files` indicates the number of files to load from this directory.'))
+    
+    parser.add_argument(
         '-p',
         '--post_proc_dir',
         type=Path,
@@ -100,11 +112,14 @@ def _parse_args():
         pd.Series({name: val for name, val in
                    [a for a in args._get_kwargs()]})
         .to_frame('arguments given'))
-    return (args.n_files, args.percent_hits_threshold,
-            args.post_proc_dir, args.frq_out_dir, set(args.frq_groups))
+    return (args.n_files, args.percent_hits_threshold, args.data_dir,
+            args.post_proc_dir.resolve(), args.frq_out_dir.resolve(), set(args.frq_groups))
 
 
-def prepare_hit_table(n_files, tok_thresh_p, post_proc_dir):
+def prepare_hit_table(n_files:int, 
+                      tok_thresh_p:float, 
+                      post_proc_dir:Path, 
+                      data_dir: Path):
     sample_tag = 'sample' if n_files < 35 else ''
     print(f"# Collecting {sample_tag} vocabulary frequencies for",
           f"{n_files} *hits.pkl.gz hit tables")
@@ -138,7 +153,7 @@ def prepare_hit_table(n_files, tok_thresh_p, post_proc_dir):
                            indent=2, title='Clean Lemma Counts Summary')
 
         else:
-            df = _load_data(n_files)
+            df = _load_data(n_files, data_dir=data_dir)
             if df.index.name != 'hit_id':
                 df = df.set_index('hit_id')
             print(f'\n> {len(df):,} initial hits')
@@ -178,12 +193,17 @@ def _describe_str_lemma_counts(df: pd.DataFrame) -> pd.DataFrame:
     return lemma_stats.round()
 
 
-def _load_data(n_files: int) -> pd.DataFrame:
-    pkl_paths = select_pickle_paths(n_files)
+def _load_data(n_files: int, data_dir: Path) -> pd.DataFrame:
+    pkl_paths = select_pickle_paths(n_files, pickle_dir=data_dir)
     _ts = pd.Timestamp.now()
     df_list = []
     for i, p in enumerate(pkl_paths):
-        print(f'\n{i+1}. ../{p.relative_to(Path("/share/compling/data"))}')
+        try:
+            print_path=p.relative_to(Path("/share/compling/data"))
+        except ValueError:
+            print_path=p.resolve().relative_to(Path("/share/compling/projects"))
+            
+        print(f'\n{i+1}. ../{print_path}')
         # check for previous simplification
         simple_out_dir = p.parent.joinpath('simple')
         if not simple_out_dir.is_dir():
@@ -198,8 +218,11 @@ def _load_data(n_files: int) -> pd.DataFrame:
         else:
             df = pd.read_pickle(p)
             df = select_cols(df)
+            path_str = str(simple_hits_pkl).split('.pkl', maxsplit=1)[0]
+            if not Path(path_str).is_absolute():
+                path_str = str(Path(path_str).resolve())
             save_table(df,
-                       str(simple_hits_pkl).split('.pkl', maxsplit=1)[0],
+                       path_str,
                        df_name='simplified hits')
         print_md_table(df.describe().T.convert_dtypes(),
                        indent=3, title=f'({i+1}) `{p.stem}` summary')
