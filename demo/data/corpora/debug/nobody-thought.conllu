@@ -1,0 +1,124 @@
+# text = Nobody thought his talk was particularly interesting
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	his	he	PRON	PRP$	Gender=Masc|Number=Sing|Person=3|Poss=Yes|PronType=Prs	4	nmod:poss	_	start_char=15|end_char=18
+4	talk	talk	NOUN	NN	Number=Sing	7	nsubj	_	start_char=19|end_char=23
+5	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	7	cop	_	start_char=24|end_char=27
+6	particularly	particularly	ADV	RB	_	7	advmod	_	start_char=28|end_char=40
+7	interesting	interesting	ADJ	JJ	Degree=Pos	2	ccomp	_	start_char=41|end_char=52
+
+# text = Nobody thought he said anything particularly interesting
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	4	nsubj	_	start_char=15|end_char=17
+4	said	say	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=18|end_char=22
+5	anything	anything	PRON	NN	Number=Sing	4	obj	_	start_char=23|end_char=31
+6	particularly	particularly	ADV	RB	_	7	advmod	_	start_char=32|end_char=44
+7	interesting	interesting	ADJ	JJ	Degree=Pos	5	amod	_	start_char=45|end_char=56
+
+# text = Nobody thought he had anything particularly interesting to say
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	4	nsubj	_	start_char=15|end_char=17
+4	had	have	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=18|end_char=21
+5	anything	anything	PRON	NN	Number=Sing	4	obj	_	start_char=22|end_char=30
+6	particularly	particularly	ADV	RB	_	7	advmod	_	start_char=31|end_char=43
+7	interesting	interesting	ADJ	JJ	Degree=Pos	5	amod	_	start_char=44|end_char=55
+8	to	to	PART	TO	_	9	mark	_	start_char=56|end_char=58
+9	say	say	VERB	VB	VerbForm=Inf	7	advcl	_	start_char=59|end_char=62
+
+# text = Nobody thought he had any particularly interesting things to say
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	4	nsubj	_	start_char=15|end_char=17
+4	had	have	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=18|end_char=21
+5	any	any	DET	DT	_	8	det	_	start_char=22|end_char=25
+6	particularly	particularly	ADV	RB	_	7	advmod	_	start_char=26|end_char=38
+7	interesting	interesting	ADJ	JJ	Degree=Pos	8	amod	_	start_char=39|end_char=50
+8	things	thing	NOUN	NNS	Number=Plur	4	obj	_	start_char=51|end_char=57
+9	to	to	PART	TO	_	10	mark	_	start_char=58|end_char=60
+10	say	say	VERB	VB	VerbForm=Inf	8	acl	_	start_char=61|end_char=64
+
+# text = Nobody thought he said particularly interesting things
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	4	nsubj	_	start_char=15|end_char=17
+4	said	say	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=18|end_char=22
+5	particularly	particularly	ADV	RB	_	6	advmod	_	start_char=23|end_char=35
+6	interesting	interesting	ADJ	JJ	Degree=Pos	7	amod	_	start_char=36|end_char=47
+7	things	thing	NOUN	NNS	Number=Plur	4	obj	_	start_char=48|end_char=54
+
+# text = Nobody thought anything particularly interesting was said
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	anything	anything	PRON	NN	Number=Sing	7	nsubj:pass	_	start_char=15|end_char=23
+4	particularly	particularly	ADV	RB	_	5	advmod	_	start_char=24|end_char=36
+5	interesting	interesting	ADJ	JJ	Degree=Pos	3	amod	_	start_char=37|end_char=48
+6	was	be	AUX	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	7	aux:pass	_	start_char=49|end_char=52
+7	said	say	VERB	VBN	Tense=Past|VerbForm=Part|Voice=Pass	2	ccomp	_	start_char=53|end_char=57
+
+# text = Nobody thought any particularly interesting points were made
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	any	any	DET	DT	_	6	det	_	start_char=15|end_char=18
+4	particularly	particularly	ADV	RB	_	5	advmod	_	start_char=19|end_char=31
+5	interesting	interesting	ADJ	JJ	Degree=Pos	6	amod	_	start_char=32|end_char=43
+6	points	point	NOUN	NNS	Number=Plur	8	nsubj:pass	_	start_char=44|end_char=50
+7	were	be	AUX	VBD	Mood=Ind|Number=Plur|Person=3|Tense=Past|VerbForm=Fin	8	aux:pass	_	start_char=51|end_char=55
+8	made	make	VERB	VBN	Tense=Past|VerbForm=Part|Voice=Pass	2	ccomp	_	start_char=56|end_char=60
+
+# text = Nobody thought it seemed particularly interesting
+# sent_id = 
+# dep_path = 
+# described = 
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	it	it	PRON	PRP	Case=Nom|Gender=Neut|Number=Sing|Person=3|PronType=Prs	4	nsubj	_	start_char=15|end_char=17
+4	seemed	seem	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=18|end_char=24
+5	particularly	particularly	ADV	RB	_	6	advmod	_	start_char=25|end_char=37
+6	interesting	interesting	ADJ	JJ	Degree=Pos	4	xcomp	_	start_char=38|end_char=49
+
+# text = Nobody thought anything he said seemed particularly interesting
+# sent_id = 0
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	anything	anything	PRON	NN	Number=Sing	6	nsubj	_	start_char=15|end_char=23
+4	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	5	nsubj	_	start_char=24|end_char=26
+5	said	say	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	3	acl:relcl	_	start_char=27|end_char=31
+6	seemed	seem	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=32|end_char=38
+7	particularly	particularly	ADV	RB	_	8	advmod	_	start_char=39|end_char=51
+8	interesting	interesting	ADJ	JJ	Degree=Pos	6	xcomp	_	start_char=52|end_char=63
+
+# text = Nobody thought he said anything that seemed particularly interesting
+# sent_id = 0
+1	Nobody	nobody	PRON	NN	Number=Sing	2	nsubj	_	start_char=0|end_char=6
+2	thought	think	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	0	root	_	start_char=7|end_char=14
+3	he	he	PRON	PRP	Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs	4	nsubj	_	start_char=15|end_char=17
+4	said	say	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	2	ccomp	_	start_char=18|end_char=22
+5	anything	anything	PRON	NN	Number=Sing	4	obj	_	start_char=23|end_char=31
+6	that	that	PRON	WDT	PronType=Rel	7	nsubj	_	start_char=32|end_char=36
+7	seemed	seem	VERB	VBD	Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin	5	acl:relcl	_	start_char=37|end_char=43
+8	particularly	particularly	ADV	RB	_	9	advmod	_	start_char=44|end_char=56
+9	interesting	interesting	ADJ	JJ	Degree=Pos	7	xcomp	_	start_char=57|end_char=68
+
