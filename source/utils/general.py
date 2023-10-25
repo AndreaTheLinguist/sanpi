@@ -11,7 +11,7 @@ def confirm_dir(dir_path: Path):
 def display_message(message: str,
                     logger: logging.Logger = None,
                     level: int = 20):
-    '''print or send to log if given. log level of message defaults to info (20)'''
+    """Print or send to log if given. log level of message defaults to info (20)."""
     if logger:
         if message.startswith('#'):
             message = '\n' + message
@@ -21,10 +21,10 @@ def display_message(message: str,
 
 
 def dur_round(time_dur: float):
-    """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits
+    """Take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits.
 
     Args:
-        dur (float): seconds value
+        time_dur (float): seconds value
 
     Returns:
         str: value converted and rounded with unit label of 's','m', or 'h'
@@ -75,14 +75,28 @@ def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
     return path_iter
 
 
+def indent_block(block: str = '',
+                 lines: list = None,
+                 indent: int = 2,
+                 hang: bool = False) -> str:
+
+    i_prefix = ' '*indent
+    if block:
+        lines = block.splitlines()
+
+    i_block = i_prefix.join(iter(lines))
+
+    return i_block if hang else i_prefix + i_block
+
+
 def find_glob_in_dir(dir_path: Path,
                      glob_expr: str,
-                     recursive: bool=False,
+                     recursive: bool = False,
                      verbose: bool = False) -> Path:
     path = None
-    if recursive: 
+    if recursive:
         paths_iter = tuple(dir_path.rglob(glob_expr))
-        
+
     else:
         paths_iter = tuple(dir_path.glob(glob_expr))
     if paths_iter:

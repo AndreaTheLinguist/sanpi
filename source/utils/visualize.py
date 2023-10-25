@@ -12,7 +12,7 @@ def heatmap(df,
             margin_name:'str'='SUM'):
     #TODO: update this with code from `explore_stats.ipynb`
     plt.figure(figsize=size, dpi=100, facecolor="white")
-    sum_col = pd.Series()
+    sum_col = pd.Series(dtype='uint64')
     # sum_row = pd.Series()
     if margin_name in df.columns:
         sum_col = df.loc[df.index != margin_name, margin_name]

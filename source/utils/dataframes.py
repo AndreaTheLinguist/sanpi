@@ -3,18 +3,29 @@ from collections import namedtuple
 from pathlib import Path
 
 import pandas as pd
-from utils.general import confirm_dir, find_files  # pylint: disable=import-error
+try: 
+    from general import confirm_dir, find_files  # pylint: disable=import-error 
+except ModuleNotFoundError: 
+    try: 
+        from utils.general import confirm_dir, find_files  # pylint: disable=import-error 
+    except ModuleNotFoundError: 
+        from source.utils.general import confirm_dir, find_files  # pylint: disable=import-error 
+        
+
+    
+
+import statistics as stat
 
 
 def balance_sample(full_df: pd.DataFrame,
                    column_name: str,
                    sample_per_value: int = 5,
                    verbose: bool = False) -> tuple:
-    '''
+    """
     create sample with no more than n rows satisfying each unique value
     of the given column. A value of -1 for `sample_per_value` will limit
     all values' results to the minimum count per value.
-    '''
+    """
     info_message = ''
     subsamples = []
     for __, col_val_df in full_df.groupby(column_name):
@@ -90,6 +101,35 @@ def count_uniq(series: pd.Series) -> int:
     return len(series.unique())
 
 
+def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
+    df = df
+    desc = df.describe().transpose()
+    desc = desc.assign(total=pd.to_numeric(df.sum()),
+                       var_coeff=desc['std'] / desc['mean'],
+                       range=desc['max'] - desc['min'],
+                       IQ_range=desc['75%'] - desc['25%'])
+    desc = desc.assign(upper_fence=desc['75%'] + (desc.IQ_range * 1.5),
+                       lower_fence=desc['25%'] - (desc.IQ_range * 1.5))
+    if 'SUM' not in desc.index:
+        desc = desc.assign(
+            plus1_geo_mean=df.add(1).apply(stat.geometric_mean),
+            plus1_har_mean=df.add(1).apply(stat.harmonic_mean))
+    for col in desc.columns:
+        if col in ('mean', 'std', 'variance', 'var_coeff'):
+            desc.loc[:, col] = desc[col].round(1)
+        else:
+            desc.loc[:, col] = pd.to_numeric(desc[col], downcast='unsigned')
+
+    # mean_centr = no_sum_frame - no_sum_frame.mean()
+    # mean_stand = no_sum_frame / no_sum_frame.mean()
+    # mean_stand_centr = mean_stand - mean_stand.mean()
+    # log2_trans = no_sum_frame.apply(np.log2)
+    # log2_plus1_trans = no_sum_frame.add(1).apply(np.log2)
+    # logn_plus1_trans = no_sum_frame.apply(np.log1p)
+
+    return desc.round(1)
+
+
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
     t_comp = (end - start).components
     time_str = (":".join(
@@ -123,16 +163,21 @@ def print_md_table(df: pd.DataFrame,
         floatfmt = f'.{n_dec}f'
         if comma:
             floatfmt = f',{floatfmt}'
+        if not df.select_dtypes(include='number').empty:
+            df[df.select_dtypes(include='number').columns] = df.select_dtypes(include='number').astype('float')
         md_table = df.to_markdown(floatfmt=floatfmt)
 
     whitespace = ' '*indent if indent else ''
     if title:
         print(f'\n{whitespace}{title}')
-    for row in md_table.splitlines():
-        print(f"{' '*indent}{row}")
+    print(whitespace 
+          + md_table.replace('\n', f'\n{whitespace}'))
+    # for row in md_table.splitlines():
+    #     print(f"{' '*indent}{row}")
 
 
-def save_in_lsc_format(frq_df, lsc_tsv_path, numeric_label='raw'):
+def save_in_lsc_format(frq_df, output_tsv_path, numeric_label='raw'):
+    confirm_dir(output_tsv_path.parent)
     new_col_name = f'{numeric_label}_frq'
     if 'adj_lemma' in frq_df.columns:
         frq_df = frq_df.set_index('adj_lemma', drop=True)
@@ -151,15 +196,14 @@ def save_in_lsc_format(frq_df, lsc_tsv_path, numeric_label='raw'):
     lsc_lines = ['2'] + [x.strip() for x in lsc_counts]
     print('\nFormatted Output Sample (top 20 bigrams):')
     print('\n'.join(lsc_lines[:20] + ['...']))
-    lsc_tsv_path.write_text('\n'.join(lsc_lines), encoding='utf8')
+    output_tsv_path.write_text('\n'.join(lsc_lines), encoding='utf8')
     print('Counts formatted to train lsc model saved as:',
-          str(lsc_tsv_path))
+          str(output_tsv_path))
 
 
-def save_table(df: pd.DataFrame,
-               path_str: str,
-               df_name: str = '',
-               formats: list = ['pickle']):
+def save_table(df: pd.DataFrame, path_str: str, df_name: str = '', formats: list = None):
+    if formats is None:
+        formats = ['pickle']
     # df_name += ' '
     path = Path(path_str)
     confirm_dir(path.parent)
@@ -167,46 +211,55 @@ def save_table(df: pd.DataFrame,
         exit('Absolute path is required.')
     _ext = namedtuple('Format', ['ext', 'sep'])
     ext_dict = {
-        'pickle': _ext('.pkl.gz', None), 
-        'csv': _ext('.csv',','),
+        'pickle': _ext('.pkl.gz', None),
+        'csv': _ext('.csv', ','),
         'psv': _ext('.psv', '|'),
         'tsv': _ext('.tsv', '\t')
     }
-    
+
     for form in formats:
         save = ext_dict[form]
         print(f'~ Saving {df_name} as {form}...')
-        t0 = pd.Timestamp.now()
+        time_0 = pd.Timestamp.now()
 
         out_path = f'{path_str.replace(save.ext, "")}{save.ext}'
         if form == 'pickle':
             df.to_pickle(out_path)
         else:
             df.to_csv(out_path, sep=save.sep)
-        # elif form == 'csv':
-        #     out_path = str(path_str) + '.csv'
-        #     df.to_csv(out_path)
-        # elif form == 'psv':
-        #     out_path = str(path_str) + '.csv'
-        #     df.to_csv(out_path, sep='|')
-        # elif form == 'tsv':
-        #     out_path = str(path_str) + '.tsv'
-        #     df.to_csv(out_path, sep='\t')
-        t1 = pd.Timestamp.now()
+        #// elif form == 'csv':
+        #//     out_path = str(path_str) + '.csv'
+        #//     df.to_csv(out_path)
+        #// elif form == 'psv':
+        #//     out_path = str(path_str) + '.csv'
+        #//     df.to_csv(out_path, sep='|')
+        #// elif form == 'tsv':
+        #//     out_path = str(path_str) + '.tsv'
+        #//     df.to_csv(out_path, sep='\t')
+        time_1 = pd.Timestamp.now()
         print(f'   >> successfully saved as {out_path}\n' +
-              f'      (time elapsed: {get_proc_time(t0, t1)})')
+              f'      (time elapsed: {get_proc_time(time_0, time_1)})')
 
 
 def select_cols(df: pd.DataFrame,
-                columns: list = ['adv_lemma', 'adj_lemma',
-                                 'text_window', 'token_str'], 
-                dtype: str='string') -> pd.DataFrame:
+                columns: list = None,
+                dtype_for_cols: str = 'string') -> pd.DataFrame:
+    # columns = ['adv_lemma', 'adj_lemma', 'text_window', 'token_str']
+    if 'hit_id' in df.columns:
+        df = df.set_index('hit_id')
+    if not columns:
+        columns = df.columns[df.columns.str.endswith('_lemma')].to_list()
+        if len(columns) > 2:
+            columns.append('colloc_id')
+            columns.append('hit_text')
+        columns.extend(['text_window', 'token_str'])
 
     df = df.loc[:, columns]
-    if dtype: 
-        df = df.astype(dtype)
-    else: 
-        df = df.convert_dtypes()
+    if dtype_for_cols:
+        try:
+            df = df.astype(dtype_for_cols)
+        except:
+            df = df.convert_dtypes()
     return df
 
 
@@ -215,7 +268,7 @@ def select_pickle_paths(n_files: int,
                             '/share/compling/data/sanpi/2_hit_tables/advadj'),
                         smallest_first=True) -> pd.Series:
 
-    pkl_df = pd.DataFrame(pickle_dir.glob('bigram-*hits.pkl.gz'),
+    pkl_df = pd.DataFrame(pickle_dir.glob('bigram*hits.pkl.gz'),
                           columns=['path'])
     pkl_df = pkl_df.assign(size=pkl_df.path.apply(lambda f: f.stat().st_size))
     # > make dataframe to load `n_files` sorted by size (for testing)
@@ -237,15 +290,13 @@ def unpack_dict(input_dict: dict,
                 keys_name: str = 'type',
                 return_df=True,
                 return_dict=False):
-    scale_df = (pd.Series(input_dict).to_frame().reset_index().rename(
-        columns={
-            0: values_name,
-            'index': keys_name
-        }))
-    explodf = scale_df.explode(values_name).set_index(values_name)
+    scale_df = pd.Series(input_dict).to_frame('values_name')
+    scale_df = scale_df.reset_index()
+    scale_df = scale_df.rename(columns={'index': keys_name})
+    explodf = scale_df.explode(values_name)
+    explodf = explodf.set_index(values_name)
     inv_flat_dict = explodf.to_dict()[keys_name]
-    flat_unq_vals = list(set(inv_flat_dict.keys()))
-    flat_unq_vals.sort()
+    flat_unq_vals = sorted(set(inv_flat_dict.keys()))
     returns = (flat_unq_vals, )
     if return_df:
         returns += (explodf, )
