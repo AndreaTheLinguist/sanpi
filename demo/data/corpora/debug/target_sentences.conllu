@@ -1035,7 +1035,7 @@
 20	.	.	PUNCT	.	_	13	punct	_	end_char=5020|start_char=5019
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_39
 # source_id = pcc_eng_24_103.5605_x1659335_45
 # text = Cause-and-effect ain't so simple when you believe in something like that."
@@ -1448,7 +1448,7 @@
 5	....	....	PUNCT	.	_	4	punct	_	end_char=388|start_char=384
 
 # target = "ain't"
-# comment = no contig match
+# comment = FIXED
 # sent_id = target_58
 # source_id = pcc_eng_27_053.7323_x0852395_19
 # text = But apparently Wiig ain't so hot either.
@@ -1754,3 +1754,4 @@
 21	take	take	_	VB	_	18	conj	18:conj	_
 22	notice	notice	_	NN	_	21	dobj	21:dobj	_
 23	.	.	_	.	_	0	-	0:-	_
+
