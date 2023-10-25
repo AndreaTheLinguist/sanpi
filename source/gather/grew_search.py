@@ -16,7 +16,11 @@ def grew_search(corpus_dir: Path,
                 pat_file: Path,
                 match_dir: Path,
                 skip_files=True):
-    multiprocessing.set_start_method('forkserver')
+    try: 
+        multiprocessing.set_start_method('forkserver')
+    except RuntimeError:
+        pass
+    
     if not match_dir.is_dir():
         match_dir.mkdir(parents=True)
 
