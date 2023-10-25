@@ -9,6 +9,8 @@ import time
 from pathlib import Path
 
 import pandas as pd
+
+from source.utils import get_proc_time
 pd.set_option('display.max_columns', 10)
 pd.set_option('display.width', 120)
 DATA_DIR = Path.cwd().joinpath('data')
@@ -16,12 +18,13 @@ if not DATA_DIR.is_dir():
     DATA_DIR = Path.home().joinpath('data')
     if not DATA_DIR.is_dir():
         DATA_DIR.mkdir()
-TIMESTAMP = time.perf_counter
-
+# TIMESTAMP = time.perf_counter
+TIMESTAMP = pd.Timestamp.now
+MARGIN_SIZE = 4
 
 def _parse_args():
     parser = argparse.ArgumentParser(
-        description='script consolidate relevant hit data from filled json files into csv files')
+        description='script consolidate relevant hit data from filled json files into tables')
 
     parser.add_argument('grew_match_dir', type=Path,
                         help='path to directory containing filled json files '
@@ -33,9 +36,12 @@ def _parse_args():
     return parser.parse_args()
 
 
-def tabulate_hits(match_dir: Path):
+def tabulate_hits(match_dir: Path, redo=False):
     start_time = TIMESTAMP()
     print(time.strftime("%Y-%m-%d @ %I:%M%p"))
+    if check_for_prior(match_dir) and not redo:
+        return
+
     print(f' ~ Grew Match Directory: {match_dir}')
     log_dir = Path(*match_dir.parts[:-3], 'logs', 'tabulate', match_dir.name)
     # print(f'Tabulate log destination: {log_dir}')
@@ -43,13 +49,14 @@ def tabulate_hits(match_dir: Path):
         log_dir.mkdir(parents=True)
     log_file = log_dir.joinpath(f'tabulate_{time.strftime("%Y-%m-%d_%R")}.log')
     print(f'Log will be saved to: `{log_file}`')
-    """ Logging snippets:
-        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        logging.debug('This message should NOT go to the log file')
-        logging.info('So should this')
-        logging.warning('And this, too')
-        logging.error('And non-ASCII stuff, too, like Øresund and Malmö'
-    """
+    
+    # Logging snippets:
+    # logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    # logging.debug('This message should NOT go to the log file')
+    # logging.info('So should this')
+    # logging.warning('And this, too')
+    # logging.error('And non-ASCII stuff, too, like Øresund and Malmö'
+
     logging.basicConfig(filename=log_file, encoding='utf-8',
                         # level=logging.DEBUG,
                         level=logging.INFO,
@@ -65,6 +72,8 @@ def tabulate_hits(match_dir: Path):
         sys.exit('Error: Specified json path is not a directory.')
 
     hit_data = _get_hit_data(match_dir)
+    if hit_data.empty:
+        return
     hit_count = len(hit_data)
     if hit_count > 0:
         logging.info(
@@ -84,6 +93,15 @@ def tabulate_hits(match_dir: Path):
         sys.exit()
 
 
+def check_for_prior(match_dir: Path) -> bool:
+    out = get_csv_path(match_dir).with_suffix('.pkl.gz')
+    if out.is_file() and out.stat().st_size > 0:
+        print('Tabulation output files already exist and are non-empty. Processing Complete.\n  ',
+              f'See {out}\n')
+        return True
+    return False
+
+
 def _get_hit_data(json_dir):
 
     file_count = 0
@@ -96,8 +114,9 @@ def _get_hit_data(json_dir):
     if not processed_files:
         logging.error(
             'Specified json directory does not contain any processed json files.')
-        sys.exit('Error: specified json directory does not contain any '
-                 'processed json files.')
+        print('Error: specified json directory does not contain any '
+              'processed json files.')
+        return pd.DataFrame()
 
     for json_file in processed_files:
 
@@ -111,7 +130,7 @@ def _get_hit_data(json_dir):
             jl0 = TIMESTAMP()
             json_dicts = json.load(j)
             jl1 = TIMESTAMP()
-            jl_time = f'  Time to load json: {dur_round(jl1-jl0)}'
+            jl_time = f'  Time to load json: {get_proc_time(jl0, jl1)}'
             logging.info(jl_time)
             # print(jl_time)
 
@@ -124,7 +143,9 @@ def _get_hit_data(json_dir):
             if 'matching' in json_dicts[0].keys():
                 raw_path = json_file.with_suffix('.raw.json')
                 logging.warning(
-                    'Node labels have not been filled for %s}. Skipping file. (** Hint: Run fill_match_info.py on %s and then try again.)', json_file, raw_path.name)
+                    ('Node labels have not been filled for %s}. Skipping file. '
+                     '(** Hint: Run fill_match_info.py on %s and then try again.)'),
+                    json_file, raw_path.name)
                 print(f'-> Warning: Node labels have not been filled for {json_file}. '
                       'Skipping file.\n     * Hint: Run FillJson.py on '
                       f'{raw_path.name} and then try again.')
@@ -148,12 +169,12 @@ def _get_hit_data(json_dir):
         df = _remove_redundant(df, json_file)
         rr1 = TIMESTAMP()
         logging.info('Time to remove redundant entries: %s',
-                     dur_round(rr1-rr0))
+                     get_proc_time(rr0, rr1))
 
         pi0 = TIMESTAMP()
         df = _process_ix(df)
         pi1 = TIMESTAMP()
-        logging.info('Time to process indices: %s', dur_round(pi1-pi0))
+        logging.info('Time to process indices: %s', get_proc_time(pi0, pi1))
 
         df = df.convert_dtypes()
 
@@ -174,7 +195,9 @@ def _get_hit_data(json_dir):
             # // hit_id=df.sent_id+':'+df.match_ix,
             # // colloc_id=(df.sent_id + ':' + df.adv_index.astype('string')
             # //            + '-' + df.adj_index.astype('string')),
-            colloc=collocs)
+            colloc=collocs,
+            pattern=Path(df.json_source[-1]).parent.suffix.strip('.')
+            )
 
         json_dir_df = pd.concat([df, json_dir_df])
 
@@ -201,8 +224,9 @@ def _remove_redundant(df, json_path):
     fdf = df
     # > then also remove any full duplicates
     dep_cols = fdf.columns[fdf.columns.str.startswith('dep')].to_list()
-    dup_assess_cols = ['match_id', 'sent_text', 'context_prev_sent',
-                       'context_next_sent'] + dep_cols
+    dup_assess_cols = ['match_id', 'sent_text',
+                       'context_prev_sent', 'context_next_sent'
+                       ] + dep_cols
     # dictionaries are not hashable types, so will crash with duplicated()
     # fdf.loc[:, dep_cols] = fdf.loc[:, dep_cols].astype('string')
     fdf_hashable = fdf.copy()
@@ -226,6 +250,7 @@ def _remove_redundant(df, json_path):
             orient='records'), sep='_', max_level=1)
         flat_deps_frame = flat_deps_frame.loc[:, flat_deps_frame.columns.str.endswith(
             ('head', 'target', 'relation'))]
+        
         all_dup_flat = all_dup_df.loc[:, ~all_dup_df.columns.str.startswith(
             'dep')].join(flat_deps_frame)
         # all_dup_df = all_dup_df[
@@ -248,7 +273,7 @@ def _remove_redundant(df, json_path):
                 df_obj.to_csv(DEBUG_OUT.joinpath(f'err_{obj_name}.csv'))
         logging.info('\n%s', all_dup_flat.to_markdown())
         # BUG: slurm `segmentation fault`. this is where the log stops. 👇
-        #! running following line in debug  console just crashed everything...? doe these things not exist?
+        #! running following line in debug console just crashed everything...? do these things not exist?
         # ? commenting out this line eliminates the segmentation fault, but I have no idea why?
         # logging.info(all_dup_flat.loc[~all_dup_flat.kept, :].to_json(
         #     orient='records', indent=4))
@@ -299,10 +324,11 @@ def _process_ix(df):
     # // ! similarly, utt_len (len(token_str)) is fine as is
     # //   (do not need to adjust for 0 indexing with `utt_len - 1`
     # //   because end is not included)
+    
     ix_df = ix_df.assign(
-        win_start_ix=ix_df.hit_start_ix.apply(lambda x: max(x - 3, 0)),
+        win_start_ix=ix_df.hit_start_ix.apply(lambda x: max(x - MARGIN_SIZE, 0)),
         # testing for end of string is unnecessary. going over the len() value doesn't do anything
-        win_final_ix=ix_df.hit_final_ix + 3
+        win_final_ix=ix_df.hit_final_ix + MARGIN_SIZE
     )
 
     win_strs = tuple(_gen_excerpt(
@@ -346,15 +372,10 @@ def _gen_excerpt(text_iter, start_iter, final_iter):
 def _create_output(hits_df, match_dir, start_time):
     logging.info('creating outputs...')
     # home/arh234/data/sanpi/1_json_grew-matches/immediateNeg/PccVa.without-relay
-    pat_category = match_dir.parent.name
-    output_dir = Path(*(match_dir.parts[:-3] + ('2_hit_tables', pat_category)))
-
-    if not output_dir.exists():
-        output_dir.mkdir(parents=True)
-
+    csv_path = get_csv_path(match_dir)
     #! already done. Will cause KeyError now
     # // hits_df = hits_df.set_index('hit_id')
-    hits_df = hits_df.assign(category=pat_category).convert_dtypes()
+    hits_df = hits_df.assign(category=match_dir.parent.name).convert_dtypes()
     hit_cols = hits_df.columns
 
     # set given columns as categories (to reduce memory impact)
@@ -393,12 +414,11 @@ def _create_output(hits_df, match_dir, start_time):
     hits_df = hits_df[required_cols + priority_cols + other_cols]
 
     # write rows to file
-    fstem = f"{match_dir.name.replace('.', '_')}_hits"
-    hits_df.to_csv(output_dir.joinpath(f'{fstem}.csv'))
     #! psv/pipe delimited (`|`) required because table includes commas (`,`)
     # ? Is this true? ^^
-    hits_df.to_csv(output_dir.joinpath(f'{fstem}.psv'), sep='|')
-    hits_df.to_pickle(output_dir.joinpath(f'{fstem}.pkl.gz'))
+    hits_df.to_csv(csv_path)
+    hits_df.to_csv(csv_path.with_suffix('.psv'), sep='|')
+    hits_df.to_pickle(csv_path.with_suffix('.pkl.gz'))
 
     view_sample_size = min(5, len(hits_df))
     print_cols = hits_df.columns[hits_df.columns.isin(
@@ -416,45 +436,66 @@ def _create_output(hits_df, match_dir, start_time):
     print(print_table+'\n')
 
     finish_time = TIMESTAMP()
-    dur_str = dur_round(finish_time - start_time)
+    dur_str = get_proc_time(start_time, finish_time)
     print(f'Time to tabulate hits: {dur_str}')
     logging.info('Tabulation Complete! Time elapsed: %s', dur_str)
 
 
-def dur_round(time_dur: float):
-    """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits
+def get_csv_path(match_dir):
+    output_dir = Path(*(match_dir.parts[:-3]
+                        + ('2_hit_tables', match_dir.parent.name)))
 
-    Args:
-        dur (float): seconds value
+    if not output_dir.exists():
+        output_dir.mkdir(parents=True)
 
-    Returns:
-        str: value converted and rounded with unit label of 's','m', or 'h'
-    """
-    unit = "s"
+    fstem = f"{match_dir.name.replace('.', '_')}_hits"
+    csv_path = output_dir.joinpath(f'{fstem}.csv')
 
-    if time_dur >= 60:
-        time_dur = time_dur / 60
-        unit = "m"
+    return csv_path
 
-        if time_dur >= 60:
-            time_dur = time_dur / 60
-            unit = "h"
 
-    if time_dur < 10:
-        dur_str = f"{round(time_dur, 2):.2f}{unit}"
-    else:
-        dur_str = f"{round(time_dur, 1):.1f}{unit}"
+# def dur_round(time_dur: float):
+#     """take float of seconds and converts to minutes if 60+, then rounds to 1 decimal if 2+ digits
 
-    return dur_str
+#     Args:
+#         dur (float): seconds value
 
+#     Returns:
+#         str: value converted and rounded with unit label of 's','m', or 'h'
+#     """
+#     unit = "s"
+
+#     if time_dur >= 60:
+#         time_dur = time_dur / 60
+#         unit = "m"
+
+#         if time_dur >= 60:
+#             time_dur = time_dur / 60
+#             unit = "h"
+
+#     if time_dur < 10:
+#         dur_str = f"{round(time_dur, 2):.2f}{unit}"
+#     else:
+#         dur_str = f"{round(time_dur, 1):.1f}{unit}"
+
+#     return dur_str
+
+
+# if __name__ == '__main__':
+#     absStart = TIMESTAMP()
+#     # print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
+
+
+#     absFinish = TIMESTAMP()
+#     print(f'\nTime elapsed: {round(absStart, 3)} seconds\n'
+#           '')
 
 if __name__ == '__main__':
-    absStart = TIMESTAMP()
-    # print("```\n### Tabulating hits via `tabulateHits.py`...\n```")
     args = _parse_args()
-
+    _t0 = pd.Timestamp.now()
     tabulate_hits(*args)
+    _t1 = pd.Timestamp.now()
 
-    absFinish = TIMESTAMP()
-    print(f'\nTime elapsed: {round(absFinish - absStart, 3)} seconds\n'
-          '====================================\n')
+    print('✔️ Program Completed --', pd.Timestamp.now().ctime())
+    print(f'   total time elapsed: {get_proc_time(_t0, _t1)}',
+          '\n====================================\n')
