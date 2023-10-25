@@ -29,10 +29,10 @@ eval "$(conda shell.bash hook)"
 conda activate sanpi
 DEMO_DIR="/share/compling/projects/sanpi/demo"
 
-CORP_IN=${1:-"nyt5.conll"}
+CORP_IN=${1:-"subsets/bigrams/bigram_X2puddin"}
 CORP_ARG="${DEMO_DIR}/data/corpora/${CORP_IN}"
 
-PAT_IN=${2:-"contig"}
+PAT_IN=${2:-"advadj"}
 PAT_ARG="${DEMO_DIR}/Pat/${PAT_IN}"
 
 echo "time python ${DEMO_DIR}/run_pipeline.py -T -c ${CORP_ARG} -p ${PAT_ARG} -g ${DEMO_DIR}/data/1_json_grew-matches"
