@@ -419,4 +419,7 @@ source/analyze/get_deps.1.py
 **/ucs_tables/**/*h???.*.r*[tw].[tcmg]*
 **/ucs_tables/readable/*4384.*view.txt
 *devel
-Pat/shelf/
+Pat/shelf
+**/*dev*
+demo/data/**/RB*/
+results/**/*[.12]?f.*
