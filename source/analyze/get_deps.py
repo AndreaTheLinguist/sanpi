@@ -134,11 +134,12 @@ def parallel_process_deps(args_df: pd.DataFrame,
 
 def _make_dep_dfs(arg_series):
     _t0 = pd.Timestamp.now()
-    dep_result = []
     out_path = arg_series.by_hit
+    dep_result = []
     if out_path.is_file() and out_path.stat().st_size > 0:
-        dep_result.append('Prior dep processing found:'
-                          + f'../{Path(*out_path.parts[-3:])}...',)
+        dep_result.append(
+            f'Prior dep processing found:../{Path(*out_path.parts[-3:])}...'
+        )
 
     else:
         sdf = pd.read_pickle(arg_series.input).assign(
@@ -182,7 +183,7 @@ def get_deps(hits_df: pd.DataFrame,
         counts_md_table = (
             new_hits_df.loc[:, new_hits_df.columns.isin(
                 ('dep_str', 'dep_str_mask', 'neg_lemma', 'colloc'))]
-                # ('hit_text', 'dep_str', 'dep_str_mask'))]
+            # ('hit_text', 'dep_str', 'dep_str_mask'))]
             .value_counts().to_frame().rename(columns={0: 'count'})
             .sort_values('colloc').nlargest(5, 'count').reset_index()
             .to_markdown())
@@ -198,8 +199,7 @@ def get_deps(hits_df: pd.DataFrame,
                 f'Time to create dep_str cols: {dep_proc_time}\n{table_str}', logger)
 
         if not dep_hits_path:
-            no_save_warning = (f'No output path given for {input_name} data.' +
-                               'Dataframe with dependency string identifiers for not saved.')
+            no_save_warning = f'No output path given for {input_name} data.Dataframe with dependency string identifiers for not saved.'
             display_message(no_save_warning, logger, 30)
 
         else:
@@ -219,9 +219,9 @@ def get_deps(hits_df: pd.DataFrame,
     display_message(f'`{input_name}` returning from processing...', logger)
     if run_in_parallel:
         return input_name, dep_proc_time, dep_hits_path, dep_node_path, overview_str
-    else:
-        display_message(overview_str, logger)
-        return new_hits_df
+
+    display_message(overview_str, logger)
+    return new_hits_df
 
 
 def _process_dep_info(hits_df: pd.DataFrame,
@@ -270,7 +270,7 @@ def _process_dep_info(hits_df: pd.DataFrame,
                    bullet=_BULLET, logger=logger,
                    header=f'## original `{input_path.name}` dependency info columns')
 
-    all_nodes_df = pd.DataFrame()
+    all_nodes_dfs = []
 
     for hit_id in hits_df.index:
         row = hits_df.loc[hit_id, dep_cols]
@@ -281,9 +281,8 @@ def _process_dep_info(hits_df: pd.DataFrame,
 
         # > add string identifiers, with & without index, but sorted by index
         str_deps_df = _add_dep_strs(deps_in_hit)
-
-        all_nodes_df = pd.concat(
-            [all_nodes_df, str_deps_df.reset_index().set_index(['hit_id', 'index'])])
+        all_nodes_dfs.append(
+            str_deps_df.reset_index().set_index(['hit_id', 'index']))
 
         # * create series of all the dep strings combined (with `; `) for a hit.
         str_cols = cols_by_str(str_deps_df, start_str='dep_str')
@@ -297,11 +296,13 @@ def _process_dep_info(hits_df: pd.DataFrame,
                     f'{x} ↣ {joined_strs[x]}' for x in joined_strs.index),
                 bullet=_BULLET,
                 header=f'⁂ Combined string representations of dependencies for match {hit_id}')
+
+    all_nodes_df = pd.concat(all_nodes_dfs)
+
     if verbose or in_parallel:
-        display_message(message=f'## New columns added to `{input_path.name}`\n'
-                        + hits_df.loc[:, 'hits_df_path':].iloc[0,
-                                                               :].to_markdown(),
-                        logger=logger)
+        display_message(
+            message=f'## New columns added to `{input_path.name}`\n{hits_df.loc[:, "hits_df_path":].iloc[0,:].to_markdown()}',
+            logger=logger)
 
     #! namedtuple `dep_info` can't be pickled, so convert `dep_tuple` to dict type
     all_nodes_df = all_nodes_df.assign(
@@ -332,7 +333,7 @@ def _process_deps_in_hit(row: pd.Series(dtype='object'),
                    header=f'\n## row {row.name} non-dictionary values')
         display_message(row.to_markdown(), logger, level=_DEBUG)
 
-    deps_for_hit = pd.DataFrame()
+    dep_dfs = []
     # ^ with multiple patterns concatenated, there will be NaN values for some "target" cols.
     # ? Is it better to simply skip those, or include them with empty values?
     for dep_col in row.index:
@@ -347,9 +348,10 @@ def _process_deps_in_hit(row: pd.Series(dtype='object'),
                             + row[[dep_col]].to_markdown()),
                             logger, level=_ERROR)
             return None
+        else:
+            dep_dfs.append(dep_df)
 
-        deps_for_hit = pd.concat([deps_for_hit, dep_df], ignore_index=True)
-
+    deps_for_hit = pd.concat(dep_dfs, ignore_index=True)
     deps_for_hit = deps_for_hit.assign(hit_id=row.name).convert_dtypes()
 
     deps_for_hit = deps_for_hit.assign(
@@ -359,28 +361,45 @@ def _process_deps_in_hit(row: pd.Series(dtype='object'),
 
 
 def _get_dep_tuples(_df):
-    row = _df[['node', 'head_ix', 'head_lemma',
-               'target_ix', 'target_lemma', 'relation']].squeeze()
     ix_cols = ['head_ix', 'target_ix']
-    row[ix_cols] = row[ix_cols].astype('string').str.zfill(2)
+    pre_cols = ['node', 'head_lemma']
+    post_cols = ['target_lemma', 'relation']
+    _df[ix_cols] = _df[ix_cols].astype('string').str.zfill(2)
+    row = _df[pre_cols + ix_cols + post_cols].squeeze()
     return _DEP._make(row)
 
 
-def _add_dep_strs(deps_in_hit: pd.DataFrame,
-                  verbose: bool = False):
+def _add_dep_strs(deps_in_hit: pd.DataFrame, verbose: bool = False):
+    # str_deps_df = deps_in_hit.assign(
+    # dep_str=deps_in_hit.dep_tuple.apply(
+    #     lambda x: (f"{x.head_lemma}{_TIE_STR}"
+    #                f"{x.target_lemma}[={x.node}]")
+    # ).fillna('').astype('string'),
 
-    str_deps_df = deps_in_hit.assign(
+    # dep_str_ix=deps_in_hit.dep_tuple.apply(
+    #     lambda x: (f"{x.head_ix}:{x.head_lemma}{_TIE_STR}"
+    #                f"{x.target_ix}:{x.target_lemma}[={x.node}]")
+    # ).fillna('').astype('string')
+    # )
 
-        dep_str=deps_in_hit.dep_tuple.apply(
-            lambda x: (f"{x.head_lemma}{_TIE_STR}"
-                       f"{x.target_lemma}[={x.node}]")
-        ).fillna('').astype('string'),
+    # str_deps_df = str_deps_df.assign(
+    # dep_str_full=str_deps_df[
+    #     ['dep_str_ix', 'relation']].apply(_add_relation, axis=1),
+    # dep_str_rel=str_deps_df[
+    #     ['dep_str', 'relation']].apply(_add_relation, axis=1)
+    # )
 
-        dep_str_ix=deps_in_hit.dep_tuple.apply(
-            lambda x: (f"{x.head_ix}:{x.head_lemma}{_TIE_STR}"
-                       f"{x.target_ix}:{x.target_lemma}[={x.node}]")
-        ).fillna('').astype('string')
-    )
+    str_deps_df = deps_in_hit.copy()
+
+    str_deps_df['dep_str'] = [
+        f"{x.head_lemma}{_TIE_STR}{x.target_lemma}[={x.node}]" if x is not None else ''
+        for x in str_deps_df['dep_tuple']
+    ]
+
+    str_deps_df['dep_str_ix'] = [
+        f"{x.head_ix}:{x.head_lemma}{_TIE_STR}{x.target_ix}:{x.target_lemma}[={x.node}]" if x is not None else ''
+        for x in str_deps_df['dep_tuple']
+    ]
 
     str_deps_df = str_deps_df.assign(
         dep_str_full=str_deps_df[
@@ -423,7 +442,12 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame,
 
 
 def _mask_dep_str(str_df: pd.DataFrame):
-
+    
+    def _assign_dep_str_mask(df, condition, col1, col2):
+        if any(condition):
+            df.loc[condition, 'dep_str_mask'] = (
+                df.loc[condition, col1] + _TIE_STR + df.loc[condition, col2])
+            
     # * for mod, use both xpos
     # * for relay, use both xpos
     if 'node' not in str_df.columns:
@@ -433,39 +457,25 @@ def _mask_dep_str(str_df: pd.DataFrame):
     # > this one doesn't need an existence check because `mod` always exists
     # > but doing it anyway, in case that changes 🤷‍♀️
     is_mod_or_relay = str_df.node.isin(('mod', 'relay'))
-    if any(is_mod_or_relay):
-        str_df.loc[is_mod_or_relay, 'dep_str_mask'] = (
-            str_df.loc[is_mod_or_relay, 'head_xpos']
-            + _TIE_STR
-            + str_df.loc[is_mod_or_relay, 'target_xpos'])
+    _assign_dep_str_mask(str_df, is_mod_or_relay, 'head_xpos', 'target_xpos')
 
     # * for neg, use target_lemma and head_xpos (keep neg token)
     is_neg = str_df.node == 'neg'
-    if any(is_neg):
-        str_df.loc[is_neg, 'dep_str_mask'] = (
-            str_df.loc[is_neg, 'head_xpos']
-            + _TIE_STR
-            + str_df.loc[is_neg, 'target_lemma'])
+    _assign_dep_str_mask(str_df, is_neg, 'head_xpos', 'target_lemma')
 
     # * for negraise, use target_xpos and head_lemma (keep NR token)
     is_raised = str_df.node == 'negraise'
-    if any(is_raised):
-        str_df.loc[is_raised, 'dep_str_mask'] = (
-            str_df.loc[is_raised, 'head_lemma']
-            + _TIE_STR
-            + str_df.loc[is_raised, 'target_xpos'])
+    _assign_dep_str_mask(str_df, is_raised, 'head_lemma', 'target_xpos')
 
     return str_df.dep_str_mask
 
 
 def _add_relation(_row):
-    _str = _row.fillna('').iloc[0]
+    _str = _row.get(0, '')
     if not (_str and isinstance(_str, str)):
         return ''
 
-    _relation = _row.iloc[1]
-    # opt_hyphen = '-' if '-' in _TIE_STR else ''
-    # return _str.replace(_TIE_STR, f'{opt_hyphen}[{_relation}]{_TIE_STR}')
+    _relation = _row.get(1)
     return _str.replace(_TIE_STR, f'{_TIE_STR}[{_relation}]{_TIE_STR}')
 
 
