@@ -214,16 +214,14 @@ def _load_data(n_files: int, data_dir: Path) -> pd.DataFrame:
             print(
                 f'   * Found previous output.\n     Loading data from `../{Path(*simple_hits_pkl.parts[-4:])}`'
             )
-            df = pd.read_pickle(simple_hits_pkl)
+            try:
+                df = pd.read_pickle(simple_hits_pkl)
+            except EOFError:
+                print(" ⚠️ simplified file unreadable. Loading original...")
+                df = simplify_table(p, simple_hits_pkl)
+
         else:
-            df = pd.read_pickle(p)
-            df = select_cols(df)
-            path_str = str(simple_hits_pkl).split('.pkl', maxsplit=1)[0]
-            if not Path(path_str).is_absolute():
-                path_str = str(Path(path_str).resolve())
-            save_table(df,
-                       path_str,
-                       df_name='simplified hits')
+            df = simplify_table(p, simple_hits_pkl)
         print_md_table(df.describe().T.convert_dtypes(),
                        indent=3, title=f'({i+1}) `{p.stem}` summary')
         df_list.append(df)
@@ -237,6 +235,25 @@ def _load_data(n_files: int, data_dir: Path) -> pd.DataFrame:
           get_proc_time(_ts, _te))
 
     return combined_df
+
+
+def simplify_table(p, simple_hits_pkl):
+    df = pd.read_pickle(p)
+    df = select_cols(
+        df,
+        columns=(['token_str', 'pattern', 'category']
+                 + df.columns[df.columns.str.endswith(('lemma', 'form', 'window'))].to_list() 
+                 + df.columns[df.columns.str.startswith('dep')].to_list()
+                 )
+        )
+    path_str = str(simple_hits_pkl).split('.pkl', maxsplit=1)[0]
+    if not Path(path_str).is_absolute():
+        path_str = str(Path(path_str).resolve())
+    save_table(df,
+               path_str,
+               df_name='simplified hits')
+
+    return df
 
 
 def _print_uniq_lemma_count(df: pd.DataFrame,
@@ -363,13 +380,18 @@ def _drop_long_sents(df: pd.DataFrame) -> pd.DataFrame:
     too_long = df.tok_in_sent > sent_limit
     uniq_too_long = df.loc[too_long, :].index.str.split(":",
                                                         1).str.get(0).unique()
-    print(f'\nDropping {(too_long.value_counts()[True]):,} hits',
+    try: 
+        drop_count = too_long.value_counts()[True]
+    except KeyError: 
+        print('No sentences are too long. Nothing dropped.')
+    else: 
+        print(f'\nDropping {(drop_count):,} hits',
           f'from {len(uniq_too_long):,} "sentences" with',
           f'{sent_limit}+ tokens. For example:\n```')
-    print((starting_df.loc[df.index.str.startswith(tuple(uniq_too_long)),
-                           ['token_str']]).sample(1).squeeze()[:550] +
-          '...\n```')
-    df = df.loc[~too_long, :]
+        print((starting_df.loc[df.index.str.startswith(tuple(uniq_too_long)),
+                            ['token_str']]).sample(1).squeeze()[:550] +
+            '...\n```')
+        df = df.loc[~too_long, :]
     return df
 
 
@@ -690,8 +712,9 @@ def _enhance_descrip(desc: pd.DataFrame,
 
     return desc
 
+
 def _select_lemmas(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
-    nth = int(len(desc)/6)
+    nth = len(desc) // 6
     trim = int(len(desc) * 0.01)
     desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
     top_means_metric = desc.loc[
@@ -715,7 +738,6 @@ def _select_lemmas(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list
     else:
         lemmas = top_means_metric.squeeze().nsmallest(nth).index.to_list()
     return lemmas
-
 
 
 def _visualize_counts(frq_df, frq_df_path):
