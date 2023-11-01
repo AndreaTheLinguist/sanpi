@@ -57,23 +57,27 @@ def fill_json(conllu_dir: Path,
         # json_fpath = list(raw_dir.rglob(f'*{data_stem}*.raw*'))[0]
         # json_fpath = raw_dir.joinpath(f'{pref}.raw.json')
         # load json object
-        # note that ordering of sentence ids in json file are reverse of conllu
-        hits_json = _load_hits_json(json_fpath)
+        # FYI, ordering of sentences in .json are reverse of .conllu
+        hits_json = _load_json(json_fpath)
 
         if not hits_json:
             print('! -> Skipping. (file is empty)')
             continue
-        # > connect (possible) context ids with hit ids
-        context_sent_ids = _include_context(hits_json)
+            
+        
+
         hits_by_id = {}
-        for this_hit_dict in hits_json:
+        #! #HACK temporarily (or maybe not) disabled context filling
+        # > connect (possible) context ids with hit ids
+        # context_sent_ids = _include_context(hits_json)
+        for this_hit_dict in _exclude_enhanced(hits_json):
             sent_id = this_hit_dict['sent_id']
-            context_dict = {}
-            context_dict['prev_id'] = context_sent_ids[sent_id].prev_id
-            context_dict['prev_sent'] = ''
-            context_dict['next_id'] = context_sent_ids[sent_id].next_id
-            context_dict['next_sent'] = ''
-            this_hit_dict['context'] = context_dict
+            # context_dict = {}
+            # context_dict['prev_id'] = context_sent_ids[sent_id].prev_id
+            # context_dict['prev_sent'] = ''
+            # context_dict['next_id'] = context_sent_ids[sent_id].next_id
+            # context_dict['next_sent'] = ''
+            # this_hit_dict['context'] = context_dict
 
             node_id_dict = this_hit_dict['matching']['nodes']
             # > add hit_id, colloc_id, and match_id
@@ -90,8 +94,7 @@ def fill_json(conllu_dir: Path,
             zlen = max(len(v) for v in node_id_dict.values())
             node_id_dict = {k: v.zfill(zlen) for k, v in node_id_dict.items()}
 
-            node_ix_strings = list(node_id_dict.values())
-            node_ix_strings.sort()
+            node_ix_strings = sorted(node_id_dict.values())
             match_id = '-'.join(node_ix_strings)
 
             hit_id = f"{sent_id}:{match_id}"
@@ -103,30 +106,66 @@ def fill_json(conllu_dir: Path,
             this_hit_dict['hit_id'] = hit_id
 
         hits_by_id, json_entry_count, conll_count = _add_conll_info(
-            hits_by_id, paths_pair.conllu, context_sent_ids)
+            hits_by_id, 
+            paths_pair.conllu, 
+            #// {h['sent_id'] for h in hits_json}
+            #// context_sent_ids
+            )
 
         finish = time.perf_counter()
 
         print(f'    + {json_entry_count} hit results filled from {conll_count} total original '
               f'sentences in {dur_round(finish - file_start)}')
 
-        _write_new(filled_json_path, hits_json)
+        #// _write_new(filled_json_path, hits_json)
+        _write_new(filled_json_path, list(hits_by_id.values()))
 
     print('Finished processing all corresponding json and conll files.')
     absFinish = time.perf_counter()
-    print(
-        f'\nTime elapsed: {dur_round(absFinish - dir_start)}\n'
-        '====================================\n')
+    print('\nTime elapsed:', 
+          dur_round(absFinish - dir_start),
+          '\n====================================\n')
+    
+    
+def _load_json(raw_json_file):
 
+    hits = None
+    
+    # FYI, ordering of sentence ids in json file are reverse of conllu
+    with open(raw_json_file, 'r', encoding='utf8') as j:
 
-def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
+        try:
+            hits = json.load(j)
+
+        except json.decoder.JSONDecodeError:
+            pass
+
+        else:
+            if len(hits) < 1:
+                hits = None
+    return hits
+
+def _exclude_enhanced(hits): 
+    
+    for hit in hits: 
+
+        if all((isinstance(edge['label'], str) 
+                for edge 
+                in hit['matching']['edges'].values())):  
+    
+            yield hit
+
+def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, 
+                    # sent_id_set: set
+                    # ids_dict: dict
+                    ):
 
     # TODO add info on what the "trigger" word is, and words directly preceding adv?
     # ^ sent_with_hit = [v['sent_id'] for v in hits_by_id.values()]
-    sent_with_hit = tuple(ids_dict.keys())
+    # hit_sent_ids = tuple(ids_dict.keys())
     # > flatten context tuple into flat tuple and concatonate with hit ids
     # > convert to set to remove duplicate ids
-    id_set = set(sent_with_hit + sum(ids_dict.values(), ()))
+    # id_set = set(hit_sent_ids + sum(ids_dict.values(), ()))
     # ^ id_set = set(sent_with_hit)
     # prev_ids = {v.prev_id: k for k, v in ids_dict.items()}
     # next_ids = {v.next_id: k for k, v in ids_dict.items()}
@@ -138,7 +177,7 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
     # > create full hit generator object from conllu file
     conll_gen = (sent for sent
                  in pyconll.load.iter_from_file(str(conllu_fpath))
-                 if sent.id in id_set)
+                 if sent.id in (h['sent_id'] for h in hits_by_id.values()))
     # conll_gen = (c for c in pyconll.load.iter_from_file(conllu_fpath)
     #              if c.id in sent_with_hit)
     # > initialize json entry count
@@ -165,8 +204,8 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
             if current_id
             in (
                 hits_by_id[hit_id]['sent_id'],
-                hits_by_id[hit_id]['context']['prev_id'],
-                hits_by_id[hit_id]['context']['next_id'],
+                # hits_by_id[hit_id]['context']['prev_id'],
+                # hits_by_id[hit_id]['context']['next_id'],
             )
         )
 
@@ -175,6 +214,7 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
             this_hit_dict = hits_by_id[hit_id]
 
             if current_id == this_hit_dict['sent_id']:
+                
                 raw_match_info = this_hit_dict.pop('matching')
                 this_hit_dict['sent_text'] = sent_text
                 this_hit_dict['token_str'] = ' '.join(t.form for t
@@ -216,11 +256,12 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, ids_dict: dict):
                 # print(this_hit_dict['token_str'])
                 # print('')
                 json_entry_count += 1
-            elif current_id == this_hit_dict['context']['prev_id']:
-                this_hit_dict['context']['prev_sent'] = sent_text
+            #! #HACK temporarily disabled context filling (though maybe not temporary)
+            # elif current_id == this_hit_dict['context']['prev_id']:
+            #     this_hit_dict['context']['prev_sent'] = sent_text
 
-            elif current_id == this_hit_dict['context']['next_id']:
-                this_hit_dict['context']['next_sent'] = sent_text
+            # elif current_id == this_hit_dict['context']['next_id']:
+            #     this_hit_dict['context']['next_sent'] = sent_text
             json_loops += 1
         conll_count += 1
 
@@ -269,30 +310,30 @@ def _collapse_contractions(conllu):
     # return hits
 
 
-def _include_context(hits):
+# def _include_context(hits):
 
-    context = namedtuple('context', ['prev_id', 'next_id'])
-    parts_tuple = namedtuple('hit_id', ['doc_id', 'sent_ix'])
+    # context = namedtuple('context', ['prev_id', 'next_id'])
+    # parts_tuple = namedtuple('hit_id', ['doc_id', 'sent_ix'])
 
-    hit_ids = list(set(h['sent_id'] for h in hits))
-    hit_ids.sort()
-    id_parts_dict = {id_str: parts_tuple._make(
-        id_str.rsplit('_', 1)) for id_str in hit_ids}
+    # hit_ids = list(set(h['sent_id'] for h in hits))
+    # hit_ids.sort()
+    # id_parts_dict = {id_str: parts_tuple._make(
+    #     id_str.rsplit('_', 1)) for id_str in hit_ids}
 
-    # // prev_ids = [f'{pair[0]}_{int(pair[1])-1}' for pair in id_parts]
-    # // next_ids = [f'{pair[0]}_{int(pair[1])+1}' for pair in id_parts]
-    #! because sentence index value may be zfilled, the constucted ids
-    #! must also be zfilled to successfully locate the context sentence
-    context_dict = {}
-    for hit_id, parts_tuple in id_parts_dict.items():
-        ix_str = parts_tuple.sent_ix
-        zlen = len(ix_str)
-        prev_sent_ix = str(int(ix_str)-1).zfill(zlen)
-        next_sent_ix = str(int(ix_str)+1).zfill(zlen)
-        context_dict[hit_id] = context(f'{parts_tuple.doc_id}_{prev_sent_ix}',
-                                       f'{parts_tuple.doc_id}_{next_sent_ix}')
-    return context_dict
-    # // return hit_ids, prev_ids, next_ids
+    # # // prev_ids = [f'{pair[0]}_{int(pair[1])-1}' for pair in id_parts]
+    # # // next_ids = [f'{pair[0]}_{int(pair[1])+1}' for pair in id_parts]
+    # #! because sentence index value may be zfilled, the constucted ids
+    # #! must also be zfilled to successfully locate the context sentence
+    # context_dict = {}
+    # for hit_id, parts_tuple in id_parts_dict.items():
+    #     ix_str = parts_tuple.sent_ix
+    #     zlen = len(ix_str)
+    #     prev_sent_ix = str(int(ix_str)-1).zfill(zlen)
+    #     next_sent_ix = str(int(ix_str)+1).zfill(zlen)
+    #     context_dict[hit_id] = context(f'{parts_tuple.doc_id}_{prev_sent_ix}',
+    #                                    f'{parts_tuple.doc_id}_{next_sent_ix}')
+    # return context_dict
+    # # // return hit_ids, prev_ids, next_ids
 
 
 # // def _get_context_id(sid, position: int):
@@ -307,7 +348,7 @@ def _include_context(hits):
     # // return cix
 
 
-def _update_tokens(info, tok_dict_list, id_to_ix, hit, raw_match_info):
+def _update_tokens(info, tok_dict_list, id_to_ix, hit_dict, raw_match_info):
     nodes = raw_match_info['nodes']
 
     tok_lemmas = {}
@@ -324,13 +365,13 @@ def _update_tokens(info, tok_dict_list, id_to_ix, hit, raw_match_info):
         tok_forms[k] = token.form
         # tok_deprel[k] = token.deprel
 
-    hit['lemmas'] = tok_lemmas
-    hit['forms'] = tok_forms
+    hit_dict['lemmas'] = tok_lemmas
+    hit_dict['forms'] = tok_forms
     # hit['deprel'] = tok_deprel
 
-    for node, id in nodes.items():
-        nodes[node] = _get_ix(id_to_ix, id)
-    hit['index'] = nodes
+    for node, w_id in nodes.items():
+        nodes[node] = _get_ix(id_to_ix, w_id)
+    hit_dict['index'] = nodes
     
     all_deps = dict.fromkeys(nodes.keys())
     for node, ix in nodes.items():
@@ -349,31 +390,14 @@ def _update_tokens(info, tok_dict_list, id_to_ix, hit, raw_match_info):
         # head=tok_dict_list[int(tok.head) -1]
         # if id_to_ix[head.id] == nodes['ADJ']:
         # tok.deprel {tok.lemma}' )
-    hit['all_dep_targets']=all_deps
+    hit_dict['all_dep_targets']=all_deps
 
 
-def _load_hits_json(raw_json_file):
-
-    hits = None
-
-    # note that ordering of sentence ids in json file are reverse of conllu
-    with open(raw_json_file, 'r') as j:
-
-        try:
-            hits = json.load(j)
-
-        except json.decoder.JSONDecodeError:
-            pass
-
-        else:
-
-            if len(hits) < 1:
-                hits = None
-
-    return hits
 
 
-def _write_new(out_path: Path, hits):
+
+
+def _write_new(out_path: Path, hits: list):
 
     with open(out_path, 'w', encoding='utf8') as o:
         print(f'   -> Writing output file {Path(*out_path._parts[-4:])}...')
@@ -395,7 +419,7 @@ def _check_dirs(raw: Path, conllu: Path, output: Path = None):
         sys.exit(
             'Error: specified conll directory and json directory do not match.')
 
-    if len(list(raw.iterdir())) > 0:
+    if list(raw.iterdir()):
         paired_paths_dict = _getDataPairs(raw, conllu)
 
         if not paired_paths_dict:
@@ -404,7 +428,7 @@ def _check_dirs(raw: Path, conllu: Path, output: Path = None):
     else:
         sys.exit('Error: specified data directory is empty')
 
-    output_dir = output if output else raw
+    output_dir = output or raw
 
     if not output_dir.exists():
         output_dir.mkdir()
@@ -451,11 +475,11 @@ def _fill_tok(ix, tok):
     return TOK_TUPLE(tok.lemma, ix, tok.xpos)
 
 
-def _get_ix(id_to_ix, id):
+def _get_ix(id_to_ix, w_id):
     try:
-        ix = id_to_ix[id]
+        ix = id_to_ix[w_id]
     except KeyError:
-        ix = int(id) - 1
+        ix = int(w_id) - 1
     return ix
 
 
@@ -513,11 +537,11 @@ def _getDataPairs(json_dir, conllu_dir):
     raw_jsons = {j.name.replace('.raw.json', ''): j
                  for j in json_dir.rglob('*.raw.json')}
     conllus = {c.stem: c for c in conllu_dir.glob('*.conllu')}
-    paired_stems = list(set(raw_jsons.keys()).intersection(conllus.keys()))
-    paired_stems.sort()
-    path_pairs = {stem: paths_tuple(
-        raw_jsons[stem], conllus[stem]) for stem in paired_stems}
-    return path_pairs
+    paired_stems = sorted(set(raw_jsons.keys()).intersection(conllus.keys()))
+    return {
+        stem: paths_tuple(raw_jsons[stem], conllus[stem])
+        for stem in paired_stems
+    }
 
 
 def _skipFiles(prefix, directory, rewrite):
