@@ -418,3 +418,5 @@ source/analyze/get_deps.1.py
 #   (including .txt & .csv file in `../ucs_tables/readable/`)
 **/ucs_tables/**/*h???.*.r*[tw].[tcmg]*
 **/ucs_tables/readable/*4384.*view.txt
+*devel
+Pat/shelf/
