@@ -134,8 +134,8 @@ if [[ -d $SEED_CORPUS && -d ${PAT_DIR} ]]; then
     LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}-${SEED}.log
     echo "Combined log will be appended to ${LOG_FILE}"
 
-    echo -e "time python ${SOURCE_DIR}/run_pipeline.py -T -c ${SEED_CORPUS} -p ${PAT_DIR}\n-g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1"
-    time python ${SOURCE_DIR}/run_pipeline.py -T -c ${SEED_CORPUS} -p ${PAT_DIR} -g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1
+    echo -e "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}\n-g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1"
+    time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR} -g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1
 
 else
     echo "SEED value ${SEED} does not point to existing directories. Skipping."

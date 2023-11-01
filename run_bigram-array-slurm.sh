@@ -27,13 +27,13 @@ CPU_MEM=5G
 
 echo "Running /share/compling/projects/sanpi/run_bigram-array-slurm.sh"
 date
-LOG_DIR=/share/compling/projects/sanpi/logs/bigram-pipeline_`date "+%y-%m-%d"`
+LOG_DIR=/share/compling/projects/sanpi/logs/bigram-pipeline_$(date "+%y-%m-%d")
 mkdir -p $LOG_DIR
 MODE=$1
 PAT_FLAG=${2:-"--neg"}
 echo "PAT_FLAG: $PAT_FLAG"
-ARRAY=${3:-""}
-echo "ARRAY: $ARRAY"
+ARRAY_FLAG=${3:-""}
+echo "ARRAY_FLAG: $ARRAY_FLAG"
 
 if [[ $(which grew && grew version) ]]; then
     date
@@ -44,6 +44,15 @@ if [[ $(which grew && grew version) ]]; then
     elif [[ $PAT_FLAG == '--neg' ]]; then
         PATS=("contig" "scoped" "raised")
 
+    elif [[ $PAT_FLAG == '--rb' ]]; then
+        PATS=("RBXadj" "RBsimple" "RBcontig" "RBscoped" "RBraised")
+
+    elif [[ $PAT_FLAG == '--direct' ]]; then
+        PATS=("RBdirect")
+
+    elif [[ $PAT_FLAG == '--rbneg' ]]; then
+        PATS=("RBcontig" "RBscoped" "RBraised")
+
     elif [[ $PAT_FLAG == '--noncontig' ]]; then
         PATS=("scoped" "raised")
 
@@ -53,7 +62,7 @@ if [[ $(which grew && grew version) ]]; then
     else
         PATS=("contig")
         ARRAY=$PAT_FLAG
-        echo "(update) ARRAY = $ARRAY"
+        echo "(update) ARRAY_FLAG = $ARRAY_FLAG"
 
     fi
 
@@ -63,14 +72,14 @@ if [[ $(which grew && grew version) ]]; then
         echo -e "\n# $PAT"
         JOB_NAME="-J bigram-${PAT}_$(date +%y-%m-%d_%H%M)"
         if [[ $MODE == 'multi' ]]; then
-            # echo 'sbatch ${JOB_NAME} $ARRAY ./bigram-array.slurm.sh $PAT'
-            echo "sbatch ${JOB_NAME} $ARRAY --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=$LOG_DIR bigram-array.slurm.sh $PAT"
-            sbatch ${JOB_NAME} $ARRAY --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=$LOG_DIR /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh $PAT
+            # echo 'sbatch ${JOB_NAME} $ARRAY_FLAG ./bigram-array.slurm.sh $PAT'
+            echo "sbatch ${JOB_NAME} $ARRAY_FLAG --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=$LOG_DIR bigram-array.slurm.sh $PAT"
+            sbatch ${JOB_NAME} $ARRAY_FLAG --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=$LOG_DIR /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh $PAT
 
         elif [[ $MODE == 'solo' ]]; then
-            # echo 'sbatch ${JOB_NAME} $ARRAY ./bigram-array.slurm.sh $PAT'
-            echo "sbatch ${JOB_NAME} $ARRAY -n 1 --mem=15G --chdir=$LOG_DIR bigram-array.slurm.sh $PAT"
-            sbatch ${JOB_NAME} $ARRAY -n 1 --mem=15G --chdir=$LOG_DIR  /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh $PAT
+            # echo 'sbatch ${JOB_NAME} $ARRAY_FLAG ./bigram-array.slurm.sh $PAT'
+            echo "sbatch ${JOB_NAME} $ARRAY_FLAG -n 1 --mem=15G --chdir=$LOG_DIR bigram-array.slurm.sh $PAT"
+            sbatch ${JOB_NAME} $ARRAY_FLAG -n 1 --mem=15G --chdir=$LOG_DIR  /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh $PAT
         else
             echo -e  "No valid cpu mode given. First argument should be one of the following strings:\n+ 'solo' for 1 core/cpu\n~or~\n+ 'multi' for multiple cores/cpus"
         fi
