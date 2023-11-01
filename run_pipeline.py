@@ -35,8 +35,11 @@ def _main():
     patdirs = ((p.resolve() for p in args.patterndirs) if args.patterndirs
                else list(CODE_DIR.parent.glob('Pat/*')))
 
-    corpora = tuple((c for c in args.corpora) if args.corpora
-                    else (DATA_DIR.glob('devel/*.conll')))
+    corpora = tuple(
+        iter(args.corpora)
+        if args.corpora
+        else (DATA_DIR.glob('devel/*.conll'))
+    )
     if not corpora:
         sys.exit('No valid corpora directories indicated. Terminating.')
     tab_only = args.tabulate_only
@@ -52,10 +55,11 @@ def _main():
             verb = 'process' if tab_only else 'search'
             print(
                 f'>> {verb}ing `{corpus}` data for '
-                f'patterns specified in `{patdir}`...')
+                f'patterns specified in `{patdir}/`...')
 
             for pat_path in patdir.iterdir():
-                print(f'. . . . . . . . . . . . . . . . . . . . .\n↯ Processing {pat_path.name} matches...')
+                print(
+                    f'. . . . . . . . . . . . . . . . . . . . .\n↯ Processing {pat_path.name} matches...')
                 # > can use "corpus.stem" for corpus subset name
                 # >     because pathlib treats ".conll" of dir name as suffix
                 grew_json_dir = (args.grew_output_dir
@@ -64,7 +68,7 @@ def _main():
 
                 if not grew_json_dir.is_dir():
                     if tab_only:
-                        print('ERROR: "tabulate_only" option specificed, but no hit files', 
+                        print('ERROR: "tabulate_only" option specificed, but no hit files',
                               'exist for given pattern and corpus. Run full pipeline.')
                     else:
                         grew_json_dir.mkdir(parents=True)
@@ -82,7 +86,9 @@ def _main():
                 tabulate_hits(match_dir=grew_json_dir,
                               #   pat_path=pat_path,
                               #   output_prefix=output_prefix
+                              redo=rewrite_files
                               )
+                print(f'✓✓✓ finished {pat_path.name} search')
 
 
 def _run_grew(pat: Path,
@@ -99,11 +105,9 @@ def _run_grew(pat: Path,
 
     else:
         # > check if all grew output files already exist in data_dir
-        prev_grew_run = (
-            set(d.stem.split('.')[0]
-                for d in match_dir.glob('*raw*'))
-            == set(c.stem for c in corpus_dir.iterdir())
-        )
+        prev_grew_run = {
+            d.stem.split('.')[0] for d in match_dir.glob('*raw*')
+        } == {c.stem for c in corpus_dir.iterdir()}
 
         if prev_grew_run:
             print(f'\n{Path(*match_dir.parts[-4:])} '
@@ -174,19 +178,18 @@ def dur_round(time_dur: float):
     unit = "s"
 
     if time_dur >= 60:
-        time_dur = time_dur / 60
+        time_dur /= 60
         unit = "m"
 
-        if time_dur >= 60:
-            time_dur = time_dur / 60
-            unit = "h"
+    if time_dur >= 60:
+        time_dur = time_dur / 60
+        unit = "h"
 
-    if time_dur < 10:
-        dur_str = f"{round(time_dur, 2):.2f}{unit}"
-    else:
-        dur_str = f"{round(time_dur, 1):.1f}{unit}"
-
-    return dur_str
+    return (
+        f"{round(time_dur, 2):.2f}{unit}"
+        if time_dur < 10
+        else f"{round(time_dur, 1):.1f}{unit}"
+    )
 
 
 if __name__ == '__main__':
