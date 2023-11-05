@@ -4,40 +4,46 @@ from pathlib import Path
 
 import pandas as pd
 
+pd.set_option('display.max_colwidth', 60)
+pd.set_option('display.max_columns', 10)
+pd.set_option('display.width',250)
 
 def print_sample():
     """
     prints a sample from a pickled DataFrame based on command line arguments.
     """
-    
     args = _parse_args()
 
-    #TODO: extend this to work with any type of tabular data input (or at least `.csv` and `.psv` files)
+    # TODO: extend this to work with any type of tabular data input (or at least `.csv` and `.psv` files)
     data = pd.read_pickle(args.pickle)
-    
+    print(f'\n## Sampling from `{args.pickle}`')
+
     data, filtered = filter_rows(data, args.filters)
 
     sampled = data.sample(min(len(data), args.sample_size))
-    if args.sort_by: 
+    if args.sort_by:
         sampled = sampled.sort_values(args.sort_by)
     else:
         sampled = sampled.sort_index()
-    
+
     sampled = select_columns(sampled, args.columns)
-    
-    length_info = (f'{len(sampled)} random rows' if len(sampled) < len(data) 
-                  else f'All ({len(data)}) rows')
-    if filtered: 
+
+    length_info = (f'{len(sampled)} random rows' if len(sampled) < len(data)
+                   else f'All ({len(data)}) rows')
+    if filtered:
         length_info += ' matching filter(s)'
-    print(f'\n## {length_info} from `{args.pickle.name}`\n')
-    
+    print(f'\n### {length_info} from `{args.pickle.name}`\n')
+
     if args.markdown:
         print(sampled.to_markdown(floatfmt=',.0f'))
     else:
+        print('```')
         print(sampled)
+        print('```')
 
-def filter_rows(input_data:pd.DataFrame, 
-                filter_list:list):
+
+def filter_rows(input_data: pd.DataFrame,
+                filter_list: list):
     """
         Filters rows of a pandas DataFrame based on a list of filter expressions.
 
@@ -56,38 +62,41 @@ def filter_rows(input_data:pd.DataFrame,
             (pd.DataFrame({"A": [1, 3], "B": [4, 6]}), True)
     """
     filtered = False
-    if filter_list: 
-        print('')
+    if filter_list:
+        print('\n- *filtering rows...*')
         f = input_data.copy()
-        for filter_str in filter_list: 
-            filter_col, filter_val = filter_str.rsplit('=',1)
+        for filter_str in filter_list:
+            filter_col, filter_val = filter_str.rsplit('=', 1)
             op = filter_col[-1]
             filter_col = filter_col[:-1]
-            try: 
+            try:
                 target_param = f[filter_col]
-            except KeyError: 
-                print(f'- ✕ ERROR: Filter column `{filter_col}` not found. Filter `{filter_str}` ignored.')
+            except KeyError:
+                print(
+                    f'  - ✕ ERROR: Filter column `{filter_col}` not found. Filter `{filter_str}` ignored.')
                 continue
-            
+
             # `filter_col` NOT equal to `filter_val`
-            if op == '!': 
+            if op == '!':
                 f = f.loc[target_param != filter_val, :]
 
                 # `filter_col` IS equal to `filter_val`
-            elif op == '=': 
+            elif op == '=':
                 f = f.loc[target_param == filter_val, :]
-                    
-            if f.empty: 
-                print(f'- Filter expression "{filter_str}" matched zero rows. Filter not applied.')
+
+            if f.empty:
+                print(
+                    f'  - Filter expression `{filter_str}` matched zero rows. Filter not applied.')
                 f = input_data.copy()
-            else: 
+            else:
                 filtered = True
                 input_data = f
-                print(f'- ✓ Applied filter: `{filter_str}`')
-                
+                print(f'  - ✓ Applied filter: `{filter_str}`')
+
     return input_data, filtered
 
-def select_columns(data_selection: pd.DataFrame, 
+
+def select_columns(data_selection: pd.DataFrame,
                    seek_cols: list):
     """
     Selects columns from a pandas DataFrame based on a list of column names.
@@ -107,14 +116,16 @@ def select_columns(data_selection: pd.DataFrame,
         pd.DataFrame({"A": [1, 2, 3]})
     """
 
-    if seek_cols: 
+    if seek_cols:
+        print('\n- *selecting columns...*')
         selected_cols = []
-        for col in seek_cols: 
-            if col not in data_selection.columns: 
-                print(f'\n- Warning‼️ "{col}" not in columns. Selection ignored.')
-            else: 
+        for col in seek_cols:
+            if col not in data_selection.columns:
+                print(
+                    f'  - Warning‼️ `{col}` not in columns. Selection ignored.')
+            else:
                 selected_cols.append(col)
-        if selected_cols: 
+        if selected_cols:
             data_selection = data_selection[selected_cols]
     return data_selection
 
@@ -122,7 +133,7 @@ def select_columns(data_selection: pd.DataFrame,
 def _parse_args():
     """
     Parses the command line arguments.
-    
+
     Returns:
         argparse.Namespace: The parsed command line arguments.
 
@@ -133,7 +144,7 @@ def _parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('pickle',
-                        type=Path, 
+                        type=Path,
                         help=('path to pickled dataframe')
                         )
 
@@ -148,7 +159,7 @@ def _parse_args():
         help=('name of column to sort sample by; '
               "needn't be selected for printout. "
               '*note* this will be _ascending_ (A-Z or increasing numerical values)'))
-    
+
     parser.add_argument(
         '-c', '--column',
         type=str, action='append', dest='columns',
@@ -178,7 +189,7 @@ def _parse_args():
         default=False,
         help=('option to print in markdown table format')
     )
-    
+
     return parser.parse_args()
 
 
