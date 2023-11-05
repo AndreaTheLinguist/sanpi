@@ -14,10 +14,10 @@
 # usage:
 #     sbatch [slurm flags addtions/overrides] slurm_pipeline_test.sh \
 #         [path of pattern dir #! relative to ..sanpi/demo/Pat/ (= name of dir containing .pat files)] \
-#          ^ ADJ-head-dev
+#          ^ RBdirect
 #         [path of corpus dir #! relative to ..sanpi/demo/data/corpora/] \
 #          ^ subsets/bigrams/bigram_smallest
-# *   defaults to: `run_pipeline.py -c ../demo/data/corpora/subsets/bigrams/bigram_smallest -p ../demo/Pat/devExtend`
+# *   defaults to: `run_pipeline.py -c ../demo/data/corpora/subsets/bigrams/bigram_smallest -p ../demo/Pat/RBdirect`
 
 echo 'running slurm script: `../sanpi/demo/slurm_pipeline_test.sh`'
 echo "JOB ID: ${SLURM_JOB_ID}"
@@ -33,7 +33,7 @@ eval "$(conda shell.bash hook)"
 conda activate sanpi
 DEMO_DIR="/share/compling/projects/sanpi/demo"
 
-PAT_IN=${1:-"ADJ-head-dev"}
+PAT_IN=${1:-"RBdirect"}
 PAT_ARG="${DEMO_DIR}/Pat/${PAT_IN}"
 
 CORP_IN=${2:-"subsets/bigrams/bigram_smallest"}

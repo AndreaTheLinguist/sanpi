@@ -5,7 +5,7 @@
 #SBATCH -o %x_%j.demo.out
 #SBATCH -e %x_%j.demo.err
 #SBATCH --time 1:00:00
-#SBATCH -J pipe-test-T(abulate)
+#SBATCH -J demo-pipe-T(abulate)
 #SBATCH --chdir=/share/compling/projects/sanpi/demo/logs
 
 # bash script to start batch slurm job to run **demo/** grew_search with cluster resources
@@ -29,7 +29,10 @@ eval "$(conda shell.bash hook)"
 conda activate sanpi
 DEMO_DIR="/share/compling/projects/sanpi/demo"
 
-CORP_IN=${1:-"subsets/bigrams/bigram_X2puddin"}
+PAT_IN=${1:-"ADJ-head-dev"}
+PAT_ARG="${DEMO_DIR}/Pat/${PAT_IN}"
+
+CORP_IN=${2:-"subsets/bigrams/bigram_smallest"}
 CORP_ARG="${DEMO_DIR}/data/corpora/${CORP_IN}"
 
 PAT_IN=${2:-"advadj"}
