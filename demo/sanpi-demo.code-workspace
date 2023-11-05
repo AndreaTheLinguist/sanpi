@@ -24,7 +24,7 @@
                 "program": "script/create_grewpy_subset.py",
                 "console": "integratedTerminal",
                 "args": [
-                    "-n", 
+                    "-n",
                     "bigram",
                     "data/corpora/gitrepo_puddin/2smallest.conll/nyt_eng_200405.conllu",
                 ]
@@ -32,7 +32,7 @@
             //* dependency analysis
             {
                 "console": "integratedTerminal",
-                "name": "analyze_deps demo sample 5",
+                "name": "analyze_deps demo SAMPLE 5",
                 "program": "source/analyze_deps.py",
                 "request": "launch",
                 "type": "python",
@@ -44,7 +44,7 @@
                     "-i",
                     "data/2_hit_tables",
                     "-n",
-                    "demo_sample5",
+                    "demo_5",
                     "-o",
                     "data/3",
                     "-s",
@@ -55,7 +55,7 @@
             },
             {
                 "console": "integratedTerminal",
-                "name": "analyze_deps demo *exactly* full",
+                "name": "analyze_deps demo devExtend/bigram_smallest*",
                 "program": "/share/compling/projects/sanpi/source/analyze_deps.py",
                 "request": "launch",
                 "type": "python",
@@ -63,24 +63,36 @@
                 //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
                 // [-g GLOB_EXPR] [-o OUTPUT_DIR]
                 // [-n NAME] [-s SAMPLE_SIZE] [-v] [-t]
+                "cwd": "/home/arh234/projects/sanpi/demo",
                 "args": [
                     "-g",
-                    "*exactly*hits.pkl*",
+                    "*bigram_smallest*hits.pkl*",
                     "-i",
                     "data/2_hit_tables",
                     "-o",
                     "data/3_dep_info",
-                
                     "-n",
-                    "demo_exactly",
-    
+                    "bigram_smallest",
                 ]
+            },
+            // run_pipeline help message
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline HELP",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "type": "python",
+                "args": [
+                    "-h"
+                ],
             },
             // run_pipeline PccX2 contig
             {
                 "console": "integratedTerminal",
                 "justMyCode": true,
-                "name": "run_pipeline PccX2 contig",
+                "name": "run_pipeline PccX2 RBsimple",
                 "program": "run_pipeline.py",
                 "request": "launch",
                 "type": "python",
@@ -91,192 +103,404 @@
                     "-c",
                     "data/corpora/puddin/PccX2.conll",
                     "-p",
-                    "Pat/contig"
+                    "Pat/RBsimple"
                 ],
                 "cwd": "/home/arh234/projects/sanpi/demo"
             },
+            // run_pipeline bigram_small contig
             {
                 "console": "integratedTerminal",
                 "justMyCode": true,
-                "name": "pipeline exactly_puddin-val contig",
+                "name": "run_pipeline bigram_small contig",
                 "program": "run_pipeline.py",
                 "request": "launch",
                 "type": "python",
                 "args": [
+                    // ! for ../demo/ launch configs, give relative paths
                     "--grew_output_dir",
                     "data/1_json_grew-matches",
                     "-c",
-                    "data/corpora/subsets/exactly_puddin-val",
-                    "-p",
-                    "Pat/contig"
-                ],
-                "cwd": "/share/compling/projects/sanpi/demo"
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "pipeline exactly_test contig",
-                "program": "run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/subsets/exactly_test",
-                    "-p",
-                    "Pat/contig"
-                ],
-                "cwd": "/share/compling/projects/sanpi/demo"
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "pipeline exactly_test negraise",
-                "program": "run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/subsets/exactly_test",
-                    "-p",
-                    "Pat/raised"
-                ],
-                "cwd": "/share/compling/projects/sanpi/demo"
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "pipeline exactly_test scoped",
-                "program": "run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/subsets/exactly_test",
-                    "-p",
-                    "Pat/scoped"
-                ],
-                "cwd": "/share/compling/projects/sanpi/demo"
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "run_pipeline exactly_test contig TABULATE",
-                "program": "run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "-T",
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/subsets/exactly_test",
+                    "data/corpora/subsets/bigrams/bigram_small",
                     "-p",
                     "Pat/contig"
                 ],
                 "cwd": "/home/arh234/projects/sanpi/demo"
             },
+            // run_pipeline bigram_small RBscoped
             {
                 "console": "integratedTerminal",
                 "justMyCode": true,
-                "name": "run_pipeline exactly_puddin-val contig TABULATE",
+                "name": "run_pipeline bigram_small RBscoped",
                 "program": "run_pipeline.py",
                 "request": "launch",
                 "type": "python",
                 "args": [
+                    // ! for ../demo/ launch configs, give relative paths
                     "--grew_output_dir",
-                    "-T",
                     "data/1_json_grew-matches",
                     "-c",
-                    "data/corpora/subsets/exactly_puddin-val",
+                    "data/corpora/subsets/bigrams/bigram_small",
                     "-p",
-                    "Pat/contig"
+                    "Pat/RBscoped"
                 ],
                 "cwd": "/home/arh234/projects/sanpi/demo"
             },
+            // run_pipeline bigram_small RBXadj
             {
                 "console": "integratedTerminal",
                 "justMyCode": true,
-                "name": "process exactly_test contig",
-                "program": "source/analyze/processTables.py",
+                "name": "run_pipeline bigram_small RBXadj",
+                "program": "run_pipeline.py",
                 "request": "launch",
                 "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "-R",
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_small",
+                    "-p",
+                    "Pat/RBXadj"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_small RBcontig
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_small RBcontig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "-R",
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_small",
+                    "-p",
+                    "Pat/RBcontig"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline DEBUG RBraised
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline DEBUG RBraised",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/debug",
+                    "-R",
+                    "-p",
+                    "Pat/RBraised"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline DEBUG RBscoped
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline DEBUG RBscoped",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/debug",
+                    "-R",
+                    "-p",
+                    "Pat/RBscoped"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline -R DEBUG RBcontig
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline -R DEBUG RBcontig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "-R",
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/debug",
+                    "-R",
+                    "-p",
+                    "Pat/RBcontig"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline -R mixed10 RBcontig
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline -R BigramDEBUG RBcontig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "-R",
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/small/BigramDebug.conll",
+                    "-p",
+                    "Pat/RBcontig"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_small devExtend
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_small devExtend",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_small",
+                    "-p",
+                    "Pat/devExtend",
+                    // "-R"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_smallest ADJ-head-dev
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_smallest ADJ-head-dev",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_smallest",
+                    "-p",
+                    "Pat/ADJ-head-dev",
+                    // "-R"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_smallest NEG-head-dev
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_smallest NEG-head-dev",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_smallest",
+                    "-p",
+                    "Pat/NEG-head-dev",
+                    // "-R"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_XX3puddin devOct19
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_XX3puddin devOct19",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_XX3puddin",
+                    "-p",
+                    "Pat/devOct19",
+                    // "-R"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_smaller oct13devel
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_smaller oct13devel",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_smaller",
+                    "-p",
+                    "Pat/oct13devel",
+                    "-R"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_smaller devel
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_smaller devel",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_smaller",
+                    "-p",
+                    "Pat/devel",
+                    "-R"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_small RBraised
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigram_small RBraised",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_small",
+                    "-p",
+                    "Pat/RBraised"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline 2smallest-bigrams RBraised
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline 2smallest-bigrams RBraised",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/git_commit/2smallest.conll/subset_bigram",
+                    "-p",
+                    "Pat/RBraised"
+                ],
+                "cwd": "/home/arh234/projects/sanpi/demo"
+            },
+            // run_pipeline bigram_X2puddin RBcontig
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "run_pipeline bigrams_X2puddin RBcontig",
+                "program": "run_pipeline.py",
+                "request": "launch",
+                "type": "python",
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "args": [
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--grew_output_dir",
+                    "data/1_json_grew-matches",
+                    "-c",
+                    "data/corpora/subsets/bigrams/bigram_X2puddin",
+                    "-p",
+                    "Pat/RBcontig"
+                ],
+            },
+            // count_bigrams bigram_X2puddin advadj
+            {
+                "name": "count_bigrams X2puddin advadj (default%)",
+                "type": "python",
+                "request": "launch",
+                "program": "source/analyze/count_bigrams.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "args": [
+                    "-f",
+                    "1",
+                    "-d",
+                    "data/2_hit_tables/advadj",
+                    "-p",
+                    "data/4_post-processed/advmod",
+                    "-o",
+                    "results/freq_out/advmod"
+                ]
+            },
+            // count_bigrams bigram_X2puddin RBXadj
+            {
+                "name": "count_bigrams X2puddin RBXadj (default%)",
+                "type": "python",
+                "request": "launch",
+                "program": "source/analyze/count_bigrams.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "args": [
+                    "-f",
+                    "1",
+                    "-d",
+                    "data/2_hit_tables/RBXadj",
+                    "-p",
+                    "data/4_post-processed/RBxpos",
+                    "-o",
+                    "results/freq_out/RBxpos"
+                ]
+            },
+            // count_neg bigram_small RBcontig
+            {
+                "name": "count_neg RBcontig",
+                "type": "python",
+                "request": "launch",
+                "program": "source/analyze/count_neg.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "cwd": "/home/arh234/projects/sanpi/demo",
                 "args": [
                     "-d",
-                    "data"
-                ],
-                "cwd": "/share/compling/projects/sanpi/demo"
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "run_pipeline PccX9 contig",
-                "program": "/share/compling/projects/sanpi/run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/puddin/PccX9.conll",
-                    "-p",
-                    "Pat/contig"
+                    "data/2_hit_tables/RBcontig",
+                    "-b",
+                    "data/4_post-processed/RBxpos/bigrams-only_thr0-001p.1f.pkl.gz",
+                    "-o",
+                    "results/freq_out/RBcontig"
                 ]
             },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "pipeline x5_exactly contig TABULATE",
-                "program": "/share/compling/projects/sanpi/run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "-T",
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/puddin/x5_subset_exactly",
-                    "-p",
-                    "Pat/contig"
-                ]
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "pipeline x5_exactly contig",
-                "program": "/share/compling/projects/sanpi/run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/puddin/x5_subset_exactly",
-                    "-p",
-                    "Pat/contig"
-                ]
-            },
-            {
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "name": "pipeline x20_exactly contig",
-                "program": "/share/compling/projects/sanpi/run_pipeline.py",
-                "request": "launch",
-                "type": "python",
-                "args": [
-                    "--grew_output_dir",
-                    "data/1_json_grew-matches",
-                    "-c",
-                    "data/corpora/puddin/x20_subset_exactly",
-                    "-p",
-                    "Pat/contig"
-                ]
-            }
         ],
     },
     "settings": {
@@ -298,16 +522,35 @@
             "**/__pycache__": true,
             "**/__init__.py": true
         },
-        "python.linting.banditEnabled": false,
-        "python.linting.cwd": "/share/compling/projects/sanpi/demo",
-        "python.linting.flake8Enabled": false,
-        "python.linting.mypyEnabled": false,
-        "python.linting.prospectorEnabled": false,
-        "solarizedCustomTheme.accentColor": "Cyan",
+        // "python.linting.banditEnabled": false,
+        // "python.linting.cwd": "/share/compling/projects/sanpi/demo",
+        // "python.linting.flake8Enabled": false,
+        // "python.linting.mypyEnabled": false,
+        // "python.linting.prospectorEnabled": false,
+        "solarizedCustomTheme.accentColor": "Magenta",
         "terminal.integrated.minimumContrastRatio": 5,
         "window.autoDetectColorScheme": true,
-        "workbench.preferredDarkColorTheme": "vscode carbon theme",
-        "workbench.preferredLightColorTheme": "Ayu Light Bordered",
-        "workbench.colorTheme": "vscode carbon theme",
+        "workbench.preferredDarkColorTheme": "semantic-rainbow",
+        // "workbench.preferredDarkColorTheme": "Rainier",
+        // "workbench.preferredDarkColorTheme": "Absent Contrast (rainglow)",
+        // "workbench.preferredDarkColorTheme": "SynthWave '84",
+        // "workbench.preferredDarkColorTheme": "vscode carbon theme",
+        // "workbench.preferredDarkColorTheme": "Zeonica",
+        // "workbench.preferredDarkColorTheme": "Abyss",
+        // "workbench.preferredLightColorTheme": "Ayu Light Bordered",
+        // "workbench.preferredLightColorTheme": "Solarized-light-fjs",
+        // "workbench.preferredLightColorTheme": "Solarized Custom Light",
+        // "workbench.preferredLightColorTheme": "Noctis Lilac",
+        "workbench.preferredLightColorTheme": "Modern Purple Theme Light",
+        // "workbench.preferredLightColorTheme": "Quiet Light",
+        "files.watcherExclude": {
+            "**/demo/data/**": true
+        },
+        "workbench.colorTheme": "semantic-rainbow",
+    },
+    "extensions": {
+        "recommendations": [
+            "mechatroner.rainbow-csv"
+        ]
     }
 }

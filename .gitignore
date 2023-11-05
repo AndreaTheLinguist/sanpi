@@ -423,3 +423,6 @@ Pat/shelf
 **/*dev*
 demo/data/**/RB*/
 results/**/*[.12]?f.*
+source/gather/utils
+source/utils/adv*
+**/te?mp*

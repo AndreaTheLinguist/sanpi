@@ -8,6 +8,24 @@
             "console": "integratedTerminal",
             "justMyCode": true
         },
+        {
+            "name": "correlate 877",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/results/correlate_lemmas.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv"]
+        },
+        {
+            "name": "correlate 4384",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/results/correlate_lemmas.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["/share/compling/projects/sanpi/results/freq_out/all-frq_thresh4384.35f.csv"]
+        },
         // * LSC
         // > view_LSC
         {
@@ -19,7 +37,8 @@
             "justMyCode": true,
             "args": [
                 "-f",
-                "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv"
+                "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv", 
+                "-"
             ]
         },
         {
@@ -32,6 +51,30 @@
             "args": [
                 "-f",
                 "/share/compling/projects/sanpi/results/transformed/sqrt_all-frq_thresh877.35f.csv"
+            ]
+        },
+        {
+            "name": "view_LSC 35f log2",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "/share/compling/projects/sanpi/results/transformed/log2_all-frq_thresh877.35f.csv"
+            ]
+        },
+        {
+            "name": "view_LSC 35f ADV mean-std",
+            "type": "python",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "/share/compling/projects/sanpi/results/mean_standardized/all-frq_thresh877.35f_ADV-mn-std.csv"
             ]
         },
         {

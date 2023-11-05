@@ -1,7 +1,14 @@
 {
     "recommendations": [
         "lgrobol.vscode-conllu",
-        "emilast.logfilehighlighter",
-        "mhutchie.git-graph"
+        "mhutchie.git-graph",
+        "ms-python.autopep8",
+        "grapecity.gc-excelviewer",
+        "formulahendry.code-runner",
+        "ms-toolsai.jupyter-renderers",
+        "ms-toolsai.jupyter",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "thinker.sort-json"
     ]
 }

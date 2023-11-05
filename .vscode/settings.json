@@ -11,5 +11,4 @@
         "**/venv": true
     },
     "explorerExclude.backup": null,
-    "python.linting.enabled": true
 }

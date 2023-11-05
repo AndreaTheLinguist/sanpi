@@ -7,60 +7,119 @@
         {
             "name": "data-sanpi",
             "path": "/share/compling/data/sanpi"
+        },
+        {
+            "path": "../../../../home/mr249/hug/someany",
+            "name": "Mats_some-any"
         }
     ],
     "launch": {
-        "version": "0.2.0",
         "configurations": [
             // * Deps
+            // DEMO collect_deps RBdirect
             {
-                "name": "analyze_deps apw -v",
-                "type": "python",
-                "request": "launch",
-                "program": "analyze_deps${defaultBuildTask}.py",
                 "console": "integratedTerminal",
-                // "python": "/home/arh234/.conda/envs/dev-sanpi/bin/python",
-                //usage: analyze_deps.py [-h] [-i INPUT_DIR] [-d DEP_DF]
-                // [-g GLOB_EXPR] [-o OUTPUT_DIR]
-                // [-n NAME] [-v]
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "justMyCode": true,
+                "name": "COLLECT_deps RBdirect",
+                "program": "/home/arh234/projects/sanpi/demo/source/collect_deps.py",
+                "request": "launch",
+                "type": "python",
                 "args": [
-                    "-g",
-                    "*apw*hits.pkl.gz",
-                    "-n",
-                    "test_apw",
-                    "-v"
-                ]
-            }
-        ]
+                    // ! for ../demo/ launch configs, give relative paths
+                    "--input_dir",
+                    "data/2_hit_tables",
+                    "--glob_expr",
+                    "RBdirect/*hits.pkl.gz",
+                    "--output_dir",
+                    "data/3_dep_info",
+                    "--sample_size",
+                    "-1",
+                    "--test",
+                    "--verbose",
+                    // "--very_verbose"
+                ],
+            },
+        ],
+        "version": "0.2.0"
     },
     "settings": {
         "debug.console.fontFamily": "iosevka term ss02",
         "debug.console.wordWrap": false,
         "debug.inlineValues": "off",
+        "explorer.autoReveal": "focusNoScroll",
+        "explorer.autoRevealExclude": {
+            "/share/compling/projects/sanpi/**": true
+        },
         "explorerExclude.backup": {},
         "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
             "**/*conda3": true,
             "**/*kaldi*": true,
             "**/.[^b]*": true,
             "**/.bash_[hl]*": true,
-            "**/.DS_Store": true,
-            "**/.git": true,
-            "**/.hg": true,
-            "**/.svn": true,
-            "**/__init__.py": true,
-            "**/CVS": true,
-            "**/stanza_resources": true,
-            "**/Thumbs.db": true
+            "**/stanza_resources": true
         },
         "files.watcherExclude": {
             "/share/compling/data/puddin": true,
             "/share/compling/data/sanpi": true,
             "/share/compling/projects/*/logs/*/*": true,
-            "/share/compling/projects/.history": true
+            "/share/compling/projects/.history": true,
+            "/share/compling/projects/sanpi/logs/grewpy_subsets": true
         },
-        "todo-tree.tree.scanMode": "open files",
+        //? think maybe this 👇 was the think causing all the weird formatting adjustments?
+        ////"python.formatting.provider": "yapf",
         "todo-tree.general.periodicRefreshInterval": 2,
         "todo-tree.general.showActivityBarBadge": true,
-        "todo-tree.general.statusBar": "current file"
+        "todo-tree.general.statusBar": "current file",
+        "todo-tree.tree.scanMode": "open files",
+        "todo-tree.tree.showBadges": false,
+        "workbench.colorCustomizations": {
+            "[Solarized Custom Light]": {
+                "activityBarBadge.background": "#6C71C4FF",
+                "badge.background": "#6C71C4FF",
+                "focusBorder": "#6C71C480",
+                "button.background": "#6C71C4FF",
+                "pickerGroup.foreground": "#6C71C480",
+                "quickInputList.focusBackground": "#6C71C433",
+                "quickInputList.focusForeground": "#6C71C4FF",
+                "dropdown.border": "#6C71C480",
+                "editor.wordHighlightBorder": "#6C71C40D",
+                "editor.wordHighlightStrongBorder": "#6C71C433",
+                "tab.activeBorderTop": "#6C71C4FF",
+                "inputOption.activeBorder": "#6C71C480",
+                "list.activeSelectionBackground": "#6C71C433",
+                "list.activeSelectionForeground": "#6C71C4FF",
+                "list.hoverBackground": "#6C71C41A",
+                "list.inactiveSelectionBackground": "#6C71C426",
+                "list.inactiveSelectionForeground": "#6C71C4FF",
+                "list.highlightForeground": "#6C71C4FF",
+                "peekViewEditor.matchHighlightBackground": "#6C71C433",
+                "peekViewResult.matchHighlightBackground": "#6C71C440",
+                "peekViewResult.selectionBackground": "#6C71C433",
+                "progressBar.background": "#6C71C4FF",
+                "statusBarItem.remoteBackground": "#6C71C480"
+            },
+            "activityBar.background": "#0b1434",
+            "titleBar.activeBackground": "#0b1434",
+            "titleBar.activeForeground": "#f2d6f5f6"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.autopep8",
+            "grapecity.gc-excelviewer",
+            "formulahendry.code-runner",
+            "ms-toolsai.jupyter-renderers",
+            "ms-toolsai.jupyter",
+            "ms-python.python",
+            "ms-python.debugpy",
+            "thinker.sort-json"
+        ]
     }
 }
