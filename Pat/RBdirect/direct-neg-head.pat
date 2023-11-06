@@ -8,5 +8,12 @@ pattern {
     NEG << ADV
 }
 
-% with following, will not match `not uninteresting` where "not" is adverb and "uninteresting" is adjective
-% ADV [lemma<>"not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"];
+% fyi, WILL match negative adverbs to `ADV` node, 
+%   provided there is an additional negative token matching NEG specs; 
+%   e.g.: 
+%   | neg_form | adv_form | adj_form | text_window                                         | neg_deprel |
+%   |----------|----------|----------|-----------------------------------------------------|------------|
+%   | Not      | not      | excited  | ( Not that I 'm not excited about those things --   | ccomp      |
+%   | nothing  | not      | awkward  | "yeah , there 's nothing not awkward about it , """ | amod       |
+%   | nothing  | not      | safe     | There 's nothing not safe about it , nothing        | amod       |
+%   | nobody   | not      | good     | There 's nobody not good in the West .              | amod       |
