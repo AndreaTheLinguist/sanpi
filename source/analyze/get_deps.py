@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 from utils.dataframes import (  # pylint: disable=import-error
-    balance_sample, cols_by_str)
+    balance_sample, cols_by_str, print_md_table)
 from utils.general import (  # pylint: disable=import-error
     display_message, dur_round, find_files, print_iter)
 
@@ -69,6 +69,8 @@ def parallel_process_deps(args_df: pd.DataFrame,
     # > (c) 15 cpus (don't want to be too ridiculous)
     # > whichever is less
     cpus = min(mp.cpu_count()-1, input_count, 15)
+    #// #!#HACK the slurm requests don't seem to be working....
+    #// cpus=2
     print(f'\n## processing {input_count} inputs with {cpus} CPUs...')
     t0 = pd.Timestamp.now()
 
@@ -159,10 +161,23 @@ def _make_dep_dfs(arg_series):
     return dep_result
 
 
+def _save_outputs(input_name, dep_hits_path, new_hits_df, dep_tie_path, all_ties_df):
+    def save_df(_df, path, description):
+        message = f'writing `{input_name}` {description} to `{path}`...'
+        display_message(
+            message, _LOGGER if _LOGGER.getEffectiveLevel == _INFO else None)
+        _df.to_pickle(path)
+
+    save_df(new_hits_df, dep_hits_path,
+            'hits dataframe with added dependency string identifiers')
+    save_df(all_ties_df, dep_tie_path,
+            'dependency info indexed by individual tie')
+
+
 def get_deps(hits_df: pd.DataFrame,
              dep_hits_path: Path = None,
              dep_tie_path: Path = None,
-             sample_size: int = None,
+             sample_size: int = 0,
              verbose: bool = False,
              run_in_parallel: bool = False):
 
@@ -177,19 +192,21 @@ def get_deps(hits_df: pd.DataFrame,
     _t1 = pd.Timestamp.now()
 
     dep_proc_time = dur_round((_t1 - _t0).seconds)
+    input_name = input_path.name.rsplit("_", 1)[0]
+    display_message(f'`{input_name}` returning from processing...', logger)
     if new_hits_df is None:
 
         overview_str = f"❗ERROR: Unparsable input data. No dependency processing completed for `{input_path}`"
+        display_message(overview_str, logger, _ERROR)
 
     else:
-        counts_md_table = (
+        counts_md_table = print_md_table(
             new_hits_df.loc[:, new_hits_df.columns.isin(
                 ('dep_str', 'dep_str_mask', 'neg_lemma', 'colloc'))]
             # ('hit_text', 'dep_str', 'dep_str_mask'))]
             .value_counts().to_frame().rename(columns={0: 'count'})
-            .sort_values('colloc').nlargest(5, 'count').reset_index()
-            .to_markdown())
-        input_name = input_path.name.rsplit("_", 1)[0]
+            .sort_values('colloc').nlargest(5, 'count').reset_index(),
+            suppress=True)
         overview_str = f'\n### `{input_name}` Top 5\n{counts_md_table}'
 
         if verbose or run_in_parallel:
@@ -205,20 +222,12 @@ def get_deps(hits_df: pd.DataFrame,
             display_message(no_save_warning, logger, 30)
 
         else:
-            message = (f'writing `{input_name}` hits dataframe with added dependency string identifiers '
-                       + f'to `{dep_hits_path}`...')
-            display_message(message, logger)
-            new_hits_df.to_pickle(dep_hits_path)
+            _save_outputs(input_name, dep_hits_path,
+                          new_hits_df, dep_tie_path, all_ties_df)
 
-            message = (f'writing `{input_name}` dependency info indexed by individual tie '
-                       + f'to `{dep_tie_path}`...')
-            display_message(message, logger)
-            all_ties_df.to_pickle(dep_tie_path)
-
-            message_done = f'✔️ `{input_name}` dataframes saved. {pd.Timestamp.now().ctime()}'
+            message_done = f'✓ `{input_name}` dataframes saved. {pd.Timestamp.now().ctime()}'
             display_message(message_done, logger)
 
-    display_message(f'`{input_name}` returning from processing...', logger)
     if run_in_parallel:
         return input_name, dep_proc_time, dep_hits_path, dep_tie_path, overview_str
 
@@ -227,16 +236,17 @@ def get_deps(hits_df: pd.DataFrame,
 
 
 def _process_dep_info(hits_df: pd.DataFrame,
-                      sample_size: int = None,
+                      sample_size: int = 0,
                       verbose=False,
                       in_parallel=False):
 
     logger = _LOGGER if in_parallel else None
     input_path = hits_df.hits_df_path[0]
-    if sample_size is not None:
-        if len(hits_df) < sample_size:
+    if sample_size:
+        sample_size = max(sample_size, 2)
+        if len(hits_df) < sample_size > 0:
             display_message(
-                f'No sampling needed. Only 2 rows in ../{Path(*input_path.parts[-2:])} dataframe.',
+                f'No sampling needed (N={sample_size}). Only {len(hits_df)} rows in ../{Path(*input_path.parts[-2:])} dataframe.',
                 logger,
                 level=_WARNING,
             )
@@ -281,6 +291,7 @@ def _process_dep_info(hits_df: pd.DataFrame,
             bullet=_BULLET,
             logger=logger,
             header=f'## original `{input_path.name}` dependency info columns')
+        print('')
 
     tie_dfs = []
 
@@ -289,7 +300,8 @@ def _process_dep_info(hits_df: pd.DataFrame,
         deps_in_hit = _process_deps_in_hit(row, verbose, in_parallel)
         # if error in processing hit, return None
         if deps_in_hit is None:
-            return None
+            display_message(f'ERROR: {row.name} processing failed.')
+            return (None, None)
 
         # > add string identifiers, with & without index, but sorted by index
         str_deps_df = _add_dep_strs(deps_in_hit)
@@ -308,6 +320,7 @@ def _process_dep_info(hits_df: pd.DataFrame,
                     f'{x} ↣ {joined_strs[x]}' for x in joined_strs.index),
                 bullet=_BULLET,
                 header=f'⁂ Combined string representations of dependencies for match {hit_id}')
+            print('')
 
     all_ties_df = pd.concat(tie_dfs)
 
@@ -323,28 +336,52 @@ def _process_dep_info(hits_df: pd.DataFrame,
     return hits_df, all_ties_df
 
 
+def _identify_dict_vals(row: pd.Series):
+    is_dict_val = row.apply(lambda val: isinstance(val, dict))
+    dict_vals = row.loc[is_dict_val]
+    other_vals = row.loc[~is_dict_val]
+    return other_vals, dict_vals
+
+
+def _show_deps_info(row):
+    logger = _LOGGER if _LOGGER.getEffectiveLevel == _DEBUG else None
+    other_vals, dict_vals = _identify_dict_vals(row)
+
+    print_iter(
+        (f'{x}:\t{other_vals[x]}'
+         for x in other_vals.index),
+        bullet=_BULLET, logger=logger, level=_DEBUG,
+        header=f'\n## `hit_id` = `{row.name}`'
+    )
+
+    #! if json processing of "edges" is updated to use 'tie' in place of 'node',
+    #!      this will also have to be updated
+    display_message('+ dependency features\n' +
+                    print_md_table(pd.json_normalize(dict_vals).set_index('node').T,
+                                   indent=2, suppress=True)
+                    )
+    print('')
+
+    # display_message(row.to_markdown(), logger, level=_DEBUG)
+
+
 def _process_deps_in_hit(row: pd.Series(dtype='object'),
                          verbose: bool = False,
                          in_parallel: bool = False):
     # ? is `fillna('n/a') necessary?`
     row = row.fillna('n/a')
     logger = _LOGGER if in_parallel else None
+    display_message(
+        f"processing {row.pattern} ~ {row.name}", logger, level=_INFO)
 
     # > log level for this info set to DEBUG
-    if verbose or (in_parallel and logger.getEffectiveLevel() == _DEBUG):
-        print_iter((f'{x}\n    {row[x]}'
-                   for x in row.index
-                   if not isinstance(row[x], dict)),
-                   bullet=_BULLET, logger=logger, level=_DEBUG,
-                   header=f'\n## row {row.name} non-dictionary values'
-                   )
-        print_iter((f'{x}\n{pd.Series(row[x])}\n'
-                   for x in row.index
-                   if isinstance(row[x], dict)),
-                   bullet=_BULLET, logger=logger, level=_DEBUG,
-                   header=f'\n## row {row.name} non-dictionary values')
-        display_message(row.to_markdown(), logger, level=_DEBUG)
-
+    # if verbose or (in_parallel and logger.getEffectiveLevel() == _DEBUG):
+    # if verbose and ((not in_parallel) or logger.getEffectiveLevel() == _DEBUG):
+    if logger.getEffectiveLevel() == _DEBUG and not in_parallel:
+        _show_deps_info(row)
+    #HACK
+    # if 'pcc_eng_06_096.6489' in row.name: 
+    #     print('found stupid long problem sentence')
     node_by_ix = view_nodes_by_index(row, extras=['form'])
 
     dep_dfs = []
@@ -360,25 +397,63 @@ def _process_deps_in_hit(row: pd.Series(dtype='object'),
         try:
             dep_df = pd.json_normalize(row[dep_col], sep='_')
         except NotImplementedError:
-            display_message(('❗ `pd.json_normalize()` in `get_deps._process_deps_in_hit()` failed on:\n'
-                            + row[[dep_col]].to_markdown()),
-                            logger, level=_ERROR)
+            display_message(
+                ('ERROR: `pd.json_normalize()` in `get_deps._process_deps_in_hit()` failed on:\n'
+                 + print_md_table(row[[dep_col]], indent=2, suppress=True)),
+                logger, level=_ERROR)
             return None
         else:
             dep_df['head_node'] = row[f'{tie}_head']
             dep_df['target_node'] = node_by_ix.node[dep_df.target_ix.squeeze()]
             dep_df['head_form'] = node_by_ix.form[dep_df.head_ix.squeeze()]
+            # if verbose:
+            #     print_dep = print_md_table(dep_df, suppress=True, indent=4)
+            #     print_row = print_md_table(row.to_frame(), suppress=True, indent=4)
+            #     print_nodeix = print_md_table(node_by_ix, suppress=True, indent=4)
+            #     display_message(
+            #         '\n'.join(
+            #             (f'\n* `dep_df` for {row.name}',
+            #              print_dep,
+            #              f'\n* `row` for {row.name}',
+            #              print_row, 
+            #              f'\n* `node_by_ix` for {row.name}',
+            #              print_nodeix, 
+            #              )
+            #         ), 
+            #         logger
+            #     )
             dep_df['target_form'] = node_by_ix.form[dep_df.target_ix.squeeze()]
+            # try:
+            #     dep_df['target_form'] = node_by_ix.form[dep_df.target_ix.squeeze()]
+            # except:
+            #     show_deps_info(row)
+            #     display_message(
+            #         '\n'.join(
+            #             (f'\n## KeyError: `dep_df.target_ix`(={dep_df.target_ix.squeeze()}) not found in `node_by_ix` index\n',
+            #              '* Offending `dep_df`',
+            #              print_md_table(dep_df, indent=2, suppress=True),
+            #              '* Offending `node_by_ix`',
+            #              print_md_table(node_by_ix, indent=2, suppress=True),
+            #              f'* `type(dep_df.target_ix.squeeze())` >> {type(dep_df.target_ix.squeeze())}',
+            #              '* Offending `row`',
+            #              print_md_table(
+            #                  row.to_frame(), indent=2, suppress=True),
+            #              ''
+            #              )
+            #         ),
+            #         logger=logger, level=_ERROR
+            #     )
+            #     return None
             # HACK temp -- remove
             # print(dep_df.T.to_markdown())
             dep_dfs.append(dep_df)
 
     deps_for_hit = pd.concat(dep_dfs, ignore_index=True)
-    
+
     index_cols = ['target_ix', 'head_ix']
     deps_for_hit[index_cols] = deps_for_hit[
         index_cols].apply(pd.to_numeric, downcast='unsigned')
-    
+
     # #! renaming `'node'` column to `'tie'`:
     # # > it's the _connection_ not the joint/vertex,
     # # > and 'node' is already used to refer to the token/words (in grew output)
@@ -391,7 +466,8 @@ def _process_deps_in_hit(row: pd.Series(dtype='object'),
     # This doesn't save any memory at this point, but it might add up.
     #   In case there are type errors later,
     #   this does change the index columns from 'int64' to 'Int64'
-    deps_for_hit = deps_for_hit.convert_dtypes()
+    #! convert_dtypes is liable to totally fuck up the values 🙅‍♀️ DO NOT USE
+    # deps_for_hit = deps_for_hit.convert_dtypes()
 
     deps_for_hit = deps_for_hit.assign(
         dep_tuple=deps_for_hit.apply(_get_dep_tuples, axis=1))
@@ -414,9 +490,10 @@ def view_nodes_by_index(hit_dep_info, extras=None):
         # frame = frame.T
     # ix_cols = list(set(ix_cols)
     #                - set(cols_by_str(frame, start_str='dep_str')))
-    _by_ix = frame[ix_cols].T
-    _by_ix['node'] = _by_ix.index.to_series().str.split('_').str.get(0).str.upper()
-    _by_ix = _by_ix.convert_dtypes().set_index('ix_info')
+    _by_ix = frame[ix_cols].T.apply(pd.to_numeric, downcast='unsigned')
+    _by_ix['node'] = (_by_ix.index.to_series().astype('string')
+                      .str.split('_').str.get(0).str.upper())
+    _by_ix = _by_ix.set_index('ix_info')
     _by_ix.index.name = 'ix'
     if extras:
         for extra_col in extras:
@@ -429,9 +506,15 @@ def view_nodes_by_index(hit_dep_info, extras=None):
                     val = frame[init_col].squeeze()
                 except KeyError:
                     val = None
-                    print(init_col, 'not found')
+                    try:
+                        display_message(
+                            f'⚠️   ERROR: {init_col} not found', _LOGGER, _ERROR)
+                    except NameError:
+                        display_message(f'⚠️   ERROR: {init_col} not found')
+
                 values.append(val)
             _by_ix[extra_col] = values
+            _by_ix[extra_col] = _by_ix[extra_col].astype('string')
     return _by_ix
 
 
@@ -453,20 +536,19 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame, verbose: bool = False):
     str_deps_df = deps_in_hit.copy()
     # ! changed the default value to `form` instead of `lemma` @ 2023-11-03
     str_deps_df['dep_str'] = [
-        f"{x.head_form.lower()}{_DELIM_STR}{x.target_form.lower()}[={x.tie}]" 
+        f"{x.head_form.lower()}{_DELIM_STR}{x.target_form.lower()}[={x.tie}]"
         if x is not None else ''
         for x in str_deps_df['dep_tuple']]
-    
+
     str_deps_df['dep_str_lemma'] = [
-        f"{x.head_lemma}{_DELIM_STR}{x.target_lemma}[={x.tie}]" 
+        f"{x.head_lemma}{_DELIM_STR}{x.target_lemma}[={x.tie}]"
         if x is not None else ''
         for x in str_deps_df['dep_tuple']]
 
     str_deps_df['dep_str_struct'] = [
-        f"{x.head_node}{_DELIM_STR}{x.target_node}[={x.tie}]" 
+        f"{x.head_node}{_DELIM_STR}{x.target_node}[={x.tie}]"
         if x is not None else ''
         for x in str_deps_df['dep_tuple']]
-
 
     str_deps_df['dep_str_ix'] = [
         f"{x.head_ix}:{x.head_form}{_DELIM_STR}{x.target_ix}:{x.target_form}[={x.tie}]" if x is not None else ''
@@ -486,19 +568,6 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame, verbose: bool = False):
         dep_str_node_rel=str_deps_df[
             ['dep_str_node', 'relation']].apply(_add_relation, axis=1)
     )
-    dep_str_cols = cols_by_str(str_deps_df, start_str='dep_str')
-    # HACK temp -- remove
-    # print(str_deps_df.set_index('tie').loc[:, dep_str_cols].T.to_markdown())
-
-    str_deps_df = str_deps_df.sort_values(['target_ix', 'head_ix']).reset_index(drop=True)
-
-    str_deps_df = str_deps_df.assign(dep_str_mask=_mask_dep_str(str_deps_df))
-    #? #TODO: mask `str_deps_df.dep_str_node_rel` as well?
-
-    str_deps_df = str_deps_df.assign(
-        dep_str_mask_rel=str_deps_df[
-            ['dep_str_mask', 'relation']].apply(_add_relation, axis=1))
-
     try:
         debug = _LOGGER.getEffectiveLevel() == 10
     except AttributeError:
@@ -506,11 +575,25 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame, verbose: bool = False):
         debug = False
     else:
         logger = _LOGGER
+    # HACK temp -- remove
+    # dep_str_cols = cols_by_str(str_deps_df, start_str='dep_str')
+    # print(str_deps_df.set_index('tie').loc[:, dep_str_cols].T.to_markdown())
+
+    str_deps_df = str_deps_df.sort_values(
+        ['target_ix', 'head_ix']).reset_index(drop=True)
+
+    str_deps_df = str_deps_df.assign(dep_str_mask=_mask_dep_str(str_deps_df))
+    # ? #TODO: mask `str_deps_df.dep_str_node_rel` as well?
+
+    str_deps_df = str_deps_df.assign(
+        dep_str_mask_rel=str_deps_df[
+            ['dep_str_mask', 'relation']].apply(_add_relation, axis=1))
 
     if verbose or debug:
-        dep_str_table = (
-            str_deps_df[cols_by_str(str_deps_df, start_str='dep_str')]
-            .to_markdown())
+        dep_str_table = (print_md_table(
+            str_deps_df[cols_by_str(str_deps_df, start_str='dep_str')],
+            indent=2, suppress=True)
+        )
         display_message(
             f'`{str_deps_df.hit_id[0]}`\n{dep_str_table}', logger, level=_DEBUG)
 
@@ -518,6 +601,13 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame, verbose: bool = False):
 
 
 def _mask_dep_str(str_df: pd.DataFrame):
+    try:
+        debug = _LOGGER.getEffectiveLevel() == 10
+    except AttributeError:
+        logger = None
+        debug = False
+    else:
+        logger = _LOGGER
 
     def _assign_dep_str_mask(_df, condition, col1, col2):
         if any(condition):
@@ -527,7 +617,8 @@ def _mask_dep_str(str_df: pd.DataFrame):
     # * for mod, use both xpos
     # * for relay, use both xpos
     if 'tie' not in str_df.columns:
-        print('Error: "tie" column is not set.')
+        display_message('Error: "tie" column is not set.',
+                        logger, level=_ERROR)
         return str_df.assign(dep_str_mask='').dep_str_mask
 
     # > this one doesn't need an existence check because `mod` always exists
