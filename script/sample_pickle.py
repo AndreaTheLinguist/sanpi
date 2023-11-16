@@ -4,45 +4,95 @@ from pathlib import Path
 
 import pandas as pd
 
-pd.set_option('display.max_colwidth', 60)
-pd.set_option('display.max_columns', 10)
-pd.set_option('display.width',250)
+from utils import set_pd_display
+
+# pd.set_option('display.max_colwidth', 40)
+# pd.set_option('display.max_columns', 20)
+# pd.set_option('display.width', 200)
+
 
 def print_sample():
     """
     prints a sample from a pickled DataFrame based on command line arguments.
     """
     args = _parse_args()
+    max_cols = set_max_cols(args)
 
-    # TODO: extend this to work with any type of tabular data input (or at least `.csv` and `.psv` files)
-    data = pd.read_pickle(args.pickle)
-    print(f'\n## Sampling from `{args.pickle}`')
+    set_pd_display(max_colwidth=args.max_colwidth,
+                   max_width=args.max_width,
+                   max_cols=max_cols)
 
-    data, filtered = filter_rows(data, args.filters)
+    data_sample = _get_data_sample(args)
 
-    sampled = data.sample(min(len(data), args.sample_size))
+    _print_table(data_sample, max_cols, 
+                 args.transpose, args.markdown)
+
+
+def set_max_cols(args):
+    read_path = args.pickle
+    if not read_path.is_file():
+        exit(f'Error: Input file not found:\n ✕ {read_path}')
+    max_cols = args.max_cols
+    col_list = args.columns
+    if args.transpose:
+        max_cols = args.sample_size or max_cols
+    elif col_list:
+        max_cols = len(col_list)
+    return max_cols
+
+
+def _get_data_sample(args):
+    sample_size = args.sample_size
+    full_frame = _read_data(args.pickle)
+    # [x]: extend this to work with any type of tabular data input (or at least `.csv` and `.psv` files)
+
+    filtered_data, filter_applied = _filter_rows(full_frame, args.filters)
+    if sample_size:
+        data = filtered_data.sample(min(len(filtered_data), sample_size))
     if args.sort_by:
-        sampled = sampled.sort_values(args.sort_by)
+        data = data.sort_values(args.sort_by)
     else:
-        sampled = sampled.sort_index()
+        data = data.sort_index()
 
-    sampled = select_columns(sampled, args.columns)
+    data = _select_columns(data, args.columns)
 
-    length_info = (f'{len(sampled)} random rows' if len(sampled) < len(data)
-                   else f'All ({len(data)}) rows')
-    if filtered:
+    _print_header(len(data), len(filtered_data),
+                  filter_applied, args.pickle.name)
+
+    return data
+
+
+def _read_data(read_path):
+    read_suffix = read_path.suffix
+    if '.pkl' in read_path.suffixes:
+        full_data = pd.read_pickle(read_path)
+    elif read_suffix == '.csv':
+        full_data = pd.read_csv(read_path)
+    elif read_suffix == '.psv':
+        full_data = pd.read_csv(read_path, delimiter='|')
+    elif read_suffix == '.tsv':
+        full_data = pd.read_csv(read_path, delimiter='\t')
+    elif read_suffix == '.json':
+        full_data = pd.read_json(read_path)
+    else:
+        exit(f'Error: Input file suffix, {read_suffix}, is either '
+             + 'not interpretable or not an expected suffix for a DataFrame.')
+    print(f'\n## Sampling from `{read_path}`')
+    return full_data
+
+
+def _print_header(n_sample_rows, n_input_rows, file_name: str,
+                  filter_applied: bool):
+
+    length_info = (f'{n_sample_rows} random row{"s" if n_sample_rows != 1 else ""}'
+                   if n_sample_rows < n_input_rows
+                   else f'All ({n_sample_rows}) row(s)')
+    if filter_applied:
         length_info += ' matching filter(s)'
-    print(f'\n### {length_info} from `{args.pickle.name}`\n')
-
-    if args.markdown:
-        print(sampled.to_markdown(floatfmt=',.0f'))
-    else:
-        print('```')
-        print(sampled)
-        print('```')
+    print(f'\n### {length_info} from `{file_name}`\n')
 
 
-def filter_rows(input_data: pd.DataFrame,
+def _filter_rows(input_data: pd.DataFrame,
                 filter_list: list):
     """
         Filters rows of a pandas DataFrame based on a list of filter expressions.
@@ -96,7 +146,7 @@ def filter_rows(input_data: pd.DataFrame,
     return input_data, filtered
 
 
-def select_columns(data_selection: pd.DataFrame,
+def _select_columns(data_selection: pd.DataFrame,
                    seek_cols: list):
     """
     Selects columns from a pandas DataFrame based on a list of column names.
@@ -130,6 +180,19 @@ def select_columns(data_selection: pd.DataFrame,
     return data_selection
 
 
+def _print_table(data_sample, max_cols, transpose, markdown):
+    if transpose:
+        print('_note: table transposed for display_\n')
+        data_sample = data_sample.transpose()
+    if markdown:
+        data_sample = data_sample.iloc[:, 0:max_cols]
+        print(data_sample.to_markdown(floatfmt=',.0f'))
+    else:
+        print('```')
+        print(data_sample)
+        print('```')
+
+
 def _parse_args():
     """
     Parses the command line arguments.
@@ -140,7 +203,11 @@ def _parse_args():
     """
     parser = argparse.ArgumentParser(
         description=(
-            'simple script to print a sample of a pickled dataframe to stdout as either the default `pandas` output or as a markdown table (-m). Specific columns can be selected (defaults to all columns), and sample size can be dictated (defaults to 20 rows)'),
+            'simple script to print a sample of a pickled dataframe to stdout '
+            'as either the default `pandas` output or as a markdown table (-m). '
+            'Specific columns can be selected (defaults to all columns), '
+            'and sample size can be dictated (defaults to 20 rows). '
+            'Tip: use `-N 1 -t` to see example of all included columns'),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('pickle',
@@ -151,7 +218,9 @@ def _parse_args():
     parser.add_argument(
         '-N', '--sample_size',
         type=int, default=20,
-        help=('number of rows to include in sample'))
+        help=('number of rows to include in sample. '
+              'To disable sampling (show entire '
+              'table--use with caution! ⚠️), use `-N 0`'))
 
     parser.add_argument(
         '-s', '--sort_by',
@@ -164,8 +233,10 @@ def _parse_args():
         '-c', '--column',
         type=str, action='append', dest='columns',
         default=[],
-        help=('option to specify columns to print. Each must have its own `-c` flag. E.g. `-c COLUMN_1 -c COLUMN_2`')
+        help=('option to specify columns to print. '
+              'Each must have its own `-c` flag. E.g. `-c COLUMN_1 -c COLUMN_2`')
     )
+
     parser.add_argument(
         '-f', '--filter',
         type=str, action='append', dest='filters',
@@ -189,6 +260,33 @@ def _parse_args():
         default=False,
         help=('option to print in markdown table format')
     )
+
+    parser.add_argument(
+        '-t', '--transpose',
+        action='store_true',
+        default=False,
+        help=('option to transpose the output (swap axes) for clearer viewing')
+    )
+
+    parser.add_argument(
+        '-C', '--max_cols',
+        type=int, default=20,
+        help=('max number of columns to include in sample; overriden by '
+              '--column flags if given (or --sample_size if --transpose specified)'))
+
+    parser.add_argument(
+        '-w', '--max_colwidth',
+        type=int, default=40,
+        help=('max width (in pixels?) of each column in sample display; '
+              '*currently does not apply to markdown formatted displays, '
+              'which include full values for every included cell.'))
+
+    parser.add_argument(
+        '-W', '--max_width',
+        type=int, default=180,
+        help=('max width of the entire display; '
+              '*currently does not apply to markdown formatted displays, '
+              'which will be the sum of the widest cell in every included columm'))
 
     return parser.parse_args()
 
