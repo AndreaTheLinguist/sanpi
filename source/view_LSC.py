@@ -9,7 +9,7 @@ from sys import exit as syxit
 
 import pandas as pd
 from utils import (  # pylint: disable=import-error
-    confirm_dir,
+    confirm_dir, transform_counts,
     get_proc_time,
     print_md_table,
     save_in_lsc_format as save_lsc
@@ -17,6 +17,9 @@ from utils import (  # pylint: disable=import-error
 # // from utils import (
 # //     save_in_lsc_format as save_lsc
 # //                    )  # pylint: disable=import-error
+
+ADV_REP = 'adv_form_lower'
+ADJ_REP = 'adj_form_lower'
 
 # frequency tuple
 freq_meta = nametup(
@@ -28,7 +31,7 @@ freq_meta = nametup(
 # lsc tuples
 cluster = nametup('Cluster', ['index', 'probability', 'features'])
 cluster_feat = nametup('Features', ['R', 'J'])
-word = nametup('Word', ['lemma', 'prob'])
+word = nametup('Word', ['word', 'prob'])
 
 # Paths
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
@@ -110,7 +113,7 @@ def _parse_args():
     parser.add_argument('-s', '--filter_stat',
                         type=str, default='var_coeff',
                         help=('name of column in descriptive statistics tables '
-                              'with which to filter lemmas in model text. '
+                              'with which to filter words in model text. '
                               'Example .csv files can be found in `{}`'.format(
                                   _FREQ_OUT_DIR.joinpath('descriptive_stats')))
                         )
@@ -153,10 +156,15 @@ def acquire_model(mod_bin_path: Path, frq_path: Path, args) -> Path:
                                      model_i=args.iterations)
         if frq_path.exists():
             if frq_path.suffix == '.csv':
-                train_model(frq_info)
+                train_model(frq_info, transform=True)
             else:
-                syxit('Error: anticipated `.csv` file for frequency table input.\n'
-                      + f'       × received: `{frq_path.name}`')
+                # csv_path = frq_path.with_name(
+                #     re.sub(r'\.pkl\.gz', '.csv', frq_path.name))
+                # if csv_path.is_file():
+                train_model(frq_info, pickle=True, transform=True)
+                # else:
+                    # syxit('Error: anticipated `.csv` file for frequency table input.\n'
+                        #   + f'       × received: `{frq_path.name}`')
         else:
             syxit('Error: No valid frequency data or binary model specified. Exiting.')
     else:
@@ -173,18 +181,19 @@ def collect_meta_info(frq_path: Path = None,
                       model_i: int = 10) -> tuple:
     lsc_data_dir = _LSC_DIR.joinpath("data")
     if frq_path:
-        frq_stem = frq_path.stem
+        frq_stem = frq_path.stem if frq_path.suffix == '.csv' else frq_path.name.replace('.pkl.gz', '')
         old_lsc_reformat = lsc_data_dir.joinpath(f"{frq_stem}.tsv")
 
-        n_tok, n_files = [int(''.join(m))
-                          for m in re.findall(r'thresh(\d+)|(\d+)f', frq_stem)]
+        n_files, n_tok = [int(''.join(m))
+                          for m in re.findall(r'(\d+)f|=(\d+)\+', frq_stem)]
+        percent_flag = re.search(r'thr(\d\-\d+)p', frq_stem).group()
         frq_info = freq_meta(freq_table=frq_path,
                              hit_thresh=n_tok,
                              corp_coverage=n_files,
                              clusters=model_k,
                              iterations=model_i)
 
-        if frq_path.parent != _FREQ_OUT_DIR:
+        if not frq_path.is_relative_to(_FREQ_OUT_DIR):
             frq_type = '_'.join(re.findall(
                 r'log\d+|sqrt[^_]*|AD[\w-]+', frq_stem))
             frq_info = frq_info._replace(freq_type=frq_type,
@@ -192,9 +201,10 @@ def collect_meta_info(frq_path: Path = None,
 
         selection_flag = 'JxR' if frq_stem.count('JxR') else 'all'
         frq_info = frq_info._replace(
-            lsc_reformat=old_lsc_reformat.with_name(
-                f"{frq_info.freq_type.upper()}_{selection_flag}-thresh{frq_info.hit_thresh}"
-                + f"-{frq_info.corp_coverage}f.csv")
+            lsc_reformat=old_lsc_reformat.with_name(frq_stem+'.csv')
+            # lsc_reformat=old_lsc_reformat.with_name(
+                # f"{frq_info.freq_type.upper()}_{selection_flag}-{frq_info.corp_coverage}f={frq_info.hit_thresh}+"
+                # + f".csv")
         )
 
         mod_dir = _LSC_DIR.joinpath("models")
@@ -256,8 +266,9 @@ def train_model(frq_info: tuple,
                 # model_k: int,
                 # model_i: int,
                 # TODO: add code to transform/standardize on the fly
-                transform: str = '',
-                standard: str = ''
+                transform: bool = False,
+                standard: str = '',
+                pickle: bool = False
                 ):
 
     print('\n## Training lsc model')
@@ -265,19 +276,27 @@ def train_model(frq_info: tuple,
     if frq_info.model_path.is_file():
         print('- Existing model found!')
     else:
-        if not frq_info.lsc_reformat.is_file():
-            print(f'- loading frequency table:',
-                  f'\n  - `../{str(frq_info.freq_table.relative_to(_SANPI_DIR))}`'
-                  )
+        out_tsv_path = frq_info.lsc_reformat
+        if not out_tsv_path.is_file():
+            print('- loading frequency table:',
+                  f'  - `../{str(frq_info.freq_table.relative_to(_SANPI_DIR))}`',
+                  sep='\n')
             t0 = pd.Timestamp.now()
-            frq_df = pd.read_csv(frq_info.freq_table).convert_dtypes()
+            if pickle:
+                frq_df = pd.read_pickle(frq_info.freq_table)
+            else:
+                frq_df = pd.read_csv(frq_info.freq_table).convert_dtypes()
             t1 = pd.Timestamp.now()
             print('    > Time to load frequency data:',
                   f'`{get_proc_time(t0, t1)}`')
+            if transform:
+                frq_df = transform_counts(frq_df, method='sqrt')
+                out_tsv_path = out_tsv_path.with_suffix('.sqrt.tsv')
 
             print('- reformatting frequency table for model training...\n\n```')
             t0 = pd.Timestamp.now()
-            save_lsc(frq_df, frq_info.lsc_reformat,
+            
+            save_lsc(frq_df, out_tsv_path,
                      numeric_label=frq_info.freq_type)
             t1 = pd.Timestamp.now()
             print('```\n\n> Time to reformat frequency data:',
@@ -319,7 +338,7 @@ def filter_model_text(frq_info, metric_name, mod_txt_path):
     model_text = mod_txt_path.read_text(encoding='utf8')
     if model_text.count('-nan') > 1:
         syxit('Error: Training Failed. Model is empty.')
-    keep_lemmas = []
+    keepers = []
     if bool(stats_paths):
 
         # > load stats and isolate stats metric to filter on
@@ -329,30 +348,31 @@ def filter_model_text(frq_info, metric_name, mod_txt_path):
             p_lower = path.name.lower()
             if 'adj' in p_lower:
                 adj_metric = load_stat(
-                    metric_name, path, lemma_col='adj_lemma')
+                    metric_name, path, word_col=ADJ_REP)
             elif 'adv' in p_lower:
                 adv_metric = load_stat(
-                    metric_name, path, lemma_col='adv_lemma')
-                # adv_metric = pd.read_csv(path, usecols=['adv_lemma', metric_name]).convert_dtypes().set_index('adv_lemma').sort_values(metric_name).squeeze()
+                    metric_name, path, word_col=ADV_REP)
+                # adv_metric = pd.read_csv(path, usecols=[ADV_REP, metric_name]).convert_dtypes().set_index(ADV_REP).sort_values(metric_name).squeeze()
         for series in (adj_metric, adv_metric):
-            keep_lemmas.extend(filter_lemmas(series))
+            keepers.extend(filter_words(series))
     else:
-        frq_df = pd.read_csv(frq_info.freq_table)
-        frq_df.columns.name = 'adv_lemma'
-        if 'adj_lemma' in frq_df.columns:
-            frq_df = frq_df.set_index('adj_lemma')
+        frq_df = pd.read_csv(frq_info.freq_table) if frq_info.freq_table.suffix == '.csv' else pd.read_pickle(
+            frq_info.freq_table)
+        frq_df.columns.name = ADV_REP
+        if ADJ_REP in frq_df.columns:
+            frq_df = frq_df.set_index(ADJ_REP)
 
         # adv_metric = frq_df.std() / frq_df.mean()
         # adj_metric = frq_df.std(axis=1) / frq_df.T.mean(axis=1)
         for ax in [0, 1]:
             cv = frq_df.std(axis=ax) / frq_df.mean(axis=ax)
             cv.name = 'var_coeff'
-            keep_lemmas.extend(filter_lemmas(cv))
+            keepers.extend(filter_words(cv))
 
     # > filter text output
     filter_mod_txt_path = mod_txt_path.with_stem(
         mod_txt_path.stem + f'_{metric_name.replace("_","-")}-filter')
-    keep_strings = tuple(keep_lemmas) + ('---', 'Number', 'Cluster', 'Feature')
+    keep_strings = tuple(keepers) + ('---', 'Number', 'Cluster', 'Feature')
     filtered_lines = []
     print('=============================================')
     # print('```{text}')
@@ -401,40 +421,40 @@ def seek_stats(frq_info) -> tuple:
     if len(stats_paths) > 2:
         print('\n+ `¯\_(ツ)_/¯` data key is ambiguous. Too many stats tables found.\n',
               ' Filtering will be based on variation coefficient for frequency table.')
-    elif not(stats_paths):
+    elif not (stats_paths):
         print('\n+ `¯\_(ツ)_/¯` Existing stats files not found.\n',
               ' Filtering will be based on variation coefficient for frequency table.')
     return stats_paths
 
 
-def load_stat(metric_name, p, lemma_col):
-    return pd.read_csv(p, usecols=[lemma_col, metric_name]).convert_dtypes().set_index(lemma_col).sort_values(metric_name).squeeze()
+def load_stat(metric_name, p, word_col):
+    return pd.read_csv(p, usecols=[word_col, metric_name]).convert_dtypes().set_index(word_col).sort_values(metric_name).squeeze()
 
 
-def filter_lemmas(metric):
+def filter_words(metric):
     desc = metric.describe()
     Q1 = desc['25%']
     lower_fence = Q1 - 1.5 * (desc['75%'] - Q1)
-    print(
-        f'+ Dropping all lemmas with `{metric.name}` values under the first quartile: `{round(Q1, 2)}`')
+    print(f'+ Dropping all words with `{metric.name}`',
+          f'values under the first quartile: `{round(Q1, 2)}`')
     print_md_table(metric.nlargest(8).to_frame(), title='Top Values', indent=2)
-    keep_lemmas = metric.loc[metric > Q1].index.astype(
+    keepers = metric.loc[metric > Q1].index.astype(
         'string').dropna().to_list()
-    print(f'  + {len(keep_lemmas):,} lemmas retained')
+    print(f'  + {len(keepers):,} words retained')
     dropped = metric.to_frame().loc[~metric.index.isin(
-        keep_lemmas), :].sort_values(metric.name, ascending=False)
+        keepers), :].sort_values(metric.name, ascending=False)
     print_md_table(dropped.head(
-        25), title=f'Filtered out {len(dropped):,} total lemmas:', n_dec=2, comma=False, indent=2)
+        25), title=f'Filtered out {len(dropped):,} total words:', n_dec=2, comma=False, indent=2)
     print_md_table(dropped.iloc[-25:, :], title='...',
                    n_dec=2, comma=False, indent=2)
-    return keep_lemmas
+    return keepers
 
 
 def parse_preamble(view_size, sections):
     preamble = sections.pop(0)
     n_clust, n_feat = [int(n) for n in re.findall(r'\d+', preamble.strip())]
     feat_quant = 'both' if n_feat == 2 else f'all {n_feat}'
-    print(f'+ Converting top {view_size} lemmas into `lemma ×',
+    print(f'+ Converting top {view_size} words into `word ×',
           f'probability for cluster` table for {feat_quant}',
           f'selectional features in all {n_clust} clusters.')
 
@@ -445,8 +465,8 @@ def parse_model(mod_bin_path, view_size, sections):
     n_clust = parse_preamble(view_size, sections)
     Rp_frames = []
     Jp_frames = []
-    R_lemmas = set()
-    J_lemmas = set()
+    R_words = set()
+    J_words = set()
     overall_p = pd.Series(dtype='float')
 
     for x in [re.split(r'(Cluster \d+)', s.strip())[1:] for s in sections]:
@@ -462,8 +482,8 @@ def parse_model(mod_bin_path, view_size, sections):
         Rp_df, Jp_df = [collect_feat_ranks(clust_id, f) for f in feat_split]
         Rp_frames.append(Rp_df)
         Jp_frames.append(Jp_df)
-        R_lemmas = R_lemmas.union(Rp_df.index)
-        J_lemmas = J_lemmas.union(Jp_df.index)
+        R_words = R_words.union(Rp_df.index)
+        J_words = J_words.union(Jp_df.index)
 
     print('\n## Overall Probability of Each Cluster\n')
     overall_table = (overall_p * 100).round(2).to_frame('Probability (%)')
@@ -474,14 +494,14 @@ def parse_model(mod_bin_path, view_size, sections):
     meta_dir = mod_bin_path.parent.joinpath('meta')
     confirm_dir(meta_dir)
     print(f'\n## Adverb Specific Probabilities across {n_clust} clusters\n')
-    R_cluster_p = join_cluster_frames(Rp_frames, R_lemmas, overall_p, n)
+    R_cluster_p = join_cluster_frames(Rp_frames, R_words, overall_p, n)
     meta_out_path = meta_dir.joinpath(
         f'{mod_bin_path.name}_{view_size}-ADV.csv')
     print(f'\nTable saved as `../LSC/{meta_out_path.relative_to(_LSC_DIR)}`')
     R_cluster_p.to_csv(meta_out_path, float_format="%.4f")
 
     print(f'\n## Adjective Specific Probabilities across {n_clust} clusters\n')
-    J_cluster_p = join_cluster_frames(Jp_frames, J_lemmas, overall_p, n)
+    J_cluster_p = join_cluster_frames(Jp_frames, J_words, overall_p, n)
     meta_out_path = meta_out_path.with_stem(
         meta_out_path.stem.replace('ADV', 'ADJ'))
     print(f'\nTable saved as `../LSC/{meta_out_path.relative_to(_LSC_DIR)}`')
@@ -499,36 +519,36 @@ def parse_model(mod_bin_path, view_size, sections):
 
 
 def collect_feat_ranks(clust_id: str, feat_info) -> pd.DataFrame:
-    lemmas_df = pd.DataFrame([
+    words_df = pd.DataFrame([
         word._make(w.strip().split('\t')) for w in feat_info
-    ]).set_index('lemma')
-    lemmas_df.columns = [clust_id]
-    return lemmas_df
+    ]).set_index('word')
+    words_df.columns = [clust_id]
+    return words_df
 
 
 def join_cluster_frames(frames: list,
-                        lemmas: list,
+                        words: list,
                         overall_p: pd.Series,
                         n: int = 20) -> pd.DataFrame:
     row_labels = ['CLUSTER']
-    print(len(set(lemmas)), 'unique lemmas')
-    row_labels.extend(set(lemmas))
+    print(len(set(words)), 'unique words')
+    row_labels.extend(set(words))
     composite = pd.DataFrame(index=row_labels, columns=overall_p.index)
 
     for df in frames:
         composite.update(df)
     composite.loc[row_labels[0], :] = overall_p
     composite = composite.apply(pd.to_numeric, downcast='float')
-    composite = composite.assign(lemma_total=pd.to_numeric(composite.sum(axis=1),
+    composite = composite.assign(word_total=pd.to_numeric(composite.sum(axis=1),
                                                            downcast='float'))
     print('\n### Descriptive Stats for Clusters\n')
-    lemmas_only = composite.loc[row_labels[1:], :]
-    print(lemmas_only.describe().T
-          .assign(all_lemmas_summed=lemmas_only.sum())
+    words_only = composite.loc[row_labels[1:], :]
+    print(words_only.describe().T
+          .assign(all_words_summed=words_only.sum())
           .round(4).to_markdown())
 
     composite = (composite
-                 .sort_values('lemma_total', ascending=False)
+                 .sort_values('word_total', ascending=False)
                  .sort_values('CLUSTER', axis=1, ascending=False)
                  .round(4))
 

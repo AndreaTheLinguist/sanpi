@@ -42,16 +42,18 @@ def _main():
                          verbose=verbose, 
                          convert_dtypes=True)  # pylint: disable=invalid-name
     
-    df = _optimize_df(df)
+    df = _optimize_df(df, args)
 
     _t1 = pd.Timestamp.now()
     print(f'\n   total time elapsed: `{udf.get_proc_time(start=_t0, end=_t1)}`')
 
 
-def _optimize_df(df:pd.DataFrame): 
-    
-    print('Original Dataframe:')
-    df.info(memory_usage='deep')
+def _optimize_df(df:pd.DataFrame, args): 
+    very_verbose = args.very_verbose or args.verbose
+    verbose = args.verbose
+    if very_verbose: 
+        print('Original Dataframe:')
+        df.info(memory_usage='deep')
     
     # * clean up dataframe a bit
     #> drop unneeded string columns
@@ -80,18 +82,21 @@ def _optimize_df(df:pd.DataFrame):
 
     cat_candidates = df_info.loc[df_info.ratio_unique < 0.8, :].loc[df_info.dtype0!='category'].index.to_list()
     #// catted_df = udf.make_cats(df.copy(), cat_candidates)
-    df[cat_candidates] = df[cat_candidates].astype('category')
+    df.loc[:,cat_candidates] = df[cat_candidates].astype('category')
     
     #// df_info = df_info.assign(dtype1=catted_df.dtypes, mem1=catted_df.memory_usage(deep=True))
     df_info = df_info.assign(dtype1=df.dtypes, mem1=df.memory_usage(deep=True))
     df_info = df_info.assign(mem_change= df_info.mem1-df_info.mem0)
-    print(df_info.sort_values(['mem_change', 'ratio_unique', 'dtype0']).to_markdown())
-    mem_improved = df_info.loc[df_info.mem_change < 0, :].index.to_list()
-    for c in df.columns[~df.columns.isin(mem_improved)]: 
-        print(c, '\t', df.loc[:, c].dtype)
-    #// df.loc[:, mem_improved] = catted_df.loc[:, mem_improved]
-    print('Category Converted dataframe:')
-    df.info(memory_usage='deep')
+    if verbose:
+        if very_verbose: 
+            print(df_info.sort_values(['mem_change', 'ratio_unique', 'dtype0']).to_markdown())
+            mem_improved = df_info.loc[df_info.mem_change < 0, :].index.to_list()
+            for c in df.columns[~df.columns.isin(mem_improved)]: 
+                print(c, '\t', df.loc[:, c].dtype)
+            #// df.loc[:, mem_improved] = catted_df.loc[:, mem_improved]
+    
+        print('Category Converted dataframe:')
+        df.info(memory_usage='deep')
     
     return df
 
@@ -153,9 +158,10 @@ def _print_paths(args_df):
 
     args_df.index = [Path(p).name.split('.', 1)[0] for p in args_df.input]
     print_df = args_df.applymap(lambda p: Path(*Path(p).parts[-3:]))
-    
+    if len(print_df) < (len(print_df.columns) + 1): 
+        print_df = print_df.T
     udf.print_md_table(
-        print_df.transpose(), 
+        print_df, 
         title='## Dependency Processing Path Info ##')
     
 def gen_out_paths(input_paths, dep_info_dir, sample_tag):
@@ -298,7 +304,7 @@ if __name__ == '__main__':
     proc_t0 = pd.Timestamp.now()
     _main()
     proc_t1 = pd.Timestamp.now()
-    print('## ✔️ Analysis Completed')
+    print('## ✓ Analysis Completed')
     print(pd.Timestamp.now().ctime())
     print('\n   total time elapsed: ',
           ugen.dur_round((proc_t1 - proc_t0).seconds))

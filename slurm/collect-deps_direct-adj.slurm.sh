@@ -6,8 +6,8 @@
 #//#SBATCH --partition=compling
 #SBATCH -o %x_%j.out
 #SBATCH -e %x_%j.err
-#SBATCH --time 4:00:00
-#SBATCH -J deps-4h_adj-RBdirect
+#SBATCH --time 3:00:00
+#SBATCH -J deps-3h_adj-RBdirect
 #SBATCH --chdir=/share/compling/projects/sanpi/logs/collect-deps
 
 # bash script to start batch slurm job to run `source/collect_deps.py` with cluster resources
