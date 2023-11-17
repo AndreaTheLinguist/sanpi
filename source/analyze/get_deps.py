@@ -551,12 +551,12 @@ def _add_dep_strs(deps_in_hit: pd.DataFrame, verbose: bool = False):
         for x in str_deps_df['dep_tuple']]
 
     str_deps_df['dep_str_ix'] = [
-        f"{x.head_ix}:{x.head_form}{_DELIM_STR}{x.target_ix}:{x.target_form}[={x.tie}]" if x is not None else ''
+        f"{x.head_ix}:{x.head_form.lower()}{_DELIM_STR}{x.target_ix}:{x.target_form.lower()}[={x.tie}]" if x is not None else ''
         for x in str_deps_df['dep_tuple']
     ]
 
     str_deps_df['dep_str_node'] = [
-        f"{x.head_node}:{x.head_form}{_DELIM_STR}{x.target_node}:{x.target_form}[={x.tie}]" if x is not None else ''
+        f"{x.head_node}:{x.head_form.lower()}{_DELIM_STR}{x.target_node}:{x.target_form.lower()}[={x.tie}]" if x is not None else ''
         for x in str_deps_df['dep_tuple']
     ]
 
