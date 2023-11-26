@@ -10,7 +10,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from source.utils import get_proc_time, print_md_table
+try: 
+    from source.utils import get_proc_time, print_md_table
+except ModuleNotFoundError: 
+    from utils import get_proc_time, print_md_table
 pd.set_option('display.max_columns', 10)
 pd.set_option('display.width', 120)
 DATA_DIR = Path.cwd().joinpath('data')
@@ -21,6 +24,7 @@ if not DATA_DIR.is_dir():
 # TIMESTAMP = time.perf_counter
 TIMESTAMP = pd.Timestamp.now
 MARGIN_SIZE = 4
+REGEX_REMOVE_PL = re.compile(r'(lemma|form|dep)s_')
 
 
 def _parse_args():
@@ -154,18 +158,21 @@ def _get_hit_data(json_dir):
                       f'{raw_path.name} and then try again.')
                 continue
 
-        df = pd.json_normalize(json_dicts, sep='_', max_level=1)
+        df = (pd.json_normalize(json_dicts, sep='_', max_level=1)
+              .convert_dtypes(convert_integer=False,
+                              convert_floating=False))
 
         # * since `hit_id` is now added in previous module, it can be moved to the index immediately.
-        df = df.convert_dtypes().set_index('hit_id')
+        df = df.set_index('hit_id')
 
-        df.columns = (df.columns.str.replace('s_', '_', regex=False))
-
-        df = df.assign(json_source=json_file)
-
+        df.columns = [REGEX_REMOVE_PL.sub(r'\1_', c) for c in df.columns]
         invert_pat = re.compile(r'(\w+)_([A-Z]+)')
         df.columns = [invert_pat.sub(r'\2_\1', str(label)).lower()
                       for label in df.columns]
+
+        num_cols = df.select_dtypes('number').columns
+        df.loc[:, num_cols] = df.select_dtypes('number').apply(
+            pd.to_numeric, downcast='unsigned')
 
         rr0 = TIMESTAMP()
 
@@ -174,18 +181,26 @@ def _get_hit_data(json_dir):
         logging.info('Time to remove redundant entries: %s',
                      get_proc_time(rr0, rr1))
 
+        df = df.join(df.filter(like='_form').apply(
+            lambda x: x.str.lower()), rsuffix='_lower')
+
         pi0 = TIMESTAMP()
         df = _process_ix(df)
         pi1 = TIMESTAMP()
         logging.info('Time to process indices: %s', get_proc_time(pi0, pi1))
 
-        df = df.convert_dtypes()
+        df['json_source'] = json_file
+        # // df = df.convert_dtypes()
 
         # Note: This does not check that the adv and adj are actually true collocates
-        if 'adv_form' in df.columns and 'adj_form' in df.columns:
-            collocs = df.adv_form + '_' + df.adj_form
-        else:
-            collocs = ''
+        # if 'adv_form_lower' in df.columns and 'adj_form_lower' in df.columns:
+        #     collocs = df.adv_form + '_' + df.adj_form
+        # else:
+        #     collocs = ''
+        df['bigram_lower'] = df.filter(regex=r'ad\w.+lower'
+                                       ).apply(lambda a: '_'.join(a), axis=1).astype('string')
+        df['all_forms_lower'] = df.filter(like='_form_lower'
+                                          ).apply(lambda c: '_'.join(c), axis=1).astype('string')
 
         # (having both adv and adj is unnecessary
         #  since they are required to be contiguous with ADV first,
@@ -193,12 +208,12 @@ def _get_hit_data(json_dir):
         #  if only 1 was included)
         # // > `hit_id` ->  NEG-ADV-ADJ
         # > (update) `hit_id` -> all nodes delineated by -
-        # > `colloc_id` ->  ADV-ADJ (only)
+        # > `bigram_id` ->  ADV-ADJ (only)
         df = df.assign(
             # // hit_id=df.sent_id+':'+df.match_ix,
-            # // colloc_id=(df.sent_id + ':' + df.adv_index.astype('string')
+            # // bigram_id=(df.sent_id + ':' + df.adv_index.astype('string')
             # //            + '-' + df.adj_index.astype('string')),
-            colloc=collocs,
+            colloc=df.adv_lemma + '_' + df.adj_lemma,
             pattern=Path(df.json_source[-1]).parent.suffix.strip('.')
         )
 
@@ -230,14 +245,16 @@ def _remove_redundant(df: pd.DataFrame,
     # > remove any full duplicates
     dep_cols = df.columns[df.columns.str.startswith('dep')].to_list()
     dup_assess_cols = df.columns[
-        df.columns.isin(['match_id', 'sent_text',
+        df.columns.isin(['match_id', 'token_str',
                          'context_prev_sent', 'context_next_sent'])
-        ].to_list() + dep_cols
+    ].to_list() + dep_cols
     # dictionaries are not hashable types, so will crash with duplicated()
     dup_hashed = df.copy().loc[:, dup_assess_cols]
     unhashable = dup_hashed.dtypes != 'string'
     dup_hashed.loc[:, unhashable] = dup_hashed.loc[:,unhashable].astype('string')
-    keep_duplicate = dup_hashed.duplicated(subset=dup_assess_cols, keep='first')
+    keep_duplicate = (
+        dup_hashed.duplicated(subset=dup_assess_cols, keep='first') 
+        & dup_hashed.token_str.str.split().apply(len) > 12)
     #! use copy to create boolean indexer, but pull data from original
     keep_df = df.loc[~keep_duplicate, :]
 
@@ -372,18 +389,18 @@ def _process_ix(df):
 
     df.token_str = df.token_str.astype('string')
     df.token_str.fillna('', inplace=True)
-    utt_len = pd.to_numeric(
-        df.token_str.str.split().str.len(), downcast='integer')
+    utt_len = pd.to_numeric(df.token_str.str.split().str.len(),
+                            downcast='integer')
 
-    ix_df = df.loc[:, df.columns.str.endswith(('index'))]
-    ix_df.fillna(0, inplace=True)
-    ix_df = ix_df.apply(pd.to_numeric, downcast='integer')
+    ix_df = df.loc[:, df.columns.str.endswith(
+        ('index'))]
+    ix_df = ix_df.fillna(0).apply(pd.to_numeric, downcast='integer')
 
     ix_df['hit_start_ix'] = pd.to_numeric(
         ix_df.min(axis=1), downcast='unsigned')
     ix_df['hit_final_ix'] = pd.to_numeric(
         ix_df.max(axis=1), downcast='unsigned')
-    ix_df['utt_len'] = utt_len
+    ix_df['utt_len'] = pd.to_numeric(utt_len, downcast='unsigned')
     ix_df['token_str'] = df.token_str
     ix_df['win_start_ix'] = ix_df['hit_start_ix'].apply(
         lambda x: max(x - MARGIN_SIZE, 0))
@@ -454,21 +471,22 @@ def _create_output(hits_df, match_dir, start_time):
     hits_df.to_pickle(csv_path.with_suffix('.pkl.gz'))
 
     view_sample_size = min(5, len(hits_df))
-    sample_df = hits_df.sample(view_sample_size)
-    print_cols = hits_df.columns[hits_df.columns.isin(
-        ('neg_form', 'colloc', 'text_window', 'neg_deprel', 'neg_head', 'pattern'))].to_list()
-    for pos in ('adj', 'adv', 'neg'):
-        if any(sample_df.loc[:, f'{pos}_lemma'].astype('string') != sample_df.loc[:, f'{pos}_form'].astype('string')):
-            print_cols.extend([f'{pos}_lemma', f'{pos}_form'])
-
+    sample_df = hits_df.sample(view_sample_size).filter(regex=r'form_lower|wind|[^d]_(deprel|head)|pat').sort_index(axis=1)
+    # print_cols = hits_df.columns[hits_df.columns.isin(
+    #     ('neg_form', 'colloc', 'text_window', 'neg_deprel', 'neg_head', 'pattern'))].to_list()
+    
+    # for pos in ('adj', 'adv', 'neg'):
+    #     if any(sample_df.loc[:, f'{pos}_lemma'].astype('string') != sample_df.loc[:, f'{pos}_form'].astype('string')):
+    #         print_cols.extend([f'{pos}_lemma', f'{pos}_form'])
+    print_sample_df = sample_df
     try:
-        print_table = sample_df[print_cols].to_markdown()
+        print_table = print_sample_df.to_markdown()
 
     except ImportError:
-        print_table = sample_df[print_cols].to_string()
+        print_table = print_sample_df.to_string()
 
     logging.info('Sample of Tabulated Data:\n%s\n', print_table)
-    print_md_table(sample_df[print_cols],
+    print_md_table(print_sample_df,
                    title=f'#### Data Sample: `{sample_df.pattern[0]}` ####\n', )
     # print(print_table+'\n')
 

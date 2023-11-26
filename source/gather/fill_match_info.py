@@ -63,8 +63,6 @@ def fill_json(conllu_dir: Path,
         if not hits_json:
             print('! -> Skipping. (file is empty)')
             continue
-            
-        
 
         hits_by_id = {}
         #! #HACK temporarily (or maybe not) disabled context filling
@@ -80,7 +78,7 @@ def fill_json(conllu_dir: Path,
             # this_hit_dict['context'] = context_dict
 
             node_id_dict = this_hit_dict['matching']['nodes']
-            # > add hit_id, colloc_id, and match_id
+            # > add hit_id, bigram_id, and match_id
             #    format: [sentence id]:[match_id]
             #       (where `sentence id` = [doc_id]_[sentence index]
             #          and `match_id` = '-' delineated zfilled node indexes--all nodes!)
@@ -89,8 +87,8 @@ def fill_json(conllu_dir: Path,
             #    3 = contig
             #    4 = scoped
             #    5 = raised
-            # * `colloc_id` (only mod node indices) will still be necessary to identify overlap between patterns
-            # *     > for advadj hits, `colloc_id` and `hit_id` will be identical
+            # * `bigram_id` (only mod node indices) will still be necessary to identify overlap between patterns
+            # *     > for advadj hits, `bigram_id` and `hit_id` will be identical
             zlen = max(len(v) for v in node_id_dict.values())
             node_id_dict = {k: v.zfill(zlen) for k, v in node_id_dict.items()}
 
@@ -100,37 +98,37 @@ def fill_json(conllu_dir: Path,
             hit_id = f"{sent_id}:{match_id}"
             # > add additional top layer to json to order by hit id, rather than int index
             this_hit_dict['match_id'] = match_id
-            this_hit_dict['colloc_id'] = f"{sent_id}:{node_id_dict['ADV']}-{node_id_dict['ADJ']}"
+            this_hit_dict['bigram_id'] = f"{sent_id}:{node_id_dict['ADV']}-{node_id_dict['ADJ']}"
 
             hits_by_id[hit_id] = this_hit_dict
             this_hit_dict['hit_id'] = hit_id
 
         hits_by_id, json_entry_count, conll_count = _add_conll_info(
-            hits_by_id, 
-            paths_pair.conllu, 
-            #// {h['sent_id'] for h in hits_json}
-            #// context_sent_ids
-            )
+            hits_by_id,
+            paths_pair.conllu,
+            # // {h['sent_id'] for h in hits_json}
+            # // context_sent_ids
+        )
 
         finish = time.perf_counter()
 
         print(f'    + {json_entry_count} hit results filled from {conll_count} total original '
               f'sentences in {dur_round(finish - file_start)}')
 
-        #// _write_new(filled_json_path, hits_json)
+        # // _write_new(filled_json_path, hits_json)
         _write_new(filled_json_path, list(hits_by_id.values()))
 
     print('Finished processing all corresponding json and conll files.')
     absFinish = time.perf_counter()
-    print('\nTime elapsed:', 
+    print('\nTime elapsed:',
           dur_round(absFinish - dir_start),
           '\n====================================\n')
-    
-    
+
+
 def _load_json(raw_json_file):
 
     hits = None
-    
+
     # FYI, ordering of sentence ids in json file are reverse of conllu
     with open(raw_json_file, 'r', encoding='utf8') as j:
 
@@ -145,17 +143,19 @@ def _load_json(raw_json_file):
                 hits = None
     return hits
 
-def _exclude_enhanced(hits): 
-    
-    for hit in hits: 
 
-        if all((isinstance(edge['label'], str) 
-                for edge 
-                in hit['matching']['edges'].values())):  
-    
+def _exclude_enhanced(hits):
+
+    for hit in hits:
+
+        if all((isinstance(edge['label'], str)
+                for edge
+                in hit['matching']['edges'].values())):
+
             yield hit
 
-def _add_conll_info(hits_by_id: dict, conllu_fpath: Path, 
+
+def _add_conll_info(hits_by_id: dict, conllu_fpath: Path,
                     # sent_id_set: set
                     # ids_dict: dict
                     ):
@@ -214,7 +214,7 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path,
             this_hit_dict = hits_by_id[hit_id]
 
             if current_id == this_hit_dict['sent_id']:
-                
+
                 raw_match_info = this_hit_dict.pop('matching')
                 this_hit_dict['sent_text'] = sent_text
                 this_hit_dict['token_str'] = ' '.join(t.form for t
@@ -232,13 +232,13 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path,
                           id_to_ix, this_hit_dict)
 
                 # emph_text = this_hit_dict['token_str']
-                # for v in this_hit_dict['forms'].values(): 
+                # for v in this_hit_dict['forms'].values():
                 #     emph_text = emph_text.replace(f' {v} ', f' **{v}** ')
-                    
+
                 # if this_hit_dict['lemmas']['ADV'] != 'even' and any(
                 #     d['lemma'] == 'even'
                 #     for d in this_hit_dict['all_dep_targets']['ADJ']
-                # ): 
+                # ):
                 #     # print('   ~ "even ADV ADJ" found!')
                 #     emph_text = emph_text.replace(' even ', ' **EVEN** ')
                 #     print(f"   + > {emph_text.replace('** **', ' ')}")
@@ -246,11 +246,11 @@ def _add_conll_info(hits_by_id: dict, conllu_fpath: Path,
                 # if this_hit_dict['lemmas']['ADV'] != 'only' and any(
                 #     d['lemma'] == 'only'
                 #     for d in this_hit_dict['all_dep_targets']['ADJ']
-                # ): 
+                # ):
                 #     # print('   ~ "only ADV ADJ" found!')
                 #     emph_text = emph_text.replace(' only ', ' **ONLY** ')
-                    
-                #     print(f"   + > {emph_text.replace('** **', ' ')}")        
+
+                #     print(f"   + > {emph_text.replace('** **', ' ')}")
 
                 # print(this_hit_dict['sent_text'])
                 # print(this_hit_dict['token_str'])
@@ -372,7 +372,7 @@ def _update_tokens(info, tok_dict_list, id_to_ix, hit_dict, raw_match_info):
     for node, w_id in nodes.items():
         nodes[node] = _get_ix(id_to_ix, w_id)
     hit_dict['index'] = nodes
-    
+
     all_deps = dict.fromkeys(nodes.keys())
     for node, ix in nodes.items():
         # print(node, ix, tok_lemmas[node])
@@ -381,20 +381,16 @@ def _update_tokens(info, tok_dict_list, id_to_ix, hit_dict, raw_match_info):
              'lemma': t.lemma,
              'form': t.form,
              'xpos': t.xpos,
-             'deprel': t.deprel} 
+             'deprel': t.deprel}
             for t in tok_dict_list if int(t.head)-1 == ix
-            ]
+        ]
         # print(f'token: lemma={tok.lemma}')
         # if id_to_ix[tok.head] == ix
         # tok_deps
         # head=tok_dict_list[int(tok.head) -1]
         # if id_to_ix[head.id] == nodes['ADJ']:
         # tok.deprel {tok.lemma}' )
-    hit_dict['all_dep_targets']=all_deps
-
-
-
-
+    hit_dict['all_dep_targets'] = all_deps
 
 
 def _write_new(out_path: Path, hits: list):
@@ -439,7 +435,6 @@ def _check_dirs(raw: Path, conllu: Path, output: Path = None):
 def _add_deps(edge_dict, tok_pyconlls, id_to_ix, hit):
     deps = {}
     for edge, info in edge_dict.items():
-
 
         target_tok = _process_dep(edge, info['target'],
                                   tok_pyconlls, id_to_ix)
