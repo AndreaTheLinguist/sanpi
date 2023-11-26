@@ -21,7 +21,7 @@ except ModuleNotFoundError:
 OPTIMIZED_DTYPES = {
     'string': {
         'sent_id':          'string',
-        'colloc_id':        'string',
+        'bigram_id':        'string',
         'lemma_str':        'string'},
 
     # > categorical (demonstrably improves memory usage)
@@ -260,11 +260,11 @@ def set_pd_display(max_colwidth, max_cols, max_width):
         pd.set_option('display.width', max_width)
 
 
-def save_in_lsc_format(frq_df, 
-                       output_tsv_path, 
+def save_in_lsc_format(frq_df,
+                       output_tsv_path,
                        numeric_label='raw',
-                       row_w1_label = 'adj_form_lower', 
-                       col_w0_label= 'adv_form_lower'):
+                       row_w1_label='adj_form_lower',
+                       col_w0_label='adv_form_lower'):
     confirm_dir(output_tsv_path.parent)
     new_col_name = f'{numeric_label}_frq'
 
@@ -275,7 +275,8 @@ def save_in_lsc_format(frq_df,
 
     lsc_format = frq_df.stack().to_frame(new_col_name)
     # lsc_format.columns = [new_col_name]
-    lsc_format = lsc_format.reset_index().loc[:, [new_col_name, col_w0_label, row_w1_label]]
+    lsc_format = lsc_format.reset_index(
+    ).loc[:, [new_col_name, col_w0_label, row_w1_label]]
     lsc_format = (
         lsc_format
         .sort_values([col_w0_label, row_w1_label])
@@ -340,7 +341,7 @@ def select_cols(df: pd.DataFrame,
     if not columns:
         columns = df.columns[df.columns.str.endswith('_lemma')].to_list()
         if len(columns) > 2:
-            columns.append('colloc_id')
+            columns.append('bigram_id')
             columns.append('hit_text')
         columns.extend(['text_window', 'token_str'])
 
@@ -377,7 +378,7 @@ def sort_by_margins(crosstab_df, margins_name='SUM'):
 
 
 def transform_counts(df: pd.DataFrame,
-                     method: str = 'sqrt', 
+                     method: str = 'sqrt',
                      plus1: bool = False):
     if plus1 or method.startswith('log'):
         df = df.add(1)
