@@ -270,10 +270,10 @@ def _load_from_priors(data_dir, check_pt):
     #   -> .txt list of `hit_id` values for current processing checkpoint
     elif check_pt.index_path.is_file():
         t0_load = pd.Timestamp.now()
-        df = load_from_txt_index(data_dir=data_dir, 
+        df = load_from_txt_index(data_dir=data_dir,
                                  check_point=check_pt)
         print(f'  time to load using prior {stage}ed',
-              'index →', 
+              'index →',
               get_proc_time(t0_load, pd.Timestamp.now()))
         if check_pt.stage != 'clean':
             save_table(df, str(check_pt.frame_path).strip(
@@ -365,43 +365,44 @@ def set_thresh_message(check_point):
             else '')
 
 
-def load_from_txt_index(data_dir:Path, 
-                        check_point:tuple=None, 
-                        index_txt_path:Path=None ):
+def load_from_txt_index(data_dir: Path,
+                        check_point: tuple = None,
+                        index_txt_path: Path = None):
     #! reason for weird argument duplication → imported to `count_neg.py`
     #! even though both default to None, at least *one* is required.
-    if check_point: 
+    if check_point:
         print(f'* Found existing {check_point.stage}ed `hit_id` index for',
-            f'{check_point.nfiles} files{set_thresh_message(check_point)}.')
+              f'{check_point.nfiles} files{set_thresh_message(check_point)}.')
         index_txt_path = check_point.index_path
-    
+
     # table_selections = []
     # for hit_table_path, _ids in :
-   
+
     # #[x] iter over each pickle and return df with matching indicated index
-    table_selections = (_load_selection(p, i) for (p,i) in locate_relevant_hit_tables(
+    table_selections = (_load_selection(p, i) for (p, i) in locate_relevant_hit_tables(
         data_dir, index_txt_path))
     return pd.concat(table_selections)
+
 
 def locate_relevant_hit_tables(data_dir, index_txt_path):
     simple_dir = data_dir.joinpath('simple')
 
-    #* Path variation info
-        # hit_ids_gen = iter_hit_id_index(check_point.index_path)
-        # for hit_id in hit_ids_gen:
-        # > examples of hit_id values and corresponding source path
-        # nyt_eng_19970307_0512_1:15-16
-        #   -> f'{simple_dir}/S_bigram-Nyt1_rb-bigram_hits.pkl.gz'
-        # nyt_eng_20051129_0028_3:46-47
-        #   -> f'{data_dir}/bigram-Nyt2_rb-bigram_hits.pkl.gz'
-        #   > if "simple" table not processed yet, will be in `data_dir`
-        #   > *BUT* this should not be the case if `hit_id` is in the index file
-        # apw_eng_20050211_0660_8:8-9
-        #   -> f'{simple_dir}/S_bigram-Apw_rb-bigram_hits.pkl.gz'
-        # pcc_eng_val_3.00133_x34743_29:4-5
-        #   -> f'{simple_dir}/S_bigram-PccVa_rb-bigram_hits.pkl.gz'
-        # pcc_eng_06_108.0002_x1730749_18:5-6
-        #   -> f'{simple_dir}/S_bigram-Pcc06_rb-bigram_hits.pkl.gz 
+    # * Path variation info
+    # hit_ids_gen = iter_hit_id_index(check_point.index_path)
+    # for hit_id in hit_ids_gen:
+    # > examples of hit_id values and corresponding source path
+    # nyt_eng_19970307_0512_1:15-16
+    #   -> f'{simple_dir}/S_bigram-Nyt1_rb-bigram_hits.pkl.gz'
+    # nyt_eng_20051129_0028_3:46-47
+    #   -> f'{data_dir}/bigram-Nyt2_rb-bigram_hits.pkl.gz'
+    #   > if "simple" table not processed yet, will be in `data_dir`
+    #   > *BUT* this should not be the case if `hit_id` is in the index file
+    # apw_eng_20050211_0660_8:8-9
+    #   -> f'{simple_dir}/S_bigram-Apw_rb-bigram_hits.pkl.gz'
+    # pcc_eng_val_3.00133_x34743_29:4-5
+    #   -> f'{simple_dir}/S_bigram-PccVa_rb-bigram_hits.pkl.gz'
+    # pcc_eng_06_108.0002_x1730749_18:5-6
+    #   -> f'{simple_dir}/S_bigram-Pcc06_rb-bigram_hits.pkl.gz
 
     hit_ids = pd.Series(index_txt_path.read_text().splitlines(),
                         dtype='string')
@@ -411,12 +412,13 @@ def locate_relevant_hit_tables(data_dir, index_txt_path):
             for g in regex_path_from_hit_id.search(hit_id).groups()))):
 
         glob_str = f'*bigram-{corpus_cue}*hit*s.{_PKL_SUFF}'
-        
+
         hit_paths = list(simple_dir.glob(glob_str))
         if not any(hit_paths):
             hit_paths = list(data_dir.glob(glob_str))
-        for hit_path in hit_paths: 
+        for hit_path in hit_paths:
             yield hit_path, _ids
+
 
 def _load_selection(t_path, load_index):
     return select_count_columns(
@@ -597,9 +599,10 @@ def select_count_columns(df):
 
     #! made this more inclusive because it's now accessed from `count_neg` via imports
     cols = (
-        ['colloc_id', 'token_str', 'pattern', 'category']
+        ['bigram_id', 'token_str', 'pattern', 'category']
         # targets: adv/adj/neg/nr/relay_lemma/form(_lower), text_window, neg/mod_head/deprel
-        + cols_by_str(df, end_str=('lemma', 'form', 'lower', 'window', 'deprel', 'head'))
+        + cols_by_str(df, end_str=('lemma', 'form',
+                      'lower', 'window', 'deprel', 'head'))
         # targets: any `dep_str_*` columns if input from `3_dep_info/`
         + cols_by_str(df, start_str='dep_str')
     )
@@ -731,7 +734,8 @@ def _clean_data(df):
         # * duplicates
         _t0 = pd.Timestamp.now()
         # [x] replace with call to interim_summary()
-        show_interim_summary(df, cols_label='non-duplicated', iter_head_bullet='~')
+        show_interim_summary(
+            df, cols_label='non-duplicated', iter_head_bullet='~')
         # _print_uniq_cols_count(df, label='nonduplicated', head_mark='~')
         # print_md_table(_describe_str_adx_counts(df))
         df = _drop_duplicate_sents(df)
@@ -888,14 +892,14 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
 
             # > if _too many_ hits were dropped...
             if ((n_remain < must_keep)
-                    # keep at least 20 unique adv
-                    or (update_df.loc[:, update_df.columns.str.startswith('adv_')]
-                        .squeeze().nunique() < _ADV_KEEP_REQ)
-                # was: or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
-                    # keep at least 40 unique adj
-                        or (update_df.loc[:, update_df.columns.str.startswith('adj_')].squeeze().nunique() < _ADJ_KEEP_REQ)
-                        # was: or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
-                ):
+                        # keep at least 20 unique adv
+                        or (update_df.loc[:, update_df.columns.str.startswith('adv_')]
+                            .squeeze().nunique() < _ADV_KEEP_REQ)
+                    # was: or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
+                        # keep at least 40 unique adj
+                    or (update_df.loc[:, update_df.columns.str.startswith('adj_')].squeeze().nunique() < _ADJ_KEEP_REQ)
+                    # was: or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
+                    ):
 
                 if not filter_applied and filter_attempt < 5:
                     # > lower percentage threshold --> reduce by 1/4
@@ -1156,7 +1160,7 @@ def _filter_bigrams(cross_vectors: list):
 
 
 def describe_counts(df: pd.DataFrame = None,
-                     df_path: Path = None) -> None:
+                    df_path: Path = None) -> None:
     if not any(df):
         if df_path.name.endswith(_PKL_SUFF):
             df = pd.read_pickle(df_path)
@@ -1171,7 +1175,7 @@ def describe_counts(df: pd.DataFrame = None,
     df = df.fillna(0)
     most_var_col = df.columns.to_list()[1:21]
     most_var_row = df.index.to_list()[1:21]
-    for frame, ax  in ((df, 'columns'), (df.transpose(), 'rows')):
+    for frame, ax in ((df, 'columns'), (df.transpose(), 'rows')):
         param = frame.columns.name
         print(
             f'\n## Descriptive Statistics for `{frame.index.name}` by `{param}`')
@@ -1205,7 +1209,6 @@ def describe_counts(df: pd.DataFrame = None,
 
     _visualize_counts(df.loc[['SUM'] + most_var_row,
                       ['SUM'] + most_var_col], df_path)
-
 
 
 def _enhance_descrip(desc: pd.DataFrame,
