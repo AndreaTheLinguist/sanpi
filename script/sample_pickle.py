@@ -104,7 +104,9 @@ def _parse_args():
         '-m', '--markdown',
         action='store_true',
         default=False,
-        help=('option to print in markdown table format')
+        help=('option to print in markdown table format. ',
+              'Note: selecting markdown formatting for output forces meta-message printing, '
+              'overriding any simultaneous `-q/--quiet` flag.')
     )
 
     parser.add_argument(

@@ -25,7 +25,6 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
                   piped: bool = False,
                   quiet: bool = False,
                   print_sample: bool = True):
-    
     """
     Sample and print a table of data.
 
@@ -49,7 +48,7 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
     Returns:
         pd.DataFrame: The sampled data table.
     """
-    
+
     if transpose:
         max_cols = sample_size or max_cols
     elif columns:
@@ -58,9 +57,13 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
         set_pd_display(max_colwidth=max_colwidth,
                        max_width=max_width,
                        max_cols=max_cols)
-
+        
+    #> markdown output formatting overrides meta-message quieting
+    elif markdown: 
+        quiet = False
+        
     data_sample = _get_data_sample(sample_size=sample_size, data_path=data_path, filters=filters,
-                                   columns=columns, sort_by=sort_by, quiet=quiet)
+                                   columns=columns, sort_by=sort_by, quiet=quiet, markdown=markdown)
 
     if print_sample:
         _print_table(data_sample=data_sample,
@@ -75,7 +78,8 @@ def _get_data_sample(sample_size: int,
                      filters: list = None,
                      columns: list = None,
                      sort_by: str = '',
-                     quiet: bool = False):
+                     quiet: bool = False,
+                     markdown: bool = False):
 
     full_frame = _read_data(data_path, quiet)
 
@@ -84,7 +88,7 @@ def _get_data_sample(sample_size: int,
         data = filtered_data.sample(min(len(filtered_data), sample_size))
     data = data.sort_values(sort_by) if sort_by else data.sort_index()
     data = _select_columns(data, columns, quiet)
-    if not quiet:
+    if markdown or not quiet:
         _print_header(len(data), len(filtered_data),
                       data_path.name, filter_applied)
 
