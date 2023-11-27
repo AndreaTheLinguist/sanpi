@@ -7,9 +7,9 @@ from pathlib import Path
 # pd.set_option('display.max_columns', 20)
 # pd.set_option('display.width', 200)
 try:
-    from utils import sample_pickle
+    from source.utils.sample import sample_pickle
 except ModuleNotFoundError:
-    from source.utils import sample_pickle
+    from utils.sample import sample_pickle
 
 
 def _main():
