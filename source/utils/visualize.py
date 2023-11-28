@@ -3,6 +3,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
+try: 
+    from utils.general import confirm_dir
+except ModuleNotFoundError: 
+    from source.utils.general import confirm_dir
+
 
 def heatmap(df,
             columns=None,
@@ -54,3 +59,16 @@ def heatmap(df,
         save_path = save_dir.joinpath(save_name)
         plt.savefig(save_path, dpi=300)
         print(f'Heatmap saved to:\n  {save_path}')
+        
+def visualize_counts(frq_df, frq_df_path):
+    heat_dir = frq_df_path.parent.joinpath('images')
+    confirm_dir(heat_dir)
+    heat_fname = f'heatmap_{frq_df_path.stem}.png'
+    if len(frq_df) < 60 and len(frq_df.columns) < 40:
+        heatmap(frq_df,
+                save_name=heat_fname,
+                save_dir=heat_dir)
+    else:
+        heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30, len(frq_df.T))).T,
+                save_name=f'sample-{heat_fname}',
+                save_dir=heat_dir)

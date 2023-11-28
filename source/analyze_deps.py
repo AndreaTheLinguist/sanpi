@@ -13,11 +13,12 @@ from sys import exit as sys_exit
 import pandas as pd
 from analyze.crosstab_deps import (  # pylint: disable=import-error
     crosstabulate_variants)
-from analyze.get_deps import (  # pylint: disable=import-error
+from source.process.get_deps import (  # pylint: disable=import-error
     parallel_process_deps)
 from analyze.utils import dataframes as udf  # pylint: disable=import-error
 from analyze.utils import general as ugen  # pylint: disable=import-error
 SAMPLE_LEN_MULTIPLY = 1.5
+
 
 def _main():
     args = _parse_args()
@@ -62,11 +63,11 @@ def _main():
     # * concatonate dataframes with deps processing
     dfs_with_dep_paths = dep_args_df.by_hit.to_list()
     df = udf.concat_pkls(pickles=dfs_with_dep_paths,
-                         verbose=verbose, 
+                         verbose=verbose,
                          convert_dtypes=True)  # pylint: disable=invalid-name
-    
+
     df = _optimize_df(df)
-    
+
     # * run crosstabulation code
     df_fname = dfs_with_dep_paths[0].name
     if '[' in df_fname:
@@ -75,7 +76,7 @@ def _main():
         df_sample_tag = ''
     ct_out_label = _get_crosstab_label(args.name, df_sample_tag)
 
-    crosses = ('hit_id', 'colloc_id', 'colloc', 'category',
+    crosses = ('hit_id', 'bigram_id', 'colloc', 'category',
                'dep_str_mask', 'neg_lemma', 'adj_lemma')
     for cross_col in crosses:
         print(f'## Crosstabulating by `{cross_col}`')
@@ -94,11 +95,11 @@ def _main():
             f'\n   total time elapsed: `{udf.get_proc_time(start=_t0, end=_t1)}`')
 
 
-def _optimize_df(df:pd.DataFrame): 
-    
+def _optimize_df(df: pd.DataFrame):
+
     print('Original Dataframe:')
     df.info(memory_usage='deep')
-    
+
     # * clean up dataframe a bit
     # drop unneeded string columns
     for c in udf.cols_by_str(df, start_str=('context', 'text', 'sent_text', 'token')):
@@ -117,43 +118,46 @@ def _optimize_df(df:pd.DataFrame):
         defined_values=df.count(),
         unique_values=df.apply(pd.unique, axis=0).apply(len))
     df_info = df_info.assign(
-        ratio_unique = (df_info.unique_values/df_info.defined_values).round(2))
+        ratio_unique=(df_info.unique_values/df_info.defined_values).round(2))
 
-    cat_candidates = df_info.loc[df_info.ratio_unique < 0.8, :].loc[df_info.dtype0!='category'].index.to_list()
+    cat_candidates = df_info.loc[df_info.ratio_unique < 0.8,
+                                 :].loc[df_info.dtype0 != 'category'].index.to_list()
     catted_df = udf.make_cats(df.copy(), cat_candidates)
-    
-    df_info = df_info.assign(dtype1=catted_df.dtypes, mem1=catted_df.memory_usage(deep=True))
-    df_info = df_info.assign(mem_change= df_info.mem1-df_info.mem0)
-    print(df_info.sort_values(['mem_change', 'ratio_unique', 'dtype0']).to_markdown())
+
+    df_info = df_info.assign(dtype1=catted_df.dtypes,
+                             mem1=catted_df.memory_usage(deep=True))
+    df_info = df_info.assign(mem_change=df_info.mem1-df_info.mem0)
+    print(df_info.sort_values(
+        ['mem_change', 'ratio_unique', 'dtype0']).to_markdown())
     mem_improved = df_info.loc[df_info.mem_change < 0, :].index.to_list()
-    for c in df.columns[~df.columns.isin(mem_improved)]: 
+    for c in df.columns[~df.columns.isin(mem_improved)]:
         print(c, '\t', df.loc[:, c].dtype)
     df.loc[:, mem_improved] = catted_df.loc[:, mem_improved]
     print('Category Converted dataframe:')
     df.info(memory_usage='deep')
-    
+
     return df
 
 
 def _get_dep_args(args):
-    
-    #> identify input paths
+
+    # > identify input paths
     input_paths = _identify_input_paths(args)
-    
-    #> set `dep_info_dir` (output dataframes with subdir for `crosstab` tables)
+
+    # > set `dep_info_dir` (output dataframes with subdir for `crosstab` tables)
     dep_info_dir = _set_dep_info_dir(args)
-    
-    #> set sample size for (test) dataframe with dependency identifier strings
+
+    # > set sample size for (test) dataframe with dependency identifier strings
     n_sample_rows = _set_n_sample_rows(args, input_paths)
-    
+
     # > generate output paths for each input and format as dataframe
     paths_df = _generate_output_paths(input_paths, dep_info_dir, n_sample_rows)
-    
-    if args.verbose: 
+
+    if args.verbose:
         _print_paths(paths_df)
 
     # old version
-    #// # * identify input paths
+    # // # * identify input paths
     # pkl_glob = args.glob_expr
     # input_paths = tuple(
         # p.resolve() for p in ugen.find_files(data_dir=args.input_dir,
@@ -162,14 +166,14 @@ def _get_dep_args(args):
     # if not input_paths:
     #     sys_exit('No input files found. Exiting.')
 
-    #// # * set `dep_info_dir` (output dataframes with subdir for `crosstab` tables)
+    # // # * set `dep_info_dir` (output dataframes with subdir for `crosstab` tables)
     # dep_info_dir = args.output_dir
     # if not dep_info_dir.relative_to(args.input_dir.parent.parent):
     #     dep_info_dir = args.input_dir.parent.joinpath('3_dep_info')
     # if not dep_info_dir.is_dir():
     #     dep_info_dir.mkdir()
 
-    #// # * set sample size for (test) dataframe with dependency identifier strings
+    # // # * set sample size for (test) dataframe with dependency identifier strings
     # # > if test dataframe is to be created, use given sample size
     # n_sample_rows = args.sample_size if args.test else 0
     # # > if sample size is negative, get minimum length across all selected input dataframes
@@ -177,12 +181,12 @@ def _get_dep_args(args):
     #     n_sample_rows = min(len(pd.read_pickle(i)) for i in input_paths)
     # # > multiply by 2 for sample size of test dataframe
     # # n_sample_rows = int(2 * n_sample_rows)
-    
+
     # n_sample_rows = int(SAMPLE_LEN_MULTIPLY * n_sample_rows)
 
     # sample_tag = f'[n{n_sample_rows}]' if n_sample_rows else ''
 
-    #// # * generate output paths for input paths and convert to dataframe
+    # // # * generate output paths for input paths and convert to dataframe
     # paths_df = pd.DataFrame(gen_out_paths(
     #     input_paths, dep_info_dir, sample_tag))
 
@@ -194,26 +198,27 @@ def _get_dep_args(args):
     #         row = print_paths.loc[i, :]
     #         row = row.apply(lambda p: Path(*p.parts[-3:])) # type: ignore
     #         print_paths.loc[i, :] = row
-    #     udf.print_md_table(print_paths.transpose(), 
+    #     udf.print_md_table(print_paths.transpose(),
     #                        title='## Dependency Processing Path Info ##')
 
     # paths_df['sample_size']=[n_sample_rows] *len(paths_df)
-    
+
     return paths_df.assign(
-        sample_size = pd.to_numeric([n_sample_rows] *len(paths_df),
-                                    downcast='unsigned'),
-        verbose = args.verbose,
-        )
+        sample_size=pd.to_numeric([n_sample_rows] * len(paths_df),
+                                  downcast='unsigned'),
+        verbose=args.verbose,
+    )
 
 
 def _identify_input_paths(args):
     input_paths = tuple(
         p.resolve() for p in ugen.find_files(data_dir=args.input_dir,
-                                   fname_glob=args.glob_expr)
+                                             fname_glob=args.glob_expr)
         if '.pkl' in p.suffixes)
     if not input_paths:
         sys_exit('No input files found. Exiting.')
     return input_paths
+
 
 def _set_dep_info_dir(args):
     dep_info_dir = args.output_dir
@@ -223,12 +228,14 @@ def _set_dep_info_dir(args):
         dep_info_dir.mkdir()
     return dep_info_dir
 
+
 def _set_n_sample_rows(args, input_paths):
     n_sample_rows = args.sample_size if args.test else 0
     if n_sample_rows < 0:
         n_sample_rows = min(len(pd.read_pickle(i)) for i in input_paths)
     n_sample_rows = int(SAMPLE_LEN_MULTIPLY * n_sample_rows)
     return n_sample_rows
+
 
 def _generate_output_paths(input_paths, dep_info_dir, n_sample_rows):
     sample_tag = f'[n{n_sample_rows}]' if n_sample_rows else ''
@@ -239,11 +246,12 @@ def _print_paths(args_df):
 
     args_df.index = [Path(p).name.split('.', 1)[0] for p in args_df.input]
     print_df = args_df.applymap(lambda p: Path(*Path(p).parts[-3:]))
-    
+
     udf.print_md_table(
-        print_df.transpose(), 
+        print_df.transpose(),
         title='## Dependency Processing Path Info ##')
-    
+
+
 def gen_out_paths(input_paths, dep_info_dir, sample_tag):
 
     path_tuple = namedtuple('path_info', ['input', 'by_hit', 'by_node'])

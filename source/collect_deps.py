@@ -11,7 +11,7 @@ from pathlib import Path
 from sys import exit as sys_exit
 
 import pandas as pd
-from analyze.get_deps import (  # pylint: disable=import-error
+from source.process.get_deps import (  # pylint: disable=import-error
     parallel_process_deps)
 from analyze.utils import dataframes as udf  # pylint: disable=import-error
 from analyze.utils import general as ugen  # pylint: disable=import-error

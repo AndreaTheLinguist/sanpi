@@ -1,7 +1,9 @@
 # coding=utf-8
 import re
 import statistics as stat
-from collections import namedtuple
+import sys
+# from collections import namedtuple
+from contextlib import contextmanager
 from math import sqrt
 from pathlib import Path
 
@@ -183,7 +185,7 @@ def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     return desc.round(1)
 
 
-def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
+def get_proc_time(start: pd.Timestamp, end: pd.Timestamp=pd.Timestamp.now()) -> str:
     t_comp = (end - start).components
     time_str = (":".join(
         str(c).zfill(2)
@@ -203,6 +205,34 @@ def make_cats(orig_df: pd.DataFrame, columns: list = None) -> pd.DataFrame:  # t
         'string').astype('category')  # type: ignore
 
     return df
+
+
+def print_table(data_sample: pd.DataFrame,
+                max_cols: int = 8,
+                transpose: bool = False,
+                markdown: bool = False,
+                tabbed: bool = False,
+                comma: bool = False,
+                piped: bool = False,
+                quiet: bool = False):
+    if transpose and not quiet:
+        print('_note: table transposed for display_\n')
+        data_sample = data_sample.transpose()
+
+    if piped or markdown or tabbed or comma:
+        data_sample = data_sample.iloc[:, 0:max_cols]
+        if comma:
+            print(data_sample.to_csv(header=True))
+        elif tabbed:
+            print(data_sample.to_csv(header=True, sep='\t'))
+        elif piped:
+            print(data_sample.to_csv(header=True, sep='|'))
+        else:
+            print_md_table(data_sample)
+    else:
+        print('```log')
+        print(data_sample)
+        print('```')
 
 
 def print_md_table(df: pd.DataFrame,
@@ -246,9 +276,32 @@ def print_md_table(df: pd.DataFrame,
                   + md_table.replace('\n', f'\n{whitespace}'))
     if suppress:
         return print_str
+    print(print_str)
+    return ''
+
+
+def read_saved_dataframe(read_path, quiet=False):
+
+    if not read_path.is_file():
+        sys.exit(f'Error: Input file not found:\n ✕ {read_path}')
+
+    read_suffix = read_path.suffix
+    if '.pkl' in read_path.suffixes:
+        full_data = pd.read_pickle(read_path)
+    elif read_suffix == '.csv':
+        full_data = pd.read_csv(read_path)
+    elif read_suffix == '.psv':
+        full_data = pd.read_csv(read_path, delimiter='|')
+    elif read_suffix == '.tsv':
+        full_data = pd.read_csv(read_path, delimiter='\t')
+    elif read_suffix == '.json':
+        full_data = pd.read_json(read_path)
     else:
-        print(print_str)
-        return ''
+        exit(f'Error: Input file suffix, {read_suffix}, is either '
+             + 'not interpretable or not an expected suffix for a DataFrame.')
+    if not quiet:
+        print(f'\n## Sampling from `{read_path}`')
+    return full_data
 
 
 def set_pd_display(max_colwidth, max_cols, max_width):
@@ -289,47 +342,82 @@ def save_in_lsc_format(frq_df,
     print('Counts formatted to train lsc model saved as:', output_tsv_path)
 
 
-def save_table(df: pd.DataFrame,
-               path_str: str,
-               df_name: str = '',
-               formats: list = None):
+# def save_table(df: pd.DataFrame,
+    #            path_str: str,
+    #            df_name: str = '',
+    #            formats: list = None):
+    # if formats is None:
+    #     formats = ['pickle']
+    # # df_name += ' '
+    # path_str = re.sub(r'\.(pkl.gz|csv|psv)', '', path_str)
+    # path = Path(path_str)
+    # confirm_dir(path.parent)
+    # if not path.is_absolute():
+    #     exit('Absolute path is required.')
+    # _ext = namedtuple('Format', ['ext', 'sep'])
+    # ext_dict = {
+    #     'pickle': _ext('.pkl.gz', None),
+    #     'csv': _ext('.csv', ','),
+    #     'psv': _ext('.psv', '|'),
+    #     'tsv': _ext('.tsv', '\t')
+    # }
+    # for form in formats:
+    #     save = ext_dict[form]
+    #     print(f'~ Saving {df_name} as {form}...')
+    #     time_0 = pd.Timestamp.now()
+
+    #     out_path = Path(f'{path}{save.ext}')
+    #     if form == 'pickle':
+    #         df.to_pickle(out_path)
+    #     else:
+    #         df.to_csv(out_path, sep=save.sep)
+    #     # // elif form == 'csv':
+    #     # //     out_path = str(path_str) + '.csv'
+    #     # //     df.to_csv(out_path)
+    #     # // elif form == 'psv':
+    #     # //     out_path = str(path_str) + '.csv'
+    #     # //     df.to_csv(out_path, sep='|')
+    #     # // elif form == 'tsv':
+    #     # //     out_path = str(path_str) + '.tsv'
+    #     # //     df.to_csv(out_path, sep='\t')
+    #     time_1 = pd.Timestamp.now()
+    #     print(f'   >> successfully saved as {out_path}\n' +
+    #           f'      (time elapsed: {get_proc_time(time_0, time_1)})')
+
+
+@contextmanager
+def track_time(df_name):
+    start_time = pd.Timestamp.now()
+    yield
+    end_time = pd.Timestamp.now()
+    print(f'      (time elapsed: {get_proc_time(start_time, end_time)})')
+
+
+def save_table(df: pd.DataFrame, path_str: str, df_name: str = '', formats: list = None):
     if formats is None:
         formats = ['pickle']
-    # df_name += ' '
-    path_str = re.sub(r'\.(pkl.gz|csv|psv)', '', path_str)
+    path_str = re.sub(r'\.(pkl.gz|csv|psv|tsv)$', '', path_str)
     path = Path(path_str)
-    confirm_dir(path.parent)
     if not path.is_absolute():
-        exit('Absolute path is required.')
-    _ext = namedtuple('Format', ['ext', 'sep'])
+        print('Absolute path is required. Dataframe not saved.')
+        return
+    confirm_dir(path.parent)
     ext_dict = {
-        'pickle': _ext('.pkl.gz', None),
-        'csv': _ext('.csv', ','),
-        'psv': _ext('.psv', '|'),
-        'tsv': _ext('.tsv', '\t')
+        'pickle': {'ext': '.pkl.gz', 'sep': None},
+        'csv': {'ext': '.csv', 'sep': ','},
+        'psv': {'ext': '.psv', 'sep': '|'},
+        'tsv': {'ext': '.tsv', 'sep': '\t'}
     }
     for form in formats:
-        save = ext_dict[form]
+        save_as = ext_dict[form]
         print(f'~ Saving {df_name} as {form}...')
-        time_0 = pd.Timestamp.now()
-
-        out_path = Path(f'{path}{save.ext}')
-        if form == 'pickle':
-            df.to_pickle(out_path)
-        else:
-            df.to_csv(out_path, sep=save.sep)
-        # // elif form == 'csv':
-        # //     out_path = str(path_str) + '.csv'
-        # //     df.to_csv(out_path)
-        # // elif form == 'psv':
-        # //     out_path = str(path_str) + '.csv'
-        # //     df.to_csv(out_path, sep='|')
-        # // elif form == 'tsv':
-        # //     out_path = str(path_str) + '.tsv'
-        # //     df.to_csv(out_path, sep='\t')
-        time_1 = pd.Timestamp.now()
-        print(f'   >> successfully saved as {out_path}\n' +
-              f'      (time elapsed: {get_proc_time(time_0, time_1)})')
+        with track_time(df_name):
+            out_path = path.with_suffix(save_as['ext'])
+            if form == 'pickle':
+                df.to_pickle(out_path)
+            else:
+                df.to_csv(out_path, sep=save_as['sep'])
+            print(f'   >> successfully saved as {out_path}')
 
 
 def select_cols(df: pd.DataFrame,
@@ -410,3 +498,40 @@ def unpack_dict(input_dict: dict,
         returns += (inv_flat_dict, )
 
     return returns
+
+class Timer:
+    
+    """
+    A context manager for measuring elapsed time using a start and end timestamp.
+
+    __enter__ method sets the start timestamp and returns the Timer instance.
+    __exit__ method sets the end timestamp.
+    elapsed method calculates and returns the elapsed time as a string.
+
+    Attributes:
+        start (pd.Timestamp): The start timestamp.
+        end (pd.Timestamp): The end timestamp.
+
+    Methods:
+        elapsed(): Calculates and returns the elapsed time as a string.
+
+    Example usage:
+        with Timer() as timer:
+            # Code to measure elapsed time
+
+        print(timer.elapsed())  # Output: Elapsed time in the format HH:MM:SS.S
+    """
+    
+    def __init__(self) -> None:
+        self.start = None
+        self.end = None
+    
+    def __enter__(self):
+        self.start = pd.Timestamp.now()
+        return self
+
+    def __exit__(self, *args):
+        self.end = pd.Timestamp.now()
+
+    def elapsed(self):
+        return get_proc_time(self.start, pd.Timestamp.now())

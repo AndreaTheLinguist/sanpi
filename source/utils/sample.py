@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pandas as pd
 try:
-    from utils import set_pd_display, print_md_table  # pylint: disable=import-error
+    from utils import set_pd_display, print_table, read_saved_dataframe  # pylint: disable=import-error
 except ModuleNotFoundError:
     with contextlib.suppress(ModuleNotFoundError):
-        from source.utils import set_pd_display, print_md_table
+        from source.utils import set_pd_display, print_table, read_saved_dataframe
 
 
 def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-processed/RBdirect/neg-bigrams_thr0-001p.10f.pkl.gz'),
@@ -25,7 +25,6 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
                   piped: bool = False,
                   quiet: bool = False,
                   print_sample: bool = True):
-    
     """
     Sample and print a table of data.
 
@@ -49,7 +48,7 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
     Returns:
         pd.DataFrame: The sampled data table.
     """
-    
+
     if transpose:
         max_cols = sample_size or max_cols
     elif columns:
@@ -63,9 +62,9 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
                                    columns=columns, sort_by=sort_by, quiet=quiet)
 
     if print_sample:
-        _print_table(data_sample=data_sample,
-                     max_cols=max_cols, transpose=transpose, quiet=quiet,
-                     markdown=markdown, tabbed=tabbed, comma=comma, piped=piped)
+        print_table(data_sample=data_sample,
+                    max_cols=max_cols, transpose=transpose, quiet=quiet,
+                    markdown=markdown, tabbed=tabbed, comma=comma, piped=piped)
 
     return data_sample
 
@@ -77,7 +76,7 @@ def _get_data_sample(sample_size: int,
                      sort_by: str = '',
                      quiet: bool = False):
 
-    full_frame = _read_data(data_path, quiet)
+    full_frame = read_saved_dataframe(data_path, quiet)
 
     filtered_data, filter_applied = _filter_rows(full_frame, filters, quiet)
     if sample_size:
@@ -91,28 +90,7 @@ def _get_data_sample(sample_size: int,
     return data
 
 
-def _read_data(read_path, quiet=False):
 
-    if not read_path.is_file():
-        exit(f'Error: Input file not found:\n ✕ {read_path}')
-
-    read_suffix = read_path.suffix
-    if '.pkl' in read_path.suffixes:
-        full_data = pd.read_pickle(read_path)
-    elif read_suffix == '.csv':
-        full_data = pd.read_csv(read_path)
-    elif read_suffix == '.psv':
-        full_data = pd.read_csv(read_path, delimiter='|')
-    elif read_suffix == '.tsv':
-        full_data = pd.read_csv(read_path, delimiter='\t')
-    elif read_suffix == '.json':
-        full_data = pd.read_json(read_path)
-    else:
-        exit(f'Error: Input file suffix, {read_suffix}, is either '
-             + 'not interpretable or not an expected suffix for a DataFrame.')
-    if not quiet:
-        print(f'\n## Sampling from `{read_path}`')
-    return full_data
 
 
 def _print_header(n_sample_rows, n_input_rows, file_name: str,
@@ -219,31 +197,3 @@ def _select_columns(data_selection: pd.DataFrame,
         if selected_cols:
             data_selection = data_selection[selected_cols]
     return data_selection
-
-
-def _print_table(data_sample: pd.DataFrame,
-                 max_cols: int = 8,
-                 transpose: bool = False,
-                 markdown: bool = False,
-                 tabbed: bool = False,
-                 comma: bool = False,
-                 piped: bool = False,
-                 quiet: bool = False):
-    if transpose and not quiet:
-        print('_note: table transposed for display_\n')
-        data_sample = data_sample.transpose()
-
-    if piped or markdown or tabbed or comma:
-        data_sample = data_sample.iloc[:, 0:max_cols]
-        if comma:
-            print(data_sample.to_csv(header=True))
-        elif tabbed:
-            print(data_sample.to_csv(header=True, sep='\t'))
-        elif piped:
-            print(data_sample.to_csv(header=True, sep='|'))
-        else:
-            print_md_table(data_sample)
-    else:
-        print('```log')
-        print(data_sample)
-        print('```')

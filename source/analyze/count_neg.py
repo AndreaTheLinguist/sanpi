@@ -2,22 +2,18 @@
 
 # > Imports
 import argparse
-import statistics as stat
-from pathlib import Path
 # from re import search
 import re
+# import statistics as stat
+from pathlib import Path
 
 import pandas as pd
-from utils import (cols_by_str, confirm_dir,  # pylint: disable=import-error
-                   count_uniq, file_size_round, find_glob_in_dir,
-                   get_proc_time, print_iter, print_md_table, save_table,
-                   sort_by_margins, unpack_dict)
-from utils.LexicalCategories import (  # pylint: disable=import-error
-    SAMPLE_ADJ, SAMPLE_ADV)
-from utils.visualize import heatmap  # pylint: disable=import-error
-from count_bigrams import (save_filter_index, describe_counts, locate_relevant_hit_tables,
-                           select_count_columns,
-                           load_from_txt_index)
+from utils import (SAMPLE_ADJ, SAMPLE_ADV,  # pylint: disable=import-error
+                   cols_by_str, confirm_dir, count_uniq, describe_counts,
+                   file_size_round, find_glob_in_dir, get_proc_time, #heatmap,
+                   load_from_txt_index, locate_relevant_hit_tables, print_iter,
+                   print_md_table, save_filter_index, save_table,
+                   select_count_columns, sort_by_margins, unpack_dict)
 
 # > Globals
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
@@ -194,8 +190,6 @@ def freq_out(bigram_filter_name: str,
              df: pd.DataFrame,
              group: str) -> None:
     _t0 = pd.Timestamp.now()
-    #! #[x] modify `get_freq_info` to deal with relevant negation data
-    # ^ #[x] modify to set parameter for different crosstab vectors
 
     frq_gen = gen_freq_info(
         file_tag=META_TAG_REGEX.search(bigram_filter_name).group(),
@@ -212,24 +206,12 @@ def freq_out(bigram_filter_name: str,
 def _describe_str_word_counts(df: pd.DataFrame) -> pd.DataFrame:
     # [ ] if certain input `df` will have columns: df[['adj_form_lower', 'adv_form_lower']], change `contains` to `endswith`
     word_stats = (df.columns[df.columns.str.contains('_form')]
-                  # was: lemma_stats = (df.columns[df.columns.str.endswith('_lemma')]
                   .to_series().apply(
         lambda c: df[c].value_counts().describe())
     ).T
-    # was: word_stats.columns = word_stats.columns.str.replace('lemma', 'counts')
+
     word_stats.columns = word_stats.columns.str.replace('form', 'counts')
     return word_stats.round()
-
-
-# replaced with ⬆️
-# // def _describe_str_lemma_counts(df: pd.DataFrame) -> pd.DataFrame:
-    # // # [x] copy changes from `count_bigrams.py` updates
-    # // lemma_stats = (df.columns[cols_by_str(df, end_str=('lower', 'lemma'))]
-    # //                .to_series().apply(
-    # //                    lambda c: df[c].value_counts().describe())
-    # //                ).T
-    # // lemma_stats.columns = lemma_stats.columns.str.replace('lemma', 'counts')
-    # // return lemma_stats.round()
 
 
 def _load_data(filter_ids_path, data_dir: Path) -> pd.DataFrame:
@@ -307,29 +289,6 @@ def flatten_deps(input_path, df):
         '3_dep_info', input_path.parts[-2], input_path.name.replace('hits.pkl.gz', 'deps')))
     save_table(df=dep_info, path_str=str(dep_path),
                df_name=dep_path.stem, formats=['pickle', 'csv'])
-
-
-# def select_count_columns(df):
-    # # * create `NODE_form_lower` if it does not exist yet
-    # _add_form_lower(df)
-
-    # _add_prev(df)
-    # if 'pattern' in df.columns:
-    #     df.loc[:, 'pattern'] = df.pattern.astype('category')
-
-    # cols = (
-    #     ['bigram_id', 'token_str', 'pattern', 'category']
-    #     # targets: adv/adj/neg/nr/relay_lemma/form(_lower), text_window, neg/mod_head/deprel
-    #     + cols_by_str(df, end_str=('lemma', 'form', 'lower', 'window', 'deprel', 'head'))
-    #     # targets: any `dep_str_*` columns if input from `3_dep_info/`
-    #     + cols_by_str(df, start_str='dep_str')
-    # )
-
-    # #! use `.isin()` to avoid potential KeyError
-    # sdf = df.loc[:, df.columns.isin(
-    #     (c for c in cols if not c.startswith('mod_')))]
-
-    # return sdf
 
 
 def _add_form_lower(df):
@@ -435,7 +394,7 @@ def gen_freq_info(df: pd.DataFrame,
     # > bigram frequency filtering used to select negated hits
     # ^#[x] modify this to encode different crosstabulations if that option is added
     for cross_label, cross_vector_names in cross_vectors_dict.items():
-        if not all([n in df.columns for n in cross_vector_names]):
+        if any(n not in df.columns for n in cross_vector_names):
             print(
                 f'Error: {cross_vector_names} not (both) found in dataframe.')
             continue
@@ -457,10 +416,6 @@ def gen_freq_info(df: pd.DataFrame,
             if not frq_df_path.name.endswith('f.pkl.gz'):
                 exit(f'frequency path error: {frq_df_path}')
 
-            # [x] move this to earlier
-            # // forms=cols_by_str(df, end_str='form')
-            # // df[[f'{f}_lower' for f in forms]] = df[forms].apply(lambda f: f.str.lower())
-            # // frq_df = _build_frq_df(df.adj_form_lower, df.adv_form_lower, frq_df_path, group)
             frq_df = _build_frq_df([df[v] for v in cross_vector_names], cross_label,
                                    save_path=frq_df_path, group_code=group)
         yield frq_df, frq_df_path
@@ -482,13 +437,10 @@ def _load_frq_table(frq_df_path):
     if not frq_df.index.name and any(frq_df.columns.str.contains('_')):
         indexer = str(frq_df.columns[frq_df.columns.str.contains('_')][0])
         frq_df = frq_df.set_index(indexer)
-    # // frq_df.columns.name = 'adv_lemma'
     return frq_df
 
 
 def _build_frq_df(cross_vectors: list,
-                  #   freq_table_rows: pd.Series,
-                  #   freq_table_cols: pd.Series,
                   cross_label: str,
                   save_path: Path,
                   group_code: str = 'all') -> pd.DataFrame:
@@ -534,115 +486,18 @@ def _filter_bigrams(cross_vectors: list):
     return cross_vectors
 
 
-# def _describe_counts(df: pd.DataFrame,
-    #  df_path: str) -> None:
-    # data_label = df_path.name.replace('.csv', '')
-    # stats_dir = df_path.parent.joinpath('descriptive_stats')
-    # confirm_dir(stats_dir)
-    # out_path_stem = f'stats_{data_label}'
-    # df = df.fillna(0)
-    # most_var_col = df.columns.to_list()[1:21]
-    # most_var_row = df.index.to_list()[1:21]
-    # for frame in (df, df.transpose()):
-    #     param = frame.columns.name
-    #     print(
-    #         f'\n## Descriptive Statistics for `{frame.index.name}` by `{param}`')
-    #     no_sum_frame = frame.loc[frame.index != 'SUM', frame.columns != 'SUM']
-    #     desc_no_sum = no_sum_frame.describe()
-    #     # > need to exclude the ['SUM','SUM'] cell
-    #     sum_col = frame.loc[frame.index != 'SUM', 'SUM']
-    #     desc_sum = sum_col.describe().to_frame()
-
-    #     for desc, values in [(desc_no_sum, no_sum_frame), (desc_sum, sum_col)]:
-    #         desc = _enhance_descrip(desc, values)
-    #         if 'SUM' in desc.index:
-    #             desc = desc.transpose()
-    #             desc.columns = [f'Summed Across {param}s']
-    #             print_md_table(desc.round(), title=' ')
-    #         else:
-    #             save_table(
-    #                 desc,
-    #                 f'{stats_dir}/{param[:4].strip("_-").upper()}-{out_path_stem}',
-    #                 f'{param} descriptive statististics for {out_path_stem}',
-    #                 ['csv'])
-    #             print_md_table(desc.sample(min(len(desc), 6)).round(),
-    #                            title=f'Sample {param} Stats ')
-
-    #             # [ ] # ? (old) add simple output of just `df.var_coeff`?
-    #             # desc.info()
-    #             if param == 'Adverb':
-    #                 most_var_col = _select_words(desc)
-    #             else:
-    #                 most_var_row = _select_words(desc)
-
-    # _visualize_counts(df.loc[['SUM'] + most_var_row,
-    #                   ['SUM'] + most_var_col], df_path)
-
-
-# def _enhance_descrip(desc: pd.DataFrame,
-    #  values: pd.Series) -> pd.DataFrame:
-    # values.apply(pd.to_numeric, downcast='unsigned')
-    # desc = desc.transpose()
-    # desc = desc.assign(total=values.sum(),
-    #                    var_coeff=desc['std'] / desc['mean'],
-    #                    range=desc['max'] - desc['min'],
-    #                    IQ_range=desc['75%'] - desc['25%'])
-    # desc = desc.assign(upper_fence=desc['75%'] + (desc.IQ_range * 1.5),
-    #                    lower_fence=desc['25%'] - (desc.IQ_range * 1.5))
-    # if 'SUM' not in desc.index:
-    #     desc = desc.assign(
-    #         plus1_geo_mean=values.add(1).apply(stat.geometric_mean),
-    #         plus1_har_mean=values.add(1).apply(stat.harmonic_mean))
-    # for col in desc.columns:
-    #     if col in ('mean', 'std', 'variance', 'coeff_var'):
-    #         desc.loc[:, col] = pd.to_numeric(desc[col].round(2),
-    #                                          downcast='float')
-    #     else:
-    #         desc.loc[:, col] = pd.to_numeric(desc[col], downcast='unsigned')
-
-    # return desc
-
-
-# def _select_words(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
-    # nth = len(desc) // 6
-    # trim = int(len(desc) * 0.01)
-    # desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
-    # top_means_metric = desc.loc[
-    #     (desc['mean'] > (desc_interior['mean'].median() * .75))
-    #     &
-    #     (desc.total > (desc_interior['total'].median() * .75)), metric]
-    # # ? Is the following just temporarily commented out or fully obsolete ⬇️
-    # # info_list = []
-    # # for label, desc_df in {'interior': desc.iloc[5:, :], 'full': desc}.items():
-    # # top_means = desc_df.loc[
-    # #     (desc_df['mean'] > (desc_df['mean'].median() + 0.5 * 1))
-    # #     &
-    # #     (desc_df.total > (desc_df.total.median() * 1.1))
-    # #     , [metric, 'mean', '50%', 'total', 'max', 'range']]
-    # # info = top_means.describe()
-    # # info.columns = info.columns.astype('string') + f'_{label}'
-    # # info_list.append(info)
-    # # print_md_table(info_list[0].join(info_list[1]).sort_index(axis=1).round(0),
-    # #                title='Compare descriptive stats')
-    # if largest:
-    #     words = top_means_metric.squeeze().nlargest(nth).index.to_list()
+# def _visualize_counts(frq_df, frq_df_path):
+    # heat_dir = frq_df_path.parent.joinpath('images')
+    # confirm_dir(heat_dir)
+    # heat_fname = f'heatmap_{frq_df_path.stem}.png'
+    # if len(frq_df) < 60 and len(frq_df.columns) < 40:
+    #     heatmap(frq_df,
+    #             save_name=heat_fname,
+    #             save_dir=heat_dir)
     # else:
-    #     words = top_means_metric.squeeze().nsmallest(nth).index.to_list()
-    # return words
-
-
-def _visualize_counts(frq_df, frq_df_path):
-    heat_dir = frq_df_path.parent.joinpath('images')
-    confirm_dir(heat_dir)
-    heat_fname = f'heatmap_{frq_df_path.stem}.png'
-    if len(frq_df) < 60 and len(frq_df.columns) < 40:
-        heatmap(frq_df,
-                save_name=heat_fname,
-                save_dir=heat_dir)
-    else:
-        heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30, len(frq_df.T))).T,
-                save_name=f'sample-{heat_fname}',
-                save_dir=heat_dir)
+    #     heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30, len(frq_df.T))).T,
+    #             save_name=f'sample-{heat_fname}',
+    #             save_dir=heat_dir)
 
 
 if __name__ == '__main__':
