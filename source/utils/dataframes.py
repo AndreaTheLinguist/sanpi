@@ -262,7 +262,6 @@ def print_md_table(df: pd.DataFrame,
 
     if describe:
         df = df.describe()
-
     if transpose:
         df = df.T
 
@@ -703,3 +702,41 @@ def unpack_dict(input_dict: dict,
         returns += (inv_flat_dict, )
 
     return returns
+
+
+class Timer:
+
+    """
+    A context manager for measuring elapsed time using a start and end timestamp.
+
+    __enter__ method sets the start timestamp and returns the Timer instance.
+    __exit__ method sets the end timestamp.
+    elapsed method calculates and returns the elapsed time as a string.
+
+    Attributes:
+        start (pd.Timestamp): The start timestamp.
+        end (pd.Timestamp): The end timestamp.
+
+    Methods:
+        elapsed(): Calculates and returns the elapsed time as a string.
+
+    Example usage:
+        with Timer() as timer:
+            # Code to measure elapsed time
+
+        print(timer.elapsed())  # Output: Elapsed time in the format HH:MM:SS.S
+    """
+
+    def __init__(self) -> None:
+        self.start = None
+        self.end = None
+
+    def __enter__(self):
+        self.start = pd.Timestamp.now()
+        return self
+
+    def __exit__(self, *args):
+        self.end = pd.Timestamp.now()
+
+    def elapsed(self):
+        return get_proc_time(self.start, pd.Timestamp.now())

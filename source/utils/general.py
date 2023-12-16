@@ -1,11 +1,36 @@
 # coding=utf-8
 from pathlib import Path
 import logging
+from os import system
+import re
+
+
+ucs_header_wrd_brk = re.compile(r'\.([a-zA-Z])')
 
 
 def confirm_dir(dir_path: Path):
     if not dir_path.is_dir():
         dir_path.mkdir(parents=True)
+
+
+def build_ucs_table(min_count: int, ucs_save_path: Path, cat_tsv_command: str):
+    threshold_arg = f'--threshold={min_count}'
+    primary_cmd = 'ucs-make-tables --types --verbose'
+    sort_cmd = f'ucs-sort -v {ucs_save_path} BY f2- f- INTO {ucs_save_path}'
+    cmd_with_args = ' '.join([primary_cmd, threshold_arg, ucs_save_path])
+    full_cmd_str = ' | '.join([cat_tsv_command, cmd_with_args])
+    full_cmd_str += f'&& {sort_cmd}'
+    print()
+    print(re.sub(r'([\|&]+)', r'\\ \n  \1', full_cmd_str))
+    print()
+    system(full_cmd_str)
+
+    note = '''
+== Note ==
+N = total number of tokens/all counts summed
+V = total number of rows/number of unique combinations before filtering to {}+ tokens
+    '''.format(min_count)  # pylint: disable=consider-using-f-string
+    print(note)
 
 
 def display_message(message: str,
@@ -18,6 +43,13 @@ def display_message(message: str,
         logger.log(level=level, msg=message)
     else:
         print(message)
+
+
+def view_doc(expr):
+    try:
+        print(expr.__doc__)
+    except AttributeError:
+        print('None')
 
 
 def dur_round(time_dur: float):
@@ -89,16 +121,49 @@ def indent_block(block: str = '',
     return i_block if hang else i_prefix + i_block
 
 
+def get_ucs_csv_path(trimmed_len: int,
+                     ucs_path: Path):
+    csv_stem = ucs_path.stem
+    if trimmed_len:
+        csv_stem = re.sub(r'_top.+$', '', csv_stem)
+        csv_stem += f'_top{trimmed_len}'
+    return ucs_path.with_name(f'{csv_stem}.csv')
+
+
+def write_ucs_csv(csv_path, csv_lines):
+
+    csv_path.write_text('\n'.join(csv_lines), encoding='utf8')
+    print(f'UCS table text converted & saved as {csv_path}')
+
+
+def convert_ucs_to_csv(ucs_path, max_rows=None):
+    raw_text = ucs_header_wrd_brk.sub(
+        r'_\1', ucs_path.read_text(encoding='utf8'))
+    raw_lines = raw_text.splitlines()
+    raw_content_len = len(raw_lines) - 1
+    csv_lines = [','.join(x.split())
+                 for x in raw_lines
+                 if not x.startswith('--')]
+    trimmed_len = None
+    if max_rows:
+        max_plus_header = max_rows + 1
+        csv_lines = csv_lines[:max_plus_header]
+        if len(csv_lines) < raw_content_len:
+            print(f':: Rows capped at {max_rows} ::')
+            trimmed_len = max_rows
+
+    write_ucs_csv(get_ucs_csv_path(trimmed_len, ucs_path), csv_lines)
+
+
 def find_glob_in_dir(dir_path: Path,
                      glob_expr: str,
                      recursive: bool = False,
                      verbose: bool = False) -> Path:
     path = None
-    if recursive:
-        paths_iter = tuple(dir_path.rglob(glob_expr))
 
-    else:
-        paths_iter = tuple(dir_path.glob(glob_expr))
+    paths_iter = (tuple(dir_path.rglob(glob_expr))
+                  if recursive else
+                  tuple(dir_path.glob(glob_expr)))
     if paths_iter:
         path = paths_iter[0]
     elif verbose:
