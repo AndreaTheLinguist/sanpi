@@ -27,8 +27,18 @@ def _parse_args():
     return parser.parse_args().data_path
 
 
-def _main():
-    data_path = _parse_args()
+def make_ucs_tsv(data_path):
+    
+    """
+    Reformat frequency table dataframe for UCS analysis.
+
+    Args:
+        data_path: The path to the dataframe file.
+
+    Returns:
+        None
+    """
+    
     df, data_stem = _load_df(data_path)
     print('\n# Reformatting frequencies for UCS analysis',
           '\n## Input Data:',
@@ -36,14 +46,17 @@ def _main():
           sep='\n')
     print(df)
     print('```')
-    tsv_out_path = set_out_path(data_path, data_stem)
     w1_row_label, w0_col_label = pull_labels_from_stem(data_stem, df)
     export_counts(df,
-                  output_tsv_path=tsv_out_path,
+                  output_tsv_path=set_out_path(data_path, data_stem),
                   row_w1_label=w1_row_label,
                   col_w0_label=w0_col_label,
                   for_ucs=True)
 
+
+def _main():
+    data_path = _parse_args()
+    make_ucs_tsv(data_path)
 
 def pull_labels_from_stem(stem, df):
 
