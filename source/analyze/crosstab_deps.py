@@ -88,7 +88,7 @@ def _get_read_path():
 
 def _select_columns(_df, extra: bool = True):
     _col_list = _df.columns[_df.columns.str.endswith(
-        ('category', 'corpus', 'colloc_id', 'colloc', 'hit_text', 'lemma'))
+        ('category', 'corpus', 'bigram_id', 'colloc', 'hit_text', 'lemma'))
     ].to_list() + _depstr_cols(_df) if extra else _depstr_cols(_df)
 
     return _col_list

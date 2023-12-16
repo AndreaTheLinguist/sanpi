@@ -125,3 +125,7 @@ def print_iter(iter_obj,
     msg_str = msg_str.replace('\n\n', '\n').strip(f'{bullet} ')
 
     display_message(msg_str, logger, level)
+
+
+def snake_to_camel(snake:str):
+    return ''.join([w.capitalize() for w in snake.split('_')])

@@ -22,13 +22,13 @@ PATHS_TUPLE = namedtuple(
 
 # ^ #[ ] there is a lot of overlap in the methods between this module and `count_bigram`--consolidate somehow?
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
+_MIN_MEDIAN = 5
+_MAX_TOK_PER_SENT = 250
 _MIN_THRESH_COUNT = 2
 _MIN_TOK_KEEP_RATIO = 0.15
 _KEEP_ALLOWANCE_RATIO = 0.99
 _ADV_KEEP_REQ = 20
 _ADJ_KEEP_REQ = 40
-_MIN_MEDIAN = 5
-
 _CROSS_LABEL = 'adj-x-adv'
 _PKL_SUFF = 'pkl.gz'
 _DF_FILE_PREF = 'bigrams'
@@ -796,8 +796,8 @@ def odd_lemma_orth(lemmas: pd.Series) -> pd.Series:
 def _drop_long_sents(df: pd.DataFrame) -> pd.DataFrame:
     starting_df = df.copy()
     df = df.assign(tok_in_sent=df.token_str.apply(lambda s: len(s.split())))
-    sent_limit = 250
-    too_long = df.tok_in_sent > sent_limit
+    
+    too_long = df.tok_in_sent > _MAX_TOK_PER_SENT
     uniq_too_long = df.loc[too_long, :].index.str.split(":",
                                                         1).str.get(0).unique()
     try:
@@ -807,7 +807,7 @@ def _drop_long_sents(df: pd.DataFrame) -> pd.DataFrame:
     else:
         print(f'\nDropping {(drop_count):,} hits',
               f'from {len(uniq_too_long):,} "sentences" with',
-              f'{sent_limit}+ tokens. For example:\n```')
+              f'{_MAX_TOK_PER_SENT}+ tokens. For example:\n```')
         print((starting_df.loc[df.index.str.startswith(tuple(uniq_too_long)),
                                ['token_str']]).sample(1).squeeze()[:550] +
               '...\n```')

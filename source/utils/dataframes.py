@@ -9,14 +9,13 @@ import numpy as np
 import pandas as pd
 
 try:
-    from general import confirm_dir, find_files  # pylint: disable=import-error
+    from general import confirm_dir, find_files, snake_to_camel  # pylint: disable=import-error
 except ModuleNotFoundError:
     try:
-        from utils.general import confirm_dir  # pylint: disable=import-error
-        from utils.general import find_files
+        from utils.general import (confirm_dir, find_files, snake_to_camel)  # pylint: disable=import-error
     except ModuleNotFoundError:
         from source.utils.general import (  # pylint: disable=import-error
-            confirm_dir, find_files)
+            confirm_dir, find_files, snake_to_camel)
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -154,6 +153,25 @@ def count_uniq(series: pd.Series) -> int:
     return len(series.unique())
 
 
+def corners(df, size: int = 5):
+    index_name = df.index.name or 'frequencies'
+    columns_name = df.columns.name or 'categories'
+    df = df.reset_index().reset_index().set_index(
+        ['index', index_name])
+    df = df.T.reset_index().reset_index().set_index(
+        ['index', columns_name]).T
+    cdf = pd.concat(
+        [dfs.iloc[:, :size].assign(__='...')
+         .join(dfs.iloc[:, -size:])
+         for dfs in (df.head(size).T.assign(__='...').T,
+                     df.tail(size))])
+    cdf = cdf.reset_index().set_index(index_name)
+    cdf.pop('index')
+    cdf = cdf.T.reset_index().set_index(columns_name)
+    cdf.pop('index')
+    return cdf.T.rename(columns={'': '...'}, index={'': '...'})
+
+
 def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # df = df
     desc = df.describe().transpose()
@@ -185,12 +203,13 @@ def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
     t_comp = (end - start).components
-    time_str = (":".join(
-        str(c).zfill(2)
-        for c in (t_comp.hours, t_comp.minutes, t_comp.seconds)) +
-        f'.{round(t_comp.microseconds, 1)}')
-
-    return time_str
+    return (
+        ":".join(
+            str(c).zfill(2)
+            for c in (t_comp.hours, t_comp.minutes, t_comp.seconds)
+        )
+        + f'.{round(t_comp.microseconds, 1)}'
+    )
 
 
 def make_cats(orig_df: pd.DataFrame, columns: list = None) -> pd.DataFrame:  # type: ignore
@@ -217,76 +236,316 @@ def print_md_table(df: pd.DataFrame,
                    describe: bool = False,
                    transpose: bool = False
                    ) -> None:
+    """
+    Converts a DataFrame to a markdown table string and prints it (unless printing is suppressed).
+
+    Args:
+        df: The DataFrame to be printed as a markdown table.
+        indent: The number of spaces to indent the table. Defaults to 0.
+        title: The title of the table. Defaults to an empty string.
+        comma: A boolean indicating whether to include commas in number formatting. Defaults to True.
+        n_dec: The number of decimal places to round the numbers to. Defaults to 0.
+        suppress: A boolean indicating whether to suppress printing and return the markdown table as a string. Defaults to False.
+        max_colwidth: The maximum width of each column. Defaults to 0.
+        max_cols: The maximum number of columns to display. Defaults to 0.
+        max_width: The maximum width of the entire table. Defaults to 0.
+        describe: A boolean indicating whether to describe the DataFrame before printing. Defaults to False.
+        transpose: A boolean indicating whether to transpose the DataFrame before printing. Defaults to False.
+
+    Returns:
+        the markdown table as a string if suppress is True, else prints the table to stdout
+    """
+    
+
     # FIXME realized this does nothing for markdown tables, which are strings
     set_pd_display(max_colwidth, max_cols, max_width)
 
     if describe:
         df = df.describe()
+
     if transpose:
         df = df.T
 
     # if max_colwidth:
     #     df = df.apply(lambda x: x.st)
-    if n_dec is None:
-        md_table = df.to_markdown()
-    else:
-        floatfmt = f'.{n_dec}f'
-        if comma:
-            floatfmt = f',{floatfmt}'
-        if not df.select_dtypes(include='number').empty:
-            df.loc[:, df.select_dtypes(include='number').columns] = df.select_dtypes(
-                include='number').astype('float')
-        md_table = df.to_markdown(floatfmt=floatfmt)
+    # replaced by sourcery suggestion below
+    # if n_dec is None:
+    #     md_table = df.to_markdown()
+    # else:
+    #     floatfmt = f'.{n_dec}f'
+    #     if comma:
+    #         floatfmt = f',{floatfmt}'
+    #     if not df.select_dtypes(include='number').empty:
+    #         df.loc[:, df.select_dtypes(include='number').columns] = df.select_dtypes(
+    #             include='number').astype('float')
+    #     md_table = df.to_markdown(floatfmt=floatfmt)
 
-    whitespace = ' '*indent if indent else ''
-    print_str = ''
-    if title:
-        print_str += f'\n{whitespace}{title}\n'
-    print_str += (whitespace
-                  + md_table.replace('\n', f'\n{whitespace}'))
+    # whitespace = ' '*indent if indent else ''
+    # print_str = ''
+    # if title:
+    #     print_str += f'\n{whitespace}{title}\n'
+    # print_str += (whitespace
+    #               + md_table.replace('\n', f'\n{whitespace}'))
+    floatfmt = f"{',' if comma else ''}.{n_dec}f"
+    if not df.select_dtypes(include='number').empty:
+        df.loc[:, df.select_dtypes(include='number').columns] = df.select_dtypes(
+            include='number').astype('float')
+    md_table = df.to_markdown(floatfmt=floatfmt)
+
+    whitespace = ' ' * indent
+    print_str = f"{whitespace}{title}\n{whitespace}" if title else ''
+    print_str += md_table.replace('\n', f'\n{whitespace}')
+    
     if suppress:
         return print_str
-    else:
-        print(print_str)
-        return ''
+    print(print_str)
+    return ''
 
 
 def set_pd_display(max_colwidth, max_cols, max_width):
     if max_colwidth:
         pd.set_option('display.max_colwidth', max_colwidth)
     if max_cols:
-        pd.set_option('display.max_columns', max_cols)
+        if max_cols == 'all':
+            pd.set_option('display.max_columns', None)
+        else:
+            pd.set_option('display.max_columns', max_cols)
     if max_width:
         pd.set_option('display.width', max_width)
+
+
+def compute_ratios(freq_dist: pd.DataFrame,
+                   dimensions: list,
+                   abbr_len: int = 3):
+    """
+    Computes ratios for each dimension in a frequency distribution DataFrame.
+
+    Args:
+        freq_dist: The frequency distribution DataFrame.
+        dimensions: A list of dimension names to compute ratios for.
+        abbr_len: The length of the abbreviation for the dimension name. Defaults to 3.
+
+    Returns:
+        None
+    """
+
+    for dimension in dimensions:
+        freq_dist[f'ratio_{dimension[:abbr_len]}'] = (
+            freq_dist[dimension]/freq_dist.TOTAL).round(3)
+
+
+def add_ratio_bins(freq_dist: pd.DataFrame):
+    """
+    Adds ratio bins to a frequency distribution DataFrame.
+
+    This function adds ratio bins to the given frequency distribution DataFrame. The `freq_dist` DataFrame must have "ratio" columns for this function to have any effect.
+
+    Args:
+        freq_dist: The frequency distribution DataFrame.
+
+    Returns:
+        None
+    """
+
+    #! `freq_dist` must have "ratio" columns for this to do anything
+    for ratio_col in freq_dist.copy().filter(like='ratio'):
+        dim_ratio = freq_dist[ratio_col]
+        bin_col = pd.to_numeric(dim_ratio.round(1), downcast='float')
+        bin_col = bin_col.astype('category')
+        freq_dist[ratio_col.replace('ratio', 'bin')] = bin_col
+
+
+def compute_meta_cols(df: pd.DataFrame,
+                      obs_col: str = 'adj_lemma',
+                      dim_col: str = 'polarity',
+                      dim_abbr_len: int = 3) -> pd.DataFrame:
+    """
+    Computes meta columns for a DataFrame.
+
+    This function computes meta columns for a DataFrame by performing the following steps:
+    1. Calculates a frequency distribution table using `pd.crosstab`.
+    2. Computes ratios for each dimension in the frequency distribution.
+    3. Adds ratio bins to the frequency distribution.
+    4. Sorts the DataFrame by the 'TOTAL' column in descending order.
+
+    Args:
+        df: The DataFrame to compute meta columns for.
+        obs_col: The name of the observation column. Defaults to 'adj_lemma'.
+        dim_col: The name of the dimension column. Defaults to 'polarity'.
+        dim_abbr_len: The length of the abbreviation for the dimension name. Defaults to 3.
+
+    Returns:
+        The computed frequency distribution DataFrame sorted by the 'TOTAL' column in descending order.
+    """
+    dimensions = list(df[dim_col].unique())
+    freq_dist = pd.crosstab(df[obs_col],
+                            df[dim_col],
+                            margins=True, margins_name='TOTAL')
+    freq_dist = freq_dist[['TOTAL'] + dimensions]
+    compute_ratios(freq_dist, dimensions, dim_abbr_len)
+    add_ratio_bins(freq_dist)
+
+    return freq_dist.sort_values('TOTAL', ascending=False)
+
+
+def show_counts(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+    """
+    Returns a DataFrame with counts of unique combinations of specified columns.
+
+    Args:
+        df: The DataFrame to count unique combinations from.
+        columns: A list of column names to consider for counting unique combinations.
+
+    Returns:
+        A DataFrame with counts of unique combinations, where each row represents a unique combination and the 'count' column represents the count of occurrences.
+
+    Raises:
+        None
+    """
+
+    return df.value_counts(columns).to_frame().rename(columns={0: 'count'})
+
+
+def save_for_ucs(df, col_1: str, col_2: str,
+                 output_dir: Path = None,
+                 ucs_path: Path = None,
+                 filter_dict: dict = None,
+                 ) -> pd.DataFrame:
+    """
+    Saves a DataFrame in UCS format based on specified columns and filters.
+
+    This function applies to the initial, `hit_id` indexed dataframe (a "hit table"). 
+    If either an output directory or a specific path are given, the resultant dataframe will be saved as a `.tsv`,
+    which can be used as the (stdin/piped) input for `usc-make-tables --types`.
+
+    Args:
+        df: The DataFrame to pull `value_counts` from.
+        col_1: The name of the first column to count.
+        col_2: The name of the second column to count.
+        output_dir: The output directory for any UCS file.
+        ucs_path: The path to save the UCS file.
+        filter_dict: An optional dictionary of column (key) == value pairs to filter the DataFrame. Filter info will be incorporated into any output path.
+
+    Returns:
+        The DataFrame with counts of unique combinations of col_1 and col_2.
+    """
+    # * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
+
+    if output_dir and not ucs_path:
+        ucs_dir = output_dir / 'ucs_format'
+        confirm_dir(ucs_dir)
+        ucs_path = (ucs_dir /
+                    f'{snake_to_camel(col_1)}{snake_to_camel(col_2)}.tsv')
+    if filter_dict:
+        for col, val in filter_dict.items():
+            df = df.loc[df[col] == val, :]
+            if ucs_path:
+                ucs_path = ucs_path.with_stem(
+                    f"{ucs_path.stem}_{snake_to_camel(col)}{val.upper()}")
+    if ucs_path:
+        print(f'output path: {ucs_path}')
+        counts = show_counts(df, [col_1, col_2]).reset_index()[
+            ['count', col_1, col_2]]
+        counts.to_csv(ucs_path, encoding='utf8',
+                      sep='\t', header=False, index=False)
+
+    return counts
 
 
 def save_in_lsc_format(frq_df,
                        output_tsv_path,
                        numeric_label='raw',
                        row_w1_label='adj_form_lower',
-                       col_w0_label='adv_form_lower'):
-    confirm_dir(output_tsv_path.parent)
-    new_col_name = f'{numeric_label}_frq'
+                       col_w0_label='adv_form_lower',
+                       for_ucs: bool = False):
+    """
+    Saves a frequency table DataFrame in LSC format.
 
+    This function applies to a "frequency table", a DataFrame where counts have already been calculated via `pd.crosstab`. The index for such a table will be unique values for the `index` Series passed, not unique tokens/observations, and the values will be co-occurrence frequencies with the value indicated by the column.
+
+    Args:
+        frq_df: The frequency table DataFrame to be saved.
+        output_tsv_path: The path to save the LSC file.
+        numeric_label: The label for the numeric column in the frequency table. Defaults to 'raw'.
+        row_w1_label: The label for the row column in the frequency table. Defaults to 'adj_form_lower'.
+        col_w0_label: The label for the column column in the frequency table. Defaults to 'adv_form_lower'.
+        for_ucs: A boolean indicating whether the output is for UCS format. Defaults to False.
+
+    Returns:
+        None
+    """
+    #! This function applies to a "frequency table", a DataFrame where counts have already been calculated via `pd.crosstab`
+    #  The index for such a table will be unique values for the `index` Series passed, not unique tokens/observations,
+    #  and the values will be co-occurrence frequencies with the value indicated by the column.
+
+    confirm_dir(output_tsv_path.parent)
+    frq_df, new_col_name = prep_to_reshape(
+        frq_df, numeric_label, row_w1_label, col_w0_label)
+    output_lines = get_reshaped_output_lines(frq_df, row_w1_label,
+                                             col_w0_label, for_ucs, new_col_name)
+
+    show_sample_output(output_lines)
+    save_tsv_file(output_tsv_path, output_lines)
+
+
+def get_reshaped_output_lines(frq_df, row_w1_label, col_w0_label, for_ucs, new_col_name):
+    lsc_format = reshape_totals(frq_df, new_col_name)
+    lsc_format = _sort_stacks(
+        row_w1_label, col_w0_label, new_col_name, lsc_format)
+    return cleanup_output(for_ucs, lsc_format)
+
+
+def cleanup_output(for_ucs, lsc_format):
+    counts_list = lsc_format.to_csv(sep="\t", index=False).splitlines()[1:]
+    counts_lines = [x.strip() for x in counts_list]
+    return counts_lines if for_ucs else ['2'] + counts_lines
+
+
+def save_tsv_file(output_tsv_path, output_lines):
+    output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
+    print('Counts formatted to train lsc model saved as:', output_tsv_path)
+
+
+def show_sample_output(output_lines):
+    print('\n## Formatted Output Sample (top 20 bigrams)\n')
+    print('\n'.join(output_lines[:20] + ['...']))
+
+
+def reshape_totals(frq_df, new_col_name):
+    return frq_df.stack().to_frame(new_col_name)
+
+
+def _sort_stacks(row_w1_label, col_w0_label, new_col_name, stacked_df):
+    stacked_df = stacked_df.reset_index()
+    print(stacked_df.head())
+    stacked_df = stacked_df[[new_col_name, col_w0_label, row_w1_label]]
+    # stacked_df = (
+    #     stacked_df
+    #     .sort_values([row_w1_label, col_w0_label])
+    # )
+    # I don't think this ^^ makes a difference.
+    #   Was trying to get it to sort A-Z within the same frequency value,
+    #   but it seems to overwrite that regardless, since one requires ascending, and the other descending
+    # But it doesn't really matter in any case.
+
+    #! The zeros have to be dropped from the data for UCS, and it might affect LSC as well
+    # ^ 💡 so maybe this should just return `nonzeros` dataframe?
+    # HACK: #! if there are errors, check this
+    nonzeros = stacked_df[stacked_df[new_col_name] != 0]
+    return nonzeros.sort_values(new_col_name, ascending=False).reset_index(drop=True)
+
+
+def prep_to_reshape(frq_df, numeric_label, row_w1_label, col_w0_label):
     if row_w1_label in frq_df.columns:
         frq_df = frq_df.set_index(row_w1_label, drop=True)
-    frq_df.columns.name = col_w0_label
+    elif not frq_df.index.name:
+        frq_df.index.name = row_w1_label
+    if not frq_df.columns.name:
+        frq_df.columns.name = col_w0_label
+
     frq_df = frq_df.loc[frq_df.index != 'SUM', frq_df.columns != 'SUM']
 
-    lsc_format = frq_df.stack().to_frame(new_col_name)
-    # lsc_format.columns = [new_col_name]
-    lsc_format = lsc_format.reset_index(
-    ).loc[:, [new_col_name, col_w0_label, row_w1_label]]
-    lsc_format = (
-        lsc_format
-        .sort_values([col_w0_label, row_w1_label])
-        .sort_values(new_col_name, ascending=False))
-    lsc_counts = lsc_format.to_csv(sep="\t", index=False).splitlines()[1:]
-    lsc_lines = ['2'] + [x.strip() for x in lsc_counts]
-    print('\nFormatted Output Sample (top 20 bigrams):')
-    print('\n'.join(lsc_lines[:20] + ['...']))
-    output_tsv_path.write_text('\n'.join(lsc_lines), encoding='utf8')
-    print('Counts formatted to train lsc model saved as:', output_tsv_path)
+    return frq_df, f'{numeric_label}_frq'
 
 
 def save_table(df: pd.DataFrame,
@@ -370,11 +629,45 @@ def select_pickle_paths(n_files: int,
 
 
 def sort_by_margins(crosstab_df, margins_name='SUM'):
-    crosstab_df = (crosstab_df.sort_values(
-        margins_name,
-        ascending=False).transpose().sort_values(margins_name,
-                                                 ascending=False).transpose())
-    return crosstab_df
+    """
+    Sorts a crosstab DataFrame by margins.
+
+    This function sorts the given crosstab DataFrame by the specified margin name in descending order along both the rows and columns.
+
+    Args:
+        crosstab_df: The crosstab DataFrame to be sorted.
+        margins_name: The name of the margins to sort by. Defaults to 'SUM'.
+
+    Returns:
+        The sorted crosstab DataFrame.
+    """
+
+    #> sort crosstabulated values by marginal frequencies
+    return (crosstab_df
+            .sort_values(margins_name,ascending=False, axis=0)
+            .sort_values(margins_name, ascending=False, axis=1))
+    
+
+
+def summarize_text_cols(tdf: pd.DataFrame):
+    """
+    Summarizes text columns in a DataFrame.
+
+    This function calculates descriptive statistics for text columns in the given DataFrame. It selects the string columns, computes the count, unique values, top value, frequency of the top value, and the percentage of the top value in the DataFrame.
+
+    Args:
+        tdf: The DataFrame containing text columns to be summarized.
+
+    Returns:
+        A summary DataFrame with descriptive statistics for the text columns, sorted by the number of unique values.
+    """
+
+    summary = tdf.select_dtypes('string').describe().transpose()
+    summary = summary.assign(top_percent=(
+        ((pd.to_numeric(summary.freq) / len(tdf)))*100).round(2))
+    summary = summary.rename(columns={'top': 'top_value', 'freq': 'top_freq'})
+
+    return summary.convert_dtypes().sort_values('unique')
 
 
 def transform_counts(df: pd.DataFrame,
