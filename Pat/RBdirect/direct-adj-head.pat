@@ -3,10 +3,14 @@ pattern {
     ADV [xpos=re"RB.?"]; 
     NEG [lemma="not"|"hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"|"ain't"|"aint"];  
     mod: ADJ -[advmod]-> ADV;  
-    neg: ADJ -[^advcl|amod|discourse|prep|obl|obl:npmod]-> NEG; 
+    neg: ADJ -[^advcl|amod|discourse|prep|obl|obl:npmod|parataxis|dislocated|rel]-> NEG; 
     ADV < ADJ;
     NEG << ADV
 }
+
+% Relations permitted in pattern matches, but will be quarantined upon collection:
+%   [ nsubjpass | attr | punct | csubj | ccomp | reparandum | obj | compound | expl | partmod | dep | conj ]
+
 
 % fyi, WILL match negative adverbs to `ADV` node, 
 %   provided there is an additional negative token matching NEG specs; 
