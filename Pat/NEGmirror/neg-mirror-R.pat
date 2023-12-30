@@ -5,7 +5,9 @@ pattern {
     mod: ADJ -[advmod]-> ADV;  
     NEG [lemma="nobody"|"nothing"|"no"|"none"|"never"|"rarely"|"seldom"|"hardly"|
             "scarcely"|"barely"|"neither"|"nor"]; 
-    neg: ADJ -[^advcl|amod|discourse|prep|obl|obl:npmod|parataxis|dislocated|rel]-> NEG; 
+    neg: ADJ -[^advcl|amod|discourse|prep|obl|obl:npmod|parataxis|dislocated|rel
+                |nsubjpass|attr|punct|csubj|ccomp|reparandum|obj 
+                |compound|expl|partmod|dep|conj]-> NEG; 
     NEG << ADV
 }
 

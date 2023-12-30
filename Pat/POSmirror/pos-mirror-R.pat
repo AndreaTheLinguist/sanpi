@@ -5,7 +5,9 @@ pattern {
     mod: ADJ -[advmod]-> ADV;  
     MIR [lemma="somebody"|"someone"|"everyone"|"everybody"|"something"|"everything"|
           "all"|"many"|"some"|"every"|"always"|"sometimes"|"often"|"either"|"both"|"or"];     
-    mir: ADJ -[^advcl|amod|discourse|prep|obl|obl:npmod|parataxis|dislocated|rel]-> MIR; 
+    mir: ADJ -[^advcl|amod|discourse|prep|obl|obl:npmod|parataxis|dislocated|rel
+                |nsubjpass|attr|punct|csubj|ccomp|reparandum|obj 
+                |compound|expl|partmod|dep|conj]-> MIR; 
     MIR << ADV
 }
 
