@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import utils as ut
 from utils.dataframes import get_proc_time, print_md_table
-from utils.general import confirm_dir
+from utils.general import confirm_dir, run_shell_command
 from utils.general import convert_ucs_to_csv as txt_to_csv
 
 SANPI_DIR = Path('/share/compling/projects/sanpi')
@@ -35,9 +35,9 @@ def _parse_args():
     return parser.parse_args()
 
 
-def get_csv(unit):
+def get_csv(unit, frq_thresh):
     bare_input = (SANPI_DIR / 'results' / 'ucs_tables' / 'readable' /
-                  f'polarized-{unit}_min{FRQ_THRESH}x.rsort-view')
+                  f'polarized-{unit}_min{frq_thresh}x.rsort-view')
     input_csv = bare_input.with_name(f'{bare_input.name}.csv')
     if input_csv.is_file():
         return input_csv
@@ -45,9 +45,9 @@ def get_csv(unit):
     input_txt = bare_input.with_name(f'{bare_input.name}.txt')
     if not input_txt.is_file():
         init_ucs = (bare_input.parent.parent /
-                    f'polarized-{unit}_min{FRQ_THRESH}x.ds.gz')
+                    f'polarized-{unit}_min{frq_thresh}x.ds.gz')
         if not init_ucs.is_file():
-            initialize = f'python {SANPI_DIR}/script/polarize_tsv_for_ucs.py -w {unit} -m {FRQ_THRESH} -R'
+            initialize = f'python {SANPI_DIR}/script/polarize_tsv_for_ucs.py -w {unit} -m {frq_thresh} -R'
             run_shell_command(initialize)
 
         transform = f'time bash {SANPI_DIR}/script/transform_ucs.sh \\\n  {init_ucs}'
@@ -58,15 +58,15 @@ def get_csv(unit):
     return input_csv
 
 
-def run_shell_command(command_str):
-    print(command_str + '\n>>>')
-    system(command_str)
+# def run_shell_command(command_str):
+#     print(command_str + '\n>>>')
+#     system(command_str)
 
 
-def _pull_data():
+def _pull_data(frq_thresh):
     for unit in ('bigram', 'adv', 'adj'):
 
-        yield unit, get_csv(unit)
+        yield unit, get_csv(unit, frq_thresh)
 
 
 def identify_skewed_bigrams(dfs_plus, floor=0.9, count_cutoff=2):
@@ -91,7 +91,7 @@ def _main():
 
     args = _parse_args()
 
-    csv_paths = pd.Series(dict(_pull_data()))
+    csv_paths = pd.Series(dict(_pull_data(args.min_frq)))
 
     print(csv_paths.to_frame('path to `ucs` scores').to_markdown())
     dfs = {count_type:
@@ -137,7 +137,7 @@ def _main():
         adv=big.l2.str.split("_").str.get(
             0).astype('string').astype('category'),
         adj=big.l2.str.split("_").str.get(1).astype('string').astype('category'))
-
+    #! #FIXME looks like a bug
     print_example(adv, unit, example_key='necessarily',
                   sort_by='conservative_log_ratio')
 
@@ -270,6 +270,7 @@ def save_dataframe(input_name, _df, added_measures=False):
 
 # %%
 if __name__ == '__main__':
+    
     _t0 = pd.Timestamp.now()
     _main()
     _t1 = pd.Timestamp.now()
