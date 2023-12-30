@@ -63,7 +63,7 @@ def _parse_args():
         '--bigram_filter',
         type=Path,
         default=_DATA_DIR.joinpath(
-            "4_post-processed/RBXadj/bigram-index_frq-thr0-001p.20f.txt"  # > 0.001% threshold
+            "4_post-processed/RBXadj/bigram-index_frq-thr0-001p.35f.txt"  # > 0.001% threshold
             # "4_post-processed/RBXadj/bigram-index_frq-thr0-001p.10f.txt" #> 0.001% threshold
             # "4_post-processed/RBXadj/bigram-index_frq-thr0-1p.10f.txt"
             # '4_post-processed/RBXadj/bigram-IDs_thr0-005p.4f.txt'
@@ -118,10 +118,10 @@ def prepare_hit_table(filter_ids_path: Path,
     print('\n## loading data...')
     file_tag = META_TAG_REGEX.search(filter_ids_path.stem).group()
     neg_filtered_hits_path = filter_ids_path.parent.parent.joinpath(
-        f'{neg_hits_dir.name}/neg-bigrams_{file_tag}'
+        f'{neg_hits_dir.name}/trigger-bigrams_{file_tag}'
     )
     neg_filter_index_path = neg_filtered_hits_path.with_name(
-        f'neg-index_{file_tag}')
+        f'trigger-index_{file_tag}')
 
     if neg_filtered_hits_path.is_file():
         print(
@@ -431,11 +431,16 @@ def gen_freq_info(df: pd.DataFrame,
         'prev-x-negLemma': ['prev_form_lower', 'neg_lemma'],
         # TODO#[ ] add `dep_str_*` values for loading from `3_def_info/`
     }
+    # HACK This is a shortcut to deal with positive mirrors. A better approach would be to:
+    # TODO #[ ] configure initial `cross_vectors_dict` to infer relevant columns from current columns. E.g. collect all node types using a regex r'(\w+)_form_lower' on the columns and set cross values for each
+    if not any(df.columns.str.startswith('neg')):
+        cross_vectors_dict = {k.replace('neg', 'mir'): [v.replace(
+            'neg', 'mir') for v in v_list] for k, v_list in cross_vectors_dict.items()}
     # > these values have to be inherited from the
     # > bigram frequency filtering used to select negated hits
     # ^#[x] modify this to encode different crosstabulations if that option is added
     for cross_label, cross_vector_names in cross_vectors_dict.items():
-        if not all([n in df.columns for n in cross_vector_names]):
+        if any(n not in df.columns for n in cross_vector_names):
             print(
                 f'Error: {cross_vector_names} not (both) found in dataframe.')
             continue

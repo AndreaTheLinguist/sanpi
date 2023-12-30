@@ -408,14 +408,14 @@ def locate_relevant_hit_tables(data_dir, index_txt_path):
                         dtype='string')
     for corpus_cue, _ids in hit_ids.groupby(
         hit_ids.apply(lambda hit_id: ''.join(
-            g.capitalize() if g else ''
+            g or ''
             for g in regex_path_from_hit_id.search(hit_id).groups()))):
 
-        glob_str = f'*bigram-{corpus_cue}*hit*s.{_PKL_SUFF}'
+        glob_str = f'*bigram-{corpus_cue}*hit*.{_PKL_SUFF}'
 
-        hit_paths = list(simple_dir.glob(glob_str))
-        if not any(hit_paths):
-            hit_paths = list(data_dir.glob(glob_str))
+        simple_paths = list(simple_dir.glob(glob_str))
+        
+        hit_paths = simple_paths or list(data_dir.glob(glob_str))
         for hit_path in hit_paths:
             yield hit_path, _ids
 
