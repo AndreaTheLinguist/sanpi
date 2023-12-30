@@ -21,6 +21,7 @@ echo "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 eval "$(conda shell.bash hook)"
 conda activate sanpi
 
+# TODO I think the argument structure has changed for python script. Update below?
 N_FILES=${1:-''}
 THRESH=${2:-''}
 PROG="/share/compling/projects/sanpi/source/analyze/count_bigrams.py"

@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -N1
 #SBATCH -n1
-#SBATCH --mem=10G
+#SBATCH --mem=16G
 #SBATCH -o %x_%j.out
 #SBATCH -e %x_%j.err
 #SBATCH --time 1:00:00
