@@ -47,7 +47,7 @@ import matplotlib.pyplot as plt
 # plt.show()
 
 
-def heatmap(df, columns=None, save_name=None, size=(8, 10)):
+def heatmap(df, columns=None, save_name=None, size=(8, 10), save_dir: Path = None):
 
     plt.figure(figsize=size, dpi=120, facecolor="white")
 

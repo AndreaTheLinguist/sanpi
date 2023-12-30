@@ -64,19 +64,18 @@ def dur_round(time_dur: float):
     unit = "s"
 
     if time_dur >= 60:
-        time_dur = time_dur / 60
+        time_dur /= 60
         unit = "m"
 
-        if time_dur >= 60:
-            time_dur = time_dur / 60
-            unit = "h"
+    if time_dur >= 60:
+        time_dur = time_dur / 60
+        unit = "h"
 
-    if time_dur < 10:
-        dur_str = f"{round(time_dur, 2):.2f}{unit}"
-    else:
-        dur_str = f"{round(time_dur, 1):.1f}{unit}"
-
-    return dur_str
+    return (
+        f"{round(time_dur, 2):.2f}{unit}"
+        if time_dur < 10
+        else f"{round(time_dur, 1):.1f}{unit}"
+    )
 
 
 def file_size_round(size: int):
@@ -192,5 +191,10 @@ def print_iter(iter_obj,
     display_message(msg_str, logger, level)
 
 
-def snake_to_camel(snake:str):
+def run_shell_command(command_str):
+    print(command_str + '\n>>>')
+    system(command_str)
+
+
+def snake_to_camel(snake: str):
     return ''.join([w.capitalize() for w in snake.split('_')])
