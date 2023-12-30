@@ -191,10 +191,10 @@ echo '*******************************'
 
 #* INPUTS
 CORPUS_DIR=${1:-'/share/compling/data/sanpi/corpora_shortcuts/debug'}
+LOG_DIR="/share/compling/projects/sanpi/logs/grewpy_subsets/$(basename $CORPUS_DIR)"
 TAG=${2:-'bigram'}
 CHECK=${3:-''}
-SLURM_ARG=${3:-'--requeue --nice --mem=15G -t1:00:00'}
-LOG_DIR="/share/compling/projects/sanpi/logs/grewpy_subsets/$(basename $CORPUS_DIR)"
+SLURM_ARG=${3:-'--requeue --nice --mem=20G -t1:00:00'}
 SLURM_FLAGS="$SLURM_ARG --chdir=$LOG_DIR"
 echo -e "Processing Corpus: ${CORPUS_DIR}/..."
 echo "+ additional slurm options:"
@@ -323,5 +323,6 @@ echo "($(squeue | egrep -c arh234) jobs still running)"
 checkCorpusStatus $CORPUS_DIR $TAG
 
 echo
+showDate
 echo "Script Closed."
 exit 0

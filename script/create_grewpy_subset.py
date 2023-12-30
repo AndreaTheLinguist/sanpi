@@ -271,8 +271,12 @@ def build_context(corpus: Corpus,
 
 def parse_sent(sent_id: str, corpus: Corpus) -> _META_TUP:
 
-    doc_id, ordinal_str = sent_id.rsplit('_', 1)
-    ordinal_int = int(ordinal_str)
+    try: 
+        doc_id, ordinal_str = sent_id.rsplit('_', 1)
+    except ValueError: 
+        ordinal_int = 0
+    else: 
+        ordinal_int = int(ordinal_str)
 
     row = (sent_id, doc_id, ordinal_int, corpus.get(sent_id).meta['text'])
     for context_ix in (ordinal_int + i for i in (-1, 1)):
