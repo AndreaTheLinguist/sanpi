@@ -8,36 +8,64 @@
             "name": "data-sanpi",
             "path": "/share/compling/data/sanpi"
         },
-        {
-            "path": "../../../../home/mr249/hug/someany",
-            "name": "Mats_some-any"
-        }
+        // {
+        //     "path": "../../../../home/mr249/hug/someany",
+        //     "name": "Mats_some-any"
+        // }
     ],
     "launch": {
         "configurations": [
             // * Deps
-            // DEMO collect_deps RBdirect
+            // DEBUG collect_deps RBdirect
             {
                 "console": "integratedTerminal",
-                "cwd": "/home/arh234/projects/sanpi/demo",
+                // "cwd": "/home/arh234/projects/sanpi/demo",
                 "justMyCode": true,
-                "name": "COLLECT_deps RBdirect",
+                "name": "COLLECT_deps 🪲 RBdirect pcc06",
                 "program": "/home/arh234/projects/sanpi/demo/source/collect_deps.py",
                 "request": "launch",
                 "type": "python",
                 "args": [
                     // ! for ../demo/ launch configs, give relative paths
-                    "--input_dir",
-                    "data/2_hit_tables",
+                    // "--input_dir",
+                    // "data/2_hit_tables",
                     "--glob_expr",
-                    "RBdirect/*hits.pkl.gz",
-                    "--output_dir",
-                    "data/3_dep_info",
-                    "--sample_size",
-                    "-1",
-                    "--test",
+                    "RBdirect/*Pcc06*neg*hits.pkl.gz",
+                    // "--output_dir",
+                    // "data/3_dep_info",
+                    // "--sample_size",
+                    // "-1",
+                    // "--test",
                     "--verbose",
                     // "--very_verbose"
+                ],
+            },
+            // * sample_pickle DEVEL
+            // DEMO collect_deps RBdirect
+            {
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "sample_pickle DEVEL",
+                "program": "/home/arh234/projects/sanpi/script/sample_pickle.py",
+                "request": "launch",
+                "type": "python",
+                "args": [
+                    "/share/compling/projects/sanpi/demo/data/3_dep_info/RBdirect/bigram_smallest_direct-adj-head_hits[n34]+deps.pkl.gz", 
+                    "-N", 
+                    "10",
+                    "-c", 
+                    "neg_form", 
+                    "-c",
+                    "adv_form",
+                    "-c", 
+                    "adj_form",
+                    "-c", 
+                    "text_window", 
+                    "-f", 
+                    "neg_form==n't", 
+                    "-f", 
+                    "adj_lemma==good", 
+                    // "-m"
                 ],
             },
         ],
@@ -106,9 +134,14 @@
                 "statusBarItem.remoteBackground": "#6C71C480"
             },
             "activityBar.background": "#0b1434",
+            "activityBar.foreground": "#8ca3f9",//"#f0a5f8f6", //> pink
             "titleBar.activeBackground": "#0b1434",
-            "titleBar.activeForeground": "#f2d6f5f6"
-        }
+            // "titleBar.activeForeground": "#f0a5f8f6", //> pink
+            "titleBar.activeForeground": "#8ca3f9",
+            "titleBar.inactiveBackground": "#8ca3f9",
+            "titleBar.inactiveForeground": "#0b1434"
+        },
+        "sourcery.codeLens": true
     },
     "extensions": {
         "recommendations": [

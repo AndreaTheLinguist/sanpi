@@ -16,6 +16,38 @@
                 "request": "launch",
                 "type": "python"
             },
+            // * count negative contexts
+            // count_neg --help
+            {
+                "name": "count_neg --help",
+                "type": "python",
+                "request": "launch",
+                "program": "source/analyze/count_neg.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "args": [
+                    "--help"
+                ]
+            },
+            // count_neg RBdirect
+            {
+                "name": "count_neg RBdirect",
+                "type": "python",
+                "request": "launch",
+                "program": "source/analyze/count_neg.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "cwd": "/home/arh234/projects/sanpi/demo",
+                "args": [
+                    "-d",
+                    "data/2_hit_tables/RBdirect",
+                    "-b",
+                    "data/4_post-processed/RBXadj/bigram-IDs_thr0-001p.1f.txt",
+                    "-o",
+                    "results/freq_out/RBdirect"
+                ]
+            },
             //* grewpy subsets
             {
                 "name": "subset - nyt200405",
@@ -75,7 +107,8 @@
                     "bigram_smallest",
                 ]
             },
-            // run_pipeline help message
+            //* run_pipeline 
+            // help message
             {
                 "console": "integratedTerminal",
                 "justMyCode": true,
@@ -286,11 +319,11 @@
                 ],
                 "cwd": "/home/arh234/projects/sanpi/demo"
             },
-            // run_pipeline bigram_smallest ADJ-head-dev
+            // run_pipeline bigram_smallest RBdirect-mirror
             {
                 "console": "integratedTerminal",
                 "justMyCode": true,
-                "name": "run_pipeline bigram_smallest ADJ-head-dev",
+                "name": "run_pipeline bigram_smallest RBdirect-mirror",
                 "program": "run_pipeline.py",
                 "request": "launch",
                 "type": "python",
@@ -301,7 +334,7 @@
                     "-c",
                     "data/corpora/subsets/bigrams/bigram_smallest",
                     "-p",
-                    "Pat/ADJ-head-dev",
+                    "Pat/RBdirect-mirror",
                     // "-R"
                 ],
                 "cwd": "/home/arh234/projects/sanpi/demo"
@@ -443,9 +476,10 @@
                     "Pat/RBcontig"
                 ],
             },
-            // count_bigrams bigram_X2puddin advadj
+            // * count_bigrams
+            // count_bigrams bigram_X2puddin RBXadj
             {
-                "name": "count_bigrams X2puddin advadj (default%)",
+                "name": "count_bigrams RBXadj 4f (default%)",
                 "type": "python",
                 "request": "launch",
                 "program": "source/analyze/count_bigrams.py",
@@ -453,19 +487,19 @@
                 "justMyCode": true,
                 "cwd": "/home/arh234/projects/sanpi/demo",
                 "args": [
-                    "-f",
-                    "1",
-                    "-d",
-                    "data/2_hit_tables/advadj",
-                    "-p",
-                    "data/4_post-processed/advmod",
+                    "--n_files",
+                    "4",
+                    "--data_dir",
+                    "data/2_hit_tables/RBXadj",
+                    "--post_proc_dir",
+                    "data/4_post-processed/RBXadj",
                     "-o",
-                    "results/freq_out/advmod"
+                    "results/freq_out/RBXadj"
                 ]
             },
             // count_bigrams bigram_X2puddin RBXadj
             {
-                "name": "count_bigrams X2puddin RBXadj (default%)",
+                "name": "count_bigrams 1f RBXadj (default%)",
                 "type": "python",
                 "request": "launch",
                 "program": "source/analyze/count_bigrams.py",
@@ -478,33 +512,15 @@
                     "-d",
                     "data/2_hit_tables/RBXadj",
                     "-p",
-                    "data/4_post-processed/RBxpos",
+                    "data/4_post-processed",
                     "-o",
-                    "results/freq_out/RBxpos"
-                ]
-            },
-            // count_neg bigram_small RBcontig
-            {
-                "name": "count_neg RBcontig",
-                "type": "python",
-                "request": "launch",
-                "program": "source/analyze/count_neg.py",
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "cwd": "/home/arh234/projects/sanpi/demo",
-                "args": [
-                    "-d",
-                    "data/2_hit_tables/RBcontig",
-                    "-b",
-                    "data/4_post-processed/RBxpos/bigrams-only_thr0-001p.1f.pkl.gz",
-                    "-o",
-                    "results/freq_out/RBcontig"
+                    "results/freq_out"
                 ]
             },
         ],
     },
     "settings": {
-        "editor.fontFamily": "Roboto Mono, Consolas, 'Courier New', monospace",
+        "editor.fontFamily": "Iosevka fixed ss02, Roboto Mono, Consolas, 'Courier New', monospace",
         "editor.fontSize": 13,
         "explorerExclude.backup": {},
         "files.exclude": {
@@ -530,23 +546,32 @@
         "solarizedCustomTheme.accentColor": "Magenta",
         "terminal.integrated.minimumContrastRatio": 5,
         "window.autoDetectColorScheme": true,
-        "workbench.preferredDarkColorTheme": "semantic-rainbow",
-        // "workbench.preferredDarkColorTheme": "Rainier",
-        // "workbench.preferredDarkColorTheme": "Absent Contrast (rainglow)",
-        // "workbench.preferredDarkColorTheme": "SynthWave '84",
+        // "workbench.preferredDarkColorTheme": "semantic-rainbow",
+        // "workbench.preferredDarkColorTheme": "Rainier - Retro",
+        // "workbench.preferredDarkColorTheme": "Banner (rainglow)",
+        "workbench.preferredDarkColorTheme": "SynthWave '84",
         // "workbench.preferredDarkColorTheme": "vscode carbon theme",
         // "workbench.preferredDarkColorTheme": "Zeonica",
         // "workbench.preferredDarkColorTheme": "Abyss",
         // "workbench.preferredLightColorTheme": "Ayu Light Bordered",
         // "workbench.preferredLightColorTheme": "Solarized-light-fjs",
         // "workbench.preferredLightColorTheme": "Solarized Custom Light",
-        // "workbench.preferredLightColorTheme": "Noctis Lilac",
-        "workbench.preferredLightColorTheme": "Modern Purple Theme Light",
-        // "workbench.preferredLightColorTheme": "Quiet Light",
+        "workbench.preferredLightColorTheme": "Noctis Lux",
+        // "workbench.preferredLightColorTheme": "Modern Purple Theme Light",
+        // "workbench.preferredLightColorTheme": "Joker Light (rainglow)",
+        // "workbench.preferredLightColorTheme": "Gruvbox Light Soft",
         "files.watcherExclude": {
             "**/demo/data/**": true
         },
-        "workbench.colorTheme": "semantic-rainbow",
+        "workbench.colorTheme": "SynthWave '84",
+        "workbench.colorCustomizations": {
+            "activityBar.background": "#012f3a",
+            "activityBar.foreground": "#4a94a6",
+            "titleBar.activeBackground": "#014252",
+            "titleBar.activeForeground": "#94c2cf",
+            "titleBar.inactiveForeground": "#022730",
+            "titleBar.inactiveBackground": "#719ca7",
+        },
     },
     "extensions": {
         "recommendations": [
