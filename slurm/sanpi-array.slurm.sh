@@ -8,9 +8,9 @@
 #SBATCH --array 0-34
 #SBATCH -N 1                            # Total number of nodes requested
 ##SBATCH -n 12                            # Total number of cores requested
-##SBATCH --mem-per-cpu=16G                     # Total amount of (real) memory requested (per node)
+#SBATCH --mem-per-cpu=16G                     # Total amount of (real) memory requested (per node)
 #SBATCH -n 1                            # Total number of cores requested
-#SBATCH --mem=60G
+## SBATCH --mem=60G
 #SBATCH --time 48:00:00                  # Time limit (hh:mm:ss)
 #SBATCH --get-user-env
 #SBATCH --chdir=/share/compling/projects/sanpi/logs # to allow running `sbatch` cmd from anywhere and still put .out and .err in ../logs/ dir
@@ -99,16 +99,22 @@ elif [ $SEED == 34 ]; then
 
 # * #HACK test
 elif [ $SEED == 35 ]; then
-    SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/small.conll"
+    SEED_CORPUS="${OUT_DIR}/debug/bigram_debug/bigram-apw"
 
 elif [ $SEED == 36 ]; then
-    SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/large.conll"
+    SEED_CORPUS="${OUT_DIR}/debug/bigram_debug/bigram-nyt"
 
 elif [ $SEED == 37 ]; then
-    SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/smallest20.conll"
+    SEED_CORPUS="${OUT_DIR}/debug/bigram_debug/bigram-pcc"
 
-elif [ $SEED == 38 ]; then
-    SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/midrange10.conll"
+# elif [ $SEED == 36 ]; then
+#     SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/large.conll"
+
+# elif [ $SEED == 37 ]; then
+#     SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/smallest20.conll"
+
+# elif [ $SEED == 38 ]; then
+#     SEED_CORPUS="${OUT_DIR}/corpora_shortcuts/testing/midrange10.conll"
 
 # * puddin
 elif [ $SEED == 30 ]; then

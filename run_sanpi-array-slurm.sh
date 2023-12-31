@@ -26,8 +26,8 @@ echo "Running /share/compling/projects/sanpi/run_sanpi-array-slurm.sh"
 MODE=$1
 PAT_FLAG=${2:-"--neg"}
 echo "PAT_FLAG: $PAT_FLAG"
-ARRAY=${3:-""}
-echo "ARRAY: $ARRAY"
+ARRAY_FLAG=${3:-""}
+echo "ARRAY flag: $ARRAY_FLAG"
 
 if [[ $(which grew && grew version) ]]; then
     date
@@ -41,13 +41,16 @@ if [[ $(which grew && grew version) ]]; then
     elif [[ $PAT_FLAG == '--noncontig' ]]; then
         PATS=("scoped" "raised")
 
+    elif [[ $PAT_FLAG == '--mirror' ]]; then
+        PATS=("POSmirror" "NEGmirror")
+
     elif [[ -d "Pat/$PAT_FLAG" ]]; then
         PATS=("$PAT_FLAG")
 
     else
         PATS=("contig")
-        ARRAY=$PAT_FLAG
-        echo "(update) ARRAY = $ARRAY"
+        ARRAY_FLAG=$PAT_FLAG
+        echo "(update) ARRAY flag = $ARRAY_FLAG"
 
     fi
 
@@ -57,14 +60,14 @@ if [[ $(which grew && grew version) ]]; then
         echo -e "\n# $PAT"
 
         if [[ $MODE == 'multi' ]]; then
-            # echo 'sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT'
-            echo "sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT"
-            sbatch -J $PAT $ARRAY -n 12 --mem-per-cpu=14G /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh $PAT
+            # echo 'sbatch -J $PAT $ARRAY_FLAG ./sanpi-array.slurm.sh $PAT'
+            echo "sbatch -J $PAT $ARRAY_FLAG ./sanpi-array.slurm.sh $PAT"
+            sbatch -J $PAT $ARRAY_FLAG -n 5 --mem-per-cpu=12G /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh $PAT
 
         elif [[ $MODE == 'solo' ]]; then
-            # echo 'sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT'
-            echo "sbatch -J $PAT $ARRAY ./sanpi-array.slurm.sh $PAT"
-            sbatch -J $PAT $ARRAY -n 1 --mem=10G /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh $PAT
+            # echo 'sbatch -J $PAT $ARRAY_FLAG ./sanpi-array.slurm.sh $PAT'
+            echo "sbatch -J $PAT $ARRAY_FLAG ./sanpi-array.slurm.sh $PAT"
+            sbatch -J $PAT $ARRAY_FLAG -n 1 --mem=10G /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh $PAT
         else
             echo -e  "No valid cpu mode given. First argument should be one of the following strings:\n+ 'solo' for 1 core/cpu\n~or~\n+ 'multi' for multiple cores/cpus"
         fi

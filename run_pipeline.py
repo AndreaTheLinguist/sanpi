@@ -57,7 +57,7 @@ def _main():
                 f'>> {verb}ing `{corpus}` data for '
                 f'patterns specified in `{patdir}/`...')
 
-            for pat_path in patdir.iterdir():
+            for pat_path in patdir.glob('*.pat'):
                 print(
                     f'. . . . . . . . . . . . . . . . . . . . .\n↯ Processing {pat_path.name} matches...')
                 # > can use "corpus.stem" for corpus subset name
