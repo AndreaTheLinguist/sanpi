@@ -22,7 +22,7 @@ echo "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 eval "$(conda shell.bash hook)"
 conda activate sanpi
 
-# TODO I think the argument structure has changed for python script. Update below?
+#// TODO I think the argument structure has changed for python script. Update below?
 N_FILES=${1:-''}
 THRESH=${2:-''}
 HIT_DATA_DIR=${3:-''}

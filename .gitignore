@@ -425,4 +425,16 @@ demo/data/**/RB*/
 results/**/*[.12]?f.*
 source/gather/utils
 source/utils/adv*
-**/te?mp*
+**/t?mp*
+source/analyze/count_neg.comments.py
+Pat/prior_version
+Pat/RBsimple
+Pat/negpol
+info/Israel*
+results/freq_out/debug
+results/freq_out/JxR
+slurm/lsc_35JxR.slurm.sh
+slurm/train-lsc.slurm.sh
+data-link
+source/LSC
+**/*scratch*
