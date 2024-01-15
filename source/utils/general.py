@@ -1,9 +1,8 @@
 # coding=utf-8
-from pathlib import Path
 import logging
-from os import system
 import re
-
+from os import system
+from pathlib import Path
 
 ucs_header_wrd_brk = re.compile(r'\.([a-zA-Z])')
 

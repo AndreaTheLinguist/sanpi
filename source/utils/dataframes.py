@@ -12,7 +12,8 @@ try:
     from general import confirm_dir, find_files, snake_to_camel  # pylint: disable=import-error
 except ModuleNotFoundError:
     try:
-        from utils.general import (confirm_dir, find_files, snake_to_camel)  # pylint: disable=import-error
+        from utils.general import (
+            confirm_dir, find_files, snake_to_camel)  # pylint: disable=import-error
     except ModuleNotFoundError:
         from source.utils.general import (  # pylint: disable=import-error
             confirm_dir, find_files, snake_to_camel)
@@ -255,7 +256,6 @@ def print_md_table(df: pd.DataFrame,
     Returns:
         the markdown table as a string if suppress is True, else prints the table to stdout
     """
-    
 
     # FIXME realized this does nothing for markdown tables, which are strings
     set_pd_display(max_colwidth, max_cols, max_width)
@@ -294,7 +294,7 @@ def print_md_table(df: pd.DataFrame,
     whitespace = ' ' * indent
     print_str = f"{whitespace}{title}\n{whitespace}" if title else ''
     print_str += md_table.replace('\n', f'\n{whitespace}')
-    
+
     if suppress:
         return print_str
     print(print_str)
@@ -405,6 +405,7 @@ def show_counts(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     return df.value_counts(columns).to_frame().rename(columns={0: 'count'})
 
 
+# * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
 def save_for_ucs(df, col_1: str, col_2: str,
                  output_dir: Path = None,
                  ucs_path: Path = None,
@@ -415,26 +416,42 @@ def save_for_ucs(df, col_1: str, col_2: str,
 
     This function applies to the initial, `hit_id` indexed dataframe (a "hit table"). 
     If either an output directory or a specific path are given, the resultant dataframe will be saved as a `.tsv`,
-    which can be used as the (stdin/piped) input for `usc-make-tables --types`.
+    which can be used as the (stdin/piped) input for `ucs-make-tables --types`.
 
     Args:
         df: The DataFrame to pull `value_counts` from.
         col_1: The name of the first column to count.
         col_2: The name of the second column to count.
         output_dir: The output directory for any UCS file.
-        ucs_path: The path to save the UCS file.
+        ucs_path: The path to save the UCS file. Generated from `output_dir`, `col_1`, and `col_2` if not given.
         filter_dict: An optional dictionary of column (key) == value pairs to filter the DataFrame. Filter info will be incorporated into any output path.
 
     Returns:
         The DataFrame with counts of unique combinations of col_1 and col_2.
     """
-    # * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
+    cols_tag = re.compile(r'_([a-z]{,4})-([a-z]{,4})_', re.IGNORECASE)
+    if col_1 not in df.columns:
+        print(
+            f'WARNING: col_1 "{col_1}" not in dataframe. Defaulting to "adv_form_lower"')
+        col_1 = 'adv_form_lower'
+        if ucs_path:
+            ucs_path = ucs_path.with_name(
+                cols_tag.sub(r'_Adv-\2_', ucs_path.name))
+
+    if col_2 not in df.columns:
+        print(
+            f'WARNING: col_2 "{col_2}" not in dataframe. Defaulting to "adj_form_lower"')
+        col_2 = 'adj_form_lower'
+        if ucs_path:
+            ucs_path = ucs_path.with_name(
+                cols_tag.sub(r'_\1-Adj_', ucs_path.name))
 
     if output_dir and not ucs_path:
         ucs_dir = output_dir / 'ucs_format'
         confirm_dir(ucs_dir)
         ucs_path = (ucs_dir /
                     f'{snake_to_camel(col_1)}{snake_to_camel(col_2)}.tsv')
+
     if filter_dict:
         for col, val in filter_dict.items():
             df = df.loc[df[col] == val, :]
@@ -451,6 +468,9 @@ def save_for_ucs(df, col_1: str, col_2: str,
     return counts
 
 
+# * This function applies to a "frequency table", a DataFrame where counts have already been calculated via `pd.crosstab`
+#  The index for such a table will be unique values for the `index` Series passed, not unique tokens/observations,
+#  and the values will be co-occurrence frequencies with the value indicated by the column.
 def save_in_lsc_format(frq_df,
                        output_tsv_path,
                        numeric_label='raw',
@@ -473,9 +493,6 @@ def save_in_lsc_format(frq_df,
     Returns:
         None
     """
-    #! This function applies to a "frequency table", a DataFrame where counts have already been calculated via `pd.crosstab`
-    #  The index for such a table will be unique values for the `index` Series passed, not unique tokens/observations,
-    #  and the values will be co-occurrence frequencies with the value indicated by the column.
 
     confirm_dir(output_tsv_path.parent)
     frq_df, new_col_name = prep_to_reshape(
@@ -548,17 +565,9 @@ def prep_to_reshape(frq_df, numeric_label, row_w1_label, col_w0_label):
 
 
 def save_table(df: pd.DataFrame,
-               path_str: str,
+               save_path: Path or str,
                df_name: str = '',
                formats: list = None):
-    if formats is None:
-        formats = ['pickle']
-    # df_name += ' '
-    path_str = re.sub(r'\.(pkl.gz|csv|psv)', '', path_str)
-    path = Path(path_str)
-    confirm_dir(path.parent)
-    if not path.is_absolute():
-        exit('Absolute path is required.')
     _ext = namedtuple('Format', ['ext', 'sep'])
     ext_dict = {
         'pickle': _ext('.pkl.gz', None),
@@ -566,28 +575,27 @@ def save_table(df: pd.DataFrame,
         'psv': _ext('.psv', '|'),
         'tsv': _ext('.tsv', '\t')
     }
+    save_path = str(save_path)
+    if formats is None:
+        formats = [save_path[-3:]
+                   ] if save_path[-3:] in ext_dict else ['pickle']
+    save_path = re.sub(r'\.(pkl\.gz|csv|psv)', '', save_path)
+    path_stub = Path(save_path)
+    confirm_dir(path_stub.parent)
+    if not path_stub.is_absolute():
+        exit('Absolute path is required.')
     for form in formats:
         save = ext_dict[form]
-        print(f'~ Saving {df_name} as {form}...')
-        time_0 = pd.Timestamp.now()
+        print(f'+ Saving {df_name} as {form}...')
+        with Timer() as timer:
 
-        out_path = Path(f'{path}{save.ext}')
-        if form == 'pickle':
-            df.to_pickle(out_path)
-        else:
-            df.to_csv(out_path, sep=save.sep)
-        # // elif form == 'csv':
-        # //     out_path = str(path_str) + '.csv'
-        # //     df.to_csv(out_path)
-        # // elif form == 'psv':
-        # //     out_path = str(path_str) + '.csv'
-        # //     df.to_csv(out_path, sep='|')
-        # // elif form == 'tsv':
-        # //     out_path = str(path_str) + '.tsv'
-        # //     df.to_csv(out_path, sep='\t')
-        time_1 = pd.Timestamp.now()
-        print(f'   >> successfully saved as {out_path}\n' +
-              f'      (time elapsed: {get_proc_time(time_0, time_1)})')
+            out_path = Path(f'{path_stub}{save.ext}')
+            if form == 'pickle':
+                df.to_pickle(out_path)
+            else:
+                df.to_csv(out_path, sep=save.sep)
+            print(f'  + successfully saved as {out_path}\n',
+                  f' + time elapsed: {timer.elapsed()}')
 
 
 def select_cols(df: pd.DataFrame,
@@ -641,11 +649,10 @@ def sort_by_margins(crosstab_df, margins_name='SUM'):
         The sorted crosstab DataFrame.
     """
 
-    #> sort crosstabulated values by marginal frequencies
+    # > sort crosstabulated values by marginal frequencies
     return (crosstab_df
-            .sort_values(margins_name,ascending=False, axis=0)
+            .sort_values(margins_name, ascending=False, axis=0)
             .sort_values(margins_name, ascending=False, axis=1))
-    
 
 
 def summarize_text_cols(tdf: pd.DataFrame):

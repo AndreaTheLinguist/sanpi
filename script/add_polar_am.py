@@ -1,7 +1,7 @@
 # %%
 import argparse
-import re
-from os import system
+# import re
+# from os import system
 from pathlib import Path
 
 import association_measures.binomial as bn
@@ -11,33 +11,80 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import utils as ut
 from utils.dataframes import get_proc_time, print_md_table
-from utils.general import confirm_dir, run_shell_command
+from utils.general import confirm_dir
 from utils.general import convert_ucs_to_csv as txt_to_csv
+from utils.general import run_shell_command
 
 SANPI_DIR = Path('/share/compling/projects/sanpi')
+_RSLT_DIR = Path('/share/compling/projects/sanpi/results')
+_FREQ_DIR = _RSLT_DIR / 'freq_out'
+# _POL_DIR = _RSLT_DIR / 'ucs_tables' / 'polarity_prepped'
 
 def _parse_args():
 
     parser = argparse.ArgumentParser(
-        description=('Script to add extra association measures to perl script UCS tables for environement co-occurence frequencies for (1) bigrams, (2) adverbs, and (3) adjectives, each as a separate table', 
-                     'If tables have not been previously run, they will be generated, given the minimum frequency parameter. The only pre-requisites are the "negated" and "not negated" (i.e. complement)'
+        description=('Script to add extra association measures to perl script UCS tables '
+                     'for environement co-occurence frequencies for (1) bigrams, (2) adverbs, and (3) adjectives, each as a separate table. ',
+                     'If tables have not been previously run, they will be generated, given the minimum frequency parameter. '
+                     'The only pre-requisites are the "negated" and "not negated" (i.e. complement) '
                      'frequency table dataframes'),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
-        )
-    
+    )
+
     parser.add_argument(
-        '-m','--min_freq',
+        '-m', '--min_freq',
         type=int, default=15,
         help=('Minimum frequency of co-occurrences included as rows '
               '(everything is still included in the marginal frequencies) in association tables')
-        )
+    )
+    
+    parser.add_argument(
+        '-c', '--complement_counts',
+        type=Path,
+        default=(_FREQ_DIR / 'diff_RBXadj-RBdirect' / 'ucs_format' /
+                 'diff-all_adj-x-adv_frq-thr0-001p.35f=868+.tsv'),
+        help=('Path to ucs-formatted .tsv of COMPLEMENT bigram frequencies; i.e. '
+              'counts for bigram tokens with no *identified* negation dependencies. '
+              '(An approximation of bigrams occurring in "positive polarity" environments.) '
+              'The transformed frequency data will be saved as `polarity_prepped/complement_bigram_counts.tsv')
+    )
+    
+    parser.add_argument(
+        '-C', '--comp_label',
+        type=str, default='complement',
+        help=('option so set the label for complement (set difference, not negated, "positive", etc.) counts. Used for output path generation.')
+    )
+    
+    parser.add_argument(
+        '-n', '--negated_counts',
+        type=Path,
+        default=(_FREQ_DIR / 'RBdirect' / 'ucs_format' /
+                 'ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv'),
+        help=('Path to ucs-formatted .tsv of NEGATED bigram frequencies; i.e. '
+              'counts for bigram tokens with *identified* negation dependencies. '
+              '(An approximation of bigrams occurring in "negative polarity" environments.)'
+              'The transformed frequency data will be saved as `polarity_prepped/negated_bigram_counts.tsv')
+    )
+    parser.add_argument(
+        '-N', '--neg_label',
+        type=str, default='negated',
+        help=('option so set the label for negated (or matching specific pattern) counts. Used for output path generation.')
+    )
+    
+    parser.add_argument(
+        '-s', '--data_suffix',
+        type=str, default='.35f=868+.tsv',
+        help=('option to indicate specific started data set as restricted by number of corpus parts/files and frequency threshold')
+    )
 
     return parser.parse_args()
 
 
-def get_csv(unit, frq_thresh):
+def get_csv(unit, args):
+    frq_thresh = args.min_freq
+    data_flag = f'{unit}_{args.data_suffix.strip(".tsv")}'
     bare_input = (SANPI_DIR / 'results' / 'ucs_tables' / 'readable' /
-                  f'polarized-{unit}_min{frq_thresh}x.rsort-view')
+                  f'polarized-{data_flag}_min{frq_thresh}x.rsort-view')
     input_csv = bare_input.with_name(f'{bare_input.name}.csv')
     if input_csv.is_file():
         return input_csv
@@ -45,9 +92,14 @@ def get_csv(unit, frq_thresh):
     input_txt = bare_input.with_name(f'{bare_input.name}.txt')
     if not input_txt.is_file():
         init_ucs = (bare_input.parent.parent /
-                    f'polarized-{unit}_min{frq_thresh}x.ds.gz')
+                    f'polarized-{data_flag}_min{frq_thresh}x.ds.gz')
         if not init_ucs.is_file():
-            initialize = f'python {SANPI_DIR}/script/polarize_tsv_for_ucs.py -w {unit} -m {frq_thresh} -R'
+            comp_path = args.complement_counts
+            neg_path = args.negated_counts
+            initialize = (f'python {SANPI_DIR}/script/polarize_tsv_for_ucs.py '
+                          f'-c {comp_path} -n {neg_path} '
+                          f'-C {args.comp_label} -N {args.neg_label} '
+                          f'-w {unit} -m {frq_thresh} -R')
             run_shell_command(initialize)
 
         transform = f'time bash {SANPI_DIR}/script/transform_ucs.sh \\\n  {init_ucs}'
@@ -63,17 +115,21 @@ def get_csv(unit, frq_thresh):
 #     system(command_str)
 
 
-def _pull_data(frq_thresh):
+def _pull_data(args):
+    
     for unit in ('bigram', 'adv', 'adj'):
 
-        yield unit, get_csv(unit, frq_thresh)
+        yield unit, get_csv(unit, args)
 
 
 def identify_skewed_bigrams(dfs_plus, floor=0.9, count_cutoff=2):
     floor = 0.9
     count_cutoff = 2
-    skewed_bigrams = dfs_plus['bigram'].loc[dfs_plus['bigram'].am_p1_given2 > floor, ['l1', 'adv', 'adj', 'f',
-                                                                                      'am_expect_diff', 'am_p1_given2', 't_score', 'log_likelihood', 'log_ratio', 'conservative_log_ratio']].round(2)
+    skewed_bigrams = dfs_plus['bigram'].loc[dfs_plus['bigram'].am_p1_given2 > floor,
+                                            ['l1', 'adv', 'adj', 'f',
+                                             'am_expect_diff', 'am_p1_given2', 
+                                             't_score', 'log_likelihood', 
+                                             'log_ratio', 'conservative_log_ratio']].round(2)
     for ad in ['adv', 'adj']:
         neg_skewed_counts = skewed_bigrams[ad].astype('string').value_counts()
 
@@ -91,7 +147,7 @@ def _main():
 
     args = _parse_args()
 
-    csv_paths = pd.Series(dict(_pull_data(args.min_frq)))
+    csv_paths = pd.Series(dict(_pull_data(args)))
 
     print(csv_paths.to_frame('path to `ucs` scores').to_markdown())
     dfs = {count_type:
@@ -270,7 +326,7 @@ def save_dataframe(input_name, _df, added_measures=False):
 
 # %%
 if __name__ == '__main__':
-    
+
     _t0 = pd.Timestamp.now()
     _main()
     _t1 = pd.Timestamp.now()

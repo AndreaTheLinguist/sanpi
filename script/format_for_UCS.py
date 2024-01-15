@@ -1,62 +1,105 @@
 import argparse
+import re
 from pathlib import Path
 
 import pandas as pd
-from utils.general import confirm_dir
-from utils.dataframes import get_proc_time
-from utils.dataframes import save_in_lsc_format as export_counts
-import re
+from utils.dataframes import Timer, save_in_lsc_format as ucs_from_crosstab, save_for_ucs as ucs_from_hits
+from utils.general import confirm_dir, snake_to_camel
+
 cross_regex = re.compile(r'([^_]+)-x-([^_]+)')
 
 
 def _parse_args():
 
     parser = argparse.ArgumentParser(
-        description=('reshape hits table for UCS or LSC application'),
+        description=('reshape hits or frequency table for UCS library application'),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(
-        'data_path',
+        '-d',
+        '--data_path',
         type=Path,
+        #// action='append',
+        #// dest='input_paths',
         default=Path(
-            '/share/compling/data/sanpi/4_post-processed/RBXadj/bigrams_frq-thr0-001p.35f.pkl.gz'),
-        help=('path to dataframe containing values to reformat')
+            '/share/compling/data/sanpi/4_post-processed/RBXadj/bigrams_frq-thr0-075p.2f.pkl.gz'),
+        help=('path to dataframe containing values to reformat. Can be `.pkl.gz` or `.csv`, '
+              'and can be a crosstabulated joint frequency table, or a table indexed by `hit_id`. '
+              'If the latter, different columns for comparison can be specified '
+              'using `-1/--col_1` and `-2/--col_2`. ')
     )
 
-    return parser.parse_args().data_path
+    parser.add_argument(
+        '-1', '--col_1',
+        type=str, default='adv_form_lower',
+        help=('Option to specify first lexical column for UCS-formatted tsv, e.g. "category". '
+              'output takes format of: "JOINT_FREQ\tCOL_1\tCOL_2; '
+              'e.g. `--col_1=adv_form_lower` --> "987    very    good"'
+              )
+    )
+
+    parser.add_argument(
+        '-2', '--col_2',
+        type=str, default='adj_form_lower',
+        help=('Option to specify second lexical column for UCS-formatted tsv, e.g. "bigram_lower". '
+              'output takes format of: "JOINT_FREQ\tCOL_1\tCOL_2; '
+              'e.g. `--col_2=adv_form_lower` --> "987	good	very"'
+              )
+    )
+
+    return parser.parse_args()
 
 
-def make_ucs_tsv(data_path):
-    
+def make_ucs_tsv(data_path, col_1: str = None, col_2: str = None):
     """
-    Reformat frequency table dataframe for UCS analysis.
+        Reformat dataframe for UCS analysis.
 
     Args:
-        data_path: The path to the dataframe file.
+        data_path: The path to the data.
+        col_1: The label for column 1.
+        col_2: The label for column 2.
 
     Returns:
         None
+
+    Examples:
+        make_ucs_tsv('data.csv', 'column1', 'column2')
     """
-    
+
     df, data_stem = _load_df(data_path)
-    print('\n# Reformatting frequencies for UCS analysis',
+    print('\n# Reformatting co-occurence data for UCS analysis',
           '\n## Input Data:',
           '\n```',
           sep='\n')
     print(df)
     print('```')
-    w1_row_label, w0_col_label = pull_labels_from_stem(data_stem, df)
-    export_counts(df,
-                  output_tsv_path=set_out_path(data_path, data_stem),
-                  row_w1_label=w1_row_label,
-                  col_w0_label=w0_col_label,
-                  for_ucs=True)
+
+    # > table indexed by individual hit tokens
+    # if data_path.is_relative_to('/share/compling/data/sanpi'):
+    if df.index.name == 'hit_id':
+
+        ucs_from_hits(
+            df, col_1, col_2,
+            ucs_path=set_out_path(data_path, data_stem, col_1, col_2))
+
+    # > crosstabulated frequency table of joint counts
+    # if data_path.is_relative_to('/share/compling/projects/sanpi/results'):
+    else:
+        w1_row_label, w0_col_label = pull_labels_from_stem(data_stem, df)
+        ucs_from_crosstab(
+            df,
+            output_tsv_path=set_out_path(data_path, data_stem),
+            row_w1_label=w1_row_label,
+            col_w0_label=w0_col_label,
+            for_ucs=True)
 
 
 def _main():
-    data_path = _parse_args()
-    make_ucs_tsv(data_path)
+    args = _parse_args()
+
+    make_ucs_tsv(args.data_path, args.col_1, args.col_2)
+
 
 def pull_labels_from_stem(stem, df):
 
@@ -77,9 +120,16 @@ def pull_labels_from_stem(stem, df):
     return tags
 
 
-def set_out_path(data_path, data_stem):
-    out_dir = data_path.with_name('ucs_format')
+def set_out_path(data_path, data_stem, col_1: str = None, col_2: str = None):
+    freq_out_dir = Path('/share/compling/projects/sanpi/results/freq_out')
+    out_dir = (data_path.with_name('ucs_format')
+               if data_path.is_relative_to(freq_out_dir)
+               else freq_out_dir / data_path.parent.name / 'ucs_format')
     confirm_dir(out_dir)
+    if col_1 and col_2:
+        prefix = '-'.join((snake_to_camel(c.replace('form',
+                          '').replace('lower', ''))[:4] for c in (col_1, col_2)))
+        data_stem = f'from-hit-table_{prefix}_{data_stem}'
     return out_dir.joinpath(f'{data_stem}.tsv')
 
 
@@ -96,9 +146,8 @@ def _load_df(data_path):
 
 
 if __name__ == '__main__':
-    _t0 = pd.Timestamp.now()
-    _main()
-    _t1 = pd.Timestamp.now()
+    with Timer() as timer:
+        _main()
 
-    print('✔️ Program Completed --', pd.Timestamp.now().ctime())
-    print(f'   total time elapsed: {get_proc_time(_t0, _t1)}')
+        print('✔️ Program Completed --', pd.Timestamp.now().ctime())
+        print(f'   total time elapsed: {timer.elapsed()}')
