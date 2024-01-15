@@ -2,7 +2,7 @@
 
 # > Imports
 import argparse
-import statistics as stat
+# import statistics as stat
 from pathlib import Path
 # from re import search
 import re
@@ -11,11 +11,12 @@ import pandas as pd
 from utils import (cols_by_str, confirm_dir,  # pylint: disable=import-error
                    count_uniq, file_size_round, find_glob_in_dir,
                    get_proc_time, print_iter, print_md_table, save_table,
-                   sort_by_margins, unpack_dict)
+                   sort_by_margins, unpack_dict, Timer)
 from utils.LexicalCategories import (  # pylint: disable=import-error
     SAMPLE_ADJ, SAMPLE_ADV)
 from utils.visualize import heatmap  # pylint: disable=import-error
-from count_bigrams import (save_filter_index, describe_counts, locate_relevant_hit_tables,
+from count_bigrams import (save_filter_index, describe_counts,
+                           locate_relevant_hit_tables,
                            select_count_columns,
                            load_from_txt_index)
 
@@ -114,39 +115,57 @@ def prepare_hit_table(filter_ids_path: Path,
                       neg_hits_dir: Path) -> pd.DataFrame:
 
     # TODO: update this method to load from `3_dep_info/`
-    _t0 = pd.Timestamp.now()
-    print('\n## loading data...')
-    file_tag = META_TAG_REGEX.search(filter_ids_path.stem).group()
-    neg_filtered_hits_path = filter_ids_path.parent.parent.joinpath(
-        f'{neg_hits_dir.name}/trigger-bigrams_{file_tag}'
-    )
-    neg_filter_index_path = neg_filtered_hits_path.with_name(
-        f'trigger-index_{file_tag}')
-
-    if neg_filtered_hits_path.is_file():
-        print(
-            f'* Found previous output. Loading data from {neg_filtered_hits_path}...')
-        df = pd.read_pickle(neg_filtered_hits_path)  # //.convert_dtypes()
-        save_filter_index(neg_filter_index_path, df)
-        if not cols_by_str(df, end_str='lower'):
-            _add_form_lower(df)
-            # forms = cols_by_str(df, end_str='form')
-            # df[[f'{f}_lower' for f in forms]] = df[forms].apply(
-            #     lambda f: f.str.lower())
-            # defaults to `.pkl.gz`
-            save_table(df, str(neg_filtered_hits_path.resolve()),
-                       '*_form_lower columns added')
-    elif neg_filter_index_path.is_file():
-        df = load_from_txt_index(
-            data_dir=neg_hits_dir, index_txt_path=neg_filter_index_path)
-    else:
-        df = _prep_df_from_raw(
-            filter_ids_path, neg_hits_dir, neg_filtered_hits_path
+    with Timer() as timer:
+        print('\n## loading data...\n')
+        file_tag = META_TAG_REGEX.search(filter_ids_path.stem).group()
+        neg_filtered_hits_path = filter_ids_path.parent.parent.joinpath(
+            f'{neg_hits_dir.name}/trigger-bigrams_{file_tag}'
         )
-    _t1 = pd.Timestamp.now()
-    print('✓ time:', get_proc_time(_t0, _t1))
+        neg_filter_index_path = neg_filtered_hits_path.with_name(
+            f'trigger-index_{file_tag}')
+
+        if neg_filtered_hits_path.is_file():
+            print(
+                f'* Found previous output. Loading data from {neg_filtered_hits_path}...')
+            df = pd.read_pickle(neg_filtered_hits_path)  # //.convert_dtypes()
+            save_filter_index(neg_filter_index_path, df)
+            if not cols_by_str(df, end_str='lower'):
+                _add_form_lower(df)
+                # forms = cols_by_str(df, end_str='form')
+                # df[[f'{f}_lower' for f in forms]] = df[forms].apply(
+                #     lambda f: f.str.lower())
+                # defaults to `.pkl.gz`
+                save_table(df, str(neg_filtered_hits_path.resolve()),
+                           '*_form_lower columns added')
+        elif neg_filter_index_path.is_file():
+            df = load_from_txt_index(
+                data_dir=neg_hits_dir, index_txt_path=neg_filter_index_path)
+        else:
+            df = _prep_df_from_raw(
+                filter_ids_path, neg_hits_dir, neg_filtered_hits_path
+            )
+        # df = _ignore_double_dipping(df)
+        # XXX #? what exactly is this doing?
+        df['bigram_id'] = df.index.str.rstrip()
+        print('✓ time:', timer.elapsed())
     return df
 
+
+# def _ignore_double_dipping(df):
+#     #! #HACK
+#     if any(df.duplicated(subset='bigram_id')):
+#         print('\n## Found bigram double-dipping!\n\n'
+#               '- dropping duplicated bigram environments.')
+#         doub_dips = df.loc[df.duplicated('bigram_id', keep=False), :].sort_values('bigram_id')
+#         print_md_table(doub_dips.loc[:40, df.columns.isin(['bigram_id', 'mir_form_lower', 'neg_form_lower', 'bigram_lower', 'text_window'])],
+#                        indent=2, title='Sample of Bigram Double-Dipping')
+#         df = _drop_more_distant_dep(doub_dips)
+#     return df
+
+
+# def _drop_more_distant_dep(dd):
+#     for bigram_id, dips in dd.groupby('bigram_id'):
+#         dips = dips.loc[dips.text_window == dips.text_window.apply(len).min(), :]
 
 def _prep_df_from_raw(filter_ids_path,
                       neg_hits_dir,
@@ -154,7 +173,7 @@ def _prep_df_from_raw(filter_ids_path,
 
     # df = load_from_txt_index(neg_hits_dir, index_txt_path=filter_ids_path)
 
-    df = _load_data(filter_ids_path, data_dir=neg_hits_dir)
+    df = _load_and_limit_data(filter_ids_path, data_dir=neg_hits_dir)
     if df.index.name != 'hit_id':
         df = df.set_index('hit_id')
         # print(f'\n> {len(df):,} initial hits')
@@ -170,6 +189,7 @@ def _prep_df_from_raw(filter_ids_path,
         str(neg_filtered_hits_path.resolve()).split('.pkl', 1)[0],
         f"filtered {neg_hits_dir.name} hits",
     )
+
     if len(df) < 10 ^ 6:
         save_table(
             df=df,
@@ -232,18 +252,17 @@ def _describe_str_word_counts(df: pd.DataFrame) -> pd.DataFrame:
     # // return lemma_stats.round()
 
 
-def _load_data(filter_ids_path, data_dir: Path) -> pd.DataFrame:
-    _ts = pd.Timestamp.now()
+def _load_and_limit_data(filter_ids_path, data_dir: Path) -> pd.DataFrame:
+    with Timer() as timer:
 
-    df_iter = filter_hits(data_dir, filter_ids_path)
+        df_iter = filter_hits(data_dir, filter_ids_path)
 
-    combined_df = pd.concat(df_iter)
-    print_md_table(combined_df.describe().T.convert_dtypes(),
-                   title='Combined Raw Hits Summary')
+        combined_df = pd.concat(df_iter)
 
-    _te = pd.Timestamp.now()
-    print('> Time to create composite hits dataframe:',
-          get_proc_time(_ts, _te))
+        print_md_table(combined_df.describe().T.convert_dtypes(),
+                       title='\n## Combined Raw Hits Summary')
+
+        print('+ Time to create composite hits dataframe:', timer.elapsed())
 
     return combined_df
 
@@ -251,9 +270,9 @@ def _load_data(filter_ids_path, data_dir: Path) -> pd.DataFrame:
 def filter_hits(data_dir: Path, filter_ids_path: Path):
 
     for i, (pkl, bigram_ids) in enumerate(
-        locate_relevant_hit_tables(
-            data_dir, filter_ids_path), 
-        start=1):
+            locate_relevant_hit_tables(
+                data_dir, filter_ids_path),
+            start=1):
 
         print(f'\n{i}. ../{Path(*pkl.parts[-3:])}')
         print('   + size:', file_size_round(pkl.stat().st_size))
@@ -266,7 +285,7 @@ def filter_hits(data_dir: Path, filter_ids_path: Path):
         print('   + Before filtering to target bigrams only')
         desc_t = df.select_dtypes(
             exclude='object').describe().T.convert_dtypes()
-        print_md_table(desc_t.sort_index(), 
+        print_md_table(desc_t.sort_index(),
                        n_dec=0, comma=True,
                        indent=5, title=f'({i}) `{pkl.stem}` summary')
 
@@ -277,13 +296,14 @@ def filter_hits(data_dir: Path, filter_ids_path: Path):
         cat_cols = df.select_dtypes(include='category').columns
         df[cat_cols] = df[cat_cols].astype('string')
         df = df.loc[df.bigram_id.isin(bigram_ids), :]
-        df[cat_cols] = df[cat_cols].astype('category')
-        print('   + After filtering to target bigrams')
-        print_md_table(df.select_dtypes(exclude='object')
-                       .describe().T.convert_dtypes(),
-                       indent=5, title=f'({i}) `{pkl.stem}` summary')
-        #! temporarily commented out-- not sure if this is needed or not
-        yield df
+
+        if not df.empty:
+            df[cat_cols] = df[cat_cols].astype('category')
+            print('   + After filtering to target bigrams')
+            print_md_table(df.select_dtypes(exclude='object')
+                           .describe().T.convert_dtypes(),
+                           indent=5, title=f'({i}) `{pkl.stem}` summary')
+            yield df
 
 
 def flatten_deps(input_path, df):

@@ -1,16 +1,16 @@
 #!/bin/bash
 #SBATCH -N1
 #SBATCH -n1
-#SBATCH --mem=10G
+#SBATCH --mem=40G
 #SBATCH -o %x.%j.out
 #SBATCH -e %x.%j.err
-#SBATCH --time 12:00:00
-#SBATCH -J count_NEG
+#SBATCH --time 4:00:00
+#SBATCH -J count_env
 #SBATCH --requeue
-#SBATCH --chdir=/share/compling/projects/sanpi/logs/count_neg/#//testing #!#HACK remove "testing"
+#SBATCH --chdir=/share/compling/projects/sanpi/logs/count_env/#//testing #!#HACK remove "testing"
 
 # usage:    sbatch [slurm flags] count-neg.slurm.sh
-echo 'running slurm script: /share/compling/projects/sanpi/slurm/count-neg.slurm.sh'
+echo 'running slurm script: /share/compling/projects/sanpi/slurm/count-env.slurm.sh'
 echo "JOB ID: ${SLURM_JOB_ID}"
 echo "JOB NAME: ${SLURM_JOB_NAME}"
 echo "started @ $(date '+%F %X') from $(pwd)"
@@ -35,7 +35,7 @@ OUT_DIR="-o /share/compling/projects/sanpi/results/freq_out/${DATA}"
 # BIGRAM_FIlTER="${SANPI_DATA}/4_post-processed/RBXadj/bigram-IDs_thr0-1p.10f.txt"
 
 
-PY_MODULE="/share/compling/projects/sanpi/source/analyze/count_neg.py"
+PY_MODULE="/share/compling/projects/sanpi/source/analyze/count_env.py"
 # LOG_FILE="${SLURM_JOB_NAME}.${SLURM_JOB_ID}~$(date +%y-%m-%d_%H%M).log"
 LOG_FILE="${SLURM_JOB_NAME}.${SLURM_JOB_ID}.log"
 # echo 'time python ${PY_MODULE}'

@@ -10,7 +10,7 @@ import pandas as pd
 from utils import (  # pylint: disable=import-error; //select_cols, set_pd_display,
     cols_by_str, confirm_dir, count_uniq, find_glob_in_dir, get_proc_time,
     percent_to_count, print_iter, print_md_table, save_table,
-    select_pickle_paths, sort_by_margins, unpack_dict)
+    select_pickle_paths, sort_by_margins, unpack_dict, Timer)
 from utils.visualize import heatmap  # pylint: disable=import-error
 
 LOAD_TUPLE = namedtuple(
@@ -60,7 +60,8 @@ def _main():
                            tok_thresh_p=percent_thresh,
                            post_proc_dir=post_proc_dir,
                            data_dir=data_dir,
-                           verbose=True)  # ! #HACK -- remove for full data processing
+                           verbose=True
+                           )  # ! #HACK -- remove for full data processing
     _summarize_hits(df)
     if not frq_groups:
         frq_groups = ['all']
@@ -385,7 +386,8 @@ def load_from_txt_index(data_dir: Path,
 
 
 def locate_relevant_hit_tables(data_dir, index_txt_path):
-    simple_dir = data_dir.joinpath('simple')
+    condensed_dir = data_dir / 'condensed'
+    simple_dir = data_dir / 'simple'
 
     # * Path variation info
     # hit_ids_gen = iter_hit_id_index(check_point.index_path)
@@ -404,20 +406,35 @@ def locate_relevant_hit_tables(data_dir, index_txt_path):
     # pcc_eng_06_108.0002_x1730749_18:5-6
     #   -> f'{simple_dir}/S_bigram-Pcc06_rb-bigram_hits.pkl.gz
 
-    hit_ids = pd.Series(index_txt_path.read_text().splitlines(),
-                        dtype='string')
-    for corpus_cue, _ids in hit_ids.groupby(
-        hit_ids.apply(lambda hit_id: ''.join(
-            g or ''
-            for g in regex_path_from_hit_id.search(hit_id).groups()))):
+    with Timer() as timer:
+        bigram_ids = pd.Series(
+            index_txt_path.read_text().splitlines(), dtype='string')
+        print(f'time to load bigram filter index: {timer.elapsed()}')
 
-        glob_str = f'*bigram-{corpus_cue}*hit*.{_PKL_SUFF}'
+    for corpus_cue, _ids in gen_corpus_cues(bigram_ids):
+        glob_str = f'*{corpus_cue}*hit*.{_PKL_SUFF}'
 
-        simple_paths = list(simple_dir.glob(glob_str))
-        
-        hit_paths = simple_paths or list(data_dir.glob(glob_str))
+        hit_paths = (
+            list(condensed_dir.glob(glob_str))
+            or list(simple_dir.glob(glob_str))
+            or list(data_dir.glob(glob_str)))
         for hit_path in hit_paths:
             yield hit_path, _ids
+
+
+def gen_corpus_cues(bigram_ids):
+    df = bigram_ids.to_frame('bigram_id')
+    with Timer() as timer:
+        df['corpus_cue'] = df.bigram_id.apply(
+            lambda x: ''.join((g or '').capitalize() for g
+                              in regex_path_from_hit_id.search(x).groups())
+        ).astype('string').astype('category')
+        print('time to isolate corpus cue values from filtered bigram IDs:',
+              timer.elapsed())
+    exit  # ! #HACK TEMP
+    yield from (
+        (corpus_part, id_df.bigram_id.to_list())
+        for corpus_part, id_df in df.groupby('corpus_cue'))
 
 
 def _load_selection(t_path, load_index):
@@ -796,7 +813,7 @@ def odd_lemma_orth(lemmas: pd.Series) -> pd.Series:
 def _drop_long_sents(df: pd.DataFrame) -> pd.DataFrame:
     starting_df = df.copy()
     df = df.assign(tok_in_sent=df.token_str.apply(lambda s: len(s.split())))
-    
+
     too_long = df.tok_in_sent > _MAX_TOK_PER_SENT
     uniq_too_long = df.loc[too_long, :].index.str.split(":",
                                                         1).str.get(0).unique()
@@ -892,13 +909,13 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
 
             # > if _too many_ hits were dropped...
             if ((n_remain < must_keep)
-                        # keep at least 20 unique adv
-                        or (update_df.loc[:, update_df.columns.str.startswith('adv_')]
-                            .squeeze().nunique() < _ADV_KEEP_REQ)
-                    # was: or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
-                        # keep at least 40 unique adj
-                    or (update_df.loc[:, update_df.columns.str.startswith('adj_')].squeeze().nunique() < _ADJ_KEEP_REQ)
-                    # was: or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
+                    # keep at least 20 unique adv
+                    or (update_df.loc[:, update_df.columns.str.startswith('adv_')]
+                                .squeeze().nunique() < _ADV_KEEP_REQ)
+                        # was: or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
+                    # keep at least 40 unique adj
+                        or (update_df.loc[:, update_df.columns.str.startswith('adj_')].squeeze().nunique() < _ADJ_KEEP_REQ)
+                        # was: or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
                     ):
 
                 if not filter_applied and filter_attempt < 5:

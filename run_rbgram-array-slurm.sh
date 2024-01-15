@@ -24,7 +24,7 @@
 #      [directory name]
 #          any (single) directory name in "./Pat/"
 
-# example: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi contig --array=35-36
+# example: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi --mirror --debug
 # EVERYTHING: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi --all_pat
 
 CPUS=10
@@ -38,6 +38,7 @@ MODE=$1
 PAT_FLAG=${2:-""}
 echo "PAT_FLAG: ${PAT_FLAG}"
 ARRAY_FLAG=${3:-""}
+echo "ARRAY_FLAG: ${ARRAY_FLAG}"
 
 
 if [[ $(which grew && grew version) ]]; then
@@ -71,16 +72,19 @@ if [[ $(which grew && grew version) ]]; then
     echo
     if [[ ${ARRAY_FLAG} == '--debug' ]]; then
         ARRAY_FLAG="--array=35-37"
+    elif [[ ${ARRAY_FLAG} == '--full' ]]; then
+        ARRAY_FLAG="--array=0-34"
     fi
     
     echo -e "\nPatterns to submit jobs for: ${PATS[@]}"
-    echo "Corpus Part Index to Search: ${ARRAY_FLAG}"
+    echo "Array Index of Corpus Parts to Search: ${ARRAY_FLAG#--array=}"
     for PAT in "${PATS[@]}"; do
         echo -e "\n## $PAT\n"
         JOB_NAME="-J bigram-${PAT}_$(date +%y-%m-%d_%H%M)"
         if [[ ${MODE} == 'multi' ]]; then
             # echo 'sbatch ${JOB_NAME} ${ARRAY_FLAG} ./bigram-array.slurm.sh ${PAT}'
             echo "sbatch ${JOB_NAME} ${ARRAY_FLAG} --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=${LOG_DIR} bigram-array.slurm.sh ${PAT}"
+            # exit #! #HACK temp exit >> remove
             sbatch ${JOB_NAME} ${ARRAY_FLAG} --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=${LOG_DIR} /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh ${PAT}
 
         elif [[ ${MODE} == 'solo' ]]; then
