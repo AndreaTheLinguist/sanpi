@@ -438,3 +438,4 @@ slurm/train-lsc.slurm.sh
 data-link
 source/LSC
 **/*scratch*
+**/prior_version
