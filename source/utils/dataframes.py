@@ -9,11 +9,12 @@ import numpy as np
 import pandas as pd
 
 try:
-    from general import confirm_dir, find_files, snake_to_camel  # pylint: disable=import-error
+    from general import (confirm_dir,  # pylint: disable=import-error
+                         find_files, snake_to_camel)
 except ModuleNotFoundError:
     try:
-        from utils.general import (
-            confirm_dir, find_files, snake_to_camel)  # pylint: disable=import-error
+        from utils.general import (confirm_dir,  # pylint: disable=import-error
+                                   find_files, snake_to_camel)
     except ModuleNotFoundError:
         from source.utils.general import (  # pylint: disable=import-error
             confirm_dir, find_files, snake_to_camel)

@@ -5,7 +5,8 @@ from pathlib import Path
 from sys import exit as sysxit
 
 from utils.dataframes import Timer
-from utils.general import build_ucs_table, confirm_dir, print_iter
+from utils.general import confirm_dir, print_iter
+from utils.ucs_prep import prep_by_polarity, build_ucs_from_multiple
 
 WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 _RSLT_DIR = Path('/share/compling/projects/sanpi/results')
@@ -114,93 +115,99 @@ def _main():
     prepped_dict = prep_by_polarity(
         in_paths_dict, args.row_limit, args.word_filter)
     if args.run:
-        _build_polar_ucs(prepped_dict, args.min_count, args.word_filter)
+        out_path = build_ucs_from_multiple(prepped_dict, args.min_count, args.word_filter)
 
 
-def prep_by_polarity(in_paths_dict, row_limit, words_to_keep='bigram'):
-    confirm_existing_tsv(in_paths_dict)
-    input_data_suff = _get_input_suff(in_paths_dict)
-    # input_data_suffix_strs = [''.join(p.suffixes) for p in in_paths_dict.values()]
-    # input_data_flag = {suff:len(suff) for suff in input_data_suffix_strs if }
-    print('---')
-    polar_dict = {counts_label: prep_lines(tsv_path=counts_tsv,
-                                           polarity=counts_label,
-                                           row_limit=row_limit,
-                                           data_suff=input_data_suff,
-                                           words_to_keep=words_to_keep)
-                  for counts_label, counts_tsv in in_paths_dict.items()}
-    # print('Polarity prepped counts saved as:')
-    # print(f'\n'.join((f'+ {n.capitalize(): >10} -> '
-    #                   + str(Path(*p.parts[-3:])) for n, p in polar_dict.items())))
-    print_iter((f'{n.capitalize(): >10} -> '
-                + str(Path(*p.parts[-3:])) for n, p in polar_dict.items()),
-               bullet='+',
-               header='Polarity prepped counts saved as:')
-    return polar_dict
-
-def _get_input_suff(in_paths_dict):
-    flag = None
-    for p in in_paths_dict.values():
-        suff = re.findall(r'\.\d+f=\d+\+\.tsv', p.name)
-        if any(suff): 
-            flag = suff[0]
-            break
-    return flag
+# def prep_by_polarity(in_paths_dict: dict,
+#                      row_limit: int = None,
+#                      words_to_keep: str = 'bigram'):
+#     confirm_existing_tsv(in_paths_dict)
+#     input_data_suff = _get_input_suff(in_paths_dict)
+#     # input_data_suffix_strs = [''.join(p.suffixes) for p in in_paths_dict.values()]
+#     # input_data_flag = {suff:len(suff) for suff in input_data_suffix_strs if }
+#     print('---')
+#     polar_dict = {counts_label: prep_lines(tsv_path=counts_tsv,
+#                                            polarity=counts_label,
+#                                            row_limit=row_limit,
+#                                            data_suff=input_data_suff,
+#                                            words_to_keep=words_to_keep)
+#                   for counts_label, counts_tsv in in_paths_dict.items()}
+#     # print('Polarity prepped counts saved as:')
+#     # print(f'\n'.join((f'+ {n.capitalize(): >10} -> '
+#     #                   + str(Path(*p.parts[-3:])) for n, p in polar_dict.items())))
+#     print_iter((f'{n.capitalize(): >10} -> '
+#                 + str(Path(*p.parts[-3:])) for n, p in polar_dict.items()),
+#                bullet='+',
+#                header='Polarity prepped counts saved as:')
+#     return polar_dict
 
 
-def confirm_existing_tsv(tsv_obj):
-    try:
-        file_exists = tsv_obj.is_file()
-    except AttributeError:
-        for tsv in tsv_obj.values():
-            if not Path(tsv).is_file():
-                sysxit(f'Input data {tsv} not found!')
-    else:
-        if not file_exists:
-            sysxit(f'Input data {tsv} not found!')
+# def _get_input_suff(in_paths_dict):
+#     suffix = '.tsv'
+#     for p in in_paths_dict.values():
+#         in_suff = re.findall(r'\.\d+f=\d+\+\.tsv', p.name)
+#         if any(in_suff):
+#             suffix = in_suff[0]
+#             break
+#     return suffix
 
 
-def prep_lines(tsv_path: Path,
-               polarity: str,
-               row_limit: int = None,
-               data_suff: str = None,
-               words_to_keep: str = 'bigram'):
-    # // confirm_existing_tsv(tsv_path)
-    # 👆 not needed because run on entire dict before this is applied
-    prep_path = _POL_DIR / f'{polarity.lower()}_{words_to_keep}_counts{data_suff}'
-    print(f'\nProcessing {polarity} counts loaded from {tsv_path.relative_to(_RSLT_DIR)}...')
-    if not prep_path.is_file():
-        prep_path.write_text('\n'.join(new_line_gen(
-            tsv_path, polarity, row_limit, words_to_keep)) + '\n')
-    else: 
-        print(f'+ [{prep_path.relative_to(_RSLT_DIR)} already exists -- not overwritten]')
-    print('+ ✓ done')
-    return prep_path
+# def confirm_existing_tsv(tsv_obj):
+#     try:
+#         file_exists = tsv_obj.is_file()
+#     except AttributeError:
+#         for tsv in tsv_obj.values():
+#             if not Path(tsv).is_file():
+#                 sysxit(f'Input data {tsv} not found!')
+#     else:
+#         if not file_exists:
+#             sysxit(f'Input data {tsv} not found!')
 
 
-def new_line_gen(tsv_path: Path, polarity: str, row_limit: int = None, words_to_keep: str = 'bigram'):
-    sub_keep_str = polarity.upper()
-    if words_to_keep == 'bigram':
-        sub_keep_str += r'\t\1_\2'
-    elif words_to_keep == 'adv':
-        sub_keep_str += r'\t\1'
-    elif words_to_keep == 'adj':
-        sub_keep_str += r'\t\2'
+# def prep_lines(tsv_path: Path,
+#                polarity: str,
+#                row_limit: int = None,
+#                data_suff: str = '',
+#                words_to_keep: str = 'bigram'):
+#     # // confirm_existing_tsv(tsv_path)
+#     # 👆 not needed because run on entire dict before this is applied
+#     prep_path = _POL_DIR / \
+#         f'{polarity.lower()}_{words_to_keep}_counts{data_suff}'
+#     print(
+#         f'\nProcessing {polarity} counts loaded from {tsv_path.relative_to(_RSLT_DIR)}...')
+#     if not prep_path.is_file():
+#         prep_path.write_text('\n'.join(new_line_gen(
+#             tsv_path, polarity, row_limit, words_to_keep)) + '\n')
+#     else:
+#         print(
+#             f'+ [{prep_path.relative_to(_RSLT_DIR)} already exists -- not overwritten]')
+#     print('+ ✓ done')
+#     return prep_path
 
-    for line in read_rows(tsv_path, row_limit):
-        yield WORD_GAP.sub(sub_keep_str, line)
+
+# def new_line_gen(tsv_path: Path, polarity: str, row_limit: int = None, words_to_keep: str = 'bigram'):
+#     sub_keep_str = polarity.upper()
+#     if words_to_keep == 'bigram':
+#         sub_keep_str += r'\t\1_\2'
+#     elif words_to_keep == 'adv':
+#         sub_keep_str += r'\t\1'
+#     elif words_to_keep == 'adj':
+#         sub_keep_str += r'\t\2'
+
+#     for line in read_rows(tsv_path, row_limit):
+#         yield WORD_GAP.sub(sub_keep_str, line)
 
 
-def read_rows(tsv_path: Path, row_limit: int = 0):
-    return (tsv_path.read_text().splitlines()[:row_limit]
-            if row_limit
-            else tsv_path.read_text().splitlines())
+# def read_rows(tsv_path: Path, row_limit: int = 0):
+#     return (tsv_path.read_text().splitlines()[:row_limit]
+#             if row_limit
+#             else tsv_path.read_text().splitlines())
 
 
-def _build_polar_ucs(polar_dict, min_count, count_type='bigram'):
-    cat_count_tsv_cmd = f'(cat {polar_dict["complement"]} && cat {polar_dict["negated"]})'
-    ucs_save_path = f'{_POL_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
-    build_ucs_table(min_count, ucs_save_path, cat_count_tsv_cmd)
+# def _build_polar_ucs(polar_dict, min_count, count_type='bigram'):
+#     cat_count_tsv_cmd = f'(cat {polar_dict["complement"]} && cat {polar_dict["negated"]})'
+#     ucs_save_path = f'{_POL_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
+#     build_ucs_table(min_count, ucs_save_path, cat_count_tsv_cmd)
 
 
 if __name__ == '__main__':

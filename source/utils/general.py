@@ -4,32 +4,30 @@ import re
 from os import system
 from pathlib import Path
 
-ucs_header_wrd_brk = re.compile(r'\.([a-zA-Z])')
-
 
 def confirm_dir(dir_path: Path):
     if not dir_path.is_dir():
         dir_path.mkdir(parents=True)
 
 
-def build_ucs_table(min_count: int, ucs_save_path: Path, cat_tsv_command: str):
-    threshold_arg = f'--threshold={min_count}'
-    primary_cmd = 'ucs-make-tables --types --verbose'
-    sort_cmd = f'ucs-sort -v {ucs_save_path} BY f2- f- INTO {ucs_save_path}'
-    cmd_with_args = ' '.join([primary_cmd, threshold_arg, ucs_save_path])
-    full_cmd_str = ' | '.join([cat_tsv_command, cmd_with_args])
-    full_cmd_str += f'&& {sort_cmd}'
-    print()
-    print(re.sub(r'([\|&]+)', r'\\ \n  \1', full_cmd_str))
-    print()
-    system(full_cmd_str)
+# def build_ucs_table(min_count: int, ucs_save_path: Path, cat_tsv_command: str):
+#     threshold_arg = f'--threshold={min_count}'
+#     primary_cmd = 'ucs-make-tables --types --verbose'
+#     sort_cmd = f'ucs-sort -v {ucs_save_path} BY f2- f- INTO {ucs_save_path}'
+#     cmd_with_args = ' '.join([primary_cmd, threshold_arg, ucs_save_path])
+#     full_cmd_str = ' | '.join([cat_tsv_command, cmd_with_args])
+#     full_cmd_str += f'&& {sort_cmd}'
+#     print()
+#     print(re.sub(r'([\|&]+)', r'\\ \n  \1', full_cmd_str))
+#     print()
+#     system(full_cmd_str)
 
-    note = '''
-== Note ==
-N = total number of tokens/all counts summed
-V = total number of rows/number of unique combinations before filtering to {}+ tokens
-    '''.format(min_count)  # pylint: disable=consider-using-f-string
-    print(note)
+#     note = '''
+# == Note ==
+# N = total number of tokens/all counts summed
+# V = total number of rows/number of unique combinations before filtering to {}+ tokens
+#     '''.format(min_count)  # pylint: disable=consider-using-f-string
+#     print(note)
 
 
 def display_message(message: str,
@@ -191,8 +189,9 @@ def print_iter(iter_obj,
 
 
 def run_shell_command(command_str):
-    print(command_str + '\n>>>')
+    print(f'\n```\n{command_str}')
     system(command_str)
+    print('```\n')
 
 
 def snake_to_camel(snake: str):

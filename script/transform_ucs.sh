@@ -177,6 +177,5 @@ ucs-print -v -o ${VIEW_PATH/.txt/_r-only.txt} \
     'l1' 'l2' 'f' 'E11' 'r.%' 'f1' 'f2' 'N' FROM ${SORT_PATH}
 ucs-print -v -o ${VIEW_PATH/.txt/_am-only.txt} \
     'l1' 'l2' 'f' 'E11' 'am.%' 'f1' 'f2' 'N' FROM ${SORT_PATH}
-ucs-print -v -o ${VIEW_PATH/.txt/_simple.txt} \
-    'l1' 'l2' 'f' 'f1' 'f2' 'N' FROM ${SORT_PATH}
+
 echo "Script finished at $(date)"
