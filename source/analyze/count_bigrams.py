@@ -228,8 +228,9 @@ def prepare_hit_table(n_files: int,
             #            path_str=str(cleaned_path).replace(pkl_suff, ''),
             #            df_name="cleaned bigrams")
         # > summarize clean hits
-        print_md_table(df.loc[:, df.columns != 'token_str'].describe(
-        ).T, indent=2, title='Clean Hits Summary ("token_str" column excluded)')
+        print_md_table(df.loc[:, df.columns != 'token_str'],
+                       title='Clean Hits Summary (`token_str` excluded)',
+                       indent=2, describe=True, transpose=True)
         print_md_table(_describe_str_adx_counts(df), indent=2,
                        title='## Clean Word Stats Summary')
 
@@ -270,15 +271,16 @@ def _load_from_priors(data_dir, check_pt):
     # > if index filter exists
     #   -> .txt list of `hit_id` values for current processing checkpoint
     elif check_pt.index_path.is_file():
-        t0_load = pd.Timestamp.now()
-        df = load_from_txt_index(data_dir=data_dir,
-                                 check_point=check_pt)
-        print(f'  time to load using prior {stage}ed',
-              'index →',
-              get_proc_time(t0_load, pd.Timestamp.now()))
-        if check_pt.stage != 'clean':
-            save_table(df, str(check_pt.frame_path).strip(
-                _PKL_SUFF), f'{stage}ed dataframe')
+        with Timer() as timer:
+            df = load_from_txt_index(data_dir=data_dir,
+                                     check_point=check_pt)
+            print(f'  time to load using prior {stage}ed',
+                  'index →', timer.elapsed())
+        if check_pt.stage != 'clean' or df.size < 850000:
+            save_table(
+                df=df,
+                save_path=str(check_pt.frame_path).strip(_PKL_SUFF),
+                df_name=f'{stage}ed dataframe')
     if any(df):
         print(f'> Loaded data already accounts for {stage}ing.')
     return df
@@ -455,9 +457,12 @@ def confirm_form_lower_columns(df):
         words_df = df[target_cols]
     except KeyError:
         df = _add_form_lower(df)
-        exit('Counting columns (`{adj,adv}_form_lower`) not found in dataframe.'
-             + ' Inspect processing and inputs and try again. \nEXITING')
 
+        try:
+            words_df = df[target_cols]
+        except KeyError:
+            exit('Counting columns (`{ad*_form_lower`) not found in dataframe.'
+                 + ' Inspect processing and inputs and try again. \nEXITING')
     return df, words_df
 
 
@@ -516,14 +521,18 @@ def save_filter_index(index_path: Path, df: pd.DataFrame):
     return
 
 
-def _describe_str_adx_counts(df: pd.DataFrame,
-                             transpose: bool = True) -> pd.DataFrame:
-    # [ ] if certain input `df` will have columns: df[['adj_form_lower', 'adv_form_lower']], change `contains` to `endswith`
-    # was: lemma_stats = (df.columns[df.columns.str.endswith('_lemma')]
-    word_stats = pd.DataFrame(df[c].value_counts().describe()
-                              for c in cols_by_str(df, start_str='ad'))
-    # was: word_stats.columns = word_stats.columns.str.replace('lemma', 'counts')
-    # word_stats.columns = word_stats.columns.str.replace('form', 'counts')
+def _describe_str_adx_counts(df: pd.DataFrame) -> pd.DataFrame:
+    word_stats = pd.DataFrame(
+        df[c].value_counts().describe()
+        for c in df.filter(
+            regex=r'^[ab].*(form|lemma|lower)$'
+        ).columns
+    #> since `describe()` is run on `value_counts()` output, `count` == num unique values
+    ).rename(columns={'count':'unique'})
+    
+    #> if num_cols - num_rows > 2 
+    transpose = word_stats.shape[1] - word_stats.shape[0] > 2
+
     return word_stats.transpose() if transpose else word_stats
 
 
@@ -895,8 +904,13 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
         # > if _no/too few_ hits were dropped (overall) ~ 95+% of initial hits remain...
         #! use `n_remain` to evaluate because `n_dropped` is only for CURRENT attempt
         # > or if median count for either lemma type is less than 5
+        count_stats = _describe_str_adx_counts(update_df)
+        try:
+            medians = count_stats['50%']
+        except KeyError: 
+            medians = count_stats.loc['50%',:]
         if (n_remain >= _KEEP_ALLOWANCE_RATIO * clean_total
-                or any(_describe_str_adx_counts(update_df).T['50%'] < _MIN_MEDIAN)):
+                or any(medians < _MIN_MEDIAN)):
             # > raise percentage threshold --> increase by 1/4
             adjust_str = '◔ Insufficient Reduction: 🔺raising'
             percent *= 1.25
@@ -995,7 +1009,9 @@ def _get_update(df, token_thresh):
 
     update_df = df.loc[indexers[0] & indexers[1], :]
 
-    up_st = _describe_str_adx_counts(update_df).T
+    up_st = _describe_str_adx_counts(update_df)
+    if 'max' not in up_st.columns: 
+        up_st = up_st.T
     up_st = (up_st
              .assign(range=up_st['max'] - up_st['min'],
                      iqr=up_st['75%'] - up_st['25%']).round())

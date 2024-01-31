@@ -225,30 +225,14 @@ def _get_hit_data(json_dir):
 def _remove_redundant(df: pd.DataFrame,
                       json_path: Path):
 
-    # FIXME: remove? Don't think this is still necessary since indexing was fixed.
     logging.info('removing redundant pattern matches...')
-    # // is_unfilled = df.sent_text.isna()
-    # // unfilled_rows = df.loc[is_unfilled, :]
-    # // unfilled_ids = unfilled_rows.reset_index().hit_id
-    # // filled_ids = df.reset_index().hit_id[~is_unfilled].unique()
-    # // # > reconfigure dataframe to be:
-    # // # >   all filled rows
-    # // # >   + all unfilled rows representing an otherwise unaccounted hit (not in filled rows)
-    # // unaccounted_raw = unfilled_rows.loc[~unfilled_ids.isin(filled_ids), :]
-    # // fdf = pd.concat([df.loc[~is_unfilled, :], unaccounted_raw])
-    # // if unaccounted_raw.empty:
-    # //     fdf = fdf.loc[:, fdf.columns[~fdf.columns.str.contains('matching_')]]
-    # //     logging.warning('Unfilled nonduplicate rows remaining in dataframe.')
-    # // #! cheating, for now, because I'm not certain the above should be removed yet.
-    # // df = df
-    # ^ it's running ok wihtout it I think, so put it all back to `df`
     # > remove any full duplicates
     dep_cols = df.columns[df.columns.str.startswith('dep')].to_list()
     dup_assess_cols = df.columns[
         df.columns.isin(['match_id', 'token_str',
                          'context_prev_sent', 'context_next_sent'])
     ].to_list() + dep_cols
-    # dictionaries are not hashable types, so will crash with duplicated()
+    #! dictionaries are not hashable types, so will crash with duplicated()
     dup_hashed = df.copy().loc[:, dup_assess_cols]
     unhashable = dup_hashed.dtypes != 'string'
     dup_hashed.loc[:, unhashable] = dup_hashed.loc[:,unhashable].astype('string')
@@ -327,63 +311,8 @@ def _remove_redundant(df: pd.DataFrame,
 
 
 def _process_ix(df):
-    # if any(df.token_str.isna()):
-    #     logging.warning('Empty token string(s) in json data.')
 
-    # # ? Are .fillna() applications necessary here?? they shouldn't be. These should all have values...
-    # df = df.assign(token_str=df.token_str.astype('string').fillna(''))
-    # utt_len = pd.to_numeric(df.token_str.apply(lambda x: len(x.split())),
-    #                         downcast='integer')
-    # ix_df = df.loc[:, df.columns.str.endswith(('index'))]
-    # ix_df = ix_df.fillna(0).apply(pd.to_numeric, downcast='integer')
-
-    # ix_df = ix_df.assign(hit_start_ix=pd.to_numeric(ix_df.apply(min, axis=1), downcast='unsigned'),
-    #                      hit_final_ix=pd.to_numeric(ix_df.apply(
-    #                          max, axis=1), downcast='unsigned'),
-    #                      utt_len=utt_len,
-    #                      token_str=df.token_str)
-
-    # ix_df = ix_df.assign(
-    #     win_start_ix=ix_df.hit_start_ix.apply(lambda x: max(x - MARGIN_SIZE, 0)),
-    #     # testing for end of string is unnecessary. going over the len() value doesn't do anything
-    #     win_final_ix=ix_df.hit_final_ix + MARGIN_SIZE
-    # )
-
-    # win_strs = tuple(_gen_window(
-    #     ix_df.token_str, ix_df.win_start_ix, ix_df.win_final_ix))
-    # hit_strs = tuple(_gen_window(
-    #     ix_df.token_str, ix_df.hit_start_ix, ix_df.hit_final_ix))
-
-    # df = df.assign(
-    #     hit_text=hit_strs,
-    #     text_window=win_strs,
-    #     utt_len=ix_df.utt_len)
-    # return df
-
-    # > Sourcery "simplify code" output
-    # if any(df.token_str.isna()):
-    #     logging.warning('Empty token string(s) in json data.')
-
-    # df = df.assign(token_str=df.token_str.astype('string').fillna(''))
-    # utt_len = pd.to_numeric(df.token_str.str.split().str.len(), downcast='integer')
-
-    # ix_df = (df.loc[:, df.columns.str.endswith(('index'))]
-    #          .fillna(0)
-    #          .apply(pd.to_numeric, downcast='integer')
-    #          .assign(hit_start_ix=lambda df: pd.to_numeric(df.min(axis=1), downcast='unsigned'),
-    #                  hit_final_ix=lambda df: pd.to_numeric(df.max(axis=1), downcast='unsigned'),
-    #                  utt_len=utt_len,
-    #                  token_str=df.token_str,
-    #                  win_start_ix=lambda df: df.hit_start_ix.apply(lambda x: max(x - MARGIN_SIZE, 0)),
-    #                  win_final_ix=lambda df: df.hit_final_ix + MARGIN_SIZE))
-
-    # win_strs = tuple(_gen_window(ix_df.token_str, ix_df.win_start_ix, ix_df.win_final_ix))
-    # hit_strs = tuple(_gen_window(ix_df.token_str, ix_df.hit_start_ix, ix_df.win_final_ix))
-
-    # df = df.assign(hit_text=hit_strs, text_window=win_strs, utt_len=ix_df.utt_len)
-    # return df
-
-    # > Then additionally optimized for performance
+    # > sourcery optimized for performance
     if any(df.token_str.isna()):
         logging.warning('Empty token string(s) in json data.')
 
@@ -466,7 +395,7 @@ def _create_output(hits_df, match_dir, start_time):
     # write rows to file
     #! psv/pipe delimited (`|`) required because table includes commas (`,`)
     # ? Is this true? ^^
-    hits_df.to_csv(csv_path)
+    # hits_df.to_csv(csv_path)
     hits_df.to_csv(csv_path.with_suffix('.psv'), sep='|')
     hits_df.to_pickle(csv_path.with_suffix('.pkl.gz'))
 
@@ -487,12 +416,12 @@ def _create_output(hits_df, match_dir, start_time):
 
     logging.info('Sample of Tabulated Data:\n%s\n', print_table)
     print_md_table(print_sample_df,
-                   title=f'#### Data Sample: `{sample_df.pattern[0]}` ####\n', )
+                   title=f'\n#### Data Sample: `{sample_df.pattern[0]}` ####\n', )
     # print(print_table+'\n')
 
     finish_time = TIMESTAMP()
     dur_str = get_proc_time(start_time, finish_time)
-    print(f'Time to tabulate hits: {dur_str}')
+    print(f'\nTime to tabulate hits: {dur_str}')
     logging.info('Tabulation Complete! Time elapsed: %s', dur_str)
 
 
@@ -504,9 +433,7 @@ def get_csv_path(match_dir):
         output_dir.mkdir(parents=True)
 
     fstem = f"{match_dir.name.replace('.', '_')}_hits"
-    csv_path = output_dir.joinpath(f'{fstem}.csv')
-
-    return csv_path
+    return output_dir.joinpath(f'{fstem}.csv')
 
 
 if __name__ == '__main__':
