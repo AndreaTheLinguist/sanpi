@@ -1,5 +1,6 @@
 # coding=utf-8
 import contextlib
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -9,22 +10,28 @@ except ModuleNotFoundError:
     with contextlib.suppress(ModuleNotFoundError):
         from source.utils import set_pd_display, print_md_table
 
+SANPI_DATA = Path('/share/compling/data/sanpi')
 
-def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-processed/RBdirect/neg-bigrams_thr0-001p.10f.pkl.gz'),
-                  sample_size: int = 20,
-                  sort_by: str = '',
-                  columns: list = None,
-                  filters: list = None,
-                  markdown: bool = False,
-                  transpose: bool = False,
-                  max_cols: int = 20,
-                  max_colwidth: int = 40,
-                  max_width: int = 100,
-                  tabbed: bool = False,
-                  comma: bool = False,
-                  piped: bool = False,
-                  quiet: bool = False,
-                  print_sample: bool = True):
+
+def sample_pickle(
+    data_path: Path = SANPI_DATA.joinpath('DEMO/2_hit_tables/RBdirect/condensed/'
+                                          'DEMO-Pcc_all-RBdirect_unique-bigram-id_hits.pkl.gz'),
+    sample_size: int = 20,
+    sort_by: str = '',
+    columns: list = None,
+    filters: list = None,
+    markdown: bool = False,
+    transpose: bool = False,
+    max_cols: int = 20,
+    max_colwidth: int = 40,
+    max_width: int = 100,
+    tabbed: bool = False,
+    comma: bool = False,
+    piped: bool = False,
+    quiet: bool = False,
+    regex: bool = False,
+    print_sample: bool = True
+):
     """
     Sample and print a table of data.
 
@@ -57,13 +64,14 @@ def sample_pickle(data_path: Path = Path('/share/compling/data/sanpi/4_post-proc
         set_pd_display(max_colwidth=max_colwidth,
                        max_width=max_width,
                        max_cols=max_cols)
-        
-    #> markdown output formatting overrides meta-message quieting
-    elif markdown: 
+
+    # > markdown output formatting overrides meta-message quieting
+    elif markdown:
         quiet = False
-        
+
     data_sample = _get_data_sample(sample_size=sample_size, data_path=data_path, filters=filters,
-                                   columns=columns, sort_by=sort_by, quiet=quiet, markdown=markdown)
+                                   columns=columns, sort_by=sort_by, regex=regex,
+                                   quiet=quiet, markdown=markdown)
 
     if print_sample:
         _print_table(data_sample=data_sample,
@@ -78,12 +86,14 @@ def _get_data_sample(sample_size: int,
                      filters: list = None,
                      columns: list = None,
                      sort_by: str = '',
+                     regex: bool = False,
                      quiet: bool = False,
                      markdown: bool = False):
 
     full_frame = _read_data(data_path, quiet)
 
-    filtered_data, filter_applied = _filter_rows(full_frame, filters, quiet)
+    filtered_data, filter_applied = _filter_rows(
+        full_frame, filters, regex, quiet)
     if sample_size:
         data = filtered_data.sample(min(len(filtered_data), sample_size))
     data = data.sort_values(sort_by) if sort_by else data.sort_index()
@@ -130,8 +140,23 @@ def _print_header(n_sample_rows, n_input_rows, file_name: str,
     print(f'\n### {length_info} from `{file_name}`\n')
 
 
+def _parse_filter(filter_str: str, f: pd.DataFrame, quiet: bool):
+    filter_col, op, filter_val = re.match(
+        r'(^\w+)([!=])=(.+$)', filter_str).groups()
+
+    try:
+        target_param = f[filter_col]
+    except KeyError:
+        if not quiet:
+            print(f'  - ✕ WARNING: Filter column `{filter_col}`',
+                  f'not found. Filter `{filter_str}` ignored.')
+        return (None, None, None)
+    return (target_param, filter_val, op)
+
+
 def _filter_rows(input_data: pd.DataFrame,
                  filter_list: list,
+                 regex: bool = False,
                  quiet=False):
     """
         Filters rows of a pandas DataFrame based on a list of filter expressions.
@@ -150,30 +175,29 @@ def _filter_rows(input_data: pd.DataFrame,
             >>> filter_rows(pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}), ["A=1", "B!=2"])
             (pd.DataFrame({"A": [1, 3], "B": [4, 6]}), True)
     """
-    filtered = False
+    filter_applied = False
     if filter_list:
         if not quiet:
             print('\n- *filtering rows...*')
         f = input_data.copy()
         for filter_str in filter_list:
-            filter_col, filter_val = filter_str.rsplit('=', 1)
-            op = filter_col[-1]
-            filter_col = filter_col[:-1]
-            try:
-                target_param = f[filter_col]
-            except KeyError:
-                if not quiet:
-                    print(
-                        f'  - ✕ ERROR: Filter column `{filter_col}` not found. Filter `{filter_str}` ignored.')
+            # filter_col, filter_val = filter_str.rsplit('=', 1)
+            # op = re.match(r'^.*(.)=.$', filter_str).groups()[0]
+            # op = '!' if '!' in filter_str else '='
+            target_param, filter_val, op = _parse_filter(filter_str, f, quiet)
+            if not filter_val:
                 continue
-
+            # matches_filter = pd.Series(_id_filter_matches(target_param, filter_val, regex))
+            # matches_filter = target_param.apply(lambda x: _assess_value_for_target(value=x, target=filter_val, regex=regex))
+            matches_filter = target_param.apply(_assess_value_for_target,
+                                                target=filter_val, regex=regex)
             # `filter_col` NOT equal to `filter_val`
             if op == '!':
-                f = f.loc[target_param != filter_val, :]
+                f = f.loc[~matches_filter, :]
 
                 # `filter_col` IS equal to `filter_val`
             elif op == '=':
-                f = f.loc[target_param == filter_val, :]
+                f = f.loc[matches_filter, :]
 
             if f.empty:
                 if not quiet:
@@ -181,12 +205,26 @@ def _filter_rows(input_data: pd.DataFrame,
                         f'  - Filter expression `{filter_str}` matched zero rows. Filter not applied.')
                 f = input_data.copy()
             else:
-                filtered = True
+                filter_applied = True
                 input_data = f
                 if not quiet:
                     print(f'  - ✓ Applied filter: `{filter_str}`')
 
-    return input_data, filtered
+    return input_data, filter_applied
+
+
+# def _id_filter_matches(target_param, filter_str, regex):
+
+    # for value in target_param:
+    #     yield _assess_value_for_target(value=value,
+    #                                    target=filter_str, regex=regex)
+    # # return target_param.apply(_assess_value_for_target, target=filter_str, regex=regex)
+
+
+def _assess_value_for_target(value: str,
+                             target: str = '',
+                             regex=False):
+    return any(re.findall(target, value)) if regex else value == target
 
 
 def _select_columns(data_selection: pd.DataFrame,

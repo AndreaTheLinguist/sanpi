@@ -9,7 +9,7 @@ from pathlib import Path
 try:
     from source.utils.sample import sample_pickle
 except ModuleNotFoundError:
-    from utils.sample import sample_pickle
+    from utils.sample import sample_pickle, SANPI_DATA
 
 
 def _main():
@@ -23,6 +23,8 @@ def _main():
         sort_by=args.sort_by,
         columns=args.columns,
         filters=args.filters,
+        # // #HACK
+        # filters=["neg_lemma!=not", "token_str==^.* n[o']t .*$"],
         markdown=args.markdown,
         transpose=args.transpose,
         max_cols=args.max_cols,
@@ -31,7 +33,9 @@ def _main():
         tabbed=args.tabbed,
         comma=args.comma,
         piped=args.piped,
-        quiet=args.quiet)
+        quiet=args.quiet,
+        regex=args.regex
+    )
 
 
 def _parse_args():
@@ -54,8 +58,8 @@ def _parse_args():
     parser.add_argument(
         '-p', '--path',
         type=Path,
-        default=Path(
-            '/share/compling/data/sanpi/4_post-processed/RBdirect/neg-bigrams_thr0-001p.10f.pkl.gz'),
+        default=SANPI_DATA.joinpath('DEMO/2_hit_tables/RBdirect/condensed/'
+                                    'DEMO-Pcc_all-RBdirect_unique-bigram-id_hits.pkl.gz'),
         help=('path to dataframe to sample')
     )
 
@@ -101,10 +105,18 @@ def _parse_args():
     )
 
     parser.add_argument(
+        '-r', '--regex',
+        action='store_true',
+        default=False,
+        help=('option to interpret filter string arguments as '
+              'regex patterns, instead of full string matches')
+    )
+
+    parser.add_argument(
         '-m', '--markdown',
         action='store_true',
         default=False,
-        help=('option to print in markdown table format. ',
+        help=('option to print in markdown table format. '
               'Note: selecting markdown formatting for output forces meta-message printing, '
               'overriding any simultaneous `-q/--quiet` flag.')
     )
@@ -166,8 +178,6 @@ def _parse_args():
               '*currently does not apply to markdown formatted displays, '
               'which will be the sum of the widest cell in every included columm')
     )
-
-
 
     return parser.parse_args()
 
