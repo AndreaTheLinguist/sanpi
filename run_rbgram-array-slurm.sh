@@ -23,23 +23,31 @@
 #          PATS=("negpol")
 #      [directory name]
 #          any (single) directory name in "./Pat/"
+#
+#  shortcuts to selecting subarrays:
+#       --demo
+#         array=35-37 (data/sanpi/subset/bigram_demo/*)
+#       --debug
+#         array=38-40 (data/sanpi/debug/bigram_debug/*)
+#       --full
+#         array=0-34 (data/sanpi/subsets/bigram_{news,puddin}/*)
+# usage: bash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh [PAT_FLAG] [ARRAY_FLAG] [MODE]
+# example: bash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh multi --mirror --debug
+# EVERYTHING: bash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh multi --all_pat
 
-# example: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi --mirror --debug
-# EVERYTHING: bash /share/compling/projects/sanpi/run_bigram-array-slurm.sh multi --all_pat
-
-CPUS=10
+CPUS=5
 CPU_MEM=5G
 
-echo "Running /share/compling/projects/sanpi/run_bigram-array-slurm.sh"
+echo "Running /share/compling/projects/sanpi/run_rbgram-array-slurm.sh"
 date
-LOG_DIR=/share/compling/projects/sanpi/logs/bigram-pipeline_$(date "+%y-%m-%d")
-mkdir -p ${LOG_DIR}
-MODE=$1
-PAT_FLAG=${2:-""}
+PAT_FLAG=${1:-""}
 echo "PAT_FLAG: ${PAT_FLAG}"
-ARRAY_FLAG=${3:-""}
+ARRAY_FLAG=${2:-""}
 echo "ARRAY_FLAG: ${ARRAY_FLAG}"
-
+MODE=${3:-"multi"}
+echo "MODE: ${MODE}"
+LOG_DIR="/share/compling/projects/sanpi/logs/${ARRAY_FLAG//-}_bigram-pipeline_$(date +%y-%m-%d)"
+mkdir -p ${LOG_DIR}
 
 if [[ $(which grew && grew version) ]]; then
     date
@@ -50,6 +58,12 @@ if [[ $(which grew && grew version) ]]; then
 
     elif [[ ${PAT_FLAG} == '--direct' ]]; then
         PATS=("RBdirect")
+
+    elif [[ ${PAT_FLAG} == '--init' ]]; then
+        PATS=("RBXadj" "RBdirect" "RBscoped" "RBraised")
+
+    elif [[ ${PAT_FLAG} == '--main' ]]; then
+        PATS=("RBXadj" "RBdirect" "RBscoped" "RBraised" "POSmirror" "NEGmirror")
 
     elif [[ ${PAT_FLAG} == '--neg' ]]; then
         PATS=("RBdirect" "RBscoped" "RBraised")
@@ -70,12 +84,14 @@ if [[ $(which grew && grew version) ]]; then
         PATS=("RBdirect")
     fi
     echo
-    if [[ ${ARRAY_FLAG} == '--debug' ]]; then
+    if [[ ${ARRAY_FLAG} == '--demo' ]]; then
         ARRAY_FLAG="--array=35-37"
+    elif [[ ${ARRAY_FLAG} == '--debug' ]]; then
+        ARRAY_FLAG="--array=38-40"
     elif [[ ${ARRAY_FLAG} == '--full' ]]; then
         ARRAY_FLAG="--array=0-34"
     fi
-    
+
     echo -e "\nPatterns to submit jobs for: ${PATS[@]}"
     echo "Array Index of Corpus Parts to Search: ${ARRAY_FLAG#--array=}"
     for PAT in "${PATS[@]}"; do
@@ -83,16 +99,15 @@ if [[ $(which grew && grew version) ]]; then
         JOB_NAME="-J bigram-${PAT}_$(date +%y-%m-%d_%H%M)"
         if [[ ${MODE} == 'multi' ]]; then
             # echo 'sbatch ${JOB_NAME} ${ARRAY_FLAG} ./bigram-array.slurm.sh ${PAT}'
-            echo "sbatch ${JOB_NAME} ${ARRAY_FLAG} --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=${LOG_DIR} bigram-array.slurm.sh ${PAT}"
-            # exit #! #HACK temp exit >> remove
+            echo -e "sbatch ${JOB_NAME}\n    ${ARRAY_FLAG}\n    --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM}\n    --chdir=${LOG_DIR} \n  bigram-array.slurm.sh ${PAT}"
             sbatch ${JOB_NAME} ${ARRAY_FLAG} --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=${LOG_DIR} /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh ${PAT}
 
         elif [[ ${MODE} == 'solo' ]]; then
             # echo 'sbatch ${JOB_NAME} ${ARRAY_FLAG} ./bigram-array.slurm.sh ${PAT}'
-            echo "sbatch ${JOB_NAME} ${ARRAY_FLAG} -n 1 --mem=15G --chdir=${LOG_DIR} bigram-array.slurm.sh ${PAT}"
-            sbatch ${JOB_NAME} ${ARRAY_FLAG} -n 1 --mem=15G --chdir=${LOG_DIR}  /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh ${PAT}
+            echo -e "sbatch ${JOB_NAME} ${ARRAY_FLAG} -n 1 --mem=15G\n    --chdir=${LOG_DIR} bigram-array.slurm.sh ${PAT}"
+            sbatch ${JOB_NAME} ${ARRAY_FLAG} -n 1 --mem=15G --chdir=${LOG_DIR} /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh ${PAT}
         else
-            echo -e  "No valid cpu mode given. First argument should be one of the following strings:\n+ 'solo' for 1 core/cpu\n~or~\n+ 'multi' for multiple cores/cpus"
+            echo -e "No valid cpu mode given. First argument should be one of the following strings:\n+ 'solo' for 1 core/cpu\n~or~\n+ 'multi' for multiple cores/cpus"
         fi
 
     done

@@ -38,7 +38,7 @@ set -o errexit
 echo ">>=======================================<<"
 echo "JOB ID: ${SLURM_ARRAY_JOB_ID}"
 echo "started @ $(date) from $(pwd)"
-echo "slurm script: /share/compling/projects/sanpi/sanpi_slurm.sh"
+echo "slurm script: /share/compling/projects/sanpi/slurm/sanpi-array.slurm.sh"
 echo ""
 # activate conda environment
 eval "$(conda shell.bash hook)"

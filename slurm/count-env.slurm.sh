@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -N1
 #SBATCH -n1
-#SBATCH --mem=40G
+#SBATCH --mem=16G
 #SBATCH -o %x.%j.out
 #SBATCH -e %x.%j.err
 #SBATCH --time 4:00:00
@@ -15,30 +15,48 @@ echo "JOB ID: ${SLURM_JOB_ID}"
 echo "JOB NAME: ${SLURM_JOB_NAME}"
 echo "started @ $(date '+%F %X') from $(pwd)"
 echo ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
-echo "running on ${SLURM_JOB_NODELIST} with `nproc` cores"
+echo "running on ${SLURM_JOB_NODELIST} with $(nproc) cores"
 echo "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
 
 eval "$(conda shell.bash hook)"
 conda activate sanpi
 
 SANPI_DATA="/share/compling/data/sanpi"
-DATA=${1:-'RBdirect'}
-# ${foo:+val} -> 	val if $foo is set (and not null)
-FRQ_FILT_IX=${2:+"-b $2"}
-PARENT_DIR=${3:-"2_hit_tables"}
-echo "Selected frequency filter indexer: ${FRQ_FILT_IX}"
+
+ENV_NAME=${1:-'RBdirect'}
+#> to run on `DEMO` data, prefix argument string with "DEMO/"
+REL_PARENT_DIR=${2:-"2_hit_tables"}
+HIT_DATA_DIR="${SANPI_DATA}/${REL_PARENT_DIR}/${ENV_NAME}"
+echo "processing ➡️ ${HIT_DATA_DIR//*data/..}"
+
+POST_PROC_DIR="${HIT_DATA_DIR%2_hit_tables*}4_post-processed/RBXadj"
+#> if no argument given, use most recent frequency index .txt file created in nearest 4_post-processed/RBXadj/ dir
+FRQ_FILTER=${3:-"$(ls -t1 $POST_PROC_DIR/*index_frq*.txt  | head -1)"}
+#> if number given instead of path, use value to locate relevant frequency index .txt file
+if [[ ! (-f $FRQ_FILTER && -r $FRQ_FILTER) ]]; then
+    FRQ_FILTER="$( (ls -t1 $POST_PROC_DIR/*index_frq*${FRQ_FILTER/./-}p*.txt || ls -t1 $POST_PROC_DIR/*index_frq*txt ) | head -1 )"
+fi
+echo -e "Selected frequency filter: \n  ${FRQ_FILTER}"
+
+RESULTS="/share/compling/projects/sanpi/results"
+if [[ "${REL_PARENT_DIR%%/*}" == "DEMO" ]]; then
+    # HIT_DATA_DIR="${SANPI_DATA}/DEMO/${REL_HIT_DIR}"
+    #> replace "results" with "DEMO/results"
+    RESULTS="${RESULTS/results/DEMO/results}"
+fi
+echo -e "Selected output parent directory: \n ${RESULTS}"
+mkdir -p $RESULTS
+
 
 #? Can this can be changed to load from `3_dep_info/` instead?
-HIT_DIR="-d ${SANPI_DATA}/${PARENT_DIR}/${DATA}"
-OUT_DIR="-o /share/compling/projects/sanpi/results/freq_out/${DATA}"
-#HACK: this would be better as an argument, but 🤷‍♀️
-# BIGRAM_FIlTER="${SANPI_DATA}/4_post-processed/RBXadj/bigram-IDs_thr0-1p.10f.txt"
-
+HIT_DIR_ARG="-d ${HIT_DATA_DIR}"
+OUT_DIR_ARG="-o ${RESULTS}/freq_out/${ENV_NAME}"
+FRQ_IX_ARG="-b ${FRQ_FILTER}"
 
 PY_MODULE="/share/compling/projects/sanpi/source/analyze/count_env.py"
-# LOG_FILE="${SLURM_JOB_NAME}.${SLURM_JOB_ID}~$(date +%y-%m-%d_%H%M).log"
-LOG_FILE="${SLURM_JOB_NAME}.${SLURM_JOB_ID}.log"
-# echo 'time python ${PY_MODULE}'
-echo -e "\ntime python ${PY_MODULE} \\ \n    ${HIT_DIR} \\ \n    ${OUT_DIR} \\ \n    ${FRQ_FILT_IX}"
-#// time python ${PY_MODULE} -b ${BIGRAM_FILTER} >> >(tee -i -a ${LOG_FILE}) 2>&1
-time python ${PY_MODULE} ${HIT_DIR} ${OUT_DIR} ${FRQ_FILT_IX} #>> >(tee -i -a ${LOG_FILE}) 2>&1
+
+echo -e "\ntime python ${PY_MODULE}\n    ${HIT_DIR_ARG}\n    ${OUT_DIR_ARG}\n    ${FRQ_IX_ARG}"
+time python ${PY_MODULE} ${HIT_DIR_ARG} ${OUT_DIR_ARG} ${FRQ_IX_ARG} #>> >(tee -i -a ${LOG_FILE}) 2>&1
+echo
+echo "Closing shell script @ $(date)"
+exit 

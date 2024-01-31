@@ -2,8 +2,8 @@
 ##SBATCH --mail-user=arh234@cornell.edu
 ##SBATCH --mail-type=ALL
 #SBATCH -J bigram-search      # Job name
-#SBATCH -o %x_%2a.%A.out      # Name of stdout output log file (%j expands to jobID)
-#SBATCH -e %x_%2a.%A.err      # Name of stderr output log file (%j expands to jobID)
+#SBATCH -o %x-%2a.%A.out      # Name of stdout output log file (%j expands to jobID)
+#SBATCH -e %x-%2a.%A.err      # Name of stderr output log file (%j expands to jobID)
 #SBATCH --open-mode=append
 #SBATCH --array 0-34%12
 #SBATCH -N 1                  # Total number of nodes requested
@@ -19,28 +19,34 @@
 
 # * Array Assignments * # 
 # > puddin
-# 0-29  ../puddin/Pcc[##].conll
+# 0-29  ../sanpi/subsets/bigram_puddin/bigram-Pcc[##]
 #   OR
-#   30  ../puddin/PccTe.conll
-#   31  ../puddin/PccVa.conll
+#   30  ../sanpi/subsets/bigram_puddin/bigram-PccTe
+#   31  ../sanpi/subsets/bigram_puddin/bigram-PccVa
 #
 # > news
 # ## APW ##
-#   32  ../news/Apw.conll
+#   32  ../sanpi/subsets/bigram_news/bigram-Apw
 #
 # ## NYT ##
-#   33  ../news/Nyt1.conll
-#   34  ../news/Nyt2.conll
+#   33  ../sanpi/subsets/bigram_news/bigram-Nyt1
+#   34  ../sanpi/subsets/bigram_news/bigram-Nyt2
 #
-# > #HACK testing
-#   35  ../sanpi/corpora_shortcuts/testing/small.conll
-#   36  ../sanpi/corpora_shortcuts/testing/large.conll
+# > demo
+#   35 ../sanpi/subsets/bigram_demo/bigram-DEMO-Apw
+#   36 ../sanpi/subsets/bigram_demo/bigram-DEMO-Nyt
+#   37 ../sanpi/subsets/bigram_demo/bigram-DEMO-Pcc
+#
+# > testing
+#   38  ../sanpi/debug/bigram_debug/bigram-apw
+#   39  ../sanpi/debug/bigram_debug/bigram-nyt
+#   40  ../sanpi/debug/bigram_debug/bigram-pcc
 
 set -o errexit
 echo ">>=======================================<<"
 echo "JOB ID: ${SLURM_ARRAY_JOB_ID}"
 echo "started @ $(date) from $(pwd)"
-echo "slurm script: /share/compling/projects/sanpi/sanpi_slurm.sh"
+echo "slurm script: /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh"
 echo ""
 # activate conda environment
 eval "$(conda shell.bash hook)"
@@ -50,7 +56,7 @@ which python
 
 # pattern directory should be specified as directory name
 PAT_DIR_NAME=${1:-"contig"}
-echo "Pattern Type: \'${PAT_DIR_NAME##*/}\'"
+echo "Pattern Type: ${PAT_DIR_NAME##*/}"
 DATA_DIR=/share/compling/data
 if [[ ! -d ${DATA_DIR} ]]; then
     DATA_DIR=/home/arh234/data
@@ -97,13 +103,28 @@ elif [ $SEED == 34 ]; then
     # echo "  Task ID ${SEED} assigned to 'Nyt2' dataset"
     SEED_CORPUS="${SUBSETS_DIR}/bigram_news/bigram-Nyt2"
 
+#* demo of bigram subset
+elif [ $SEED == 35 ]; then
+    echo "  Task ID ${SEED} assigned to 'Apw' demo sample dataset"
+    SEED_CORPUS="${SUBSETS_DIR}/bigram_demo/bigram-DEMO-Apw"
+elif [ $SEED == 36 ]; then
+    echo "  Task ID ${SEED} assigned to 'Nyt' demo sample dataset"
+    SEED_CORPUS="${SUBSETS_DIR}/bigram_demo/bigram-DEMO-Nyt"
+elif [ $SEED == 37 ]; then
+    echo "  Task ID ${SEED} assigned to 'Pcc' demo sample dataset"
+    SEED_CORPUS="${SUBSETS_DIR}/bigram_demo/bigram-DEMO-Pcc"
+
+
 #HACK debug assignments
 #* test
-elif [ $SEED == 35 ]; then
-    SEED_CORPUS="${SUBSETS_DIR}/bigram_debug/bigram-apw"
+elif [ $SEED == 38 ]; then
+    SEED_CORPUS="${OUT_DIR}/debug/bigram_debug/bigram-apw"
 
-elif [ $SEED == 36 ]; then
-    SEED_CORPUS="${SUBSETS_DIR}/bigram_debug/bigram-nyt"
+elif [ $SEED == 39 ]; then
+    SEED_CORPUS="${OUT_DIR}/debug/bigram_debug/bigram-nyt"
+
+elif [ $SEED == 40 ]; then
+    SEED_CORPUS="${OUT_DIR}/debug/bigram_debug/bigram-pcc"
 
 # * puddin
 elif [ $SEED == 30 ]; then
@@ -131,12 +152,27 @@ if [[ -d $SEED_CORPUS && -d ${PAT_DIR} ]]; then
     # run script and send both stdout and stderr to log file
     # DATE="$(date -I)"
     # job name itself has date now ✓
-    LOG_FILE=${LOGS_DIR}/${SLURM_JOB_NAME}-${SEED}.log
+    LOG_FILE="${LOGS_DIR}/${SLURM_JOB_NAME}-${SEED}.log"
     echo "Combined log will be appended to ${LOG_FILE}"
+    
+    if [[ "$( basename $(dirname ${SEED_CORPUS}))" == 'bigram_demo' ]]; then
+        OUT_DIR="${OUT_DIR}/DEMO"
+        mkdir -p $OUT_DIR
+    fi
 
-    echo -e "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}\n-g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1"
-    time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR} -g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1
+    echo "time python ${SOURCE_DIR}/run_pipeline.py -c ${SEED_CORPUS} -p ${PAT_DIR}"
+    echo "  -g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a ${LOG_FILE}) 2>&1"
+    time python ${SOURCE_DIR}/run_pipeline.py -c $SEED_CORPUS -p $PAT_DIR \
+        -g ${OUT_DIR}/1_json_grew-matches >> >(tee -i -a $LOG_FILE) 2>&1
 
+    if [[ $PAT_DIR_NAME != "RBXadj" ]]; then
+        echo -e "\n>> Run condensation and remove any bigram double dipping <<"
+        CORPUS_NAME="$(basename $SEED_CORPUS)"
+        echo "time python ${SOURCE_DIR}/source/gather/stop_double_dipping.py -c $CORPUS_NAME -p $PAT_DIR_NAME"
+        echo "  --verbose --data_dir $OUT_DIR >> >(tee -i -a "${LOGS_DIR}/condense_${CORPUS_NAME}-${PAT_DIR_NAME}.$(date +%Y-%m-%d).log") 2>&1"
+        time python ${SOURCE_DIR}/source/gather/stop_double_dipping.py -c $CORPUS_NAME -p $PAT_DIR_NAME --verbose \
+            --data_dir $OUT_DIR >> >(tee -i -a "${LOGS_DIR}/condense_${CORPUS_NAME}-${PAT_DIR_NAME}.$(date +%Y-%m-%d).log") 2>&1
+    fi
 else
     echo "SEED value ${SEED} does not point to existing directories. Skipping."
 
