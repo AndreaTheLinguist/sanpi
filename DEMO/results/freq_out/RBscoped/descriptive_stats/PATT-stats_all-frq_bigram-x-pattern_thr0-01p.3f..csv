@@ -1,0 +1,2 @@
+pattern,count,mean,std,min,25%,50%,75%,max,total,var_coeff,range,IQ_range,upper_fence,lower_fence,plus1_geo_mean,plus1_har_mean
+rb-relay,104,1.88,6.68,1,1,1,1,69,195,3.562382873412869,68,0,1,1,2.2343175955317514,2.1407567143697315
