@@ -1,5 +1,5 @@
 # %%
-from utils import sample_pickle, print_md_table
+from source.utils import sample_pickle, print_md_table
 import pandas as pd
 from pathlib import Path
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
