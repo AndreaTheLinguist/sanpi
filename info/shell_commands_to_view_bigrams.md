@@ -1,8 +1,22 @@
 # Shell commands to view specific hits
 
+## ⚠️ Heads up!
+
+There is a new, more direct way to do this now.
+
+Use the script, [`../script/sample_pickle.py`](../script/sample_pickle.py),
+or import `sample_pickle` from the `source.utils.sample` module. 
+
+
+
+---
+
+## Rudimentary shell commands
+
 `COLS` variable can be changed to access other columns, which are ordered as follows:
 
 **bigram pattern columns**
+
 1. `hit_id`
 1. `colloc`
 1. `sent_text`
@@ -29,6 +43,7 @@
 1. `category`
 
 **`contig` pattern columns**
+
 1. `hit_id`
 1. `colloc`
 1. `sent_text`
@@ -58,7 +73,7 @@
 1. `utt_len`
 1. `category`
 
-## Adjective with `text_window`
+### Adjective with `text_window`
 
 ```{shell}
 KEY='_favorite'; \
@@ -70,7 +85,7 @@ KEY='_favorite'; \
         | egrep -i --color=always ${KEY//_/.[a-z]*.}
 ```
 
-## Adverb with `sent_text`
+### Adverb with `sent_text`
 
 ```{shell}
 KEY='mostly_'; \
@@ -82,7 +97,7 @@ KEY='mostly_'; \
         | egrep -i --color=always ${KEY//_/.[a-z]*.}
 ```
 
-## Full bigram/collocation with `hit_id`
+### Full bigram/collocation with `hit_id`
 
 ```{shell}
 KEY='slightly_high'; \
@@ -94,7 +109,7 @@ KEY='slightly_high'; \
         | egrep -i --color=always ${KEY//_/.[a-z]*.}
 ```
 
-## All hits for specific `colloc_id`
+### All hits for specific `colloc_id`
 
 Include `\|` at end of `ID` if `colloc_id` match desired
 
