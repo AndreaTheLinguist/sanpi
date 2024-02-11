@@ -1,6 +1,0 @@
-dep_str_mask,example,one,piece,two,SUM
-CD>no; JJ>CD; JJ>RB,0,0,0,1,1
-NN>no; JJ>NN; JJ>RB,0,1,0,0,1
-NNS>few; JJ>NNS; JJ>RB,1,0,0,0,1
-NNS>no; JJ>NNS; JJ>RB,0,0,1,0,1
-SUM,1,1,1,1,4

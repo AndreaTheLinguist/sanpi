@@ -1,8 +1,0 @@
-neg_lemma,CD>[det]>no; JJ>[nsubj]>CD; JJ>[advmod]>RB,JJ>[advmod]>not; JJ>[advmod]>RB,JJ>[neg]>never; JJ>[advmod]>RB,JJ>[neg]>not; JJ>[advmod]>RB,JJ>[nsubj]>none; JJ>[advmod]>RB,NN>[det]>no; JJ>[nsubj]>NN; JJ>[advmod]>RB,NNS>[amod]>few; JJ>[nsubj]>NNS; JJ>[advmod]>RB,NNS>[det]>no; JJ>[nsubj]>NNS; JJ>[advmod]>RB,VB>[advmod]>not; JJ>[advmod]>RB; believe>[ccomp]>JJ,VB>[advmod]>not; JJ>[advmod]>RB; think>[ccomp]>JJ,VBZ>[nsubj]>nothing; JJ>[advmod]>RB; look>[acomp]>JJ,SUM
-few,0,0,0,0,0,0,1,0,0,0,0,1
-never,0,0,1,0,0,0,0,0,0,0,0,1
-no,1,0,0,0,0,1,0,1,0,0,0,3
-none,0,0,0,0,1,0,0,0,0,0,0,1
-not,0,71,0,29,0,0,0,0,1,1,0,102
-nothing,0,0,0,0,0,0,0,0,0,0,1,1
-SUM,1,71,1,29,1,1,1,1,1,1,1,109

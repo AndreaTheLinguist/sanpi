@@ -1,5 +1,0 @@
-dep_str_mask,believe,look,think,SUM
-VB>not; JJ>RB; believe>JJ,1,0,0,1
-VB>not; JJ>RB; think>JJ,0,0,1,1
-VBZ>nothing; JJ>RB; look>JJ,0,1,0,1
-SUM,1,1,1,3
