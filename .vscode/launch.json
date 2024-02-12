@@ -41,21 +41,20 @@
             "justMyCode": true,
             "args": [
                 "-c",
-                "/share/compling/projects/sanpi/results/freq_out/POSmirror/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv", 
+                "/share/compling/projects/sanpi/results/freq_out/POSmirror/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv",
                 "-C",
                 "positive",
-                "-n", 
+                "-n",
                 "/share/compling/projects/sanpi/results/freq_out/NEGmirror/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv",
-                "-N", 
-                "negative", 
-                "--min_freq", 
-                "25", 
-                "-s", 
-                ".MIRROR.35f-868thresh.tsv", 
+                "-N",
+                "negative",
+                "--min_freq",
+                "25",
+                "-s",
+                ".MIRROR.35f-868thresh.tsv",
                 "-v"
             ]
         },
-
         // run_pipeline debug/* posMirror
         {
             "console": "integratedTerminal",
@@ -130,135 +129,6 @@
                 "/share/compling/projects/sanpi/results/freq_out/RBXadj/all_adj-x-adv_frq-thr0-001p.35f=868+.csv"
             ]
         },
-        // * LSC
-        // > view_LSC
-        // {
-        //     "name": "view_LSC RBgrams 30f",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-f",
-        //         "/share/compling/projects/sanpi/results/freq_out/RBXadj/all_adj-x-adv_frq-thr0-001p.30f=732+.pkl.gz",
-        //     ]
-        // },
-        // {
-        //     "name": "view_LSC 35f sqrt",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-f",
-        //         "/share/compling/projects/sanpi/results/transformed/sqrt_all-frq_thresh877.35f.csv"
-        //     ]
-        // },
-        // {
-        //     "name": "view_LSC 35f log2",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-f",
-        //         "/share/compling/projects/sanpi/results/transformed/log2_all-frq_thresh877.35f.csv"
-        //     ]
-        // },
-        // {
-        //     "name": "view_LSC 35f ADV mean-std",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-f",
-        //         "/share/compling/projects/sanpi/results/mean_standardized/all-frq_thresh877.35f_ADV-mn-std.csv"
-        //     ]
-        // },
-        // {
-        //     "name": "view_LSC 20f",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-f",
-        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh478.20f.csv"
-        //     ]
-        // },
-        // {
-        //     "name": "view_LSC 15f",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-f",
-        //         "all-frq_thresh478.20f.csv"
-        //     ]
-        // },
-        // > format_counts (for LSC)
-        // {
-        //     "name": "format_counts: ALL 35",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-i",
-        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh5.35f.csv",
-        //         "-f",
-        //         "75"
-        //     ]
-        // },
-        // {
-        //     "name": "format_counts: ALL 3",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-i",
-        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh5.3f.csv",
-        //         "-f",
-        //         "50"
-        //     ]
-        // },
-        // {
-        //     "name": "format_counts: ALL 6",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-i",
-        //         "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh5.6f.csv"
-        //     ]
-        // },
-        // {
-        //     "name": "format_counts: JxR 35",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/share/compling/projects/sanpi/source/LSC/src/format_counts.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "-i",
-        //         "/share/compling/projects/sanpi/results/freq_out/JxR-frq_thresh5.35f.csv",
-        //         "-f",
-        //         "20"
-        //     ]
-        // },
         // * count_*.py bigram_debug/*
         {
             "name": "🦗 neg🪞 count_env",
@@ -608,47 +478,6 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         }
-        // * simple view hits
-        // {
-        //     "name": "specified simple_view_hits",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/home/arh234/projects/sanpi/script/simple_view_hits.py",
-        //     "console": "integratedTerminal",
-        //     "cwd": "${workspaceFolder},
-        //     "args": [
-        //         "hits_new/contig/apwtest_sans-relay_hits.csv",
-        //         "script-debug",
-        //         // "-k", 
-        //         // "word", 
-        //         // "-k" , 
-        //         // "text", 
-        //         // "-k", 
-        //         // "window",
-        //         // "-k", 
-        //         // "relation"
-        //     ]
-        // },        
-        // {
-        //     "name": "specified simple_view_hits",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "/home/arh234/projects/sanpi/script/simple_view_hits.py",
-        //     "console": "integratedTerminal",
-        //     "cwd": "${workspaceFolder},
-        //     "args": [
-        //         // "hits_new/contig/apwtest_sans-relay_hits.csv",
-        //         // "script-debug",
-        //         // "-k", 
-        //         // "word", 
-        //         // "-k" , 
-        //         // "text", 
-        //         // "-k", 
-        //         // "window",
-        //         // "-k", 
-        //         // "relation"
-        //     ]
-        // },
     ],
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
