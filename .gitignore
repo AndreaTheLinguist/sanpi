@@ -439,3 +439,11 @@ data-link
 source/LSC
 **/*scratch*
 **/prior_version
+demo/data/3_dep_info/crosstab/*
+sanpi-data.link
+results/**/images
+results/**/partials
+results/**/*ed
+results/**/descriptive_stats
+results/freq_out/spearman
+results/*.*py*
