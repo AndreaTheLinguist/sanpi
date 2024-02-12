@@ -1,62 +1,210 @@
 {
+    "settings": {
+        // "workbench.preferredDarkColorTheme": "vscode carbon theme",
+        // "workbench.preferredDarkColorTheme": "Solarized Sharp Darker",
+        // "workbench.preferredDarkColorTheme": "Boundless",
+        "workbench.preferredDarkColorTheme": "Dainty – Panda Theme (chroma 3, lightness 0)",
+        "workbench.preferredLightColorTheme": "Learn with Sumit - Simple as light",
+        // "workbench.preferredLightColorTheme": "Nord Light Brighter",
+        // "workbench.preferredLightColorTheme": "Ysgrifennwr",
+        "workbench.colorCustomizations": {
+            "titleBar.inactiveForeground": "#0d8b7ce8",
+            "titleBar.inactiveBackground": "#0f1615",
+            "titleBar.activeForeground": "#5ff5e4db",
+            "titleBar.activeBackground": "#023d36fd",
+            "tab.activeBackground": "#2bf8e05e",
+            "activityBar.inactiveForeground": "#1e998be8",
+            "activityBar.foreground": "#5ff5e4db",
+            "activityBar.background": "#023d36fd"
+         },
+        "todo-tree.tree.showBadges": false,
+        "todo-tree.tree.scanMode": "current file",
+        "markdown.updateLinksOnFileMove.enableForDirectories": false,
+        "files.watcherExclude": {
+            "./setup/**": true,
+            "./demo/data/corpora/**": true,
+            "./*data_samples*/**": true,
+            "./*/.vscode/**": true,
+            "./**/.history/**": true,
+            "./.untracked/**": true,
+            "./.git/**": true
+        },
+        "files.exclude": {
+            "source/LSC": false,
+            "slurm": false,
+            "setup": false,
+            "prior_version": false,
+            "LSC": false,
+            "**/Thumbs.db": false,
+            "**/slurm": false,
+            "**/setup": false,
+            "**/prior_version": false,
+            "**/LSC.tar.gz": false,
+            "**/LSC": false,
+            "**/CVS": false,
+            "**/*.tex": false,
+            "**/*.tar": false,
+            "**/*.Identifier": false,
+            "**/.vscode": false,
+            "**/.trunk/*plugins/": false,
+            "**/.trunk/*out/": false,
+            "**/.trunk/*notifications/": false,
+            "**/.trunk/*logs/": false,
+            "**/.trunk/*actions/": false,
+            "**/.svn": false,
+            "**/.lh": false,
+            "**/.history": false,
+            "**/.hg": false,
+            "**/.git": false,
+            "**/.DS_Store": false,
+            ".untracked": false,
+            ".sourcery.yaml": false,
+            ".lh": true,
+            ".history": false,
+            ".git": true
+        },
+        "files.autoSave": "afterDelay",
+        "files.associations": {
+            "lsc.C": "cpp",
+            "lsc-print.C": "cpp",
+            "*.pat": "OCaml",
+            "*.out": "Log",
+            "*.log": "Log",
+            "*.err": "Log"
+        },
+        "explorerExclude.backup": {
+            "source/LSC": true,
+            "slurm": true,
+            "setup": true,
+            "prior_version": true,
+            "LSC": true,
+            "**/Thumbs.db": true,
+            "**/slurm": true,
+            "**/setup": true,
+            "**/prior_version": true,
+            "**/LSC.tar.gz": true,
+            "**/LSC": true,
+            "**/CVS": true,
+            "**/*.tex": true,
+            "**/*.tar": true,
+            "**/*.Identifier": true,
+            "**/.vscode": true,
+            "**/.trunk/*plugins/": true,
+            "**/.trunk/*out/": true,
+            "**/.trunk/*notifications/": true,
+            "**/.trunk/*logs/": true,
+            "**/.trunk/*actions/": true,
+            "**/.svn": true,
+            "**/.lh": true,
+            "**/.history": true,
+            "**/.hg": true,
+            "**/.git": true,
+            "**/.DS_Store": true,
+            ".untracked": true,
+            ".sourcery.yaml": true,
+            ".lh": true,
+            ".history": true,
+            ".git": true
+        },
+        "explorer.autoReveal": false,
+        "workbench.colorTheme": "Dainty – Panda Theme (chroma 3, lightness 0)"
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            // * LSC
+            // > view_LSC
+            {
+                "type": "python",
+                "request": "launch",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "name": "view_LSC 35f",
+                "justMyCode": true,
+                "console": "integratedTerminal",
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv",
+                    "-"
+                ]
+            },
+            {
+                "type": "python",
+                "request": "launch",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "name": "view_LSC 35f sqrt",
+                "justMyCode": true,
+                "console": "integratedTerminal",
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/transformed/sqrt_all-frq_thresh877.35f.csv"
+                ]
+            },
+            {
+                "type": "python",
+                "request": "launch",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "name": "view_LSC 35f log2",
+                "justMyCode": true,
+                "console": "integratedTerminal",
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/transformed/log2_all-frq_thresh877.35f.csv"
+                ]
+            },
+            {
+                "type": "python",
+                "request": "launch",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "name": "view_LSC 35f ADV mean-std",
+                "justMyCode": true,
+                "console": "integratedTerminal",
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/mean_standardized/all-frq_thresh877.35f_ADV-mn-std.csv"
+                ]
+            },
+            {
+                "type": "python",
+                "request": "launch",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "name": "view_LSC 20f",
+                "justMyCode": true,
+                "console": "integratedTerminal",
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh478.20f.csv"
+                ]
+            },
+            {
+                "type": "python",
+                "request": "launch",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "name": "view_LSC 15f",
+                "justMyCode": true,
+                "console": "integratedTerminal",
+                "args": [
+                    "-f",
+                    "all-frq_thresh478.20f.csv"
+                ]
+            }
+        ]
+    },
     "folders": [
         {
             "path": "."
         },
         {
             "path": "../../data"
-        },
-        {
-            "path": "../../UCS-0.6/doc", 
-            "name": "UCS-doc"
         }
+        // {
+        //     "path": "../../UCS-0.6/doc",
+        //     "name": "UCS-doc"
+        // }
     ],
-    "settings": {
-        "explorerExclude.backup": {},
-        "files.exclude": {
-            "**/.git": true,
-            "**/.svn": true,
-            "**/.hg": true,
-            "**/CVS": true,
-            "**/.DS_Store": true,
-            "**/Thumbs.db": true,
-            "**/.vscode": true,
-            ".vscode": true,
-            "**/.history": true,
-            ".history": true,
-            ".git": true
-        },
-        "files.watcherExclude": {
-            "./.git/**": true,
-            "./.untracked/**": true,
-            "./**/.history/**": true,
-            "./*/.vscode/**": true,
-            "./*data_samples*/**": true,
-            "./demo/data/corpora/**": true,
-            "./setup/**": true
-        },
-        "python.linting.pylintArgs": [
-            "--disable:protected-access"
-        ],
-        "todo-tree.tree.scanMode": "current file",
-        // "workbench.editor.defaultFormatter": "ms-python.python",
-        // "workbench.preferredDarkColorTheme": "Zeonica",
-        // "workbench.preferredDarkColorTheme": "Solarized Sharp Darker",
-        "workbench.preferredDarkColorTheme": "Boundless",
-        // "workbench.preferredLightColorTheme": "Noctis Lux",
-        "workbench.preferredLightColorTheme": "Nord Light Brighter",
-        // "workbench.preferredLightColorTheme": "Solarized-light-fjs",
-        "files.autoSave": "afterDelay",
-        "files.associations": {
-            "*.err": "Log",
-            "*.log": "Log",
-            "*.out": "Log",
-            "*.pat": "OCaml",
-            "lsc-print.C": "cpp",
-            "lsc.C": "cpp"
-        },
-        "todo-tree.tree.showBadges": false,
-        "workbench.colorTheme": "Nord Light Brighter",
-        "markdown.updateLinksOnFileMove.enableForDirectories": false
+    "extensions": {
+        "recommendations": [
+            "ibm.output-colorizer"
+            // "rainbow_csv"
+        ]
     }
 }

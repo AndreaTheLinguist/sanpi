@@ -447,3 +447,5 @@ results/**/*ed
 results/**/descriptive_stats
 results/freq_out/spearman
 results/*.*py*
+results/ucs_tables/.ucs_tmp.tsv
+results/freq_out/*/*bigram-x-prev*.csv
