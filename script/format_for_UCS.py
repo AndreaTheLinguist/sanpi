@@ -12,7 +12,8 @@ cross_regex = re.compile(r'([^_]+)-x-([^_]+)')
 def _parse_args():
 
     parser = argparse.ArgumentParser(
-        description=('reshape hits or frequency table for UCS library application'),
+        description=(
+            'reshape hits or frequency table for UCS library application'),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
@@ -20,10 +21,12 @@ def _parse_args():
         '-d',
         '--data_path',
         type=Path,
-        #// action='append',
-        #// dest='input_paths',
+        # // action='append',
+        # // dest='input_paths',
         default=Path(
-            '/share/compling/data/sanpi/4_post-processed/RBXadj/bigrams_frq-thr0-075p.2f.pkl.gz'),
+            # '/share/compling/data/sanpi/4_post-processed/RBXadj/bigrams_frq-thr0-075p.2f.pkl.gz'
+            '/share/compling/projects/sanpi/DEMO/results/freq_out/RBXadj/all_adj-x-adv_frq-thr0-0001p.3f=2+.pkl.gz'
+        ),
         help=('path to dataframe containing values to reformat. Can be `.pkl.gz` or `.csv`, '
               'and can be a crosstabulated joint frequency table, or a table indexed by `hit_id`. '
               'If the latter, different columns for comparison can be specified '
@@ -123,7 +126,7 @@ def pull_labels_from_stem(stem, df):
 def set_out_path(data_path, data_stem, col_1: str = None, col_2: str = None):
     freq_out_dir = Path('/share/compling/projects/sanpi/results/freq_out')
     out_dir = (data_path.with_name('ucs_format')
-               if data_path.is_relative_to(freq_out_dir)
+               if 'freq_out' in data_path._parts
                else freq_out_dir / data_path.parent.name / 'ucs_format')
     confirm_dir(out_dir)
     if col_1 and col_2:

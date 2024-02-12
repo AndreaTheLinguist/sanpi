@@ -3,37 +3,59 @@
 ## Usage
 
 ```log
-usage: sample_pickle.py [-h] [-N SAMPLE_SIZE] [-s SORT_BY] [-c COLUMNS] [-f FILTERS] [-m] pickle
+usage: sample_pickle.py [-h] [-p PATH] [-N SAMPLE_SIZE] [-s SORT_BY] [-c COLUMNS] [-f FILTERS] [-r]
+                        [-m] [-T] [-P] [-C] [-t] [-q] [-x MAX_COLS] [-w MAX_COLWIDTH] [-W MAX_WIDTH]
 
-simple script to print a sample of a pickled dataframe to stdout as either the default `pandas`
-output or as a markdown table (-m). Specific columns can be selected (defaults to all columns),
-and sample size can be dictated (defaults to 20 rows)
+simple script to print a sample of a pickled dataframe to stdout as either the default `pandas` output
+or as a markdown table (-m). Specific columns can be selected (defaults to all columns), and sample
+size can be dictated (defaults to 20 rows). Tip: use `-N 1 -t` to see example of all included columns
 
-positional arguments:
-  pickle                path to pickled dataframe
-
-options:
+optional arguments:
   -h, --help            show this help message and exit
+  -p PATH, --path PATH  path to dataframe to sample (default:
+                        /share/compling/data/sanpi/DEMO/2_hit_tables/RBdirect/condensed/DEMO-Pcc_all-
+                        RBdirect_unique-bigram-id_hits.pkl.gz)
   -N SAMPLE_SIZE, --sample_size SAMPLE_SIZE
-                        number of rows to include in sample (default: 20)
+                        number of rows to include in sample. To disable sampling (show entire table--
+                        use with caution! ⚠️), use `-N 0` (default: 20)
   -s SORT_BY, --sort_by SORT_BY
-                        name of column to sort sample by; needn't be selected for printout. *note*
-                        this will be _ascending_ (A-Z or increasing numerical values) (default:
-                        None)
+                        name of column to sort sample by; needn't be selected for printout. *note* this
+                        will be _ascending_ (A-Z or increasing numerical values) (default: None)
   -c COLUMNS, --column COLUMNS
-                        option to specify columns to print. Each must have its own `-c` flag. E.g.
-                        `-c COLUMN_1 -c COLUMN_2` (default: [])
+                        option to specify columns to print. Each must have its own `-c` flag. E.g. `-c
+                        COLUMN_1 -c COLUMN_2` (default: [])
   -f FILTERS, --filter FILTERS
                         option to filter rows before sampling. Specify as a string of the format:
-                        `COLUMN_NAME==VALUE` or `COLUMN_NAME!=VALUE` to invert the filter. For
-                        example, to limit the sample to only rows with the adverb "absolutely",
-                        use → `adv_lemma==absolutely` or `adv_form==absolutely` To only see rows
-                        where the adjective is NOT "good", use → `adj_lemma!=good` or
-                        `adj_form!=good`. As with the --column flag, there can be multiple
-                        filters, but every string needs its own flag. NOTE: row filtering is done
-                        *before* column selection so filters may be based on columns which will
-                        not be printed. (default: [])
-  -m, --markdown        option to print in markdown table format (default: False)
+                        `COLUMN_NAME==VALUE` or `COLUMN_NAME!=VALUE` to invert the filter. For example,
+                        to limit the sample to only rows with the adverb "absolutely", use →
+                        `adv_lemma==absolutely` or `adv_form==absolutely` To only see rows where the
+                        adjective is NOT "good", use → `adj_lemma!=good` or `adj_form!=good`. As with
+                        the --column flag, there can be multiple filters, but every string needs its
+                        own flag. NOTE: row filtering is done *before* column selection so filters may
+                        be based on columns which will not be printed. (default: [])
+  -r, --regex           option to interpret filter string arguments as regex patterns, instead of full
+                        string matches (default: False)
+  -m, --markdown        option to print in markdown table format. Note: selecting markdown formatting
+                        for output forces meta-message printing, overriding any simultaneous
+                        `-q/--quiet` flag. (default: False)
+  -T, --tabbed          option to print tab-delimited format (default: False)
+  -P, --piped           option to print pipe-delimited (|) format (default: False)
+  -C, --comma           option to print in csv format (default: False)
+  -t, --transpose       option to transpose the output (swap axes) for clearer viewing (default: False)
+  -q, --quiet           option to suppress meta-messages printed to stdout. (Can be used with
+                        `-T/--tabbed` or `-P/--piped` or `-C/--comma` to write sample to file or use
+                        with `column -T [-s,/-s\|]`) (default: False)
+  -x MAX_COLS, --max_cols MAX_COLS
+                        max number of columns to include in sample; overriden by --column flags if
+                        given (or --sample_size if --transpose specified) (default: 20)
+  -w MAX_COLWIDTH, --max_colwidth MAX_COLWIDTH
+                        max width (in pixels?) of each column in sample display; *currently does not
+                        apply to markdown formatted displays, which include full values for every
+                        included cell. (default: 40)
+  -W MAX_WIDTH, --max_width MAX_WIDTH
+                        max width of the entire display; *currently does not apply to markdown
+                        formatted displays, which will be the sum of the widest cell in every included
+                        columm (default: 180)
 ```
 
 ## Examples
