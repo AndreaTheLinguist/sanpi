@@ -1,0 +1,25 @@
+      l1  l2                      f  f2   f1    N  
+--------  ---------------------  --  --  ---  ---  
+POSITIVE  very_important          9   9  400  536  
+POSITIVE  very_good               9   9  400  536  
+NEGATIVE  too_late                8   9  136  536  
+POSITIVE  more_important          4   7  400  536  
+NEGATIVE  more_important          3   7  136  536  
+NEGATIVE  as_good                 4   6  136  536  
+POSITIVE  all_right               4   5  400  536  
+POSITIVE  too_familiar            5   5  400  536  
+POSITIVE  as_young                4   4  400  536  
+POSITIVE  still_alive             4   4  400  536  
+NEGATIVE  as_bad                  4   4  136  536  
+NEGATIVE  more_toxic              4   4  136  536  
+POSITIVE  too_afraid              3   3  400  536  
+POSITIVE  very_special            3   3  400  536  
+POSITIVE  less_good               3   3  400  536  
+POSITIVE  as_mundane              3   3  400  536  
+POSITIVE  too_young               3   3  400  536  
+POSITIVE  so_strong               3   3  400  536  
+POSITIVE  as_divisive             3   3  400  536  
+NEGATIVE  immediately_available   3   3  136  536  
+NEGATIVE  as_popular              3   3  136  536  
+NEGATIVE  more_effective          3   3  136  536  
+NEGATIVE  particularly_exciting   3   3  136  536  

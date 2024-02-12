@@ -1,0 +1,20 @@
+        l1  l2                      f  f2   f1    N  
+----------  ---------------------  --  --  ---  ---  
+ something  very_important          4   9  105  536  
+      some  very_good               5   9   52  536  
+     never  too_late                8   9   46  536  
+    always  very_good               3   9   37  536  
+    always  very_important          3   9   37  536  
+       all  too_familiar            5   5   38  536  
+everything  all_right               4   5   20  536  
+      some  as_young                3   4   52  536  
+      some  still_alive             3   4   52  536  
+     never  as_bad                  3   4   46  536  
+        no  more_toxic              4   4   24  536  
+ something  as_mundane              3   3  105  536  
+ something  very_special            3   3  105  536  
+      some  less_good               3   3   52  536  
+     never  as_popular              3   3   46  536  
+   nothing  particularly_exciting   3   3   26  536  
+        no  more_effective          3   3   24  536  
+   someone  as_divisive             3   3   23  536  

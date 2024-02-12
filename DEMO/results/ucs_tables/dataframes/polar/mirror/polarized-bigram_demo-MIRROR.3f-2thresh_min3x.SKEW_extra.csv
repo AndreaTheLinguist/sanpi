@@ -1,0 +1,7 @@
+key,l1,l2,f,E11,am_expect_diff,adv,adv_total,adj,adj_total,am_p1_given2,am_log_likelihood,am_odds_ratio_disc,log_ratio,conservative_log_ratio,am_expect_diff_%
+NEG-as_bad,NEGATIVE,as_bad,4,1.015,2.985,as,45.0,bad,7.0,0.752,11.061,1.435,13.523,0.0,74.625
+NEG-more_toxic,NEGATIVE,more_toxic,4,1.015,2.985,more,89.0,toxic,4.0,0.752,11.061,1.435,13.523,0.0,74.625
+NEG-particularly_exciting,NEGATIVE,particularly_exciting,3,0.761,2.239,particularly,5.0,exciting,4.0,0.75,8.279,1.322,13.108,0.0,74.63334
+NEG-more_effective,NEGATIVE,more_effective,3,0.761,2.239,more,89.0,effective,4.0,0.75,8.279,1.322,13.108,0.0,74.63334
+NEG-as_popular,NEGATIVE,as_popular,3,0.761,2.239,as,45.0,popular,3.0,0.75,8.279,1.322,13.108,0.0,74.63334
+NEG-immediately_available,NEGATIVE,immediately_available,3,0.761,2.239,immediately,4.0,available,6.0,0.75,8.279,1.322,13.108,0.0,74.63334
