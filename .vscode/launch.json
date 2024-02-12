@@ -232,9 +232,9 @@
         //         "20"
         //     ]
         // },
-        // * count_*.py bigram_debug/*
+        // * count_*.py *
         {
-            "name": "🦗 neg🪞 count_env",
+            "name": "neg🪞🐜 count_env",
             "type": "python",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_env.py",
@@ -242,15 +242,15 @@
             "justMyCode": true,
             "args": [
                 "-d",
-                "/share/compling/data/sanpi/debug/2_hit_tables/NEGmirror",
+                "/share/compling/data/sanpi/2_hit_tables/NEGmirror",
                 "-o",
-                "/share/compling/projects/sanpi/results/freq_out/debug/NEGmirror",
+                "/share/compling/projects/sanpi/results/freq_out/NEGmirror",
                 "-b",
-                "/share/compling/data/sanpi/debug/4_post-processed/RBXadj/bigram-index_frq-thr0-007p.3f.txt"
+                "/share/compling/data/sanpi/4_post-processed/RBXadj/bigram-index_frq-thr0-01p.5f.txt"
             ]
         },
         {
-            "name": "🦗 pos🪞 count_env",
+            "name": "pos🪞🐜 count_env",
             "type": "python",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_env.py",
@@ -258,15 +258,15 @@
             "justMyCode": true,
             "args": [
                 "-d",
-                "/share/compling/data/sanpi/debug/2_hit_tables/POSmirror",
+                "/share/compling/data/sanpi/2_hit_tables/POSmirror",
                 "-o",
-                "/share/compling/projects/sanpi/results/freq_out/debug/POSmirror",
+                "/share/compling/projects/sanpi/results/freq_out/POSmirror",
                 "-b",
-                "/share/compling/data/sanpi/debug/4_post-processed/RBXadj/bigram-index_frq-thr0-007p.3f.txt"
+                "/share/compling/data/sanpi/4_post-processed/RBXadj/bigram-index_frq-thr0-01p.5f.txt"
             ]
         },
         {
-            "name": "🪲 count_bigrams",
+            "name": "👀💁‍♀️ DEMO count_bigrams",
             "type": "python",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
@@ -274,15 +274,15 @@
             "justMyCode": true,
             "args": [
                 "-d",
-                "/share/compling/data/sanpi/debug/2_hit_tables/RBXadj",
-                "-t",
-                "0.001",
+                "/share/compling/data/sanpi/DEMO/2_hit_tables/RBXadj",
+                // "-t",
+                // "0.001",
                 "-f",
                 "3",
                 "-p",
-                "/share/compling/data/sanpi/debug/4_post-processed/RBXadj",
+                "/share/compling/data/sanpi/DEMO/4_post-processed/RBXadj",
                 "-o",
-                "/share/compling/projects/sanpi/results/freq_out/debug/RBXadj",
+                "/share/compling/projects/sanpi/DEMO/results/freq_out/RBXadj",
             ]
         },
         // * count bigrams
