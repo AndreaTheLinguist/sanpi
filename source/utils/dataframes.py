@@ -116,6 +116,10 @@ def balance_sample(full_df: pd.DataFrame,
     return b_sample, info_message
 
 
+def calculate_var_coeff(vector: pd.Series):
+    return vector.std() / vector.mean()
+
+
 def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables'),
                 fname_glob: str = '*.pkl.gz',
                 pickles=None,
@@ -172,6 +176,10 @@ def corners(df, size: int = 5):
     cdf = cdf.T.reset_index().set_index(columns_name)
     cdf.pop('index')
     return cdf.T.rename(columns={'': '...'}, index={'': '...'})
+
+
+def drop_sums(_df):
+    return _df.filter(regex=r'[a-z]', axis=1).filter(regex=r'[a-z]', axis=0)
 
 
 def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
@@ -636,6 +644,15 @@ def select_pickle_paths(n_files: int,
     return pkl_select.path
 
 
+def set_axes(_df, index_name='adj_form_lower', columns_name='adv_form_lower'):
+    if index_name in _df.columns:
+        _df = _df.set_index(index_name)
+    else:
+        _df.index.name == _df.index.name or index_name
+    _df.columns.name = _df.columns.name or columns_name
+    return _df
+
+
 def sort_by_margins(crosstab_df, margins_name='SUM'):
     """
     Sorts a crosstab DataFrame by margins.
@@ -654,6 +671,16 @@ def sort_by_margins(crosstab_df, margins_name='SUM'):
     return (crosstab_df
             .sort_values(margins_name, ascending=False, axis=0)
             .sort_values(margins_name, ascending=False, axis=1))
+
+
+def square_sample(df: pd.DataFrame, n: int = 10, with_margin: bool = True):
+    _df = drop_sums(df.copy())
+    rows = _df.index.to_series().sample(n).to_list()
+    cols = _df.columns.to_series().sample(n).to_list()
+    if with_margin:
+        rows.insert(0, 'SUM')
+        cols.insert(0, 'SUM')
+    return df.loc[rows, cols]
 
 
 def summarize_text_cols(tdf: pd.DataFrame):

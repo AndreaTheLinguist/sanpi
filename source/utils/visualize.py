@@ -47,11 +47,14 @@ import matplotlib.pyplot as plt
 # plt.show()
 
 
-def heatmap(df, columns=None, save_name=None, size=(8, 10), save_dir: Path = None):
+def heatmap(df,
+            columns=None,
+            save_name=None,
+            size=(8, 10),
+            save_dir: Path = None):
 
     plt.figure(figsize=size, dpi=120, facecolor="white")
 
-    adv_labels = df.index
     if columns:
         df = df.loc[:, columns]
     df = df.astype('float')
@@ -67,10 +70,10 @@ def heatmap(df, columns=None, save_name=None, size=(8, 10), save_dir: Path = Non
     plt.colorbar()
     # Assigning labels of x-axis
     # according to dataframe
-    plt.xticks(range(len(df.columns)), df.columns, rotation=-20)
+    plt.xticks(range(len(df.columns)), df.columns, rotation=-70)
     # Assigning labels of y-axis
     # according to dataframe
-    plt.yticks(range(len(df.index)), adv_labels)
+    plt.yticks(range(len(df.index)), df.index)
     # Displaying the figure
     plt.show()
 

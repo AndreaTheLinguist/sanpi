@@ -3,7 +3,12 @@ import logging
 import re
 from os import system
 from pathlib import Path
+from datetime import datetime
 
+
+def timestamp_now() -> str: 
+    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime("%Y-%m-%d_%H%M")
 
 def confirm_dir(dir_path: Path):
     if not dir_path.is_dir():
@@ -179,8 +184,10 @@ def print_iter(iter_obj,
                indent: int = 0):
 
     bullet_str = f'\n{" " * indent}{bullet} '
-
-    iter_str = bullet_str.join(f'{i}' for i in iter_obj)
+    if isinstance(iter_obj, dict): 
+        iter_str = bullet_str.join(f'{k}:\t{v}' for k,v in iter_obj.items())
+    else: 
+        iter_str = bullet_str.join(f'{i}' for i in iter_obj)
 
     msg_str = f'\n{header}{bullet_str}{iter_str}'
     msg_str = msg_str.replace('\n\n', '\n').strip(f'{bullet} ')
