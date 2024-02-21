@@ -1,7 +1,8 @@
 # coding=utf-8
 from pathlib import Path
 import matplotlib.pyplot as plt
-# import pandas as pd
+from .general import confirm_dir
+import pandas as pd
 
 
 # def heatmap(df,
@@ -49,18 +50,22 @@ import matplotlib.pyplot as plt
 
 def heatmap(df,
             columns=None,
-            save_name=None,
             size=(8, 10),
-            save_dir: Path = None):
+            dpi=130,
+            save_name=None,
+            save_dir: Path = None,
+            colormap="plasma",
+            title: str = 'Frequency Heatmap'):
 
-    plt.figure(figsize=size, dpi=120, facecolor="white")
+    plt.figure(figsize=size, dpi=dpi, facecolor="white")
 
     if columns:
         df = df.loc[:, columns]
     df = df.astype('float')
     # Displaying dataframe as an heatmap
     # with diverging colourmap as RdYlBu
-    plt.imshow(df, cmap="plasma")
+
+    plt.imshow(df, cmap=colormap)
     # plt.imshow(df, cmap="gist_rainbow")
     # plt.imshow(df, cmap="jet")
     # plt.imshow(df, cmap="viridis")
@@ -71,9 +76,11 @@ def heatmap(df,
     # Assigning labels of x-axis
     # according to dataframe
     plt.xticks(range(len(df.columns)), df.columns, rotation=-70)
+
     # Assigning labels of y-axis
     # according to dataframe
     plt.yticks(range(len(df.index)), df.index)
+    plt.title(title)
     # Displaying the figure
     plt.show()
 
@@ -82,8 +89,27 @@ def heatmap(df,
     if save_name:
         if save_dir is None:
             save_dir = Path.cwd().joinpath('images')
-        if not save_dir.is_dir():
-            save_dir.mkdir(parents=True)
+        confirm_dir(save_dir)
         save_path = save_dir.joinpath(save_name)
         plt.savefig(save_path, dpi=300)
         print(f'Heatmap saved to:\n  {save_path}')
+
+
+def plot_barh(sample_df: pd.DataFrame,
+              chart_name: str,
+              stacked: bool = False,
+              color: str = 'gist_rainbow',
+              dpi: int = 120):
+
+    fig = plt.figure(dpi=dpi)
+    sample_df.plot(kind='barh',
+                   stacked=True,
+                   width=0.8,
+                   figsize=(8, 10),
+                   position=1,
+                   title=chart_name,
+                   grid=True,
+                   colormap=color,
+                   ax=plt.gca()
+                   )
+    plt.show()

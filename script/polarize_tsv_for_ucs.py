@@ -6,7 +6,7 @@ from sys import exit as sysxit
 
 from utils.dataframes import Timer
 from utils.general import confirm_dir, print_iter
-from utils.ucs_prep import prep_by_polarity, build_ucs_from_multiple
+from utils.associate import prep_by_polarity, build_ucs_from_multiple
 
 WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 _RSLT_DIR = Path('/share/compling/projects/sanpi/results')
