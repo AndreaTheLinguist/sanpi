@@ -5,16 +5,22 @@ from pathlib import Path
 from sys import exit as sysxit
 
 import pandas as pd
-from utils.dataframes import Timer
-
+from .dataframes import Timer
 from .general import confirm_dir, print_iter, run_shell_command
 
 UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
-
 WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
-_RSLT_DIR = Path('/share/compling/projects/sanpi/results')
-_FREQ_DIR = _RSLT_DIR / 'freq_out'
-_POL_DIR = _RSLT_DIR / 'ucs_tables' / 'polarity_prepped'
+
+_SANPI_HOME = Path('/share/compling/projects/sanpi')
+_DEMO_DIR = _SANPI_HOME / 'DEMO'
+_RSLT_DIR, _DEMO_RSLT_DIR = [ W / 'results' for W in (_SANPI_HOME, _DEMO_DIR)]
+
+_FREQ_DIR, _DEMO_FREQ_DIR = [R / 'freq_out' for R in (_RSLT_DIR, _DEMO_RSLT_DIR)]
+_UCS_DIR, _DEMO_UCS_DIR = [R / 'ucs_tables' for R in (_RSLT_DIR, _DEMO_RSLT_DIR)]
+_POL_DIR, _DEMO_POL_DIR = [R / 'polarity_prepped' for R in (_UCS_DIR, _DEMO_UCS_DIR)]
+
+#? Does this even do anything? This is never run as its own thing...
+confirm_dir(_RSLT_DIR)
 confirm_dir(_POL_DIR)
 
 

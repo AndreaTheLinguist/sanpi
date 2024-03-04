@@ -1,7 +1,8 @@
 # coding=utf-8
 from pathlib import Path
 import matplotlib.pyplot as plt
-# import pandas as pd
+from .general import confirm_dir
+import pandas as pd
 
 
 # def heatmap(df,
@@ -49,20 +50,32 @@ import matplotlib.pyplot as plt
 
 def heatmap(df,
             columns=None,
-            save_name=None,
             size=(8, 10),
+<<<<<<< HEAD
             title='Joint Frequency Heatmap',
             save_dir: Path = None, 
             color="plasma"):
+=======
+            dpi=130,
+            save_name=None,
+            save_dir: Path = None,
+            colormap="plasma",
+            title: str = 'Frequency Heatmap'):
+>>>>>>> b8e6b5eecf35b37e0e1a70ecbe6c936332b9697b
 
-    plt.figure(figsize=size, dpi=120, facecolor="white")
+    plt.figure(figsize=size, dpi=dpi, facecolor="white")
 
     if columns:
         df = df.loc[:, columns]
     df = df.astype('float').sort_index(axis=0).sort_index(axis=1)
     # Displaying dataframe as an heatmap
     # with diverging colourmap as RdYlBu
+<<<<<<< HEAD
     plt.imshow(df, cmap=color)
+=======
+
+    plt.imshow(df, cmap=colormap)
+>>>>>>> b8e6b5eecf35b37e0e1a70ecbe6c936332b9697b
     # plt.imshow(df, cmap="gist_rainbow")
     # plt.imshow(df, cmap="jet")
     # plt.imshow(df, cmap="viridis")
@@ -73,6 +86,7 @@ def heatmap(df,
     # Assigning labels of x-axis
     # according to dataframe
     plt.xticks(range(len(df.columns)), df.columns, rotation=-70)
+
     # Assigning labels of y-axis
     # according to dataframe
     plt.yticks(range(len(df.index)), df.index)
@@ -85,8 +99,27 @@ def heatmap(df,
     if save_name:
         if save_dir is None:
             save_dir = Path.cwd().joinpath('images')
-        if not save_dir.is_dir():
-            save_dir.mkdir(parents=True)
+        confirm_dir(save_dir)
         save_path = save_dir.joinpath(save_name)
         plt.savefig(save_path, dpi=300)
         print(f'Heatmap saved to:\n  {save_path}')
+
+
+def plot_barh(sample_df: pd.DataFrame,
+              chart_name: str,
+              stacked: bool = False,
+              color: str = 'gist_rainbow',
+              dpi: int = 120):
+
+    fig = plt.figure(dpi=dpi)
+    sample_df.plot(kind='barh',
+                   stacked=True,
+                   width=0.8,
+                   figsize=(8, 10),
+                   position=1,
+                   title=chart_name,
+                   grid=True,
+                   colormap=color,
+                   ax=plt.gca()
+                   )
+    plt.show()

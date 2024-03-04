@@ -821,15 +821,16 @@ def summarize_text_cols(tdf: pd.DataFrame):
 def transform_counts(df: pd.DataFrame,
                      method: str = 'sqrt',
                      plus1: bool = False):
+    _df = df.copy()
     if plus1 or method.startswith('log'):
-        df = df.add(1)
+        _df = _df.add(1)
     if method == 'sqrt':
-        df = df.apply(lambda x: x.apply(sqrt))
+        _df = _df.apply(lambda x: x.apply(sqrt))
     elif method == 'log10':
-        df = df.apply(lambda x: x.apply(np.log10))
+        _df = _df.apply(lambda x: x.apply(np.log10))
     elif method == 'log2':
-        df = df.apply(lambda x: x.apply(np.log2))
-    return df
+        _df = _df.apply(lambda x: x.apply(np.log2))
+    return _df
 
 
 def unpack_dict(input_dict: dict,
