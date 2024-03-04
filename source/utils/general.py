@@ -5,6 +5,7 @@ from os import system
 from pathlib import Path
 from datetime import datetime
 
+PKL_SUFF = '.pkl.gz'
 
 def timestamp_now() -> str: 
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

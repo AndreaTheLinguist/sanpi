@@ -1,6 +1,7 @@
 # coding=utf-8
+import contextlib
 import re
-import statistics as stat
+# import statistics as stat
 from collections import namedtuple
 from math import sqrt
 from pathlib import Path
@@ -9,15 +10,14 @@ import numpy as np
 import pandas as pd
 
 try:
-    from general import (confirm_dir,  # pylint: disable=import-error
-                         find_files, snake_to_camel)
+    from general import PKL_SUFF, confirm_dir, find_files, snake_to_camel
 except ModuleNotFoundError:
     try:
-        from utils.general import (confirm_dir,  # pylint: disable=import-error
-                                   find_files, snake_to_camel)
+        from utils.general import (PKL_SUFF, confirm_dir, find_files,
+                                   snake_to_camel)
     except ModuleNotFoundError:
-        from source.utils.general import (  # pylint: disable=import-error
-            confirm_dir, find_files, snake_to_camel)
+        from source.utils.general import (PKL_SUFF, confirm_dir, find_files,
+                                          snake_to_camel)
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -121,7 +121,7 @@ def calculate_var_coeff(vector: pd.Series):
 
 
 def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables'),
-                fname_glob: str = '*.pkl.gz',
+                fname_glob: str = f'*{PKL_SUFF}',
                 pickles=None,
                 convert_dtypes=False,
                 verbose: bool = True) -> pd.DataFrame:
@@ -129,17 +129,24 @@ def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables')
         pickles = find_files(data_dir, fname_glob, verbose)
 
     # tested and found that it is faster to assign `corpus` intermittently
-    df = pd.concat((pd.read_pickle(p).assign(corpus=p.stem.rsplit('_', 2)[0])
+    _df = pd.concat((pd.read_pickle(p).assign(corpus=p.stem.rsplit('_', 2)[0])
                     for p in pickles))
 
-    dup_check_cols = cols_by_str(df, end_str=('text', 'id', 'sent'))
-    df = (df.loc[~df.duplicated(dup_check_cols), :])
+    dup_check_cols = cols_by_str(_df, end_str=('text', 'id', 'sent'))
+    _df = (_df.loc[~_df.duplicated(dup_check_cols), :])
     if convert_dtypes:
-        df = df.convert_dtypes()
-        df = make_cats(df, (['corpus'] + cols_by_str(df, start_str=('nr', 'neg', 'adv'),
-                                                     end_str=('lemma', 'form'))))
-
-    return df
+        cdf = _df.copy().convert_dtypes()
+        num_cols = cdf.select_dtypes(include='number').columns
+        cdf.loc[:, num_cols] = _df[num_cols].apply(
+            pd.to_numeric, downcast='unsigned')
+    return make_cats(
+        cdf, (['corpus']
+              + cols_by_str(
+                  cdf,
+                  start_str=('nr', 'neg', 'adv'),
+                  end_str=('lemma', 'form', 'lower', 'pattern', 'category'))
+              )
+    )
 
 
 def cols_by_str(df: pd.DataFrame, start_str=None, end_str=None) -> list:
@@ -160,17 +167,20 @@ def count_uniq(series: pd.Series) -> int:
 
 
 def corners(df, size: int = 5):
-    index_name = df.index.name or 'frequencies'
-    columns_name = df.columns.name or 'categories'
-    df = df.reset_index().reset_index().set_index(
+    _df = df.copy()
+    _df.index.name = _df.index.name or 'rows'
+    _df.columns.name = _df.columns.name or 'columns'
+    index_name = _df.index.name
+    columns_name = _df.columns.name
+    _df = _df.reset_index().reset_index().set_index(
         ['index', index_name])
-    df = df.T.reset_index().reset_index().set_index(
+    _df = _df.T.reset_index().reset_index().set_index(
         ['index', columns_name]).T
     cdf = pd.concat(
         [dfs.iloc[:, :size].assign(__='...')
          .join(dfs.iloc[:, -size:])
-         for dfs in (df.head(size).T.assign(__='...').T,
-                     df.tail(size))])
+         for dfs in (_df.head(size).T.assign(__='...').T,
+                     _df.tail(size))])
     cdf = cdf.reset_index().set_index(index_name)
     cdf.pop('index')
     cdf = cdf.T.reset_index().set_index(columns_name)
@@ -178,8 +188,8 @@ def corners(df, size: int = 5):
     return cdf.T.rename(columns={'': '...'}, index={'': '...'})
 
 
-def drop_sums(_df):
-    return _df.filter(regex=r'[a-z]', axis=1).filter(regex=r'[a-z]', axis=0)
+def drop_margins(_df, margin_name='SUM'):
+    return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
 
 def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
@@ -191,16 +201,19 @@ def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
                        IQ_range=desc['75%'] - desc['25%'])
     desc = desc.assign(upper_fence=desc['75%'] + (desc.IQ_range * 1.5),
                        lower_fence=desc['25%'] - (desc.IQ_range * 1.5))
-    if 'SUM' not in desc.index:
-        desc = desc.assign(
-            plus1_geo_mean=df.add(1).apply(stat.geometric_mean),
-            plus1_har_mean=df.add(1).apply(stat.harmonic_mean))
+    # if 'SUM' not in desc.index:
+    #     desc = desc.assign(
+    #         plus1_geo_mean=df.add(1).apply(stat.geometric_mean),
+    #         plus1_har_mean=df.add(1).apply(stat.harmonic_mean))
     for col in desc.columns:
-        if col in ('mean', 'std', 'variance', 'var_coeff'):
-            desc.loc[:, col] = desc[col].round(1)
+        if col in ('count', 'min', 'max', 'total', 'range'):
+            desc.loc[:, col] = pd.to_numeric(
+                desc.loc[:, col], downcast='unsigned')
+        # if col in ('mean', 'std', 'variance', 'var_coeff'):
         else:
-            desc.loc[:, col] = pd.to_numeric(desc[col], downcast='unsigned')
-
+            desc.loc[:, col] = pd.to_numeric(
+                desc.loc[:, col], downcast='float').round(1)
+    desc = desc.rename(columns={'50%': 'median'})
     # mean_centr = no_sum_frame - no_sum_frame.mean()
     # mean_stand = no_sum_frame / no_sum_frame.mean()
     # mean_stand_centr = mean_stand - mean_stand.mean()
@@ -208,7 +221,7 @@ def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # log2_plus1_trans = no_sum_frame.add(1).apply(np.log2)
     # logn_plus1_trans = no_sum_frame.apply(np.log1p)
 
-    return desc.round(1)
+    return desc
 
 
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
@@ -234,7 +247,91 @@ def make_cats(orig_df: pd.DataFrame, columns: list = None) -> pd.DataFrame:  # t
     return df
 
 
-def print_md_table(df: pd.DataFrame,
+def optimize_hit_df(df: pd.DataFrame, verbosity=0):
+    very_verbose = verbosity > 1
+    verbose = verbosity > 0
+    if very_verbose:
+        print('Original Dataframe:')
+        df.info(memory_usage='deep')
+
+    _df = df.copy()
+    # * clean up dataframe a bit
+    # > drop extraneous string columns
+    _df.drop(
+        cols_by_str(_df, start_str=('context',  # 'text', 'sent_text',
+                                    'token', 'json')),
+        axis=1, inplace=True)
+
+    if very_verbose:
+        print('Original Dataframe Minus Superfluous Columns:')
+        _df.info(memory_usage='deep')
+
+    # > select only non-`object` dtype columns
+    #  was #// relevant_cols = df.columns[~df.dtypes.astype('string').str.endswith(('object'))]
+    relevant_cols = _df.select_dtypes(exclude='object').columns
+
+    # > limit df to `relevant_cols`
+    r_df = _df.copy()[relevant_cols]
+
+    # > create empty dataframe with `relevant_cols` as index/rows
+    df_info = pd.DataFrame(index=relevant_cols)
+
+    df_info = df_info.assign(
+        mem0=r_df.memory_usage(deep=True),
+        dtype0=r_df.dtypes.astype('string'),
+        defined_values=r_df.count(),
+        unique_values=r_df.nunique())
+    df_info = df_info.assign(
+        ratio_unique=(df_info.unique_values
+                      / df_info.defined_values).round(2))
+
+    cat_candidates = df_info.loc[df_info.ratio_unique < 0.8,
+                                 :].loc[df_info.dtype0 != 'category'].index.to_list()
+    c_df = r_df.copy()[cat_candidates].astype('category')
+
+    df_info = df_info.assign(
+        dtype1=c_df.dtypes, mem1=c_df.memory_usage(deep=True))
+    df_info = df_info.assign(mem_change=df_info.mem1-df_info.mem0)
+    mem_improved = df_info.loc[df_info.mem_change < 0, :].index.to_list()
+    if very_verbose:
+        print_md_table(df_info.sort_values(
+            ['mem_change', 'ratio_unique', 'dtype0']), n_dec=2, title='\nMemory Usage Comparison\n')
+        for c in relevant_cols:
+            if c not in mem_improved:
+                print('✕', c, r_df.loc[:, c].dtype, sep='\t')
+            else:
+                print('✓', c, c_df.loc[:, c].dtype, sep='\t')
+    _df[mem_improved] = c_df[mem_improved]
+    if verbose:
+        print('Category Converted dataframe:')
+        _df.info(memory_usage='deep')
+    return _df
+
+
+def optimize_am_df(df: pd.DataFrame, verbose=False):
+    _df = df.copy()
+    if verbose:
+        print('>> Unoptimized <<')
+        _df.info(memory_usage='deep')
+    str_cols = _df.select_dtypes(exclude='number').columns.to_list()
+    int_cols = _df.columns[_df.columns.str.startswith(
+        ('r_', 'C', 'R', 'N', 'f', 'index'))].to_list()
+    is_float = ~_df.columns.isin(int_cols + str_cols)
+    _df[int_cols] = _df[int_cols].apply(pd.to_numeric, downcast='unsigned')
+    _df.loc[:, is_float] = _df.loc[:, is_float].apply(
+        pd.to_numeric, downcast='float')
+    _df[str_cols] = _df[str_cols].apply(
+        lambda c: c.astype('string').astype('category')
+        if c.dtype != 'category' and c.nunique() > (len(c) / 2)
+        else c)
+    if verbose:
+        print('\n--------\n>> Optimized DataFrame')
+        _df.info(memory_usage='deep')
+    _df['l1'] = _df['l1'].astype('category')
+    return _df
+
+
+def print_md_table(input_df: pd.DataFrame,
                    indent: int = 0,
                    title: str = '',
                    comma: bool = True,
@@ -265,14 +362,14 @@ def print_md_table(df: pd.DataFrame,
     Returns:
         the markdown table as a string if suppress is True, else prints the table to stdout
     """
-
+    _df = input_df.copy()
     # FIXME realized this does nothing for markdown tables, which are strings
     set_pd_display(max_colwidth, max_cols, max_width)
 
     if describe:
-        df = df.describe()
+        _df = input_df.describe()
     if transpose:
-        df = df.T
+        _df = _df.T
 
     # if max_colwidth:
     #     df = df.apply(lambda x: x.st)
@@ -294,11 +391,13 @@ def print_md_table(df: pd.DataFrame,
     #     print_str += f'\n{whitespace}{title}\n'
     # print_str += (whitespace
     #               + md_table.replace('\n', f'\n{whitespace}'))
+
     floatfmt = f"{',' if comma else ''}.{n_dec}f"
-    if not df.select_dtypes(include='number').empty:
-        df.loc[:, df.select_dtypes(include='number').columns] = df.select_dtypes(
-            include='number').astype('float')
-    md_table = df.to_markdown(floatfmt=floatfmt)
+    num_cols = _df.select_dtypes(include='number').columns.to_list()
+    if any(num_cols):
+        _df.loc[:, num_cols] = _df.loc[:, num_cols].astype(
+            'float').round(n_dec)
+    md_table = _df.to_markdown(floatfmt=floatfmt)
 
     whitespace = ' ' * indent
     print_str = f"{whitespace}{title}\n{whitespace}" if title else ''
@@ -503,6 +602,59 @@ def save_in_lsc_format(frq_df,
         None
     """
 
+    def get_reshaped_output_lines(frq_df, row_w1_label, col_w0_label, for_ucs, new_col_name):
+        lsc_format = reshape_totals(frq_df, new_col_name)
+        lsc_format = _sort_stacks(
+            row_w1_label, col_w0_label, new_col_name, lsc_format)
+        return cleanup_output(for_ucs, lsc_format)
+
+    def cleanup_output(for_ucs, lsc_format):
+        counts_list = lsc_format.to_csv(sep="\t", index=False).splitlines()[1:]
+        counts_lines = [x.strip() for x in counts_list]
+        return counts_lines if for_ucs else ['2'] + counts_lines
+
+    def save_tsv_file(output_tsv_path, output_lines):
+        output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
+        print('Counts formatted to train lsc model saved as:', output_tsv_path)
+
+    def show_sample_output(output_lines):
+        print('\n## Formatted Output Sample (top 20 bigrams)\n')
+        print('\n'.join(output_lines[:20] + ['...']))
+
+    def reshape_totals(frq_df, new_col_name):
+        return frq_df.stack().to_frame(new_col_name)
+
+    def _sort_stacks(row_w1_label, col_w0_label, new_col_name, stacked_df):
+        stacked_df = stacked_df.reset_index()
+        print(stacked_df.head())
+        stacked_df = stacked_df[[new_col_name, col_w0_label, row_w1_label]]
+        # stacked_df = (
+        #     stacked_df
+        #     .sort_values([row_w1_label, col_w0_label])
+        # )
+        # I don't think this ^^ makes a difference.
+        #   Was trying to get it to sort A-Z within the same frequency value,
+        #   but it seems to overwrite that regardless, since one requires ascending, and the other descending
+        # But it doesn't really matter in any case.
+
+        #! The zeros have to be dropped from the data for UCS, and it might affect LSC as well
+        # ^ 💡 so maybe this should just return `nonzeros` dataframe?
+        # HACK: #! if there are errors, check this
+        nonzeros = stacked_df[stacked_df[new_col_name] != 0]
+        return nonzeros.sort_values(new_col_name, ascending=False).reset_index(drop=True)
+
+    def prep_to_reshape(frq_df, numeric_label, row_w1_label, col_w0_label):
+        if row_w1_label in frq_df.columns:
+            frq_df = frq_df.set_index(row_w1_label, drop=True)
+        elif not frq_df.index.name:
+            frq_df.index.name = row_w1_label
+        if not frq_df.columns.name:
+            frq_df.columns.name = col_w0_label
+
+        frq_df = frq_df.loc[frq_df.index != 'SUM', frq_df.columns != 'SUM']
+
+        return frq_df, f'{numeric_label}_frq'
+
     confirm_dir(output_tsv_path.parent)
     frq_df, new_col_name = prep_to_reshape(
         frq_df, numeric_label, row_w1_label, col_w0_label)
@@ -513,73 +665,13 @@ def save_in_lsc_format(frq_df,
     save_tsv_file(output_tsv_path, output_lines)
 
 
-def get_reshaped_output_lines(frq_df, row_w1_label, col_w0_label, for_ucs, new_col_name):
-    lsc_format = reshape_totals(frq_df, new_col_name)
-    lsc_format = _sort_stacks(
-        row_w1_label, col_w0_label, new_col_name, lsc_format)
-    return cleanup_output(for_ucs, lsc_format)
-
-
-def cleanup_output(for_ucs, lsc_format):
-    counts_list = lsc_format.to_csv(sep="\t", index=False).splitlines()[1:]
-    counts_lines = [x.strip() for x in counts_list]
-    return counts_lines if for_ucs else ['2'] + counts_lines
-
-
-def save_tsv_file(output_tsv_path, output_lines):
-    output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
-    print('Counts formatted to train lsc model saved as:', output_tsv_path)
-
-
-def show_sample_output(output_lines):
-    print('\n## Formatted Output Sample (top 20 bigrams)\n')
-    print('\n'.join(output_lines[:20] + ['...']))
-
-
-def reshape_totals(frq_df, new_col_name):
-    return frq_df.stack().to_frame(new_col_name)
-
-
-def _sort_stacks(row_w1_label, col_w0_label, new_col_name, stacked_df):
-    stacked_df = stacked_df.reset_index()
-    print(stacked_df.head())
-    stacked_df = stacked_df[[new_col_name, col_w0_label, row_w1_label]]
-    # stacked_df = (
-    #     stacked_df
-    #     .sort_values([row_w1_label, col_w0_label])
-    # )
-    # I don't think this ^^ makes a difference.
-    #   Was trying to get it to sort A-Z within the same frequency value,
-    #   but it seems to overwrite that regardless, since one requires ascending, and the other descending
-    # But it doesn't really matter in any case.
-
-    #! The zeros have to be dropped from the data for UCS, and it might affect LSC as well
-    # ^ 💡 so maybe this should just return `nonzeros` dataframe?
-    # HACK: #! if there are errors, check this
-    nonzeros = stacked_df[stacked_df[new_col_name] != 0]
-    return nonzeros.sort_values(new_col_name, ascending=False).reset_index(drop=True)
-
-
-def prep_to_reshape(frq_df, numeric_label, row_w1_label, col_w0_label):
-    if row_w1_label in frq_df.columns:
-        frq_df = frq_df.set_index(row_w1_label, drop=True)
-    elif not frq_df.index.name:
-        frq_df.index.name = row_w1_label
-    if not frq_df.columns.name:
-        frq_df.columns.name = col_w0_label
-
-    frq_df = frq_df.loc[frq_df.index != 'SUM', frq_df.columns != 'SUM']
-
-    return frq_df, f'{numeric_label}_frq'
-
-
 def save_table(df: pd.DataFrame,
                save_path: Path or str,
                df_name: str = '',
                formats: list = None):
     _ext = namedtuple('Format', ['ext', 'sep'])
     ext_dict = {
-        'pickle': _ext('.pkl.gz', None),
+        'pickle': _ext(PKL_SUFF, None),
         'csv': _ext('.csv', ','),
         'psv': _ext('.psv', '|'),
         'tsv': _ext('.tsv', '\t')
@@ -635,7 +727,7 @@ def select_pickle_paths(n_files: int,
                             '/share/compling/data/sanpi/2_hit_tables/advadj'),
                         smallest_first=True) -> pd.Series:
 
-    pkl_df = pd.DataFrame(pickle_dir.glob('bigram*hits.pkl.gz'),
+    pkl_df = pd.DataFrame(pickle_dir.glob(f'bigram*hits{PKL_SUFF}'),
                           columns=['path'])
     pkl_df = pkl_df.assign(size=pkl_df.path.apply(lambda f: f.stat().st_size))
     # > make dataframe to load `n_files` sorted by size (for testing)
@@ -653,6 +745,19 @@ def set_axes(_df, index_name='adj_form_lower', columns_name='adv_form_lower'):
     return _df
 
 
+def set_count_dtype(df, df_save_path:Path=None): 
+    df = df.apply(pd.to_numeric, downcast='unsigned')
+    # BUG There may be an issue with this selecting the wrong dtype and fucking up large numbers again.
+    uniq_dt = [str(d) for d in df.dtypes.unique()]
+    # if len(uniq_dt) > 1: 
+    #     uniq_dt.sort()
+    #     df = df.astype(uniq_dt[-1])
+    if df_save_path: 
+        if df_save_path.suffix == '.csv':
+            df_save_path = df_save_path.with_suffix(PKL_SUFF)
+        df.to_pickle(df_save_path)
+    return df
+
 def sort_by_margins(crosstab_df, margins_name='SUM'):
     """
     Sorts a crosstab DataFrame by margins.
@@ -668,19 +773,28 @@ def sort_by_margins(crosstab_df, margins_name='SUM'):
     """
 
     # > sort crosstabulated values by marginal frequencies
-    return (crosstab_df
-            .sort_values(margins_name, ascending=False, axis=0)
-            .sort_values(margins_name, ascending=False, axis=1))
+    for ax in [0, 1]:
+
+        with contextlib.suppress(KeyError):
+            crosstab_df = crosstab_df.sort_index(axis=ax)
+            crosstab_df = crosstab_df.sort_values(
+                margins_name, axis=ax, ascending=False)
+    return crosstab_df
 
 
-def square_sample(df: pd.DataFrame, n: int = 10, with_margin: bool = True):
-    _df = drop_sums(df.copy())
-    rows = _df.index.to_series().sample(n).to_list()
-    cols = _df.columns.to_series().sample(n).to_list()
-    if with_margin:
-        rows.insert(0, 'SUM')
-        cols.insert(0, 'SUM')
-    return df.loc[rows, cols]
+def square_sample(df: pd.DataFrame, n: int = 10,
+                  with_margin: bool = True,
+                  as_sqrt: bool = False):
+    _df = drop_margins(df.copy())
+    rows = ['SUM'] + _df.index.to_series().sample(n).to_list()
+    cols = ['SUM'] + _df.columns.to_series().sample(n).to_list()
+
+    sample = sort_by_margins(df.copy().loc[rows, cols])
+    if not with_margin: 
+        sample = drop_margins(sample)
+    if as_sqrt:
+        sample = transform_counts(sample)
+    return sample
 
 
 def summarize_text_cols(tdf: pd.DataFrame):
@@ -696,7 +810,7 @@ def summarize_text_cols(tdf: pd.DataFrame):
         A summary DataFrame with descriptive statistics for the text columns, sorted by the number of unique values.
     """
 
-    summary = tdf.select_dtypes('string').describe().transpose()
+    summary = tdf.select_dtypes(exclude='number').describe().transpose()
     summary = summary.assign(top_percent=(
         ((pd.to_numeric(summary.freq) / len(tdf)))*100).round(2))
     summary = summary.rename(columns={'top': 'top_value', 'freq': 'top_freq'})

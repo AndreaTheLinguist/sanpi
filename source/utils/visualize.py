@@ -51,16 +51,18 @@ def heatmap(df,
             columns=None,
             save_name=None,
             size=(8, 10),
-            save_dir: Path = None):
+            title='Joint Frequency Heatmap',
+            save_dir: Path = None, 
+            color="plasma"):
 
     plt.figure(figsize=size, dpi=120, facecolor="white")
 
     if columns:
         df = df.loc[:, columns]
-    df = df.astype('float')
+    df = df.astype('float').sort_index(axis=0).sort_index(axis=1)
     # Displaying dataframe as an heatmap
     # with diverging colourmap as RdYlBu
-    plt.imshow(df, cmap="plasma")
+    plt.imshow(df, cmap=color)
     # plt.imshow(df, cmap="gist_rainbow")
     # plt.imshow(df, cmap="jet")
     # plt.imshow(df, cmap="viridis")
@@ -74,6 +76,7 @@ def heatmap(df,
     # Assigning labels of y-axis
     # according to dataframe
     plt.yticks(range(len(df.index)), df.index)
+    plt.title(title)
     # Displaying the figure
     plt.show()
 
