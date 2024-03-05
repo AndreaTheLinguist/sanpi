@@ -378,74 +378,91 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,git,jetbrains+all,jupyternotebooks,ocaml,pydev,python,vim
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
-.untracked/
-sandbox/
+
+## extension exclusions
 *.[0-9]+.*
 *.err
 *.out
-playground/
-demo/**/*tar
-demo/script
-demo/source
-demo/scratch.ipynb
-
-demo/**/x20_*
-demo/**/PccX9*
-demo/**/Pcc*.conll/*conllu
-demo/data/corpora/puddin
-demo/data/corpora/nyt5.conll
-demo/data/corpora/gitrepo_puddin/PccTe.conll/subset_advadj/pcc*.conllu
-demo/data/debug
-demo/data/pre23-02-08*
-
-tmp*
-tmp/
-logs/
-demo/run_pipeline.py
-demo/data/corpora/small/mixed10.conll/*.conllu
-demo/data/corpora/git_commit/*/subset_advadj/
 **.tar*
+
+## top-level directory exclusions
+**/old/
+.untracked/
 backups
-old/
+playground/
+sandbox/
 **/Notes*
-source/analyze/get_deps.1.py
+tmp*
+**/t?mp*
+**/*dev*
+# *devel
+info/Israel*
+data-link
+**/*scratch*
+sanpi-data.link
+**/debug
+
+## logs
+logs/
+
+## demo (exclude all)
+demo/
+# demo/**/*tar
+# demo/script
+# demo/source
+# demo/scratch.ipynb
+# demo/**/x20_*
+# demo/**/PccX9*
+# demo/**/Pcc*.conll/*conllu
+# demo/data/corpora/puddin
+# demo/data/corpora/nyt5.conll
+# demo/data/corpora/gitrepo_puddin/PccTe.conll/subset_advadj/pcc*.conllu
+# demo/data/**/RB*/
+# demo/data/debug
+# demo/data/pre23-02-08*
+# demo/run_pipeline.py
+# demo/data/3_dep_info/crosstab/*
+# demo/data/corpora/small/mixed10.conll/*.conllu
+# demo/data/corpora/git_commit/*/subset_advadj/
+
+## `notebooks/` exclusions
+notebooks/exactly_out/
+
+## `Pat/` exclusions
+Pat/shelf
+Pat/RBsimple
+Pat/negpol
+
+## "priors" exclusions
+# **/prior_version
+
+## `results/` exclusions
+results/**/*.*py*
+results/freq_out/*/*bigram-x-prev*.csv
+results/freq_out/JxR
+results/**/images
+results/**/partials
+results/**/*[.12]?f.*
+# results/**/*ed
+# results/**/descriptive_stats
+# results/freq_out/spearman
+results/**/heatmaps
+
+### `ucs_tables/` exclusions
+**/ucs_tables/.ucs_tmp.tsv
 **/ucs_tables/*.ll*
-**/ucs_tables/*8.*.scores.*
 **/ucs_tables/*.ranks.*
 # don't commit any of the `..view_r-only..` or `..view_am-only` files
 **/ucs_tables/readable/*-only*
-# exclude all full `.ranks.` and `.rsort` files for 877 & 438 thresh
-#   (including .txt & .csv file in `../ucs_tables/readable/`)
-**/ucs_tables/**/*h???.*.r*[tw].[tcmg]*
-**/ucs_tables/readable/*4384.*view.txt
-*devel
-Pat/shelf
-**/*dev*
-demo/data/**/RB*/
-results/**/*[.12]?f.*
-source/gather/utils
-source/utils/adv*
-**/t?mp*
-source/analyze/count_neg.comments.py
-Pat/prior_version
-Pat/RBsimple
-Pat/negpol
-info/Israel*
-results/freq_out/debug
-results/freq_out/JxR
+**/ucs_tables/[!d]*/*.gz
+
+## `slurm/` exclusions
 slurm/lsc_35JxR.slurm.sh
 slurm/train-lsc.slurm.sh
-data-link
+
+## `source/` exclusions
 source/LSC
-**/*scratch*
-**/prior_version
-demo/data/3_dep_info/crosstab/*
-sanpi-data.link
-results/**/images
-results/**/partials
-results/**/*ed
-results/**/descriptive_stats
-results/freq_out/spearman
-results/*.*py*
-results/ucs_tables/.ucs_tmp.tsv
-results/freq_out/*/*bigram-x-prev*.csv
+source/gather/utils
+source/utils/adv*
+source/**/*comments*
+source/**/*edits*
