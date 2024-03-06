@@ -1,15 +1,17 @@
 # %%
+from sys import argv
 from source.utils import sample_pickle, print_md_table
 import pandas as pd
 from pathlib import Path
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
 _DATA_DIR = Path('/share/compling/data/sanpi')
 
-skew_path = _SANPI_DIR.joinpath(
-    'results/ucs_tables/dataframes/polarized-bigram_MIRROR.35f-868thresh_min15x.SKEW_extra.csv')
-
+skew_path = argv[1]
 if not skew_path.is_file():
-    raise FileNotFoundError
+    skew_path = _SANPI_DIR.joinpath(
+        'results/ucs_tables/dataframes/polarized-bigram_MIRROR.35f-868thresh_min15x.SKEW_extra.csv')
+    if not skew_path.is_file():
+        raise FileNotFoundError
 # %%
 sk = (pd.read_csv(skew_path) if skew_path.suffix == '.csv'
       else pd.read_pickle(skew_path))
@@ -17,7 +19,7 @@ sk = (pd.read_csv(skew_path) if skew_path.suffix == '.csv'
 sk.head(3)
 # %%
 
-print('Minimum adjusted conditional probability of polarity environment:',
+print('Minimum adjusted conditional probability of l1 (polarity or adv) given l2 (bigram or adj):',
       round(sk.am_p1_given2.abs().min(), 3))
 sk.head().key
 # %%
@@ -28,8 +30,8 @@ parts
 
 # %%
 parts['data_paths'] = parts.pol.apply(
-    lambda p: pd.Series(Path(f'/share/compling/data/sanpi/4_post-processed/{p}mirror/')
-                        .glob('*trigger*pkl.gz')).squeeze())
+    lambda p: pd.Series(Path(f'/share/compling/data/sanpi/4_post-processed/')
+                        .rglob('*trigger*pkl.gz')).squeeze())
 relevant_col = ['neg_form', 'mir_form', 'bigram_lower',
                 'pattern', 'neg_deprel', 'mir_deprel', 'text_window', 'token_str']
 
@@ -63,13 +65,3 @@ for bigram in sk.l2.head(n_bigrams):
             df=(exdf.sort_values([exdf.columns[0], exdf.columns[4]])
                 .reset_index(drop=True)),
             title=f'\n  {n} Random `{pol}` Hits', indent=2)
-            # samples.append(
-            # sample_pickle(
-            # data_path=path, sample_size=1,
-            # filters=[f'bigram_lower=={bigram}'],
-            # columns=relevant_col,
-            # print_sample=False)
-            # )
-
-
-# %%

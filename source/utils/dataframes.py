@@ -10,13 +10,13 @@ import numpy as np
 import pandas as pd
 
 try:
-    from general import PKL_SUFF, confirm_dir, find_files, snake_to_camel
+    from source.utils.general import PKL_SUFF, confirm_dir, find_files, snake_to_camel
 except ModuleNotFoundError:
     try:
         from utils.general import (PKL_SUFF, confirm_dir, find_files,
                                    snake_to_camel)
     except ModuleNotFoundError:
-        from source.utils.general import (PKL_SUFF, confirm_dir, find_files,
+        from general import (PKL_SUFF, confirm_dir, find_files,
                                           snake_to_camel)
 
 OPTIMIZED_DTYPES = {

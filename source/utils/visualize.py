@@ -51,17 +51,11 @@ import pandas as pd
 def heatmap(df,
             columns=None,
             size=(8, 10),
-<<<<<<< HEAD
-            title='Joint Frequency Heatmap',
-            save_dir: Path = None, 
-            color="plasma"):
-=======
             dpi=130,
             save_name=None,
             save_dir: Path = None,
             colormap="plasma",
             title: str = 'Frequency Heatmap'):
->>>>>>> b8e6b5eecf35b37e0e1a70ecbe6c936332b9697b
 
     plt.figure(figsize=size, dpi=dpi, facecolor="white")
 
@@ -70,12 +64,8 @@ def heatmap(df,
     df = df.astype('float').sort_index(axis=0).sort_index(axis=1)
     # Displaying dataframe as an heatmap
     # with diverging colourmap as RdYlBu
-<<<<<<< HEAD
-    plt.imshow(df, cmap=color)
-=======
 
     plt.imshow(df, cmap=colormap)
->>>>>>> b8e6b5eecf35b37e0e1a70ecbe6c936332b9697b
     # plt.imshow(df, cmap="gist_rainbow")
     # plt.imshow(df, cmap="jet")
     # plt.imshow(df, cmap="viridis")

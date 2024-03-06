@@ -6,10 +6,7 @@ from pathlib import Path
 from datetime import datetime
 
 PKL_SUFF = '.pkl.gz'
-<<<<<<< HEAD
-=======
 SANPI_HOME = Path('/share/compling/projects/sanpi')
->>>>>>> b8e6b5eecf35b37e0e1a70ecbe6c936332b9697b
 
 def timestamp_now() -> str: 
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
