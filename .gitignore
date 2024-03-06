@@ -380,7 +380,7 @@ tags
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
 ## extension exclusions
-*.[0-9]+.*
+*.[0-9_-]+.*
 *.err
 *.out
 **.tar*
@@ -400,7 +400,7 @@ info/Israel*
 data-link
 **/*scratch*
 sanpi-data.link
-**/debug
+**/*debug*
 
 ## logs
 logs/
@@ -434,7 +434,7 @@ Pat/RBsimple
 Pat/negpol
 
 ## "priors" exclusions
-# **/prior_version
+**/prior_version
 
 ## `results/` exclusions
 results/**/*.*py*
@@ -443,18 +443,22 @@ results/freq_out/JxR
 results/**/images
 results/**/partials
 results/**/*[.12]?f.*
-# results/**/*ed
-# results/**/descriptive_stats
-# results/freq_out/spearman
+results/**/descriptive_stats
+results/freq_out/spearman
 results/**/heatmaps
 
 ### `ucs_tables/` exclusions
 **/ucs_tables/.ucs_tmp.tsv
 **/ucs_tables/*.ll*
 **/ucs_tables/*.ranks.*
-# don't commit any of the `..view_r-only..` or `..view_am-only` files
-**/ucs_tables/readable/*-only*
-**/ucs_tables/[!d]*/*.gz
+# don't commit any of the `..view_r-only..` files
+**/ucs_tables/**/*r-only.txt
+**/ucs_tables/**/*view.txt
+**/ucs_tables/**/*init.txt
+**/ucs_tables/**/readable/*0x*
+**/ucs_tables/[!d]*/**/*.gz
+**/ucs_tables/RBXadj/readable/all_adj-x-adv_*35f*_min[123]*x.rsort-view*
+results/**/ucs_logs
 
 ## `slurm/` exclusions
 slurm/lsc_35JxR.slurm.sh
@@ -465,4 +469,4 @@ source/LSC
 source/gather/utils
 source/utils/adv*
 source/**/*comments*
-source/**/*edits*
+source/**/*edit*
