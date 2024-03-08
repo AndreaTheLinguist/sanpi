@@ -470,3 +470,5 @@ source/gather/utils
 source/utils/adv*
 source/**/*comments*
 source/**/*edit*
+Pat/_RBsimple/cop-rb-direct.pat
+Pat/_RBsimple/rb-predadj.pat
