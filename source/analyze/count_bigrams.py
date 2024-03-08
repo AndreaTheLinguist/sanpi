@@ -7,11 +7,11 @@ from pathlib import Path
 
 # import numpy as np
 import pandas as pd
-from utils import (  # pylint: disable=import-error; //select_cols, set_pd_display,
+from source.utils import (  # pylint: disable=import-error; //select_cols, set_pd_display,
     cols_by_str, confirm_dir, count_uniq, find_glob_in_dir, get_proc_time,
     percent_to_count, print_iter, print_md_table, save_table,
-    select_pickle_paths, sort_by_margins, unpack_dict, Timer)
-from utils.visualize import heatmap  # pylint: disable=import-error
+    select_pickle_paths, sort_by_margins, unpack_dict, Timer, PKL_SUFF)
+from source.utils.visualize import heatmap  # pylint: disable=import-error
 
 LOAD_TUPLE = namedtuple(
     'Data_Load_Info',
@@ -30,7 +30,7 @@ _KEEP_ALLOWANCE_RATIO = 0.99
 _ADV_KEEP_REQ = 20
 _ADJ_KEEP_REQ = 40
 _CROSS_LABEL = 'adj-x-adv'
-_PKL_SUFF = 'pkl.gz'
+
 _DF_FILE_PREF = 'bigrams'
 _IX_FILE_PREF = 'bigram-index'
 
@@ -1201,7 +1201,7 @@ def describe_counts(df: pd.DataFrame = None,
             print(
                 'Stats can only be determined from a given path if indicated file is in pickle format.')
             return
-    data_label = df_path.name.replace('.csv', '').replace(_PKL_SUFF, '')
+    data_label = df_path.name.replace('.csv', '').replace(PKL_SUFF, '')
     stats_dir = df_path.parent.joinpath('descriptive_stats')
     confirm_dir(stats_dir)
     out_path_stem = f'stats_{data_label}'
