@@ -6,14 +6,18 @@ import association_measures.frequencies as fq
 import association_measures.measures as am
 # import matplotlib.pyplot as plt
 import pandas as pd
-from utils.associate import _FREQ_DIR, _POL_DIR, _RSLT_DIR
-from utils.associate import _SANPI_HOME as SANPI_DIR
-from utils.associate import _UCS_DIR, build_ucs_from_multiple, build_ucs_table
-from utils.associate import convert_ucs_to_csv as txt_to_csv
-from utils.associate import prep_by_polarity as polarize_counts
 from utils.dataframes import Timer, print_md_table, set_pd_display
 from utils.general import confirm_dir, run_shell_command
+from utils.associate import build_ucs_from_multiple, build_ucs_table
+from utils.associate import convert_ucs_to_csv as txt_to_csv
+from utils.associate import prep_by_polarity as polarize_counts
+from utils.associate import _SANPI_HOME as SANPI_DIR, _RSLT_DIR, _UCS_DIR, _FREQ_DIR, _POL_DIR
 
+#// SANPI_DIR = Path('/share/compling/projects/sanpi')
+#// _RSLT_DIR = SANPI_DIR / 'results'
+#// _UCS_DIR = _RSLT_DIR / 'ucs_tables'
+#// _FREQ_DIR = _RSLT_DIR / 'freq_out'
+#// _POL_DIR = _RSLT_DIR / 'ucs_tables' / 'polarity_prepped'
 READ_TAG = 'rsort-view'
 
 
@@ -132,14 +136,14 @@ def print_sorted_md(skewed_bigrams, sorter, floor, n_top=20):
 def add_adx_info(df_dict):
     adv_totals, adj_totals = [get_adx_totals(
         df_dict=df_dict, adx=x) for x in ('adv', 'adj')]
-    
+
     bigram_df = df_dict['bigram']
     bigram_df[['adv', 'adj']] = bigram_df.l2.str.split(
         "_", expand=True).astype('string').astype('category')
 
     bigram_df['adv_total'] = bigram_df.adv.map(adv_totals)
     bigram_df['adj_total'] = bigram_df.adj.map(adj_totals)
-    
+
     return bigram_df
 
 
@@ -191,7 +195,7 @@ def _main():
         display_init_info(dfs_dict)
 
     dfs_plus = add_extra_am(dfs_dict)
-    floor = 0.75
+    floor = 0.7
     # big = dfs_plus['bigram']
     if verbose:
         for unit, df in dfs_plus.items():
@@ -202,37 +206,51 @@ def _main():
 
         print_md_table(
             adv.loc[adv.am_p1_given2 > floor,
-                    ['l1', 'l2', 'f', 'am_expect_diff', 'am_p1_given2']],
+                    ['l1', 'l2', 'f', 'unexpected_count', 'am_p1_given2']],
             title=f'adverbs with adjusted conditional probability of environment > {floor}')
 
     big = add_adx_info(dfs_plus)
 
     dfs_plus['bigram'] = big
-    polar_skewed_bigrams = identify_skewed_bigrams(
-        big, floor=floor, verbose=verbose)
+    skew_dict = {
+        'bigram':identify_skewed_bigrams(big, floor, verbose),
+        '': identify_skewed_bigrams(dfs_plus[''], floor, verbose, metric='joint_probability'), 
+        'pADV_givenADJ': identify_skewed_bigrams(dfs_plus[''], floor, verbose),
+        'pADJ_givenADV': identify_skewed_bigrams(dfs_plus[''], floor, verbose, metric='am_p2_given1'), 
+        'lrc': identify_skewed_bigrams(dfs_plus[''], 6, verbose, metric='conservative_log_ratio')}
+
+
+
     # TODO: call `identify_skewed_bigrams()` on `dfs_plus['']` (i.e. adv & adj skewed towards *each other* instead of a polarity environment)
     if verbose:
         print_example(big, count_type='bigram',
-                      example_key=big.at[polar_skewed_bigrams.sample(1).squeeze().name, 'l2'])
+                      example_key=big.at[skew_dict['bigram'].sample(1).squeeze().name, 'l2'])
 
         for sorter in ['conservative_log_ratio', 'am_p1_given2', 'log_ratio', 'am_odds_ratio_disc']:
-            print_sorted_md(polar_skewed_bigrams, sorter, floor)
+            print_sorted_md(skew_dict['bigram'], sorter, floor)
 
     print('\n'.join([f'+ saved `{p}`' for p
           in list(save_optimized(dfs_plus, df_paths,
                                  added_measures=True, verbose=verbose))]))
-    skew_dict = {'bigram': polar_skewed_bigrams}
+
     skew_paths = df_paths.apply(
-        lambda p: p.with_name(p.name.replace(READ_TAG, 'SKEW')))
+        lambda p: p.with_name(p.name.replace(READ_TAG, 'SKEW')))    
+    for added_skew in ['pADV_givenADJ', 'pADJ_givenADV', 'lrc']:
+        skew_paths[added_skew] = Path(str(skew_paths['']).replace('SKEW', f'SKEW-{added_skew}'))
+
     print('\n'.join([f'+ saved `{p}`' for p
           in list(save_optimized(df_dict=skew_dict,
-                                 paths=skew_paths[['bigram']],
-                                 added_measures=True, verbose=verbose))]))
+                                 paths=skew_paths[list(skew_dict.keys())],
+                                 added_measures=False, verbose=verbose))]))
 
 
 def get_adx_totals(df_dict: dict, adx: str) -> pd.Series:
-    return pd.to_numeric(df_dict[adx][['l2', 'f2']].drop_duplicates().rename(
-        columns={'l2': adx, 'f2': f'{adx}_total'}).set_index(adx).squeeze(), downcast='unsigned')
+    return pd.to_numeric(
+        df_dict[adx][['l2', 'f2']]
+        .drop_duplicates()
+        .rename(columns={'l2': adx, 'f2': f'{adx}_total'})
+        .set_index(adx).squeeze(),
+        downcast='unsigned')
 
 
 def _pull_data(args):
@@ -340,50 +358,54 @@ def associate_ucs(basic_ucs_path):
         print(f'+ time elapsed → {_timer.elapsed()}')
 
 
-def identify_skewed_bigrams(bigrams_df: pd.DataFrame,
+def identify_skewed_bigrams(df: pd.DataFrame,
                             floor: float = 0.8,
                             count_cutoff: int = 2,
-                            verbose: bool = False):
-
-    big = bigrams_df.filter(
-        items=['l1', 'l2', 'f', 'E11', 'am_expect_diff', 'adv', 'adv_total', 'adj', 'adj_total',
-               'am_p1_given2', 'am_log_likelihood', 'am_odds_ratio_disc',
-               #    'log_likelihood',
-               'log_ratio', 'conservative_log_ratio']
-    ).sort_values('conservative_log_ratio', ascending=False)
-    big.update(big.select_dtypes('number').round(3))
+                            verbose: bool = False, 
+                            metric:str='am_p1_given2'):
+    # [ ] #BUG
+    # Traceback (most recent call last):
+    #   File "<string>", line 1, in <module>
+    #   File "script/add_polar_am.py", line 240, in identify_skewed_bigrams
+    # TypeError: type NAType doesn't define __round__ method
+    keep_columns = ['l1', 'l2', 'f', 'E11', 'unexpected_count', 'adv', 'adv_total', 'adj', 'adj_total',
+               'am_p1_given2', 'am_p2_given1', 'am_log_likelihood', 'am_odds_ratio_disc',
+               'log_ratio', 'conservative_log_ratio', 'unexpected_ratio', 'joint_probability']
+    if metric not in keep_columns: 
+        keep_columns.append(metric)
+    
+    _df = df.copy().loc[:, df.columns.isin(keep_columns)].sort_values(metric, ascending=False)
+    _df.update(_df.select_dtypes('number').round(3))
     # > quantify percentage of ENV-bigram tokens that were *unexpected*
-    big['am_expect_diff_%'] = big.am_expect_diff.abs() / big.f * 100
-    skewed_bigrams = big.loc[big.am_p1_given2.round(3).abs() >= floor, :]
+
+    skewed_bigrams = _df.loc[_df[metric].round(3).abs() >= floor, :]
     if verbose:
         n_top = 30
         print_md_table(
             df=(skewed_bigrams
-                .sort_values('am_p1_given2', ascending=False)
                 .head(n_top).round(2)
-                .sort_values(['am_expect_diff_%', 'am_expect_diff'], ascending=False)),
+                .sort_values(['unexpected_ratio', 'unexpected_count'], ascending=False)),
             title=(f'\n## Top {n_top} '
                    'bigrams most strongly skewed toward polar environment '
-                   f'(f>={big.f.min()}; am_p1_given2>={floor})\n'),
+                   f'(f>={_df.f.min()}; {metric}>={floor})\n'),
             n_dec=2)
-    for ad in ['adv', 'adj']:
-        neg_skewed = skewed_bigrams[ad].astype('string').value_counts()
-        if verbose:
+        for ad in ['adv', 'adj']:
+            neg_skewed = skewed_bigrams[ad].astype('string').value_counts()
             print_md_table(
                 neg_skewed.loc[neg_skewed > count_cutoff].to_frame(
                     'bigram count'),
                 n_dec=2,
                 title=(f'\n### {ad.capitalize()} appearing in more than {count_cutoff} '
-                       f'negatively "skewed" bigrams (p1.given2 >= {floor})\n'))
+                    f'negatively "skewed" bigrams ({metric} >= {floor})\n'))
 
             print(f"\n+ mean bigram count for unique {ad} =",
-                  round(neg_skewed.filter(regex=r'[a-z]').mean(), 1))
-    if verbose:
-        print(f"\n> Skewed bigrams (f>={big.f.min()}; am_p1_given2>={floor}) account for\n> ",
-              round(100 * skewed_bigrams.f.sum() / bigrams_df.N.iat[0], 2),
+                round(neg_skewed.filter(regex=r'[a-z]').mean(), 1))
+                
+        print(f"\n> Skewed bigrams (f>={_df.f.min()}; {metric}>={floor}) account for\n> ",
+              round(100 * skewed_bigrams.f.sum() / df.N.iat[0], 2),
               "% of all tokens in current dataset\n> and ",
-              round(bigrams_df.filter(items=skewed_bigrams.index,
-                    axis=0).l2.nunique() / bigrams_df.l2.nunique() * 100, 2),
+              round(df.filter(items=skewed_bigrams.index,
+                    axis=0).l2.nunique() / df.l2.nunique() * 100, 2),
               "% of unique bigram forms",
               sep='')
     return skewed_bigrams
@@ -474,15 +496,22 @@ def print_example(df,
 def add_extra_am(df_dict):
     for count_type, df in df_dict.items():
         try:
-            scores = am.score(df)
+            scores = am.score(df.copy())
         except KeyError:
-            df = df.join(fq.observed_frequencies(df)).join(
-                fq.expected_frequencies(df))
+            df = df.join(fq.observed_frequencies(df.copy())).join(
+                fq.expected_frequencies(df.copy()))
             scores = am.score(df)
         # loaded_cols = df.columns.to_list()
-        df = df.copy().join(scores.loc[:, ~scores.columns.isin(df.columns)])
-
-        print_example(df, count_type, columns_like=r'^[^ECORr]')
+        df = df.join(scores.loc[:, ~scores.columns.isin(df.columns)])
+        try:
+            unexpect = df.unexpected_count 
+        except AttributeError: 
+            unexpect = df.f - df.E11
+            df['unexpected_count'] = unexpect
+        df['unexpected_ratio'] = unexpect / df.f
+        df['joint_probability'] = df.am_p2_given1 * df.am_p1_given2
+        if count_type:
+            print_example(df, count_type, columns_like=r'^[^ECORr]')
         df_dict[count_type] = df
 
     # am.conservative_log_ratio(dfs_plus['bigram'], alpha=0.05, boundary='poisson').nlargest(20)
