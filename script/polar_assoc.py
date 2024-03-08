@@ -6,17 +6,14 @@ import association_measures.frequencies as fq
 import association_measures.measures as am
 # import matplotlib.pyplot as plt
 import pandas as pd
+from utils.associate import _FREQ_DIR, _POL_DIR, _RSLT_DIR
+from utils.associate import _SANPI_HOME as SANPI_DIR
+from utils.associate import _UCS_DIR, build_ucs_from_multiple, build_ucs_table
+from utils.associate import convert_ucs_to_csv as txt_to_csv
+from utils.associate import prep_by_polarity as polarize_counts
 from utils.dataframes import Timer, print_md_table, set_pd_display
 from utils.general import confirm_dir, run_shell_command
-from utils.ucs_prep import (build_ucs_from_multiple,
-                            convert_ucs_to_csv as txt_to_csv,
-                            prep_by_polarity as polarize_counts)
 
-SANPI_DIR = Path('/share/compling/projects/sanpi')
-_RSLT_DIR = SANPI_DIR / 'results'
-_UCS_DIR = _RSLT_DIR / 'ucs_tables'
-_FREQ_DIR = _RSLT_DIR / 'freq_out'
-# _POL_DIR = _RSLT_DIR / 'ucs_tables' / 'polarity_prepped'
 READ_TAG = 'rsort-view'
 
 
@@ -32,11 +29,17 @@ def _parse_args():
         / 'ucs_format'
         / f'diff-all_adj-x-adv_frq-thr{_frq_prcnt}p.{_n_corp_parts}f={_frq_cnt}+.tsv'
     )
+    # results/freq_out/RBdirect/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv
     _default_negs = (
         _FREQ_DIR
         .joinpath('RBdirect/ucs_format')
-        .joinpath(f'ALL-WORDS_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
+        .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
     )
+
+    _default_all = (
+        _FREQ_DIR
+        .joinpath('RBXadj/ucs_format')
+        .joinpath(f'all_adj-x-adv_frq-thr{_frq_prcnt}p.{_n_corp_parts}f={_frq_cnt}+.tsv'))
     _default_suff = f'.{_n_corp_parts}f={_frq_cnt}+.tsv'
 
     # > set help messages
@@ -75,8 +78,10 @@ def _parse_args():
     parser = argparse.ArgumentParser(
         description=(
             "Script to add extra association measures to perl script UCS tables "
-            "for environement co-occurence frequencies for (1) bigrams, (2) adverbs, and (3) adjectives, each as a separate table. "
-            "If tables have not been previously run, they will be generated, given the minimum frequency parameter and input paths. "
+            "for environement co-occurence frequencies for (1) bigrams, (2) adverbs, "
+            "and (3) adjectives, each as a separate table. "
+            "If tables have not been previously run, they will be generated, "
+            "given the minimum frequency parameter and input paths. "
             "The only pre-requisites are the 'negated' and 'not negated' (i.e. complement) "
             "frequency data, in ucs formatted `.tsv` files. "
             "(To create these, use `sanpi/script/format_for_UCS.py`)"
@@ -84,27 +89,39 @@ def _parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument('-m', '--min_freq', type=int,
-                        default=15, help=min_freq_help)
-    parser.add_argument('-c', '--complement_counts', type=Path,
-                        default=_default_comps, help=complement_counts_help)
-    parser.add_argument('-C', '--comp_label', type=str,
-                        default='complement', help=comp_label_help)
-    parser.add_argument('-n', '--negated_counts', type=Path,
-                        default=_default_negs, help=negated_counts_help)
-    parser.add_argument('-N', '--neg_label', type=str,
-                        default='negated', help=neg_label_help)
-    parser.add_argument('-s', '--data_suffix', type=str,
-                        default=_default_suff, help=data_suffix_help)
+    parser.add_argument(
+        '-m', '--min_freq', type=int,
+        default=15, help=min_freq_help)
+    parser.add_argument(
+        '-a', '--all_counts', type=Path,
+        default=_default_all,
+        help='path to ucs formatted .tsv of all bigram combinations, regardless of polarity')
+    parser.add_argument(
+        '-c', '--complement_counts', type=Path,
+        default=_default_comps, help=complement_counts_help)
+    parser.add_argument(
+        '-C', '--comp_label', type=str,
+        default='complement', help=comp_label_help)
+    parser.add_argument(
+        '-n', '--negated_counts', type=Path,
+        default=_default_negs, help=negated_counts_help)
+    parser.add_argument(
+        '-N', '--neg_label', type=str,
+        default='negated', help=neg_label_help)
+    parser.add_argument(
+        '-s', '--data_suffix', type=str,
+        default=_default_suff, help=data_suffix_help)
 
-    parser.add_argument('-v', '--verbose', default=False, action='store_true',
-                        help='Option to print more processing info to stdout')
+    parser.add_argument(
+        '-v', '--verbose', default=False, action='store_true',
+        help='Option to print more processing info to stdout')
 
     return parser.parse_args()
 
 
 def print_sorted_md(skewed_bigrams, sorter, floor, n_top=20):
-    table_title = f'\n### Top {n_top} Bigrams with adjusted conditional probability of env polarity > {floor}, sorted by `{sorter}`'
+    table_title = (f'\n### Top {n_top} Bigrams with env polarity association '
+                   f'> {floor}, sorted by `{sorter}`')
 
     print_md_table(
         skewed_bigrams.copy().sort_values(
@@ -115,20 +132,14 @@ def print_sorted_md(skewed_bigrams, sorter, floor, n_top=20):
 def add_adx_info(df_dict):
     adv_totals, adj_totals = [get_adx_totals(
         df_dict=df_dict, adx=x) for x in ('adv', 'adj')]
+    
     bigram_df = df_dict['bigram']
-    # // big = big.assign(
-    # //     adv=big.l2.str.split("_").str.get(0).astype('string').astype('category'),
-    # //     adj=big.l2.str.split("_").str.get(1).astype('string').astype('category'))
     bigram_df[['adv', 'adj']] = bigram_df.l2.str.split(
         "_", expand=True).astype('string').astype('category')
 
-    # // big['adv_total'] = pd.to_numeric(big.adv.apply(
-    # //     lambda w: adv_totals[w]), downcast='unsigned')
     bigram_df['adv_total'] = bigram_df.adv.map(adv_totals)
-
-    # // big['adj_total'] = pd.to_numeric(big.adj.apply(
-    # //     lambda w: adj_totals[w]), downcast='unsigned')
     bigram_df['adj_total'] = bigram_df.adj.map(adj_totals)
+    
     return bigram_df
 
 
@@ -141,11 +152,8 @@ def display_init_info(counts_by_type_dict):
         print_md_table(df=df.filter(regex=r'^[Eaf]').head(n),
                        title=f'\n### Top {n} {count_type.upper()} Associations Overall\n',
                        transpose=True, n_dec=2, comma=True)
-        # set_pd_display(20, n+1, 100)
-        # print(df.head(n).round(2).T)
-        # print(df.head(n).round(2).T.to_markdown(floatfmt=',.2f'))
 
-        # # * Top `NEGATED` values
+        # * Top `NEGATED` values
         n = 5 if count_type == 'bigram' else 8
         print_md_table(df=df.filter(like='NEG', axis=0).filter(regex=r'^[Eaf]').head(n),
                        title=f'\n### Top {n} {count_type.upper()} most likely to be **negated**\n',
@@ -191,7 +199,7 @@ def _main():
                           sort_by='conservative_log_ratio')
 
         adv = dfs_plus['adv']
-        
+
         print_md_table(
             adv.loc[adv.am_p1_given2 > floor,
                     ['l1', 'l2', 'f', 'am_expect_diff', 'am_p1_given2']],
@@ -200,24 +208,26 @@ def _main():
     big = add_adx_info(dfs_plus)
 
     dfs_plus['bigram'] = big
-    skewed_bigrams = identify_skewed_bigrams(big, floor=floor, verbose=verbose)
-
+    polar_skewed_bigrams = identify_skewed_bigrams(
+        big, floor=floor, verbose=verbose)
+    # TODO: call `identify_skewed_bigrams()` on `dfs_plus['']` (i.e. adv & adj skewed towards *each other* instead of a polarity environment)
     if verbose:
         print_example(big, count_type='bigram',
-                      example_key=big.at[skewed_bigrams.sample(1).squeeze().name, 'l2'])
+                      example_key=big.at[polar_skewed_bigrams.sample(1).squeeze().name, 'l2'])
 
         for sorter in ['conservative_log_ratio', 'am_p1_given2', 'log_ratio', 'am_odds_ratio_disc']:
-            print_sorted_md(skewed_bigrams, sorter, floor)
+            print_sorted_md(polar_skewed_bigrams, sorter, floor)
 
     print('\n'.join([f'+ saved `{p}`' for p
           in list(save_optimized(dfs_plus, df_paths,
-                            added_measures=True, verbose=verbose))]))
-    skew_dict = {'bigram': skewed_bigrams}
-    skew_paths = df_paths.apply(lambda p: p.with_name(p.name.replace(READ_TAG, 'SKEW')))
+                                 added_measures=True, verbose=verbose))]))
+    skew_dict = {'bigram': polar_skewed_bigrams}
+    skew_paths = df_paths.apply(
+        lambda p: p.with_name(p.name.replace(READ_TAG, 'SKEW')))
     print('\n'.join([f'+ saved `{p}`' for p
           in list(save_optimized(df_dict=skew_dict,
-                            paths=skew_paths[['bigram']],
-                            added_measures=True, verbose=verbose))]))
+                                 paths=skew_paths[['bigram']],
+                                 added_measures=True, verbose=verbose))]))
 
 
 def get_adx_totals(df_dict: dict, adx: str) -> pd.Series:
@@ -225,104 +235,116 @@ def get_adx_totals(df_dict: dict, adx: str) -> pd.Series:
         columns={'l2': adx, 'f2': f'{adx}_total'}).set_index(adx).squeeze(), downcast='unsigned')
 
 
-def confirm_basic_ucs(basic_ucs_path, args, unit):
-    if not basic_ucs_path.is_file():
-        comp_path = args.complement_counts
-        neg_path = args.negated_counts
-        if any(not p.is_file() for p in (comp_path, neg_path)):
-            exit(
-                f'Initial counts file not found. Check your paths...\n> {comp_path}\n> {neg_path}')
-        # // initialize = (f'python {SANPI_DIR}/script/polarize_tsv_for_ucs.py '
-        # //               f'-c {comp_path} -n {neg_path} '
-        # //               f'-C {args.comp_label} -N {args.neg_label} '
-        # //               f'-w {unit} -m {frq_thresh} -R')
-        # // run_shell_command(initialize)
-        path_dict = polarize_counts(words_to_keep=unit, data_suffix=args.data_suffix,
-                                    in_paths_dict={args.comp_label: comp_path,
-                                                   args.neg_label: neg_path})
-        basic_ucs_path = build_ucs_from_multiple(tsv_paths=path_dict.values(),
-                                                 min_count=args.min_freq,
-                                                 save_path=basic_ucs_path,
-                                                 # //  debug=True #! #HACK temporary! forces `head` instead of `cat`. REMOVE
-                                                 )
-    else:
-        print('+ existing UCS table found ✓')
-    return basic_ucs_path
-
-
-def initialize_ucs(init_ucs_stem, args, unit):
-    basic_ucs_path = _UCS_DIR / f'{init_ucs_stem}.ds.gz'
-
-    print('\nLocating and/or building initial frequency-only UCS table...')
-    with Timer() as timer:
-        basic_ucs_path = confirm_basic_ucs(basic_ucs_path, args, unit)
-        print(f'+ path to simple UCS table: `{basic_ucs_path}`')
-        print(f'+ time elapsed → {timer.elapsed()}')
-    return basic_ucs_path
-
-
-def associate_ucs(basic_ucs_path):
-    with Timer() as timer:
-        print('\nCalculating UCS associations...')
-        run_shell_command(
-            f'bash {SANPI_DIR}/script/transform_ucs.sh {basic_ucs_path}')
-        print(f'+ time elapsed → {timer.elapsed()}')
-
-
-def manipulate_ucs(init_ucs_stem, args, unit):
-    basic_ucs_path = initialize_ucs(init_ucs_stem, args, unit)
-    associate_ucs(basic_ucs_path)
-    return basic_ucs_path
-
-
-def seek_readable(unit, args):
-    data_flag = f'{unit}_{args.data_suffix.strip(".tsv")}'
-    init_ucs_stem = f'polarized-{data_flag}_min{args.min_freq}x'
-    print(f'\n## Acquiring `{init_ucs_stem}`',
-          'frequency data and initial associations\n')
-
-    ucs_stem = f'{init_ucs_stem}.{READ_TAG}'
-
-    ucs_csv_path = _UCS_DIR / 'readable' / f'{ucs_stem}.csv'
-    if ucs_csv_path.is_file():
-        return init_ucs_stem, ucs_csv_path
-
-    return init_ucs_stem, ucs_csv_path.with_name(f'{ucs_stem}.txt')
+def _pull_data(args):
+    for unit in ('', 'bigram', 'adv', 'adj'):
+        csv_path = _get_ucs_csv(unit, args)
+        yield unit, csv_path
 
 
 def _get_ucs_csv(unit, args):
 
     # > select readable/*.csv if it exists, else readable/*.txt
-    init_ucs_stem, readable = seek_readable(unit, args)
-
+    readable = seek_readable(unit, args)
     # > create ucs tables if readable/*.txt does not exist
     if not readable.is_file():
 
-        basic_ucs_path = manipulate_ucs(init_ucs_stem, args, unit)
-        readable = basic_ucs_path.parent / 'readable' / \
-            basic_ucs_path.name.replace('ds.gz', f'{READ_TAG}.txt')
+        init_ucs_stem = readable.stem.replace(READ_TAG, '').strip('.')
+        basic_ucs_path = readable.parent.with_name(f'{init_ucs_stem}.ds.gz')
+        basic_ucs_path = manipulate_ucs(basic_ucs_path, args, unit)
+        # if given path to readable file still does not exist
+        if not readable.is_file():
+            readable = basic_ucs_path.with_name('readable').joinpath(
+                basic_ucs_path.name.replace('ds.gz', f'{READ_TAG}.txt'))
 
     # > return readable path as .csv
     return txt_to_csv(readable) if readable.suffix == '.txt' else readable
 
 
-def _pull_data(args):
+def seek_readable(unit, args):
+    # TODO: I think this will fail if "readable" directory is embedded in subdir...
+    min_freq_flag = f'_min{args.min_freq}x'
+    if unit:
+        subdir = 'mirror' if 'mir' in args.data_suffix.lower() else 'set_diff'
+        readable_parent = f'polar/{subdir}/{unit}'
+        init_ucs_stem = f'polarized-{unit}_{args.data_suffix.strip(".tsv")}'
+    else:
+        # subdir = 'adj-x-adv'
+        init_ucs_stem = args.all_counts.stem
+        readable_parent = args.all_counts.parent
+        if 'ucs' in readable_parent.name.lower():
+            readable_parent = readable_parent.parent
+        readable_parent = readable_parent.name
 
-    for unit in ('bigram', 'adv', 'adj'):
+    readable_dir = _UCS_DIR.joinpath(f'{readable_parent}/readable')
+    confirm_dir(readable_dir)
+    init_ucs_stem += min_freq_flag
+    print(f'\n## Acquiring `{init_ucs_stem}`',
+          'frequency data and initial associations\n')
 
-        csv_path = _get_ucs_csv(unit, args)
-        yield unit, csv_path
+    ucs_stem = f'{init_ucs_stem}.{READ_TAG}'
+
+    readable_csv = readable_dir / f'{ucs_stem}.csv'
+
+    return (readable_csv if readable_csv.is_file()
+            else readable_dir / f'{ucs_stem}.txt')
+
+
+def manipulate_ucs(basic_ucs_path: Path, args, unit: str):
+    basic_ucs_path = initialize_ucs(basic_ucs_path, args, unit)
+    associate_ucs(basic_ucs_path)
+    return basic_ucs_path
+
+
+def initialize_ucs(basic_ucs_path: Path, args, unit: str = ''):
+
+    print('\nLocating and/or building initial frequency-only UCS table...')
+    with Timer() as _timer:
+        basic_ucs_path = confirm_basic_ucs(basic_ucs_path, args, unit)
+        print(f'+ path to simple UCS table: `{basic_ucs_path}`')
+        print(f'+ time elapsed → {_timer.elapsed()}')
+    return basic_ucs_path
+
+
+def confirm_basic_ucs(basic_ucs_path, args,
+                      unit: str = None):
+    if basic_ucs_path.is_file():
+        print('+ existing UCS table found ✓')
+    elif unit:
+        comp_path = args.complement_counts
+        neg_path = args.negated_counts
+        if any(not p.is_file() for p in (comp_path, neg_path)):
+            exit(
+                f'Initial counts file not found. Check your paths...\n> {comp_path}\n> {neg_path}')
+        path_dict = polarize_counts(words_to_keep=unit, data_suffix=args.data_suffix,
+                                    in_paths_dict={args.comp_label: comp_path,
+                                                   args.neg_label: neg_path})
+        basic_ucs_path = build_ucs_from_multiple(
+            tsv_paths=path_dict.values(),
+            min_count=args.min_freq,
+            save_path=basic_ucs_path
+        )
+    elif args.all_counts.is_file():
+        build_ucs_table(min_count=args.min_freq,
+                        ucs_save_path=basic_ucs_path,
+                        cat_tsv_str=f'cat {args.all_counts}')
+    else:
+        raise FileNotFoundError
+    return basic_ucs_path
+
+
+def associate_ucs(basic_ucs_path):
+    with Timer() as _timer:
+        print('\nCalculating UCS associations...')
+        run_shell_command(
+            f'bash {SANPI_DIR}/script/transform_ucs.sh {basic_ucs_path}')
+        print(f'+ time elapsed → {_timer.elapsed()}')
 
 
 def identify_skewed_bigrams(bigrams_df: pd.DataFrame,
                             floor: float = 0.8,
                             count_cutoff: int = 2,
                             verbose: bool = False):
-    # [ ] #BUG 🐞🪲 debu: 
-    # Traceback (most recent call last):
-    #   File "<string>", line 1, in <module>
-    #   File "script/add_polar_am.py", line 240, in identify_skewed_bigrams
-    # TypeError: type NAType doesn't define __round__ method
+
     big = bigrams_df.filter(
         items=['l1', 'l2', 'f', 'E11', 'am_expect_diff', 'adv', 'adv_total', 'adj', 'adj_total',
                'am_p1_given2', 'am_log_likelihood', 'am_odds_ratio_disc',
@@ -378,8 +400,27 @@ def save_optimized(df_dict: dict, paths: pd.Series,
 
 def load_from_ucs_csv(input_csv):
     df = pd.read_csv(input_csv)
-    df['key'] = df.l1.apply(lambda x: x[:3]) + '-' + df.l2
-    return df.reset_index().set_index('key')
+    return _set_data_keys(df)
+
+
+def _set_data_keys(df):
+    unique_l1 = df.l1.nunique()
+    if unique_l1 < 40:
+        key_len = 3
+        keys = _make_keys(df.l1, df.l2, key_len)
+        while keys.str.split('-').str.get(0).nunique() < unique_l1:
+            key_len += 1
+            keys = _make_keys(df.l1, df.l2, key_len)
+    else:
+        keys = df.l1 + '-' + df.l2
+
+    df['key'] = keys
+    df.reset_index().set_index('key')
+    return df
+
+
+def _make_keys(l1: pd.Series, l2: pd.Series, key_len: int):
+    return l1.apply(lambda x: x[:key_len]) + '-' + l2
 
 
 def print_example(df,
@@ -405,9 +446,10 @@ def print_example(df,
         None
     """
     if not example_key:
-        example_keys = {'bigram': 'exactly_sure',
+        example_keys = {'bigram': 'exactly_surprising',
                         'adv': 'exactly',
-                        'adj': 'sure'}
+                        'adj': 'surprising',
+                        '': 'surprising'}
         example_key = example_keys[count_type]
     if regex:
         example = df.round(round_level).filter(axis=0, regex=example_key)
@@ -486,7 +528,7 @@ def save_dataframe(input_name, _df, added_measures=False):
             out_path.name.replace('.pkl.gz', '_extra.pkl.gz'))
 
     _df.to_pickle(out_path)
-    if len(_df) < 5000 and _df.size < 250000: 
+    if len(_df) <= 6500 and _df.size <= 250000:
         _df.to_csv(str(out_path).replace('.pkl.gz', '.csv'))
     return out_path
 
