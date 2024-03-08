@@ -1,0 +1,40 @@
+
+Fri Mar  8 17:22:23 EST 2024
+in /share/compling/projects/sanpi
+Processing -> results/freq_out/NEGmirror/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz
+
+time python script/format_for_UCS.py -d results/freq_out/NEGmirror/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz > logs/make_NEGmirror-complement-tsv.2024-03-08-0522PM.log 2>&1
+
+real	0m1.153s
+user	0m1.049s
+sys	0m0.100s
+
+Fri Mar  8 17:22:25 EST 2024
+in /share/compling/projects/sanpi
+Processing -> results/freq_out/POSmirror/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz
+
+time python script/format_for_UCS.py -d results/freq_out/POSmirror/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz > logs/make_POSmirror-complement-tsv.2024-03-08-0522PM.log 2>&1
+
+real	0m1.506s
+user	0m1.391s
+sys	0m0.110s
+
+Fri Mar  8 17:22:26 EST 2024
+in /share/compling/projects/sanpi
+Processing -> results/freq_out/RBdirect/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz
+
+time python script/format_for_UCS.py -d results/freq_out/RBdirect/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz > logs/make_RBdirect-complement-tsv.2024-03-08-0522PM.log 2>&1
+
+real	0m1.340s
+user	0m1.168s
+sys	0m0.168s
+
+Fri Mar  8 17:22:27 EST 2024
+in /share/compling/projects/sanpi
+Processing -> results/freq_out/combined_POSmirror-NEGmirror/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz
+
+time python script/format_for_UCS.py -d results/freq_out/combined_POSmirror-NEGmirror/ALL-WORDS_adj-x-adv_thr0-001p.35f.pkl.gz > logs/make_combined_POSmirror-NEGmirror-complement-tsv.2024-03-08-0522PM.log 2>&1
+
+real	0m1.335s
+user	0m1.208s
+sys	0m0.120s
