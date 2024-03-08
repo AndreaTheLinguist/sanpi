@@ -75,10 +75,15 @@ def _main():
     print_md_table(corners(frq_diff, 3))
 
     # set the path
-    frq_diff_pkl = (
-        pat_frq_path.parent.joinpath(
-            f'complement/diff_{pat_frq_path.parent.name}-{all_frq_path.name}'))
-    confirm_dir(frq_diff_pkl.parent)
+    pat_dir = pat_frq_path.parent
+    frq_diff_dir = pat_dir / 'complement' 
+    confirm_dir(frq_diff_dir)
+    
+    frq_diff_pkl = frq_diff_dir.joinpath(
+        f'/diff_{pat_dir.name}-{all_frq_path.name}'
+        .replace(f'{pat_dir.name}-all', f'all-{pat_dir.name}')
+        )
+    
     frq_diff = set_count_dtype(frq_diff, frq_diff_pkl)
     describe_counts(frq_diff, frq_diff_pkl)
     # if path doesn't point to a file, save the table as path
