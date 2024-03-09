@@ -6,18 +6,13 @@ import association_measures.frequencies as fq
 import association_measures.measures as am
 # import matplotlib.pyplot as plt
 import pandas as pd
-from utils.dataframes import Timer, print_md_table, set_pd_display
-from utils.general import confirm_dir, run_shell_command
-from utils.associate import build_ucs_from_multiple, build_ucs_table
+from utils.associate import (FREQ_DIR, POLAR_DIR, RESULT_DIR, UCS_DIR,
+                             build_ucs_from_multiple, build_ucs_table)
 from utils.associate import convert_ucs_to_csv as txt_to_csv
 from utils.associate import prep_by_polarity as polarize_counts
-from utils.associate import _SANPI_HOME as SANPI_DIR, _RSLT_DIR, _UCS_DIR, _FREQ_DIR, _POL_DIR
+from utils.dataframes import Timer, print_md_table, set_pd_display
+from utils.general import SANPI_HOME, confirm_dir, run_shell_command
 
-#// SANPI_DIR = Path('/share/compling/projects/sanpi')
-#// _RSLT_DIR = SANPI_DIR / 'results'
-#// _UCS_DIR = _RSLT_DIR / 'ucs_tables'
-#// _FREQ_DIR = _RSLT_DIR / 'freq_out'
-#// _POL_DIR = _RSLT_DIR / 'ucs_tables' / 'polarity_prepped'
 READ_TAG = 'rsort-view'
 
 
@@ -28,20 +23,22 @@ def _parse_args():
     _frq_prcnt = '0-001'
 
     _default_comps = (
-        _FREQ_DIR
-        / 'diff_RBXadj-RBdirect'
+        FREQ_DIR
+        / 'RBdirect'
+        / 'complement'
         / 'ucs_format'
-        / f'diff-all_adj-x-adv_frq-thr{_frq_prcnt}p.{_n_corp_parts}f={_frq_cnt}+.tsv'
+        / f'diff_all-RBdirect_adj-x-adv_frq-thr{_frq_prcnt}p.{_n_corp_parts}f={_frq_cnt}+.tsv'
     )
     # results/freq_out/RBdirect/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv
     _default_negs = (
-        _FREQ_DIR
+        FREQ_DIR
         .joinpath('RBdirect/ucs_format')
-        .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
+        .joinpath(f'ALL-WORDS_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
+        # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
     )
 
     _default_all = (
-        _FREQ_DIR
+        FREQ_DIR
         .joinpath('RBXadj/ucs_format')
         .joinpath(f'all_adj-x-adv_frq-thr{_frq_prcnt}p.{_n_corp_parts}f={_frq_cnt}+.tsv'))
     _default_suff = f'.{_n_corp_parts}f={_frq_cnt}+.tsv'
@@ -56,7 +53,7 @@ def _parse_args():
         "counts for bigram tokens with no *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'positive polarity' environments.) "
         "The transformed frequency data will be saved as "
-        "`polarity_prepped/[COMP_LABEL]_bigram_counts[DATA_SUFFIX]`"
+        "`polarity_prepped_tsv/[COMP_LABEL]_bigram_counts[DATA_SUFFIX]`"
     )
     comp_label_help = (
         "Option to set the label for complement (set difference, not negated, 'positive', etc.) counts. "
@@ -67,7 +64,7 @@ def _parse_args():
         "counts for bigram tokens with *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'negative polarity' environments.) "
         "The transformed frequency data will be saved as "
-        "`polarity_prepped/[NEG_LABEL]_bigram_counts[DATA_SUFFIX]`"
+        "`polarity_prepped_tsv/[NEG_LABEL]_bigram_counts[DATA_SUFFIX]`"
     )
     neg_label_help = (
         "Option to set the label for negated (or matching specific pattern) counts. "
@@ -293,7 +290,7 @@ def seek_readable(unit, args):
             readable_parent = readable_parent.parent
         readable_parent = readable_parent.name
 
-    readable_dir = _UCS_DIR.joinpath(f'{readable_parent}/readable')
+    readable_dir = UCS_DIR.joinpath(f'{readable_parent}/readable')
     confirm_dir(readable_dir)
     init_ucs_stem += min_freq_flag
     print(f'\n## Acquiring `{init_ucs_stem}`',

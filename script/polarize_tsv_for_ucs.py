@@ -4,15 +4,14 @@ import re
 from pathlib import Path
 from sys import exit as sysxit
 
+from utils.associate import (FREQ_DIR, POLAR_DIR, RESULT_DIR, UCS_DIR,
+                             build_ucs_from_multiple, prep_by_polarity)
 from utils.dataframes import Timer
+from utils.general import SANPI_HOME as SANPI_DIR
 from utils.general import confirm_dir, print_iter
-from utils.associate import prep_by_polarity, build_ucs_from_multiple
 
 WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
-_RSLT_DIR = Path('/share/compling/projects/sanpi/results')
-_FREQ_DIR = _RSLT_DIR / 'freq_out'
-_POL_DIR = _RSLT_DIR / 'ucs_tables' / 'polarity_prepped'
-confirm_dir(_POL_DIR)
+confirm_dir(POLAR_DIR)
 
 
 def _parse_args():
@@ -39,7 +38,7 @@ def _parse_args():
     parser.add_argument(
         '-c', '--complement_counts',
         type=Path,
-        default=(_FREQ_DIR / 'diff_RBXadj-RBdirect' / 'ucs_format' /
+        default=(FREQ_DIR / 'diff_RBXadj-RBdirect' / 'ucs_format' /
                  'diff-all_adj-x-adv_frq-thr0-001p.35f=868+.tsv'),
         help=('Path to ucs-formatted .tsv of COMPLEMENT bigram frequencies; i.e. '
               'counts for bigram tokens with no *identified* negation dependencies. '
@@ -56,7 +55,7 @@ def _parse_args():
     parser.add_argument(
         '-n', '--negated_counts',
         type=Path,
-        default=(_FREQ_DIR / 'RBdirect' / 'ucs_format' /
+        default=(FREQ_DIR / 'RBdirect' / 'ucs_format' /
                  'ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv'),
         help=('Path to ucs-formatted .tsv of NEGATED bigram frequencies; i.e. '
               'counts for bigram tokens with *identified* negation dependencies. '
@@ -171,7 +170,7 @@ def _main():
 #                words_to_keep: str = 'bigram'):
 #     # // confirm_existing_tsv(tsv_path)
 #     # 👆 not needed because run on entire dict before this is applied
-#     prep_path = _POL_DIR / \
+#     prep_path = POLAR_DIR / \
 #         f'{polarity.lower()}_{words_to_keep}_counts{data_suff}'
 #     print(
 #         f'\nProcessing {polarity} counts loaded from {tsv_path.relative_to(_RSLT_DIR)}...')
@@ -206,7 +205,7 @@ def _main():
 
 # def _build_polar_ucs(polar_dict, min_count, count_type='bigram'):
 #     cat_count_tsv_cmd = f'(cat {polar_dict["complement"]} && cat {polar_dict["negated"]})'
-#     ucs_save_path = f'{_POL_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
+#     ucs_save_path = f'{POLAR_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
 #     build_ucs_table(min_count, ucs_save_path, cat_count_tsv_cmd)
 
 

@@ -6,22 +6,24 @@ from sys import exit as sysxit
 
 import pandas as pd
 from .dataframes import Timer
-from .general import confirm_dir, print_iter, run_shell_command
+from .general import confirm_dir, print_iter, run_shell_command, SANPI_HOME
 
 UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
 WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 
-_SANPI_HOME = Path('/share/compling/projects/sanpi')
-_DEMO_DIR = _SANPI_HOME / 'DEMO'
-_RSLT_DIR, _DEMO_RSLT_DIR = [ W / 'results' for W in (_SANPI_HOME, _DEMO_DIR)]
+DEMO_DIR = SANPI_HOME / 'DEMO'
+RESULT_DIR, DEMO_RESULT_DIR = [W / 'results' for W in (SANPI_HOME, DEMO_DIR)]
 
-_FREQ_DIR, _DEMO_FREQ_DIR = [R / 'freq_out' for R in (_RSLT_DIR, _DEMO_RSLT_DIR)]
-_UCS_DIR, _DEMO_UCS_DIR = [R / 'ucs_tables' for R in (_RSLT_DIR, _DEMO_RSLT_DIR)]
-_POL_DIR, _DEMO_POL_DIR = [R / 'polarity_prepped' for R in (_UCS_DIR, _DEMO_UCS_DIR)]
+FREQ_DIR, DEMO_FREQ_DIR = [
+    R / 'freq_out' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
+UCS_DIR, DEMO_UCS_DIR = [
+    R / 'ucs_tables' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
+POLAR_DIR, DEMO_POLAR_DIR = [
+    R / 'polarity_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
 
-#? Does this even do anything? This is never run as its own thing...
-confirm_dir(_RSLT_DIR)
-confirm_dir(_POL_DIR)
+# ? Does this even do anything? This is never run as its own thing...
+confirm_dir(RESULT_DIR)
+confirm_dir(POLAR_DIR)
 
 
 def get_ucs_csv_path(trimmed_len: int,
@@ -60,31 +62,34 @@ def convert_ucs_to_csv(ucs_path: Path, max_rows: int = None) -> Path:
     return csv_path
 
 
-def make_verbose(cmd_parts:list, verbose_flag:str='--verbose'):
+def make_verbose(cmd_parts: list, verbose_flag: str = '--verbose'):
     return cmd_parts.insert(1, verbose_flag)
 
 
 def build_ucs_table(min_count: int,
                     ucs_save_path: Path,
-                    cat_tsv_str: str, 
-                    verbose: bool=False):
+                    cat_tsv_str: str,
+                    verbose: bool = False):
     # > mine
     # threshold_arg = f'--threshold={min_count}'
     # primary_cmd = 'ucs-make-tables --verbose --types'
     # sort_cmd = f'ucs-sort --verbose {ucs_save_path} BY f2- f1- INTO {ucs_save_path}'
-    # if not verbose: 
+    # if not verbose:
     #     primary_cmd, sort_cmd = [cmd.replace('--verbose', '') for cmd in (primary_cmd, sort_cmd)]
     # cmd_with_args = f'{primary_cmd} {threshold_arg} {ucs_save_path}'
     # full_cmd_str = f'( {cat_tsv_str} | {cmd_with_args} ) && {sort_cmd}'
-    
-    #> sourcery suggests:
+
+    # > sourcery suggests:
     primary_cmd = ['ucs-make-tables', '--types']
-    sort_cmd = ['ucs-sort', f'{ucs_save_path}', 'BY', 'f2-', 'f1-', 'INTO', f'{ucs_save_path}']
+    sort_cmd = ['ucs-sort', f'{ucs_save_path}',
+                'BY', 'f2-', 'f1-', 'INTO', f'{ucs_save_path}']
     if verbose:
-        primary_cmd, sort_cmd = [make_verbose(c) for c in [primary_cmd, sort_cmd]]
-    cmd_with_args = primary_cmd + [f'--threshold={min_count}', f'{ucs_save_path}']
+        primary_cmd, sort_cmd = [make_verbose(
+            c) for c in [primary_cmd, sort_cmd]]
+    cmd_with_args = primary_cmd + \
+        [f'--threshold={min_count}', f'{ucs_save_path}']
     full_cmd_str = f'( {cat_tsv_str} | {" ".join(cmd_with_args)} ) && {" ".join(sort_cmd)}'
-    
+
     print('\n## Creating initial UCS table...')
     note = f'''
     == Note ==
@@ -167,10 +172,10 @@ def prep_lines(tsv_path: Path,
                words_to_keep: str = 'bigram'):
     # // confirm_existing_tsv(tsv_path)
     # 👆 not needed because run on entire dict before this is applied
-    prep_path = _POL_DIR.joinpath(
+    prep_path = POLAR_DIR.joinpath(
         f'{polarity.lower()}_{words_to_keep}_counts{data_suff}')
     try:
-        rel_path = tsv_path.relative_to(_RSLT_DIR)
+        rel_path = tsv_path.relative_to(RESULT_DIR)
     except ValueError:
         rel_path = Path(*tsv_path.parts[-4:])
     print(
@@ -180,7 +185,7 @@ def prep_lines(tsv_path: Path,
             tsv_path, polarity, row_limit, words_to_keep)) + '\n')
     else:
         print(
-            f'+ [{prep_path.relative_to(_RSLT_DIR)} already exists -- not overwritten]')
+            f'+ [{prep_path.relative_to(RESULT_DIR)} already exists -- not overwritten]')
     print('+ ✓ done')
     return prep_path
 
@@ -210,7 +215,7 @@ def build_ucs_from_multiple(tsv_paths,
                             save_path: Path = None,
                             debug: bool = False):
     cmd = 'cat'
-    save_path = save_path or f'{_POL_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
+    save_path = save_path or f'{POLAR_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
     if debug:
         cmd = 'head -50'
         save_path = save_path.parent.joinpath(f'debug/debug_{save_path.name}')
