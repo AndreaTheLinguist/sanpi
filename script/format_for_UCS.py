@@ -3,7 +3,9 @@ import re
 from pathlib import Path
 
 import pandas as pd
-from utils.dataframes import Timer, save_in_lsc_format as ucs_from_crosstab, save_for_ucs as ucs_from_hits
+from utils.dataframes import Timer, corners, print_md_table
+from utils.dataframes import save_for_ucs as ucs_from_hits
+from utils.dataframes import save_in_lsc_format as ucs_from_crosstab
 from utils.general import confirm_dir, snake_to_camel
 
 cross_regex = re.compile(r'([^_]+)-x-([^_]+)')
@@ -71,12 +73,11 @@ def make_ucs_tsv(data_path, col_1: str = None, col_2: str = None):
     """
 
     df, data_stem = _load_df(data_path)
-    print('\n# Reformatting co-occurence data for UCS analysis',
-          '\n## Input Data:',
-          '\n```',
-          sep='\n')
-    print(df)
-    print('```')
+    print('# Reformatting co-occurence data for UCS analysis\n')
+    print(f'* Loading from `{data_path}`')
+    md_str = print_md_table(
+        corners(df, 3), title='\n## Input Data\n', suppress=True)
+    print(md_str.replace('-|:', ':|-').replace('-|\n', ':|\n'))
 
     # > table indexed by individual hit tokens
     # if data_path.is_relative_to('/share/compling/data/sanpi'):
@@ -152,5 +153,6 @@ if __name__ == '__main__':
     with Timer() as timer:
         _main()
 
-        print('✔️ Program Completed --', pd.Timestamp.now().ctime())
-        print(f'   total time elapsed: {timer.elapsed()}')
+        print('\n* Program Completed ✓')
+        print(f'  * current time: {pd.Timestamp.now().ctime()}')
+        print(f'  * total time elapsed: {timer.elapsed()}')

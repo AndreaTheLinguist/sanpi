@@ -17,7 +17,7 @@ except ModuleNotFoundError:
                                    snake_to_camel)
     except ModuleNotFoundError:
         from general import (PKL_SUFF, confirm_dir, find_files,
-                                          snake_to_camel)
+                             snake_to_camel)
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -615,18 +615,22 @@ def save_in_lsc_format(frq_df,
 
     def save_tsv_file(output_tsv_path, output_lines):
         output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
-        print('Counts formatted to train lsc model saved as:', output_tsv_path)
+        print(f'* Simple tab-delimited counts saved as `.tsv`:\n  * path: `{output_tsv_path}`')
 
     def show_sample_output(output_lines):
-        print('\n## Formatted Output Sample (top 20 bigrams)\n')
-        print('\n'.join(output_lines[:20] + ['...']))
+        print('\n## Formatted Output Sample (top 20 bigrams)\n\n```log')
+        print('\n'.join(output_lines[:20] + ['...']).expandtabs(8))
+        print('```\n')
 
     def reshape_totals(frq_df, new_col_name):
         return frq_df.stack().to_frame(new_col_name)
 
     def _sort_stacks(row_w1_label, col_w0_label, new_col_name, stacked_df):
         stacked_df = stacked_df.reset_index()
-        print(stacked_df.head())
+        stacked_df['raw_frq'] = pd.to_numeric(stacked_df.raw_frq, downcast='unsigned')
+        print_md_table(stacked_df.head(6).convert_dtypes(), title='\n## Stacked\n')
+        print_md_table(stacked_df.tail(6).convert_dtypes(), title='\n...\n')
+
         stacked_df = stacked_df[[new_col_name, col_w0_label, row_w1_label]]
         # stacked_df = (
         #     stacked_df
@@ -745,18 +749,19 @@ def set_axes(_df, index_name='adj_form_lower', columns_name='adv_form_lower'):
     return _df
 
 
-def set_count_dtype(df, df_save_path:Path=None): 
+def set_count_dtype(df, df_save_path: Path = None):
     df = df.apply(pd.to_numeric, downcast='unsigned')
     # BUG There may be an issue with this selecting the wrong dtype and fucking up large numbers again.
     uniq_dt = [str(d) for d in df.dtypes.unique()]
-    # if len(uniq_dt) > 1: 
+    # if len(uniq_dt) > 1:
     #     uniq_dt.sort()
     #     df = df.astype(uniq_dt[-1])
-    if df_save_path: 
+    if df_save_path:
         if df_save_path.suffix == '.csv':
             df_save_path = df_save_path.with_suffix(PKL_SUFF)
         df.to_pickle(df_save_path)
     return df
+
 
 def sort_by_margins(crosstab_df, margins_name='SUM'):
     """
@@ -790,7 +795,7 @@ def square_sample(df: pd.DataFrame, n: int = 10,
     cols = ['SUM'] + _df.columns.to_series().sample(n).to_list()
 
     sample = sort_by_margins(df.copy().loc[rows, cols])
-    if not with_margin: 
+    if not with_margin:
         sample = drop_margins(sample)
     if as_sqrt:
         sample = transform_counts(sample)
