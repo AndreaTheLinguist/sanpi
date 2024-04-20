@@ -7,12 +7,22 @@ from pathlib import Path
 # pd.set_option('display.max_columns', 20)
 # pd.set_option('display.width', 200)
 try:
-    from source.utils.sample import sample_pickle
+    from source.utils.sample import sample_pickle, SANPI_DATA
 except ModuleNotFoundError:
     from utils.sample import sample_pickle, SANPI_DATA
 
 
 def _main():
+    """
+    Executes the main functionality of the script by parsing command-line arguments and calling the sample_pickle function with the specified options.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
     # [-N SAMPLE_SIZE] [-s SORT_BY] [-c COLUMNS] [-f FILTERS] [-m] [-t] [-C MAX_COLS] [-w MAX_COLWIDTH] [-W MAX_WIDTH] pickle
 
     args = _parse_args()
@@ -33,19 +43,26 @@ def _main():
         tabbed=args.tabbed,
         comma=args.comma,
         piped=args.piped,
+        fancy=args.fancy,
+        grid=args.grid,
+        outline=args.outline,
         quiet=args.quiet,
-        regex=args.regex
+        regex=args.regex, 
+        n_dec=args.n_dec
     )
 
 
 def _parse_args():
     """
-    Parses the command line arguments.
+    Parses command-line arguments for the script to sample and display data from a pickled DataFrame with various formatting and display options.
+
+    Args:
+        None
 
     Returns:
-        argparse.Namespace: The parsed command line arguments.
-
+        argparse.Namespace: Parsed command-line arguments.
     """
+
     parser = argparse.ArgumentParser(
         description=(
             'simple script to print a sample of a pickled dataframe to stdout '
@@ -84,7 +101,16 @@ def _parse_args():
         type=str, action='append', dest='columns',
         default=[],
         help=('option to specify columns to print. '
-              'Each must have its own `-c` flag. E.g. `-c COLUMN_1 -c COLUMN_2`')
+              'Each must have its own `-c` flag. E.g. `-c COLUMN_1 -c COLUMN_2`.'
+              'UPDATE ➡️ flags can be prefaced with `START::`, `END::`, or `WITH::` '
+              'to select multiple columns by the following substring '
+              '(or simply as a shortcut to typing the exact column string). '
+              '`START::substr` employs `str.startswith(substr)`, '
+              '`END::substr` employs `str.endswith(substr)`, '
+              'and `WITH::substr` employs `str.contains(substr)`. '
+              'Example: `-c START::un` will select every column starting with "un" (✓"under" but ✕ "fun", "thunder") '
+              'while `-c END::un` only columns ending with "un" (✓"fun" but ✕ "under", "thunder"), '
+              'and `-c WITH::un` selects any column with "un" anywhere (✓"under", "fun", "thunder"). ')
     )
 
     parser.add_argument(
@@ -128,6 +154,26 @@ def _parse_args():
         help=('option to print tab-delimited format')
     )
     parser.add_argument(
+        '-F', '--fancy',
+        action='store_true',
+        default=False,
+        help=('option to print in "fancy" table format')
+    )
+    parser.add_argument(
+        '-G', '--grid',
+        action='store_true',
+        default=False,
+        help=('option to print in "grid" table format; '
+              '"fancy_grid" if `-F/--fancy` also given')
+    )
+    parser.add_argument(
+        '-O', '--outline',
+        action='store_true',
+        default=False,
+        help=('option to print in "grid" table format; '
+              '"fancy_outline" if `-F/--fancy` also given')
+    )
+    parser.add_argument(
         '-P', '--piped',
         action='store_true',
         default=False,
@@ -154,6 +200,12 @@ def _parse_args():
         help=('option to suppress meta-messages printed to stdout. '
               '(Can be used with `-T/--tabbed` or `-P/--piped` or `-C/--comma` '
               'to write sample to file or use with `column -T [-s,/-s\\|]`)')
+    )
+
+    parser.add_argument(
+        '-d', '--n_dec',
+        type=int, default=0,
+        help=('number of decimal places to include in output')
     )
 
     parser.add_argument(
