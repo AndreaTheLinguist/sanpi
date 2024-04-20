@@ -1,5 +1,6 @@
 # -*- coding=utf-8 -*-
 import re
+from math import sqrt
 from os import system
 from pathlib import Path
 from sys import exit as sysxit
@@ -14,6 +15,8 @@ from .general import (DEMO_RESULT_DIR, RESULT_DIR, SANPI_HOME, camel_to_snake,
                       confirm_dir, print_iter, run_shell_command,
                       snake_to_camel)
 
+ALPHA = 0.0001
+READ_TAG = 'rsort-view_am-only'
 _UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
 _WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 
@@ -162,15 +165,15 @@ def symmetric_deltaP(combo: pd.Series,
         return deltaP_vals.iat[0] * deltaP_vals.iat[1]
 
 
-def get_vocab_size(all_bigrams: Path or pd.DataFrame, 
+def get_vocab_size(all_bigrams: Path or pd.DataFrame,
                    polarized: bool = True):
     '''
     calculates the vocab size for all units and subunits of the bigram
-    
+
     assumes all_bigrams is either:
         + a dataframe containing the columns "l1" and "l2"
         + or the path to a simple tsv file containing all unique adverb and adjective combinations and their joint frequencies
-        
+
     assumes that solo unit vocabs are being compared with binary group and multiplies by 2, 
         but this can be turned off using `polarized=False`.
         In which case the returned dictionary values will need to be adjusted accordingly.
@@ -184,13 +187,13 @@ def get_vocab_size(all_bigrams: Path or pd.DataFrame,
     unique_l1 = all_df.l1.nunique()
     unique_l2 = all_df.l2.nunique()
     unique_words = unique_l1 + unique_l2
-    #> all possible combinations, not just *occuring* combinations
+    # > all possible combinations, not just *occuring* combinations
     unique_bigrams = unique_l1 * unique_l2
     vocabs = {'adv': unique_l1,
-                   'adj': unique_l2,
-                   'bigram': unique_words}
+              'adj': unique_l2,
+              'bigram': unique_words}
     if polarized:
-        vocabs = {k: v*2 for k,v in vocabs.items()}
+        vocabs = {k: v*2 for k, v in vocabs.items()}
     vocabs['adv~adj'] = unique_words
     return vocabs
 
@@ -570,14 +573,13 @@ def save_for_ucs(df, col_1: str, col_2: str,
     return counts
 
 
-
 def print_ex_assoc(df,
-                  unit=None,
-                  example_key=None,
-                  round_level=2,
-                  sort_by='am_p1_given2',
-                  columns_like=r'^[Ecuj]|odds|^log.+d$|(given\d|_?f)$',
-                  regex=False) -> None:
+                   unit=None,
+                   example_key=None,
+                   round_level=2,
+                   sort_by='am_p1_given2',
+                   columns_like=r'^[Ecuj]|odds|^log.+d$|(given\d|_?f)$',
+                   regex=False) -> None:
     """
     Prints a specific example from a dataframe.
 
@@ -636,8 +638,6 @@ def print_ex_assoc(df,
         n_dec=round_level,
         title=f'\n### {unit.capitalize()} "{example_key}" examples sorted by `{sort_by}` column\n')
     print('---')
-
-
 
 
 def vary_lrc(obs_df, vocab: int):
@@ -726,4 +726,3 @@ def vary_lrc(obs_df, vocab: int):
         'n_significant').reset_index().sort_values('n_significant', ascending=False)
     nonzero_lrc.loc[nonzero_lrc.value, :].groupby('vocab').value_counts(['correct', 'alpha', 'value']).to_frame('n_significant').reset_index(
     ).sort_values('n_significant', ascending=False).groupby('n_significant').value_counts(['correct', 'alpha', 'vocab'])
-
