@@ -1,16 +1,33 @@
 # coding=utf-8
+import errno
 import logging
 import re
-from os import system
-from pathlib import Path
 from datetime import datetime
+from os import system, strerror
+from pathlib import Path
+from scipy import constants as sc
+import numpy as np
 
 PKL_SUFF = '.pkl.gz'
 SANPI_HOME = Path('/share/compling/projects/sanpi')
+DEMO_DIR = SANPI_HOME / 'DEMO'
+RESULT_DIR, DEMO_RESULT_DIR = [W / 'results' for W in (SANPI_HOME, DEMO_DIR)]
 
-def timestamp_now() -> str: 
+FREQ_DIR, DEMO_FREQ_DIR = [
+    R / 'freq_out' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
+
+
+def timestamp_now() -> str:
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return datetime.now().strftime("%Y-%m-%d_%H%M")
+
+def timestamp_today() -> str:
+    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime("%Y-%m-%d")
+
+def camel_to_snake(camel:str): 
+    return re.sub(r'([a-z])([A-Z])', r'\1_\2', camel).lower()
+
 
 def confirm_dir(dir_path: Path):
     if not dir_path.is_dir():
@@ -83,21 +100,31 @@ def dur_round(time_dur: float):
 
 
 def file_size_round(size: int):
+    unit = ''
+    constant = 1
+    for unit, constant in {
+        'G': sc.giga,
+        'M': sc.mega,
+        'K': sc.kilo,
+        '': 1,
+    }.items():
+        if round(size) < constant:
+            continue
+        else:
+            return f'{round((size / constant), 1):.1f} {unit}B'
 
-    if size >= 10**8:
-        unit = 'G'
-        power = 9
-    elif size >= 10**5:
-        unit = 'M'
-        power = 6
-    elif size >= 10**2:
-        unit = 'K'
-        power = 3
-    else:
-        unit = ''
-        power = 0
-
-    return f'{round(size / (10**power), 1):.1f} {unit}B'
+    # if size >= sc.giga:
+    #     unit = 'G'
+    #     power = 9
+    # elif size >= sc.mega:
+    #     unit = 'M'
+    #     power = 6
+    # elif size >= sc.kilo:
+    #     unit = 'K'
+    #     power = 3
+    # else:
+    #     unit = ''
+    #     power = 0
 
 
 def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
@@ -108,6 +135,15 @@ def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
             [f'../{p.relative_to(data_dir)}' for p in path_iter], bullet='-',
             header=f'### {len(path_iter)} paths matching {fname_glob} found in {data_dir}')
     return path_iter
+
+
+def gen_random_array(low, high, nvals=8, nvecs=20):
+
+    rng = np.random.default_rng(seed=int(f"{np.datetime64('now', 'h')}".replace('-', '').replace('T', '')))
+    c = 0
+    while c < nvecs: 
+        yield rng.integers(low=low, high=high, size=nvals)
+        c += 1
 
 
 def indent_block(block: str = '',
@@ -161,17 +197,29 @@ def convert_ucs_to_csv(ucs_path, max_rows=None):
 def find_glob_in_dir(dir_path: Path,
                      glob_expr: str,
                      recursive: bool = False,
-                     verbose: bool = False) -> Path:
-    path = None
+                     verbose: bool = False,
+                     err_response: str = '') -> Path:
 
     paths_iter = (tuple(dir_path.rglob(glob_expr))
                   if recursive else
                   tuple(dir_path.glob(glob_expr)))
-    if paths_iter:
-        path = paths_iter[0]
-    elif verbose:
-        print(f'Glob expression, "{glob_expr}", not found in {dir_path}/')
-    return path
+    # if paths_iter:
+    #     path = paths_iter[0]
+    # elif verbose:
+
+    try:
+        return paths_iter[0]
+    except IndexError as e:
+        if err_response: 
+            if err_response == 'raise':
+                raise FileNotFoundError(
+                    errno.ENOENT, strerror(errno.ENOENT), str(dir_path.joinpath(glob_expr))) from e
+            elif err_response == 'return':
+                return str(dir_path.joinpath(glob_expr))
+        elif verbose:
+            print(f'Glob expression, "{glob_expr}", not found in {dir_path}/')
+    
+    return
 
 
 def percent_to_count(percent: float, total: int) -> int:
@@ -186,9 +234,9 @@ def print_iter(iter_obj,
                indent: int = 0):
 
     bullet_str = f'\n{" " * indent}{bullet} '
-    if isinstance(iter_obj, dict): 
-        iter_str = bullet_str.join(f'{k}:\t{v}' for k,v in iter_obj.items())
-    else: 
+    if isinstance(iter_obj, dict):
+        iter_str = bullet_str.join(f'{k}:\t{v}' for k, v in iter_obj.items())
+    else:
         iter_str = bullet_str.join(f'{i}' for i in iter_obj)
 
     msg_str = f'\n{header}{bullet_str}{iter_str}'
@@ -204,4 +252,4 @@ def run_shell_command(command_str):
 
 
 def snake_to_camel(snake: str):
-    return ''.join([w.capitalize() for w in snake.split('_')])
+    return ''.join([w.capitalize() if i != 0 else w for i, w in enumerate(snake.split('_'))])
