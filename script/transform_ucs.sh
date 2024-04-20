@@ -38,7 +38,7 @@ echo -e "> log will be saved to: ${LOG_PATH}\n..."
 exec 1>${LOG_PATH} 2>&1
 TMP_DIR=${UCS_DIR}/tmp
 mkdir -p ${TMP_DIR}
-TMP=${TMP_DIR}/tmp-${DATA_SET#*thresh}.ds.gz
+TMP=${TMP_DIR}/tmp_$(date +"%Y%m%d-%H%M%S").${DATA_SET}
 
 echo "# Manipulating ${DATA_SET} ucs table"
 echo "path to this script: $0"
@@ -75,9 +75,9 @@ P1="am.p1.given2.simple := (%O11% / %C1%)"
 P2="am.p2.given1.simple := (%O11% / %R1%)"
 P1_MARG_ADJUST="am.p1.given2.margin := (%O11% / %C1%) - (%R1% / %N%)"
 P2_MARG_ADJUST="am.p2.given1.margin := (%O11% / %R1%) - (%C1% / %N%)"
-EXPECT_DIFF="am.expect.diff := (%O11% - %E11%)"
+#// EXPECT_DIFF="am.expect.diff := (%O11% - %E11%)"
 
-USER_SCORES="${P1_OTHER_ADJUST} ${P2_OTHER_ADJUST} ${P1} ${P2} ${P1_MARG_ADJUST} ${P2_MARG_ADJUST} ${EXPECT_DIFF}"
+USER_SCORES="${P1_OTHER_ADJUST} ${P2_OTHER_ADJUST} ${P1} ${P2} ${P1_MARG_ADJUST} ${P2_MARG_ADJUST}" #${EXPECT_DIFF}"
 echo -e "\n## derived association metrics to be added:\n(adjusted conditional probabilities)${USER_SCORES//'am.'/'\n+ am.'}\n"
 SCORES_STR="${INIT_SCORES} ${USER_SCORES}"
 N_SCORES_REQ=$(echo -e "${SCORES_STR//'am.'/'\nam.'}" | egrep -c 'am\.')
@@ -90,9 +90,9 @@ if [[ ! -f ${SCORES_PATH} ]]; then
     #> add additional columns to table for computation
     add_extra_fvar ${DATA_PATH} ${TMP}
     echo -e "\n> adding association metric scores:"
-    echo 'ucs-add -v -x htest ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" "${EXPECT_DIFF}" TO ${TMP} INTO ${SCORES_PATH}'
-    echo "ucs-add -v -x htest ${INIT_SCORES} \"${P1_OTHER_ADJUST}\" \"${P2_OTHER_ADJUST}\" \"${P1}\" \"${P2}\" \"${P1_MARG_ADJUST}\" \"${P2_MARG_ADJUST}\" \"${EXPECT_DIFF}\" TO ${TMP} INTO ${SCORES_PATH}"
-    ucs-add -v -x htest ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" "${EXPECT_DIFF}" TO ${TMP} INTO ${SCORES_PATH}
+    echo 'ucs-add -v -x htest ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}'
+    echo "ucs-add -v -x htest ${INIT_SCORES} \"${P1_OTHER_ADJUST}\" \"${P2_OTHER_ADJUST}\" \"${P1}\" \"${P2}\" \"${P1_MARG_ADJUST}\" \"${P2_MARG_ADJUST}\" TO ${TMP} INTO ${SCORES_PATH}"
+    ucs-add -v -x htest ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}
 
 else
     SCORES_N="$(ucs-info -l ${SCORES_PATH} | egrep -c 'am\.')"
@@ -135,7 +135,7 @@ SORT_PATH=${DATA_PATH/.ds./.rsort.}
 echo "Sorted Table: ${SORT_PATH}"
 #! #BUG The odds.ratio measure appears to be broken for the "polarized-bigrams" dataset
 #// SORT=${2:-'r.odds.ratio r.log.likelihood'}
-SORT=${2:-'r.p1.given2 r.t.score r.odds.ratio.disc '}
+SORT=${2:-'r.p1.given2 r.odds.ratio.disc r.log.likelihood '}
 # SORT=${2:-'r.Dice r.log.likelihood'}
 # SORT=${2:-'r.p1.given2 r.log.likelihood'}
 if [[ ! -f ${SORT_PATH} ]]; then
