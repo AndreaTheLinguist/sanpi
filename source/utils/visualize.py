@@ -2,7 +2,10 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 from .general import confirm_dir
+
 import pandas as pd
+
+from .colors import mcm, GRADIENT_COLORS as gradient, CATEGORICAL_COLORS as listed, random_colormap_selection as rand_colormap
 
 
 # def heatmap(df,
@@ -48,17 +51,21 @@ import pandas as pd
 # plt.show()
 
 
+
 def heatmap(df,
             columns=None,
             size=(8, 10),
-            dpi=130,
+            dpi=250,
             save_name=None,
             save_dir: Path = None,
-            colormap="plasma",
+            colormap=None,
+            # colormap="plasma",
             title: str = 'Frequency Heatmap'):
-
-    plt.figure(figsize=size, dpi=dpi, facecolor="white")
-
+    
+    plt.style.use('dark_background')
+    rcParams['font.family'] = 'lato'
+    plt.figure(figsize=size, dpi=dpi)
+    colormap = colormap or rand_colormap()
     if columns:
         df = df.loc[:, columns]
     df = df.astype('float').sort_index(axis=0).sort_index(axis=1)
