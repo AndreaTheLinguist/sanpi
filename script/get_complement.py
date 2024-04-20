@@ -1,4 +1,5 @@
 
+import argparse
 import re
 from pathlib import Path
 
@@ -6,22 +7,50 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from source.analyze.count_bigrams import describe_counts
-from source.utils.dataframes import (corners, print_md_table, set_count_dtype, sort_by_margins,
+from source.utils.dataframes import (Timer, corners, print_md_table,
+                                     set_count_dtype, sort_by_margins,
                                      square_sample, transform_counts)
-from source.utils.general import print_iter, confirm_dir
+from source.utils.general import confirm_dir, print_iter
 from source.utils.visualize import heatmap
-from sys import argv
 
-FREQ_OUT = Path('/share/compling/projects/sanpi/results/freq_out')
+
+def _parse_args():
+
+    parser = argparse.ArgumentParser(
+        description=(''), #TODO add description message
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument(
+        '-t', '--threshold',
+        type=str, default='01',
+        help=('flag indicating frequency (percentage) threshold applied in filenames. '
+              '"001" will point to `0-001`, "01" will point to `0-01`, etc.')
+    )
+    parser.add_argument(
+        '-p', '--pattern',
+        type=str, default='RBdirect',
+        help=('pattern category (i.e. directory in ./Pat/) to get complement of')
+    )
+    parser.add_argument(
+        '-f', '--freq_out_dir',
+        type=Path, default=Path(
+            '/share/compling/projects/sanpi/results/freq_out'),
+        help=('path to directory housing frequency tables')
+    )
+    parser.add_argument(
+        '-d', '--describe',
+        default='True', action='store_true',
+        help=('whether to produce additional descriptive information files.')
+    )
+    return parser.parse_args()
+
+
 N_FILES = 35
-THR_DEC_STR = '001'
-DESCRIBE = True
-# DESCRIBE = False
-try:
-    PAT_CAT = argv[1]
-except IndexError:
-    PAT_CAT = 'RBdirect'
-    # PAT_CAT = 'POSmirror+NEGmirror'
+args = _parse_args()
+THR_DEC_STR = args.threshold
+DESCRIBE = args.describe
+PAT_CAT = args.pattern
+FREQ_OUT = args.freq_out_dir
 
 
 def _main():
@@ -76,14 +105,14 @@ def _main():
 
     # set the path
     pat_dir = pat_frq_path.parent
-    frq_diff_dir = pat_dir / 'complement' 
+    frq_diff_dir = pat_dir / 'complement'
     confirm_dir(frq_diff_dir)
-    
+
     frq_diff_pkl = frq_diff_dir.joinpath(
         f'/diff_{pat_dir.name}-{all_frq_path.name}'
         .replace(f'{pat_dir.name}-all', f'all-{pat_dir.name}')
-        )
-    
+    )
+
     frq_diff = set_count_dtype(frq_diff, frq_diff_pkl)
     describe_counts(frq_diff, frq_diff_pkl)
     # if path doesn't point to a file, save the table as path
@@ -209,7 +238,7 @@ def seek_frq_table(meta_tag, parent_dir: str = 'RBdirect', stem_glob: str = None
         try:
             frq_path = list(glob_dir.glob(f'{stem_glob}.csv'))[0]
         except IndexError:
-            print('⚠️ frequency table corresponding to '
+            raise FileNotFoundError('⚠️ frequency table corresponding to '
                   f'{stem_glob} not found in {parent_dir}.')
     return frq_path
 
@@ -362,7 +391,7 @@ def get_totals_frame(pat_frq, frq_diff, all_frq, transpose):
     totals_df['DIFF/ALL'] = diff_ratio_frq['SUM']
     totals_df[f'{PAT_CAT}_RAW'] = pat_frq['SUM']
     totals_df['DIFF_RAW'] = frq_diff['SUM']
-    return totals_df.sort_values(['DIFF/ALL','DIFF_RAW'])
+    return totals_df.sort_values(['DIFF/ALL', 'DIFF_RAW'])
 
 
 def _compare_grp_totals(pat_frq, frq_diff, all_frq,
