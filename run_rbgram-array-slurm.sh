@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# shell script to submit array slurm jobs to run pipeline on full corpora directories. Calls 'sbatch /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh'.
+# shell script to submit array slurm jobs to run pipeline on full corpora directories. 
+#   Calls 'sbatch /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh'.
 #
-#  1 of the following can be passed to specify pattern directories to run (directories in ./Pat/) If none is given, '--direct' will be used.
+# The following can be passed to specify pattern directories (in ./Pat/) to pass to slurm script. If none is given, '--direct' will be used.
 #      --rbgrams
 #        Bigram baseline, with ADV restricted to RB
 #          PATS=("RBXadj")
@@ -31,21 +32,37 @@
 #         array=38-40 (data/sanpi/debug/bigram_debug/*)
 #       --full
 #         array=0-34 (data/sanpi/subsets/bigram_{news,puddin}/*)
+# 
+#  mode options are: "solo" for a single core/cpu and "multi" for multiple cpus requested (for parallel processing)
+#
 # usage: bash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh [PAT_FLAG] [ARRAY_FLAG] [MODE]
 # example: bash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh multi --mirror --debug
 # EVERYTHING: bash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh multi --all_pat
 
+HELP="shell script to submit array slurm jobs to run pipeline on full corpora directories. \n> \`sbatch /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh\`.\n\nThe following can be passed to specify pattern directories (in ./Pat/) to pass to slurm script. If none is given, '--direct' will be used.\n\t--rbgrams\n\t\tBigram baseline, with ADV restricted to RB\n\t\tPATS=(\"RBXadj\")\n\t--neg\n\t\tall main negated patterns (set complement approach):\n\t\tPATS=(\"RBdirect\" \"RBscoped\" \"RBraised\")\n\t--direct\n\t\tnegated with *direct* dependency relation between NEG and ADJ nodes\n\t\tPATS=(\"RBdirect\")\n\t--indirect\n\t\tnegated with *indirect* dependency relation (1+ intervening node)\n\t\tPATS=(\"RBscoped\" \"RBraised\")\n\t--mirror\n\t\tPositive and Negative \"mirror\" patterns (explicit retrieval approach)\n\t\tPATS=(\"POSmirror\" \"NEGmirror\")\n\t--npi (added on a whim; *.pat not verified)\n\t\tPatterns for specific literature-identified NPIs\n\t\tPATS=(\"negpol\")\n\t[directory name]\n\t\tany (single) directory name in \"./Pat/\"\n  shortcuts to selecting subarrays:\n\t --demo\n\t\t array=35-37 (data/sanpi/subset/bigram_demo/*)\n\t --debug\n\t\t array=38-40 (data/sanpi/debug/bigram_debug/*)\n\t --full\n\t\t array=0-34 (data/sanpi/subsets/bigram_{news,puddin}/*)\n\nMODE options are: \"solo\" for a single core/cpu OR \"multi\" for multiple cpus requested (for parallel processing)\n\nusage:\n\tbash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh [PAT_FLAG] [ARRAY_FLAG] [MODE]\nexample:\n\tbash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh multi --mirror --debug\n-----------\nEVERYTHING:\n-----------\n\tbash /share/compling/projects/sanpi/run_rbgram-array-slurm.sh multi --all_pat"
+
 CPUS=5
 CPU_MEM=5G
-
+MODE='multi'
 echo "Running /share/compling/projects/sanpi/run_rbgram-array-slurm.sh"
+
+#> Parse command-line arguments to customize job parameters
+#   Exits with an error message for invalid options
+while getopts ":p:m:a:h" opt; do
+  case $opt in
+    p) PAT_FLAG="${OPTARG}" ;;  # Store the Pat/dirname or flag
+    m) MODE="${OPTARG}" ;;  # Store the mode value
+    a) ARRAY_FLAG="${OPTARG}" ;;  # Store the number of corpus parts
+    h) echo -e "${HELP}"; exit 0;;
+    \?) echo "Invalid option -$OPTARG" >&2; exit 1 ;;
+    esac
+done
+
 date
-PAT_FLAG=${1:-""}
 echo "PAT_FLAG: ${PAT_FLAG}"
-ARRAY_FLAG=${2:-""}
 echo "ARRAY_FLAG: ${ARRAY_FLAG}"
-MODE=${3:-"multi"}
 echo "MODE: ${MODE}"
+
 LOG_DIR="/share/compling/projects/sanpi/logs/${ARRAY_FLAG//-}_bigram-pipeline_$(date +%y-%m-%d)"
 mkdir -p ${LOG_DIR}
 
@@ -53,6 +70,7 @@ if [[ $(which grew && grew version) ]]; then
     date
     echo 'grew module found'
 
+    #* Pattern selection based on PAT_FLAG
     if [[ ${PAT_FLAG} == '--rbgrams' ]]; then
         PATS=("RBXadj")
 
@@ -94,6 +112,8 @@ if [[ $(which grew && grew version) ]]; then
 
     echo -e "\nPatterns to submit jobs for: ${PATS[@]}"
     echo "Array Index of Corpus Parts to Search: ${ARRAY_FLAG#--array=}"
+    
+    #* Job submission based on MODE
     for PAT in "${PATS[@]}"; do
         echo -e "\n## $PAT\n"
         JOB_NAME="-J bigram-${PAT}_$(date +%y-%m-%d_%H%M)"
@@ -103,7 +123,6 @@ if [[ $(which grew && grew version) ]]; then
             sbatch ${JOB_NAME} ${ARRAY_FLAG} --cpus-per-task ${CPUS} --mem-per-cpu=${CPU_MEM} --chdir=${LOG_DIR} /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh ${PAT}
 
         elif [[ ${MODE} == 'solo' ]]; then
-            # echo 'sbatch ${JOB_NAME} ${ARRAY_FLAG} ./bigram-array.slurm.sh ${PAT}'
             echo -e "sbatch ${JOB_NAME} ${ARRAY_FLAG} -n 1 --mem=15G\n    --chdir=${LOG_DIR} bigram-array.slurm.sh ${PAT}"
             sbatch ${JOB_NAME} ${ARRAY_FLAG} -n 1 --mem=15G --chdir=${LOG_DIR} /share/compling/projects/sanpi/slurm/bigram-array.slurm.sh ${PAT}
         else
