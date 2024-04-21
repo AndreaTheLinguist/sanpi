@@ -7,7 +7,40 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true
+        },
+        // sample_pickle testing
+        {
+            "name": "sample_pickle test",
+            "type": "python",
+            "request": "launch",
+            "program": "script/sample_pickle.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-p",
+                "/share/compling/projects/sanpi/results/ucs_tables/dataframes/polar/RBdirect/adv/extra/polarized-adv_35f=868+_min100x_extra.pkl.gz",
+                "-c", 
+                "START::f", 
+                "-c",
+                "l1", 
+                "-c",
+                "l2", 
+                "-c", 
+                "WITH::log_r",
+                "-f", 
+                "l2==^incr", 
+                "-r", 
+                "-d", 
+                "2", 
+                "-N",
+                "6", 
+                // "-m", 
+                // "-F", 
+                "-O"
+            ]
         },
         // format frequency table for UCS
         {
@@ -16,48 +49,132 @@
             "request": "launch",
             "program": "script/format_for_UCS.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "/share/compling/projects/sanpi/results/freq_out/RBdirect/partials/25f/all-frq_adj-x-neg_thr0-001p.25f.pkl.gz"
             ]
         },
         {
-            "name": "💈HELP add_polar_am",
+            "name": "🫏💈HELP polar_assoc",
             "type": "python",
             "request": "launch",
-            "program": "script/add_polar_am.py",
+            "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-h"
             ]
         },
         {
-            "name": "💈🪞 MIRROR add_polar_am.py",
+            "name": "🫏💈200 polar_assoc",
             "type": "python",
             "request": "launch",
-            "program": "script/add_polar_am.py",
+            "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-m",
+                "200", 
+                // "-v"
+            ]
+        },
+        {
+            "name": "🫏💈300 polar_assoc",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-m",
+                "300", 
+                // "-v"
+            ]
+        },
+        {
+            "name": "🫏💈100 polar_assoc",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-m",
+                "100", 
+                // "-v"
+            ]
+        },
+        {
+            "name": "🫏💈500 polar_assoc",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-m",
+                "500", 
+                // "-v"
+            ]
+        },
+        {
+            "name": "🫏💈🪞1000 NEG mirror complement polar_assoc.py",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-c",
-                "/share/compling/projects/sanpi/results/freq_out/POSmirror/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv",
+                "/share/compling/projects/sanpi/results/freq_out/NEGmirror/complement/ucs_format/diff_all-NEGmirror_adj-x-adv_frq-thr0-001p.35f=868+.tsv",
                 "-C",
-                "positive",
+                "diff_negmir",
                 "-n",
-                "/share/compling/projects/sanpi/results/freq_out/NEGmirror/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv",
+                "/share/compling/projects/sanpi/results/freq_out/NEGmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv",
                 "-N",
-                "negative",
+                "negmir",
                 "--min_freq",
-                "25",
-                "-s",
-                ".MIRROR.35f-868thresh.tsv",
+                "1000",
+                "--data_suffix",
+                ".MIRROR_ALL-neg.35f~868c.tsv",
+                "-v"
+            ]
+        },
+        {
+            "name": "🫏💈🪞1000 ANY mirror complement polar_assoc.py",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-c",
+                "/share/compling/projects/sanpi/results/freq_out/ANYmirror/complement/ucs_format/diff_all-ANYmirror_adj-x-adv_frq-thr0-001p.35f=868+.tsv",
+                "-C",
+                "diff_anymir",
+                "-n",
+                "/share/compling/projects/sanpi/results/freq_out/ANYmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv",
+                "-N",
+                "anymir",
+                "--min_freq",
+                "1000",
+                "--data_suffix",
+                ".MIRROR_ALL-any.35f~868c.tsv",
                 "-v"
             ]
         },
         // run_pipeline debug/* posMirror
         {
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "name": "🐞 pipeline POS mirror",
             "program": "run_pipeline.py",
@@ -77,6 +194,7 @@
         // run_pipeline debug/* negMirror
         {
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "name": "🐞 pipeline NEG mirror",
             "program": "run_pipeline.py",
@@ -96,6 +214,7 @@
         // run_pipeline debug/* RBdirect
         {
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "name": "🐞 pipeline direct",
             "program": "run_pipeline.py",
@@ -124,6 +243,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/results/correlate_lemmas.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "/share/compling/projects/sanpi/results/freq_out/RBXadj/all_adj-x-adv_frq-thr0-001p.35f=868+.csv"
@@ -136,6 +256,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_env.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-d",
@@ -152,6 +273,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_env.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-d",
@@ -168,6 +290,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-d",
@@ -189,6 +312,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -203,6 +327,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-t",
@@ -217,6 +342,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-t",
@@ -231,6 +357,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -243,6 +370,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -258,6 +386,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -270,6 +399,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -284,6 +414,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -298,6 +429,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "-f",
@@ -316,6 +448,7 @@
             "request": "launch",
             "program": "run_pipeline.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             // "cwd": "${workspaceFolder}",
             // "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
             //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
@@ -339,6 +472,7 @@
             "request": "launch",
             "program": "run_pipeline.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             // "cwd": "${workspaceFolder}",
             // "python": "/home/arh234/.conda/envs/parallel-sanpi/bin/python",
             //args: [-h] [-c CORPORA_DIR] [-p PATTERN_DIR] [-R]
@@ -359,6 +493,7 @@
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}",
             "args": [
                 "/home/arh234/data/devel/apwtest.conll/",
@@ -372,6 +507,7 @@
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}",
             // args: corpus_dir pat_file output
             "args": [
@@ -386,6 +522,7 @@
             "request": "launch",
             "program": "source/gather/grewSearchDir.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}",
             // args: corpus_dir pat_file output
             "args": [
@@ -400,6 +537,7 @@
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}",
             // args: corpus_dir pat_file output
             "args": [
@@ -415,6 +553,7 @@
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/gather/fill_match_info.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "justMyCode": true,
             "args": [
                 "conllu_dir",
@@ -428,6 +567,7 @@
             "request": "launch",
             "program": "script/tabulateHits.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}",
             "args": [
                 "/home/arh234/data/sanpi/1_json_grew-matches/contig/PccVa.sans-relay",
@@ -440,6 +580,7 @@
             "request": "launch",
             "program": "script/tabulateHits.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}",
             // args: [-h] PAT_JSON_DIR OUTPUTPREFIX [-v]
             "args": [
@@ -455,6 +596,7 @@
             // ? Does this script still exist? I don't remember it
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}"
         },
         {
@@ -463,6 +605,7 @@
             "request": "launch",
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
             "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
             "cwd": "${workspaceFolder}"
         }
     ],
