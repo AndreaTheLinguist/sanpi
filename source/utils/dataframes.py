@@ -372,49 +372,31 @@ def print_md_table(input_df: pd.DataFrame,
     """
     _df = input_df.copy()
     # FIXME realized this does nothing for markdown tables, which are strings
-    set_pd_display(max_colwidth, max_cols, max_width)
-
+    # set_pd_display(max_colwidth, max_cols, max_width)
+    
     if describe:
         _df = input_df.describe()
+    floatfmt = f"{',' if comma else ''}.{n_dec}f"
+    #FIXME this doesn't actually work. Integers seem to be treated as floats quite often. Could be when they are very large values? i.e. were put into scientific notation?
+    intfmt = ',' if comma else ''
+
+    float_data = _df.select_dtypes(include='float')
+    if any(float_data):
+        _df.update(float_data.apply(pd.to_numeric, downcast='float', axis=1).apply(np.around, decimals=n_dec, axis=1))
+        
     if transpose:
         _df = _df.T
 
-    # if max_colwidth:
-    #     df = df.apply(lambda x: x.st)
-    # replaced by sourcery suggestion below
-    # if n_dec is None:
-    #     md_table = df.to_markdown()
-    # else:
-    #     floatfmt = f'.{n_dec}f'
-    #     if comma:
-    #         floatfmt = f',{floatfmt}'
-    #     if not df.select_dtypes(include='number').empty:
-    #         df.loc[:, df.select_dtypes(include='number').columns] = df.select_dtypes(
-    #             include='number').astype('float')
-    #     md_table = df.to_markdown(floatfmt=floatfmt)
-
-    # whitespace = ' '*indent if indent else ''
-    # print_str = ''
-    # if title:
-    #     print_str += f'\n{whitespace}{title}\n'
-    # print_str += (whitespace
-    #               + md_table.replace('\n', f'\n{whitespace}'))
-
-    floatfmt = f"{',' if comma else ''}.{n_dec}f"
-    num_cols = _df.select_dtypes(include='number').columns.to_list()
-    if any(num_cols):
-        _df.loc[:, num_cols] = _df.loc[:, num_cols].astype(
-            'float').round(n_dec)
-    md_table = _df.to_markdown(floatfmt=floatfmt)
+    #// md_table = _df.to_markdown(tablefmt="grid", floatfmt=floatfmt, numalign='decimal')
+    md_table = _df.to_markdown(floatfmt=floatfmt, intfmt=intfmt)
 
     whitespace = ' ' * indent
     print_str = f"{whitespace}{title}\n{whitespace}" if title else ''
-    print_str += md_table.replace('\n', f'\n{whitespace}')
+    print_str += md_table.replace('\n', f'\n{whitespace}') + '\n'
 
     if suppress:
         return print_str
     print(print_str)
-    return ''
 
 
 def set_pd_display(max_colwidth, max_cols, max_width):
@@ -760,7 +742,7 @@ def set_axes(_df, index_name='adj_form_lower', columns_name='adv_form_lower'):
 def set_count_dtype(df, df_save_path: Path = None):
     df = df.apply(pd.to_numeric, downcast='unsigned')
     # BUG There may be an issue with this selecting the wrong dtype and fucking up large numbers again.
-    uniq_dt = [str(d) for d in df.dtypes.unique()]
+    # uniq_dt = [str(d) for d in df.dtypes.unique()]
     # if len(uniq_dt) > 1:
     #     uniq_dt.sort()
     #     df = df.astype(uniq_dt[-1])
