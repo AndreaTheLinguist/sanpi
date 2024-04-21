@@ -899,3 +899,43 @@ class Timer:
 
     def elapsed(self):
         return get_proc_time(self.start, pd.Timestamp.now())
+
+
+def quartile_dispersion(X: pd.Series=None, Q1:float=None, Q3: float=None ):
+    """
+    Calculates the Quartile Dispersion Coefficient of a given pandas Series.
+
+    Args:
+        X: pandas Series. The input data for which the Quartile Dispersion Coefficient is to be calculated.
+
+    Returns:
+        float. The Quartile Dispersion Coefficient of the input data.
+
+    suggested use: 
+        df['Q_disp_coeff'] = df.apply(quartile_dispersion)
+    """
+    if X:
+        iX = X.describe()
+        Q1 = Q1 or iX['25%']
+        Q3 = Q3 or iX['75%']
+    
+    return (Q3 - Q1) / (Q3 + Q1)
+
+
+def get_mad(X: pd.Series):
+    """
+    Calculates the Median Absolute Deviation (MAD) of a given pandas Series.
+
+    Args:
+        X: pandas Series. The input data for which MAD is to be calculated.
+
+    Returns:
+        float. The Median Absolute Deviation (MAD) of the input data.
+
+    suggested use: 
+        df['MAD'] = df.apply(get_mad)
+    """
+
+    medX = X.median()
+    abs_dev = X.apply(lambda x: x - medX).abs()
+    return abs_dev.median()
