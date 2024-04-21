@@ -627,8 +627,10 @@ def save_in_lsc_format(frq_df,
 
     def _sort_stacks(row_w1_label, col_w0_label, new_col_name, stacked_df):
         stacked_df = stacked_df.reset_index()
-        stacked_df['raw_frq'] = pd.to_numeric(stacked_df.raw_frq, downcast='unsigned')
-        print_md_table(stacked_df.head(6).convert_dtypes(), title='\n## Stacked\n')
+        stacked_df['raw_frq'] = pd.to_numeric(
+            stacked_df.raw_frq, downcast='unsigned')
+        print_md_table(stacked_df.head(6).convert_dtypes(),
+                       title='\n## Stacked\n')
         print_md_table(stacked_df.tail(6).convert_dtypes(), title='\n...\n')
 
         stacked_df = stacked_df[[new_col_name, col_w0_label, row_w1_label]]
