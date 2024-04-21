@@ -196,28 +196,31 @@ def drop_margins(_df, margin_name='SUM'):
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
 
-def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
+def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # df = df
     desc = df.describe().transpose()
     desc = desc.assign(total=pd.to_numeric(df.sum()),
                        var_coeff=desc['std'] / desc['mean'],
                        range=desc['max'] - desc['min'],
-                       IQ_range=desc['75%'] - desc['25%'])
+                       IQ_range=desc['75%'] - desc['25%'], 
+                       Q_disper=df.apply(quartile_dispersion), 
+                       MAD=df.apply(get_mad))
     desc = desc.assign(upper_fence=desc['75%'] + (desc.IQ_range * 1.5),
                        lower_fence=desc['25%'] - (desc.IQ_range * 1.5))
     # if 'SUM' not in desc.index:
     #     desc = desc.assign(
     #         plus1_geo_mean=df.add(1).apply(stat.geometric_mean),
     #         plus1_har_mean=df.add(1).apply(stat.harmonic_mean))
+    int_cols = {'count', 'min', 'max', 'total', 'range'}
     for col in desc.columns:
-        if col in ('count', 'min', 'max', 'total', 'range'):
+        if col in int_cols:
             desc.loc[:, col] = pd.to_numeric(
                 desc.loc[:, col], downcast='unsigned')
         # if col in ('mean', 'std', 'variance', 'var_coeff'):
         else:
             desc.loc[:, col] = pd.to_numeric(
-                desc.loc[:, col], downcast='float').round(1)
-    desc = desc.rename(columns={'50%': 'median'})
+                desc[col].round(1), downcast='float')
+
     # mean_centr = no_sum_frame - no_sum_frame.mean()
     # mean_stand = no_sum_frame / no_sum_frame.mean()
     # mean_stand_centr = mean_stand - mean_stand.mean()
@@ -225,7 +228,8 @@ def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # log2_plus1_trans = no_sum_frame.add(1).apply(np.log2)
     # logn_plus1_trans = no_sum_frame.apply(np.log1p)
 
-    return desc
+    return desc.rename(columns={'50%': 'median', 
+                                'count':'unique_forms'})
 
 
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
@@ -901,7 +905,7 @@ class Timer:
         return get_proc_time(self.start, pd.Timestamp.now())
 
 
-def quartile_dispersion(X: pd.Series=None, Q1:float=None, Q3: float=None ):
+def quartile_dispersion(X: pd.Series=None):
     """
     Calculates the Quartile Dispersion Coefficient of a given pandas Series.
 
@@ -914,10 +918,11 @@ def quartile_dispersion(X: pd.Series=None, Q1:float=None, Q3: float=None ):
     suggested use: 
         df['Q_disp_coeff'] = df.apply(quartile_dispersion)
     """
-    if X:
-        iX = X.describe()
-        Q1 = Q1 or iX['25%']
-        Q3 = Q3 or iX['75%']
+    
+    #! if `Q3` is (also) 0, values will be undefined
+    iX = X.add(1).describe()
+    Q1 = iX['25%']
+    Q3 = iX['75%']
     
     return (Q3 - Q1) / (Q3 + Q1)
 
