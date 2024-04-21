@@ -166,8 +166,12 @@ def count_uniq(series: pd.Series) -> int:
     return len(series.unique())
 
 
-def corners(df, size: int = 5):
+def corners(df, size: int = 5, n_dec: int = None):
+
     _df = df.copy()
+    if n_dec:
+        _df.update(
+            _df.select_dtypes(include='float').apply(np.around, decimals=n_dec, axis=1))
     _df.index.name = _df.index.name or 'rows'
     _df.columns.name = _df.columns.name or 'columns'
     index_name = _df.index.name
@@ -177,9 +181,9 @@ def corners(df, size: int = 5):
     _df = _df.T.reset_index().reset_index().set_index(
         ['index', columns_name]).T
     cdf = pd.concat(
-        [dfs.iloc[:, :size].assign(__='...')
-         .join(dfs.iloc[:, -size:])
-         for dfs in (_df.head(size).T.assign(__='...').T,
+        [d.iloc[:, :size].assign(__='...')
+         .join(d.iloc[:, -size:])
+         for d in (_df.head(size).T.assign(__='...').T,
                      _df.tail(size))])
     cdf = cdf.reset_index().set_index(index_name)
     cdf.pop('index')
