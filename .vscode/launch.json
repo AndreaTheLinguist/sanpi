@@ -322,7 +322,7 @@
             ]
         },
         {
-            "name": "count_bigrams (2) 0.075%",
+            "name": "count_bigrams (2) 0 0️⃣ minimum %",
             "type": "python",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
@@ -331,13 +331,13 @@
             "justMyCode": true,
             "args": [
                 "-t",
-                "0.075",
+                "0",
                 "-f",
                 "2"
             ]
         },
         {
-            "name": "count_bigrams (2) 0.25%",
+            "name": "count_bigrams (2) 0.0025%",
             "type": "python",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
@@ -346,7 +346,7 @@
             "justMyCode": true,
             "args": [
                 "-t",
-                "0.25",
+                "0.0025",
                 "-f",
                 "2"
             ]
@@ -365,7 +365,7 @@
             ]
         },
         {
-            "name": "count_bigrams 4f 0.005%",
+            "name": "count_bigrams 4f min%",
             "type": "python",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
@@ -376,24 +376,10 @@
                 "-f",
                 "4",
                 "-t",
-                "0.005"
+                "0"
             ]
         },
-        {
-            "name": "EDIT count_bigrams 2f 0.005%",
-            "type": "python",
-            "request": "launch",
-            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams-EDIT.py",
-            "console": "integratedTerminal",
-            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
-            "justMyCode": true,
-            "args": [
-                "-f",
-                "2",
-                "-t",
-                "0.005"
-            ]
-        },
+
         {
             "name": "count_bigrams 5f default%",
             "type": "python",
