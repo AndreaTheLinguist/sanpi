@@ -15,9 +15,9 @@
 
 ## _ALL_ (`POSmirror+NEGmirror` and non-`POSmirror+NEGmirror`) Frequencies Overview
 
-## Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
+### Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
 
-- Saving `adv_form_lower` descriptive statististics for stats_all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adv_form_lower` descriptive statististics for`stats_all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBXadj/descriptive_stats/ADV-stats_all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.920
 
@@ -49,9 +49,9 @@ Sample `adv_form_lower` Stats
 | upper_fence |                        24,227 |
 | lower_fence |                       -11,917 |
 
-## Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
+### Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
 
-- Saving `adj_form_lower` descriptive statististics for stats_all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adj_form_lower` descriptive statististics for`stats_all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBXadj/descriptive_stats/ADJ-stats_all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.963
 
@@ -221,7 +221,7 @@ Heatmap saved to:
 
 ### Descriptive _Complement_ Statistics for `adj_form_lower` by `adv_form_lower`
 
-- Saving `adv_form_lower` descriptive statististics for stats_diff_combined_POSmirror-NEGmirror-all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adv_form_lower` descriptive statististics for`stats_diff_combined_POSmirror-NEGmirror-all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/combined_POSmirror-NEGmirror/complement/descriptive_stats/ADV-stats_diff_combined_POSmirror-NEGmirror-all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.511
 
@@ -255,7 +255,7 @@ Sample `adv_form_lower` Stats
 
 ### Descriptive _Complement_ Statistics for `adv_form_lower` by `adj_form_lower`
 
-- Saving `adj_form_lower` descriptive statististics for stats_diff_combined_POSmirror-NEGmirror-all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adj_form_lower` descriptive statististics for`stats_diff_combined_POSmirror-NEGmirror-all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/combined_POSmirror-NEGmirror/complement/descriptive_stats/ADJ-stats_diff_combined_POSmirror-NEGmirror-all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.789
 

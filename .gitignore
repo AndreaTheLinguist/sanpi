@@ -228,7 +228,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -380,10 +379,12 @@ tags
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
 ## extension exclusions
-*.[0-9_-]+.*
+# *.[0-9_-]+.*
 *.err
 *.out
-**.tar*
+*.tar*
+*.7z
+*.zip
 
 ## top-level directory exclusions
 **/old/
@@ -404,6 +405,11 @@ sanpi-data.link
 
 ## logs
 logs/
+*.out
+*.err
+*.screen*
+*.log
+
 
 ## demo (exclude all)
 demo/
@@ -430,8 +436,10 @@ notebooks/exactly_out/
 
 ## `Pat/` exclusions
 Pat/shelf
-Pat/RBsimple
+Pat/*RBsimple
 Pat/negpol
+Pat/negated
+
 
 ## "priors" exclusions
 **/prior_version
@@ -446,6 +454,7 @@ results/**/*[.12]?f.*
 results/**/descriptive_stats
 results/freq_out/spearman
 results/**/heatmaps
+results/**/ucs_format/*.tsv
 
 ### `ucs_tables/` exclusions
 **/ucs_tables/.ucs_tmp.tsv
@@ -459,6 +468,7 @@ results/**/heatmaps
 **/ucs_tables/[!d]*/**/*.gz
 **/ucs_tables/RBXadj/readable/all_adj-x-adv_*35f*_min[123]*x.rsort-view*
 results/**/ucs_logs
+results/ucs_tables/dataframes/**/prior_extra/*
 
 ## `slurm/` exclusions
 slurm/lsc_35JxR.slurm.sh
@@ -470,5 +480,7 @@ source/gather/utils
 source/utils/adv*
 source/**/*comments*
 source/**/*edit*
-Pat/_RBsimple/cop-rb-direct.pat
-Pat/_RBsimple/rb-predadj.pat
+# softlinks to `source/` from subdirectories
+*/source 
+
+.vscode/launch.json

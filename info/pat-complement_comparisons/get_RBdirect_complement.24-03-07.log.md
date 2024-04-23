@@ -11,9 +11,9 @@
 
 ## _`RBdirect`_ Frequencies Overview
 
-## Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
+### Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
 
-- Saving `adv_form_lower` descriptive statististics for stats_all-frq_adj-x-adv_thr0-001p.35f as csv...
+- Saving `adv_form_lower` descriptive statististics for`stats_all-frq_adj-x-adv_thr0-001p.35f` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBdirect/descriptive_stats/ADV-stats_all-frq_adj-x-adv_thr0-001p.35f.csv`
   - time elapsed: 00:00:00.14
   
@@ -28,26 +28,26 @@ Sample `adv_form_lower` Stats
 | blissfully       | 3,886 |    0 |   0 |   0 |   0 |   0 |   0 |  14 |    42 |        28 |    14 |        0 |           0 |           0 |              1 |              1 |
 | blazingly        | 3,886 |    0 |   0 |   0 |   0 |   0 |   0 |  18 |    31 |        38 |    18 |        0 |           0 |           0 |              1 |              1 |
   
-|             | Summed Across adv_form_lowers |
-|:------------|------------------------------:|
-| count       |                         3,886 |
-| mean        |                           810 |
-| std         |                         4,753 |
-| min         |                             1 |
-| 25%         |                            35 |
-| 50%         |                            88 |
-| 75%         |                           298 |
-| max         |                       132,226 |
-| total       |                     3,148,010 |
-| var_coeff   |                             6 |
-| range       |                       132,225 |
-| IQ_range    |                           263 |
-| upper_fence |                           692 |
-| lower_fence |                          -359 |
+|             | `RBdirect`: `adv_form_lower` totals |
+|:------------|------------------------------------:|
+| count       |                               3,886 |
+| mean        |                                 810 |
+| std         |                               4,753 |
+| min         |                                   1 |
+| 25%         |                                  35 |
+| 50%         |                                  88 |
+| 75%         |                                 298 |
+| max         |                             132,226 |
+| total       |                           3,148,010 |
+| var_coeff   |                                   6 |
+| range       |                             132,225 |
+| IQ_range    |                                 263 |
+| upper_fence |                                 692 |
+| lower_fence |                                -359 |
 
-## Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
+### Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
 
-- Saving `adj_form_lower` descriptive statististics for stats_all-frq_adj-x-adv_thr0-001p.35f as csv...
+- Saving `adj_form_lower` descriptive statististics for`stats_all-frq_adj-x-adv_thr0-001p.35f` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBdirect/descriptive_stats/ADJ-stats_all-frq_adj-x-adv_thr0-001p.35f.csv`
   - time elapsed: 00:00:00.99
 
@@ -62,22 +62,22 @@ Sample `adj_form_lower` Stats
 | free             | 1,001 |    6 |  44 |   0 |   0 |   0 |   0 | 617 | 5,837 |         7 |   617 |        0 |           0 |           0 |              1 |              1 |
 | stingy           | 1,001 |    0 |   2 |   0 |   0 |   0 |   0 |  42 |   144 |        14 |    42 |        0 |           0 |           0 |              1 |              1 |
 
-|             | Summed Across adj_form_lowers |
-|:------------|------------------------------:|
-| count       |                         1,001 |
-| mean        |                         3,145 |
-| std         |                        25,328 |
-| min         |                             1 |
-| 25%         |                            16 |
-| 50%         |                            49 |
-| 75%         |                           205 |
-| max         |                       526,827 |
-| total       |                     3,148,010 |
-| var_coeff   |                             8 |
-| range       |                       526,826 |
-| IQ_range    |                           189 |
-| upper_fence |                           488 |
-| lower_fence |                          -268 |
+|             | `RBdirect`: `adj_form_lower` totals |
+|:------------|------------------------------------:|
+| count       |                               1,001 |
+| mean        |                               3,145 |
+| std         |                              25,328 |
+| min         |                                   1 |
+| 25%         |                                  16 |
+| 50%         |                                  49 |
+| 75%         |                                 205 |
+| max         |                             526,827 |
+| total       |                           3,148,010 |
+| var_coeff   |                                   8 |
+| range       |                             526,826 |
+| IQ_range    |                                 189 |
+| upper_fence |                                 488 |
+| lower_fence |                                -268 |
 
 Heatmap saved to:
 
@@ -116,9 +116,9 @@ Heatmap saved to:
 
 ## _ALL_ (`RBdirect` and non-`RBdirect`) Frequencies Overview
 
-## Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
+### Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
 
-- Saving `adv_form_lower` descriptive statististics for stats_all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adv_form_lower` descriptive statististics for`stats_all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBXadj/descriptive_stats/ADV-stats_all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.530
 
@@ -133,26 +133,26 @@ Sample `adv_form_lower` Stats
 | eminently        | 3,894 |    3 |  27 |   0 |   0 |   0 |   0 |   909 | 11,180 |         9 |   909 |        0 |           0 |           0 |              1 |              1 |
 | outright         | 3,894 |    2 |  12 |   0 |   0 |   0 |   1 |   322 |  7,573 |         6 |   322 |        1 |           2 |          -2 |              1 |              1 |
 
-|             | Summed Across adv_form_lowers |
-|:------------|------------------------------:|
-| count       |                         3,894 |
-| mean        |                        21,388 |
-| std         |                        91,460 |
-| min         |                           870 |
-| 25%         |                         1,637 |
-| 50%         |                         3,466 |
-| 75%         |                        10,673 |
-| max         |                     2,210,387 |
-| total       |                    83,284,343 |
-| var_coeff   |                             4 |
-| range       |                     2,209,517 |
-| IQ_range    |                         9,036 |
-| upper_fence |                        24,227 |
-| lower_fence |                       -11,917 |
+|             | ALL: `adv_form_lower` totals |
+|:------------|-----------------------------:|
+| count       |                        3,894 |
+| mean        |                       21,388 |
+| std         |                       91,460 |
+| min         |                          870 |
+| 25%         |                        1,637 |
+| 50%         |                        3,466 |
+| 75%         |                       10,673 |
+| max         |                    2,210,387 |
+| total       |                   83,284,343 |
+| var_coeff   |                            4 |
+| range       |                    2,209,517 |
+| IQ_range    |                        9,036 |
+| upper_fence |                       24,227 |
+| lower_fence |                      -11,917 |
 
-## Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
+### Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
 
-- Saving `adj_form_lower` descriptive statististics for stats_all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adj_form_lower` descriptive statististics for`stats_all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBXadj/descriptive_stats/ADJ-stats_all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.959
 
@@ -167,22 +167,22 @@ Sample `adj_form_lower` Stats
 | pro              | 1,005 |    1 |  12 |   0 |   0 |   0 |   0 |   259 |  1,299 |         9 |   259 |        0 |           0 |           0 |              1 |              1 |
 | predominant      | 1,005 |    2 |  24 |   0 |   0 |   0 |   0 |   612 |  1,913 |        13 |   612 |        0 |           0 |           0 |              1 |              1 |
 
-|             | Summed Across adj_form_lowers |
-|:------------|------------------------------:|
-| count       |                         1,005 |
-| mean        |                        82,870 |
-| std         |                       581,924 |
-| min         |                           868 |
-| 25%         |                         1,705 |
-| 50%         |                         4,049 |
-| 75%         |                        15,767 |
-| max         |                     9,913,432 |
-| total       |                    83,284,343 |
-| var_coeff   |                             7 |
-| range       |                     9,912,564 |
-| IQ_range    |                        14,062 |
-| upper_fence |                        36,860 |
-| lower_fence |                       -19,388 |
+|             | ALL: `adj_form_lower` totals |
+|:------------|-----------------------------:|
+| count       |                        1,005 |
+| mean        |                       82,870 |
+| std         |                      581,924 |
+| min         |                          868 |
+| 25%         |                        1,705 |
+| 50%         |                        4,049 |
+| 75%         |                       15,767 |
+| max         |                    9,913,432 |
+| total       |                   83,284,343 |
+| var_coeff   |                            7 |
+| range       |                    9,912,564 |
+| IQ_range    |                       14,062 |
+| upper_fence |                       36,860 |
+| lower_fence |                      -19,388 |
 
 Heatmap saved to:
 
@@ -265,9 +265,9 @@ Heatmap saved to:
 | panicked         | 832      | 53      | 153     | ... | 0           | 0            | 0         |
 | oversized        | 854      | 32      | 45      | ... | 0           | 0            | 0         |
 
-## Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
+### Descriptive _Complement_ Statistics for `adj_form_lower` by `adv_form_lower`
 
-- Saving `adv_form_lower` descriptive statististics for stats_diff_RBdirect-all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adv_form_lower` descriptive statististics for`stats_diff_RBdirect-all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBdirect/complement/descriptive_stats/ADV-stats_diff_RBdirect-all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.234
 
@@ -282,26 +282,26 @@ Sample `adv_form_lower` Stats
 | momentarily      | 3,894 |    1 |   3 |   0 |   0 |   0 |   0 |    128 |  2,058 |         6 |    128 |        0 |           0 |           0 |              1 |              1 |
 | therefore        | 3,894 |   13 |  87 |   0 |   0 |   1 |   5 |  3,674 | 50,873 |         7 |  3,674 |        5 |          12 |          -8 |              3 |              2 |
 
-|             | Summed Across adv_form_lowers |
-|:------------|------------------------------:|
-| count       |                         3,894 |
-| mean        |                        20,579 |
-| std         |                        88,045 |
-| min         |                           801 |
-| 25%         |                         1,600 |
-| 50%         |                         3,368 |
-| 75%         |                        10,266 |
-| max         |                     2,196,242 |
-| total       |                    80,136,344 |
-| var_coeff   |                             4 |
-| range       |                     2,195,441 |
-| IQ_range    |                         8,666 |
-| upper_fence |                        23,264 |
-| lower_fence |                       -11,400 |
+|             | _not `RBdirect`_: `adv_form_lower` totals |
+|:------------|------------------------------------------:|
+| count       |                                     3,894 |
+| mean        |                                    20,579 |
+| std         |                                    88,045 |
+| min         |                                       801 |
+| 25%         |                                     1,600 |
+| 50%         |                                     3,368 |
+| 75%         |                                    10,266 |
+| max         |                                 2,196,242 |
+| total       |                                80,136,344 |
+| var_coeff   |                                         4 |
+| range       |                                 2,195,441 |
+| IQ_range    |                                     8,666 |
+| upper_fence |                                    23,264 |
+| lower_fence |                                   -11,400 |
 
-## Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
+### Descriptive _Complement_ Statistics for `adv_form_lower` by `adj_form_lower`
 
-- Saving `adj_form_lower` descriptive statististics for stats_diff_RBdirect-all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
+- Saving `adj_form_lower` descriptive statististics for`stats_diff_RBdirect-all_adj-x-adv_frq-thr0-001p.35f=868+` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBdirect/complement/descriptive_stats/ADJ-stats_diff_RBdirect-all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
   - time elapsed: 00:00:00.535
 
@@ -316,22 +316,22 @@ Sample `adj_form_lower` Stats
 | inconvenient     | 1,005 |    9 |  65 |   0 |   0 |   0 |   1 | 1,310 | 8,651 |         8 | 1,310 |        1 |           2 |          -2 |              2 |              1 |
 | rosy             | 1,005 |    5 |  36 |   0 |   0 |   0 |   0 |   688 | 4,590 |         8 |   688 |        0 |           0 |           0 |              1 |              1 |
 
-|             | Summed Across adj_form_lowers |
-|:------------|------------------------------:|
-| count       |                         1,005 |
-| mean        |                        79,738 |
-| std         |                       566,480 |
-| min         |                           757 |
-| 25%         |                         1,661 |
-| 50%         |                         3,969 |
-| 75%         |                        15,230 |
-| max         |                     9,722,389 |
-| total       |                    80,136,333 |
-| var_coeff   |                             7 |
-| range       |                     9,721,632 |
-| IQ_range    |                        13,569 |
-| upper_fence |                        35,584 |
-| lower_fence |                       -18,692 |
+|             | _not `RBdirect`_: `adj_form_lower` totals |
+|:------------|------------------------------------------:|
+| count       |                                     1,005 |
+| mean        |                                    79,738 |
+| std         |                                   566,480 |
+| min         |                                       757 |
+| 25%         |                                     1,661 |
+| 50%         |                                     3,969 |
+| 75%         |                                    15,230 |
+| max         |                                 9,722,389 |
+| total       |                                80,136,333 |
+| var_coeff   |                                         7 |
+| range       |                                 9,721,632 |
+| IQ_range    |                                    13,569 |
+| upper_fence |                                    35,584 |
+| lower_fence |                                   -18,692 |
 
 Heatmap saved to:
 
