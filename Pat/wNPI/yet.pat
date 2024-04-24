@@ -1,0 +1,3 @@
+pattern { 
+    NPI [lemma="yet"];
+}

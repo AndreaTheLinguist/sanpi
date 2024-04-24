@@ -166,8 +166,12 @@ def count_uniq(series: pd.Series) -> int:
     return len(series.unique())
 
 
-def corners(df, size: int = 5):
+def corners(df, size: int = 5, n_dec: int = None):
+
     _df = df.copy()
+    if n_dec:
+        _df.update(
+            _df.select_dtypes(include='float').apply(np.around, decimals=n_dec, axis=1))
     _df.index.name = _df.index.name or 'rows'
     _df.columns.name = _df.columns.name or 'columns'
     index_name = _df.index.name
@@ -177,9 +181,9 @@ def corners(df, size: int = 5):
     _df = _df.T.reset_index().reset_index().set_index(
         ['index', columns_name]).T
     cdf = pd.concat(
-        [dfs.iloc[:, :size].assign(__='...')
-         .join(dfs.iloc[:, -size:])
-         for dfs in (_df.head(size).T.assign(__='...').T,
+        [d.iloc[:, :size].assign(__='...')
+         .join(d.iloc[:, -size:])
+         for d in (_df.head(size).T.assign(__='...').T,
                      _df.tail(size))])
     cdf = cdf.reset_index().set_index(index_name)
     cdf.pop('index')
@@ -192,28 +196,31 @@ def drop_margins(_df, margin_name='SUM'):
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
 
-def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
+def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # df = df
     desc = df.describe().transpose()
     desc = desc.assign(total=pd.to_numeric(df.sum()),
                        var_coeff=desc['std'] / desc['mean'],
                        range=desc['max'] - desc['min'],
-                       IQ_range=desc['75%'] - desc['25%'])
+                       IQ_range=desc['75%'] - desc['25%'], 
+                       Q_disper=df.apply(quartile_dispersion), 
+                       MAD=df.apply(get_mad))
     desc = desc.assign(upper_fence=desc['75%'] + (desc.IQ_range * 1.5),
                        lower_fence=desc['25%'] - (desc.IQ_range * 1.5))
     # if 'SUM' not in desc.index:
     #     desc = desc.assign(
     #         plus1_geo_mean=df.add(1).apply(stat.geometric_mean),
     #         plus1_har_mean=df.add(1).apply(stat.harmonic_mean))
+    int_cols = {'count', 'min', 'max', 'total', 'range'}
     for col in desc.columns:
-        if col in ('count', 'min', 'max', 'total', 'range'):
+        if col in int_cols:
             desc.loc[:, col] = pd.to_numeric(
                 desc.loc[:, col], downcast='unsigned')
         # if col in ('mean', 'std', 'variance', 'var_coeff'):
         else:
             desc.loc[:, col] = pd.to_numeric(
-                desc.loc[:, col], downcast='float').round(1)
-    desc = desc.rename(columns={'50%': 'median'})
+                desc[col].round(1), downcast='float')
+
     # mean_centr = no_sum_frame - no_sum_frame.mean()
     # mean_stand = no_sum_frame / no_sum_frame.mean()
     # mean_stand_centr = mean_stand - mean_stand.mean()
@@ -221,7 +228,8 @@ def _enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # log2_plus1_trans = no_sum_frame.add(1).apply(np.log2)
     # logn_plus1_trans = no_sum_frame.apply(np.log1p)
 
-    return desc
+    return desc.rename(columns={'50%': 'median', 
+                                'count':'unique_forms'})
 
 
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
@@ -364,49 +372,31 @@ def print_md_table(input_df: pd.DataFrame,
     """
     _df = input_df.copy()
     # FIXME realized this does nothing for markdown tables, which are strings
-    set_pd_display(max_colwidth, max_cols, max_width)
-
+    # set_pd_display(max_colwidth, max_cols, max_width)
+    
     if describe:
         _df = input_df.describe()
+    floatfmt = f"{',' if comma else ''}.{n_dec}f"
+    #FIXME this doesn't actually work. Integers seem to be treated as floats quite often. Could be when they are very large values? i.e. were put into scientific notation?
+    intfmt = ',' if comma else ''
+
+    float_data = _df.select_dtypes(include='float')
+    if any(float_data):
+        _df.update(float_data.apply(pd.to_numeric, downcast='float', axis=1).apply(np.around, decimals=n_dec, axis=1))
+        
     if transpose:
         _df = _df.T
 
-    # if max_colwidth:
-    #     df = df.apply(lambda x: x.st)
-    # replaced by sourcery suggestion below
-    # if n_dec is None:
-    #     md_table = df.to_markdown()
-    # else:
-    #     floatfmt = f'.{n_dec}f'
-    #     if comma:
-    #         floatfmt = f',{floatfmt}'
-    #     if not df.select_dtypes(include='number').empty:
-    #         df.loc[:, df.select_dtypes(include='number').columns] = df.select_dtypes(
-    #             include='number').astype('float')
-    #     md_table = df.to_markdown(floatfmt=floatfmt)
-
-    # whitespace = ' '*indent if indent else ''
-    # print_str = ''
-    # if title:
-    #     print_str += f'\n{whitespace}{title}\n'
-    # print_str += (whitespace
-    #               + md_table.replace('\n', f'\n{whitespace}'))
-
-    floatfmt = f"{',' if comma else ''}.{n_dec}f"
-    num_cols = _df.select_dtypes(include='number').columns.to_list()
-    if any(num_cols):
-        _df.loc[:, num_cols] = _df.loc[:, num_cols].astype(
-            'float').round(n_dec)
-    md_table = _df.to_markdown(floatfmt=floatfmt)
+    #// md_table = _df.to_markdown(tablefmt="grid", floatfmt=floatfmt, numalign='decimal')
+    md_table = _df.to_markdown(floatfmt=floatfmt, intfmt=intfmt)
 
     whitespace = ' ' * indent
     print_str = f"{whitespace}{title}\n{whitespace}" if title else ''
-    print_str += md_table.replace('\n', f'\n{whitespace}')
+    print_str += md_table.replace('\n', f'\n{whitespace}') + '\n'
 
     if suppress:
         return print_str
     print(print_str)
-    return ''
 
 
 def set_pd_display(max_colwidth, max_cols, max_width):
@@ -754,7 +744,7 @@ def set_axes(_df, index_name='adj_form_lower', columns_name='adv_form_lower'):
 def set_count_dtype(df, df_save_path: Path = None):
     df = df.apply(pd.to_numeric, downcast='unsigned')
     # BUG There may be an issue with this selecting the wrong dtype and fucking up large numbers again.
-    uniq_dt = [str(d) for d in df.dtypes.unique()]
+    # uniq_dt = [str(d) for d in df.dtypes.unique()]
     # if len(uniq_dt) > 1:
     #     uniq_dt.sort()
     #     df = df.astype(uniq_dt[-1])
@@ -897,3 +887,44 @@ class Timer:
 
     def elapsed(self):
         return get_proc_time(self.start, pd.Timestamp.now())
+
+
+def quartile_dispersion(X: pd.Series=None):
+    """
+    Calculates the Quartile Dispersion Coefficient of a given pandas Series.
+
+    Args:
+        X: pandas Series. The input data for which the Quartile Dispersion Coefficient is to be calculated.
+
+    Returns:
+        float. The Quartile Dispersion Coefficient of the input data.
+
+    suggested use: 
+        df['Q_disp_coeff'] = df.apply(quartile_dispersion)
+    """
+    
+    #! if `Q3` is (also) 0, values will be undefined
+    iX = X.add(1).describe()
+    Q1 = iX['25%']
+    Q3 = iX['75%']
+    
+    return (Q3 - Q1) / (Q3 + Q1)
+
+
+def get_mad(X: pd.Series):
+    """
+    Calculates the Median Absolute Deviation (MAD) of a given pandas Series.
+
+    Args:
+        X: pandas Series. The input data for which MAD is to be calculated.
+
+    Returns:
+        float. The Median Absolute Deviation (MAD) of the input data.
+
+    suggested use: 
+        df['MAD'] = df.apply(get_mad)
+    """
+
+    medX = X.median()
+    abs_dev = X.apply(lambda x: x - medX).abs()
+    return abs_dev.median()

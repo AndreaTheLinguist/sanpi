@@ -11,9 +11,9 @@
 
 ## _`POSmirror`_ Frequencies Overview
 
-## Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
+### Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
 
-- Saving `adv_form_lower` descriptive statististics for stats_all-frq_adj-x-adv_thr0-001p.35f as csv...
+- Saving `adv_form_lower` descriptive statististics for`stats_all-frq_adj-x-adv_thr0-001p.35f` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/POSmirror/descriptive_stats/ADV-stats_all-frq_adj-x-adv_thr0-001p.35f.csv`
   - time elapsed: 00:00:00.838
 
@@ -45,9 +45,9 @@ Sample `adv_form_lower` Stats
 | upper_fence |                           528 |
 | lower_fence |                          -268 |
 
-## Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
+### Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
 
-- Saving `adj_form_lower` descriptive statististics for stats_all-frq_adj-x-adv_thr0-001p.35f as csv...
+- Saving `adj_form_lower` descriptive statististics for`stats_all-frq_adj-x-adv_thr0-001p.35f` as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/POSmirror/descriptive_stats/ADJ-stats_all-frq_adj-x-adv_thr0-001p.35f.csv`
   - time elapsed: 00:00:00.351
 
@@ -116,7 +116,7 @@ Heatmap saved to:
 
 ## _ALL_ (`POSmirror` and non-`POSmirror`) Frequencies Overview
 
-## Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
+### Descriptive Statistics for `adj_form_lower` by `adv_form_lower`
 
 - Saving `adv_form_lower` descriptive statististics for stats_all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBXadj/descriptive_stats/ADV-stats_all_adj-x-adv_frq-thr0-001p.35f=868+.csv`
@@ -150,7 +150,7 @@ Sample `adv_form_lower` Stats
 | upper_fence |                        24,227 |
 | lower_fence |                       -11,917 |
 
-## Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
+### Descriptive Statistics for `adv_form_lower` by `adj_form_lower`
 
 - Saving `adj_form_lower` descriptive statististics for stats_all_adj-x-adv_frq-thr0-001p.35f=868+ as csv...
   - successfully saved as `/share/compling/projects/sanpi/results/freq_out/RBXadj/descriptive_stats/ADJ-stats_all_adj-x-adv_frq-thr0-001p.35f=868+.csv`

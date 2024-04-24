@@ -9,7 +9,7 @@ import re
 
 import pandas as pd
 from utils import (cols_by_str, confirm_dir,  # pylint: disable=import-error
-                   count_uniq, file_size_round, find_glob_in_dir,
+                   file_size_round, find_glob_in_dir,
                    get_proc_time, print_iter, print_md_table, save_table,
                    sort_by_margins, unpack_dict, Timer)
 from utils.LexicalCategories import (  # pylint: disable=import-error
@@ -388,7 +388,7 @@ def _print_uniq_cols_count(df: pd.DataFrame,
         # [ ] if certain `adv_form_lower` and `adj_form_lower` have both been added to any frame this is called on, change to `.endswith('form_lower')`
         cols = df.columns[df.columns.str.contains('_form')]
     counts_info = {
-        c.upper(): count_uniq(df[c])
+        c.upper(): df[c].nunique()
         for c in cols
     }
     str_len = len(max(counts_info.keys()))

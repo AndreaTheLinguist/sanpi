@@ -1,3 +1,0 @@
-pattern { 
-    NPI [lemma="ever"];
-}
