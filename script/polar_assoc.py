@@ -43,16 +43,16 @@ def _main():
 
     ex_data = data.filter(like='extra', axis=0)
     if args.verbose:
-        ex_data.index.to_series().apply(
-            lambda i:
-                print_ex_assoc(
-                    ex_data.frame[i], ex_data.unit[i],
-                    sort_by=set_selector_column(
-                        ex_data.frame[i].columns,
-                        ['conservative_log_ratio', 'conserv_log_r',
-                         'am_odds_ratio_disc', 'odds_r_disc'])
-                )
-        )
+        for i, assoc_inquiry in enumerate(ex_data.index):
+            idf = ex_data.frame.iat[i]
+            print_ex_assoc(
+                idf, ex_data.unit.iat[i],
+                sort_by=set_selector_column(
+                    idf.columns,
+                    ['conservative_log_ratio', 'conserv_log_r',
+                        'am_odds_ratio_disc', 'odds_r_disc'])
+            )
+
     if args.skew:
 
         get_skews(ex_data, args.verbose)
@@ -866,6 +866,61 @@ def _save_dataframe(out_path: Path,
             return
 
     _write_df(out_path, _df)
+
+
+def print_ex_assoc(df: pd.DataFrame,
+                  count_type:str=None,
+                  example_key:str=None,
+                  round_level:int=2,
+                  sort_by:str='am_p1_given2',
+                  columns_like=r'^([^ECORr_]|E11)',
+                  max_examples:int=8,
+                  regex=False) -> None:
+    """
+    Prints examples of associated words from a DataFrame based on specified criteria.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the data.
+        count_type (str, optional): The type of count to use for selecting examples. Defaults to None.
+        example_key (str, optional): The key to use for selecting examples. Defaults to None.
+        round_level (int, optional): The level of rounding to apply. Defaults to 2.
+        sort_by (str, optional): The column to sort the examples by. Defaults to 'am_p1_given2'.
+        columns_like: (str, optional): Regular expression pattern to match column names. Defaults to r'^([^ECORr_]|E11)'.
+        max_examples (int, optional): The maximum number of examples to display. Defaults to 8.
+        regex (bool, optional): Whether to use regex pattern matching. Defaults to False.
+
+    Returns:
+        None
+
+    Examples:
+        print_ex_assoc(df, count_type='bigram', example_key='that_', round_level=2, sort_by='am_p1_given2', columns_like=r'^([^ECORr_]|E11)', max_examples=8, regex=False)
+    """
+
+    if not example_key:
+        example_keys = {'bigram': 'that_',
+                        'adv': 'exactly',
+                        'adj': 'better',
+                        'adv~adj': 'slightly',
+                        '': 'slightly'}
+        example_key = example_keys[count_type]
+    if regex:
+        example = df.round(round_level).filter(axis=0, regex=example_key)
+    else:
+        example = df.round(round_level).filter(axis=0, like=example_key)
+    if sort_by not in example.columns:
+        sort_by = example.columns.iloc[0]
+    example = example.sort_values(
+        sort_by, ascending=sort_by.startswith(('r_', 'l')))
+    example = example.filter(regex=columns_like).sort_index(axis=1).head(max_examples)
+    if example.empty:
+        print(f'🤷 No {count_type} match {example_key}')
+    else:
+        transpose = example.shape[0] < example.shape[1] * .75
+        print_md_table(
+            example.select_dtypes(include='number'),
+            transpose=transpose, n_dec=round_level,
+            title=f'\n### {count_type.capitalize()} "{example_key}" examples sorted by `{sort_by}` column\n')
+    print('\n---')
 
 
 if __name__ == '__main__':
