@@ -5,14 +5,26 @@ import statistics as stat
 from collections import namedtuple
 from pathlib import Path
 
-# import numpy as np
+from numpy import format_float_positional as np_floatfmt
 import pandas as pd
-from source.utils import (  # pylint: disable=import-error; //select_cols, set_pd_display,
-    cols_by_str, confirm_dir, count_uniq, find_glob_in_dir, get_proc_time,
-    percent_to_count, print_iter, print_md_table, save_table,
-    select_pickle_paths, sort_by_margins, unpack_dict, Timer, PKL_SUFF)
-from source.utils.visualize import heatmap  # pylint: disable=import-error
 
+try:
+    from source.utils.visualize import heatmap  # pylint: disable=import-error
+except ModuleNotFoundError:
+    from utils import (PKL_SUFF, Timer,  # pylint: disable=import-error
+                       cols_by_str, confirm_dir, count_uniq, find_glob_in_dir,
+                       get_proc_time, percent_to_count, print_iter,
+                       print_md_table, save_table, select_pickle_paths,
+                       sort_by_margins, unpack_dict)
+    from utils.visualize import heatmap
+else:
+    from source.utils import (PKL_SUFF, Timer,  # pylint: disable=import-error
+                              cols_by_str, confirm_dir, count_uniq,
+                              find_glob_in_dir, get_proc_time,
+                              percent_to_count, print_iter, print_md_table,
+                              save_table, select_pickle_paths, sort_by_margins,
+                              unpack_dict)
+pd.set_option("display.float_format", '{:,.3f}'.format)
 LOAD_TUPLE = namedtuple(
     'Data_Load_Info',
     ['nfiles', 'frq_thr', 'stage', 'frame_path', 'index_path'])
@@ -22,15 +34,18 @@ PATHS_TUPLE = namedtuple(
 
 # ^ #[ ] there is a lot of overlap in the methods between this module and `count_bigram`--consolidate somehow?
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
-_MIN_MEDIAN = 5
 _MAX_TOK_PER_SENT = 250
-_MIN_THRESH_COUNT = 2
+
+# don't remove too much
 _MIN_TOK_KEEP_RATIO = 0.15
-_KEEP_ALLOWANCE_RATIO = 0.99
 _ADV_KEEP_REQ = 20
 _ADJ_KEEP_REQ = 40
-_CROSS_LABEL = 'adj-x-adv'
+# don't remove too little
+_MIN_THRESH_COUNT = 2
+_KEEP_ALLOWANCE_RATIO = 0.995
+_MIN_MEDIAN = 3
 
+_CROSS_LABEL = 'adj-x-adv'
 _DF_FILE_PREF = 'bigrams'
 _IX_FILE_PREF = 'bigram-index'
 
@@ -43,15 +58,16 @@ regex_path_from_hit_id = re.compile(
 def _main():
     print(pd.Timestamp.now().ctime())
     (n_files, percent_thresh, data_dir,
-     post_proc_dir, frq_out_dir, frq_groups, get_stats) = _parse_args()
+     post_proc_dir, frq_out_dir, frq_groups,
+     stats_requested) = _parse_args()
     frq_out_stem = get_freq_out_stem(
         cross_label=_CROSS_LABEL, group_code='',
         freq_meta_tag=(f'{frq_thr_tag(percent_thresh, n_files)}'))
     if frq_out_path := find_glob_in_dir(
-            frq_out_dir, f'*{frq_out_stem}*{_PKL_SUFF}'):
+            frq_out_dir, f'*{frq_out_stem}*{PKL_SUFF}'):
         print('Crosstabulated frequencies for bigram word types already exist:',
               f'\n⇰  {frq_out_path}')
-        if get_stats:
+        if stats_requested:
             describe_counts(frq_out_path)
         print('~ Exiting ~')
         return
@@ -59,12 +75,11 @@ def _main():
     df = prepare_hit_table(n_files=n_files,
                            tok_thresh_p=percent_thresh,
                            post_proc_dir=post_proc_dir,
-                           data_dir=data_dir,
-                           verbose=True
-                           )  # ! #HACK -- remove for full data processing
+                           data_dir=data_dir
+                           )
+    # ! #HACK -- remove for full data processing
     _summarize_hits(df)
-    if not frq_groups:
-        frq_groups = ['all']
+    frq_groups = frq_groups or ['all']
 
     for group in frq_groups:
 
@@ -74,7 +89,7 @@ def _main():
         _t1 = pd.Timestamp.now()
         print('[ Time to process frequencies:', get_proc_time(_t0, _t1), ']')
 
-        if get_stats:
+        if stats_requested:
             describe_counts(frq_df_path, frq_df)
         else:
             print('~ Note: full descriptive statistics not calculated. To retrieve, simply rerun with same arguments + `-s` or `--get_stats` ~')
@@ -84,7 +99,8 @@ def _main():
                            title='### Summary Statistics for Marginal Frequencies ###')
 
             print_md_table(
-                frq_df.iloc[0:21, 0:16], title='### Top 20 Adjectives by Top 15 Adverbs ###')
+                frq_df.iloc[0:21, 0:16],
+                title='\n### Top 20 Adjectives by Top 15 Adverbs ###', )
 
 
 def _parse_args():
@@ -107,7 +123,7 @@ def _parse_args():
         '-t',
         '--percent_hits_threshold',
         type=float,
-        default=0.01,
+        default=0.001,
         help=('Minimum frequency threshold of hits per word type (in summation) for it to be included. '
               '**Specified as PERCENTAGE of total (cleaned) hits, not as explicit integer of hits!** '
               'Any adverb or adjective form which does not meet this minimum frequency '
@@ -154,17 +170,24 @@ def _parse_args():
     )
 
     args = parser.parse_args()
-    print_md_table(
-        pd.Series(dict(list(args._get_kwargs()))).to_frame('arguments given'))
-    return (args.n_files, args.percent_hits_threshold, args.data_dir,
-            args.post_proc_dir.resolve(), args.frq_out_dir.resolve(), set(args.frq_groups), args.get_stats)
+    arg_dict = dict(list(args._get_kwargs()))
+    arg_dict['percent_hits_threshold'] = np_floatfmt(
+        float(arg_dict['percent_hits_threshold']))
+    print_md_table(pd.Series(arg_dict).to_frame('arguments given'), indent=2)
+
+    return (args.n_files,
+            float(args.percent_hits_threshold),
+            args.data_dir,
+            args.post_proc_dir.resolve(),
+            args.frq_out_dir.resolve(),
+            set(args.frq_groups),
+            args.get_stats)
 
 
 def prepare_hit_table(n_files: int,
                       tok_thresh_p: float,
                       post_proc_dir: Path,
-                      data_dir: Path,
-                      verbose: False):
+                      data_dir: Path):
     partial_run = n_files < len(list(data_dir.glob('*hits.pkl.gz')))
     print(f"# Collecting {'sample ' if partial_run else ''}"
           "vocabulary frequencies for",
@@ -173,13 +196,13 @@ def prepare_hit_table(n_files: int,
     _t0 = pd.Timestamp.now()
     print('\n## Loading data...')
 
-    checkpts_iter = generate_paths(n_files, tok_thresh_p, post_proc_dir)
+    checkpt_tuple = tuple(generate_paths(n_files, tok_thresh_p, post_proc_dir))
 
     # * Load any prior processing
     # > iterate through "check points" (data output post-cleaning or post-frequency filtering)
     #! generator yields "frequency filter" check point information first
 
-    for check_pt in checkpts_iter:
+    for check_pt in checkpt_tuple:
         print(f'Checking for prior {check_pt.stage}ing outputs...')
         df = _load_from_priors(data_dir, check_pt)
 
@@ -199,59 +222,65 @@ def prepare_hit_table(n_files: int,
             return df
 
         # > no prior processing for exact parameters
-        elif not any(df):
+        else:
+            
+            if not any(df):
 
-            # > look for prior cleaning records
-            index_values, nfiles_in_filter = seek_prior_processing(
-                check_pt.index_path, check_pt.nfiles)
+                # > look for prior cleaning records
+                index_values, nfiles_in_filter = seek_prior_processing(
+                    check_pt.index_path, check_pt.nfiles)
 
-            df = _load_data(n_files, data_dir, index_values, nfiles_in_filter)
+                df = _load_data(n_files, data_dir, index_values, nfiles_in_filter)
 
-            if df.index.name != 'hit_id':
-                try:
-                    df = df.set_index('hit_id')
-                except KeyError:
-                    exit(
-                        'ERROR: 🚫 `hit_id` information not found! Check arguments and try again.')
+                if df.index.name != 'hit_id':
+                    try:
+                        df = df.set_index('hit_id')
+                    except KeyError:
+                        exit(
+                            'ERROR: 🚫 `hit_id` information not found! Check arguments and try again.')
 
-            if nfiles_in_filter < n_files:
-                print(f'\n> {len(df):,} starting hits')
-                show_interim_summary(df, raw=True)
-                df = _get_clean_data(df)
+                if nfiles_in_filter < n_files:
+                    print(f'\n> {len(df):,} starting hits')
+                    show_interim_summary(df, raw=True)
+                    df = _get_clean_data(df)
 
-            else:
-                print(
-                    '== Loaded data already filtered to account for cleaning of given data. Cleaning skipped. ==')
+                else:
+                    print(
+                        '== Loaded data already filtered to account for cleaning of given data. Cleaning skipped. ==')
 
             save_filter_index(check_pt.index_path, df)
-            # save_table(df,
-            #            path_str=str(cleaned_path).replace(pkl_suff, ''),
-            #            df_name="cleaned bigrams")
+            if tok_thresh_p == 0:
+                save_table(df,
+                           save_path=str(check_pt.frame_path).replace(PKL_SUFF, ''),
+                           df_name="cleaned bigrams (no frequency filtering)")
+                
         # > summarize clean hits
         print_md_table(df.loc[:, df.columns != 'token_str'],
                        title='Clean Hits Summary (`token_str` excluded)',
                        indent=2, describe=True, transpose=True)
         print_md_table(_describe_str_adx_counts(df), indent=2,
                        title='## Clean Word Stats Summary')
+        if tok_thresh_p != 0:
+            df, adx_lower_df = confirm_form_lower_columns(df)
 
-        df, adx_lower_df = confirm_form_lower_columns(df)
+            # > drop infrequent adv & adj lemmas
+            adx_lower_df = _drop_infreq(adx_lower_df, tok_thresh_p)
 
-        # > drop infrequent adv & adj lemmas
-        adx_lower_df = _drop_infreq(adx_lower_df, tok_thresh_p)
+            # > save index (.txt) for frequency filter
+            save_filter_index(freq_filt_paths.index, adx_lower_df)
 
-        # > save index (.txt) for frequency filter
-        save_filter_index(freq_filt_paths.index, adx_lower_df)
+            # > save full filtered dataframe (pkl.gz)
+            df = df.loc[adx_lower_df.index, :]
 
-        # > save full filtered dataframe (pkl.gz)
-        df = df.loc[adx_lower_df.index, :]
-
-        # tok_thresh_c = infer_count_thresh(df)
-        save_table(
-            df,
-            str(freq_filt_paths.frame).replace(_PKL_SUFF, '').strip('.'),
-            f'frequency restrictred bigrams ({infer_count_floor(df)}+ frequency threshold)')
-        # print(
-        # f'frequency restrictred bigrams ({infer_count_thresh(df)}+ frequency threshold)')
+            # tok_thresh_c = infer_count_thresh(df)
+            save_table(
+                df,
+                save_path=(str(freq_filt_paths.frame)
+                           .replace(PKL_SUFF, '').strip('.')),
+                df_name=('frequency restrictred bigrams '
+                         f'({infer_count_floor(df)}+ frequency threshold)'))
+            # print(
+            # f'frequency restrictred bigrams ({infer_count_thresh(df)}+ frequency threshold)')
 
     _t1 = pd.Timestamp.now()
     print('✓ time:', get_proc_time(_t0, _t1))
@@ -279,7 +308,7 @@ def _load_from_priors(data_dir, check_pt):
         if check_pt.stage != 'clean' or df.size < 850000:
             save_table(
                 df=df,
-                save_path=str(check_pt.frame_path).strip(_PKL_SUFF),
+                save_path=str(check_pt.frame_path).strip(PKL_SUFF),
                 df_name=f'{stage}ed dataframe')
     if any(df):
         print(f'> Loaded data already accounts for {stage}ing.')
@@ -292,9 +321,9 @@ def generate_paths(n_files: int,
 
     confirm_dir(post_proc_dir)
 
-    stage_tags = {
-        'frequency filter': frq_thr_tag(tok_thresh_p, n_files),
-        'clean': get_clean_tag(n_files)}
+    stage_tags = {'clean': get_clean_tag(n_files)}
+    if tok_thresh_p != 0: 
+        stage_tags['frequency filter'] = frq_thr_tag(tok_thresh_p, n_files)
 
     for stage, file_base in stage_tags.items():
         # tuple example:
@@ -310,7 +339,7 @@ def generate_paths(n_files: int,
 
 def get_path_to_frame(post_proc_dir, file_base):
     return post_proc_dir.joinpath(
-        f'{_DF_FILE_PREF}_{file_base}.{_PKL_SUFF}')
+        f'{_DF_FILE_PREF}_{file_base}{PKL_SUFF}')
 
 
 def get_path_to_index(post_proc_dir, file_base):
@@ -327,9 +356,10 @@ def nfiles_tag(n_files):
     return f'{n_files}f'
 
 
-def frq_thr_tag(tok_thresh_p: float, n_files: int) -> str:
-    thresh_str = re.sub(r'\.', '-', str(tok_thresh_p))
-    return f'frq-thr{thresh_str}p.{n_files}f'
+def frq_thr_tag(tok_thresh_p: float,
+                n_files: int) -> str:
+    thr_str = re.sub(r'\.', '-', np_floatfmt(tok_thresh_p))
+    return f'frq-thr{thr_str}p.{n_files}f'
 
 
 def _load_prior_table(check_point: tuple  # Data_Load_Info
@@ -363,7 +393,7 @@ def _load_prior_table(check_point: tuple  # Data_Load_Info
 
 
 def set_thresh_message(check_point):
-    return (f' and {check_point.frq_thr}% threshold'
+    return (f' and {np_floatfmt(check_point.frq_thr)}% threshold'
             if check_point.frq_thr
             else '')
 
@@ -378,12 +408,10 @@ def load_from_txt_index(data_dir: Path,
               f'{check_point.nfiles} files{set_thresh_message(check_point)}.')
         index_txt_path = check_point.index_path
 
-    # table_selections = []
-    # for hit_table_path, _ids in :
-
     # #[x] iter over each pickle and return df with matching indicated index
-    table_selections = (_load_selection(p, i) for (p, i) in locate_relevant_hit_tables(
-        data_dir, index_txt_path))
+    table_selections = (
+        _load_selection(p, i) for (p, i)
+        in locate_relevant_hit_tables(data_dir, index_txt_path))
     return pd.concat(table_selections)
 
 
@@ -414,7 +442,7 @@ def locate_relevant_hit_tables(data_dir, index_txt_path):
         print(f'time to load bigram filter index: {timer.elapsed()}')
 
     for corpus_cue, _ids in gen_corpus_cues(bigram_ids):
-        glob_str = f'*{corpus_cue}*hit*.{_PKL_SUFF}'
+        glob_str = f'*{corpus_cue}*hit*{PKL_SUFF}'
 
         hit_paths = (
             list(condensed_dir.glob(glob_str))
@@ -433,15 +461,15 @@ def gen_corpus_cues(bigram_ids):
         ).astype('string').astype('category')
         print('time to isolate corpus cue values from filtered bigram IDs:',
               timer.elapsed())
-    exit  # ! #HACK TEMP
+
     yield from (
-        (corpus_part, id_df.bigram_id.to_list())
-        for corpus_part, id_df in df.groupby('corpus_cue'))
+        (corpus_part, set(id_df.bigram_id.to_list()))
+        for corpus_part, id_df in df.groupby('corpus_cue', observed=False))
 
 
 def _load_selection(t_path, load_index):
     return select_count_columns(
-        pd.read_pickle(t_path).loc[load_index, :])
+        pd.read_pickle(t_path).loc[list(load_index), :].sort_index())
 
 
 def infer_count_floor(filtered_df: pd.DataFrame) -> int:
@@ -514,7 +542,7 @@ def save_filter_index(index_path: Path, df: pd.DataFrame):
         label_verb = ("cleaning" if "clean" in index_path.stem
                       else "frequency filtering")
 
-        print(f'* Saving list of all {len(hit_id_index)} bigram hit_id',
+        print(f'* Saving list of all {len(hit_id_index):,} bigram hit_id',
               f'values retained after {label_verb} as\n  + {index_path}')
         index_path.write_text('\n'.join(hit_id_index), encoding='utf8')
 
@@ -527,10 +555,10 @@ def _describe_str_adx_counts(df: pd.DataFrame) -> pd.DataFrame:
         for c in df.filter(
             regex=r'^[ab].*(form|lemma|lower)$'
         ).columns
-    #> since `describe()` is run on `value_counts()` output, `count` == num unique values
-    ).rename(columns={'count':'unique'})
-    
-    #> if num_cols - num_rows > 2 
+        # > since `describe()` is run on `value_counts()` output, `count` == num unique values
+    ).rename(columns={'count': 'unique'})
+
+    # > if num_cols - num_rows > 2
     transpose = word_stats.shape[1] - word_stats.shape[0] > 2
 
     return word_stats.transpose() if transpose else word_stats
@@ -906,11 +934,11 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
         # > or if median count for either lemma type is less than 5
         count_stats = _describe_str_adx_counts(update_df)
         try:
-            medians = count_stats['50%']
-        except KeyError: 
-            medians = count_stats.loc['50%',:]
+            adx_medians = count_stats['50%']
+        except KeyError:
+            adx_medians = count_stats.loc['50%', :]
         if (n_remain >= _KEEP_ALLOWANCE_RATIO * clean_total
-                or any(medians < _MIN_MEDIAN)):
+                or any(adx_medians < _MIN_MEDIAN)):
             # > raise percentage threshold --> increase by 1/4
             adjust_str = '◔ Insufficient Reduction: 🔺raising'
             percent *= 1.25
@@ -923,13 +951,13 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
 
             # > if _too many_ hits were dropped...
             if ((n_remain < must_keep)
-                    # keep at least 20 unique adv
-                    or (update_df.loc[:, update_df.columns.str.startswith('adv_')]
-                                .squeeze().nunique() < _ADV_KEEP_REQ)
-                        # was: or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
-                    # keep at least 40 unique adj
-                        or (update_df.loc[:, update_df.columns.str.startswith('adj_')].squeeze().nunique() < _ADJ_KEEP_REQ)
-                        # was: or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
+                        # keep at least 20 unique adv
+                        or (update_df.loc[:, update_df.columns.str.startswith('adv_')]
+                            .squeeze().nunique() < _ADV_KEEP_REQ)
+                    # was: or (count_uniq(update_df.adv_lemma) < _ADV_KEEP_REQ)
+                        # keep at least 40 unique adj
+                    or (update_df.loc[:, update_df.columns.str.startswith('adj_')].squeeze().nunique() < _ADJ_KEEP_REQ)
+                    # was: or (count_uniq(update_df.adj_lemma) < _ADJ_KEEP_REQ)
                     ):
 
                 if not filter_applied and filter_attempt < 5:
@@ -964,7 +992,7 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
             hit_thresh = percent_to_count(percent, clean_total)
             print(f'  {adjust_str} percentage for threshold by 1/4')
             print(f'    updated threshold: {hit_thresh:,} tokens,',
-                  f'      ~{percent:.5}% of initial (clean) hits')
+                  f'      ~{np_floatfmt(percent)}% of initial (clean) hits')
 
     te = pd.Timestamp.now()
     print(
@@ -976,7 +1004,7 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
 
     print_md_table(_describe_str_adx_counts(words_df), indent=2)
     remain_str = f'\n>>> {len(words_df):,} total remaining hits <<<'
-    percent_str = f'{round(len(words_df)/clean_total*100, 2)}% of {clean_total} total valid hits.'
+    percent_str = f'{len(words_df)/clean_total*100:.2f}% of {clean_total:,} total valid hits.'
     width = max(len(remain_str), len(percent_str))+2
     print(remain_str.center(width))
     print(percent_str.center(width))
@@ -986,12 +1014,12 @@ def _drop_infreq(words_df, percent) -> pd.DataFrame:
 
 def _confirm_thresh(total, percent):
     hit_thresh = percent_to_count(percent, total)
-    if hit_thresh < _MIN_THRESH_COUNT:
+    if hit_thresh < _MIN_THRESH_COUNT or percent == 0:
         hit_thresh = _MIN_THRESH_COUNT
         percent = hit_thresh / total * 100
         print('Given percentage is too low for noticable reduction.',
               f'Set values to minimum {hit_thresh} hit tokens/word type')
-        print(f'  ≈ {round(percent,6)}% of clean hits')
+        print(f'  ≈ {np_floatfmt(percent)}% of clean hits')
     return percent, hit_thresh
 
 
@@ -1010,7 +1038,7 @@ def _get_update(df, token_thresh):
     update_df = df.loc[indexers[0] & indexers[1], :]
 
     up_st = _describe_str_adx_counts(update_df)
-    if 'max' not in up_st.columns: 
+    if 'max' not in up_st.columns:
         up_st = up_st.T
     up_st = (up_st
              .assign(range=up_st['max'] - up_st['min'],
@@ -1033,7 +1061,8 @@ def _summarize_hits(df):
 
     print_md_table(df, indent=2, describe=True, transpose=True,
                    title='Frequency Filtered Hits Summary',
-                   max_colwidth=40)
+                   max_colwidth=80, format='grid')
+
     print_md_table(wc_summary, indent=2,
                    title='Frequency Filtered Word Type Distributions')
 
@@ -1041,13 +1070,14 @@ def _summarize_hits(df):
 def compare_word_types(df: pd.DataFrame, node: str = 'adj'):
     compare_cols = [f'{node}_{wt}' for wt in ('lemma', 'form_lower', 'form')]
     differ = df[compare_cols[0]] != df[compare_cols[1]]
-    C = df.loc[differ, compare_cols].value_counts(
+    _C = df.loc[differ, compare_cols].value_counts(
         compare_cols
     ).to_frame('tokens').reset_index()
-    C = C.loc[C.tokens > 2, :]
+    _C = _C.loc[_C.tokens > 2, :]
     print_md_table(
-        C.sample(min(20, len(C))).sort_index(),
-        title=f'#### Sample where `{node}_lemma` differs from `{node}_form_lower`')
+        _C.set_index(_C.filter(regex=r'form$').columns[0]
+                     ).nlargest(20, columns='tokens'),
+        title=f'\n#### Most common cases where `{node}_lemma` differs from `{node}_form_lower`')
 
 
 def get_freq_info(df: pd.DataFrame,
@@ -1064,9 +1094,10 @@ def get_freq_info(df: pd.DataFrame,
     frq_out_stem = get_freq_out_stem(
         cross_label=_CROSS_LABEL, group_code=group,
         freq_meta_tag=(f'{frq_thr_tag(percent_thresh, n_files)}'
-                       + f'={infer_count_floor(df)}+'))
+                       + f'={infer_count_floor(df)}+')
+    )
     # > method returns `None` if stem not found
-    frq_df_path = find_glob_in_dir(frq_out_dir, f'*{frq_out_stem}*{_PKL_SUFF}')
+    frq_df_path = find_glob_in_dir(frq_out_dir, f'*{frq_out_stem}*{PKL_SUFF}')
 
     # if crosstabulated frequency table is found
     if frq_df_path:
@@ -1075,7 +1106,7 @@ def get_freq_info(df: pd.DataFrame,
     # if frequency table is not found;
     #   i.e. `f` call returned None
     else:
-        frq_df_path = frq_out_dir.joinpath(f'{frq_out_stem}.{_PKL_SUFF}')
+        frq_df_path = frq_out_dir.joinpath(f'{frq_out_stem}{PKL_SUFF}')
         # sanity check
         # if not frq_df_path.name.endswith('f.csv'):
         #     exit(f'frequency path error: {frq_df_path}')
@@ -1165,7 +1196,7 @@ def _build_frq_df(cross_vectors: list,
         f'[ Time to crosstabulate {cross_label} frequencies: {get_proc_time(_t0, _t1)} ]')
 
     frq_df = sort_by_margins(frq_df, margins_name='SUM')
-    title = (f'{group_code} {freq_table_rows.name} ✕ {freq_table_cols.name} frequency table'
+    title = (f'{group_code} {freq_table_rows.name} × {freq_table_cols.name} frequency table'
              .replace('JxR', 'scale diagnostics'))
     save_table(frq_df,
                str(save_path.resolve()),
@@ -1195,7 +1226,7 @@ def _filter_bigrams(cross_vectors: list):
 def describe_counts(df: pd.DataFrame = None,
                     df_path: Path = None) -> None:
     if not any(df):
-        if df_path.name.endswith(_PKL_SUFF):
+        if df_path.name.endswith(PKL_SUFF):
             df = pd.read_pickle(df_path)
         else:
             print(
