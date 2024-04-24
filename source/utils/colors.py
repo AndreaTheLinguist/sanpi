@@ -3,7 +3,8 @@ import contextlib
 import itertools as it
 from pprint import pprint
 from re import findall as re_findall
-from tabulate import tabulate
+from typing import Iterable, Sequence
+
 import matplotlib as mpl
 import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
@@ -11,11 +12,16 @@ import numpy as np
 from matplotlib import colormaps as mcm
 from matplotlib.colors import LinearSegmentedColormap as gradient_cmap
 from matplotlib.colors import ListedColormap as categorical_cmap
+from tabulate import tabulate
+
 try:
     from source.utils.general import gen_random_array
 except ModuleNotFoundError:
-    from general import gen_random_array
-from typing import Iterable, Sequence
+    try:
+        from utils.general import gen_random_array
+    except ModuleNotFoundError:
+        from general import gen_random_array
+
 
 
 def safe_register(cmap: (mpc.ListedColormap | mpc.LinearSegmentedColormap)

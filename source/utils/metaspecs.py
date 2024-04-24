@@ -13,10 +13,27 @@ import matplotlib as mpl
 import numpy as np
 import pandas as pd
 
-from source.utils import PKL_SUFF, SANPI_HOME, UCS_DIR 
-from source.utils.dataframes import corners, print_md_table
-from source.utils.general import find_glob_in_dir as seek_in_dir, gen_random_array
-from source.utils.general import print_iter, snake_to_camel
+try:
+    from source.utils import PKL_SUFF, SANPI_HOME, UCS_DIR
+    from source.utils import find_glob_in_dir as seek_in_dir
+    from source.utils import gen_random_array 
+except ModuleNotFoundError:
+    try:
+        from utils import PKL_SUFF, SANPI_HOME, UCS_DIR
+        from utils import find_glob_in_dir as seek_in_dir
+        from utils import gen_random_array
+    except ModuleNotFoundError:
+        from dataframes import corners, print_md_table
+        from general import PKL_SUFF, SANPI_HOME, UCS_DIR
+        from general import find_glob_in_dir as seek_in_dir
+        from general import gen_random_array
+    else:
+        from utils.dataframes import corners, print_md_table
+
+else:
+    from source.utils.dataframes import corners, print_md_table
+# from source.utils.general import find_glob_in_dir as seek_in_dir, gen_random_array
+# from source.utils.general import print_iter, snake_to_camel
 
 
 class Bigram(NamedTuple):
