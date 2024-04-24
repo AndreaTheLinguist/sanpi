@@ -327,6 +327,16 @@ def gen_init_ucs_tables(args) -> tuple:
 
 
 def handle_word_null(df, csv_path):
+    """
+    Handles null values in the DataFrame by converting them to the string "null" if present.
+
+    Args:
+        df: The DataFrame to handle null values in.
+        csv_path: The path to the CSV file for potential data reversion.
+
+    Returns:
+        pd.DataFrame: The DataFrame with null values handled appropriately.
+    """
     #! This is necessary because the adjective "null" gets read by pandas as `<NA>`.
     #! Must be manually reset to the string `"null"`
     if any(df.l1.isna() | df.l2.isna()):
@@ -348,6 +358,16 @@ def handle_word_null(df, csv_path):
 
 
 def set_data_keys(df):
+    """
+    Sets data keys for the DataFrame index based on the values in columns l1 and l2.
+
+    Args:
+        df: The DataFrame for which data keys are being set.
+
+    Returns:
+        pd.DataFrame: The DataFrame with data keys set as the index.
+    """
+
     print('> + Creating data keys for index')
 
     unique_l1 = df.l1.nunique()
@@ -372,6 +392,16 @@ def set_data_keys(df):
 
 
 def extend_tables(data, args):
+    """
+    Extends tables in the provided data to include additional association metric columns if necessary.
+
+    Args:
+        data: The data containing tables to be extended.
+        args: The arguments used for extension.
+
+    Returns:
+        pd.DataFrame: The updated data with tables extended as needed.
+    """
 
     # > if any dataframes have not been extended to include additional columns
     if (any(data.stage == 'initial')
@@ -400,6 +430,18 @@ def _extend_assoc_data(data: pd.DataFrame,
                        vocab_size: int = None,
 
                        stage_name: str = 'extra'):
+    """
+    Extends the association data by adding additional entries for a specified stage.
+
+    Args:
+        data (pd.DataFrame): The original data to be extended.
+        verbose (bool, optional): Whether to display verbose output. Defaults to False.
+        vocab_size (int, optional): The vocabulary size. Defaults to None.
+        stage_name (str, optional): The name of the stage for extension. Defaults to 'extra'.
+
+    Returns:
+        pd.DataFrame: The extended data with additional entries for the specified stage.
+    """
 
     init_data = data.copy().loc[data.stage != stage_name]
 
@@ -460,6 +502,18 @@ def process_extensions(init_data: pd.DataFrame,
                        verbose: bool = False,
                        vocab_size_dict: dict = None,
                        ):
+    """
+    Processes extensions for the initial data by creating new entries with additional measures.
+
+    Args:
+        init_data (pd.DataFrame): The initial data to be extended.
+        stage_name (str, optional): The name of the stage for the extensions. Defaults to 'extra'.
+        verbose (bool, optional): Whether to display verbose output. Defaults to False.
+        vocab_size_dict (dict, optional): A dictionary containing vocabulary sizes. Defaults to None.
+
+    Returns:
+        pd.DataFrame: The updated data with new entries containing additional measures.
+    """
 
     # Copy, reassign 'stage', and update index
     data_update = init_data.copy().assign(stage=stage_name)
@@ -485,6 +539,17 @@ def process_extensions(init_data: pd.DataFrame,
 
 def set_selector_column(df_columns: pd.Index,
                         ranked_options: list = None) -> str:
+    """
+    Sets the selector column based on the provided DataFrame columns and ranked options.
+
+    Args:
+        df_columns (pd.Index): The columns of the DataFrame to select from.
+        ranked_options (list, optional): The ranked options for column selection. Defaults to None.
+
+    Returns:
+        str: The selected column based on the ranked options or fallback columns.
+    """
+
     if ranked_options is None:
         ranked_options = []
     fallback = ['observed_f', 'f', 'f_sqrt',
@@ -509,6 +574,13 @@ def set_selector_column(df_columns: pd.Index,
 
 
 def get_skews(data: pd.DataFrame, verbose: bool = False):
+    """
+    Gets skews for the provided data by filtering based on different metrics.
+
+    Args:
+        data (pd.DataFrame): The data to calculate skews for.
+        verbose (bool, optional): Whether to display verbose output. Defaults to False.
+    """
 
     exd = (data.copy()
            .assign(metric='am_p1_given2',
@@ -564,6 +636,19 @@ def _set_outlier_margins(skews: pd.DataFrame,
                          margin_factor: float = OUTLIER_MARGIN_IQR_FACTOR,
                          verbose: bool = False
                          ) -> pd.DataFrame:
+    """
+    Sets outlier margins for the provided DataFrame based on the specified metrics and factors.
+
+    Args:
+        skews (pd.DataFrame): The DataFrame containing skew data.
+        all_metrics (bool, optional): Whether to consider all metrics for setting outlier margins. Defaults to True.
+        margin_factor (float, optional): The factor to determine outlier margins. Defaults to OUTLIER_MARGIN_IQR_FACTOR.
+        verbose (bool, optional): Whether to display verbose output. Defaults to False.
+
+    Returns:
+        pd.DataFrame: The DataFrame with updated outlier margins set.
+    """
+
     #! technically, outlier margin is defined as 1.5 * the interquartile range,
     #!   but I want something more extreme for these cases, so defaults to 2.
     _metrics = skews.metric.unique()
@@ -631,7 +716,22 @@ def id_skewed_combos(df: pd.DataFrame,
                      verbose: bool = False,
                      metric: str = 'am_p1_given2',
                      out_path: Path = None):
+    """
+    Identifies skewed combinations in the provided DataFrame based on specified metrics and thresholds.
 
+    Args:
+        df (pd.DataFrame): The DataFrame to identify skewed combinations in.
+        floor (float, optional): The lower threshold for skew identification. Defaults to -0.8.
+        ceiling (float, optional): The upper threshold for skew identification. Defaults to 0.8.
+        unit (str, optional): The unit type for identification. Defaults to 'bigram'.
+        count_cutoff (int, optional): The count cutoff for displaying skewed counts. Defaults to 5.
+        verbose (bool, optional): Whether to display verbose output. Defaults to False.
+        metric (str, optional): The metric used for skew identification. Defaults to 'am_p1_given2'.
+        out_path (Path, optional): The output path for saving the identified skewed combinations. Defaults to None.
+
+    Returns:
+        pd.DataFrame: The DataFrame containing the identified skewed combinations.
+    """
     keep_columns = ['f', 'E11', 'adv', 'adj', 'l1', 'l2', 'unexpected_count', 'z_score',
                     'am_p1_given2', 'am_p2_given1', 'log_likelihood', 'am_odds_ratio_disc',
                     'conservative_log_ratio', 'unexpected_ratio', 'deltaP_min', 'deltaP_max', 'deltaP_product', 'adv_total', 'adj_total']
@@ -716,6 +816,16 @@ def id_skewed_combos(df: pd.DataFrame,
 
 
 def _set_skew_path(row):
+    """
+    Sets the path for the skew based on the provided row data.
+
+    Args:
+        row: The row data containing information for setting the skew path.
+
+    Returns:
+        Path: The path for the skew based on the row data.
+    """
+
     margin_flag = f"-x{OUTLIER_MARGIN_IQR_FACTOR}"
     metric_label = snake_to_camel(
         re.sub(r'a(m_|tive|tio)|robability', '', row.at['metric']))
@@ -797,6 +907,18 @@ def load_from_csv(csv_path):
 def get_am_df_path(input_path: Path or str,
                    added_measures: bool = False,
                    metric_name: str = None):
+    """
+    Determines the path for the DataFrame based on the input path and additional measures flag.
+
+    Args:
+        input_path (Path or str): The input path for the DataFrame.
+        added_measures (bool, optional): Flag indicating if additional measures are included. Defaults to False.
+        metric_name (str, optional): The name of the metric. Defaults to None.
+
+    Returns:
+        Path: The path for the DataFrame based on the input and settings.
+    """
+
     input_path = Path(input_path)
     nesting = Path(input_path).relative_to(UCS_DIR).parent
     # e.g. for `ucs_tables/polar/RBdirect/bigram/readable/*`,
