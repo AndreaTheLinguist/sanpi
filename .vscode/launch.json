@@ -110,7 +110,7 @@
             ]
         },
         {
-            "name": "🫏💈500 polar_assoc",
+            "name": "🫏💈3k polar_assoc",
             "type": "python",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -119,12 +119,26 @@
             "justMyCode": true,
             "args": [
                 "-m",
-                "500", 
+                "3000", 
                 // "-v"
             ]
         },
         {
-            "name": "🫏💈🪞1000 NEG mirror complement polar_assoc.py",
+            "name": "🫏💈5k polar_assoc",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-m",
+                "5000", 
+                // "-v"
+            ]
+        },
+        {
+            "name": "🫏💈🪞1k NEG mirror complement polar_assoc.py",
             "type": "python",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -148,7 +162,7 @@
             ]
         },
         {
-            "name": "🫏💈🪞1000 ANY mirror complement polar_assoc.py",
+            "name": "🫏💈🪞1k ANY mirror complement polar_assoc.py",
             "type": "python",
             "request": "launch",
             "program": "script/polar_assoc.py",

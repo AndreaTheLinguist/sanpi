@@ -484,3 +484,5 @@ source/**/*edit*
 */source 
 
 .vscode/launch.json
+results/ucs_tables/**/readable/*
+results/ucs_tables/misc/*/*.txt
