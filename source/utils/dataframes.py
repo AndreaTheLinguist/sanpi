@@ -184,7 +184,7 @@ def corners(df, size: int = 5, n_dec: int = None):
         [d.iloc[:, :size].assign(__='...')
          .join(d.iloc[:, -size:])
          for d in (_df.head(size).T.assign(__='...').T,
-                     _df.tail(size))])
+                   _df.tail(size))])
     cdf = cdf.reset_index().set_index(index_name)
     cdf.pop('index')
     cdf = cdf.T.reset_index().set_index(columns_name)
@@ -202,8 +202,8 @@ def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     desc = desc.assign(total=pd.to_numeric(df.sum()),
                        var_coeff=desc['std'] / desc['mean'],
                        range=desc['max'] - desc['min'],
-                       IQ_range=desc['75%'] - desc['25%'], 
-                       Q_disper=df.apply(quartile_dispersion), 
+                       IQ_range=desc['75%'] - desc['25%'],
+                       Q_disper=df.apply(quartile_dispersion),
                        MAD=df.apply(get_mad))
     desc = desc.assign(upper_fence=desc['75%'] + (desc.IQ_range * 1.5),
                        lower_fence=desc['25%'] - (desc.IQ_range * 1.5))
@@ -228,8 +228,8 @@ def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
     # log2_plus1_trans = no_sum_frame.add(1).apply(np.log2)
     # logn_plus1_trans = no_sum_frame.apply(np.log1p)
 
-    return desc.rename(columns={'50%': 'median', 
-                                'count':'unique_forms'})
+    return desc.rename(columns={'50%': 'median',
+                                'count': 'unique_forms'})
 
 
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
@@ -345,11 +345,12 @@ def print_md_table(input_df: pd.DataFrame,
                    comma: bool = True,
                    n_dec: int = 0,
                    suppress: bool = False,
-                   max_colwidth: int = 0,
-                   max_cols: int = 0,
-                   max_width: int = 0,
+                   max_colwidth: int = 60,
+                   max_cols: int = None,
+                   max_width: int = None,
                    describe: bool = False,
-                   transpose: bool = False
+                   transpose: bool = False,
+                   format: str = 'pipe'
                    ) -> None:
     """
     Converts a DataFrame to a markdown table string and prints it (unless printing is suppressed).
@@ -373,30 +374,51 @@ def print_md_table(input_df: pd.DataFrame,
     _df = input_df.copy()
     # FIXME realized this does nothing for markdown tables, which are strings
     # set_pd_display(max_colwidth, max_cols, max_width)
-    
+
     if describe:
         _df = input_df.describe()
     floatfmt = f"{',' if comma else ''}.{n_dec}f"
-    #FIXME this doesn't actually work. Integers seem to be treated as floats quite often. Could be when they are very large values? i.e. were put into scientific notation?
+    # FIXME this doesn't actually work. Integers seem to be treated as floats quite often. Could be when they are very large values? i.e. were put into scientific notation?
     intfmt = ',' if comma else ''
 
     float_data = _df.select_dtypes(include='float')
     if any(float_data):
-        _df.update(float_data.apply(pd.to_numeric, downcast='float', axis=1).apply(np.around, decimals=n_dec, axis=1))
-        
+        _df.update(float_data.apply(pd.to_numeric, downcast='float',
+                   axis=1).apply(np.around, decimals=n_dec, axis=1))
+
     if transpose:
-        _df = _df.T
+        _df = _df.T.convert_dtypes()
 
-    #// md_table = _df.to_markdown(tablefmt="grid", floatfmt=floatfmt, numalign='decimal')
-    md_table = _df.to_markdown(floatfmt=floatfmt, intfmt=intfmt)
-
-    whitespace = ' ' * indent
-    print_str = f"{whitespace}{title}\n{whitespace}" if title else ''
-    print_str += md_table.replace('\n', f'\n{whitespace}') + '\n'
+    # md_table = _df.to_markdown(tablefmt="grid", floatfmt=floatfmt, numalign='decimal')
+    if any(_df.select_dtypes(include='string')):
+        str_cap = int((max_colwidth*2.75)-3)
+        _df.update(
+            _df.loc[:,
+                    _df.astype('string')
+                    .apply(lambda c: max([len(x) for x in c]) > str_cap)]
+            .apply(
+                lambda y: y.apply(
+                    lambda z: (str(z)[:str_cap]
+                               + ('...' if len(z) > str_cap
+                                  else ''))
+                )
+            )
+        )
+    if max_cols and max_cols < _df.shape[1]:
+        _df = _df.iloc[:, int(max_cols//2)].join(_df.iloc[:, -int(max_cols//2)])
+    md_table = _df.to_markdown(floatfmt=floatfmt,
+                               intfmt=intfmt,
+                               maxcolwidths=max_colwidth,
+                               tablefmt=format)
+    title = title.strip('\n')
+    ws = ' ' * indent
+    print_str = f"\n{ws}{title}\n\n{ws}" if title else f'{ws}\n{ws}'
+    print_str += md_table.replace('\n', f'\n{ws}') + '\n'
 
     if suppress:
         return print_str
     print(print_str)
+    return ''
 
 
 def set_pd_display(max_colwidth, max_cols, max_width):
@@ -605,7 +627,8 @@ def save_in_lsc_format(frq_df,
 
     def save_tsv_file(output_tsv_path, output_lines):
         output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
-        print(f'* Simple tab-delimited counts saved as `.tsv`:\n  * path: `{output_tsv_path}`')
+        print(
+            f'* Simple tab-delimited counts saved as `.tsv`:\n  * path: `{output_tsv_path}`')
 
     def show_sample_output(output_lines):
         print('\n## Formatted Output Sample (top 20 bigrams)\n\n```log')
@@ -889,7 +912,7 @@ class Timer:
         return get_proc_time(self.start, pd.Timestamp.now())
 
 
-def quartile_dispersion(X: pd.Series=None):
+def quartile_dispersion(X: pd.Series = None):
     """
     Calculates the Quartile Dispersion Coefficient of a given pandas Series.
 
@@ -902,12 +925,12 @@ def quartile_dispersion(X: pd.Series=None):
     suggested use: 
         df['Q_disp_coeff'] = df.apply(quartile_dispersion)
     """
-    
+
     #! if `Q3` is (also) 0, values will be undefined
     iX = X.add(1).describe()
     Q1 = iX['25%']
     Q3 = iX['75%']
-    
+
     return (Q3 - Q1) / (Q3 + Q1)
 
 
