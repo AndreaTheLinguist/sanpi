@@ -255,7 +255,7 @@ def gen_init_ucs_tables(args) -> tuple:
             print(f'{i}. {unit or "adv ~ adj"} table')
             csv_path = get_associations_csv(
                 unit, args, is_polar=polarity_approx)
-            print(f'  * csv = `{csv_path.relative_to(UCS_DIR)}`\n')
+            print(f'  * csv = `{csv_path.relative_to(RESULT_DIR)}`\n')
             yield unit, csv_path
 
     csv_paths = pd.Series(dict(_prepare_data(args)))
@@ -275,7 +275,7 @@ def gen_init_ucs_tables(args) -> tuple:
         def load_from_pickle(unit, pkl_path, extra: bool = False):
             _extra = "_extra" if extra else ""
             print(f'\n> Loading `{unit}` data',
-                  f'from *{_extra}.pkl.gz: {pkl_path.relative_to(UCS_DIR)}')
+                  f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
             return pd.read_pickle(pkl_path)
 
         if df_extra_path.is_file():
@@ -611,7 +611,7 @@ def get_skews(data: pd.DataFrame, verbose: bool = False):
                 verbose=verbose, unit=new_skews.unit[i].upper(), out_path=new_skews.path[i])
         else:
             print(
-                f'* Skewed Dataframe already exists:\n  * see `{new_skews.path[i].relative_to(UCS_DIR)}`')
+                f'* Skewed Dataframe already exists:\n  * see `{new_skews.path[i].relative_to(RESULT_DIR)}`')
 
     # if verbose:
     #     # skews.index.to_series().apply(
@@ -919,14 +919,14 @@ def get_am_df_path(input_path: Path or str,
     """
 
     input_path = Path(input_path)
-    nesting = Path(input_path).relative_to(UCS_DIR).parent.parent
+    nesting = Path(input_path).relative_to(RESULT_DIR).parent
     # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
     #       nesting == `polar/RBdirect/bigram/readable`
     #       change to --> `polar/RBdirect/bigram`
     if nesting.name == 'readable':
         nesting = nesting.parent
 
-    out_dir = (UCS_DIR.parent / 'assoc_df'
+    out_dir = (RESULT_DIR / 'assoc_df'
                if 'assoc_df' not in nesting.parts
                else UCS_DIR)
 
