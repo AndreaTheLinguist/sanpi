@@ -6,8 +6,14 @@ from pathlib import Path
 from sys import exit as sysxit
 
 # import association_measures.binomial as bn
-import association_measures.frequencies as fq
-import association_measures.measures as am
+try: 
+    import association_measures
+except ModuleNotFoundError: 
+    pass
+    #! This will result in crashes if environment without `association_measures` is used to run methods actually using this import, but handled this way to avoid crashing when it isn't used
+else:
+    import association_measures.frequencies as fq
+    import association_measures.measures as am
 import pandas as pd
 
 from .dataframes import Timer, print_md_table
@@ -22,13 +28,12 @@ _WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 
 
 UCS_DIR, DEMO_UCS_DIR = [
-    R / 'ucs_tables' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
-POLAR_DIR, DEMO_POLAR_DIR = [
-    R / 'polarity_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
+    R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
+AM_ENV_DIR, DEMO_AM_ENV_DIR = [
+    R / 'env_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
 
 # ? Does this even do anything? This is never run as its own thing...
-confirm_dir(RESULT_DIR)
-confirm_dir(POLAR_DIR)
+confirm_dir(AM_ENV_DIR)
 
 
 def adjust_assoc_columns(columns: pd.Index or list, style: str = None) -> list:
@@ -453,7 +458,7 @@ def prep_by_polarity(in_paths_dict: dict,
 
         # // confirm_existing_tsv(tsv_path)
         # 👆 not needed because run on entire dict before this is applied
-        prep_path = POLAR_DIR.joinpath(
+        prep_path = AM_ENV_DIR.joinpath(
             f'{polarity.lower()}_{words_to_keep}_counts{data_suff}')
         try:
             rel_path = tsv_path.relative_to(RESULT_DIR)
@@ -497,7 +502,7 @@ def build_ucs_from_multiple(tsv_paths,
                             save_path: Path = None,
                             debug: bool = False):
     cmd = 'cat'
-    save_path = save_path or f'{POLAR_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
+    save_path = save_path or f'{AM_ENV_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
     if debug:
         cmd = 'head -50'
         save_path = save_path.parent.joinpath(f'debug/debug_{save_path.name}')

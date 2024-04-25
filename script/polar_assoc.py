@@ -1,7 +1,6 @@
 import argparse
 import itertools as itt
 import re
-
 from pathlib import Path
 
 import numpy as np
@@ -9,13 +8,12 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from tabulate import tabulate
 
-from source.utils.associate import (READ_TAG, RESULT_DIR, UCS_DIR, ALPHA,
+from source.utils.associate import (ALPHA, READ_TAG, RESULT_DIR, UCS_DIR,
                                     add_extra_am, adjust_assoc_columns,
                                     get_associations_csv, get_vocab_size)
 from source.utils.dataframes import Timer, corners, print_md_table
 from source.utils.general import (FREQ_DIR, PKL_SUFF, SANPI_HOME, confirm_dir,
                                   run_shell_command, snake_to_camel)
-
 
 RATIO_CEIL = 0.7
 OUTLIER_MARGIN_IQR_FACTOR = 4
@@ -67,6 +65,7 @@ def _parse_args():
         / 'ucs_format'
         / f'diff_all-RBdirect_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
     )
+    #results/freq_out/RBdirect/complement/ucs_format/diff_all-RBdirect_adj-x-adv_frq-thr0-001p.35f=868+.tsv
     # results/freq_out/RBdirect/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv
     _default_negs = (
         FREQ_DIR
@@ -75,7 +74,7 @@ def _parse_args():
         # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
     )
 
-    _default_suff = f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+    _default_suff = f'.{_DEFAULT_CORP_PARTS}f-{_DEFAULT_FRQ_COUNT}c.tsv'
     _default_all = (
         FREQ_DIR
         .joinpath('RBXadj/ucs_format')
@@ -920,18 +919,19 @@ def get_am_df_path(input_path: Path or str,
     """
 
     input_path = Path(input_path)
-    nesting = Path(input_path).relative_to(UCS_DIR).parent
-    # e.g. for `ucs_tables/polar/RBdirect/bigram/readable/*`,
+    nesting = Path(input_path).relative_to(UCS_DIR).parent.parent
+    # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
     #       nesting == `polar/RBdirect/bigram/readable`
     #       change to --> `polar/RBdirect/bigram`
     if nesting.name == 'readable':
         nesting = nesting.parent
 
-    out_dir = (UCS_DIR / 'dataframes'
-               if 'dataframes' not in nesting.parts
+    out_dir = (UCS_DIR.parent / 'assoc_df'
+               if 'assoc_df' not in nesting.parts
                else UCS_DIR)
 
     out_dir = out_dir.joinpath(nesting)
+    confirm_dir(out_dir)
     #! manually set stem, bc `.stem` attribute yields "STEM.pkl" for "STEM.pkl.gz" paths
     output_stem = (
         input_path.name.replace('.csv', '').replace(PKL_SUFF, '')

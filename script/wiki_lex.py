@@ -41,7 +41,7 @@ def _parse_args():
     parser.add_argument(
         '-i','--input',
         type=Path, 
-        default=Path('/share/compling/projects/sanpi/DEMO/results/ucs_tables/dataframes/polar/mirror/extra/polarized-bigram_demo-MIRROR.3f-2thresh_min3x.rsort-view_extra.pkl.gz'),
+        default=Path('/share/compling/projects/sanpi/DEMO/results/assoc_df/polar/NEGmirror/extra/polarized-bigram_demo-MIRROR.3f-2thresh_min3x.rsort-view_extra.pkl.gz'),
         help=('path to dataframe to add "lexicalized" column to. '
               'Must have column "l2" corresponding to the bigram delimited by `_`')
         )

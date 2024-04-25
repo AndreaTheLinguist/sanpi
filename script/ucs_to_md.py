@@ -35,7 +35,7 @@ def _parse_args():
         '-u', '--ucs_text_path',
         type=Path,
         default=Path(
-            '/home/arh234/projects/sanpi/results/ucs_tables/all-frq_thresh8777.35f-min3x.rsort-view_top200.txt'),
+            '/home/arh234/projects/sanpi/results/ucs/all-frq_thresh8777.35f-min3x.rsort-view_top200.txt'),
         help=('path to text version of UCS table to convert')
     )
     parser.add_argument(
