@@ -11,7 +11,8 @@ from tabulate import tabulate
 from source.utils.associate import (ALPHA, READ_TAG, RESULT_DIR, UCS_DIR,
                                     add_extra_am, adjust_assoc_columns,
                                     get_associations_csv, get_vocab_size)
-from source.utils.dataframes import Timer, corners, print_md_table
+from source.utils.dataframes import (Timer, beef_up_dtypes, corners,
+                                     print_md_table)
 from source.utils.general import (FREQ_DIR, PKL_SUFF, SANPI_HOME, confirm_dir,
                                   run_shell_command, snake_to_camel)
 
@@ -65,7 +66,7 @@ def _parse_args():
         / 'ucs_format'
         / f'diff_all-RBdirect_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
     )
-    #results/freq_out/RBdirect/complement/ucs_format/diff_all-RBdirect_adj-x-adv_frq-thr0-001p.35f=868+.tsv
+    # results/freq_out/RBdirect/complement/ucs_format/diff_all-RBdirect_adj-x-adv_frq-thr0-001p.35f=868+.tsv
     # results/freq_out/RBdirect/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv
     _default_negs = (
         FREQ_DIR
@@ -74,13 +75,15 @@ def _parse_args():
         # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
     )
 
-    _default_suff = f'.{_DEFAULT_CORP_PARTS}f-{_DEFAULT_FRQ_COUNT}c.tsv'
+    _default_output_suffix = f'.{_DEFAULT_CORP_PARTS}f-{_DEFAULT_FRQ_COUNT}c.tsv'
     _default_all = (
         FREQ_DIR
         .joinpath('RBXadj/ucs_format')
         .joinpath(f'all_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p'
-                  # f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
-                  + _default_suff))
+                  f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+                  #   + _default_suff
+                  )
+    )
 
     # > set help messages
     min_freq_help = (
@@ -151,7 +154,7 @@ def _parse_args():
         default='negated', help=neg_label_help)
     parser.add_argument(
         '-s', '--data_suffix', type=str,
-        default=_default_suff, help=data_suffix_help)
+        default=_default_output_suffix, help=data_suffix_help)
 
     parser.add_argument(
         '-S', '--skew', default=False, action='store_true',
@@ -177,7 +180,8 @@ def designate_data(args):
 
         print_md_table(data.copy().filter(
             items=['key', 'unit', 'stage', 'path']
-        ).astype('str'), title='\n## Starting Data Specs\n')
+        ).astype('str'), title='\n## Starting Data Specs\n', 
+                       format='grid')
         for ix in data.index:
             df = data.frame[ix]
             count_type = data.unit[ix]
@@ -233,6 +237,15 @@ def designate_data(args):
 
 
 def gen_init_ucs_tables(args) -> tuple:
+    """
+    Generate initial UCS tables for comparison based on the provided arguments.
+
+    Args:
+        args: The arguments used to generate the UCS tables.
+
+    Returns:
+        tuple: A tuple containing information about the generated UCS tables.
+    """
 
     def _prepare_data(args):
         comp_path = args.complement_counts
@@ -261,7 +274,10 @@ def gen_init_ucs_tables(args) -> tuple:
     csv_paths = pd.Series(dict(_prepare_data(args)))
 
     if args.verbose:
-        print_md_table(csv_paths.to_frame('path to `ucs` scores'))
+        print_md_table(csv_paths.apply(lambda p: p.relative_to(RESULT_DIR))
+                       .to_frame('`ucs` scores'),
+                       format='grid',
+                       title=f"UCS Paths relative to `{RESULT_DIR}/`")
 
     def _load_assoc_data(csv_path: Path, unit: str = ''):
 
@@ -293,8 +309,8 @@ def gen_init_ucs_tables(args) -> tuple:
         df = handle_word_null(df, csv_path)
 
         # HACK trying to figure out what's going on with the non-zero decimals for `f` for `most_important`
-        cols_regex = r'^[fOE]|l\d|^observed_f'
-        rows_regex = r'^[A-Z~\w]+.important$'
+        # cols_regex = r'^[fOE]|l\d|^observed_f'
+        # rows_regex = r'^[A-Z~\w]+.important$'
         # print(df.filter(regex=rows_regex, axis=0).filter(regex=cols_regex))
         # print()
         # print_md_table(df.filter(regex=rows_regex, axis=0).filter(regex=cols_regex))
@@ -319,7 +335,7 @@ def gen_init_ucs_tables(args) -> tuple:
             csv_path=csv_paths[unit], unit=unit)
         if not df_path.is_file():
             # > save initial dataframe conversions as optimized pickle
-            _save_optimized(df, df_path, args.verbose)
+            _save_optimized(df, df_path)
         if not unit:
             unit = 'adv~adj'
         yield unit, stage, df_path, df
@@ -410,8 +426,8 @@ def extend_tables(data, args):
              # or there are fewer "extra" entries than there are unique units
              or data.stage.count('extra') < data.unit.nunique())):
 
-        # > do so now
         vocab_size_dict = get_vocab_size(args.all_counts)
+        # > do so now
         data = _extend_assoc_data(
             data, verbose=args.verbose, vocab_size=vocab_size_dict)
         data.loc[data.stage == 'extra', :].index.to_series().apply(
@@ -449,8 +465,9 @@ def _extend_assoc_data(data: pd.DataFrame,
 
     extended = pd.concat([data.loc[data.stage == stage_name], new_extend])
     if (f'bigram_{stage_name}' in extended.index
-        and any(adx_col not in extended.at[f'bigram_{stage_name}', 'frame'].columns
-                        for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
+        and any(adx_col not in
+                extended.at[f'bigram_{stage_name}', 'frame'].columns
+                for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
         ):
 
         if all(adx in extended.unit.unique() for adx in ('adv', 'adj')):
@@ -488,7 +505,7 @@ def _extend_assoc_data(data: pd.DataFrame,
             extended.at[f'bigram_{stage_name}',
                         'frame'] = _optimize(
                             add_adx_info(
-                                extended.copy(), verbose=verbose))
+                                extended.copy()))
         else:
             raise Warning(
                 'Frequency info for adverbs and adjectives not added to polar bigram table')
@@ -524,11 +541,12 @@ def process_extensions(init_data: pd.DataFrame,
         return get_am_df_path(row['path'], added_measures=True)
 
     def get_frame(data_row):
-        extended_df = add_extra_am(data_row['frame'],
+        xdf = beef_up_dtypes(data_row['frame'])
+
+        extended_df = add_extra_am(xdf,
                                    verbose=verbose,
                                    vocab=vocab_size_dict[data_row['unit']])
-        return _optimize(extended_df,
-                         verbose=verbose)
+        return _optimize(extended_df)
 
     # Apply operations
     data_update['path'] = data_update.apply(get_path, axis=1)
@@ -847,9 +865,9 @@ def _set_skew_path(row):
 
 
 def _save_optimized(_df: pd.DataFrame,
-                   path: Path,
-                   added_measures: bool = False,
-                   verbose: bool = False):
+                    path: Path,
+                    added_measures: bool = False,
+                    verbose: bool = False):
 
     out_path = get_am_df_path(path, added_measures)
     _save_dataframe(out_path, _optimize(_df, verbose))
@@ -919,18 +937,22 @@ def get_am_df_path(input_path: Path or str,
     """
 
     input_path = Path(input_path)
-    nesting = Path(input_path).relative_to(RESULT_DIR).parent
+    input_dir = input_path.parent
+    input_dir_nesting = (input_dir.relative_to(UCS_DIR)
+                   if input_dir.is_relative_to(UCS_DIR)
+                   else input_dir.relative_to(RESULT_DIR))
     # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
     #       nesting == `polar/RBdirect/bigram/readable`
     #       change to --> `polar/RBdirect/bigram`
-    if nesting.name == 'readable':
-        nesting = nesting.parent
+    if input_dir_nesting.name == 'readable':
+        input_dir_nesting = input_dir_nesting.parent
 
+    # append `assoc_df` to directory path if nesting does not already include it
     out_dir = (RESULT_DIR / 'assoc_df'
-               if 'assoc_df' not in nesting.parts
-               else UCS_DIR)
+               if 'assoc_df' not in input_dir_nesting.parts
+               else RESULT_DIR)
 
-    out_dir = out_dir.joinpath(nesting)
+    out_dir = out_dir.joinpath(input_dir_nesting)
     confirm_dir(out_dir)
     #! manually set stem, bc `.stem` attribute yields "STEM.pkl" for "STEM.pkl.gz" paths
     output_stem = (
@@ -991,13 +1013,13 @@ def _save_dataframe(out_path: Path,
 
 
 def print_ex_assoc(df: pd.DataFrame,
-                  count_type:str=None,
-                  example_key:str=None,
-                  round_level:int=2,
-                  sort_by:str='am_p1_given2',
-                  columns_like=r'^([^ECORr_]|E11)',
-                  max_examples:int=8,
-                  regex=False) -> None:
+                   count_type: str = None,
+                   example_key: str = None,
+                   round_level: int = 2,
+                   sort_by: str = 'am_p1_given2',
+                   columns_like=r'^([^ECORr_]|E11)',
+                   max_examples: int = 8,
+                   regex=False) -> None:
     """
     Prints examples of associated words from a DataFrame based on specified criteria.
 
@@ -1033,7 +1055,8 @@ def print_ex_assoc(df: pd.DataFrame,
         sort_by = example.columns.iloc[0]
     example = example.sort_values(
         sort_by, ascending=sort_by.startswith(('r_', 'l')))
-    example = example.filter(regex=columns_like).sort_index(axis=1).head(max_examples)
+    example = example.filter(regex=columns_like).sort_index(
+        axis=1).head(max_examples)
     if example.empty:
         print(f'🤷 No {count_type} match {example_key}')
     else:

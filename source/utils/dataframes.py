@@ -117,6 +117,16 @@ def balance_sample(full_df: pd.DataFrame,
 
 
 def calculate_var_coeff(vector: pd.Series):
+    """
+    Calculate the coefficient of variation for a given Series.
+
+    Args:
+        vector (pd.Series): The input Series for which to calculate the coefficient of variation.
+
+    Returns:
+        float: The coefficient of variation.
+    """
+
     return vector.std() / vector.mean()
 
 
@@ -167,6 +177,17 @@ def count_uniq(series: pd.Series) -> int:
 
 
 def corners(df, size: int = 5, n_dec: int = None):
+    """
+    Extract the corner values of a DataFrame and display them in a new DataFrame.
+
+    Args:
+        df: The input DataFrame to extract corner values from.
+        size (int, optional): The number of corner values to display. Defaults to 5.
+        n_dec (int, optional): Number of decimals to round the float values to. Defaults to None.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the corner values extracted from the input DataFrame.
+    """
 
     _df = df.copy()
     if n_dec:
@@ -193,11 +214,58 @@ def corners(df, size: int = 5, n_dec: int = None):
 
 
 def drop_margins(_df, margin_name='SUM'):
+    """
+    Drop marginal frequencies from frequency table DataFrame.
+
+    Args:
+        _df: The input DataFrame.
+        margin_name (str, optional): The name of the margin to drop. Defaults to 'SUM'.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the specified margin dropped.
+    """
+
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
 
+def beef_up_dtypes(df: pd.DataFrame,
+                   integers: bool = True,
+                   floats: bool = True):
+    """
+    Beef up the data types of a DataFrame by converting columns to specified data types.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame to modify.
+        integers (bool, optional): Whether to convert integer columns. Defaults to True.
+        floats (bool, optional): Whether to convert float columns. Defaults to True.
+
+    Returns:
+        pd.DataFrame: The DataFrame with updated data types.
+
+    Examples:
+        df = beef_up_dtypes(df, integers=True, floats=False)
+    """
+
+    if floats:
+        float_cols = df.select_dtypes(include='float').columns
+        df[float_cols] = df[float_cols].astype('float64')
+    if integers:
+        ints = df.select_dtypes(include='int').columns
+        df[ints] = df[ints].astype('int64')
+    return df
+
+
 def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
-    # df = df
+    """
+    Enhance the description of a DataFrame by adding additional statistical metrics.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame for which to enhance the description.
+
+    Returns:
+        pd.DataFrame: The DataFrame with enhanced statistical metrics added to the description.
+    """
+
     desc = df.describe().transpose()
     desc = desc.assign(total=pd.to_numeric(df.sum()),
                        var_coeff=desc['std'] / desc['mean'],
@@ -405,7 +473,8 @@ def print_md_table(input_df: pd.DataFrame,
             )
         )
     if max_cols and max_cols < _df.shape[1]:
-        _df = _df.iloc[:, int(max_cols//2)].join(_df.iloc[:, -int(max_cols//2)])
+        _df = _df.iloc[:, int(max_cols//2)
+                       ].join(_df.iloc[:, -int(max_cols//2)])
     md_table = _df.to_markdown(floatfmt=floatfmt,
                                intfmt=intfmt,
                                maxcolwidths=max_colwidth,
@@ -688,6 +757,22 @@ def save_table(df: pd.DataFrame,
                save_path: Path or str,
                df_name: str = '',
                formats: list = None):
+    """
+    Save a DataFrame to a specified file path in various formats.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to save.
+        save_path (Path or str): The path where the DataFrame will be saved.
+        df_name (str, optional): Name of the DataFrame. Defaults to ''.
+        formats (list, optional): List of formats to save the DataFrame in. Defaults to None.
+
+    Raises:
+        SystemExit: If an absolute path is not provided.
+
+    Examples:
+        save_table(df, '/path/to/save/file.csv', 'my_data', ['csv', 'pickle'])
+    """
+
     _ext = namedtuple('Format', ['ext', 'sep'])
     ext_dict = {
         'pickle': _ext(PKL_SUFF, None),
@@ -805,6 +890,19 @@ def sort_by_margins(crosstab_df, margins_name='SUM'):
 def square_sample(df: pd.DataFrame, n: int = 10,
                   with_margin: bool = True,
                   as_sqrt: bool = False):
+    """
+    Create a square sample DataFrame by selecting a specified number of rows and columns.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame to sample from.
+        n (int, optional): Number of rows and columns to include in the sample. Defaults to 10.
+        with_margin (bool, optional): Whether to include margins in the sample. Defaults to True.
+        as_sqrt (bool, optional): Whether to transform the sample using square root. Defaults to False.
+
+    Returns:
+        pd.DataFrame: The square sample DataFrame.
+    """
+
     _df = drop_margins(df.copy())
     rows = ['SUM'] + _df.index.to_series().sample(n).to_list()
     cols = ['SUM'] + _df.columns.to_series().sample(n).to_list()
@@ -841,6 +939,18 @@ def summarize_text_cols(tdf: pd.DataFrame):
 def transform_counts(df: pd.DataFrame,
                      method: str = 'sqrt',
                      plus1: bool = False):
+    """
+    Transform the counts in a DataFrame using a specified method.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame to transform.
+        method (str, optional): The transformation method to apply. Defaults to 'sqrt'.
+        plus1 (bool, optional): Whether to add 1 before transformation. Defaults to False.
+
+    Returns:
+        pd.DataFrame: The DataFrame with transformed counts.
+    """
+
     _df = df.copy()
     if plus1 or method.startswith('log'):
         _df = _df.add(1)

@@ -1,11 +1,11 @@
 #!/bin/bash
-"""
-Runs a Python script for associating data with specified parameters and options. 
-The script generates logs and executes the association metric processing for different frequency thresholds.
+# Runs a Python script for associating data with specified parameters and options. 
+# The script generates logs and executes the association metric processing for different frequency thresholds.
 
-Args:
-    The script takes optional arguments for the target pattern, comparison type. 
-"""
+# Args:
+#     The script takes optional arguments for the target pattern, comparison type. 
+
+
 SANPI='/share/compling/projects/sanpi'
 FRQ="${SANPI}/results/freq_out"
 TARGET_PAT=${1:-'RBdirect'} # directory name in $FRQ
