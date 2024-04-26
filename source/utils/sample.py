@@ -322,11 +322,11 @@ def _select_columns(data_selection: pd.DataFrame,
     Returns:
         pd.DataFrame: DataFrame with the selected columns.
     """
-
+    df = data_selection.copy()
     if seek_cols:
         index_col_name = data_selection.index.name
-        _df = data_selection.copy().reset_index()
-        existing_cols = _df.columns
+        df = df.reset_index()
+        existing_cols = df.columns
         # if not quiet:
         #     print('\n- *selecting columns...*')
 
@@ -356,15 +356,15 @@ def _select_columns(data_selection: pd.DataFrame,
                 selected_cols.append(index_col_name)
             # > if `selected_cols` was not *only* the index, apply column filter
             if len(selected_cols) != 1: 
-                _df = _df[selected_cols]
+                df = df[selected_cols]
                 
             #! otherwise, do not filter
             #   index will be returned to original:
             #   if column selection contains no other columns, returned `_df` will be empty
         
-        _df = _df.set_index(index_col_name)
+        df = df.set_index(index_col_name)
 
-    return _df
+    return df
 
 
 def read_cue(col_request: str,
