@@ -275,11 +275,11 @@ def _filter_rows(input_data: pd.DataFrame,
                 f = _df.copy()
             else:
                 filter_applied = True
-                input_data = f
+                _df = f
                 if not quiet:
                     print(f'  - ✓ Applied filter: `{filter_str}`')
 
-    return f.set_index(input_indexer), filter_applied
+    return _df.set_index(input_indexer), filter_applied
 
 
 # def _id_filter_matches(target_param, filter_str, regex):
