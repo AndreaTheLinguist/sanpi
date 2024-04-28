@@ -56,7 +56,7 @@
         },
         {
             "name": "sample_pickle test freq_out",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/sample_pickle.py",
             "console": "integratedTerminal",
@@ -173,7 +173,7 @@
         },
         {
             "name": "🫏💈🪞1k MIRROR polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
