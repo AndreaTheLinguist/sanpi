@@ -426,6 +426,21 @@
             ]
         },
         {
+            "name": "count_bigrams 3 0.0015%",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
+            "console": "integratedTerminal",
+            "env": {"PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"},
+            "justMyCode": true,
+            "args": [
+                "-f",
+                "3",
+                "-t",
+                "0.0015",
+            ]
+        },
+        {
             "name": "count_bigrams (2) 0 0️⃣ minimum %",
             "type": "debugpy",
             "request": "launch",
@@ -441,7 +456,7 @@
             ]
         },
         {
-            "name": "count_bigrams (2) 0.0025%",
+            "name": "count_bigrams (2) 0.004%",
             "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
@@ -450,7 +465,7 @@
             "justMyCode": true,
             "args": [
                 "-t",
-                "0.0025",
+                "0.004",
                 "-f",
                 "2"
             ]
