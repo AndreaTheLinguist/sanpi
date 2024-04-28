@@ -6,8 +6,14 @@ from pathlib import Path
 from sys import exit as sysxit
 
 # import association_measures.binomial as bn
-import association_measures.frequencies as fq
-import association_measures.measures as am
+try:
+    import association_measures
+except ModuleNotFoundError:
+    pass
+    #! This will result in crashes if environment without `association_measures` is used to run methods actually using this import, but handled this way to avoid crashing when it isn't used
+else:
+    import association_measures.frequencies as fq
+    import association_measures.measures as am
 import pandas as pd
 
 from .dataframes import Timer, print_md_table
@@ -15,20 +21,21 @@ from .general import (DEMO_RESULT_DIR, RESULT_DIR, SANPI_HOME, camel_to_snake,
                       confirm_dir, print_iter, run_shell_command,
                       snake_to_camel)
 
-ALPHA = 0.0001
+ADDITIONAL_METRICS = ['log_likelihood', 'log_ratio',
+                      't_score', 'mutual_information', 'local_mutual_information']
+ALPHA = 0.005
 READ_TAG = 'rsort-view_am-only'
 _UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
 _WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 
 
 UCS_DIR, DEMO_UCS_DIR = [
-    R / 'ucs_tables' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
-POLAR_DIR, DEMO_POLAR_DIR = [
-    R / 'polarity_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
+    R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
+AM_ENV_DIR, DEMO_AM_ENV_DIR = [
+    R / 'env_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
 
 # ? Does this even do anything? This is never run as its own thing...
-confirm_dir(RESULT_DIR)
-confirm_dir(POLAR_DIR)
+confirm_dir(AM_ENV_DIR)
 
 
 def adjust_assoc_columns(columns: pd.Index or list, style: str = None) -> list:
@@ -53,19 +60,29 @@ def adjust_assoc_columns(columns: pd.Index or list, style: str = None) -> list:
         updated_cols = [camel_to_snake(c) for c in updated_cols]
     return updated_cols
 
+def relative_risk(sc, invert:bool=False): 
+    sc = sc.fillna(0)
+    r = (
+        (sc.O11 * sc.R2) / (sc.O21 * sc.R1)
+         if invert else
+        (sc.O11 * sc.C2) / (sc.O12 * sc.C1)
+         )
+    
+    
+    return r.apply(log)
 
 def add_extra_am(df: pd.DataFrame,
                  verbose: bool = False,
                  vocab: int = None,
-                 ndigits: int = 9):
+                 ndigits: int = 9, 
+                 metrics: list=None):
     """
     ['z_score', 't_score', 'log_likelihood', 'simple_ll', 
     'liddell', 'dice', 'log_ratio', 'conservative_log_ratio', 
     'min_sensitivity', 'mutual_information', 'local_mutual_information']
     """
     #! conservative_log_ratio added separatedly later
-    metrics = ['log_likelihood', 'simple_ll', 'log_ratio',
-               'z_score', 'mutual_information', 'local_mutual_information']
+    metrics = metrics or ADDITIONAL_METRICS
 
     vocab = vocab or df.l1.nunique() + df.l2.nunique()
     init_cols = df.columns.to_list()
@@ -74,8 +91,9 @@ def add_extra_am(df: pd.DataFrame,
         scores = am.score(df.copy(), measures=metrics,
                           alpha=ALPHA, vocab=vocab, digits=ndigits)
     except KeyError:
-        df = df.join(fq.observed_frequencies(df.copy())).join(
-            fq.expected_frequencies(df.copy()))
+        df = df.join(
+            fq.observed_frequencies(df.copy()).astype('int64').join(fq.expected_frequencies(df.copy()).apply(pd.to_numeric, downcast='float'))
+                     )
         scores = am.score(df, measures=metrics, alpha=ALPHA,
                           vocab=vocab, digits=ndigits)
 
@@ -102,12 +120,12 @@ def add_extra_am(df: pd.DataFrame,
     df['f_sqrt'] = df.f.apply(sqrt)
     df['f1_sqrt'] = df.f1.apply(sqrt)
     df['f2_sqrt'] = df.f2.apply(sqrt)
-
+    df = df.loc[:, ~df.columns.isin(df.filter(regex=r'^(ipm|index|log_ratio$)').columns)]
     if verbose:
         print_md_table(
             df.loc[:, ~df.columns.isin(
                 init_cols)].filter(regex=r'^[a-z]').iloc[:10, :8],
-            title='\nPreview of Extended Measures (rounded)\n')
+            title='\nPreview of Extended Measures (rounded)\n', n_dec=2)
         # HACK for when `corners` was crashing due to hidden NaNs
         # print_md_table(df.iloc[:5, :5])
         # print_md_table(df.iloc[-5:, -5:])
@@ -177,6 +195,9 @@ def get_vocab_size(all_bigrams: Path or pd.DataFrame,
     assumes that solo unit vocabs are being compared with binary group and multiplies by 2, 
         but this can be turned off using `polarized=False`.
         In which case the returned dictionary values will need to be adjusted accordingly.
+
+    NOTE: cannot be run on `data.frame['adv~adj_initial']` etc., 
+        because some forms have already been eliminated by frequency filtering
     '''
     if isinstance(all_bigrams, Path):
         all_df = pd.read_csv(all_bigrams, delimiter='\t', header=None)
@@ -453,7 +474,7 @@ def prep_by_polarity(in_paths_dict: dict,
 
         # // confirm_existing_tsv(tsv_path)
         # 👆 not needed because run on entire dict before this is applied
-        prep_path = POLAR_DIR.joinpath(
+        prep_path = AM_ENV_DIR.joinpath(
             f'{polarity.lower()}_{words_to_keep}_counts{data_suff}')
         try:
             rel_path = tsv_path.relative_to(RESULT_DIR)
@@ -497,7 +518,7 @@ def build_ucs_from_multiple(tsv_paths,
                             save_path: Path = None,
                             debug: bool = False):
     cmd = 'cat'
-    save_path = save_path or f'{POLAR_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
+    save_path = save_path or f'{AM_ENV_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
     if debug:
         cmd = 'head -50'
         save_path = save_path.parent.joinpath(f'debug/debug_{save_path.name}')

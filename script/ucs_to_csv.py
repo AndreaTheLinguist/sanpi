@@ -30,7 +30,7 @@ def _parse_args():
         '-u', '--ucs_text_path',
         type=Path,
         default=Path(
-            '/share/compling/projects/sanpi/results/ucs_tables/readable/polarized-bigram_min50x.rsort-view_top500.txt'),
+            '/share/compling/projects/sanpi/results/ucs/readable/polarized-bigram_min50x.rsort-view_top500.txt'),
         help=('path to text version of UCS table to convert')
     )
     parser.add_argument(

@@ -1,4 +1,4 @@
-from .associate import (DEMO_RESULT_DIR, DEMO_UCS_DIR, POLAR_DIR, UCS_DIR,
+from .associate import (DEMO_RESULT_DIR, DEMO_UCS_DIR, AM_ENV_DIR, UCS_DIR,
                         build_ucs_from_multiple, build_ucs_table,
                         convert_ucs_to_csv, prep_by_polarity)
 from .dataframes import *

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 
-UCS_DIR = Path('/share/compling/projects/sanpi/results/ucs_tables')
+UCS_DIR = Path('/share/compling/projects/sanpi/results/ucs')
 pd.set_option('display.max_colwidth', 20)
 pd.set_option('display.max_columns', 8)
 pd.set_option('display.width', 200)

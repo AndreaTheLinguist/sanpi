@@ -243,10 +243,12 @@ def _filter_rows(input_data: pd.DataFrame,
         (pd.DataFrame({"A": [1, 3], "B": [4, 6]}), True)
     """
     filter_applied = False
+    input_indexer = input_data.index.name
+    _df = input_data.copy().reset_index()
     if filter_list:
         if not quiet:
             print(f'\n- *filtering rows...*\n  - regex parsing = {regex}')
-        f = input_data.copy()
+        f = _df.copy()
         for filter_str in filter_list:
             # filter_col, filter_val = filter_str.rsplit('=', 1)
             # op = re.match(r'^.*(.)=.$', filter_str).groups()[0]
@@ -270,14 +272,14 @@ def _filter_rows(input_data: pd.DataFrame,
                 if not quiet:
                     print(
                         f'  - Filter expression `{filter_str}` matched zero rows. Filter not applied.')
-                f = input_data.copy()
+                f = _df.copy()
             else:
                 filter_applied = True
-                input_data = f
+                _df = f
                 if not quiet:
                     print(f'  - ✓ Applied filter: `{filter_str}`')
 
-    return input_data, filter_applied
+    return _df.set_index(input_indexer), filter_applied
 
 
 # def _id_filter_matches(target_param, filter_str, regex):
@@ -320,9 +322,11 @@ def _select_columns(data_selection: pd.DataFrame,
     Returns:
         pd.DataFrame: DataFrame with the selected columns.
     """
-
+    df = data_selection.copy()
     if seek_cols:
-        existing_cols = data_selection.columns
+        index_col_name = data_selection.index.name
+        df = df.reset_index()
+        existing_cols = df.columns
         # if not quiet:
         #     print('\n- *selecting columns...*')
 
@@ -334,7 +338,7 @@ def _select_columns(data_selection: pd.DataFrame,
         sought[~infer] = sought[~infer & found]
         # sought.loc[] = sought.loc[explicit_found]
 
-        selected_cols = sought.explode().drop_duplicates().to_list()
+        selected_cols = sought.explode().drop_duplicates().dropna().to_list()
 
         missing_cols = sought[~infer & ~found]
         if any(missing_cols) and not quiet:
@@ -345,11 +349,22 @@ def _select_columns(data_selection: pd.DataFrame,
                 header='  - Warning: The following requested columns were not found. Selection ignored.',
             )
         if any(selected_cols):
-            # if not quiet:
-            #     print_iter(selected_cols, bullet='-',
-            #                header='  - Column Selection:', indent=6)
-            data_selection = data_selection[selected_cols]
-    return data_selection
+
+            # > check to see if original index has been included
+            # >     if not, add it
+            if index_col_name not in selected_cols: 
+                selected_cols.append(index_col_name)
+            # > if `selected_cols` was not *only* the index, apply column filter
+            if len(selected_cols) != 1: 
+                df = df[selected_cols]
+                
+            #! otherwise, do not filter
+            #   index will be returned to original:
+            #   if column selection contains no other columns, returned `_df` will be empty
+        
+        df = df.set_index(index_col_name)
+
+    return df
 
 
 def read_cue(col_request: str,

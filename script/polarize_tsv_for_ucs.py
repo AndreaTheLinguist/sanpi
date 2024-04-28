@@ -4,14 +4,14 @@ import re
 from pathlib import Path
 from sys import exit as sysxit
 
-from utils.associate import (FREQ_DIR, POLAR_DIR, RESULT_DIR, UCS_DIR,
+from utils.associate import (FREQ_DIR, AM_ENV_DIR, RESULT_DIR, UCS_DIR,
                              build_ucs_from_multiple, prep_by_polarity)
 from utils.dataframes import Timer
 from utils.general import SANPI_HOME as SANPI_DIR
 from utils.general import confirm_dir, print_iter
 
 WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
-confirm_dir(POLAR_DIR)
+confirm_dir(AM_ENV_DIR)
 
 
 def _parse_args():
@@ -22,7 +22,7 @@ def _parse_args():
                      '& association measure calculation via the `UCS` toolkit '
                      '(http://www.collocations.de/software.html).'
                      'It converts each (separate) ucs-formatted .tsv input file into a '
-                     'new .tsv (saved in `../results/ucs_tables/polarity_prepped/`) '
+                     'new .tsv (saved in `../results/ucs/env_prepped_tsv`) '
                      'that is ready to be piped to the `ucs-make-tables --types` command. '
                      '"ucs-formatted" means that the count for each (attested) `L1 L2` combination '
                      'is encoded as tab-delimited values: `#tokens<tab>L1<tab>L2`. '

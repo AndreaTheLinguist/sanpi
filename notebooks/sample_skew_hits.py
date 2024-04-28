@@ -1,15 +1,18 @@
 # %%
-from sys import argv
-from source.utils import sample_pickle, print_md_table
-import pandas as pd
 from pathlib import Path
+from sys import argv
+
+import pandas as pd
+
+from source.utils import print_md_table, sample_pickle
+
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
 _DATA_DIR = Path('/share/compling/data/sanpi')
 
 skew_path = argv[1]
 if not skew_path.is_file():
     skew_path = _SANPI_DIR.joinpath(
-        'results/ucs_tables/dataframes/polarized-bigram_MIRROR.35f-868thresh_min15x.SKEW_extra.csv')
+        'results/assoc_df/polarized-bigram_MIRROR.35f-868thresh_min15x.SKEW_extra.csv')
     if not skew_path.is_file():
         raise FileNotFoundError
 # %%

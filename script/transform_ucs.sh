@@ -11,7 +11,7 @@ function add_extra_fvar() {
     ucs-add 'E11' 'O%' 'C%' 'R%' TO ${DATA_PATH} INTO ${TMP}
 }
 
-TOP_UCS_DIR="/share/compling/projects/sanpi/results/ucs_tables"
+TOP_UCS_DIR="/share/compling/projects/sanpi/results/ucs"
 DATA_PATH=${1:-"${TOP_UCS_DIR}/polarized-adv_min50x.ds.gz"}
 # if [[ -f "${ARG1}" ]]; then
 # DATA_PATH="${ARG1}"
@@ -28,7 +28,7 @@ DATA_SET=$(basename ${DATA_PATH/./-})
 DATA_SET=${DATA_SET%%.*}
 
 #* initialize logging
-LOG_DIR="/share/compling/projects/sanpi/logs/ucs"
+LOG_DIR="/share/compling/projects/sanpi/logs/associate/ucs"
 LOG_FILE_NAME="ucs_${DATA_SET}"
 if [[ ! -d ${LOG_DIR} ]]; then
     mkdir -p ${LOG_DIR}
@@ -66,18 +66,19 @@ SCORES_PATH=${DATA_PATH/.ds./.scores.}
 # INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.pv,log.likelihood.tt,log.likelihood.tt.pv,Poisson.pv,odds.ratio,odds.ratio.disc,Dice,t.score,t.score.pv,multinomial.likelihood.pv,binomial.pv,binomial.likelihood.pv})}
 # ! #BUG some issue with the installation versions of UCS and R is preventing the .pv scores
 # INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.tt,odds.ratio,odds.ratio.disc,Dice,t.score})}
-INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.tt,odds.ratio.disc,Dice,t.score})}
+# INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.tt,odds.ratio.disc,Dice,t.score})}
+INIT_SCORES=${3:-$(echo am.{log.likelihood,odds.ratio.disc,Dice,t.score})}
 echo -e "## built-in association metrics (all symmetric) to be added:${INIT_SCORES//am./"\n+ am."}"
 # PJ="am.p.joint := (%O11% / %N%)"
-P1_OTHER_ADJUST="am.p1.given2 := (%O11% / %C1%) - (%O12% / %C2%)"
-P2_OTHER_ADJUST="am.p2.given1 := (%O11% / %R1%) - (%O21% / %R2%)"
+DELTA_P1="am.p1.given2 := (%O11% / %C1%) - (%O12% / %C2%)"
+DELTA_P2="am.p2.given1 := (%O11% / %R1%) - (%O21% / %R2%)"
 P1="am.p1.given2.simple := (%O11% / %C1%)"
 P2="am.p2.given1.simple := (%O11% / %R1%)"
-P1_MARG_ADJUST="am.p1.given2.margin := (%O11% / %C1%) - (%R1% / %N%)"
-P2_MARG_ADJUST="am.p2.given1.margin := (%O11% / %R1%) - (%C1% / %N%)"
+# P1_MARG_ADJUST="am.p1.given2.margin := (%O11% / %C1%) - (%R1% / %N%)"
+# P2_MARG_ADJUST="am.p2.given1.margin := (%O11% / %R1%) - (%C1% / %N%)"
 #// EXPECT_DIFF="am.expect.diff := (%O11% - %E11%)"
 
-USER_SCORES="${P1_OTHER_ADJUST} ${P2_OTHER_ADJUST} ${P1} ${P2} ${P1_MARG_ADJUST} ${P2_MARG_ADJUST}" #${EXPECT_DIFF}"
+USER_SCORES="${DELTA_P1} ${DELTA_P2} ${P1} ${P2}" # ${P1_MARG_ADJUST} ${P2_MARG_ADJUST}" #${EXPECT_DIFF}"
 echo -e "\n## derived association metrics to be added:\n(adjusted conditional probabilities)${USER_SCORES//'am.'/'\n+ am.'}\n"
 SCORES_STR="${INIT_SCORES} ${USER_SCORES}"
 N_SCORES_REQ=$(echo -e "${SCORES_STR//'am.'/'\nam.'}" | egrep -c 'am\.')
@@ -90,9 +91,12 @@ if [[ ! -f ${SCORES_PATH} ]]; then
     #> add additional columns to table for computation
     add_extra_fvar ${DATA_PATH} ${TMP}
     echo -e "\n> adding association metric scores:"
-    echo 'ucs-add -v -x htest ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}'
-    echo "ucs-add -v -x htest ${INIT_SCORES} \"${P1_OTHER_ADJUST}\" \"${P2_OTHER_ADJUST}\" \"${P1}\" \"${P2}\" \"${P1_MARG_ADJUST}\" \"${P2_MARG_ADJUST}\" TO ${TMP} INTO ${SCORES_PATH}"
-    ucs-add -v -x htest ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}
+    # echo 'ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}'
+    # echo "ucs-add -v -x htest ${INIT_SCORES} \"${DELTA_P1}\" \"${DELTA_P2}\" \"${P1}\" \"${P2}\" \"${P1_MARG_ADJUST}\" \"${P2_MARG_ADJUST}\" TO ${TMP} INTO ${SCORES_PATH}"
+    # ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}
+    echo 'ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}'
+    echo "ucs-add -v -x htest ${INIT_SCORES} \"${DELTA_P1}\" \"${DELTA_P2}\" \"${P1}\" \"${P2}\" TO ${TMP} INTO ${SCORES_PATH}"
+    ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}
 
 else
     SCORES_N="$(ucs-info -l ${SCORES_PATH} | egrep -c 'am\.')"
@@ -104,8 +108,8 @@ else
         #> add additional columns to table for computation
         add_extra_fvar ${DATA_PATH} ${TMP}
         echo -e "\n> adding association metric scores..."
-        echo "ucs-add -v ${INIT_SCORES} '${P1_OTHER_ADJUST}' '${P2_OTHER_ADJUST}' TO ${TMP} INTO ${SCORES_PATH}"
-        ucs-add -v ${INIT_SCORES} "${P1_OTHER_ADJUST}" "${P2_OTHER_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}
+        echo "ucs-add -v ${INIT_SCORES} '${DELTA_P1}' '${DELTA_P2}' TO ${TMP} INTO ${SCORES_PATH}"
+        ucs-add -v ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" TO ${TMP} INTO ${SCORES_PATH}
 
     else
         echo -e "↻ Prior computation of metrics will be used.\n"
