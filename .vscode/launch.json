@@ -3,7 +3,7 @@
         // run current file
         {
             "name": "Python: Current File",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
@@ -13,7 +13,7 @@
         // sample_pickle testing
         {
             "name": "sample_pickle test",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/sample_pickle.py",
             "console": "integratedTerminal",
@@ -45,7 +45,7 @@
         // format frequency table for UCS
         {
             "name": "format_for_UCS test",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/format_for_UCS.py",
             "console": "integratedTerminal",
@@ -57,7 +57,7 @@
         },
         {
             "name": "🫏💈HELP polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -69,7 +69,7 @@
         },
         {
             "name": "🫏💈200 polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -83,7 +83,7 @@
         },
         {
             "name": "🫏💈300 polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -97,7 +97,7 @@
         },
         {
             "name": "🫏💈100 polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -111,7 +111,7 @@
         },
         {
             "name": "🫏💈3k polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -125,7 +125,7 @@
         },
         {
             "name": "🫏💈5k polar_assoc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -139,7 +139,7 @@
         },
         {
             "name": "🫏💈🪞1k NEG mirror complement polar_assoc.py",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -163,7 +163,7 @@
         },
         {
             "name": "🫏💈🪞1k ANY mirror complement polar_assoc.py",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
             "console": "integratedTerminal",
@@ -193,7 +193,7 @@
             "name": "🐞 pipeline POS mirror",
             "program": "run_pipeline.py",
             "request": "launch",
-            "type": "python",
+            "type": "debugpy",
             "args": [
                 // ! for ../demo/ launch configs, give relative paths
                 "--grew_output_dir",
@@ -213,7 +213,7 @@
             "name": "🐞 pipeline NEG mirror",
             "program": "run_pipeline.py",
             "request": "launch",
-            "type": "python",
+            "type": "debugpy",
             "args": [
                 // ! for ../demo/ launch configs, give relative paths
                 "--grew_output_dir",
@@ -233,7 +233,7 @@
             "name": "🐞 pipeline direct",
             "program": "run_pipeline.py",
             "request": "launch",
-            "type": "python",
+            "type": "debugpy",
             "args": [
                 // ! for ../demo/ launch configs, give relative paths
                 "--grew_output_dir",
@@ -253,7 +253,7 @@
         // * correlate lemmas
         {
             "name": "correlate 868",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/results/correlate_lemmas.py",
             "console": "integratedTerminal",
@@ -266,7 +266,7 @@
         // * count_*.py *
         {
             "name": "neg🪞🐜 count_env",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_env.py",
             "console": "integratedTerminal",
@@ -283,7 +283,7 @@
         },
         {
             "name": "pos🪞🐜 count_env",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_env.py",
             "console": "integratedTerminal",
@@ -300,7 +300,7 @@
         },
         {
             "name": "👀💁‍♀️ DEMO count_bigrams",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -322,7 +322,7 @@
         // * count bigrams
         {
             "name": "count_bigrams 1 0.025",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -337,7 +337,7 @@
         },
         {
             "name": "count_bigrams (2) 0 0️⃣ minimum %",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -352,7 +352,7 @@
         },
         {
             "name": "count_bigrams (2) 0.0025%",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -367,7 +367,7 @@
         },
         {
             "name": "count_bigrams 4 (default%)",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -380,7 +380,7 @@
         },
         {
             "name": "count_bigrams 4f min%",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -396,7 +396,7 @@
 
         {
             "name": "count_bigrams 5f default%",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -409,7 +409,7 @@
         },
         {
             "name": "count_bigrams 6 0.01%",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -424,7 +424,7 @@
         },
         {
             "name": "count_bigrams 10f 0.1%",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -439,7 +439,7 @@
         },
         {
             "name": "DEMO count_bigrams 5f 0.001%",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/analyze/count_bigrams.py",
             "console": "integratedTerminal",
@@ -458,7 +458,7 @@
         },
         {
             "name": "pipeline 🪲 bigram",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "run_pipeline.py",
             "console": "integratedTerminal",
@@ -482,7 +482,7 @@
         },
         {
             "name": "pipeline exactly-test contig-TABULATE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "run_pipeline.py",
             "console": "integratedTerminal",
@@ -503,7 +503,7 @@
         // * Grew Search
         {
             "name": "apw grew relayed",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
@@ -517,7 +517,7 @@
         },
         {
             "name": "puddin grew immediate",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
@@ -532,7 +532,7 @@
         },
         {
             "name": "exactly grew immediate",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "source/gather/grewSearchDir.py",
             "console": "integratedTerminal",
@@ -547,7 +547,7 @@
         },
         {
             "name": "pcc-val grew sans-relay",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/grewSearchDir.py",
             "console": "integratedTerminal",
@@ -563,7 +563,7 @@
         // * Fill Json
         {
             "name": "fill_match_info",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/share/compling/projects/sanpi/source/gather/fill_match_info.py",
             "console": "integratedTerminal",
@@ -577,7 +577,7 @@
         // * Tabulate Hits
         {
             "name": "tabulateHits puddin pcc val",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/tabulateHits.py",
             "console": "integratedTerminal",
@@ -590,7 +590,7 @@
         },
         {
             "name": "tabulateHits devel",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "script/tabulateHits.py",
             "console": "integratedTerminal",
@@ -605,7 +605,7 @@
         // * Get Frequencies
         {
             "name": "getFrequecies abs",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             // ? Does this script still exist? I don't remember it
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
@@ -615,7 +615,7 @@
         },
         {
             "name": "getFrequecies",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "/home/arh234/projects/sanpi/script/getFrequencies.py",
             "console": "integratedTerminal",
