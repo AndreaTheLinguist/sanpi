@@ -160,8 +160,8 @@ def prepare_hit_table(filter_ids_path: Path,
                 save_table(df, str(neg_filter_df_path),
                            '*_form_lower columns added')
         elif neg_filter_ix_path.is_file():
-            df = load_from_txt_index(
-                data_dir=neg_hits_dir, filter_index=neg_filter_ix_path)
+            df = load_from_txt_index(data_dir=neg_hits_dir,
+                                     filter_index=neg_filter_ix_path)
         else:
             df = _prep_df_from_raw(
                 filter_ids_path, neg_hits_dir, neg_filter_df_path
@@ -310,7 +310,7 @@ def filter_hits(data_dir: Path, filter_ids_path: Path):
 
         print('   + Before filtering to target bigrams only')
         desc_t = df.select_dtypes(
-            include=['string','category']).describe().T
+            include=['string', 'category']).describe().T
         print_md_table(desc_t.sort_index(),
                        n_dec=0, comma=True,
                        indent=5, title=f'({i}) `{pkl.stem}` summary')
@@ -323,12 +323,13 @@ def filter_hits(data_dir: Path, filter_ids_path: Path):
         df[cat_cols] = df[cat_cols].astype('string')
         df = df.loc[df.bigram_id.isin(ids_in_pkl), :]
 
-        print_md_table(df.sample(3).T,  format='grid',  max_colwidth=35,  indent=5)
- 
+        print_md_table(df.sample(3).T,  format='grid',
+                       max_colwidth=35,  indent=5)
+
         if not df.empty:
             df[cat_cols] = df[cat_cols].astype('category')
             print('   + After filtering to target bigrams')
-            print_md_table(df.select_dtypes(include=['string','category'])
+            print_md_table(df.select_dtypes(include=['string', 'category'])
                            .describe().T.convert_dtypes(),
                            indent=5, title=f'({i}) `{pkl.stem}` summary')
             yield df
