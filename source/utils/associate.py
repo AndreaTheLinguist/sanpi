@@ -21,13 +21,20 @@ from .general import (DEMO_RESULT_DIR, RESULT_DIR, SANPI_HOME, camel_to_snake,
                       confirm_dir, print_iter, run_shell_command,
                       snake_to_camel)
 
-ADDITIONAL_METRICS = ['log_likelihood', 'log_ratio',
-                      't_score', 'mutual_information', 'local_mutual_information']
+ADDITIONAL_METRICS = ['t_score', 'dice','log_ratio','liddell', 'mutual_information', 'hypergeometric_likelihood','binomial_likelihood']
 ALPHA = 0.005
 READ_TAG = 'rsort-view_am-only'
 _UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
 _WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
-
+TRANSPARENT_O_NAMES = {
+    'O12':'Fyn(O12)',
+    'O21':'Fny(O21)',
+    'O22':'Fnn(O22)',
+    'O11':'Fyy(O11)', 
+    'R1':'Fy_(R1)',
+    'R2':'Fn_(R2)', 
+    'C1':'F_y(C1)',
+    'C2':'F_n(C2)'}
 
 UCS_DIR, DEMO_UCS_DIR = [
     R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
@@ -60,8 +67,10 @@ def adjust_assoc_columns(columns: pd.Index or list, style: str = None) -> list:
         updated_cols = [camel_to_snake(c) for c in updated_cols]
     return updated_cols
 
-def relative_risk(sc, invert:bool=False): 
+def log_relative_risk(sc, invert:bool=False): 
     sc = sc.fillna(0)
+    if 'O11' not in sc.columns:
+        sc = fq.observed_frequencies(sc).fillna(0)
     r = (
         (sc.O11 * sc.R2) / (sc.O21 * sc.R1)
          if invert else
@@ -102,18 +111,26 @@ def add_extra_am(df: pd.DataFrame,
     # MARK: LRC
     # * manually set conservative_log_ratio variants:
     # *      one-tailed, two-tailed, and two-tailed without correction
-    df['conservative_log_ratio_1t'] = am.conservative_log_ratio(
-        df, one_sided=True, alpha=ALPHA,
-        vocab=vocab, digits=ndigits
-    )
     df['conservative_log_ratio'] = am.conservative_log_ratio(
         df, one_sided=False, alpha=ALPHA,
-        vocab=vocab, digits=ndigits
-    )
+        vocab=vocab, digits=ndigits)
+    # df['conservative_log_ratio_1t'] = am.conservative_log_ratio(
+    #     df, one_sided=True, alpha=ALPHA,
+    #     vocab=vocab, digits=ndigits)
+    # no correction performed
+    for a in ('001','005','01','05'):
+        _alpha = float(f'0.{a}')
+        if ALPHA != _alpha:
+            df[f'conservative_log_ratio_{a}'] = am.conservative_log_ratio(
+                df, one_sided=False, alpha=_alpha,
+                vocab=vocab, digits=ndigits)
     df['conservative_log_ratio_nc'] = am.conservative_log_ratio(
         df, one_sided=False, alpha=ALPHA, correct=None,
-        digits=ndigits
-    )
+        digits=ndigits)
+    # default vocab calculation
+    df['conservative_log_ratio_dv'] = am.conservative_log_ratio(
+        df, one_sided=False, alpha=ALPHA,
+        digits=ndigits)
     df = extend_deltaP(df.copy())
     df = adjust_expectations(df)
 
@@ -126,15 +143,9 @@ def add_extra_am(df: pd.DataFrame,
             df.loc[:, ~df.columns.isin(
                 init_cols)].filter(regex=r'^[a-z]').iloc[:10, :8],
             title='\nPreview of Extended Measures (rounded)\n', n_dec=2)
-        # HACK for when `corners` was crashing due to hidden NaNs
-        # print_md_table(df.iloc[:5, :5])
-        # print_md_table(df.iloc[-5:, -5:])
-    # obs_df = df.filter(regex=r'O[12]{2}|R[12]')
+    
     # vary_lrc(obs_df, df.l1.nunique() + df.l2.nunique())
-    # am.conservative_log_ratio(df, alpha=0.05, boundary='poisson').nlargest(20)
-    # am.conservative_log_ratio(df, alpha=0.05, boundary='poisson').sort_values(ascending=False).abs().round(0).value_counts()
-    # am.conservative_log_ratio(df, alpha=0.05, boundary='poisson').sort_values(ascending=False).round(0).abs().nlargest(10)
-    return df  # , obs_df
+    return df.rename(columns=TRANSPARENT_O_NAMES)
 
 
 def adjust_expectations(df):
@@ -154,7 +165,7 @@ def adjust_expectations(df):
 
 def extend_deltaP(df):
 
-    for e in ('min', 'max', 'product'):
+    for e in ('min', 'max', 'max_abs', 'product'):
         df[f'deltaP_{e}'] = df.apply(
             symmetric_deltaP, eval=e, axis=1)
 
@@ -162,7 +173,7 @@ def extend_deltaP(df):
 
 
 def symmetric_deltaP(combo: pd.Series,
-                     eval: str = 'product'):
+                     eval: str = 'max'):
     """
     Calculates the symmetric deltaP value based on the given combination of deltaP values.
 
@@ -179,6 +190,8 @@ def symmetric_deltaP(combo: pd.Series,
         return deltaP_vals.min()
     elif eval == 'max':
         return deltaP_vals.max()
+    elif eval == 'abs_max':
+        return deltaP_vals.abs().max()
     elif eval == 'product':
         return deltaP_vals.iat[0] * deltaP_vals.iat[1]
 

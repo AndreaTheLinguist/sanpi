@@ -189,6 +189,34 @@
             ]
         },
         {
+            "name": "🫏💈🪞500 MIRROR polar_assoc",
+            "type": "python",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"
+            },
+            "justMyCode": true,
+            "args": [
+                "-c",
+                "/share/compling/projects/sanpi/results/freq_out/POSmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv",
+                "-C",
+                "posmir",
+                "-n",
+                "/share/compling/projects/sanpi/results/freq_out/NEGmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv",
+                "-N",
+                "negmir",
+                "--min_freq",
+                "500",
+                "--data_suffix",
+                ".MIRROR_polar.35f-868c.tsv",
+                "-v", 
+                "-a",
+                "/share/compling/projects/sanpi/results/freq_out/ANYmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv"
+            ]
+        },
+        {
             "name": "🫏💈🪞1k MIRROR polar_assoc",
             "type": "debugpy",
             "request": "launch",
