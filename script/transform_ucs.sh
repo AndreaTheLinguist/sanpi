@@ -33,7 +33,7 @@ LOG_FILE_NAME="ucs_${DATA_SET}"
 if [[ ! -d ${LOG_DIR} ]]; then
     mkdir -p ${LOG_DIR}
 fi
-LOG_PATH=${LOG_DIR}/${LOG_FILE_NAME}.$(date +"%Y-%m-%d_%R").log
+LOG_PATH=${LOG_DIR}/${LOG_FILE_NAME}.$(date +"%Y-%m-%d_%H%M").log
 echo -e "> log will be saved to: ${LOG_PATH}\n..."
 exec 1>${LOG_PATH} 2>&1
 TMP_DIR=${UCS_DIR}/tmp
@@ -56,18 +56,20 @@ echo "## Initial Contingency Info"
 
 ucs-info -l -s -v ${DATA_PATH}
 echo -e '========================================\n'
-echo "ucs-sort -v ${DATA_PATH} BY f2- f- | ucs-print -v -i | head -12"
-ucs-sort -v ${DATA_PATH} BY f2- f- | ucs-print -v -i | head -12
+echo "ucs-sort -v ${DATA_PATH} BY f- f1- f2- | ucs-print -v -i | head -12"
+ucs-sort -v ${DATA_PATH} BY f- f1- f2- | ucs-print -v -i | head -12
 echo -e '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n'
 #* Declare association metrics
 SCORES_PATH=${DATA_PATH/.ds./.scores.}
 
 #> set built-in association measures to use. More information for the measures can be found with `ucsdoc ucsam`, `ucs-list-am`, or at http://www.collocations.de/AM/index.html
 # INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.pv,log.likelihood.tt,log.likelihood.tt.pv,Poisson.pv,odds.ratio,odds.ratio.disc,Dice,t.score,t.score.pv,multinomial.likelihood.pv,binomial.pv,binomial.likelihood.pv})}
-# ! #BUG some issue with the installation versions of UCS and R is preventing the .pv scores
+# ! #BUG some issue with the installation versions of UCS and R is preventing the .pv and MI.conf scores
 # INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.tt,odds.ratio,odds.ratio.disc,Dice,t.score})}
 # INIT_SCORES=${3:-$(echo am.{log.likelihood,log.likelihood.tt,odds.ratio.disc,Dice,t.score})}
-INIT_SCORES=${3:-$(echo am.{log.likelihood,odds.ratio.disc,Dice,t.score})}
+# INIT_SCORES=${3:-$(echo am.{log.likelihood,MI,odds.ratio.disc,Jaccard,gmean,relative.risk,t.score,chi.squared.corr})}
+#*  MARK:ADD
+INIT_SCORES=${3:-$(echo am.{log.likelihood,odds.ratio.disc})}
 echo -e "## built-in association metrics (all symmetric) to be added:${INIT_SCORES//am./"\n+ am."}"
 # PJ="am.p.joint := (%O11% / %N%)"
 DELTA_P1="am.p1.given2 := (%O11% / %C1%) - (%O12% / %C2%)"
@@ -94,9 +96,9 @@ if [[ ! -f ${SCORES_PATH} ]]; then
     # echo 'ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}'
     # echo "ucs-add -v -x htest ${INIT_SCORES} \"${DELTA_P1}\" \"${DELTA_P2}\" \"${P1}\" \"${P2}\" \"${P1_MARG_ADJUST}\" \"${P2_MARG_ADJUST}\" TO ${TMP} INTO ${SCORES_PATH}"
     # ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" "${P1_MARG_ADJUST}" "${P2_MARG_ADJUST}" TO ${TMP} INTO ${SCORES_PATH}
-    echo 'ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}'
-    echo "ucs-add -v -x htest ${INIT_SCORES} \"${DELTA_P1}\" \"${DELTA_P2}\" \"${P1}\" \"${P2}\" TO ${TMP} INTO ${SCORES_PATH}"
-    ucs-add -v -x htest ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}
+    echo 'ucs-add -v -x ALL ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}'
+    echo "ucs-add -v -x ALL ${INIT_SCORES} \"${DELTA_P1}\" \"${DELTA_P2}\" \"${P1}\" \"${P2}\" TO ${TMP} INTO ${SCORES_PATH}"
+    ucs-add -v -x ALL ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}
 
 else
     SCORES_N="$(ucs-info -l ${SCORES_PATH} | egrep -c 'am\.')"

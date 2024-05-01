@@ -42,7 +42,8 @@ if [[ ! -d $LOG_DIR ]]; then mkdir $LOG_DIR; fi
 LOG_PREFIX="${LOG_DIR}/assoc_${TARGET_PAT}-${COMPARE}_"
 echo "logs ⇰  ${LOG_PREFIX}*"
 
-for F in 50 100 800 2000; do
+for F in 50 300 1000 2000 6000; do
+# for F in 5500 1500; do # ! #HACK revert to full set of thresholds
     LOG="${LOG_PREFIX}${F}x-verbose.$(date +%Y%m%d_%H%M).out"
     exec 1>${LOG} 2>${LOG/out/err}
     date +"@ %I:%m%P"
