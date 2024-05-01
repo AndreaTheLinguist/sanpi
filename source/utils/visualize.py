@@ -63,7 +63,7 @@ def heatmap(df,
             title: str = 'Frequency Heatmap'):
     
     plt.style.use('dark_background')
-    rcParams['font.family'] = 'lato'
+    plt.rcParams['font.family'] = 'serif'
     plt.figure(figsize=size, dpi=dpi)
     colormap = colormap or rand_colormap()
     if columns:

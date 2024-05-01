@@ -24,7 +24,7 @@
                 "name": "COLLECT_deps 🪲 RBdirect pcc06",
                 "program": "/home/arh234/projects/sanpi/demo/source/collect_deps.py",
                 "request": "launch",
-                "type": "python",
+                "type": "debugpy",
                 "args": [
                     // ! for ../demo/ launch configs, give relative paths
                     // "--input_dir",
@@ -48,7 +48,7 @@
                 "name": "sample_pickle DEVEL",
                 "program": "/home/arh234/projects/sanpi/script/sample_pickle.py",
                 "request": "launch",
-                "type": "python",
+                "type": "debugpy",
                 "args": [
                     "/share/compling/projects/sanpi/demo/data/3_dep_info/RBdirect/bigram_smallest_direct-adj-head_hits[n34]+deps.pkl.gz", 
                     "-N", 
@@ -91,7 +91,8 @@
             "**/*kaldi*": true,
             "**/.[^b]*": true,
             "**/.bash_[hl]*": true,
-            "**/stanza_resources": true
+            "**/stanza_resources": true,
+            "**/prior_version": true
         },
         "files.watcherExclude": {
             "/share/compling/data/puddin": true,
@@ -105,7 +106,7 @@
         "todo-tree.general.periodicRefreshInterval": 2,
         "todo-tree.general.showActivityBarBadge": true,
         "todo-tree.general.statusBar": "current file",
-        "todo-tree.tree.scanMode": "open files",
+        "todo-tree.tree.scanMode": "current file",
         "todo-tree.tree.showBadges": false,
         "workbench.colorCustomizations": {
             "[Solarized Custom Light]": {

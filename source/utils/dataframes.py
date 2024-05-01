@@ -828,7 +828,7 @@ def select_cols(df: pd.DataFrame,
 
 def select_pickle_paths(n_files: int,
                         pickle_dir=Path(
-                            '/share/compling/data/sanpi/2_hit_tables/advadj'),
+                            '/share/compling/data/sanpi/2_hit_tables/RBXadj'),
                         smallest_first=True) -> pd.Series:
 
     pkl_df = pd.DataFrame(pickle_dir.glob(f'bigram*hits{PKL_SUFF}'),

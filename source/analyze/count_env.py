@@ -11,7 +11,7 @@ import pandas as pd
 from utils import (cols_by_str, confirm_dir,  # pylint: disable=import-error
                    file_size_round, find_glob_in_dir,
                    get_proc_time, print_iter, print_md_table, save_table,
-                   sort_by_margins, unpack_dict, Timer)
+                   sort_by_margins, unpack_dict, Timer, PKL_SUFF)
 from utils.LexicalCategories import (  # pylint: disable=import-error
     SAMPLE_ADJ, SAMPLE_ADV)
 from utils.visualize import heatmap  # pylint: disable=import-error
@@ -24,7 +24,8 @@ from count_bigrams import (save_filter_index, describe_counts,
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
 _DATA_DIR = Path('/share/compling/data/sanpi')
 
-META_TAG_REGEX = re.compile(r'(th.+p).(\d{1,2}f)')
+META_TAG_REGEX = re.compile(r'index_([\w-]+)\.(\d{1,2}f)')
+# META_NFILES_REGEX = re.compile(r'.(\d{1,2}f)')
 
 pd.set_option('display.max_colwidth', 40)
 pd.set_option('display.max_columns', 20)
@@ -111,41 +112,63 @@ def _parse_args():
             args.frq_out_dir.resolve(), set(args.frq_groups))
 
 
+def _set_postproc_paths(filter_ids_path: Path, neg_hits_dir: Path):
+    """
+    Set post-processing paths based on filter IDs and negative hits directory.
+
+    Args:
+        filter_ids_path: Path to the filter IDs file.
+        neg_hits_dir: Path to the negative hits directory.
+
+    Returns:
+        List of resolved paths for the filtered hits DataFrame and index file.
+    """
+
+    file_tag = '.'.join(META_TAG_REGEX.search(filter_ids_path.stem).groups())
+
+    neg_filtered_hits_stem = filter_ids_path.parent.parent.joinpath(
+        f'{neg_hits_dir.name}/trigger-bigrams_{file_tag}'
+    )
+    neg_filter_df_str = f'{neg_filtered_hits_stem}{PKL_SUFF}'
+
+    neg_filter_index_stem = neg_filtered_hits_stem.with_name(
+        f'trigger-index_{file_tag}')
+    neg_filter_ix_str = f'{neg_filter_index_stem}.txt'
+
+    return [Path(p).resolve() for p in (neg_filter_df_str, neg_filter_ix_str)]
+
+
 def prepare_hit_table(filter_ids_path: Path,
                       neg_hits_dir: Path) -> pd.DataFrame:
 
     # TODO: update this method to load from `3_dep_info/`
     with Timer() as timer:
         print('\n## loading data...\n')
-        file_tag = META_TAG_REGEX.search(filter_ids_path.stem).group()
-        neg_filtered_hits_path = filter_ids_path.parent.parent.joinpath(
-            f'{neg_hits_dir.name}/trigger-bigrams_{file_tag}'
-        )
-        neg_filter_index_path = neg_filtered_hits_path.with_name(
-            f'trigger-index_{file_tag}')
 
-        if neg_filtered_hits_path.is_file():
-            print(
-                f'* Found previous output. Loading data from {neg_filtered_hits_path}...')
-            df = pd.read_pickle(neg_filtered_hits_path)  # //.convert_dtypes()
-            save_filter_index(neg_filter_index_path, df)
-            if not cols_by_str(df, end_str='lower'):
+        neg_filter_df_path, neg_filter_ix_path = _set_postproc_paths(
+            filter_ids_path, neg_hits_dir)
+
+        if neg_filter_df_path.is_file():
+            print('* Found previous output. Loading data from',
+                  f'{neg_filter_df_path}...')
+            df = pd.read_pickle(neg_filter_df_path)  # //.convert_dtypes()
+            save_filter_index(neg_filter_ix_path, df)
+            # > should have at least 4 columns for lower case forms: trigger (neg/mir), adv, adj, & bigram
+            if len(df.filter(like='lower').columns) < 4:
                 _add_form_lower(df)
-                # forms = cols_by_str(df, end_str='form')
-                # df[[f'{f}_lower' for f in forms]] = df[forms].apply(
-                #     lambda f: f.str.lower())
-                # defaults to `.pkl.gz`
-                save_table(df, str(neg_filtered_hits_path.resolve()),
+
+                save_table(df, str(neg_filter_df_path),
                            '*_form_lower columns added')
-        elif neg_filter_index_path.is_file():
-            df = load_from_txt_index(
-                data_dir=neg_hits_dir, index_txt_path=neg_filter_index_path)
+        elif neg_filter_ix_path.is_file():
+            df = load_from_txt_index(data_dir=neg_hits_dir,
+                                     filter_index=neg_filter_ix_path)
         else:
             df = _prep_df_from_raw(
-                filter_ids_path, neg_hits_dir, neg_filtered_hits_path
+                filter_ids_path, neg_hits_dir, neg_filter_df_path
             )
         # df = _ignore_double_dipping(df)
         # XXX #? what exactly is this doing?
+        #       ^ dealing with potential whitespace picked up somewhere?
         df['bigram_id'] = df.index.str.rstrip()
         print('✓ time:', timer.elapsed())
     return df
@@ -174,6 +197,7 @@ def _prep_df_from_raw(filter_ids_path,
     # df = load_from_txt_index(neg_hits_dir, index_txt_path=filter_ids_path)
 
     df = _load_and_limit_data(filter_ids_path, data_dir=neg_hits_dir)
+    # TODO replace with import from dataframes (after moving `validate_hit_df` from `count_bigrams` to `utils.dataframes`)
     if df.index.name != 'hit_id':
         df = df.set_index('hit_id')
         # print(f'\n> {len(df):,} initial hits')
@@ -193,7 +217,8 @@ def _prep_df_from_raw(filter_ids_path,
     if len(df) < 10 ^ 6:
         save_table(
             df=df,
-            path_str=str(neg_filtered_hits_path.resolve()).split('.pkl', 1)[0],
+            save_path=str(neg_filtered_hits_path.resolve()
+                          ).split('.pkl', 1)[0],
             df_name=f"filtered {neg_hits_dir.name} hits",
             formats=['psv', 'csv'],
         )
@@ -201,7 +226,8 @@ def _prep_df_from_raw(filter_ids_path,
     elif len(df) < 2 * 10 ^ 6:
         save_table(
             df=df,
-            path_str=str(neg_filtered_hits_path.resolve()).split('.pkl', 1)[0],
+            save_path=str(neg_filtered_hits_path.resolve()
+                          ).split('.pkl', 1)[0],
             df_name=f"filtered {neg_hits_dir.name} hits",
             formats=['psv'],
         )
@@ -269,7 +295,7 @@ def _load_and_limit_data(filter_ids_path, data_dir: Path) -> pd.DataFrame:
 
 def filter_hits(data_dir: Path, filter_ids_path: Path):
 
-    for i, (pkl, bigram_ids) in enumerate(
+    for i, (pkl, ids_in_pkl) in enumerate(
             locate_relevant_hit_tables(
                 data_dir, filter_ids_path),
             start=1):
@@ -284,7 +310,7 @@ def filter_hits(data_dir: Path, filter_ids_path: Path):
 
         print('   + Before filtering to target bigrams only')
         desc_t = df.select_dtypes(
-            exclude='object').describe().T.convert_dtypes()
+            include=['string', 'category']).describe().T
         print_md_table(desc_t.sort_index(),
                        n_dec=0, comma=True,
                        indent=5, title=f'({i}) `{pkl.stem}` summary')
@@ -295,12 +321,15 @@ def filter_hits(data_dir: Path, filter_ids_path: Path):
         #!   Otherwise, removed lemmas, etc. will persist as "empty" categories
         cat_cols = df.select_dtypes(include='category').columns
         df[cat_cols] = df[cat_cols].astype('string')
-        df = df.loc[df.bigram_id.isin(bigram_ids), :]
+        df = df.loc[df.bigram_id.isin(ids_in_pkl), :]
+
+        print_md_table(df.sample(3).T,  format='grid',
+                       max_colwidth=35,  indent=5)
 
         if not df.empty:
             df[cat_cols] = df[cat_cols].astype('category')
             print('   + After filtering to target bigrams')
-            print_md_table(df.select_dtypes(exclude='object')
+            print_md_table(df.select_dtypes(include=['string', 'category'])
                            .describe().T.convert_dtypes(),
                            indent=5, title=f'({i}) `{pkl.stem}` summary')
             yield df
@@ -325,7 +354,7 @@ def flatten_deps(input_path, df):
     print(dep_info)
     dep_path = Path(*input_path.parts[:-3] + (
         '3_dep_info', input_path.parts[-2], input_path.name.replace('hits.pkl.gz', 'deps')))
-    save_table(df=dep_info, path_str=str(dep_path),
+    save_table(df=dep_info, save_path=str(dep_path),
                df_name=dep_path.stem, formats=['pickle', 'csv'])
 
 
