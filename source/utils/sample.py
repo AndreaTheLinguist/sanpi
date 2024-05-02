@@ -7,13 +7,14 @@ from pathlib import Path
 import pandas as pd
 
 try:
-    from utils import (print_iter,  # pylint: disable=import-error
-                       print_md_table, set_pd_display)
+    from utils.general import print_iter  # pylint: disable=import-error
 except ModuleNotFoundError:
     with contextlib.suppress(ModuleNotFoundError):
-        from source.utils import print_iter, print_md_table, set_pd_display
+        from source.utils.general import print_iter
+        from source.utils.dataframes import set_pd_display
         from source.utils.associate import adjust_assoc_columns
 else:
+    from utils.dataframes import set_pd_display
     from utils.associate import adjust_assoc_columns
 SANPI_DATA = Path('/share/compling/data/sanpi')
 

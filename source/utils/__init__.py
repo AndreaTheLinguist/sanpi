@@ -4,6 +4,6 @@ from .associate import (DEMO_RESULT_DIR, DEMO_UCS_DIR, AM_ENV_DIR, UCS_DIR,
 from .dataframes import *
 from .general import *
 from .LexicalCategories import *
-from .metaspecs import AssocTable, Bigram, DataSpecs, LexUnit
-from .sample import sample_pickle
-from .visualize import heatmap
+# from .metaspecs import AssocTable, Bigram, DataSpecs, LexUnit
+# from .sample import sample_pickle
+# from .visualize import heatmap

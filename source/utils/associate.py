@@ -1,40 +1,44 @@
 # -*- coding=utf-8 -*-
+import itertools as itt
 import re
-from math import sqrt
+from math import log1p, log2, log10, sqrt
 from os import system
 from pathlib import Path
 from sys import exit as sysxit
 
-# import association_measures.binomial as bn
-try:
-    import association_measures
-except ModuleNotFoundError:
-    pass
-    #! This will result in crashes if environment without `association_measures` is used to run methods actually using this import, but handled this way to avoid crashing when it isn't used
-else:
-    import association_measures.frequencies as fq
-    import association_measures.measures as am
 import pandas as pd
 
-from .dataframes import Timer, print_md_table
+from .dataframes import Timer, corners, print_md_table, show_counts
 from .general import (DEMO_RESULT_DIR, RESULT_DIR, SANPI_HOME, camel_to_snake,
                       confirm_dir, print_iter, run_shell_command,
                       snake_to_camel)
 
-ADDITIONAL_METRICS = ['t_score', 'dice','log_ratio','liddell', 'mutual_information', 'hypergeometric_likelihood','binomial_likelihood']
+#! This 👇 will result in crashes if environment without `association_measures` is used
+#!  to run methods actually using this import,
+#!  but handled this way to avoid crashing when it isn't used
+try:
+    import association_measures
+except ModuleNotFoundError:
+    pass
+else:
+    import association_measures.frequencies as fq
+    import association_measures.measures as am
+
+ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio', 'liddell',
+                      'mutual_information', 'hypergeometric_likelihood', 'binomial_likelihood']
 ALPHA = 0.005
 READ_TAG = 'rsort-view_am-only'
 _UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
 _WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
 TRANSPARENT_O_NAMES = {
-    'O12':'Fyn(O12)',
-    'O21':'Fny(O21)',
-    'O22':'Fnn(O22)',
-    'O11':'Fyy(O11)', 
-    'R1':'Fy_(R1)',
-    'R2':'Fn_(R2)', 
-    'C1':'F_y(C1)',
-    'C2':'F_n(C2)'}
+    'O12': 'Fyn(O12)',
+    'O21': 'Fny(O21)',
+    'O22': 'Fnn(O22)',
+    'O11': 'Fyy(O11)',
+    'R1': 'Fy_(R1)',
+    'R2': 'Fn_(R2)',
+    'C1': 'F_y(C1)',
+    'C2': 'F_n(C2)'}
 
 UCS_DIR, DEMO_UCS_DIR = [
     R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
@@ -45,7 +49,8 @@ AM_ENV_DIR, DEMO_AM_ENV_DIR = [
 confirm_dir(AM_ENV_DIR)
 
 
-def adjust_assoc_columns(columns: pd.Index or list, style: str = None) -> list:
+def adjust_assoc_columns(columns: pd.Index | list,
+                         style: str = None) -> list:
     col_abbr = {
         r'am_': '',
         r'ratio': 'r',
@@ -67,24 +72,25 @@ def adjust_assoc_columns(columns: pd.Index or list, style: str = None) -> list:
         updated_cols = [camel_to_snake(c) for c in updated_cols]
     return updated_cols
 
-def log_relative_risk(sc, invert:bool=False): 
+
+def log_relative_risk(sc, invert: bool = False):
     sc = sc.fillna(0)
     if 'O11' not in sc.columns:
         sc = fq.observed_frequencies(sc).fillna(0)
     r = (
         (sc.O11 * sc.R2) / (sc.O21 * sc.R1)
-         if invert else
+        if invert else
         (sc.O11 * sc.C2) / (sc.O12 * sc.C1)
-         )
-    
-    
-    return r.apply(log)
+    )
+
+    return r.apply(log2)
+
 
 def add_extra_am(df: pd.DataFrame,
                  verbose: bool = False,
                  vocab: int = None,
-                 ndigits: int = 9, 
-                 metrics: list=None):
+                 ndigits: int = 9,
+                 metrics: list = None):
     """
     ['z_score', 't_score', 'log_likelihood', 'simple_ll', 
     'liddell', 'dice', 'log_ratio', 'conservative_log_ratio', 
@@ -101,8 +107,9 @@ def add_extra_am(df: pd.DataFrame,
                           alpha=ALPHA, vocab=vocab, digits=ndigits)
     except KeyError:
         df = df.join(
-            fq.observed_frequencies(df.copy()).astype('int64').join(fq.expected_frequencies(df.copy()).apply(pd.to_numeric, downcast='float'))
-                     )
+            fq.observed_frequencies(df.copy()).astype('int64').join(
+                fq.expected_frequencies(df.copy()).apply(pd.to_numeric, downcast='float'))
+        )
         scores = am.score(df, measures=metrics, alpha=ALPHA,
                           vocab=vocab, digits=ndigits)
 
@@ -118,7 +125,8 @@ def add_extra_am(df: pd.DataFrame,
     #     df, one_sided=True, alpha=ALPHA,
     #     vocab=vocab, digits=ndigits)
     # no correction performed
-    for a in ('001','005','01','05'):
+    alphas = ['001', '005', '01', '05']
+    for a in alphas:
         _alpha = float(f'0.{a}')
         if ALPHA != _alpha:
             df[f'conservative_log_ratio_{a}'] = am.conservative_log_ratio(
@@ -134,16 +142,16 @@ def add_extra_am(df: pd.DataFrame,
     df = extend_deltaP(df.copy())
     df = adjust_expectations(df)
 
-    df['f_sqrt'] = df.f.apply(sqrt)
-    df['f1_sqrt'] = df.f1.apply(sqrt)
-    df['f2_sqrt'] = df.f2.apply(sqrt)
-    df = df.loc[:, ~df.columns.isin(df.filter(regex=r'^(ipm|index|log_ratio$)').columns)]
+    for col in ['f', 'f1', 'f2']:
+        df[f'{col}_sqrt'] = df[col].apply(sqrt)
+    df = df.loc[:, ~df.columns.isin(
+        df.filter(regex=r'^(log_ratio$|ipm|index)').columns)]
     if verbose:
         print_md_table(
             df.loc[:, ~df.columns.isin(
                 init_cols)].filter(regex=r'^[a-z]').iloc[:10, :8],
             title='\nPreview of Extended Measures (rounded)\n', n_dec=2)
-    
+
     # vary_lrc(obs_df, df.l1.nunique() + df.l2.nunique())
     return df.rename(columns=TRANSPARENT_O_NAMES)
 
@@ -435,6 +443,25 @@ def build_ucs_table(min_count: int,
         print(f'+ time to save as txt → {timer.elapsed()}\n')
 
 
+def build_ucs_from_multiple(tsv_paths,
+                            min_count: int = 2,
+                            count_type: str = 'bigram',
+                            save_path: Path = None,
+                            debug: bool = False):
+    cmd = 'cat'
+    save_path = save_path or f'{AM_ENV_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
+    if debug:
+        cmd = 'head -50'
+        save_path = save_path.parent.joinpath(f'debug/debug_{save_path.name}')
+        confirm_dir(save_path.parent)
+    build_ucs_table(
+        ucs_save_path=save_path,
+        cat_tsv_str=f"({' && '.join(f'{cmd} {p}' for p in tsv_paths)})",
+        min_count=min_count
+    )
+    return save_path
+
+
 def prep_by_polarity(in_paths_dict: dict,
                      row_limit: int = None,
                      words_to_keep: str = 'bigram',
@@ -485,8 +512,6 @@ def prep_by_polarity(in_paths_dict: dict,
             for line in _read_tsv_rows(tsv_path, row_limit):
                 yield _WORD_GAP.sub(sub_keep_str, line)
 
-        # // confirm_existing_tsv(tsv_path)
-        # 👆 not needed because run on entire dict before this is applied
         prep_path = AM_ENV_DIR.joinpath(
             f'{polarity.lower()}_{words_to_keep}_counts{data_suff}')
         try:
@@ -525,31 +550,12 @@ def prep_by_polarity(in_paths_dict: dict,
     return polar_dict
 
 
-def build_ucs_from_multiple(tsv_paths,
-                            min_count: int = 2,
-                            count_type: str = 'bigram',
-                            save_path: Path = None,
-                            debug: bool = False):
-    cmd = 'cat'
-    save_path = save_path or f'{AM_ENV_DIR.parent}/polarized-{count_type}_min{min_count}x.ds.gz'
-    if debug:
-        cmd = 'head -50'
-        save_path = save_path.parent.joinpath(f'debug/debug_{save_path.name}')
-        confirm_dir(save_path.parent)
-    build_ucs_table(
-        ucs_save_path=save_path,
-        cat_tsv_str=f"({' && '.join(f'{cmd} {p}' for p in tsv_paths)})",
-        min_count=min_count
-    )
-    return save_path
-
-
 # * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
-def save_for_ucs(df, col_1: str, col_2: str,
-                 output_dir: Path = None,
-                 ucs_path: Path = None,
-                 filter_dict: dict = None,
-                 ) -> pd.DataFrame:
+def ucs_from_hit_table(df, col_1: str, col_2: str,
+                       output_dir: Path = None,
+                       ucs_path: Path = None,
+                       filter_dict: dict = None,
+                       ) -> pd.DataFrame:
     # ? Is this method actually used?
     """
     Saves a DataFrame in UCS format based on specified columns and filters.
@@ -605,6 +611,250 @@ def save_for_ucs(df, col_1: str, col_2: str,
                       sep='\t', header=False, index=False)
 
     return counts
+
+# * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
+
+
+def ucs_from_hit_table(df, col_1: str, col_2: str,
+                       output_dir: Path = None,
+                       ucs_path: Path = None,
+                       filter_dict: dict = None,
+                       ) -> pd.DataFrame:
+    """
+    Saves a DataFrame in UCS format based on specified columns and filters.
+
+    This function applies to the initial, `hit_id` indexed dataframe (a "hit table"). 
+    If either an output directory or a specific path are given, the resultant dataframe will be saved as a `.tsv`,
+    which can be used as the (stdin/piped) input for `ucs-make-tables --types`.
+
+    Args:
+        df: The DataFrame to pull `value_counts` from.
+        col_1: The name of the first column to count.
+        col_2: The name of the second column to count.
+        output_dir: The output directory for any UCS file.
+        ucs_path: The path to save the UCS file. Generated from `output_dir`, `col_1`, and `col_2` if not given.
+        filter_dict: An optional dictionary of column (key) == value pairs to filter the DataFrame. Filter info will be incorporated into any output path.
+
+    Returns:
+        The DataFrame with counts of unique combinations of col_1 and col_2.
+    """
+    cols_tag = re.compile(r'_([a-z]{,4})-([a-z]{,4})_', re.IGNORECASE)
+    if col_1 not in df.columns:
+        print(
+            f'WARNING: col_1 "{col_1}" not in dataframe. Defaulting to "adv_form_lower"')
+        col_1 = 'adv_form_lower'
+        if ucs_path:
+            ucs_path = ucs_path.with_name(
+                cols_tag.sub(r'_Adv-\2_', ucs_path.name))
+
+    if col_2 not in df.columns:
+        print(
+            f'WARNING: col_2 "{col_2}" not in dataframe. Defaulting to "adj_form_lower"')
+        col_2 = 'adj_form_lower'
+        if ucs_path:
+            ucs_path = ucs_path.with_name(
+                cols_tag.sub(r'_\1-Adj_', ucs_path.name))
+
+    if output_dir and not ucs_path:
+        ucs_dir = output_dir / 'ucs_format'
+        confirm_dir(ucs_dir)
+        ucs_path = (ucs_dir /
+                    f'{snake_to_camel(col_1)}{snake_to_camel(col_2)}.tsv')
+
+    if filter_dict:
+        for col, val in filter_dict.items():
+            df = df.loc[df[col] == val, :]
+            if ucs_path:
+                ucs_path = ucs_path.with_stem(
+                    f"{ucs_path.stem}_{snake_to_camel(col)}{val.upper()}")
+    if ucs_path:
+        print(f'output path: {ucs_path}')
+        counts = show_counts(df, [col_1, col_2]).reset_index()[
+            ['count', col_1, col_2]]
+        counts.to_csv(ucs_path, encoding='utf8',
+                      sep='\t', header=False, index=False)
+
+    return counts
+
+
+# * This function applies to a "frequency table", a DataFrame where counts have already been calculated via `pd.crosstab`
+#  The index for such a table will be unique values for the `index` Series passed, not unique tokens/observations,
+#  and the values will be co-occurrence frequencies with the value indicated by the column.
+def ucs_from_frq_table(frq_df,
+                       output_tsv_path,
+                       numeric_label='raw',
+                       row_w1_label='adj_form_lower',
+                       col_w0_label='adv_form_lower',
+                       for_ucs: bool = False):
+    """
+    Saves a frequency table DataFrame in LSC format.
+
+    This function applies to a "frequency table", a DataFrame where counts have already been calculated via `pd.crosstab`. The index for such a table will be unique values for the `index` Series passed, not unique tokens/observations, and the values will be co-occurrence frequencies with the value indicated by the column.
+
+    Args:
+        frq_df: The frequency table DataFrame to be saved.
+        output_tsv_path: The path to save the LSC file.
+        numeric_label: The label for the numeric column in the frequency table. Defaults to 'raw'.
+        row_w1_label: The label for the row column in the frequency table. Defaults to 'adj_form_lower'.
+        col_w0_label: The label for the column column in the frequency table. Defaults to 'adv_form_lower'.
+        for_ucs: A boolean indicating whether the output is for UCS format. Defaults to False.
+
+    Returns:
+        None
+    """
+
+    def get_reshaped_output_lines(frq_df, row_w1_label, col_w0_label, for_ucs, new_col_name):
+        lsc_format = reshape_totals(frq_df, new_col_name)
+        lsc_format = _sort_stacks(
+            row_w1_label, col_w0_label, new_col_name, lsc_format)
+        return cleanup_output(for_ucs, lsc_format)
+
+    def cleanup_output(for_ucs, lsc_format):
+        counts_list = lsc_format.to_csv(sep="\t", index=False).splitlines()[1:]
+        counts_lines = [x.strip() for x in counts_list]
+        return counts_lines if for_ucs else ['2'] + counts_lines
+
+    def save_tsv_file(output_tsv_path, output_lines):
+        output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
+        print(
+            f'* Simple tab-delimited counts saved as `.tsv`:\n  * path: `{output_tsv_path}`')
+
+    def show_sample_output(output_lines):
+        print('\n## Formatted Output Sample (top 20 bigrams)\n\n```log')
+        print('\n'.join(output_lines[:20] + ['...']).expandtabs(8))
+        print('```\n')
+
+    def reshape_totals(frq_df, new_col_name):
+        return frq_df.stack().to_frame(new_col_name)
+
+    def _sort_stacks(row_w1_label, col_w0_label, new_col_name, stacked_df):
+        stacked_df = stacked_df.reset_index()
+        stacked_df['raw_frq'] = pd.to_numeric(
+            stacked_df.raw_frq, downcast='unsigned')
+        print_md_table(stacked_df.head(6).convert_dtypes(),
+                       title='\n## Stacked\n')
+        print_md_table(stacked_df.tail(6).convert_dtypes(), title='\n...\n')
+
+        stacked_df = stacked_df[[new_col_name, col_w0_label, row_w1_label]]
+        # stacked_df = (
+        #     stacked_df
+        #     .sort_values([row_w1_label, col_w0_label])
+        # )
+        # I don't think this ^^ makes a difference.
+        #   Was trying to get it to sort A-Z within the same frequency value,
+        #   but it seems to overwrite that regardless, since one requires ascending, and the other descending
+        # But it doesn't really matter in any case.
+
+        #! The zeros have to be dropped from the data for UCS, and it might affect LSC as well
+        # ^ 💡 so maybe this should just return `nonzeros` dataframe?
+        # HACK: #! if there are errors, check this
+        nonzeros = stacked_df[stacked_df[new_col_name] != 0]
+        return nonzeros.sort_values(new_col_name, ascending=False).reset_index(drop=True)
+
+    def prep_to_reshape(frq_df, numeric_label, row_w1_label, col_w0_label):
+        if row_w1_label in frq_df.columns:
+            frq_df = frq_df.set_index(row_w1_label, drop=True)
+        elif not frq_df.index.name:
+            frq_df.index.name = row_w1_label
+        if not frq_df.columns.name:
+            frq_df.columns.name = col_w0_label
+
+        frq_df = frq_df.loc[frq_df.index != 'SUM', frq_df.columns != 'SUM']
+
+        return frq_df, f'{numeric_label}_frq'
+
+    confirm_dir(output_tsv_path.parent)
+    frq_df, new_col_name = prep_to_reshape(
+        frq_df, numeric_label, row_w1_label, col_w0_label)
+    output_lines = get_reshaped_output_lines(frq_df, row_w1_label,
+                                             col_w0_label, for_ucs, new_col_name)
+
+    show_sample_output(output_lines)
+    save_tsv_file(output_tsv_path, output_lines)
+
+
+def make_ucs_tsv(data_path, col_1: str = None, col_2: str = None):
+    cross_regex = re.compile(r'([^_]+)-x-([^_]+)')
+    """
+        Reformat dataframe for UCS analysis.
+
+    Args:
+        data_path: The path to the data.
+        col_1: The label for column 1.
+        col_2: The label for column 2.
+
+    Returns:
+        None
+
+    Examples:
+        make_ucs_tsv('data.csv', 'column1', 'column2')
+    """
+
+    def _pull_labels_from_stem(stem, df):
+
+        # > if both axes have a name, don't bother with extracting info from stem
+        tags = [df.index.name, df.columns.name]
+        if all(tags):
+            return tags
+
+        # > if not, use regular expression to locate the "__-x-__" cross info from the stem
+        cross = cross_regex.search(stem)
+
+        # ? #FIXME: is this right? is the ordering row, col or as it would be linearly in the text?
+        # ^ if the loaded dataframe is a pickle, it won't matter --> the names will already be there.
+        if not tags[0]:
+            tags[0] = cross.groups(0)
+        if not tags[1]:
+            tags[1] = cross.groups(1)
+        return tags
+
+    def _set_out_path(data_path, data_stem, col_1: str = None, col_2: str = None):
+        freq_out_dir = Path('/share/compling/projects/sanpi/results/freq_out')
+        out_dir = (data_path.with_name('ucs_format')
+                   if 'freq_out' in data_path._parts
+                   else freq_out_dir / data_path.parent.name / 'ucs_format')
+        confirm_dir(out_dir)
+        if col_1 and col_2:
+            prefix = '-'.join((snake_to_camel(c.replace('form',
+                                                        '').replace('lower', ''))[:4] for c in (col_1, col_2)))
+            data_stem = f'from-hit-table_{prefix}_{data_stem}'
+        return out_dir.joinpath(f'{data_stem}.tsv')
+
+    def _load_df(data_path):
+        stem = data_path.stem
+        if '.pkl' in data_path.suffixes:
+            df = pd.read_pickle(data_path)
+            stem = Path(stem).stem
+        else:
+            df = pd.read_csv(data_path)
+            if 'hit_id' in df.columns:
+                df = df.set_index('hit_id')
+        return df, stem
+    df, data_stem = _load_df(data_path)
+    print('# Reformatting co-occurence data for UCS analysis\n')
+    print(f'* Loading from `{data_path}`')
+    md_str = print_md_table(
+        corners(df, 3), title='\n## Input Data\n', suppress=True)
+    print(md_str.replace('-|:', ':|-').replace('-|\n', ':|\n'))
+
+    # > table indexed by individual hit tokens
+    # if data_path.is_relative_to('/share/compling/data/sanpi'):
+    if df.index.name == 'hit_id':
+
+        ucs_from_hit_table(
+            df, col_1, col_2,
+            ucs_path=_set_out_path(data_path, data_stem, col_1, col_2))
+
+    # > crosstabulated frequency table of joint counts
+    # if data_path.is_relative_to('/share/compling/projects/sanpi/results'):
+    else:
+        w1_row_label, w0_col_label = _pull_labels_from_stem(data_stem, df)
+        ucs_from_frq_table(
+            df,
+            output_tsv_path=_set_out_path(data_path, data_stem),
+            row_w1_label=w1_row_label,
+            col_w0_label=w0_col_label,
+            for_ucs=True)
 
 
 def print_ex_assoc(df,
