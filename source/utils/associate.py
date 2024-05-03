@@ -9,9 +9,9 @@ from sys import exit as sysxit
 import pandas as pd
 
 from .dataframes import Timer, corners, print_md_table, show_counts
-from .general import (DEMO_RESULT_DIR, RESULT_DIR, SANPI_HOME, camel_to_snake,
-                      confirm_dir, print_iter, run_shell_command,
-                      snake_to_camel)
+from .general import (DEMO_RESULT_DIR, FREQ_DIR, RESULT_DIR, SANPI_HOME,
+                      camel_to_snake, confirm_dir, print_iter,
+                      run_shell_command, snake_to_camel)
 
 #! This 👇 will result in crashes if environment without `association_measures` is used
 #!  to run methods actually using this import,
@@ -773,7 +773,9 @@ def ucs_from_frq_table(frq_df,
     save_tsv_file(output_tsv_path, output_lines)
 
 
-def make_ucs_tsv(data_path, col_1: str = None, col_2: str = None):
+def make_ucs_tsv(data_path, 
+                 col_1: str = None, 
+                 col_2: str = None):
     cross_regex = re.compile(r'([^_]+)-x-([^_]+)')
     """
         Reformat dataframe for UCS analysis.
@@ -787,7 +789,13 @@ def make_ucs_tsv(data_path, col_1: str = None, col_2: str = None):
         None
 
     Examples:
-        make_ucs_tsv('data.csv', 'column1', 'column2')
+        make_ucs_tsv('freq_out/*/freq_table.csv')
+        make_ucs_tsv('4_post-processed/*/hit_table.pkl.gz', 
+                     col_1='pattern', col_2='bigram_lower')
+        make_ucs_tsv('4_post-processed/*/hit_table.pkl.gz', 
+                     col_1='corpus', col_2='bigram_lower')
+        make_ucs_tsv('4_post-processed/*/hit_table.pkl.gz', 
+                     col_1='neg_form_lower', col_2='bigram_lower')
     """
 
     def _pull_labels_from_stem(stem, df):
@@ -808,16 +816,19 @@ def make_ucs_tsv(data_path, col_1: str = None, col_2: str = None):
             tags[1] = cross.groups(1)
         return tags
 
-    def _set_out_path(data_path, data_stem, col_1: str = None, col_2: str = None):
-        freq_out_dir = Path('/share/compling/projects/sanpi/results/freq_out')
+    def _set_out_path(data_path:Path, 
+                      data_stem:str, 
+                      col_1: str = None, 
+                      col_2: str = None) -> Path:
         out_dir = (data_path.with_name('ucs_format')
                    if 'freq_out' in data_path._parts
-                   else freq_out_dir / data_path.parent.name / 'ucs_format')
+                   else FREQ_DIR / data_path.parent.name / 'ucs_format')
         confirm_dir(out_dir)
         if col_1 and col_2:
-            prefix = '-'.join((snake_to_camel(c.replace('form',
-                                                        '').replace('lower', ''))[:4] for c in (col_1, col_2)))
-            data_stem = f'from-hit-table_{prefix}_{data_stem}'
+            data_name = re.search(r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
+            prefix = '-x-'.join((snake_to_camel(re.sub(r'lower|form', '', c))[:4] 
+                                 for c in (col_1, col_2)))
+            data_stem = f'{prefix}_{data_name}'
         return out_dir.joinpath(f'{data_stem}.tsv')
 
     def _load_df(data_path):
