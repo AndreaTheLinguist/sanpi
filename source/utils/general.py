@@ -9,6 +9,7 @@ from scipy import constants as sc
 import numpy as np
 
 PKL_SUFF = '.pkl.gz'
+POST_PROC_DIR = Path('/share/compling/data/sanpi/4_post-processed')
 SANPI_HOME = Path('/share/compling/projects/sanpi')
 DEMO_DIR = SANPI_HOME / 'DEMO'
 RESULT_DIR, DEMO_RESULT_DIR = [W / 'results' for W in (SANPI_HOME, DEMO_DIR)]
