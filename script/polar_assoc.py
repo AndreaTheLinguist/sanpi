@@ -249,7 +249,7 @@ def designate_data(args):
     return data
 
 
-def gen_init_ucs_tables(args) -> tuple:
+def gen_init_ucs_tables(args):
     """
     Generate initial UCS tables for comparison based on the provided arguments.
 
@@ -495,12 +495,18 @@ def _extend_assoc_data(data: pd.DataFrame,
                         .rename(columns={'l2': adx, 'f2': f'{adx}_total'})
                         .set_index(adx).squeeze(),
                         downcast='integer')
-
                 adv_totals, adj_totals = [
                     get_adx_totals(
                         _data.frame[f'{x}_extra'].filter(regex=r'^[fl]'), adx=x)
                     for x in ('adv', 'adj')]
-
+                # TODO? add ad* joint f as well as total
+                # def get_adx_polar_f(adx_df: pd.DataFrame, adx: str) -> pd.Series: 
+                #     adx_df = adx_df.copy()[['l1', 'l2', 'f']]
+                #     pass
+                #
+                # adv_polar, adj_polar = [
+                #     get_adx_polar_f(_data.frame[f'{x}_extra'].filter(regex=r'^[fl]'), adx=x)
+                #     for x in ('adv', 'adj')]
                 bigram_df = _data.frame['bigram_extra'].copy()
                 bigram_df[['adv', 'adj']] = bigram_df.l2.str.split(
                     "_", expand=True).astype('string').astype('category')
@@ -512,7 +518,6 @@ def _extend_assoc_data(data: pd.DataFrame,
                         pd.concat([bigram_df.filter(regex=r'^ad[vj]|^(f|l1)$').filter(
                             like=e[:2], axis=0).sample(3) for e in bigram_df.l1.unique()]),
                         title='\n Sample (6) of lexical columns added to `bigram_extra` table\n')
-                #> also add "bigram_total" to polarized bigrams
                 return bigram_df
 
             extended.at[f'bigram_{stage_name}',
@@ -934,7 +939,7 @@ def load_from_csv(csv_path):
     return pd.read_csv(csv_path)
 
 
-def get_am_df_path(input_path: Path or str,
+def get_am_df_path(input_path: Path | str,
                    added_measures: bool = False,
                    metric_name: str = None):
     """
