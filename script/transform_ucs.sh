@@ -28,8 +28,8 @@ DATA_SET=$(basename ${DATA_PATH/./-})
 DATA_SET=${DATA_SET%%.*}
 
 #* initialize logging
-LOG_DIR="/share/compling/projects/sanpi/logs/associate/ucs"
-LOG_FILE_NAME="ucs_${DATA_SET}"
+LOG_DIR="/share/compling/projects/sanpi/logs/associate/ucs/"
+LOG_FILE_NAME="ucs-${SUBDIR_NAME}_${DATA_SET}"
 if [[ ! -d ${LOG_DIR} ]]; then
     mkdir -p ${LOG_DIR}
 fi
