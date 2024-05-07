@@ -1,4 +1,5 @@
 # -*- coding=utf-8 -*-
+from collections import namedtuple
 import itertools as itt
 import re
 from math import log1p, log2, log10, sqrt
@@ -47,6 +48,10 @@ AM_ENV_DIR, DEMO_AM_ENV_DIR = [
 
 # ? Does this even do anything? This is never run as its own thing...
 confirm_dir(AM_ENV_DIR)
+
+BINARY_ASSOC_ARGS = namedtuple(
+    'BINARY_ASSOC_TUPLE',
+    ['min_freq', 'all_counts', 'compare_counts', 'comp_label', 'target_counts', 'targ_label', 'data_suffix', 'skew', 'verbose'])
 
 
 def adjust_assoc_columns(columns: pd.Index | list,
@@ -114,6 +119,8 @@ def add_extra_am(df: pd.DataFrame,
                           vocab=vocab, digits=ndigits)
 
     df = df.join(scores.loc[:, ~scores.columns.isin(df.columns)])
+    df = extend_deltaP(df.copy())
+    df = adjust_expectations(df)
 
     # MARK: LRC
     # * manually set conservative_log_ratio variants:
@@ -139,8 +146,6 @@ def add_extra_am(df: pd.DataFrame,
     df['conservative_log_ratio_dv'] = am.conservative_log_ratio(
         df, one_sided=False, alpha=ALPHA,
         digits=ndigits)
-    df = extend_deltaP(df.copy())
-    df = adjust_expectations(df)
 
     for col in ['f', 'f1', 'f2']:
         df[f'{col}_sqrt'] = df[col].apply(sqrt)
@@ -172,36 +177,25 @@ def adjust_expectations(df):
 
 
 def extend_deltaP(df):
-
+    deltaP_df = df.copy().filter(regex=r'given[12]$')
     for e in ('min', 'max', 'max_abs', 'product'):
-        df[f'deltaP_{e}'] = df.apply(
-            symmetric_deltaP, eval=e, axis=1)
+        df[f'deltaP_{e}'] = symmetric_deltaP(deltaP_df, eval=e)
 
     return df
 
 
-def symmetric_deltaP(combo: pd.Series,
+def symmetric_deltaP(_df: pd.DataFrame,
                      eval: str = 'max'):
-    """
-    Calculates the symmetric deltaP value based on the given combination of deltaP values.
-
-    Args:
-        combo: pandas Series. The combination of deltaP values.
-        eval: str, optional. The evaluation method to use ('min', 'max', or 'product'). Defaults to 'product'.
-
-    Returns:
-        float or pandas Series. The symmetric deltaP value calculated based on the specified evaluation method.
-    """
-
-    deltaP_vals = combo.filter(regex=r'given[12]$')
+    if _df.shape[1] > 2: 
+        _df = _df.filter(regex=r'given[12]$')
     if eval == 'min':
-        return deltaP_vals.min()
+        return _df.min(axis=1)
     elif eval == 'max':
-        return deltaP_vals.max()
-    elif eval == 'abs_max':
-        return deltaP_vals.abs().max()
+        return _df.max(axis=1)
+    elif eval in {'abs_max', 'max_abs'}:
+        return _df.abs().max(axis=1)
     elif eval == 'product':
-        return deltaP_vals.iat[0] * deltaP_vals.iat[1]
+        return _df.product(axis=1)
 
 
 def get_vocab_size(all_bigrams: Path or pd.DataFrame,
@@ -240,24 +234,14 @@ def get_vocab_size(all_bigrams: Path or pd.DataFrame,
     return vocabs
 
 
-def confirm_basic_ucs(basic_ucs_path, args,
+def confirm_basic_ucs(basic_ucs_path: Path, 
+                      args: BINARY_ASSOC_ARGS,
                       unit: str = None):
+
     if basic_ucs_path.is_file():
         print('+ existing UCS table found ✓')
     elif unit:
-        comp_path = args.complement_counts
-        neg_path = args.negated_counts
-        if any(not p.is_file() for p in (comp_path, neg_path)):
-            exit(
-                f'Initial counts file not found. Check your paths...\n> {comp_path}\n> {neg_path}')
-        path_dict = prep_by_polarity(words_to_keep=unit, data_suffix=args.data_suffix,
-                                     in_paths_dict={args.comp_label: comp_path,
-                                                    args.neg_label: neg_path})
-        basic_ucs_path = build_ucs_from_multiple(
-            tsv_paths=path_dict.values(),
-            min_count=args.min_freq,
-            save_path=basic_ucs_path
-        )
+        basic_ucs_path = confirm_polarized_ucs(basic_ucs_path, args, unit)
     elif args.all_counts.is_file():
         build_ucs_table(min_count=args.min_freq,
                         ucs_save_path=basic_ucs_path,
@@ -266,8 +250,28 @@ def confirm_basic_ucs(basic_ucs_path, args,
         raise FileNotFoundError
     return basic_ucs_path
 
+def confirm_polarized_ucs(basic_ucs_path: Path, 
+                          args: BINARY_ASSOC_ARGS, 
+                          unit_str:str):
+    comp_path = args.compare_counts
+    neg_path = args.target_counts
+    if any(not p.is_file() for p in (comp_path, neg_path)):
+        exit(
+                f'Initial counts file not found. Check your paths...\n> {comp_path}\n> {neg_path}')
+    path_dict = prep_by_polarity(words_to_keep=unit_str, 
+                                 data_suffix=args.data_suffix,
+                                 in_paths_dict={args.comp_label: comp_path,
+                                                    args.targ_label: neg_path})
+    basic_ucs_path = build_ucs_from_multiple(
+            tsv_paths=path_dict.values(),
+            min_count=args.min_freq,
+            save_path=basic_ucs_path
+        )
+    
+    return basic_ucs_path
 
-def initialize_ucs(basic_ucs_path: Path, args, unit: str = ''):
+
+def initialize_ucs(basic_ucs_path: Path, args: BINARY_ASSOC_ARGS, unit: str = ''):
 
     print(
         '\nLocating and/or building initial frequency-only UCS table...')
@@ -288,7 +292,7 @@ def associate_ucs(basic_ucs_path):
         print(f'+ time elapsed → {_timer.elapsed()}')
 
 
-def get_associations_csv(unit, args, is_polar) -> Path:
+def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
 
     def manipulate_ucs(basic_ucs_path: Path, args, unit: str):
 
@@ -297,7 +301,11 @@ def get_associations_csv(unit, args, is_polar) -> Path:
         return basic_ucs_path
 
     # > select readable/*.csv if it exists, else readable/*.txt
-    readable = seek_readable_ucs(unit, args,
+    readable = seek_readable_ucs(unit,
+                                 min_freq=args.min_freq,
+                                 target_counts_dir=args.target_counts.parent,
+                                 data_suffix=args.data_suffix,
+                                 all_counts=args.all_counts,
                                  is_polar=is_polar)
 
     # > create ucs tables if readable/*.txt does not exist
@@ -317,24 +325,27 @@ def get_associations_csv(unit, args, is_polar) -> Path:
     return convert_ucs_to_csv(readable) if readable.suffix == '.txt' else readable
 
 
-def seek_readable_ucs(unit, args, is_polar: bool = True):
-    min_freq_flag = f'_min{args.min_freq}x'
+def seek_readable_ucs(unit: str,
+                      min_freq: int,
+                      target_counts_dir: Path,
+                      all_counts: Path,
+                      data_suffix: str,
+                      is_polar: bool = True):
+    min_freq_flag = f'_min{min_freq}x'
 
     if unit:
-        # TODO rename the `neg_counts` argument --> `target_counts` or `pat_counts`
-        target_parent = args.negated_counts.parent
-        while target_parent.name.lower().startswith(('ucs', 'complement')):
-            target_parent = target_parent.parent
-        subdir = target_parent.name
+        while target_counts_dir.name.lower().startswith(('ucs', 'complement')):
+            target_counts_dir = target_counts_dir.parent
+        subdir = target_counts_dir.name
         pref = 'polar' if is_polar else 'eval_mirror'
         readable_parent = f'{pref}/{subdir}/{unit}'
-        init_ucs_stem = (f'{pref}-{unit}_{args.data_suffix.strip(".tsv")}'
+        init_ucs_stem = (f'{pref}-{unit}_{data_suffix.strip(".tsv")}'
                          .replace('polar', 'polarized'))
 
     else:
         subdir = 'adv_adj'
-        init_ucs_stem = args.all_counts.stem
-        readable_parent = args.all_counts.parent
+        init_ucs_stem = all_counts.stem
+        readable_parent = all_counts.parent
         if 'ucs' in readable_parent.name.lower():
             readable_parent = readable_parent.parent
         readable_parent = f'{subdir}/{readable_parent.name}'
@@ -773,8 +784,8 @@ def ucs_from_frq_table(frq_df,
     save_tsv_file(output_tsv_path, output_lines)
 
 
-def make_ucs_tsv(data_path, 
-                 col_1: str = None, 
+def make_ucs_tsv(data_path,
+                 col_1: str = None,
                  col_2: str = None):
     cross_regex = re.compile(r'([^_]+)-x-([^_]+)')
     """
@@ -816,17 +827,18 @@ def make_ucs_tsv(data_path,
             tags[1] = cross.groups(1)
         return tags
 
-    def _set_out_path(data_path:Path, 
-                      data_stem:str, 
-                      col_1: str = None, 
+    def _set_out_path(data_path: Path,
+                      data_stem: str,
+                      col_1: str = None,
                       col_2: str = None) -> Path:
         out_dir = (data_path.with_name('ucs_format')
                    if 'freq_out' in data_path._parts
                    else FREQ_DIR / data_path.parent.name / 'ucs_format')
         confirm_dir(out_dir)
         if col_1 and col_2:
-            data_name = re.search(r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
-            prefix = '-x-'.join((snake_to_camel(re.sub(r'lower|form', '', c))[:4] 
+            data_name = re.search(
+                r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
+            prefix = '-x-'.join((snake_to_camel(re.sub(r'lower|form', '', c))[:4]
                                  for c in (col_1, col_2)))
             data_stem = f'{prefix}_{data_name}'
         return out_dir.joinpath(f'{data_stem}.tsv')

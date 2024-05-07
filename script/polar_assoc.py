@@ -8,7 +8,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from tabulate import tabulate
 
-from source.utils.associate import (ALPHA, READ_TAG, RESULT_DIR, UCS_DIR,
+from source.utils.associate import (READ_TAG, RESULT_DIR, UCS_DIR, BINARY_ASSOC_ARGS,
                                     add_extra_am, adjust_assoc_columns,
                                     get_associations_csv, get_vocab_size)
 from source.utils.dataframes import (Timer, beef_up_dtypes, corners,
@@ -90,27 +90,27 @@ def _parse_args():
         "Minimum frequency of co-occurrences included as rows "
         "(everything is still included in the marginal frequencies) in association tables"
     )
-    complement_counts_help = (
-        "Path to ucs-formatted .tsv of COMPLEMENT bigram frequencies; i.e. "
+    comparison_counts_help = (
+        "Path to ucs-formatted .tsv of COMPARISON bigram frequencies; e.g. "
         "counts for bigram tokens with no *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'positive polarity' environments.) "
         "The transformed frequency data will be saved as "
         "`polarity_prepped_tsv/[COMP_LABEL]_bigram_counts[DATA_SUFFIX]`"
     )
     comp_label_help = (
-        "Option to set the label for complement (set difference, not negated, 'positive', etc.) counts. "
+        "Option to set the label for comparison (set difference, not negated, 'positive', etc.) counts. "
         "Used for output path generation."
     )
-    negated_counts_help = (
+    target_counts_help = (
         "Path to ucs-formatted .tsv of NEGATED bigram frequencies; i.e. "
         "counts for bigram tokens with *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'negative polarity' environments.) "
         "The transformed frequency data will be saved as "
         "`polarity_prepped_tsv/[NEG_LABEL]_bigram_counts[DATA_SUFFIX]`"
     )
-    neg_label_help = (
-        "Option to set the label for negated (or matching specific pattern) counts. "
-        "Used for output path generation."
+    target_label_help = (
+        "Option to set the label for target counts; "
+        "Used to generate output path(s) and set the `l1` values for contained `l2` values."
     )
     data_suffix_help = (
         "Option to indicate specific starting data set "
@@ -141,17 +141,17 @@ def _parse_args():
         default=_default_all,
         help='path to ucs formatted .tsv of all bigram combinations, regardless of polarity')
     parser.add_argument(
-        '-c', '--complement_counts', type=Path,
-        default=_default_comps, help=complement_counts_help)
+        '-c', '--compare_counts', type=Path,
+        default=_default_comps, help=comparison_counts_help)
     parser.add_argument(
         '-C', '--comp_label', type=str,
         default='complement', help=comp_label_help)
     parser.add_argument(
-        '-n', '--negated_counts', type=Path,
-        default=_default_negs, help=negated_counts_help)
+        '-n', '--target_counts', type=Path,
+        default=_default_negs, help=target_counts_help)
     parser.add_argument(
-        '-N', '--neg_label', type=str,
-        default='negated', help=neg_label_help)
+        '-N', '--targ_label', type=str,
+        default='negated', help=target_label_help)
     parser.add_argument(
         '-s', '--data_suffix', type=str,
         default=_default_output_suffix, help=data_suffix_help)
@@ -162,8 +162,21 @@ def _parse_args():
     parser.add_argument(
         '-v', '--verbose', default=False, action='store_true',
         help='Option to print more processing info to stdout')
-
-    return parser.parse_args()
+    args = parser.parse_args()
+    # // # ! Warning: if the above order changes, `utils.associate.BINARY_ASSOC_ARGS` must be updated as well,
+    # // # !   or the following assignments will be messed up.
+    # // args_tuple = BINARY_ASSOC_ARGS._make(args.__dict__.values())
+    # Explicit assignement is safer 🦺
+    return BINARY_ASSOC_ARGS(min_freq=args.min_freq,
+                             all_counts=args.all_counts,
+                             compare_counts=args.compare_counts,
+                             comp_label=args.comp_label,
+                             target_counts=args.target_counts,
+                             targ_label=args.targ_label,
+                             data_suffix=args.data_suffix,
+                             skew=args.skew,
+                             verbose=args.verbose
+                             )
 
 
 def designate_data(args):
@@ -180,8 +193,8 @@ def designate_data(args):
 
         print_md_table(data.copy().filter(
             items=['key', 'unit', 'stage', 'path']
-        ).astype('str'), title='\n## Starting Data Specs\n', 
-                       format='grid')
+        ).astype('str'), title='\n## Starting Data Specs\n',
+            format='grid')
         for ix in data.index:
             df = data.frame[ix]
             count_type = data.unit[ix]
@@ -248,8 +261,8 @@ def gen_init_ucs_tables(args) -> tuple:
     """
 
     def _prepare_data(args):
-        comp_path = args.complement_counts
-        # > if `args.complement_counts` relative to `*mirror/complement/`
+        comp_path = args.compare_counts
+        # > if `args.compare_counts` relative to `*mirror/complement/`
         # >     comparison is between `{POS,NEG}mirror` and non-`{POS,NEG}mirror`
         # >     not approximation of polarity environments.
         #       i.e. one of the following
@@ -259,9 +272,9 @@ def gen_init_ucs_tables(args) -> tuple:
         #           NEGmirror/ucs_format/*.tsv ~VS~ POSmirror/ucs_format/*.tsv
         polarity_approx = 'mirror/complement' not in str(comp_path)
         print('Comparing:',
-              f'* pat target = {args.negated_counts.relative_to(FREQ_DIR)}',
+              f'* target set = {args.target_counts.relative_to(FREQ_DIR)}',
               '   ~vs~',
-              f'* complement = {comp_path.relative_to(FREQ_DIR)}',
+              f'* comparison = {comp_path.relative_to(FREQ_DIR)}',
               '....................',
               sep='\n')
         for i, unit in enumerate(('', 'bigram', 'adv', 'adj'), start=1):
@@ -465,12 +478,12 @@ def _extend_assoc_data(data: pd.DataFrame,
 
     extended = pd.concat([data.loc[data.stage == stage_name], new_extend])
     if (f'bigram_{stage_name}' in extended.index
-        and any(adx_col not in
-                extended.at[f'bigram_{stage_name}', 'frame'].columns
-                for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
+            and any(adx_col not in
+                    extended.at[f'bigram_{stage_name}', 'frame'].columns
+                    for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
         ):
 
-        if all(adx in extended.unit.unique() for adx in ('adv', 'adj')):
+        if all(adx in extended.unit.unique() for adx in ('adv', 'adj', 'bigram')):
 
             def add_adx_info(_data: pd.DataFrame,
                              verbose: bool = False) -> pd.DataFrame:
@@ -499,7 +512,7 @@ def _extend_assoc_data(data: pd.DataFrame,
                         pd.concat([bigram_df.filter(regex=r'^ad[vj]|^(f|l1)$').filter(
                             like=e[:2], axis=0).sample(3) for e in bigram_df.l1.unique()]),
                         title='\n Sample (6) of lexical columns added to `bigram_extra` table\n')
-
+                #> also add "bigram_total" to polarized bigrams
                 return bigram_df
 
             extended.at[f'bigram_{stage_name}',
@@ -939,8 +952,8 @@ def get_am_df_path(input_path: Path or str,
     input_path = Path(input_path)
     input_dir = input_path.parent
     input_dir_nesting = (input_dir.relative_to(UCS_DIR)
-                   if input_dir.is_relative_to(UCS_DIR)
-                   else input_dir.relative_to(RESULT_DIR))
+                         if input_dir.is_relative_to(UCS_DIR)
+                         else input_dir.relative_to(RESULT_DIR))
     # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
     #       nesting == `polar/RBdirect/bigram/readable`
     #       change to --> `polar/RBdirect/bigram`
