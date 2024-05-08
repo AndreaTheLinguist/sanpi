@@ -45,6 +45,7 @@ UCS_DIR, DEMO_UCS_DIR = [
     R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
 AM_ENV_DIR, DEMO_AM_ENV_DIR = [
     R / 'env_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
+AM_DF_DIR=RESULT_DIR / 'assoc_df'
 
 # ? Does this even do anything? This is never run as its own thing...
 confirm_dir(AM_ENV_DIR)
@@ -561,71 +562,8 @@ def prep_by_polarity(in_paths_dict: dict,
     return polar_dict
 
 
-# * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
-def ucs_from_hit_table(df, col_1: str, col_2: str,
-                       output_dir: Path = None,
-                       ucs_path: Path = None,
-                       filter_dict: dict = None,
-                       ) -> pd.DataFrame:
-    # ? Is this method actually used?
-    """
-    Saves a DataFrame in UCS format based on specified columns and filters.
-
-    This function applies to the initial, `hit_id` indexed dataframe (a "hit table"). 
-    If either an output directory or a specific path are given, the resultant dataframe will be saved as a `.tsv`,
-    which can be used as the (stdin/piped) input for `usc-make-tables --types`.
-
-    Args:
-        df: The DataFrame to pull `value_counts` from.
-        col_1: The name of the first column to count.
-        col_2: The name of the second column to count.
-        output_dir: The output directory for any UCS file.
-        ucs_path: The path to save the UCS file. Generated from `output_dir`, `col_1`, and `col_2` if not given.
-        filter_dict: An optional dictionary of column (key) == value pairs to filter the DataFrame. Filter info will be incorporated into any output path.
-
-    Returns:
-        The DataFrame with counts of unique combinations of col_1 and col_2.
-    """
-    cols_tag = re.compile(r'_([a-z]{,4})-([a-z]{,4})_', re.IGNORECASE)
-    if col_1 not in df.columns:
-        print(
-            f'WARNING: col_1 "{col_1}" not in dataframe. Defaulting to "adv_form_lower"')
-        col_1 = 'adv_form_lower'
-        if ucs_path:
-            ucs_path = ucs_path.with_name(
-                cols_tag.sub(r'_Adv-\2_', ucs_path.name))
-
-    if col_2 not in df.columns:
-        print(
-            f'WARNING: col_2 "{col_2}" not in dataframe. Defaulting to "adj_form_lower"')
-        col_2 = 'adj_form_lower'
-        if ucs_path:
-            ucs_path = ucs_path.with_name(
-                cols_tag.sub(r'_\1-Adj_', ucs_path.name))
-
-    if output_dir and not ucs_path:
-        ucs_dir = output_dir / 'ucs_format'
-        confirm_dir(ucs_dir)
-        ucs_path = (ucs_dir /
-                    f'{snake_to_camel(col_1)}{snake_to_camel(col_2)}.tsv')
-    if filter_dict:
-        for col, val in filter_dict.items():
-            df = df.loc[df[col] == val, :]
-            if ucs_path:
-                ucs_path = ucs_path.with_stem(
-                    f"{ucs_path.stem}_{snake_to_camel(col)}{val.upper()}")
-    if ucs_path:
-        print(f'output path: {ucs_path}')
-        counts = show_counts(df, [col_1, col_2]).reset_index()[
-            ['count', col_1, col_2]]
-        counts.to_csv(ucs_path, encoding='utf8',
-                      sep='\t', header=False, index=False)
-
-    return counts
 
 # * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
-
-
 def ucs_from_hit_table(df, col_1: str, col_2: str,
                        output_dir: Path = None,
                        ucs_path: Path = None,
@@ -726,7 +664,9 @@ def ucs_from_frq_table(frq_df,
         return counts_lines if for_ucs else ['2'] + counts_lines
 
     def save_tsv_file(output_tsv_path, output_lines):
-        output_tsv_path.write_text('\n'.join(output_lines), encoding='utf8')
+        output_tsv_path.write_text(
+            re.sub(r'^o[\._]?k[\._]?$', 'ok', '\n'.join(output_lines)), 
+            encoding='utf8')
         print(
             f'* Simple tab-delimited counts saved as `.tsv`:\n  * path: `{output_tsv_path}`')
 
@@ -853,6 +793,8 @@ def make_ucs_tsv(data_path,
             if 'hit_id' in df.columns:
                 df = df.set_index('hit_id')
         return df, stem
+    
+    
     df, data_stem = _load_df(data_path)
     print('# Reformatting co-occurence data for UCS analysis\n')
     print(f'* Loading from `{data_path}`')
@@ -863,7 +805,8 @@ def make_ucs_tsv(data_path,
     # > table indexed by individual hit tokens
     # if data_path.is_relative_to('/share/compling/data/sanpi'):
     if df.index.name == 'hit_id':
-
+        if 'adj_form_lower' in df.columns: 
+            df['adj_form_lower'] = df.adj_form_lower.astype('string').apply(lambda x: re.sub(r'^o[\._]?k[\._]?$', 'ok', x))
         ucs_from_hit_table(
             df, col_1, col_2,
             ucs_path=_set_out_path(data_path, data_stem, col_1, col_2))

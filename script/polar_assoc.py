@@ -8,10 +8,11 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from tabulate import tabulate
 
-from source.utils.associate import (READ_TAG, RESULT_DIR, UCS_DIR, BINARY_ASSOC_ARGS,
-                                    add_extra_am, adjust_assoc_columns,
-                                    get_associations_csv, get_vocab_size)
-from source.utils.dataframes import (Timer, beef_up_dtypes, corners,
+from source.utils.associate import (AM_DF_DIR, BINARY_ASSOC_ARGS, READ_TAG,
+                                    RESULT_DIR, UCS_DIR, add_extra_am,
+                                    adjust_assoc_columns, get_associations_csv,
+                                    get_vocab_size)
+from source.utils.dataframes import (Timer, beef_up_dtypes, corners, save_table,
                                      print_md_table)
 from source.utils.general import (FREQ_DIR, PKL_SUFF, SANPI_HOME, confirm_dir,
                                   run_shell_command, snake_to_camel)
@@ -20,9 +21,11 @@ RATIO_CEIL = 0.7
 OUTLIER_MARGIN_IQR_FACTOR = 4
 # > set defaults
 _DEFAULT_CORP_PARTS = 35
-_DEFAULT_FRQ_COUNT = 868
-_DEFAULT_FRQ_PRCNT = '0-001'
-_DEFAULT_UCS_MIN = 100
+# _DEFAULT_FRQ_COUNT = 868
+_DEFAULT_FRQ_COUNT = 7
+# _DEFAULT_FRQ_PRCNT = '0-001p'
+_DEFAULT_FRQ_PRCNT = 'MIN-7'
+_DEFAULT_UCS_MIN = 500
 
 # > set pandas options
 pd.set_option("display.memory_usage", 'deep')
@@ -35,15 +38,26 @@ pd.set_option("display.float_format", '{:,.3f}'.format)
 def _main():
 
     args = _parse_args()
-
-    data = designate_data(args)
-
-    data = extend_tables(data, args)
-
+    meta_info_path = AM_DF_DIR.joinpath(
+            f'AM_meta_info{args.data_suffix}'.replace('.tsv', f'_min{args.min_freq}x.csv'))
+    if meta_info_path.is_file(): 
+        print(f'Association Meta Info found. Loading from {meta_info_path.relative_to(RESULT_DIR)}')
+        data = pd.read_csv(meta_info_path)
+        
+    else:
+        data = designate_data(args)
+        data = extend_tables(data, args)
+    
     ex_data = data.filter(like='extra', axis=0)
+    if 'frame' not in ex_data.columns:
+        ex_data['frame'] = ex_data.index.to_series().apply(
+                lambda i: load_from_pickle(
+                    unit=ex_data.unit[i], pkl_path=ex_data.path[i], extra=True))
+        
     if args.verbose:
         for i, assoc_inquiry in enumerate(ex_data.index):
             idf = ex_data.frame.iat[i]
+            print(assoc_inquiry)
             print_ex_assoc(
                 idf, ex_data.unit.iat[i],
                 sort_by=set_selector_column(
@@ -56,33 +70,41 @@ def _main():
 
         get_skews(ex_data, args.verbose)
 
+        
+    save_table(data.filter(regex=r'^[^f]'),
+        meta_info_path, 
+        df_name=f"Association Meta Info for {args.data_suffix.replace('.tsv','')} & displayed joint f >={args.min_freq}"
+        )
 
 def _parse_args():
-
+    base_freq_tsv_name = 'AdvAdj_frq-thrMIN-7.35f.tsv'
     _default_comps = (
         FREQ_DIR
         / 'RBdirect'
         / 'complement'
         / 'ucs_format'
-        / f'diff_all-RBdirect_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+        # / f'diff_all-RBdirect_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+        / f'diff_all-RBdirect_{base_freq_tsv_name}'
     )
     # results/freq_out/RBdirect/complement/ucs_format/diff_all-RBdirect_adj-x-adv_frq-thr0-001p.35f=868+.tsv
     # results/freq_out/RBdirect/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv
     _default_negs = (
         FREQ_DIR
         .joinpath('RBdirect/ucs_format')
-        .joinpath(f'ALL-WORDS_adj-x-adv_thr{_DEFAULT_FRQ_PRCNT}p.{_DEFAULT_CORP_PARTS}f.tsv')
-        # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
+        # .joinpath(f'ALL-WORDS_adj-x-adv_thr{_DEFAULT_FRQ_PRCNT}.{_DEFAULT_CORP_PARTS}f.tsv')
+        .joinpath(base_freq_tsv_name)
+        # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}.{_n_corp_parts}f.tsv')
     )
 
     _default_output_suffix = f'.{_DEFAULT_CORP_PARTS}f-{_DEFAULT_FRQ_COUNT}c.tsv'
     _default_all = (
         FREQ_DIR
         .joinpath('RBXadj/ucs_format')
-        .joinpath(f'all_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p'
-                  f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
-                  #   + _default_suff
-                  )
+        # .joinpath(f'all_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}'
+        #           f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+        #           #   + _default_suff
+        #           )
+        .joinpath(base_freq_tsv_name)
     )
 
     # > set help messages
@@ -301,11 +323,6 @@ def gen_init_ucs_tables(args):
             input_path=csv_path, added_measures=True)
         stage = 'initial'
 
-        def load_from_pickle(unit, pkl_path, extra: bool = False):
-            _extra = "_extra" if extra else ""
-            print(f'\n> Loading `{unit}` data',
-                  f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
-            return pd.read_pickle(pkl_path)
 
         if df_extra_path.is_file():
             df = load_from_pickle(unit, df_extra_path, extra=True)
@@ -339,7 +356,7 @@ def gen_init_ucs_tables(args):
             # print_md_table(opt_df.filter(regex=rows_regex, axis=0).filter(regex=cols_regex).sample(10))
             # print_md_table(opt_df.filter(regex=rows_regex, axis=0).filter(regex=cols_regex).sample(10), n_dec=2)
 
-            _save_dataframe(df_path, _optimize(df), force=True)
+            _save_am_dataframe(df_path, _optimize(df), force=True)
 
         return df, df_path, stage
 
@@ -353,6 +370,14 @@ def gen_init_ucs_tables(args):
             unit = 'adv~adj'
         yield unit, stage, df_path, df
 
+
+def load_from_pickle(unit:str, 
+                     pkl_path:Path, 
+                     extra: bool = False):
+    _extra = "_extra" if extra else ""
+    print(f'\n> Loading `{unit}` data',
+            f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
+    return pd.read_pickle(pkl_path)
 
 def handle_word_null(df, csv_path):
     """
@@ -446,7 +471,7 @@ def extend_tables(data, args):
         data.loc[data.stage == 'extra', :].index.to_series().apply(
             lambda k:
                 # `data.frame` objects are optimized in `_extend_assoc_data`
-                _save_dataframe(
+                _save_am_dataframe(
                     out_path=data.path[k],
                     _df=data.frame[k])
         )
@@ -845,7 +870,7 @@ def id_skewed_combos(df: pd.DataFrame,
         print_skew_percents(skewed_pairs, df, metric, ceiling, floor, unit)
     skewed_pairs = skewed_pairs.filter(items=keep_columns)
     if out_path:
-        _save_dataframe(out_path, _optimize(skewed_pairs))
+        _save_am_dataframe(out_path, _optimize(skewed_pairs))
     else:
         return skewed_pairs
 
@@ -888,7 +913,7 @@ def _save_optimized(_df: pd.DataFrame,
                     verbose: bool = False):
 
     out_path = get_am_df_path(path, added_measures)
-    _save_dataframe(out_path, _optimize(_df, verbose))
+    _save_am_dataframe(out_path, _optimize(_df, verbose))
     return out_path
 
 
@@ -966,8 +991,8 @@ def get_am_df_path(input_path: Path | str,
         input_dir_nesting = input_dir_nesting.parent
 
     # append `assoc_df` to directory path if nesting does not already include it
-    out_dir = (RESULT_DIR / 'assoc_df'
-               if 'assoc_df' not in input_dir_nesting.parts
+    out_dir = (AM_DF_DIR
+               if AM_DF_DIR.name not in input_dir_nesting.parts
                else RESULT_DIR)
 
     out_dir = out_dir.joinpath(input_dir_nesting)
@@ -995,7 +1020,7 @@ def get_am_df_path(input_path: Path | str,
 #     return pd.to_numeric(numerical.apply(np.around, decimals=n_dec), downcast=downcast)
 
 
-def _save_dataframe(out_path: Path,
+def _save_am_dataframe(out_path: Path,
                     _df: pd.DataFrame,
                     force: bool = False):
 
