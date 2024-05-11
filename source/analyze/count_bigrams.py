@@ -11,7 +11,7 @@ from numpy import format_float_positional as np_floatfmt
 try:
     from source.utils.visualize import heatmap  # pylint: disable=import-error
 except ModuleNotFoundError:
-    from utils.dataframes import (Timer, cols_by_str,
+    from utils.dataframes import (Timer, cols_by_str, describe_counts,
                                   get_proc_time, print_md_table, save_table,
                                   select_pickle_paths, sort_by_margins,
                                   unpack_dict)
@@ -20,7 +20,7 @@ except ModuleNotFoundError:
     from utils.visualize import heatmap
 else:
 
-    from source.utils.dataframes import (Timer, cols_by_str,
+    from source.utils.dataframes import (Timer, cols_by_str, describe_counts,
                                          get_proc_time, print_md_table,
                                          save_table, select_pickle_paths,
                                          sort_by_margins, unpack_dict)
@@ -80,7 +80,7 @@ def _main():
             print('Crosstabulated frequencies for bigram word types already exist:',
                   f'\n⇰  {frq_out_path}')
             if stats_requested:
-                describe_counts(frq_out_path)
+                _visualize_counts(describe_counts(frq_out_path))
             print('~ Exiting ~')
             return
 
@@ -110,7 +110,7 @@ def _main():
             print('[ Time to process frequencies:', get_proc_time(_t0, _t1), ']')
 
             if stats_requested:
-                describe_counts(frq_df_path, frq_df)
+                _visualize_counts(describe_counts(frq_df_path, frq_df))
             else:
                 print('~ Note: full descriptive statistics not calculated. To retrieve, simply rerun with same arguments + `-s` or `--get_stats` ~')
 
@@ -1431,57 +1431,96 @@ def _filter_bigrams(cross_vectors: list):
     return cross_vectors
 
 
-def describe_counts(df: pd.DataFrame = None,
-                    df_path: Path = None) -> None:
-    if not any(df):
-        if df_path.name.endswith(PKL_SUFF):
-            df = pd.read_pickle(df_path)
-        else:
-            print(
-                'Stats can only be determined from a given path if indicated file is in pickle format.')
-            return
-    data_label = df_path.name.replace('.csv', '').replace(PKL_SUFF, '')
-    stats_dir = df_path.parent.joinpath('descriptive_stats')
-    confirm_dir(stats_dir)
-    out_path_stem = f'stats_{data_label}'
-    df = df.fillna(0)
-    most_var_col = df.columns.to_list()[1:21]
-    most_var_row = df.index.to_list()[1:21]
-    for frame, ax in ((df, 'columns'), (df.transpose(), 'rows')):
-        param = frame.columns.name
-        print(
-            f'\n## Descriptive Statistics for `{frame.index.name}` by `{param}`')
-        no_sum_frame = frame.loc[frame.index != 'SUM', frame.columns != 'SUM']
-        desc_no_sum = no_sum_frame.describe()
-        # > need to exclude the ['SUM','SUM'] cell
-        sum_col = frame.loc[frame.index != 'SUM', 'SUM']
-        desc_sum = sum_col.describe().to_frame()
+# def describe_counts(df: pd.DataFrame = None,
+#                     df_path: Path = None) -> None:
+#     if not any(df):
+#         if df_path.name.endswith(PKL_SUFF):
+#             df = pd.read_pickle(df_path)
+#         else:
+#             print(
+#                 'Stats can only be determined from a given path if indicated file is in pickle format.')
+#             return
+        
+#     def _select_word_sample(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
+#         nth = len(desc) // 6
+#         trim = int(len(desc) * 0.01)
+#         desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
+#         top_means_metric = desc.loc[
+#             (desc['mean'] > (desc_interior['mean'].median() * .75))
+#             &
+#             (desc['total'] > (desc_interior['total'].median() * .75)), metric]
+#         return (
+#             top_means_metric.squeeze().nlargest(nth).index.to_list()
+#             if largest
+#             else top_means_metric.squeeze().nsmallest(nth).index.to_list()
+#         )
 
-        for desc, values in [(desc_no_sum, no_sum_frame), (desc_sum, sum_col)]:
-            desc = _enhance_descrip(desc, values)
-            if 'SUM' in desc.index:
-                desc = desc.transpose()
-                desc.columns = [f'Summed Across {param}s']
-                print_md_table(desc.round(), title=' ')
-            else:
-                save_table(
-                    desc,
-                    f'{stats_dir}/{param[:4].strip("_-").upper()}-{out_path_stem}',
-                    f'{param} descriptive statististics for {out_path_stem}',
-                    ['csv'])
-                print_md_table(desc.sample(min(len(desc), 6)).round(),
-                               title=f'Sample {param} Stats ')
+#     data_label = df_path.name.replace('.csv', '').replace(PKL_SUFF, '')
+#     stats_dir = df_path.parent.joinpath('descriptive_stats')
+#     confirm_dir(stats_dir)
+#     out_path_stem = f'stats_{data_label}'
+#     df = df.fillna(0)
+#     most_var_col = df.columns.to_list()[1:21]
+#     most_var_row = df.index.to_list()[1:21]
+#     for frame, ax in ((df, 'columns'), (df.transpose(), 'rows')):
+#         param = frame.columns.name
+#         print(
+#             f'\n## Descriptive Statistics for `{frame.index.name}` by `{param}`')
+#         no_sum_frame = frame.loc[frame.index != 'SUM', frame.columns != 'SUM']
+#         desc_no_sum = no_sum_frame.describe()
+#         # > need to exclude the ['SUM','SUM'] cell
+#         sum_col = frame.loc[frame.index != 'SUM', 'SUM']
+#         desc_sum = sum_col.describe().to_frame()
 
-                # [ ] # ? (old) add simple output of just `df.var_coeff`?
-                # desc.info()
-                if ax == 'columns':
-                    most_var_col = _select_word_sample(desc)
-                else:
-                    most_var_row = _select_word_sample(desc)
+#         for desc, values in [(desc_no_sum, no_sum_frame), (desc_sum, sum_col)]:
+#             desc = _enhance_descrip(desc, values)
+#             if 'SUM' in desc.index:
+#                 desc = desc.transpose()
+#                 desc.columns = [f'Summed Across {param}s']
+#                 print_md_table(desc.round(), title=' ')
+#             else:
+#                 save_table(
+#                     desc,
+#                     f'{stats_dir}/{param[:4].strip("_-").upper()}-{out_path_stem}',
+#                     f'{param} descriptive statististics for {out_path_stem}',
+#                     ['csv'])
+#                 print_md_table(desc.sample(min(len(desc), 6)).round(),
+#                                title=f'Sample {param} Stats ')
 
-    _visualize_counts(df.loc[['SUM'] + most_var_row,
-                      ['SUM'] + most_var_col], df_path)
+#                 # [ ] # ? (old) add simple output of just `df.var_coeff`?
+#                 # desc.info()
+#                 if ax == 'columns':
+#                     most_var_col = _select_word_sample(desc)
+#                 else:
+#                     most_var_row = _select_word_sample(desc)
 
+#     return df.loc[['SUM'] + most_var_row,
+#                       ['SUM'] + most_var_col], df_path
+
+def _visualize_counts(frq_df: pd.DataFrame,
+                    frq_df_path: Path or str) -> None:
+    """
+    Visualizes the counts in a DataFrame as a heatmap image.
+
+    Args:
+        frq_df (pd.DataFrame): The DataFrame containing the counts to visualize.
+        frq_df_path (Path or str): The path to save the heatmap image.
+
+    Returns:
+        None
+    """
+
+    heat_dir = Path(frq_df_path).parent.joinpath('images')
+    confirm_dir(heat_dir)
+    heat_fname = f'heatmap_{frq_df_path.stem}.png'
+    if len(frq_df) < 60 and len(frq_df.columns) < 40:
+        heatmap(frq_df,
+                save_name=heat_fname,
+                save_dir=heat_dir)
+    else:
+        heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30, len(frq_df.T))).T,
+                save_name=f'sample-{heat_fname}',
+                save_dir=heat_dir)
 
 def _enhance_descrip(desc: pd.DataFrame,
                      values: pd.Series) -> pd.DataFrame:
@@ -1516,45 +1555,7 @@ def _enhance_descrip(desc: pd.DataFrame,
     return desc
 
 
-def _select_word_sample(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
-    nth = len(desc) // 6
-    trim = int(len(desc) * 0.01)
-    desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
-    top_means_metric = desc.loc[
-        (desc['mean'] > (desc_interior['mean'].median() * .75))
-        &
-        (desc['total'] > (desc_interior['total'].median() * .75)), metric]
-    return (
-        top_means_metric.squeeze().nlargest(nth).index.to_list()
-        if largest
-        else top_means_metric.squeeze().nsmallest(nth).index.to_list()
-    )
 
-
-def _visualize_counts(frq_df: pd.DataFrame,
-                      frq_df_path: Path or str) -> None:
-    """
-    Visualizes the counts in a DataFrame as a heatmap image.
-
-    Args:
-        frq_df (pd.DataFrame): The DataFrame containing the counts to visualize.
-        frq_df_path (Path or str): The path to save the heatmap image.
-
-    Returns:
-        None
-    """
-
-    heat_dir = Path(frq_df_path).parent.joinpath('images')
-    confirm_dir(heat_dir)
-    heat_fname = f'heatmap_{frq_df_path.stem}.png'
-    if len(frq_df) < 60 and len(frq_df.columns) < 40:
-        heatmap(frq_df,
-                save_name=heat_fname,
-                save_dir=heat_dir)
-    else:
-        heatmap(frq_df.sample(min(60, len(frq_df))).T.sample(min(30, len(frq_df.T))).T,
-                save_name=f'sample-{heat_fname}',
-                save_dir=heat_dir)
 
 # def _make_freq_tables(frq_out_dir: Path,
     #                   df: pd.DataFrame,

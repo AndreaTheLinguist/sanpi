@@ -806,10 +806,13 @@ def make_ucs_tsv(data_path,
                    else FREQ_DIR / data_path.parent.name / 'ucs_format')
         confirm_dir(out_dir)
         if col_1 and col_2:
-            data_name = re.search(
-                r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
-            prefix = '-x-'.join((snake_to_camel(re.sub(r'lower|form', '', c))[:4]
-                                 for c in (col_1, col_2)))
+            data_name = re.search(r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
+            prefix = snake_to_camel(
+                '_'.join(
+                    (re.sub(r'lower|form', '', c)[:4]
+                     for c in (col_1, col_2))
+                )
+            )
             data_stem = f'{prefix}_{data_name}'
         return out_dir.joinpath(f'{data_stem}.tsv')
 

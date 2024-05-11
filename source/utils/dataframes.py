@@ -10,14 +10,14 @@ import numpy as np
 import pandas as pd
 
 try:
-    from source.utils.general import PKL_SUFF, confirm_dir, find_files, snake_to_camel
+    from source.utils.general import (PKL_SUFF, confirm_dir, find_files,
+                                      snake_to_camel)
 except ModuleNotFoundError:
     try:
         from utils.general import (PKL_SUFF, confirm_dir, find_files,
                                    snake_to_camel)
     except ModuleNotFoundError:
-        from general import (PKL_SUFF, confirm_dir, find_files,
-                             snake_to_camel)
+        from general import PKL_SUFF, confirm_dir, find_files, snake_to_camel
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -212,6 +212,74 @@ def corners(df, size: int = 5, n_dec: int = None):
     cdf.pop('index')
     return cdf.T.rename(columns={'': '...'}, index={'': '...'})
 
+
+def describe_counts(df: pd.DataFrame = None,
+                    df_path: Path = None) -> None:
+    if not any(df):
+        if df_path.name.endswith(PKL_SUFF):
+            df = pd.read_pickle(df_path)
+        else:
+            print(
+                'Stats can only be determined from a given path if indicated file is in pickle format.')
+            return
+        
+
+    data_label = df_path.name.replace('.csv', '').replace(PKL_SUFF, '')
+    stats_dir = df_path.parent.joinpath('descriptive_stats')
+    confirm_dir(stats_dir)
+    out_path_stem = f'stats_{data_label}'
+    df = df.fillna(0)
+    most_var_col = df.columns.to_list()[1:21]
+    most_var_row = df.index.to_list()[1:21]
+    for frame, ax in ((df, 'columns'), (df.transpose(), 'rows')):
+        param = frame.columns.name
+        print(
+            f'\n## Descriptive Statistics for `{frame.index.name}` by `{param}`')
+        no_sum_frame = frame.loc[frame.index != 'SUM', frame.columns != 'SUM']
+        desc_no_sum = no_sum_frame.describe()
+        # > need to exclude the ['SUM','SUM'] cell
+        sum_col = frame.loc[frame.index != 'SUM', 'SUM']
+        desc_sum = sum_col.describe().to_frame()
+
+        for desc, values in [(desc_no_sum, no_sum_frame), (desc_sum, sum_col)]:
+            desc = enhance_descrip(values)
+            if 'SUM' in desc.index:
+                desc = desc.transpose()
+                desc.columns = [f'Summed Across {param}s']
+                print_md_table(desc.round(), title=' ')
+            else:
+                save_table(
+                    desc,
+                    f'{stats_dir}/{param[:4].strip("_-").upper()}-{out_path_stem}',
+                    f'{param} descriptive statististics for {out_path_stem}',
+                    ['csv'])
+                print_md_table(desc.sample(min(len(desc), 6)).round(),
+                               title=f'Sample {param} Stats ')
+
+                # [ ] # ? (old) add simple output of just `df.var_coeff`?
+                # desc.info()
+                if ax == 'columns':
+                    most_var_col = _select_word_sample(desc)
+                else:
+                    most_var_row = _select_word_sample(desc)
+
+    return df.loc[['SUM'] + most_var_row,
+                      ['SUM'] + most_var_col], df_path
+
+
+def _select_word_sample(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
+    nth = len(desc) // 6
+    trim = int(len(desc) * 0.01)
+    desc_interior = desc.sort_values('mean').iloc[trim:-trim, :]
+    top_means_metric = desc.loc[
+        (desc['mean'] > (desc_interior['mean'].median() * .75))
+        &
+        (desc['total'] > (desc_interior['total'].median() * .75)), metric]
+    return (
+        top_means_metric.squeeze().nlargest(nth).index.to_list()
+        if largest
+        else top_means_metric.squeeze().nsmallest(nth).index.to_list()
+    )
 
 def drop_margins(_df, margin_name='SUM'):
     """
