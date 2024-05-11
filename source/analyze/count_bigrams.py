@@ -24,7 +24,7 @@ else:
                                          get_proc_time, print_md_table,
                                          save_table, select_pickle_paths,
                                          sort_by_margins, unpack_dict)
-    from source.utils.general import (PKL_SUFF, confirm_dir,
+    from source.utils.general import (PKL_SUFF, confirm_dir, POST_PROC_DIR,
                                       find_glob_in_dir, percent_to_count,
                                       print_iter)
     from source.utils.visualize import heatmap
@@ -177,7 +177,7 @@ def _parse_args():
         '-p',
         '--post_proc_dir',
         type=Path,
-        default=Path('/share/compling/data/sanpi/4_post-processed/RBXadj'),
+        default=POST_PROC_DIR.joinpath('RBXadj'),
         help=('Path to location for saving post processed hits. '
               '(i.e. tables indexed by `hit_id`). '
               'Name of file(s) generated from `n_files` and `tok_threshold`'))

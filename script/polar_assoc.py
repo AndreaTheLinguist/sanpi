@@ -8,10 +8,11 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from tabulate import tabulate
 
-from source.utils.associate import (ALPHA, READ_TAG, RESULT_DIR, UCS_DIR,
-                                    add_extra_am, adjust_assoc_columns,
-                                    get_associations_csv, get_vocab_size)
-from source.utils.dataframes import (Timer, beef_up_dtypes, corners,
+from source.utils.associate import (AM_DF_DIR, BINARY_ASSOC_ARGS, READ_TAG,
+                                    RESULT_DIR, UCS_DIR, add_extra_am,
+                                    adjust_assoc_columns, get_associations_csv,
+                                    get_vocab_size)
+from source.utils.dataframes import (Timer, beef_up_dtypes, corners, save_table,
                                      print_md_table)
 from source.utils.general import (FREQ_DIR, PKL_SUFF, SANPI_HOME, confirm_dir,
                                   run_shell_command, snake_to_camel)
@@ -20,9 +21,11 @@ RATIO_CEIL = 0.7
 OUTLIER_MARGIN_IQR_FACTOR = 4
 # > set defaults
 _DEFAULT_CORP_PARTS = 35
-_DEFAULT_FRQ_COUNT = 868
-_DEFAULT_FRQ_PRCNT = '0-001'
-_DEFAULT_UCS_MIN = 100
+# _DEFAULT_FRQ_COUNT = 868
+_DEFAULT_FRQ_COUNT = 7
+# _DEFAULT_FRQ_PRCNT = '0-001p'
+_DEFAULT_FRQ_PRCNT = 'MIN-7'
+_DEFAULT_UCS_MIN = 500
 
 # > set pandas options
 pd.set_option("display.memory_usage", 'deep')
@@ -35,15 +38,26 @@ pd.set_option("display.float_format", '{:,.3f}'.format)
 def _main():
 
     args = _parse_args()
-
-    data = designate_data(args)
-
-    data = extend_tables(data, args)
-
+    meta_info_path = AM_DF_DIR.joinpath(
+            f'AM_meta_info{args.data_suffix}'.replace('.tsv', f'_min{args.min_freq}x.csv'))
+    if meta_info_path.is_file(): 
+        print(f'Association Meta Info found. Loading from {meta_info_path.relative_to(RESULT_DIR)}')
+        data = pd.read_csv(meta_info_path)
+        
+    else:
+        data = designate_data(args)
+        data = extend_tables(data, args)
+    
     ex_data = data.filter(like='extra', axis=0)
+    if 'frame' not in ex_data.columns:
+        ex_data['frame'] = ex_data.index.to_series().apply(
+                lambda i: load_from_pickle(
+                    unit=ex_data.unit[i], pkl_path=ex_data.path[i], extra=True))
+        
     if args.verbose:
         for i, assoc_inquiry in enumerate(ex_data.index):
             idf = ex_data.frame.iat[i]
+            print(assoc_inquiry)
             print_ex_assoc(
                 idf, ex_data.unit.iat[i],
                 sort_by=set_selector_column(
@@ -56,33 +70,41 @@ def _main():
 
         get_skews(ex_data, args.verbose)
 
+        
+    save_table(data.filter(regex=r'^[^f]'),
+        meta_info_path, 
+        df_name=f"Association Meta Info for {args.data_suffix.replace('.tsv','')} & displayed joint f >={args.min_freq}"
+        )
 
 def _parse_args():
-
+    base_freq_tsv_name = 'AdvAdj_frq-thrMIN-7.35f.tsv'
     _default_comps = (
         FREQ_DIR
         / 'RBdirect'
         / 'complement'
         / 'ucs_format'
-        / f'diff_all-RBdirect_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+        # / f'diff_all-RBdirect_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+        / f'diff_all-RBdirect_{base_freq_tsv_name}'
     )
     # results/freq_out/RBdirect/complement/ucs_format/diff_all-RBdirect_adj-x-adv_frq-thr0-001p.35f=868+.tsv
     # results/freq_out/RBdirect/ucs_format/all-frq_adj-x-adv_thr0-001p.35f.tsv
     _default_negs = (
         FREQ_DIR
         .joinpath('RBdirect/ucs_format')
-        .joinpath(f'ALL-WORDS_adj-x-adv_thr{_DEFAULT_FRQ_PRCNT}p.{_DEFAULT_CORP_PARTS}f.tsv')
-        # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}p.{_n_corp_parts}f.tsv')
+        # .joinpath(f'ALL-WORDS_adj-x-adv_thr{_DEFAULT_FRQ_PRCNT}.{_DEFAULT_CORP_PARTS}f.tsv')
+        .joinpath(base_freq_tsv_name)
+        # .joinpath(f'all-frq_adj-x-adv_thr{_frq_prcnt}.{_n_corp_parts}f.tsv')
     )
 
     _default_output_suffix = f'.{_DEFAULT_CORP_PARTS}f-{_DEFAULT_FRQ_COUNT}c.tsv'
     _default_all = (
         FREQ_DIR
         .joinpath('RBXadj/ucs_format')
-        .joinpath(f'all_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}p'
-                  f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
-                  #   + _default_suff
-                  )
+        # .joinpath(f'all_adj-x-adv_frq-thr{_DEFAULT_FRQ_PRCNT}'
+        #           f'.{_DEFAULT_CORP_PARTS}f={_DEFAULT_FRQ_COUNT}+.tsv'
+        #           #   + _default_suff
+        #           )
+        .joinpath(base_freq_tsv_name)
     )
 
     # > set help messages
@@ -90,27 +112,27 @@ def _parse_args():
         "Minimum frequency of co-occurrences included as rows "
         "(everything is still included in the marginal frequencies) in association tables"
     )
-    complement_counts_help = (
-        "Path to ucs-formatted .tsv of COMPLEMENT bigram frequencies; i.e. "
+    comparison_counts_help = (
+        "Path to ucs-formatted .tsv of COMPARISON bigram frequencies; e.g. "
         "counts for bigram tokens with no *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'positive polarity' environments.) "
         "The transformed frequency data will be saved as "
         "`polarity_prepped_tsv/[COMP_LABEL]_bigram_counts[DATA_SUFFIX]`"
     )
     comp_label_help = (
-        "Option to set the label for complement (set difference, not negated, 'positive', etc.) counts. "
+        "Option to set the label for comparison (set difference, not negated, 'positive', etc.) counts. "
         "Used for output path generation."
     )
-    negated_counts_help = (
+    target_counts_help = (
         "Path to ucs-formatted .tsv of NEGATED bigram frequencies; i.e. "
         "counts for bigram tokens with *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'negative polarity' environments.) "
         "The transformed frequency data will be saved as "
         "`polarity_prepped_tsv/[NEG_LABEL]_bigram_counts[DATA_SUFFIX]`"
     )
-    neg_label_help = (
-        "Option to set the label for negated (or matching specific pattern) counts. "
-        "Used for output path generation."
+    target_label_help = (
+        "Option to set the label for target counts; "
+        "Used to generate output path(s) and set the `l1` values for contained `l2` values."
     )
     data_suffix_help = (
         "Option to indicate specific starting data set "
@@ -141,17 +163,17 @@ def _parse_args():
         default=_default_all,
         help='path to ucs formatted .tsv of all bigram combinations, regardless of polarity')
     parser.add_argument(
-        '-c', '--complement_counts', type=Path,
-        default=_default_comps, help=complement_counts_help)
+        '-c', '--compare_counts', type=Path,
+        default=_default_comps, help=comparison_counts_help)
     parser.add_argument(
         '-C', '--comp_label', type=str,
         default='complement', help=comp_label_help)
     parser.add_argument(
-        '-n', '--negated_counts', type=Path,
-        default=_default_negs, help=negated_counts_help)
+        '-n', '--target_counts', type=Path,
+        default=_default_negs, help=target_counts_help)
     parser.add_argument(
-        '-N', '--neg_label', type=str,
-        default='negated', help=neg_label_help)
+        '-N', '--targ_label', type=str,
+        default='negated', help=target_label_help)
     parser.add_argument(
         '-s', '--data_suffix', type=str,
         default=_default_output_suffix, help=data_suffix_help)
@@ -162,8 +184,21 @@ def _parse_args():
     parser.add_argument(
         '-v', '--verbose', default=False, action='store_true',
         help='Option to print more processing info to stdout')
-
-    return parser.parse_args()
+    args = parser.parse_args()
+    # // # ! Warning: if the above order changes, `utils.associate.BINARY_ASSOC_ARGS` must be updated as well,
+    # // # !   or the following assignments will be messed up.
+    # // args_tuple = BINARY_ASSOC_ARGS._make(args.__dict__.values())
+    # Explicit assignement is safer 🦺
+    return BINARY_ASSOC_ARGS(min_freq=args.min_freq,
+                             all_counts=args.all_counts,
+                             compare_counts=args.compare_counts,
+                             comp_label=args.comp_label,
+                             target_counts=args.target_counts,
+                             targ_label=args.targ_label,
+                             data_suffix=args.data_suffix,
+                             skew=args.skew,
+                             verbose=args.verbose
+                             )
 
 
 def designate_data(args):
@@ -180,8 +215,8 @@ def designate_data(args):
 
         print_md_table(data.copy().filter(
             items=['key', 'unit', 'stage', 'path']
-        ).astype('str'), title='\n## Starting Data Specs\n', 
-                       format='grid')
+        ).astype('str'), title='\n## Starting Data Specs\n',
+            format='grid')
         for ix in data.index:
             df = data.frame[ix]
             count_type = data.unit[ix]
@@ -236,7 +271,7 @@ def designate_data(args):
     return data
 
 
-def gen_init_ucs_tables(args) -> tuple:
+def gen_init_ucs_tables(args):
     """
     Generate initial UCS tables for comparison based on the provided arguments.
 
@@ -248,8 +283,8 @@ def gen_init_ucs_tables(args) -> tuple:
     """
 
     def _prepare_data(args):
-        comp_path = args.complement_counts
-        # > if `args.complement_counts` relative to `*mirror/complement/`
+        comp_path = args.compare_counts
+        # > if `args.compare_counts` relative to `*mirror/complement/`
         # >     comparison is between `{POS,NEG}mirror` and non-`{POS,NEG}mirror`
         # >     not approximation of polarity environments.
         #       i.e. one of the following
@@ -259,9 +294,9 @@ def gen_init_ucs_tables(args) -> tuple:
         #           NEGmirror/ucs_format/*.tsv ~VS~ POSmirror/ucs_format/*.tsv
         polarity_approx = 'mirror/complement' not in str(comp_path)
         print('Comparing:',
-              f'* pat target = {args.negated_counts.relative_to(FREQ_DIR)}',
+              f'* target set = {args.target_counts.relative_to(FREQ_DIR)}',
               '   ~vs~',
-              f'* complement = {comp_path.relative_to(FREQ_DIR)}',
+              f'* comparison = {comp_path.relative_to(FREQ_DIR)}',
               '....................',
               sep='\n')
         for i, unit in enumerate(('', 'bigram', 'adv', 'adj'), start=1):
@@ -288,11 +323,6 @@ def gen_init_ucs_tables(args) -> tuple:
             input_path=csv_path, added_measures=True)
         stage = 'initial'
 
-        def load_from_pickle(unit, pkl_path, extra: bool = False):
-            _extra = "_extra" if extra else ""
-            print(f'\n> Loading `{unit}` data',
-                  f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
-            return pd.read_pickle(pkl_path)
 
         if df_extra_path.is_file():
             df = load_from_pickle(unit, df_extra_path, extra=True)
@@ -326,7 +356,7 @@ def gen_init_ucs_tables(args) -> tuple:
             # print_md_table(opt_df.filter(regex=rows_regex, axis=0).filter(regex=cols_regex).sample(10))
             # print_md_table(opt_df.filter(regex=rows_regex, axis=0).filter(regex=cols_regex).sample(10), n_dec=2)
 
-            _save_dataframe(df_path, _optimize(df), force=True)
+            _save_am_dataframe(df_path, _optimize(df), force=True)
 
         return df, df_path, stage
 
@@ -340,6 +370,14 @@ def gen_init_ucs_tables(args) -> tuple:
             unit = 'adv~adj'
         yield unit, stage, df_path, df
 
+
+def load_from_pickle(unit:str, 
+                     pkl_path:Path, 
+                     extra: bool = False):
+    _extra = "_extra" if extra else ""
+    print(f'\n> Loading `{unit}` data',
+            f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
+    return pd.read_pickle(pkl_path)
 
 def handle_word_null(df, csv_path):
     """
@@ -433,7 +471,7 @@ def extend_tables(data, args):
         data.loc[data.stage == 'extra', :].index.to_series().apply(
             lambda k:
                 # `data.frame` objects are optimized in `_extend_assoc_data`
-                _save_dataframe(
+                _save_am_dataframe(
                     out_path=data.path[k],
                     _df=data.frame[k])
         )
@@ -465,12 +503,12 @@ def _extend_assoc_data(data: pd.DataFrame,
 
     extended = pd.concat([data.loc[data.stage == stage_name], new_extend])
     if (f'bigram_{stage_name}' in extended.index
-        and any(adx_col not in
-                extended.at[f'bigram_{stage_name}', 'frame'].columns
-                for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
+            and any(adx_col not in
+                    extended.at[f'bigram_{stage_name}', 'frame'].columns
+                    for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
         ):
 
-        if all(adx in extended.unit.unique() for adx in ('adv', 'adj')):
+        if all(adx in extended.unit.unique() for adx in ('adv', 'adj', 'bigram')):
 
             def add_adx_info(_data: pd.DataFrame,
                              verbose: bool = False) -> pd.DataFrame:
@@ -482,12 +520,18 @@ def _extend_assoc_data(data: pd.DataFrame,
                         .rename(columns={'l2': adx, 'f2': f'{adx}_total'})
                         .set_index(adx).squeeze(),
                         downcast='integer')
-
                 adv_totals, adj_totals = [
                     get_adx_totals(
                         _data.frame[f'{x}_extra'].filter(regex=r'^[fl]'), adx=x)
                     for x in ('adv', 'adj')]
-
+                # TODO? add ad* joint f as well as total
+                # def get_adx_polar_f(adx_df: pd.DataFrame, adx: str) -> pd.Series: 
+                #     adx_df = adx_df.copy()[['l1', 'l2', 'f']]
+                #     pass
+                #
+                # adv_polar, adj_polar = [
+                #     get_adx_polar_f(_data.frame[f'{x}_extra'].filter(regex=r'^[fl]'), adx=x)
+                #     for x in ('adv', 'adj')]
                 bigram_df = _data.frame['bigram_extra'].copy()
                 bigram_df[['adv', 'adj']] = bigram_df.l2.str.split(
                     "_", expand=True).astype('string').astype('category')
@@ -499,7 +543,6 @@ def _extend_assoc_data(data: pd.DataFrame,
                         pd.concat([bigram_df.filter(regex=r'^ad[vj]|^(f|l1)$').filter(
                             like=e[:2], axis=0).sample(3) for e in bigram_df.l1.unique()]),
                         title='\n Sample (6) of lexical columns added to `bigram_extra` table\n')
-
                 return bigram_df
 
             extended.at[f'bigram_{stage_name}',
@@ -827,7 +870,7 @@ def id_skewed_combos(df: pd.DataFrame,
         print_skew_percents(skewed_pairs, df, metric, ceiling, floor, unit)
     skewed_pairs = skewed_pairs.filter(items=keep_columns)
     if out_path:
-        _save_dataframe(out_path, _optimize(skewed_pairs))
+        _save_am_dataframe(out_path, _optimize(skewed_pairs))
     else:
         return skewed_pairs
 
@@ -870,7 +913,7 @@ def _save_optimized(_df: pd.DataFrame,
                     verbose: bool = False):
 
     out_path = get_am_df_path(path, added_measures)
-    _save_dataframe(out_path, _optimize(_df, verbose))
+    _save_am_dataframe(out_path, _optimize(_df, verbose))
     return out_path
 
 
@@ -921,7 +964,7 @@ def load_from_csv(csv_path):
     return pd.read_csv(csv_path)
 
 
-def get_am_df_path(input_path: Path or str,
+def get_am_df_path(input_path: Path | str,
                    added_measures: bool = False,
                    metric_name: str = None):
     """
@@ -939,8 +982,8 @@ def get_am_df_path(input_path: Path or str,
     input_path = Path(input_path)
     input_dir = input_path.parent
     input_dir_nesting = (input_dir.relative_to(UCS_DIR)
-                   if input_dir.is_relative_to(UCS_DIR)
-                   else input_dir.relative_to(RESULT_DIR))
+                         if input_dir.is_relative_to(UCS_DIR)
+                         else input_dir.relative_to(RESULT_DIR))
     # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
     #       nesting == `polar/RBdirect/bigram/readable`
     #       change to --> `polar/RBdirect/bigram`
@@ -948,8 +991,8 @@ def get_am_df_path(input_path: Path or str,
         input_dir_nesting = input_dir_nesting.parent
 
     # append `assoc_df` to directory path if nesting does not already include it
-    out_dir = (RESULT_DIR / 'assoc_df'
-               if 'assoc_df' not in input_dir_nesting.parts
+    out_dir = (AM_DF_DIR
+               if AM_DF_DIR.name not in input_dir_nesting.parts
                else RESULT_DIR)
 
     out_dir = out_dir.joinpath(input_dir_nesting)
@@ -977,7 +1020,7 @@ def get_am_df_path(input_path: Path or str,
 #     return pd.to_numeric(numerical.apply(np.around, decimals=n_dec), downcast=downcast)
 
 
-def _save_dataframe(out_path: Path,
+def _save_am_dataframe(out_path: Path,
                     _df: pd.DataFrame,
                     force: bool = False):
 
