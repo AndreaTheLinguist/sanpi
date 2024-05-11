@@ -1,4 +1,4 @@
-
+import contextlib
 import argparse
 import re
 from pathlib import Path
@@ -6,40 +6,39 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from source.analyze.count_bigrams import describe_counts
-from source.utils.dataframes import (Timer, corners, print_md_table,
-                                     set_count_dtype, sort_by_margins,
-                                     square_sample, transform_counts)
-from source.utils.general import confirm_dir, print_iter
+from source.utils.dataframes import (Timer, corners, describe_counts,
+                                     print_md_table, set_count_dtype,
+                                     sort_by_margins, square_sample,
+                                     transform_counts)
+from source.utils.general import FREQ_DIR, confirm_dir, print_iter
 from source.utils.visualize import heatmap
 
 
 def _parse_args():
 
     parser = argparse.ArgumentParser(
-        description=(''), #TODO add description message
+        description=(''),  # TODO add description message
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
         '-t', '--threshold',
-        type=str, default='01',
+        type=str, default='clean',
         help=('flag indicating frequency (percentage) threshold applied in filenames. '
               '"001" will point to `0-001`, "01" will point to `0-01`, etc.')
     )
     parser.add_argument(
         '-p', '--pattern',
-        type=str, default='RBdirect',
+        type=str, default='NEGmirror',
         help=('pattern category (i.e. directory in ./Pat/) to get complement of')
     )
     parser.add_argument(
         '-f', '--freq_out_dir',
-        type=Path, default=Path(
-            '/share/compling/projects/sanpi/results/freq_out'),
-        help=('path to directory housing frequency tables')
+        type=Path, default=FREQ_DIR,
+        help='path to directory housing frequency tables'
     )
     parser.add_argument(
         '-d', '--describe',
-        default='True', action='store_true',
+        action='store_true',
         help=('whether to produce additional descriptive information files.')
     )
     return parser.parse_args()
@@ -109,12 +108,13 @@ def _main():
     confirm_dir(frq_diff_dir)
 
     frq_diff_pkl = frq_diff_dir.joinpath(
-        f'/diff_{pat_dir.name}-{all_frq_path.name}'
+        f'diff_{pat_dir.name}-{all_frq_path.name}'
         .replace(f'{pat_dir.name}-all', f'all-{pat_dir.name}')
     )
 
     frq_diff = set_count_dtype(frq_diff, frq_diff_pkl)
-    describe_counts(frq_diff, frq_diff_pkl)
+    if DESCRIBE:
+        describe_counts(frq_diff, frq_diff_pkl)
     # if path doesn't point to a file, save the table as path
     if not frq_diff_pkl.is_file():
         frq_diff.to_pickle(frq_diff_pkl)
@@ -226,11 +226,14 @@ def sample_counts(frq_table, label,
     return s, sample_df
 
 
-def seek_frq_table(meta_tag, parent_dir: str = 'RBdirect', stem_glob: str = None):
+def seek_frq_table(meta_tag_glob, parent_dir: str = 'RBdirect', stem_glob: str = None):
 
-    stem_glob = stem_glob or f'all*adj-x-adv*{meta_tag}*'
-    glob_dir = FREQ_OUT.joinpath(parent_dir)
-
+    stem_glob = (stem_glob or f'all*adj-x-adv*{meta_tag_glob}*'
+                 ).replace('**', '*')
+    glob_dir = (FREQ_OUT.joinpath(parent_dir).joinpath(f'partials/{N_FILES}f')
+                if N_FILES < 35 and parent_dir == 'RBXadj'
+                else FREQ_OUT.joinpath(parent_dir))
+    frq_path = None
     try:
         frq_path = list(glob_dir.glob(f'{stem_glob}.pkl.gz'))[0]
 
@@ -238,29 +241,40 @@ def seek_frq_table(meta_tag, parent_dir: str = 'RBdirect', stem_glob: str = None
         try:
             frq_path = list(glob_dir.glob(f'{stem_glob}.csv'))[0]
         except IndexError:
-            raise FileNotFoundError('⚠️ frequency table corresponding to '
-                  f'{stem_glob} not found in {parent_dir}.')
+            glob_dir = FREQ_OUT.joinpath(parent_dir).joinpath('ucs_format')
+            if glob_dir.is_dir():
+                stem_glob = stem_glob.replace('all*adj-x-adv*','adv-x-adj*')
+                with contextlib.suppress(IndexError):
+                    frq_path = list(glob_dir.glob(f"{stem_glob}.tsv"))[0]
+
+    if frq_path is None:
+        raise FileNotFoundError('⚠️ frequency table corresponding to '
+                                f'{stem_glob} not found in {parent_dir}.')
     return frq_path
 
 
 def locate_freq_tables(_pat_cat=PAT_CAT, verbose=True):
-
-    meta_tag = f'thr0-{THR_DEC_STR}p.{N_FILES}f'
+    thresh_tag = (f'0-{THR_DEC_STR}'
+                  if THR_DEC_STR.startswith(tuple('0123456789'))
+                  else THR_DEC_STR)
+    meta_tag_glob = f'{thresh_tag}*.{N_FILES}f'
+    # ! will be embedded between *, so should not start or end with * to avoid an unintended ** situation
 
     if verbose:
         print('# Comparing Bigram Frequencies by Polarity\n',
               f'- for `{N_FILES}` corpus input `.conll` directories containing source `.conllu` files',
-              (f'- with word types limited to only those that account for at least $0.{THR_DEC_STR}\%$'
+              (f'- with word types limited to only those that account for at least {THR_DEC_STR}'
                f' of the cleaned dataset (as sourced from {N_FILES} corpus file inputs)'),
-              f'- file identifier = `{meta_tag}`',
+              f'- file identifier = `{meta_tag_glob}`',
               sep='\n')
 
-    paths = [seek_frq_table(meta_tag, d) for d in (_pat_cat, 'RBXadj')]
+    paths = [seek_frq_table(meta_tag_glob, d) for d in (_pat_cat, 'RBXadj')]
 
     if verbose:
-        global_count_floor = re.search(r'=(\d+)\+', paths[1].stem).groups()[0]
-        print('- pattern matches restricted to only token word types with at least '
-              f'`{global_count_floor}` total tokens across all combinations')
+        with contextlib.suppress(AttributeError):
+            global_count_floor = re.search(r'=(\d+)\+', paths[1].stem).groups()[0]
+            print('- pattern matches restricted to only token word types with at least '
+                f'`{global_count_floor}` total tokens across all combinations')
     print_iter((f'`{p}`' for p in paths),
                bullet='-', indent=2,
                header='- Selected Paths')
@@ -338,10 +352,18 @@ def visualize_samples(pat_frq, all_frq, frq_diff):
     return __
 
 
-def load_pattern_counts(pat_frq_path, describe=True):
+def load_frequencies(frq_path:Path):
+    if frq_path.parent == 'ucs_format': 
+        frq_tsv = pd.read_csv(frq_path, sep='\t', header=None)
+        frq_tsv.columns = ['f'] + frq_path.name.split('_')[0].split('-x-')
+        return frq_tsv
+    return load_freq_table(frq_path)
+
+
+def load_pattern_counts(pat_frq_path, describe: bool=DESCRIBE):
     _pat = pat_frq_path.parent.name
     print(f'\n## _`{_pat}`_ Frequencies Overview\n')
-    pat_only = load_freq_table(pat_frq_path)
+    pat_only = load_frequencies(pat_frq_path)
     if describe:
         describe_counts(df=pat_only, df_path=pat_frq_path)
 
@@ -353,7 +375,7 @@ def load_pattern_counts(pat_frq_path, describe=True):
     return pat_only
 
 
-def load_baseline(all_frq_path, describe: bool = False):
+def load_baseline(all_frq_path, describe: bool = DESCRIBE):
     print(
         f'\n## _ALL_ (`{PAT_CAT}` and non-`{PAT_CAT}`) Frequencies Overview\n')
     all_frq = load_freq_table(all_frq_path)
