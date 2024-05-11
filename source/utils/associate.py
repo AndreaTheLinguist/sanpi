@@ -98,7 +98,8 @@ def adjust_assoc_columns(cols_or_df,
             columns = [snake_to_camel(c) for c in columns]
         elif style == 'snake':
             columns = [camel_to_snake(c) for c in columns]
-            
+        return columns 
+    
     # if dataframe is given, dataframe is returned. 
     if isinstance(cols_or_df, pd.DataFrame):
         cols_or_df.columns = change_columns(cols_or_df.columns)
