@@ -55,38 +55,58 @@ BINARY_ASSOC_ARGS = namedtuple(
     ['min_freq', 'all_counts', 'compare_counts', 'comp_label', 'target_counts', 'targ_label', 'data_suffix', 'skew', 'verbose'])
 
 
-def adjust_assoc_columns(columns: pd.Index | list,
+def adjust_assoc_columns(cols_or_df,
                          style: str = None) -> list:
-    replacements = {'conservative_log_ratio': 'LRC', 
-                              'am_log_likelihood': 'G2', 
-                              'log_likelihood': 'G2', 
-                              't_score': 't', 
-                              'mutual_information': 'MI', 
-                              'am_p1_given2': 'dP1', 
-                              'am_p2_given1': 'dP2', 
-                              }
-    abbreviations = {
-        r'am_': '',
-        r'ratio': 'r',
-        r'probability': 'p',
-        r'11': 'f',
-        r'O': 'obs_',
-        r'E': 'exp_',
-        r'ative': '',
-        r'unexpected': 'unexp'
-    }
-    for update_dict in [replacements, abbreviations]: 
-        columns = [
-            re.sub(r'|'.join(update_dict.keys()),
-                #    r'am_|ratio|probability|[OE]11|ative_',
-                lambda m:
-                update_dict[m.group()], col)
-            for col in columns]
-    if style == 'camel':
-        columns = [snake_to_camel(c) for c in columns]
-    elif style == 'snake':
-        columns = [camel_to_snake(c) for c in columns]
-    return columns
+    """Adjust association columns based on specified style.
+
+    This function adjusts association columns by applying replacements and abbreviations based on the specified style.
+
+    Args:
+        cols_or_df: Either a list of column names or a pandas DataFrame.
+        style (str): The style to apply for column names ('camel' or 'snake').
+
+    Returns:
+        list or DataFrame: Modified list of column names or DataFrame with modified column names.
+    """
+    def change_columns(columns):
+        replacements = {'conservative_log_ratio': 'LRC', 
+                                'am_log_likelihood': 'G2', 
+                                'log_likelihood': 'G2', 
+                                't_score': 't', 
+                                'mutual_information': 'MI', 
+                                'am_p1_given2': 'dP1', 
+                                'am_p2_given1': 'dP2', 
+                                }
+        abbreviations = {
+            r'am_': '',
+            r'ratio': 'r',
+            r'probability': 'p',
+            r'11': 'f',
+            r'O': 'obs_',
+            r'E': 'exp_',
+            r'ative': '',
+            r'unexpected': 'unexp'
+        }
+        for update_dict in [replacements, abbreviations]: 
+            columns = [
+                re.sub(r'|'.join(update_dict.keys()),
+                    #    r'am_|ratio|probability|[OE]11|ative_',
+                    lambda m:
+                    update_dict[m.group()], col)
+                for col in columns]
+        if style == 'camel':
+            columns = [snake_to_camel(c) for c in columns]
+        elif style == 'snake':
+            columns = [camel_to_snake(c) for c in columns]
+            
+    # if dataframe is given, dataframe is returned. 
+    if isinstance(cols_or_df, pd.DataFrame):
+        cols_or_df.columns = change_columns(cols_or_df.columns)
+        return cols_or_df
+    
+    # if iterable is given, iterable is returned.
+    else: 
+        return change_columns(cols_or_df)
 
 
 def log_relative_risk(sc, invert: bool = False):
