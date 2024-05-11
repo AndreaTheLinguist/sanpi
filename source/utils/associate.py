@@ -57,26 +57,36 @@ BINARY_ASSOC_ARGS = namedtuple(
 
 def adjust_assoc_columns(columns: pd.Index | list,
                          style: str = None) -> list:
-    col_abbr = {
+    replacements = {'conservative_log_ratio': 'LRC', 
+                              'am_log_likelihood': 'G2', 
+                              'log_likelihood': 'G2', 
+                              't_score': 't', 
+                              'mutual_information': 'MI', 
+                              'am_p1_given2': 'dP1', 
+                              'am_p2_given1': 'dP2', 
+                              }
+    abbreviations = {
         r'am_': '',
         r'ratio': 'r',
         r'probability': 'p',
         r'11': 'f',
-        r'O': 'observed_',
-        r'E': 'expected_',
-        r'ative': ''
+        r'O': 'obs_',
+        r'E': 'exp_',
+        r'ative': '',
+        r'unexpected': 'unexp'
     }
-    updated_cols = [
-        re.sub(r'|'.join(col_abbr.keys()),
-               #    r'am_|ratio|probability|[OE]11|ative_',
-               lambda m:
-               col_abbr[m.group()], col)
-        for col in columns]
+    for update_dict in [replacements, abbreviations]: 
+        columns = [
+            re.sub(r'|'.join(update_dict.keys()),
+                #    r'am_|ratio|probability|[OE]11|ative_',
+                lambda m:
+                update_dict[m.group()], col)
+            for col in columns]
     if style == 'camel':
-        updated_cols = [snake_to_camel(c) for c in updated_cols]
+        columns = [snake_to_camel(c) for c in columns]
     elif style == 'snake':
-        updated_cols = [camel_to_snake(c) for c in updated_cols]
-    return updated_cols
+        columns = [camel_to_snake(c) for c in columns]
+    return columns
 
 
 def log_relative_risk(sc, invert: bool = False):
