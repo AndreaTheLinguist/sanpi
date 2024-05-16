@@ -46,7 +46,7 @@ UCS_DIR, DEMO_UCS_DIR = [
 AM_ENV_DIR, DEMO_AM_ENV_DIR = [
     R / 'env_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
 AM_DF_DIR=RESULT_DIR / 'assoc_df'
-
+TOP_AM_DIR=RESULT_DIR / 'top_AM'
 # ? Does this even do anything? This is never run as its own thing...
 confirm_dir(AM_ENV_DIR)
 
