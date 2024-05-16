@@ -1,25 +1,25 @@
 # coding=utf-8
 import contextlib
-from tabulate import tabulate
 import re
 from pathlib import Path
 
 import pandas as pd
+from tabulate import tabulate
 
 try:
     from utils.general import print_iter  # pylint: disable=import-error
 except ModuleNotFoundError:
     with contextlib.suppress(ModuleNotFoundError):
-        from source.utils.general import print_iter
-        from source.utils.dataframes import set_pd_display
         from source.utils.associate import adjust_assoc_columns
+        from source.utils.dataframes import set_pd_display
+        from source.utils.general import print_iter
 else:
-    from utils.dataframes import set_pd_display
     from utils.associate import adjust_assoc_columns
+    from utils.dataframes import set_pd_display
 SANPI_DATA = Path('/share/compling/data/sanpi')
 
 
-def sample_pickle(data_path: Path,
+def sample_pickle(data,
                   sample_size: int = 20,
                   sort_by: str = '',
                   columns: list = None,
@@ -80,7 +80,7 @@ def sample_pickle(data_path: Path,
                        max_width=max_width,
                        max_cols=max_cols)
 
-    data_sample = _get_data_sample(sample_size=sample_size, data_path=data_path, filters=filters,
+    data_sample = _get_data_sample(sample_size=sample_size, data=data, filters=filters,
                                    columns=columns, sort_by=sort_by, regex=regex,
                                    quiet=quiet, markdown=markdown, n_dec=n_dec)
     if print_sample:
@@ -94,7 +94,7 @@ def sample_pickle(data_path: Path,
 
 
 def _get_data_sample(sample_size: int,
-                     data_path: Path,
+                     data,
                      filters: list = None,
                      columns: list = None,
                      sort_by: str = '',
@@ -119,8 +119,12 @@ def _get_data_sample(sample_size: int,
     Returns:
         pd.DataFrame: The sampled and processed DataFrame based on the specified parameters.
     """
-
-    full_frame = _read_data(data_path, quiet)
+    if isinstance(data, Path):
+        full_frame = _read_data(data, quiet)
+        data_name = data.name
+    else: 
+        full_frame = data
+        data_name = 'input frame'
 
     filtered_data, filter_applied = _filter_rows(
         full_frame, filters, regex, quiet)
@@ -130,14 +134,14 @@ def _get_data_sample(sample_size: int,
     data = _select_columns(data, columns, quiet)
     if markdown or not quiet:
         _print_header(len(data), len(filtered_data),
-                      data_path.name, filter_applied)
+                      data_name, filter_applied)
     data.update(
         data.select_dtypes(include='float').apply(pd.to_numeric, downcast='float').apply(
             round, ndigits=n_dec))
     return data
 
 
-def _read_data(read_path, quiet=False) -> pd.DataFrame:
+def _read_data(read_path:Path, quiet=False) -> pd.DataFrame:
     """
     Reads data from a file based on the file format and returns the corresponding DataFrame.
 
