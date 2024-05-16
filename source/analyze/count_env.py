@@ -2,23 +2,24 @@
 
 # > Imports
 import argparse
-# import statistics as stat
-from pathlib import Path
 # from re import search
 import re
+# import statistics as stat
+from pathlib import Path
 
 import pandas as pd
-from utils import (cols_by_str, confirm_dir,  # pylint: disable=import-error
-                   file_size_round, find_glob_in_dir,
-                   get_proc_time, print_iter, print_md_table, save_table,
-                   sort_by_margins, unpack_dict, Timer, PKL_SUFF)
+from utils import (PKL_SUFF, Timer,  # pylint: disable=import-error
+                   cols_by_str, confirm_dir, describe_counts, file_size_round,
+                   find_glob_in_dir, get_proc_time, print_iter, print_md_table,
+                   save_table, sort_by_margins, unpack_dict)
 from utils.LexicalCategories import (  # pylint: disable=import-error
     SAMPLE_ADJ, SAMPLE_ADV)
 from utils.visualize import heatmap  # pylint: disable=import-error
-from count_bigrams import (save_filter_index, describe_counts,
-                           locate_relevant_hit_tables,
-                           select_count_columns,
-                           load_from_txt_index)
+
+from source.analyze.count_bigrams import (load_from_txt_index,
+                                          locate_relevant_hit_tables,
+                                          save_filter_index,
+                                          select_count_columns)
 
 # > Globals
 _SANPI_DIR = Path('/share/compling/projects/sanpi')
@@ -124,7 +125,8 @@ def _set_postproc_paths(filter_ids_path: Path, neg_hits_dir: Path):
         List of resolved paths for the filtered hits DataFrame and index file.
     """
 
-    file_tag = '.'.join(META_TAG_REGEX.search(filter_ids_path.stem).groups())
+    file_tag = '.'.join(META_TAG_REGEX.search(
+        filter_ids_path.stem).groups()).replace('index_', '')
 
     neg_filtered_hits_stem = filter_ids_path.parent.parent.joinpath(
         f'{neg_hits_dir.name}/trigger-bigrams_{file_tag}'
