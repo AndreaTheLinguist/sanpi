@@ -89,7 +89,8 @@ def adjust_assoc_columns(cols_or_df,
         }
         for update_dict in [replacements, abbreviations]: 
             columns = [
-                re.sub(r'|'.join(update_dict.keys()),
+                re.sub(r'|'.join([(f'^{k}' if k in 'OE' else k) 
+                                  for k in update_dict.keys()]),
                     #    r'am_|ratio|probability|[OE]11|ative_',
                     lambda m:
                     update_dict[m.group()], col)

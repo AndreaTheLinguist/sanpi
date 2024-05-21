@@ -28,7 +28,7 @@ def _main():
     args = _parse_args()
 
     sample_pickle(
-        data_path=args.path,
+        data=args.path,
         sample_size=args.sample_size,
         sort_by=args.sort_by,
         columns=args.columns,

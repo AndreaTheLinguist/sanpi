@@ -474,6 +474,15 @@ def optimize_am_df(df: pd.DataFrame, verbose=False):
     _df['l1'] = _df['l1'].astype('category')
     return _df
 
+# def nb_print_table(df, n_dec:int=2, 
+#                    adjust_columns:bool=True) -> None: 
+#     _df = df.copy()
+#     if adjust_columns: 
+#         _df = adjust_assoc_columns(_df)
+#     _df.columns = [f'`{c}`' for c in _df.columns]
+#     _df.index = [f'**{r}**' for r in _df.index ]
+#     print('\n'+_df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')+'\n')
+
 
 def print_md_table(input_df: pd.DataFrame,
                    indent: int = 0,

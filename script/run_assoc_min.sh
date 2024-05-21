@@ -33,8 +33,6 @@ SUFF=".${SUFF/MIN-/}"
 TSV_STEM="${TSV_STEM}.${N_FILES}"
 
 A=${A:-"${FRQ}/RBXadj/ucs_format/${TSV_STEM}.tsv"}
-echo -e "pattern data dir, ${PAT_DIR}\nstem,${TSV_STEM}\nsuffix,${SUFF}\nall_counts,${A}\ncomparison type,${COMPARE}" \
-| tabulate -f grid -s ','
 
 if [[ ! $(ls ${A}) ]]; then
     exit
@@ -63,14 +61,16 @@ else
     SUFF=".MIRROR_${N_NAME::3}_diff${SUFF}"
 fi
 
+echo -e "pattern data dir, ${PAT_DIR}\nstem,${TSV_STEM}\nsuffix,${SUFF}\nall_counts,${A}\ncomparison type,${COMPARE}" \
+| tabulate -f grid -s ','
 date
 LOG_DIR="/share/compling/projects/sanpi/logs/associate"
 if [[ ! -d $LOG_DIR ]]; then mkdir $LOG_DIR; fi
 LOG_PREFIX="${LOG_DIR}/assoc_${PAT_DIR}-${COMPARE}_"
 echo "logs ⇰  ${LOG_PREFIX}*x-verbose.$(date +%Y%m)*"
 
-# for FRQ_FLOOR in 50 100 200 1500 3000 6000; do
-for FRQ_FLOOR in 6000 3000; do #! #HACK revert to full set of thresholds
+# for FRQ_FLOOR in 50 75 120; do
+for FRQ_FLOOR in 50 120 200 500 868 1000 2000 3000 5000; do
     OUT="${LOG_PREFIX}${FRQ_FLOOR}x-verbose.$(date +%Y%m%d_%H%M).out"
     ERR="${OUT/out/err}"
     echo -e "exec 1>${OUT/${SANPI}\//} \\ \n     2>${ERR/${SANPI}\//}"
