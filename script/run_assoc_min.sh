@@ -70,7 +70,8 @@ LOG_PREFIX="${LOG_DIR}/assoc_${PAT_DIR}-${COMPARE}_"
 echo "logs ⇰  ${LOG_PREFIX}*x-verbose.$(date +%Y%m)*"
 
 # for FRQ_FLOOR in 50 75 120; do
-for FRQ_FLOOR in 50 120 200 500 868 1000 2000 3000 5000; do
+# for FRQ_FLOOR in 50 120 200 500 700 1000 2000; do
+for FRQ_FLOOR in 3 5 10 100 200 250; do
     OUT="${LOG_PREFIX}${FRQ_FLOOR}x-verbose.$(date +%Y%m%d_%H%M).out"
     ERR="${OUT/out/err}"
     echo -e "exec 1>${OUT/${SANPI}\//} \\ \n     2>${ERR/${SANPI}\//}"
@@ -81,6 +82,7 @@ for FRQ_FLOOR in 50 120 200 500 868 1000 2000 3000 5000; do
     echo -e "  --targ_label ${N_NAME} --target_counts ${N} \\ \n  --all_counts ${A} \\ \n  --data_suffix ${SUFF}"
     echo "..........................................."
     echo
+    echo "time python ${SANPI}/script/polar_assoc.py -v -m ${FRQ_FLOOR} -C ${C_NAME} -c ${C} -N ${N_NAME} --target_counts ${N} --data_suffix ${SUFF} --all_counts ${A}"
     time python ${SANPI}/script/polar_assoc.py -v -m ${FRQ_FLOOR} -C ${C_NAME} -c ${C} -N ${N_NAME} --target_counts ${N} --data_suffix ${SUFF} --all_counts ${A}
     
 done

@@ -110,8 +110,8 @@ else
         #> add additional columns to table for computation
         add_extra_fvar ${DATA_PATH} ${TMP}
         echo -e "\n> adding association metric scores..."
-        echo "ucs-add -v ${INIT_SCORES} '${DELTA_P1}' '${DELTA_P2}' TO ${TMP} INTO ${SCORES_PATH}"
-        ucs-add -v ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" TO ${TMP} INTO ${SCORES_PATH}
+        echo "ucs-add -v ${INIT_SCORES} '${DELTA_P1}' '${DELTA_P2}' '${P1}' '${P2}'TO ${TMP} INTO ${SCORES_PATH}"
+        ucs-add -v ${INIT_SCORES} "${DELTA_P1}" "${DELTA_P2}" "${P1}" "${P2}" TO ${TMP} INTO ${SCORES_PATH}
 
     else
         echo -e "↻ Prior computation of metrics will be used.\n"

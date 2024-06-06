@@ -1,0 +1,6322 @@
+```python
+import re
+from pathlib import Path
+
+import pandas as pd
+
+from source.utils import POST_PROC_DIR, RESULT_DIR, corners
+from source.utils.associate import POLAR_DIR, TOP_AM_DIR, adjust_assoc_columns
+from source.utils.sample import sample_pickle
+
+pd.set_option('display.float_format', '{:,.2f}'.format)
+pd.set_option("styler.format.thousands", ',')
+pd.set_option('display.max_colwidth', 80)
+pd.set_option('display.max_columns', 10)
+pd.set_option('display.width', 300)
+HIT_EX_COLS = ['WITH::^[bt].*lower', 'WITH::text', 'token_str']
+FOCUS = ['f',
+         'am_p1_given2', 'conservative_log_ratio',
+         'am_p1_given2_simple',
+         'am_log_likelihood',
+        #  'N', 'f1', 
+        #  'mutual_information', 'am_odds_ratio_disc', 't_score',
+          'f2', 'E11', 'unexpected_f', 
+         'l1', 'l2', 'adj', 'adj_total']
+abbr_FOCUS = adjust_assoc_columns(FOCUS)
+```
+
+## Define helper functions
+
+
+```python
+def update_index(df, pat_name: str = None):
+    neg_env_name = df.filter(like='NEG', axis=0).l1[0]
+    # > will be either `NEGATED` or `NEGMIR`
+    #   both are shortened to just `NEG` for the keys in their separate dataframes
+    # > replace to avoid ambiguity in `key` values when combined
+    #! some filtering relies on 'NEG', so have to keep that prefix
+    index_update = pat_name or (
+        'NEGmir' if neg_env_name.endswith('MIR') else 'NEGany')
+    df.index = df.index.str.replace('NEG', index_update)
+    return df
+
+
+def set_col_widths(df):
+    cols = df.copy().reset_index().columns
+    width_dict = (
+        {c: None for c in cols}
+        | {c: 22 for c in cols[cols.str.contains('_id')]}
+        | {c: 35 for c in cols[cols.str.contains('text')]}
+        | {c: 30 for c in cols[cols.str.contains('forms')]}
+        | {c: 55 for c in cols[cols.str.contains('_str')]})
+    return list(width_dict.values())
+
+
+def embolden(strings: pd.Series,
+             bold_regex: str = None,
+             mono: bool = True) -> pd.Series:
+    bold_regex = re.compile(bold_regex, flags=re.I) if bold_regex else REGNOT
+    if mono:
+        return strings.apply(lambda x: bold_regex.sub(r' __`\1`__ ', x))
+    else:
+        return strings.apply(lambda x: bold_regex.sub(r' __\1__ ', x))
+
+
+def show_sample(df: pd.DataFrame,
+                format: str = 'grid',
+                n_dec: int = 0, 
+                limit_cols: bool = True, 
+                assoc: bool = False):
+    _df = df.copy().convert_dtypes()
+    if limit_cols and format != 'pipe' and not assoc:
+        print(_df.to_markdown(
+        floatfmt=f',.{n_dec}f', intfmt=',',
+        maxcolwidths=set_col_widths(_df),
+        tablefmt=format
+    ))
+    else:
+        if assoc: 
+            if not bool(n_dec): 
+                n_dec = 2
+            _df = adjust_assoc_columns(_df)
+            
+        
+        print(_df.to_markdown(
+            floatfmt=f',.{n_dec}f', intfmt=',',
+            tablefmt=format
+        ))
+```
+
+## Load and Evaluate _Exactly_ Hits by Subset
+
+
+```python
+def update_mir_paths(paths:dict) -> dict:
+    for mir in {'POS', 'NEG'}:
+        key = f'{mir}mirror'
+        mir_path = paths[key]
+        updated_mir_path = mir_path.with_name(f'Limited{mir}-'+mir_path.name)
+        if updated_mir_path.is_file():
+            paths[key] = updated_mir_path
+    return paths
+
+pkl_name = 'trigger-bigrams_frq-thrMIN-7.35f.pkl.gz'
+path_dict = {p: POST_PROC_DIR / p / pkl_name for  p in ('RBdirect', 'POSmirror','NEGmirror')}
+    
+path_dict = update_mir_paths(path_dict)
+show_sample(pd.Series(path_dict).to_frame('hits path'))
+pd.Series({d:p.relative_to(POST_PROC_DIR.parent) for d,p in path_dict.items()}).to_frame('hits path')
+```
+
+| pattern category | hits path                                                                                                |
+|:----------------:|----------------------------------------------------------------------------------------------------------|
+|     RBdirect     | /share/compling/data/sanpi/4_post-processed/RBdirect/trigger-bigrams_frq-thrMIN-7.35f.pkl.gz             |
+|    POSmirror     | /share/compling/data/sanpi/4_post-processed/POSmirror/LimitedPOS-trigger-bigrams_frq-thrMIN-7.35f.pkl.gz |
+|    NEGmirror     | /share/compling/data/sanpi/4_post-processed/NEGmirror/LimitedNEG-trigger-bigrams_frq-thrMIN-7.35f.pkl.gz |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hits path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RBdirect</th>
+      <td>4_post-processed/RBdirect/trigger-bigrams_frq-thrMIN-7.35f.pkl.gz</td>
+    </tr>
+    <tr>
+      <th>POSmirror</th>
+      <td>4_post-processed/POSmirror/LimitedPOS-trigger-bigrams_frq-thrMIN-7.35f.pkl.gz</td>
+    </tr>
+    <tr>
+      <th>NEGmirror</th>
+      <td>4_post-processed/NEGmirror/LimitedNEG-trigger-bigrams_frq-thrMIN-7.35f.pkl.gz</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+def load_exactly_hits(pkl_path):
+    _df = pd.read_pickle(pkl_path).convert_dtypes()
+    _df = _df.loc[_df.adv_form_lower == 'exactly', :]
+    return _df
+
+nmir_exactly = load_exactly_hits(pkl_path=path_dict['NEGmirror'])
+pmir_exactly = load_exactly_hits(pkl_path=path_dict['POSmirror'])
+full_not_exactly = load_exactly_hits(pkl_path=path_dict['RBdirect'])
+
+```
+
+### `NEGmirror` *exactly* hits
+
+
+```python
+xnmir = (nmir_exactly.sample(8)
+            .sort_values(['bigram_lower','adj_form'])
+            .filter(regex=r'trig[ger]*_[dl]e|text|bigram_lower'))
+show_sample(xnmir)
+xnmir
+```
+
+    +------------------------+-------------------------------------+--------------------+
+    | hit_id                 | text_window                         | bigram_lower       |
+    +========================+=====================================+====================+
+    | pcc_eng_20_084.0354_x1 | are all different , none of us are  | exactly_alike      |
+    | 341744_059:06-10-11    | exactly alike and variety is a      |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | pcc_eng_07_052.8916_x0 | None of those are exactly           | exactly_convenient |
+    | 838851_26:1-5-6        | convenient and production and work  |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | pcc_eng_02_040.4261_x0 | begin the scenes , none of the      | exactly_horrifying |
+    | 637920_34:14-19-20     | scenes are exactly horrifying .     |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | pcc_eng_21_027.4394_x0 | women and minorities -- none of it  | exactly_new        |
+    | 427443_31:26-30-31     | is exactly new .                    |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | pcc_eng_02_105.3699_x1 | by manga etc -- nothing is exactly  | exactly_square     |
+    | 687756_36:09-11-12     | square .                            |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | pcc_eng_07_001.7565_x0 | way , you 're never exactly sure    | exactly_sure       |
+    | 012177_15:20-21-22     | how the recording process           |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | pcc_eng_25_044.9147_x0 | because at this point nobody is     | exactly_sure       |
+    | 711011_22:10-12-13     | exactly sure how to get there       |                    |
+    +------------------------+-------------------------------------+--------------------+
+    | nyt_eng_20100722_0112_ | it 's predictable and never exactly | exactly_sweeping   |
+    | 18:30-31-32            | sweeping , it 's certainly          |                    |
+    +------------------------+-------------------------------------+--------------------+
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text_window</th>
+      <th>bigram_lower</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_20_084.0354_x1341744_059:06-10-11</th>
+      <td>are all different , none of us are exactly alike and variety is a</td>
+      <td>exactly_alike</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_07_052.8916_x0838851_26:1-5-6</th>
+      <td>None of those are exactly convenient and production and work</td>
+      <td>exactly_convenient</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_02_040.4261_x0637920_34:14-19-20</th>
+      <td>begin the scenes , none of the scenes are exactly horrifying .</td>
+      <td>exactly_horrifying</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_21_027.4394_x0427443_31:26-30-31</th>
+      <td>women and minorities -- none of it is exactly new .</td>
+      <td>exactly_new</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_02_105.3699_x1687756_36:09-11-12</th>
+      <td>by manga etc -- nothing is exactly square .</td>
+      <td>exactly_square</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_07_001.7565_x0012177_15:20-21-22</th>
+      <td>way , you 're never exactly sure how the recording process</td>
+      <td>exactly_sure</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_25_044.9147_x0711011_22:10-12-13</th>
+      <td>because at this point nobody is exactly sure how to get there</td>
+      <td>exactly_sure</td>
+    </tr>
+    <tr>
+      <th>nyt_eng_20100722_0112_18:30-31-32</th>
+      <td>it 's predictable and never exactly sweeping , it 's certainly</td>
+      <td>exactly_sweeping</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+xpm = (pmir_exactly.sample(6)
+            .sort_values(['bigram_lower','adj_form'])
+            .filter(regex=r'trig[ger]*_[dl]e|text|bigram_lower'))
+show_sample(xpm)
+xpm
+```
+
+    +------------------------+------------------------------------+-------------------+
+    | hit_id                 | text_window                        | bigram_lower      |
+    +========================+====================================+===================+
+    | pcc_eng_24_088.2047_x1 | , if we were all exactly alike we  | exactly_alike     |
+    | 410351_42:16-17-18     | would never exchange               |                   |
+    +------------------------+------------------------------------+-------------------+
+    | pcc_eng_24_012.7792_x0 | along if we were all exactly alike | exactly_alike     |
+    | 189980_12:10-11-12     | ?                                  |                   |
+    +------------------------+------------------------------------+-------------------+
+    | pcc_eng_11_103.3304_x1 | either virtually the same or       | exactly_identical |
+    | 656213_46:39-40-41     | exactly identical to the bullets   |                   |
+    |                        | used                               |                   |
+    +------------------------+------------------------------------+-------------------+
+    | pcc_eng_06_042.8439_x0 | seemed genuinely concerned that    | exactly_right     |
+    | 676759_37:16-18-19     | everything was exactly right .     |                   |
+    +------------------------+------------------------------------+-------------------+
+    | pcc_eng_04_061.6183_x0 | , and headliner , all of which are | exactly_right     |
+    | 979284_12:24-28-29     | exactly right and installed by     |                   |
+    |                        | experts                            |                   |
+    +------------------------+------------------------------------+-------------------+
+    | pcc_eng_21_049.1505_x0 | , inscrutable expression ,         | exactly_right     |
+    | 778237_23:10-12-13     | everything is exactly right and so |                   |
+    |                        | exactly the                        |                   |
+    +------------------------+------------------------------------+-------------------+
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text_window</th>
+      <th>bigram_lower</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_24_088.2047_x1410351_42:16-17-18</th>
+      <td>, if we were all exactly alike we would never exchange</td>
+      <td>exactly_alike</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_24_012.7792_x0189980_12:10-11-12</th>
+      <td>along if we were all exactly alike ?</td>
+      <td>exactly_alike</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_11_103.3304_x1656213_46:39-40-41</th>
+      <td>either virtually the same or exactly identical to the bullets used</td>
+      <td>exactly_identical</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_06_042.8439_x0676759_37:16-18-19</th>
+      <td>seemed genuinely concerned that everything was exactly right .</td>
+      <td>exactly_right</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_04_061.6183_x0979284_12:24-28-29</th>
+      <td>, and headliner , all of which are exactly right and installed by experts</td>
+      <td>exactly_right</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_21_049.1505_x0778237_23:10-12-13</th>
+      <td>, inscrutable expression , everything is exactly right and so exactly the</td>
+      <td>exactly_right</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+xn_all =(full_not_exactly.sample(6)
+            .sort_values(['bigram_lower','adj_form'])
+            .filter(regex=r'trig[ger]*_[dl]e|text|bigram_lower'))
+show_sample(xn_all)
+xn_all
+```
+
+    +------------------------+-------------------------------------+----------------------+
+    | hit_id                 | text_window                         | bigram_lower         |
+    +========================+=====================================+======================+
+    | pcc_eng_13_087.7563_x1 | and decaying carcasses -- not       | exactly_appetizing   |
+    | 402076_07:23-24-25     | exactly appetizing to the human     |                      |
+    |                        | palate                              |                      |
+    +------------------------+-------------------------------------+----------------------+
+    | pcc_eng_13_101.9941_x1 | defendant , you were n't exactly    | exactly_certain      |
+    | 631945_125:22-23-24    | certain when , Friday ,             |                      |
+    +------------------------+-------------------------------------+----------------------+
+    | pcc_eng_06_044.1854_x0 | - Saxon world is not exactly chock  | exactly_chock        |
+    | 698472_052:11-12-13    | -a- block with Tiger                |                      |
+    +------------------------+-------------------------------------+----------------------+
+    | pcc_eng_11_050.4455_x0 | which means he was n't exactly fond | exactly_fond         |
+    | 799859_20:13-14-15     | of pinstripes , but                 |                      |
+    +------------------------+-------------------------------------+----------------------+
+    | pcc_eng_00_103.7144_x1 | , cable management is n't exactly   | exactly_optimal      |
+    | 661316_3:41-42-43      | optimal either ) .                  |                      |
+    +------------------------+-------------------------------------+----------------------+
+    | pcc_eng_28_031.0975_x0 | through glasses that are n't        | exactly_rose-colored |
+    | 486453_7:27-28-29      | exactly rose-colored .              |                      |
+    +------------------------+-------------------------------------+----------------------+
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text_window</th>
+      <th>bigram_lower</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_13_087.7563_x1402076_07:23-24-25</th>
+      <td>and decaying carcasses -- not exactly appetizing to the human palate</td>
+      <td>exactly_appetizing</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_13_101.9941_x1631945_125:22-23-24</th>
+      <td>defendant , you were n't exactly certain when , Friday ,</td>
+      <td>exactly_certain</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_06_044.1854_x0698472_052:11-12-13</th>
+      <td>- Saxon world is not exactly chock -a- block with Tiger</td>
+      <td>exactly_chock</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_11_050.4455_x0799859_20:13-14-15</th>
+      <td>which means he was n't exactly fond of pinstripes , but</td>
+      <td>exactly_fond</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_00_103.7144_x1661316_3:41-42-43</th>
+      <td>, cable management is n't exactly optimal either ) .</td>
+      <td>exactly_optimal</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_28_031.0975_x0486453_7:27-28-29</th>
+      <td>through glasses that are n't exactly rose-colored .</td>
+      <td>exactly_rose-colored</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+def adjust_hit_table(_df): 
+    _df.columns = _df.columns.str.replace(
+        r'mir|neg', 'trig', regex=True)
+    _df = _df.assign(
+        all_forms_lower=(_df.trig_form_lower.astype('string')
+                         + '_' + _df.bigram_lower.astype('string')
+                         ).astype('category'))
+    _df = _df.drop_duplicates(['all_forms_lower', 'text_window'])
+
+    if any(_df.category.str.contains('mirror')):
+        _df['trigger_head'] = (
+            _df.pattern.astype('string')
+            .str.split('mirror-').str.get(1)
+        ).astype('category')
+    else:
+        _df['trigger_head'] = (
+            _df.pattern.astype('string')
+            .str.split('-').str.get(1)
+            .str.replace('adj', 'R')
+            .str.replace('neg', 'L')
+        ).astype('category')
+    if 'trigger_lower' in _df.columns: 
+        _df = _df.loc[:, _df.columns != 'trig_form_lower']
+    else: 
+        _df = _df.rename(columns={'trig_form_lower': 'trigger_lower'})
+    return _df.rename(columns={'trig_lemma': 'trigger_lemma'})
+    
+```
+
+
+```python
+nmir_exactly = adjust_hit_table(nmir_exactly)
+pmir_exactly = adjust_hit_table(pmir_exactly)
+full_not_exactly = adjust_hit_table(full_not_exactly)
+```
+
+filtering `not_exactly` hits to ignore duplicates with NEGmirror hits...
+
+🤔 but the question is how much of the remainder is due a trigger not included in the NEGmirror patterns 
+as opposed to being a duplicate that was not discarded? 
+
+The forms `"not"` and `"n't"` were not included in the mirror hits, but are any other trigger hits cases of duplication already removed from the NEGmirror hits? 
+
+❓ Can proper redundancy elimination only be done with the NEGmirror hits before additional duplicate removal?
+
+
+```python
+not_exactly = full_not_exactly.copy()
+not_exactly = not_exactly.loc[~not_exactly.bigram_id.isin(nmir_exactly.bigram_id), :]
+xnot_exactly = (pd.Series({'all negated  hits': len(full_not_exactly), 
+                       'NEGmirror complement': len(not_exactly), 
+                       'NEGmirror hits': len(nmir_exactly), 
+                       'POSmirror hits': len(pmir_exactly)}).to_frame('"exactly" hits in subset'))
+show_sample(xnot_exactly, format='pipe')
+xnot_exactly
+```
+
+    |                      | "exactly" hits in subset |
+    |:---------------------|-------------------------:|
+    | all negated  hits    |                   42,058 |
+    | NEGmirror complement |                   41,260 |
+    | NEGmirror hits       |                      802 |
+    | POSmirror hits       |                      219 |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>"exactly" hits in subset</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>all negated  hits</th>
+      <td>42058</td>
+    </tr>
+    <tr>
+      <th>NEGmirror complement</th>
+      <td>41260</td>
+    </tr>
+    <tr>
+      <th>NEGmirror hits</th>
+      <td>802</td>
+    </tr>
+    <tr>
+      <th>POSmirror hits</th>
+      <td>219</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Ok, so not so bad, all things considered. 
+- _never_, _neither_, _none_, and _nor_ should be included in the `NEGmirror` hits, but these numbers are reasonable
+- **but** keep in mind that the _not_ hits shown here have not been filtered for additional duplicates
+
+
+```python
+show_sample(not_exactly.trigger_lemma.value_counts().to_frame(), format='pipe')
+not_exactly.trigger_lemma.value_counts().to_frame()
+```
+
+    | trigger_lemma |  count |
+    |:--------------|-------:|
+    | not           | 41,149 |
+    | ain't         |     78 |
+    | without       |     16 |
+    | aint          |      8 |
+    | few           |      3 |
+    | never         |      2 |
+    | neither       |      2 |
+    | none          |      1 |
+    | nor           |      1 |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>trigger_lemma</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>not</th>
+      <td>41149</td>
+    </tr>
+    <tr>
+      <th>ain't</th>
+      <td>78</td>
+    </tr>
+    <tr>
+      <th>without</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>aint</th>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>few</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>never</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>neither</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>none</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>nor</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Just going to drop the hits that should be represented by `NEGmirror`
+
+
+```python
+neg_overlap = not_exactly.loc[not_exactly.trigger_lemma.isin(['never', 'neither', 'none', 'nor'])].filter(regex=r'all|text|token|deprel|head')
+show_sample(neg_overlap)
+neg_overlap
+```
+
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+    | hit_id                 | token_str                                               | text_window                         | trig_deprel   | all_forms_lower         | trigger_head   |
+    +========================+=========================================================+=====================================+===============+=========================+================+
+    | pcc_eng_09_006.3776_x0 | It was never exactly clear , however , what he intended | It was never exactly clear ,        | advmod        | never_exactly_clear     | R              |
+    | 087199_04:3-4-5        | to do about it : Appearing at the American Israel       | however , what                      |               |                         |                |
+    |                        | Public Affairs Committee 's policy conference in March  |                                     |               |                         |                |
+    |                        | 2016 , Trump said in the same speech that he planned to |                                     |               |                         |                |
+    |                        | " dismantle " and " enforce " it .                      |                                     |               |                         |                |
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+    | pcc_eng_17_025.1287_x0 | Life is never exactly easy for Jamie and Claire .       | Life is never exactly easy for      | advmod        | never_exactly_easy      | R              |
+    | 390487_29:3-4-5        |                                                         | Jamie and Claire                    |               |                         |                |
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+    | pcc_eng_01_013.5821_x0 | The problem with the system is that none of King        | the system is that none of King     | nsubj         | none_exactly_young      | R              |
+    | 203017_13:08-15-16     | Abdullah 's brothers are exactly young and full of      | Abdullah 's brothers are exactly    |               |                         |                |
+    |                        | vigor .                                                 | young and full of vigor             |               |                         |                |
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+    | nyt_eng_20060406_0182_ | it would be a stretch to say that at that moment her    | actually happy , but neither is she | dep           | neither_exactly_unhappy | R              |
+    | 2:28-31-32             | character , a vaguely depressed pot-smoking housekeeper | exactly unhappy .                   |               |                         |                |
+    |                        | named Olivia , is actually happy , but neither is she   |                                     |               |                         |                |
+    |                        | exactly unhappy .                                       |                                     |               |                         |                |
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+    | nyt_eng_20101010_0083_ | neither Dara , Xavier nor , apparently , Leonard is     | neither Dara , Xavier nor ,         | dep           | neither_exactly_sure    | R              |
+    | 15:01-11-12            | exactly sure what opportunities Djibouti will provide . | apparently , Leonard is exactly     |               |                         |                |
+    |                        |                                                         | sure what opportunities Djibouti    |               |                         |                |
+    |                        |                                                         | will                                |               |                         |                |
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+    | pcc_eng_02_069.5519_x1 | Nor were the procedures exactly similar .               | Nor were the procedures exactly     | cc            | nor_exactly_similar     | R              |
+    | 108750_03:1-5-6        |                                                         | similar .                           |               |                         |                |
+    +------------------------+---------------------------------------------------------+-------------------------------------+---------------+-------------------------+----------------+
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>token_str</th>
+      <th>text_window</th>
+      <th>trig_deprel</th>
+      <th>all_forms_lower</th>
+      <th>trigger_head</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_09_006.3776_x0087199_04:3-4-5</th>
+      <td>It was never exactly clear , however , what he intended to do about it : App...</td>
+      <td>It was never exactly clear , however , what</td>
+      <td>advmod</td>
+      <td>never_exactly_clear</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_17_025.1287_x0390487_29:3-4-5</th>
+      <td>Life is never exactly easy for Jamie and Claire .</td>
+      <td>Life is never exactly easy for Jamie and Claire</td>
+      <td>advmod</td>
+      <td>never_exactly_easy</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_01_013.5821_x0203017_13:08-15-16</th>
+      <td>The problem with the system is that none of King Abdullah 's brothers are ex...</td>
+      <td>the system is that none of King Abdullah 's brothers are exactly young and f...</td>
+      <td>nsubj</td>
+      <td>none_exactly_young</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>nyt_eng_20060406_0182_2:28-31-32</th>
+      <td>it would be a stretch to say that at that moment her character , a vaguely d...</td>
+      <td>actually happy , but neither is she exactly unhappy .</td>
+      <td>dep</td>
+      <td>neither_exactly_unhappy</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>nyt_eng_20101010_0083_15:01-11-12</th>
+      <td>neither Dara , Xavier nor , apparently , Leonard is exactly sure what opport...</td>
+      <td>neither Dara , Xavier nor , apparently , Leonard is exactly sure what opport...</td>
+      <td>dep</td>
+      <td>neither_exactly_sure</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_02_069.5519_x1108750_03:1-5-6</th>
+      <td>Nor were the procedures exactly similar .</td>
+      <td>Nor were the procedures exactly similar .</td>
+      <td>cc</td>
+      <td>nor_exactly_similar</td>
+      <td>R</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+nmir_overlap = nmir_exactly.loc[nmir_exactly.text_window.isin(neg_overlap.text_window)].filter(regex=r'all|text|token|deprel|head')
+show_sample(nmir_overlap)
+nmir_overlap
+```
+
+    +------------------------+---------------------------------------------------------+----------------------------------+---------------+---------------------+----------------+
+    | hit_id                 | token_str                                               | text_window                      | trig_deprel   | all_forms_lower     | trigger_head   |
+    +========================+=========================================================+==================================+===============+=====================+================+
+    | pcc_eng_08_036.2797_x0 | Nor were the procedures exactly similar .               | Nor were the procedures exactly  | cc            | nor_exactly_similar | R              |
+    | 571321_24:1-5-6        |                                                         | similar .                        |               |                     |                |
+    +------------------------+---------------------------------------------------------+----------------------------------+---------------+---------------------+----------------+
+    | pcc_eng_08_065.4444_x1 | Life is never exactly easy for Jamie and Claire .       | Life is never exactly easy for   | advmod        | never_exactly_easy  | R              |
+    | 043970_32:3-4-5        |                                                         | Jamie and Claire                 |               |                     |                |
+    +------------------------+---------------------------------------------------------+----------------------------------+---------------+---------------------+----------------+
+    | pcc_eng_29_009.8148_x0 | It was never exactly clear , however , what he intended | It was never exactly clear ,     | advmod        | never_exactly_clear | R              |
+    | 142508_17:3-4-5        | to ...                                                  | however , what                   |               |                     |                |
+    +------------------------+---------------------------------------------------------+----------------------------------+---------------+---------------------+----------------+
+    | pcc_eng_15_026.9576_x0 | The problem with the system is that none of King        | the system is that none of King  | nsubj         | none_exactly_young  | R              |
+    | 419493_10:08-15-16     | Abdullah 's brothers are exactly young and full of      | Abdullah 's brothers are exactly |               |                     |                |
+    |                        | vigor . ''                                              | young and full of vigor          |               |                     |                |
+    +------------------------+---------------------------------------------------------+----------------------------------+---------------+---------------------+----------------+
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>token_str</th>
+      <th>text_window</th>
+      <th>trig_deprel</th>
+      <th>all_forms_lower</th>
+      <th>trigger_head</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_08_036.2797_x0571321_24:1-5-6</th>
+      <td>Nor were the procedures exactly similar .</td>
+      <td>Nor were the procedures exactly similar .</td>
+      <td>cc</td>
+      <td>nor_exactly_similar</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_08_065.4444_x1043970_32:3-4-5</th>
+      <td>Life is never exactly easy for Jamie and Claire .</td>
+      <td>Life is never exactly easy for Jamie and Claire</td>
+      <td>advmod</td>
+      <td>never_exactly_easy</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_29_009.8148_x0142508_17:3-4-5</th>
+      <td>It was never exactly clear , however , what he intended to ...</td>
+      <td>It was never exactly clear , however , what</td>
+      <td>advmod</td>
+      <td>never_exactly_clear</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_15_026.9576_x0419493_10:08-15-16</th>
+      <td>The problem with the system is that none of King Abdullah 's brothers are ex...</td>
+      <td>the system is that none of King Abdullah 's brothers are exactly young and f...</td>
+      <td>nsubj</td>
+      <td>none_exactly_young</td>
+      <td>R</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+💡 hmm maybe the `dep` dependency relations were excluded outright for mirror patterns? (since they were developed later?)
+
+
+```python
+not_exactly = not_exactly.loc[~not_exactly.index.isin(neg_overlap.index),:]
+```
+
+
+```python
+show_sample(not_exactly.trigger_lemma.value_counts(), format='pipe')
+```
+
+    | trigger_lemma |  count |
+    |:--------------|-------:|
+    | not           | 41,149 |
+    | ain't         |     78 |
+    | without       |     16 |
+    | aint          |      8 |
+    | few           |      3 |
+
+
+It appears there are no duplicates in the `RBdirect` remainder however 🤷‍♀️, so I guess there just really are **that** many hits with sentential negation 🤯
+
+
+```python
+not_exactly.text_window.duplicated().value_counts().to_frame()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>text_window</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>41254</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print(f'{not_exactly.text_window.nunique():,} unique `text_window` strings')
+print(f'{len(not_exactly):,} total rows')
+```
+
+    41,254 unique `text_window` strings
+    41,254 total rows
+
+
+
+```python
+updated_afl = not_exactly.groupby('trigger_lower').value_counts(['adj_form_lower'])
+updated_afl.nlargest(20).to_frame()
+
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>trigger_lower</th>
+      <th>adj_form_lower</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>not</th>
+      <th>sure</th>
+      <td>6169</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>sure</th>
+      <td>1969</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">not</th>
+      <th>clear</th>
+      <td>1097</td>
+    </tr>
+    <tr>
+      <th>true</th>
+      <td>764</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>new</th>
+      <td>762</td>
+    </tr>
+    <tr>
+      <th>not</th>
+      <th>new</th>
+      <td>548</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>easy</th>
+      <td>521</td>
+    </tr>
+    <tr>
+      <th>not</th>
+      <th>easy</th>
+      <td>503</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>clear</th>
+      <td>486</td>
+    </tr>
+    <tr>
+      <th>not</th>
+      <th>cheap</th>
+      <td>345</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">n't</th>
+      <th>cheap</th>
+      <td>327</td>
+    </tr>
+    <tr>
+      <th>true</th>
+      <td>324</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">not</th>
+      <th>right</th>
+      <td>307</td>
+    </tr>
+    <tr>
+      <th>surprising</th>
+      <td>251</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>right</th>
+      <td>229</td>
+    </tr>
+    <tr>
+      <th>not</th>
+      <th>happy</th>
+      <td>218</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>happy</th>
+      <td>216</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">not</th>
+      <th>ideal</th>
+      <td>212</td>
+    </tr>
+    <tr>
+      <th>accurate</th>
+      <td>206</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>ideal</th>
+      <td>189</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+updated_afl.nsmallest(10).to_frame()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>trigger_lower</th>
+      <th>adj_form_lower</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="10" valign="top">ain't</th>
+      <th>accurate</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>short</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>unfounded</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>unprecedented</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>unbiased</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>shabby</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>sensible</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>catchy</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>different</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>eager</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+not_exactly[['trigger_head', 'trigger_lemma',  'adj_form_lower']].astype('string').value_counts(['trigger_lemma', 'adj_form_lower']).nlargest(20)
+```
+
+
+
+
+    trigger_lemma  adj_form_lower
+    not            sure              8138
+                   clear             1584
+                   new               1310
+                   true              1089
+                   easy              1024
+                   cheap              672
+                   right              536
+                   happy              434
+                   surprising         426
+                   ideal              401
+                   accurate           309
+                   great              304
+                   perfect            276
+                   good               252
+                   fair               251
+                   subtle             246
+                   correct            230
+                   fun                215
+                   conducive          206
+                   hard               201
+    Name: count, dtype: int64
+
+
+
+
+```python
+# full_not_exactly.loc[full_not_exactly.trigger_lemma!='not', ['trigger_lemma', 'adj_form_lower', 'trigger_head']].groupby('trigger_lemma').value_counts(['trigger_head','adj_form_lower', ])
+trigger_counts = full_not_exactly[['trigger_lemma' ,'trigger_head', 'trigger_lower']].value_counts().to_frame().reset_index()
+# trigger_counts = full_not_exactly[['trigger_lemma', 'trigger_lower' ,'trigger_head', ]].value_counts().to_frame().reset_index()
+trigger_counts.index = trigger_counts.index + 1
+show_sample(trigger_counts.sort_values(['trigger_head', 'count', 'trigger_lemma'], ascending = False), format='pipe')
+
+```
+
+    |    | trigger_lemma | trigger_head | trigger_lower |  count |
+    |---:|:--------------|:-------------|:--------------|-------:|
+    |  1 | not           | R            | not           | 24,362 |
+    |  2 | not           | R            | n't           | 16,572 |
+    |  3 | never         | R            | never         |    323 |
+    |  5 | none          | R            | none          |    185 |
+    |  6 | nobody        | R            | nobody        |     83 |
+    |  7 | ain't         | R            | ain't         |     74 |
+    |  8 | neither       | R            | neither       |     71 |
+    |  9 | nor           | R            | nor           |     43 |
+    | 11 | nothing       | R            | nothing       |     32 |
+    | 12 | no            | R            | no            |     16 |
+    | 13 | without       | R            | without       |     15 |
+    | 14 | not           | R            | nit           |     13 |
+    | 15 | aint          | R            | aint          |      8 |
+    | 17 | rarely        | R            | rarely        |      4 |
+    | 19 | few           | R            | few           |      2 |
+    | 23 | seldom        | R            | seldom        |      1 |
+    | 22 | few           | R            | fewer         |      1 |
+    |  4 | not           | L            | not           |    206 |
+    | 10 | nothing       | L            | nothing       |     33 |
+    | 16 | none          | L            | none          |      7 |
+    | 18 | ain't         | L            | ain't         |      4 |
+    | 24 | without       | L            | without       |      1 |
+    | 20 | nobody        | L            | nobody        |      1 |
+    | 21 | neither       | L            | neither       |      1 |
+
+
+
+```python
+def flatten_by_head(trigger_counts):
+    by_head = {h:hc.filter(['trigger_lemma', 'count']).set_index('trigger_lemma') for h, hc in trigger_counts.groupby('trigger_head')}
+    by_head = by_head['R'].join(by_head['L'], lsuffix='_R_headed', rsuffix='_L_headed').fillna(0).convert_dtypes().sort_index(axis=1)
+    by_head.columns = by_head.columns.str.replace('count_','')
+    show_sample(by_head.sort_values('R_headed', ascending=False), format='pipe')
+    return by_head.sort_values('R_headed', ascending=False)
+flatten_by_head(trigger_counts)
+```
+
+    | trigger_lemma | L_headed | R_headed |
+    |:--------------|---------:|---------:|
+    | not           |      206 |   24,362 |
+    | not           |      206 |   16,572 |
+    | never         |        0 |      323 |
+    | none          |        7 |      185 |
+    | nobody        |        1 |       83 |
+    | ain't         |        4 |       74 |
+    | neither       |        1 |       71 |
+    | nor           |        0 |       43 |
+    | nothing       |       33 |       32 |
+    | no            |        0 |       16 |
+    | without       |        1 |       15 |
+    | not           |      206 |       13 |
+    | aint          |        0 |        8 |
+    | rarely        |        0 |        4 |
+    | few           |        0 |        2 |
+    | few           |        0 |        1 |
+    | seldom        |        0 |        1 |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>L_headed</th>
+      <th>R_headed</th>
+    </tr>
+    <tr>
+      <th>trigger_lemma</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>not</th>
+      <td>206</td>
+      <td>24362</td>
+    </tr>
+    <tr>
+      <th>not</th>
+      <td>206</td>
+      <td>16572</td>
+    </tr>
+    <tr>
+      <th>never</th>
+      <td>0</td>
+      <td>323</td>
+    </tr>
+    <tr>
+      <th>none</th>
+      <td>7</td>
+      <td>185</td>
+    </tr>
+    <tr>
+      <th>nobody</th>
+      <td>1</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>ain't</th>
+      <td>4</td>
+      <td>74</td>
+    </tr>
+    <tr>
+      <th>neither</th>
+      <td>1</td>
+      <td>71</td>
+    </tr>
+    <tr>
+      <th>nor</th>
+      <td>0</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <th>nothing</th>
+      <td>33</td>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>no</th>
+      <td>0</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>without</th>
+      <td>1</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>not</th>
+      <td>206</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>aint</th>
+      <td>0</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>rarely</th>
+      <td>0</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>few</th>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>few</th>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>seldom</th>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# ref_trigger_count =  pd.read_pickle(path_dict['RBdirect'])[['neg_lemma', 'pattern']].value_counts().to_frame().reset_index()
+# ref_trigger_count.columns = ['trigger_lemma', 'trigger_head', 'total count']
+# ref_trigger_count.index = ref_trigger_count.index + 1
+# ref_trigger_count.loc[:,'trigger_head'] = ref_trigger_count.trigger_head.apply(lambda n: 'R' if 'adj' in n else 'L')
+
+ref_trigger_count = pd.read_csv('/home/arh234/projects/sanpi/info/md_import_tables/allMIN-7_neg_trigger_counts.csv').set_index('rank')
+show_sample(ref_trigger_count.sort_values(['trigger_head', 'count', 'trigger_lemma'], ascending = False), format='pipe')
+flatten_by_head(ref_trigger_count)
+# show_sample(ref_trigger_count.sort_values(['trigger_lemma', 'trigger_head', 'total count'], ascending = False), format='pipe')
+```
+
+    | rank | trigger_lemma | trigger_head |     count |
+    |-----:|:--------------|:-------------|----------:|
+    |    1 | not           | R            | 2,894,561 |
+    |    2 | never         | R            |   111,085 |
+    |    4 | nothing       | R            |    34,234 |
+    |    5 | none          | R            |    21,621 |
+    |    6 | nor           | R            |    15,922 |
+    |    7 | without       | R            |    13,320 |
+    |    8 | no            | R            |    12,721 |
+    |   10 | few           | R            |     8,077 |
+    |   12 | neither       | R            |     6,617 |
+    |   13 | nobody        | R            |     5,859 |
+    |   14 | hardly        | R            |     5,513 |
+    |   15 | rarely        | R            |     4,461 |
+    |   17 | ain't         | R            |     1,361 |
+    |   18 | barely        | R            |     1,228 |
+    |   19 | seldom        | R            |     1,037 |
+    |   20 | scarcely      | R            |       796 |
+    |   24 | aint          | R            |       198 |
+    |    3 | nothing       | L            |    66,536 |
+    |    9 | none          | L            |     9,978 |
+    |   11 | not           | L            |     7,480 |
+    |   16 | without       | L            |     1,495 |
+    |   21 | ain't         | L            |       691 |
+    |   22 | few           | L            |       546 |
+    |   23 | nobody        | L            |       539 |
+    |   25 | no            | L            |       101 |
+    |   26 | neither       | L            |        91 |
+    |   27 | aint          | L            |        74 |
+    |   28 | never         | L            |        64 |
+    |   29 | rarely        | L            |        10 |
+    |   30 | hardly        | L            |         8 |
+    |   31 | seldom        | L            |         5 |
+    |   32 | scarcely      | L            |         1 |
+    | trigger_lemma | L_headed |  R_headed |
+    |:--------------|---------:|----------:|
+    | not           |    7,480 | 2,894,561 |
+    | never         |       64 |   111,085 |
+    | nothing       |   66,536 |    34,234 |
+    | none          |    9,978 |    21,621 |
+    | nor           |        0 |    15,922 |
+    | without       |    1,495 |    13,320 |
+    | no            |      101 |    12,721 |
+    | few           |      546 |     8,077 |
+    | neither       |       91 |     6,617 |
+    | nobody        |      539 |     5,859 |
+    | hardly        |        8 |     5,513 |
+    | rarely        |       10 |     4,461 |
+    | ain't         |      691 |     1,361 |
+    | barely        |        0 |     1,228 |
+    | seldom        |        5 |     1,037 |
+    | scarcely      |        1 |       796 |
+    | aint          |       74 |       198 |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>L_headed</th>
+      <th>R_headed</th>
+    </tr>
+    <tr>
+      <th>trigger_lemma</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>not</th>
+      <td>7480</td>
+      <td>2894561</td>
+    </tr>
+    <tr>
+      <th>never</th>
+      <td>64</td>
+      <td>111085</td>
+    </tr>
+    <tr>
+      <th>nothing</th>
+      <td>66536</td>
+      <td>34234</td>
+    </tr>
+    <tr>
+      <th>none</th>
+      <td>9978</td>
+      <td>21621</td>
+    </tr>
+    <tr>
+      <th>nor</th>
+      <td>0</td>
+      <td>15922</td>
+    </tr>
+    <tr>
+      <th>without</th>
+      <td>1495</td>
+      <td>13320</td>
+    </tr>
+    <tr>
+      <th>no</th>
+      <td>101</td>
+      <td>12721</td>
+    </tr>
+    <tr>
+      <th>few</th>
+      <td>546</td>
+      <td>8077</td>
+    </tr>
+    <tr>
+      <th>neither</th>
+      <td>91</td>
+      <td>6617</td>
+    </tr>
+    <tr>
+      <th>nobody</th>
+      <td>539</td>
+      <td>5859</td>
+    </tr>
+    <tr>
+      <th>hardly</th>
+      <td>8</td>
+      <td>5513</td>
+    </tr>
+    <tr>
+      <th>rarely</th>
+      <td>10</td>
+      <td>4461</td>
+    </tr>
+    <tr>
+      <th>ain't</th>
+      <td>691</td>
+      <td>1361</td>
+    </tr>
+    <tr>
+      <th>barely</th>
+      <td>0</td>
+      <td>1228</td>
+    </tr>
+    <tr>
+      <th>seldom</th>
+      <td>5</td>
+      <td>1037</td>
+    </tr>
+    <tr>
+      <th>scarcely</th>
+      <td>1</td>
+      <td>796</td>
+    </tr>
+    <tr>
+      <th>aint</th>
+      <td>74</td>
+      <td>198</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+`NEGmirror` *exactly* examples
+
+
+```python
+show_sample(nmir_exactly.sample(8)
+            .sort_values(['trigger_lemma', 'trigger_lower', 'adj_form'])
+            .filter(regex=r'trig[ger]*_[dl]e|text|bigram_lower'))
+
+```
+
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | hit_id                 | text_window                        | trig_deprel   | trigger_lemma   | bigram_lower     |
+    +========================+====================================+===============+=================+==================+
+    | pcc_eng_04_010.3961_x0 | is that it is never exactly boring | advmod        | never           | exactly_boring   |
+    | 151951_64:7-8-9        | , only dulled .                    |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | pcc_eng_15_040.9047_x0 | , it 's still never exactly fun to | advmod        | never           | exactly_fun      |
+    | 645253_57:7-8-9        | have to worry                      |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | pcc_eng_08_081.8258_x1 | No not exactly unknown like the    | advmod        | no              | exactly_unknown  |
+    | 308847_32:1-3-4        | milky way                          |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | pcc_eng_09_073.0402_x1 | " Nobody is exactly ready , "      | nsubj         | nobody          | exactly_ready    |
+    | 165119_29:2-4-5        | Hudson said                        |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | pcc_eng_13_048.6277_x0 | How much time nobody is exactly    | nsubj         | nobody          | exactly_sure     |
+    | 770082_48:4-6-7        | sure .                             |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | pcc_eng_25_053.7497_x0 | strand of DNA and none are exactly | nsubj         | none            | exactly_alike    |
+    | 854201_35:16-18-19     | alike .                            |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | nyt_eng_20031117_0007_ | none of the problems are exactly   | nsubj         | none            | exactly_new      |
+    | 6:1-6-7                | new .                              |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+    | pcc_eng_09_096.9861_x1 | touch there , but nothing exactly  | amod          | nothing         | exactly_definite |
+    | 553002_031:12-13-14    | definite until -                   |               |                 |                  |
+    +------------------------+------------------------------------+---------------+-----------------+------------------+
+
+
+`POSmirror` *exactly* examples
+
+
+```python
+show_sample(pmir_exactly.sample(8)
+            .sort_values(['trigger_lemma', 'trigger_lower', 'adj_form'])
+            .filter(regex=r'trig[ger]*_[dl]e|text|bigram_lower'))
+
+```
+
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | hit_id                 | text_window                         | trig_deprel   | trigger_lemma   | bigram_lower       |
+    +========================+=====================================+===============+=================+====================+
+    | pcc_eng_17_097.1162_x1 | ground ) wind is always exactly     | advmod        | always          | exactly_zero       |
+    | 553549_29:16-17-18     | zero .                              |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_00_034.6056_x0 | with this statement that everyone   | nsubj         | everyone        | exactly_right      |
+    | 542944_056:16-19-20    | new was exactly right !             |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_07_074.2182_x1 | came across this and everything you | nsubj         | everything      | exactly_accurate   |
+    | 183280_143:23-28-29    | have said is exactly accurate to    |               |                 |                    |
+    |                        | what I have                         |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_22_073.0874_x1 | to make sure that everything is     | nsubj         | everything      | exactly_right      |
+    | 165093_82:13-15-16     | exactly right , especially with our |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_26_085.0062_x1 | mm is enough if everything is       | nsubj         | everything      | exactly_right      |
+    | 358518_20:07-09-10     | exactly right .                     |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_21_079.5590_x1 | " Everything must be exactly right  | nsubj         | everything      | exactly_right      |
+    | 269528_003:2-5-6       | , James , understand                |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_16_014.2506_x0 | - or under-estimate , or will it be | cc            | or              | exactly_correct    |
+    | 214645_03:15-20-21     | essentially exactly correct ?       |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+    | pcc_eng_17_076.5027_x1 | So someone traveling to Alpha       | nsubj         | someone         | exactly_equivalent |
+    | 220260_178:02-12-13    | Centauri at .99c , that 's exactly  |               |                 |                    |
+    |                        | equivalent to them remaining        |               |                 |                    |
+    |                        | stationary                          |               |                 |                    |
+    +------------------------+-------------------------------------+---------------+-----------------+--------------------+
+
+
+Sententially negated *exactly* examples
+
+
+```python
+show_sample(not_exactly.sample(8)
+            .sort_values(['trigger_lemma', 'trigger_lower', 'adj_form'])
+            .filter(regex=r'trig[ger]*_[dl]e|text|bigram_lower'))
+```
+
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | hit_id                 | text_window                         | trig_deprel   | trigger_lemma   | bigram_lower         |
+    +========================+=====================================+===============+=================+======================+
+    | pcc_eng_28_041.2299_x0 | , my coworkers were n't exactly     | advmod        | not             | exactly_impressed    |
+    | 650717_29:6-7-8        | impressed ... most of them          |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_02_094.5840_x1 | Moves you is n't exactly right .    | advmod        | not             | exactly_right        |
+    | 513186_02:4-5-6        |                                     |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_09_023.1785_x0 | realizing that Apple is not exactly | advmod        | not             | exactly_dead         |
+    | 358990_53:12-13-14     | dead .                              |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_20_003.2358_x0 | I 'm not exactly proud of this pic  | advmod        | not             | exactly_proud        |
+    | 035823_21:3-4-5        | .                                   |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_05_025.2014_x0 | most biological experimentation is  | advmod        | not             | exactly_reproducible |
+    | 392079_43:21-22-23     | not exactly reproducible .          |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_03_041.8926_x0 | I 'm not exactly sorry to see this  | advmod        | not             | exactly_sorry        |
+    | 662637_752:3-4-5       | title                               |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_19_096.0317_x1 | I 'm not exactly sure how to take   | advmod        | not             | exactly_sure         |
+    | 536431_58:3-4-5        | that                                |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+    | pcc_eng_18_033.2784_x0 | I 'm not exactly sure why but as    | advmod        | not             | exactly_sure         |
+    | 522544_39:3-4-5        | the                                 |               |                 |                      |
+    +------------------------+-------------------------------------+---------------+-----------------+----------------------+
+
+
+
+```python
+all_pat_counts = pd.concat((mdf.pattern.value_counts() for mdf in [pmir_exactly, nmir_exactly, not_exactly])
+                           ).to_frame().sort_values('count', ascending=False)
+show_sample(all_pat_counts, format='pipe')
+all_pat_counts
+```
+
+    | pattern         |  count |
+    |:----------------|-------:|
+    | direct-adj-head | 41,043 |
+    | neg-mirror-R    |    760 |
+    | pos-mirror-R    |    211 |
+    | direct-neg-head |    211 |
+    | neg-mirror-L    |     42 |
+    | pos-mirror-L    |      8 |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>pattern</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>direct-adj-head</th>
+      <td>41043</td>
+    </tr>
+    <tr>
+      <th>neg-mirror-R</th>
+      <td>760</td>
+    </tr>
+    <tr>
+      <th>pos-mirror-R</th>
+      <td>211</td>
+    </tr>
+    <tr>
+      <th>direct-neg-head</th>
+      <td>211</td>
+    </tr>
+    <tr>
+      <th>neg-mirror-L</th>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>pos-mirror-L</th>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+all_trig_counts = pd.concat((mdf.trigger_head for mdf in [pmir_exactly, nmir_exactly, not_exactly])).value_counts().to_frame()
+show_sample(all_trig_counts, format='pipe')
+all_trig_counts
+```
+
+    | trigger_head |  count |
+    |:-------------|-------:|
+    | R            | 42,014 |
+    | L            |    261 |
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>trigger_head</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>R</th>
+      <td>42014</td>
+    </tr>
+    <tr>
+      <th>L</th>
+      <td>261</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+exactly = pd.concat((d[['adj_form_lower', 'trigger_head', 'trigger_lemma',  'category']].astype('string') 
+           for d in [not_exactly, nmir_exactly, pmir_exactly])
+          )
+exactly
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>adj_form_lower</th>
+      <th>trigger_head</th>
+      <th>trigger_lemma</th>
+      <th>category</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_09_001.0244_x0000400_05:08-09-10</th>
+      <td>full</td>
+      <td>R</td>
+      <td>not</td>
+      <td>RBdirect</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_09_001.2416_x0003918_19:5-6-7</th>
+      <td>consistent</td>
+      <td>R</td>
+      <td>not</td>
+      <td>RBdirect</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_09_001.2755_x0004474_37:4-5-6</th>
+      <td>celebratory</td>
+      <td>R</td>
+      <td>not</td>
+      <td>RBdirect</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_09_001.2765_x0004492_04:10-11-12</th>
+      <td>friendly</td>
+      <td>R</td>
+      <td>not</td>
+      <td>RBdirect</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_09_001.3782_x0006136_05:4-5-6</th>
+      <td>wrong</td>
+      <td>R</td>
+      <td>not</td>
+      <td>RBdirect</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_24_068.2411_x1087534_2:39-40-41</th>
+      <td>impossible</td>
+      <td>R</td>
+      <td>or</td>
+      <td>POSmirror</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_24_088.2047_x1410351_42:16-17-18</th>
+      <td>alike</td>
+      <td>R</td>
+      <td>all</td>
+      <td>POSmirror</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_26_012.4795_x0185440_4029:18-20-21</th>
+      <td>alike</td>
+      <td>R</td>
+      <td>all</td>
+      <td>POSmirror</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_26_073.3344_x1169114_092:4-6-7</th>
+      <td>alike</td>
+      <td>R</td>
+      <td>all</td>
+      <td>POSmirror</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_26_081.6803_x1304416_25:12-16-17</th>
+      <td>correct</td>
+      <td>R</td>
+      <td>everything</td>
+      <td>POSmirror</td>
+    </tr>
+  </tbody>
+</table>
+<p>42275 rows × 4 columns</p>
+</div>
+
+
+
+
+```python
+for trigger, tdf in exactly.groupby('trigger_lemma'):
+    print(f'\n>> {trigger} <<')
+    show_sample(tdf.groupby('trigger_head').adj_form_lower.value_counts().nlargest(10).reset_index(), format='pipe')
+```
+
+    
+    >> ain't <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | clear          |    40 |
+    | 1 | R            | cheap          |     4 |
+    | 2 | R            | easy           |     3 |
+    | 3 | R            | real           |     2 |
+    | 4 | L            | different      |     1 |
+    | 5 | L            | fun            |     1 |
+    | 6 | L            | rich           |     1 |
+    | 7 | L            | ready          |     1 |
+    | 8 | R            | normal         |     1 |
+    | 9 | R            | perfect        |     1 |
+    
+    >> aint <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | sure           |     3 |
+    | 1 | R            | clear          |     1 |
+    | 2 | R            | easy           |     1 |
+    | 3 | R            | new            |     1 |
+    | 4 | R            | positive       |     1 |
+    | 5 | R            | quiet          |     1 |
+    
+    >> all <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | alike          |    30 |
+    | 1 | R            | right          |    19 |
+    | 2 | R            | identical      |     4 |
+    | 3 | R            | opposite       |     3 |
+    | 4 | R            | equal          |     2 |
+    | 5 | R            | same           |     2 |
+    | 6 | L            | alike          |     1 |
+    | 7 | R            | correct        |     1 |
+    | 8 | R            | equivalent     |     1 |
+    | 9 | R            | parallel       |     1 |
+    
+    >> always <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |     6 |
+    | 1 | R            | equal          |     3 |
+    | 2 | R            | aware          |     1 |
+    | 3 | R            | enough         |     1 |
+    | 4 | R            | horizontal     |     1 |
+    | 5 | R            | parallel       |     1 |
+    | 6 | R            | second         |     1 |
+    | 7 | R            | wrong          |     1 |
+    | 8 | R            | zero           |     1 |
+    
+    >> both <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |     4 |
+    | 1 | R            | alike          |     2 |
+    | 2 | R            | correct        |     1 |
+    | 3 | R            | equal          |     1 |
+    | 4 | R            | perfect        |     1 |
+    | 5 | R            | related        |     1 |
+    | 6 | R            | same           |     1 |
+    | 7 | R            | true           |     1 |
+    
+    >> either <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | true           |     1 |
+    
+    >> everybody <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | L            | alike          |     1 |
+    | 1 | R            | comfortable    |     1 |
+    | 2 | R            | right          |     1 |
+    
+    >> everyone <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | alike          |     4 |
+    | 1 | R            | right          |     4 |
+    | 2 | R            | equal          |     2 |
+    | 3 | L            | alike          |     1 |
+    | 4 | R            | correct        |     1 |
+    
+    >> everything <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |    34 |
+    | 1 | R            | perfect        |     3 |
+    | 2 | R            | true           |     3 |
+    | 3 | L            | same           |     2 |
+    | 4 | R            | correct        |     2 |
+    | 5 | R            | different      |     2 |
+    | 6 | R            | accurate       |     1 |
+    | 7 | R            | opposite       |     1 |
+    | 8 | R            | relevant       |     1 |
+    | 9 | R            | unchanged      |     1 |
+    
+    >> few <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | alike          |     1 |
+    | 1 | R            | solvable       |     1 |
+    | 2 | R            | woeful         |     1 |
+    
+    >> many <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |     3 |
+    | 1 | R            | alike          |     1 |
+    | 2 | R            | new            |     1 |
+    
+    >> neither <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |    12 |
+    | 1 | R            | sure           |     3 |
+    | 2 | R            | wrong          |     2 |
+    | 3 | R            | comfortable    |     2 |
+    | 4 | R            | new            |     2 |
+    | 5 | R            | true           |     2 |
+    | 6 | R            | accurate       |     2 |
+    | 7 | L            | benign         |     1 |
+    | 8 | R            | unknown        |     1 |
+    | 9 | R            | unhappy        |     1 |
+    
+    >> never <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | sure           |    67 |
+    | 1 | R            | clear          |    44 |
+    | 2 | R            | easy           |    15 |
+    | 3 | R            | right          |    13 |
+    | 4 | R            | alike          |     8 |
+    | 5 | R            | fun            |     5 |
+    | 6 | R            | shy            |     4 |
+    | 7 | R            | popular        |     4 |
+    | 8 | R            | subtle         |     4 |
+    | 9 | R            | identical      |     4 |
+    
+    >> no <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | sure           |     5 |
+    | 1 | R            | alike          |     4 |
+    | 2 | R            | new            |     2 |
+    | 3 | R            | true           |     2 |
+    | 4 | R            | apparent       |     1 |
+    | 5 | R            | creative       |     1 |
+    | 6 | R            | relaxed        |     1 |
+    | 7 | R            | responsible    |     1 |
+    | 8 | R            | stunning       |     1 |
+    | 9 | R            | unknown        |     1 |
+    
+    >> nobody <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | sure           |    65 |
+    | 1 | R            | certain        |     2 |
+    | 2 | R            | clear          |     2 |
+    | 3 | R            | alike          |     2 |
+    | 4 | L            | iconic         |     1 |
+    | 5 | R            | happy          |     1 |
+    | 6 | R            | thrilled       |     1 |
+    | 7 | R            | surprised      |     1 |
+    | 8 | R            | ready          |     1 |
+    | 9 | R            | mute           |     1 |
+    
+    >> none <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | alike          |    22 |
+    | 1 | R            | right          |    20 |
+    | 2 | R            | new            |    16 |
+    | 3 | R            | revolutionary  |     7 |
+    | 4 | R            | cheap          |     6 |
+    | 5 | R            | surprising     |     5 |
+    | 6 | R            | true           |     5 |
+    | 7 | R            | sure           |     5 |
+    | 8 | R            | good           |     3 |
+    | 9 | R            | expansive      |     2 |
+    
+    >> nor <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | clear          |     3 |
+    | 1 | R            | sure           |     3 |
+    | 2 | R            | alike          |     2 |
+    | 3 | R            | private        |     2 |
+    | 4 | R            | savory         |     1 |
+    | 5 | R            | polite         |     1 |
+    | 6 | R            | popular        |     1 |
+    | 7 | R            | queer          |     1 |
+    | 8 | R            | representative |     1 |
+    | 9 | R            | right          |     1 |
+    
+    >> not <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | sure           | 8,138 |
+    | 1 | R            | clear          | 1,584 |
+    | 2 | R            | new            | 1,303 |
+    | 3 | R            | true           | 1,082 |
+    | 4 | R            | easy           | 1,020 |
+    | 5 | R            | cheap          |   670 |
+    | 6 | R            | right          |   536 |
+    | 7 | R            | happy          |   433 |
+    | 8 | R            | surprising     |   426 |
+    | 9 | R            | ideal          |   400 |
+    
+    >> nothing <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | L            | wrong          |    13 |
+    | 1 | L            | new            |     4 |
+    | 2 | L            | special        |     2 |
+    | 3 | L            | unique         |     2 |
+    | 4 | R            | new            |     2 |
+    | 5 | R            | normal         |     2 |
+    | 6 | R            | easy           |     2 |
+    | 7 | R            | revolutionary  |     2 |
+    | 8 | R            | right          |     2 |
+    | 9 | L            | abhorrent      |     1 |
+    
+    >> often <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |     3 |
+    | 1 | R            | alike          |     1 |
+    | 2 | R            | clever         |     1 |
+    | 3 | R            | true           |     1 |
+    
+    >> or <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | identical      |     4 |
+    | 1 | R            | alike          |     3 |
+    | 2 | R            | wrong          |     3 |
+    | 3 | R            | correct        |     2 |
+    | 4 | R            | equal          |     2 |
+    | 5 | R            | enough         |     2 |
+    | 6 | R            | more           |     1 |
+    | 7 | R            | same           |     1 |
+    | 8 | R            | right          |     1 |
+    | 9 | R            | opposite       |     1 |
+    
+    >> rarely <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | alike          |     1 |
+    | 1 | R            | equal          |     1 |
+    | 2 | R            | right          |     1 |
+    | 3 | R            | square         |     1 |
+    
+    >> seldom <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | true           |     1 |
+    
+    >> some <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | identical      |     1 |
+    | 1 | R            | real           |     1 |
+    
+    >> someone <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | equivalent     |     1 |
+    
+    >> something <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |     3 |
+    | 1 | L            | alien          |     1 |
+    | 2 | L            | opposite       |     1 |
+    | 3 | L            | related        |     1 |
+    | 4 | R            | perfect        |     1 |
+    
+    >> sometimes <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | right          |     3 |
+    | 1 | R            | black          |     1 |
+    | 2 | R            | opposite       |     1 |
+    | 3 | R            | wrong          |     1 |
+    
+    >> without <<
+    |   | trigger_head | adj_form_lower | count |
+    |--:|:-------------|:---------------|------:|
+    | 0 | R            | sure           |     3 |
+    | 1 | L            | sure           |     1 |
+    | 2 | R            | aware          |     1 |
+    | 3 | R            | bad            |     1 |
+    | 4 | R            | bland          |     1 |
+    | 5 | R            | certain        |     1 |
+    | 6 | R            | clear          |     1 |
+    | 7 | R            | conscious      |     1 |
+    | 8 | R            | honest         |     1 |
+    | 9 | R            | horrific       |     1 |
+
+
+---
+## *Exactly* Associations
+### Work in Progress 🚧 
+
+_Prior_ Table Output for Negation Marginal frequencies
+
+|                     |        `N` |      `f1` | `adv_total` |
+|:--------------------|-----------:|----------:|------------:|
+| **NEGATED_exactly** | 86,330,752 | 3,226,213 |      61,599 |
+| **NEGMIR_exactly**  |  2,032,082 |   293,963 |       1,114 |
+
+### Top bigrams for _exactly_
+
+
+```python
+most_neg = pd.read_csv('/share/compling/projects/sanpi/results/top_AM/neg_bigram_examples/exactly/exactly_10mostNEG-bigrams_AMscores_2024-05-22.csv').set_index('key')
+show_sample(most_neg.sort_values(['LRC', 'dP1'], ascending=False).loc[:, :'f2'], assoc=True, format='pipe')
+```
+
+    | key                        |     f |  dP1 |  LRC |        G2 |          N |        f1 |    f2 |
+    |:---------------------------|------:|-----:|-----:|----------:|-----------:|----------:|------:|
+    | NEGany~exactly_sure        | 8,860 | 0.92 | 8.63 | 54,750.58 | 86,330,752 | 3,226,213 | 9,301 |
+    | NEGany~exactly_new         | 1,378 | 0.93 | 8.54 |  8,697.93 | 86,330,752 | 3,226,213 | 1,418 |
+    | NEGany~exactly_easy        | 1,069 | 0.93 | 8.37 |  6,747.64 | 86,330,752 | 3,226,213 | 1,100 |
+    | NEGany~exactly_clear       | 1,759 | 0.92 | 8.30 | 10,937.16 | 86,330,752 | 3,226,213 | 1,835 |
+    | NEGany~exactly_cheap       |   693 | 0.95 | 8.28 |  4,443.27 | 86,330,752 | 3,226,213 |   704 |
+    | NEGany~exactly_surprising  |   441 | 0.96 | 7.34 |  2,863.35 | 86,330,752 | 3,226,213 |   444 |
+    | NEGany~exactly_practical   |   105 | 0.95 | 3.52 |    679.01 | 86,330,752 | 3,226,213 |   106 |
+    | NEGmir~exactly_clear       |    52 | 0.80 | 2.13 |    178.73 |  2,032,082 |   293,963 |    55 |
+    | NEGmir~exactly_sure        |   148 | 0.85 | 2.09 |    560.65 |  2,032,082 |   293,963 |   149 |
+    | NEGany~exactly_shy         |   124 | 0.96 | 1.53 |    815.15 | 86,330,752 | 3,226,213 |   124 |
+    | NEGany~exactly_forthcoming |   107 | 0.96 | 1.32 |    703.40 | 86,330,752 | 3,226,213 |   107 |
+    | NEGany~exactly_impressive  |   100 | 0.96 | 1.22 |    657.38 | 86,330,752 | 3,226,213 |   100 |
+
+
+
+```python
+top_overall = pd.read_csv('/share/compling/projects/sanpi/results/top_AM/any_bigram_examples/exactly/exactly_top11-bigrams_AMscores_2024-05-18.csv').set_index('key')
+show_sample(top_overall.sort_values('LRC', ascending=False))
+```
+
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | key               |     f |   exp_f |   unexp_f |   dP1 |   LRC |     G2 |          N |     f1 |      f2 | l1      | l2        |
+    +===================+=======+=========+===========+=======+=======+========+============+========+=========+=========+===========+
+    | exactly~alike     | 3,040 |       9 |     3,031 |     0 |     9 | 29,939 | 86,330,753 | 61,599 |  13,261 | exactly | alike     |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~opposite  |   498 |       7 |       491 |     0 |     6 |  3,337 | 86,330,753 | 61,599 |   9,404 | exactly | opposite  |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~right     | 6,948 |     146 |     6,802 |     0 |     6 | 41,086 | 86,330,753 | 61,599 | 204,572 | exactly | right     |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~zero      |   344 |       8 |       336 |     0 |     5 |  1,912 | 86,330,753 | 61,599 |  11,472 | exactly | zero      |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~parallel  |   224 |       5 |       219 |     0 |     5 |  1,238 | 86,330,753 | 61,599 |   7,577 | exactly | parallel  |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~sure      | 9,301 |     603 |     8,698 |     0 |     4 | 34,896 | 86,330,753 | 61,599 | 844,981 | exactly | sure      |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~equal     |   560 |      34 |       526 |     0 |     4 |  2,108 | 86,330,753 | 61,599 |  47,099 | exactly | equal     |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~conducive |   214 |      12 |       202 |     0 |     4 |    842 | 86,330,753 | 61,599 |  16,405 | exactly | conducive |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~correct   |   788 |      56 |       732 |     0 |     4 |  2,723 | 86,330,753 | 61,599 |  78,240 | exactly | correct   |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~ideal     |   445 |      30 |       415 |     0 |     4 |  1,564 | 86,330,753 | 61,599 |  42,701 | exactly | ideal     |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+    | exactly~same      |   493 |      40 |       453 |     0 |     3 |  1,575 | 86,330,753 | 61,599 |  56,190 | exactly | same      |
+    +-------------------+-------+---------+-----------+-------+-------+--------+------------+--------+---------+---------+-----------+
+
+
+
+```python
+top_overall = pd.read_csv('/share/compling/projects/sanpi/results/top_AM/any_bigram_examples/exactly/exactly_top11-bigrams_AMscores_2024-05-18.csv').set_index('key')
+top_overall.sort_values('LRC', ascending=False)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>f</th>
+      <th>exp_f</th>
+      <th>unexp_f</th>
+      <th>dP1</th>
+      <th>LRC</th>
+      <th>...</th>
+      <th>N</th>
+      <th>f1</th>
+      <th>f2</th>
+      <th>l1</th>
+      <th>l2</th>
+    </tr>
+    <tr>
+      <th>key</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>exactly~alike</th>
+      <td>3040</td>
+      <td>9.46</td>
+      <td>3,030.54</td>
+      <td>0.23</td>
+      <td>8.55</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>13261</td>
+      <td>exactly</td>
+      <td>alike</td>
+    </tr>
+    <tr>
+      <th>exactly~opposite</th>
+      <td>498</td>
+      <td>6.71</td>
+      <td>491.29</td>
+      <td>0.05</td>
+      <td>5.94</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>9404</td>
+      <td>exactly</td>
+      <td>opposite</td>
+    </tr>
+    <tr>
+      <th>exactly~right</th>
+      <td>6948</td>
+      <td>145.97</td>
+      <td>6,802.03</td>
+      <td>0.03</td>
+      <td>5.53</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>204572</td>
+      <td>exactly</td>
+      <td>right</td>
+    </tr>
+    <tr>
+      <th>exactly~zero</th>
+      <td>344</td>
+      <td>8.19</td>
+      <td>335.81</td>
+      <td>0.03</td>
+      <td>5.02</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>11472</td>
+      <td>exactly</td>
+      <td>zero</td>
+    </tr>
+    <tr>
+      <th>exactly~parallel</th>
+      <td>224</td>
+      <td>5.41</td>
+      <td>218.59</td>
+      <td>0.03</td>
+      <td>4.90</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>7577</td>
+      <td>exactly</td>
+      <td>parallel</td>
+    </tr>
+    <tr>
+      <th>exactly~sure</th>
+      <td>9301</td>
+      <td>602.91</td>
+      <td>8,698.09</td>
+      <td>0.01</td>
+      <td>3.89</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>844981</td>
+      <td>exactly</td>
+      <td>sure</td>
+    </tr>
+    <tr>
+      <th>exactly~equal</th>
+      <td>560</td>
+      <td>33.61</td>
+      <td>526.39</td>
+      <td>0.01</td>
+      <td>3.75</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>47099</td>
+      <td>exactly</td>
+      <td>equal</td>
+    </tr>
+    <tr>
+      <th>exactly~conducive</th>
+      <td>214</td>
+      <td>11.71</td>
+      <td>202.29</td>
+      <td>0.01</td>
+      <td>3.68</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>16405</td>
+      <td>exactly</td>
+      <td>conducive</td>
+    </tr>
+    <tr>
+      <th>exactly~correct</th>
+      <td>788</td>
+      <td>55.83</td>
+      <td>732.17</td>
+      <td>0.01</td>
+      <td>3.56</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>78240</td>
+      <td>exactly</td>
+      <td>correct</td>
+    </tr>
+    <tr>
+      <th>exactly~ideal</th>
+      <td>445</td>
+      <td>30.47</td>
+      <td>414.53</td>
+      <td>0.01</td>
+      <td>3.52</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>42701</td>
+      <td>exactly</td>
+      <td>ideal</td>
+    </tr>
+    <tr>
+      <th>exactly~same</th>
+      <td>493</td>
+      <td>40.09</td>
+      <td>452.91</td>
+      <td>0.01</td>
+      <td>3.29</td>
+      <td>...</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>56190</td>
+      <td>exactly</td>
+      <td>same</td>
+    </tr>
+  </tbody>
+</table>
+<p>11 rows × 11 columns</p>
+</div>
+
+
+
+### `ENV~ADJ` associations for top bigrams
+
+
+```python
+setdiff_floor = 200
+mirror_floor = 120
+adj_dfs = {
+    d.name:
+    update_index(pd.read_pickle(
+        tuple(d.joinpath('adj/extra')
+              .glob(f'*35f-7c*min{mirror_floor if d.name == "NEGmirror" else setdiff_floor}x*.pkl.gz')
+              )[0]
+    )
+    )
+    for d in POLAR_DIR.iterdir()}
+for pat_dir, amdf in adj_dfs.items():
+    print(f'>> {pat_dir} <<')
+    show_sample(amdf.loc[amdf.conservative_log_ratio.abs().round() > 1, :].sample(
+        8).filter(FOCUS).filter(regex=r'^[^l]'), assoc=True)
+    print('.............')
+```
+
+    >> RBdirect <<
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | key                 |       f |   dP1 |   LRC |   dP1_simple |        G2 |      f2 |      exp_f |   unexp_f |
+    +=====================+=========+=======+=======+==============+===========+=========+============+===========+
+    | NEGany~clear-cut    |   1,368 |  0.27 |  3.29 |         0.31 |  3,770.52 |   4,399 |     164.39 |  1,203.61 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | COM~basic           | 104,613 |  0.03 |  2.45 |         0.99 |  4,544.02 | 105,208 | 101,273.29 |  3,339.71 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | NEGany~prestigious  |     265 | -0.03 | -2.22 |         0.01 | -1,868.25 |  44,499 |   1,662.94 | -1,397.94 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | COM~picky           |  10,311 | -0.09 | -1.68 |         0.87 | -1,621.43 |  11,798 |  11,356.76 | -1,045.76 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | COM~third           |   5,008 |  0.03 |  1.62 |         1.00 |    266.15 |   5,025 |   4,837.07 |    170.93 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | NEGany~quantifiable |     246 |  0.12 |  1.72 |         0.16 |    355.08 |   1,569 |      58.63 |    187.37 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | COM~manageable      |  20,321 |  0.03 |  1.71 |         0.99 |    738.85 |  20,478 |  19,712.14 |    608.86 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    | NEGany~dissimilar   |   2,525 |  0.25 |  3.19 |         0.29 |  6,519.56 |   8,816 |     329.46 |  2,195.54 |
+    +---------------------+---------+-------+-------+--------------+-----------+---------+------------+-----------+
+    .............
+    >> NEGmirror <<
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | key               |     f |   dP1 |   LRC |   dP1_simple |         G2 |     f2 |     exp_f |   unexp_f |
+    +===================+=======+=======+=======+==============+============+========+===========+===========+
+    | NEGmir~flashy     |   165 |  0.38 |  1.73 |         0.54 |     227.67 |    303 |     49.83 |    115.17 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | NEGmir~vital      |   503 |  0.28 |  1.55 |         0.44 |     481.42 |  1,139 |    187.33 |    315.67 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | POS~greater       | 2,213 |  0.15 |  2.35 |         0.98 |     561.42 |  2,248 |  1,878.21 |    334.79 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | POS~deeper        |   988 |  0.15 |  1.82 |         0.99 |     268.54 |  1,000 |    835.50 |    152.50 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | NEGmir~gratifying |   293 |  0.31 |  1.57 |         0.47 |     316.86 |    621 |    102.14 |    190.86 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | POS~higher        | 2,837 |  0.14 |  2.25 |         0.98 |     657.20 |  2,896 |  2,419.62 |    417.38 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | POS~late          | 2,245 | -0.67 | -4.45 |         0.17 | -28,481.80 | 13,153 | 10,989.39 | -8,744.39 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    | POS~unknown       | 1,153 |  0.14 |  1.60 |         0.98 |     254.65 |  1,180 |    985.90 |    167.10 |
+    +-------------------+-------+-------+-------+--------------+------------+--------+-----------+-----------+
+    .............
+
+
+
+```python
+adj_amdf = pd.concat(adj_dfs.values())
+adj_amdf = adjust_assoc_columns(adj_amdf)
+adj_amdf = adj_amdf.sort_values(
+    ['LRC', 'dP1', 'dP1_simple'],
+    ascending=False)
+adj_amdf.filter(abbr_FOCUS).describe().round(2).T.iloc[:,1:].sort_index()
+
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>G2</th>
+      <td>24.05</td>
+      <td>4,604.00</td>
+      <td>-188,432.85</td>
+      <td>-0.65</td>
+      <td>6.44</td>
+      <td>33.16</td>
+      <td>188,571.60</td>
+    </tr>
+    <tr>
+      <th>LRC</th>
+      <td>0.06</td>
+      <td>0.55</td>
+      <td>-5.66</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.66</td>
+    </tr>
+    <tr>
+      <th>dP1</th>
+      <td>0.01</td>
+      <td>0.05</td>
+      <td>-0.76</td>
+      <td>-0.00</td>
+      <td>0.01</td>
+      <td>0.03</td>
+      <td>0.76</td>
+    </tr>
+    <tr>
+      <th>dP1_simple</th>
+      <td>0.82</td>
+      <td>0.33</td>
+      <td>0.00</td>
+      <td>0.90</td>
+      <td>0.97</td>
+      <td>0.98</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>exp_f</th>
+      <td>8,460.63</td>
+      <td>55,383.96</td>
+      <td>35.20</td>
+      <td>333.06</td>
+      <td>775.83</td>
+      <td>2,676.51</td>
+      <td>2,130,224.57</td>
+    </tr>
+    <tr>
+      <th>f</th>
+      <td>8,481.82</td>
+      <td>55,421.21</td>
+      <td>120.00</td>
+      <td>331.00</td>
+      <td>758.00</td>
+      <td>2,629.50</td>
+      <td>2,198,836.00</td>
+    </tr>
+    <tr>
+      <th>f2</th>
+      <td>15,931.39</td>
+      <td>80,623.04</td>
+      <td>122.00</td>
+      <td>418.00</td>
+      <td>1,243.50</td>
+      <td>6,206.00</td>
+      <td>2,212,989.00</td>
+    </tr>
+    <tr>
+      <th>unexp_f</th>
+      <td>21.18</td>
+      <td>2,833.95</td>
+      <td>-97,222.23</td>
+      <td>-4.69</td>
+      <td>10.20</td>
+      <td>45.89</td>
+      <td>97,246.74</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+for c in adj_amdf.select_dtypes(include='number').columns:
+    print(f'\nWeakest/Minimum `{c}`')
+    show_sample(
+        adj_amdf.loc[adj_amdf[c] == adj_amdf[c].abs().min()]
+                .filter(set(abbr_FOCUS + [c])).head(10),
+        assoc=True, format='pipe')
+```
+
+    
+    Weakest/Minimum `f`
+    | key               | LRC | l1     |  exp_f | unexp_f |   dP1 | l2            |   f |  f2 |    G2 | dP1_simple |
+    |:------------------|----:|:-------|-------:|--------:|------:|:--------------|----:|----:|------:|-----------:|
+    | POS~regional      |   0 | POSMIR | 104.44 |   15.56 |  0.12 | regional      | 120 | 125 | 19.20 |       0.96 |
+    | POS~psychological |   0 | POSMIR | 105.27 |   14.73 |  0.12 | psychological | 120 | 126 | 16.55 |       0.95 |
+    | POS~sexist        |   0 | POSMIR | 107.78 |   12.22 |  0.09 | sexist        | 120 | 129 | 10.34 |       0.93 |
+    | POS~unsuitable    |   0 | POSMIR | 108.62 |   11.38 |  0.09 | unsuitable    | 120 | 130 |  8.72 |       0.92 |
+    | POS~disingenuous  |   0 | POSMIR | 111.96 |    8.04 |  0.06 | disingenuous  | 120 | 134 |  3.94 |       0.90 |
+    | POS~sticky        |   0 | POSMIR | 114.46 |    5.54 |  0.04 | sticky        | 120 | 137 |  1.75 |       0.88 |
+    | POS~unnatural     |   0 | POSMIR | 121.98 |   -1.98 | -0.01 | unnatural     | 120 | 146 | -0.19 |       0.82 |
+    | POS~tenuous       |   0 | POSMIR | 123.65 |   -3.65 | -0.02 | tenuous       | 120 | 148 | -0.63 |       0.81 |
+    | POS~sinful        |   0 | POSMIR | 124.49 |   -4.49 | -0.03 | sinful        | 120 | 149 | -0.94 |       0.81 |
+    | POS~prestigious   |   0 | POSMIR | 128.67 |   -8.67 | -0.06 | prestigious   | 120 | 154 | -3.27 |       0.78 |
+    
+    Weakest/Minimum `exp_f`
+    | key                  |  LRC | l1     | exp_f | unexp_f |  dP1 | l2            |   f |  f2 |     G2 | dP1_simple |
+    |:---------------------|-----:|:-------|------:|--------:|-----:|:--------------|----:|----:|-------:|-----------:|
+    | NEGmir~disheartening | 1.84 | NEGMIR | 35.20 |   91.80 | 0.43 | disheartening | 127 | 214 | 200.63 |       0.59 |
+    
+    Weakest/Minimum `G2`
+    | key               | LRC | l1         |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `odds_r_disc`
+    | key                 | LRC | l1      |  exp_f | unexp_f |   dP1 | l2           |   f | odds_r_disc |    f2 |    G2 | dP1_simple |
+    |:--------------------|----:|:--------|-------:|--------:|------:|:-------------|----:|------------:|------:|------:|-----------:|
+    | NEGany~affectionate |   0 | NEGATED | 238.46 |   -0.46 | -0.00 | affectionate | 238 |        0.00 | 6,381 | -0.00 |       0.04 |
+    
+    Weakest/Minimum `dP1`
+    | key               | LRC | l1         |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `dP2`
+    | key               | LRC | l1         |  dP2 |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-----:|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 0.00 | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 0.00 | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `dP1_simple`
+    | key           |   LRC | l1      |     exp_f |    unexp_f |   dP1 | l2     |   f |      f2 |         G2 | dP1_simple |
+    |:--------------|------:|:--------|----------:|-----------:|------:|:-------|----:|--------:|-----------:|-----------:|
+    | NEGany~recent | -4.39 | NEGATED | 15,020.16 | -14,423.16 | -0.04 | recent | 597 | 401,927 | -25,593.71 |       0.00 |
+    
+    Weakest/Minimum `dP2_simple`
+    | key                  | dP2_simple | LRC | l1         |  exp_f | unexp_f |  dP1 | l2               |   f |  f2 |    G2 | dP1_simple |
+    |:---------------------|-----------:|----:|:-----------|-------:|--------:|-----:|:-----------------|----:|----:|------:|-----------:|
+    | COM~puerto           |       0.00 |   0 | COMPLEMENT | 192.52 |    7.48 | 0.04 | puerto           | 200 | 200 | 15.25 |       1.00 |
+    | COM~cervical         |       0.00 |   0 | COMPLEMENT | 192.52 |    7.48 | 0.04 | cervical         | 200 | 200 | 15.25 |       1.00 |
+    | COM~gut              |       0.00 |   0 | COMPLEMENT | 193.48 |    6.52 | 0.03 | gut              | 200 | 201 |  9.22 |       1.00 |
+    | COM~multiethnic      |       0.00 |   0 | COMPLEMENT | 193.48 |    6.52 | 0.03 | multiethnic      | 200 | 201 |  9.22 |       1.00 |
+    | COM~state-controlled |       0.00 |   0 | COMPLEMENT | 193.48 |    6.52 | 0.03 | state-controlled | 200 | 201 |  9.22 |       1.00 |
+    | COM~snappier         |       0.00 |   0 | COMPLEMENT | 193.48 |    6.52 | 0.03 | snappier         | 200 | 201 |  9.22 |       1.00 |
+    | COM~workin           |       0.00 |   0 | COMPLEMENT | 194.45 |    5.55 | 0.03 | workin           | 200 | 202 |  5.95 |       0.99 |
+    | COM~firsthand        |       0.00 |   0 | COMPLEMENT | 194.45 |    5.55 | 0.03 | firsthand        | 200 | 202 |  5.95 |       0.99 |
+    | COM~unclassifiable   |       0.00 |   0 | COMPLEMENT | 194.45 |    5.55 | 0.03 | unclassifiable   | 200 | 202 |  5.95 |       0.99 |
+    | COM~non-jewish       |       0.00 |   0 | COMPLEMENT | 195.41 |    4.59 | 0.02 | non-jewish       | 200 | 203 |  3.72 |       0.99 |
+    
+    Weakest/Minimum `f1`
+    | key                  |  LRC | l1     |    exp_f |  unexp_f |  dP1 | l2            |      f |      f1 |     f2 |        G2 | dP1_simple |
+    |:---------------------|-----:|:-------|---------:|---------:|-----:|:--------------|-------:|--------:|-------:|----------:|-----------:|
+    | NEGmir~early         | 5.49 | NEGMIR |   883.20 | 4,057.80 | 0.76 | early         |  4,941 | 289,770 |  5,370 | 15,068.94 |       0.92 |
+    | NEGmir~late          | 4.45 | NEGMIR | 2,163.26 | 8,744.74 | 0.67 | late          | 10,908 | 289,770 | 13,153 | 28,485.26 |       0.83 |
+    | NEGmir~fancy         | 3.11 | NEGMIR |   182.07 |   598.93 | 0.54 | fancy         |    781 | 289,770 |  1,107 |  1,596.15 |       0.71 |
+    | NEGmir~alone         | 3.06 | NEGMIR |   130.26 |   434.74 | 0.55 | alone         |    565 | 289,770 |    792 |  1,173.08 |       0.71 |
+    | NEGmir~sure          | 2.72 | NEGMIR | 1,602.58 | 4,150.42 | 0.43 | sure          |  5,753 | 289,770 |  9,744 |  9,087.14 |       0.59 |
+    | NEGmir~frustrating   | 2.72 | NEGMIR |   545.71 | 1,475.29 | 0.45 | frustrating   |  2,021 | 289,770 |  3,318 |  3,330.61 |       0.61 |
+    | NEGmir~certain       | 2.58 | NEGMIR |   311.83 |   826.17 | 0.44 | certain       |  1,138 | 289,770 |  1,896 |  1,831.75 |       0.60 |
+    | NEGmir~evident       | 2.55 | NEGMIR |   406.90 | 1,048.10 | 0.42 | evident       |  1,455 | 289,770 |  2,474 |  2,270.95 |       0.59 |
+    | NEGmir~strenuous     | 1.96 | NEGMIR |    55.59 |   139.41 | 0.41 | strenuous     |    195 | 289,770 |    338 |    294.90 |       0.58 |
+    | NEGmir~disheartening | 1.84 | NEGMIR |    35.20 |    91.80 | 0.43 | disheartening |    127 | 289,770 |    214 |    200.63 |       0.59 |
+    
+    Weakest/Minimum `f2`
+    | key        | LRC | l1     |  exp_f | unexp_f |  dP1 | l2     |   f |  f2 |    G2 | dP1_simple |
+    |:-----------|----:|:-------|-------:|--------:|-----:|:-------|----:|----:|------:|-----------:|
+    | POS~triple |   0 | POSMIR | 101.93 |   20.07 | 0.16 | triple | 122 | 122 | 43.85 |          1 |
+    
+    Weakest/Minimum `N`
+    | key                |  LRC | l1     |         N |     exp_f |  unexp_f |  dP1 | l2          |      f |     f2 |        G2 | dP1_simple |
+    |:-------------------|-----:|:-------|----------:|----------:|---------:|-----:|:------------|-------:|-------:|----------:|-----------:|
+    | NEGmir~early       | 5.49 | NEGMIR | 1,761,853 |    883.20 | 4,057.80 | 0.76 | early       |  4,941 |  5,370 | 15,068.94 |       0.92 |
+    | NEGmir~late        | 4.45 | NEGMIR | 1,761,853 |  2,163.26 | 8,744.74 | 0.67 | late        | 10,908 | 13,153 | 28,485.26 |       0.83 |
+    | NEGmir~fancy       | 3.11 | NEGMIR | 1,761,853 |    182.07 |   598.93 | 0.54 | fancy       |    781 |  1,107 |  1,596.15 |       0.71 |
+    | POS~familiar       | 3.09 | POSMIR | 1,761,853 | 10,773.83 | 1,918.17 | 0.15 | familiar    | 12,692 | 12,895 |  3,221.81 |       0.98 |
+    | NEGmir~alone       | 3.06 | NEGMIR | 1,761,853 |    130.26 |   434.74 | 0.55 | alone       |    565 |    792 |  1,173.08 |       0.71 |
+    | NEGmir~sure        | 2.72 | NEGMIR | 1,761,853 |  1,602.58 | 4,150.42 | 0.43 | sure        |  5,753 |  9,744 |  9,087.14 |       0.59 |
+    | NEGmir~frustrating | 2.72 | NEGMIR | 1,761,853 |    545.71 | 1,475.29 | 0.45 | frustrating |  2,021 |  3,318 |  3,330.61 |       0.61 |
+    | POS~larger         | 2.66 | POSMIR | 1,761,853 |  2,068.71 |   379.29 | 0.15 | larger      |  2,448 |  2,476 |    674.89 |       0.99 |
+    | NEGmir~certain     | 2.58 | NEGMIR | 1,761,853 |    311.83 |   826.17 | 0.44 | certain     |  1,138 |  1,896 |  1,831.75 |       0.60 |
+    | NEGmir~evident     | 2.55 | NEGMIR | 1,761,853 |    406.90 | 1,048.10 | 0.42 | evident     |  1,455 |  2,474 |  2,270.95 |       0.59 |
+    
+    Weakest/Minimum `Fyy(Of)`
+    | key               | LRC | l1     |  exp_f | unexp_f |   dP1 | l2            |   f | Fyy(Of) |  f2 |    G2 | dP1_simple |
+    |:------------------|----:|:-------|-------:|--------:|------:|:--------------|----:|--------:|----:|------:|-----------:|
+    | POS~regional      |   0 | POSMIR | 104.44 |   15.56 |  0.12 | regional      | 120 |     120 | 125 | 19.20 |       0.96 |
+    | POS~psychological |   0 | POSMIR | 105.27 |   14.73 |  0.12 | psychological | 120 |     120 | 126 | 16.55 |       0.95 |
+    | POS~sexist        |   0 | POSMIR | 107.78 |   12.22 |  0.09 | sexist        | 120 |     120 | 129 | 10.34 |       0.93 |
+    | POS~unsuitable    |   0 | POSMIR | 108.62 |   11.38 |  0.09 | unsuitable    | 120 |     120 | 130 |  8.72 |       0.92 |
+    | POS~disingenuous  |   0 | POSMIR | 111.96 |    8.04 |  0.06 | disingenuous  | 120 |     120 | 134 |  3.94 |       0.90 |
+    | POS~sticky        |   0 | POSMIR | 114.46 |    5.54 |  0.04 | sticky        | 120 |     120 | 137 |  1.75 |       0.88 |
+    | POS~unnatural     |   0 | POSMIR | 121.98 |   -1.98 | -0.01 | unnatural     | 120 |     120 | 146 | -0.19 |       0.82 |
+    | POS~tenuous       |   0 | POSMIR | 123.65 |   -3.65 | -0.02 | tenuous       | 120 |     120 | 148 | -0.63 |       0.81 |
+    | POS~sinful        |   0 | POSMIR | 124.49 |   -4.49 | -0.03 | sinful        | 120 |     120 | 149 | -0.94 |       0.81 |
+    | POS~prestigious   |   0 | POSMIR | 128.67 |   -8.67 | -0.06 | prestigious   | 120 |     120 | 154 | -3.27 |       0.78 |
+    
+    Weakest/Minimum `Fyn(O12)`
+    | key              |  LRC | l1     | Fyn(O12) |    exp_f |  unexp_f |  dP1 | l2        |      f |     f2 |       G2 | dP1_simple |
+    |:-----------------|-----:|:-------|---------:|---------:|---------:|-----:|:----------|-------:|-------:|---------:|-----------:|
+    | NEGmir~important | 1.28 | NEGMIR |  275,112 | 7,199.79 | 7,458.21 | 0.17 | important | 14,658 | 43,776 | 7,798.82 |       0.33 |
+    
+    Weakest/Minimum `Fny(O21)`
+    | key           | LRC | l1         |    exp_f | unexp_f |  dP1 | l2        |     f |    f2 |     G2 | dP1_simple | Fny(O21) |
+    |:--------------|----:|:-----------|---------:|--------:|-----:|:----------|------:|------:|-------:|-----------:|---------:|
+    | POS~daily     |   0 | POSMIR     |   144.54 |   28.46 | 0.16 | daily     |   173 |   173 |  62.19 |          1 |        0 |
+    | POS~ongoing   |   0 | POSMIR     |   120.31 |   23.69 | 0.16 | ongoing   |   144 |   144 |  51.76 |          1 |        0 |
+    | POS~fewer     |   0 | POSMIR     |   120.31 |   23.69 | 0.16 | fewer     |   144 |   144 |  51.76 |          1 |        0 |
+    | POS~triple    |   0 | POSMIR     |   101.93 |   20.07 | 0.16 | triple    |   122 |   122 |  43.85 |          1 |        0 |
+    | COM~evolving  |   0 | COMPLEMENT | 3,055.29 |  118.71 | 0.04 | evolving  | 3,174 | 3,174 | 241.97 |          1 |        0 |
+    | COM~earliest  |   0 | COMPLEMENT | 2,122.53 |   82.47 | 0.04 | earliest  | 2,205 | 2,205 | 168.10 |          1 |        0 |
+    | COM~northerly |   0 | COMPLEMENT | 1,819.32 |   70.68 | 0.04 | northerly | 1,890 | 1,890 | 144.08 |          1 |        0 |
+    | COM~chopped   |   0 | COMPLEMENT | 1,513.21 |   58.79 | 0.04 | chopped   | 1,572 | 1,572 | 119.84 |          1 |        0 |
+    | COM~southerly |   0 | COMPLEMENT | 1,375.56 |   53.44 | 0.04 | southerly | 1,429 | 1,429 | 108.94 |          1 |        0 |
+    | COM~away      |   0 | COMPLEMENT | 1,242.72 |   48.28 | 0.04 | away      | 1,291 | 1,291 |  98.42 |          1 |        0 |
+    
+    Weakest/Minimum `Fnn(O22)`
+    | key           |   LRC | l1     | Fnn(O22) |     exp_f |   unexp_f |   dP1 | l2        |      f |     f2 |        G2 | dP1_simple |
+    |:--------------|------:|:-------|---------:|----------:|----------:|------:|:----------|-------:|-------:|----------:|-----------:|
+    | POS~important | -1.28 | POSMIR |  275,158 | 36,575.04 | -7,458.04 | -0.17 | important | 29,117 | 43,776 | -7,797.76 |       0.67 |
+    
+    Weakest/Minimum `Fy_(R1)`
+    | key                  |  LRC | l1     |    exp_f | Fy_(R1) |  unexp_f |  dP1 | l2            |      f |     f2 |        G2 | dP1_simple |
+    |:---------------------|-----:|:-------|---------:|--------:|---------:|-----:|:--------------|-------:|-------:|----------:|-----------:|
+    | NEGmir~early         | 5.49 | NEGMIR |   883.20 | 289,770 | 4,057.80 | 0.76 | early         |  4,941 |  5,370 | 15,068.94 |       0.92 |
+    | NEGmir~late          | 4.45 | NEGMIR | 2,163.26 | 289,770 | 8,744.74 | 0.67 | late          | 10,908 | 13,153 | 28,485.26 |       0.83 |
+    | NEGmir~fancy         | 3.11 | NEGMIR |   182.07 | 289,770 |   598.93 | 0.54 | fancy         |    781 |  1,107 |  1,596.15 |       0.71 |
+    | NEGmir~alone         | 3.06 | NEGMIR |   130.26 | 289,770 |   434.74 | 0.55 | alone         |    565 |    792 |  1,173.08 |       0.71 |
+    | NEGmir~sure          | 2.72 | NEGMIR | 1,602.58 | 289,770 | 4,150.42 | 0.43 | sure          |  5,753 |  9,744 |  9,087.14 |       0.59 |
+    | NEGmir~frustrating   | 2.72 | NEGMIR |   545.71 | 289,770 | 1,475.29 | 0.45 | frustrating   |  2,021 |  3,318 |  3,330.61 |       0.61 |
+    | NEGmir~certain       | 2.58 | NEGMIR |   311.83 | 289,770 |   826.17 | 0.44 | certain       |  1,138 |  1,896 |  1,831.75 |       0.60 |
+    | NEGmir~evident       | 2.55 | NEGMIR |   406.90 | 289,770 | 1,048.10 | 0.42 | evident       |  1,455 |  2,474 |  2,270.95 |       0.59 |
+    | NEGmir~strenuous     | 1.96 | NEGMIR |    55.59 | 289,770 |   139.41 | 0.41 | strenuous     |    195 |    338 |    294.90 |       0.58 |
+    | NEGmir~disheartening | 1.84 | NEGMIR |    35.20 | 289,770 |    91.80 | 0.43 | disheartening |    127 |    214 |    200.63 |       0.59 |
+    
+    Weakest/Minimum `Fn_(R2)`
+    | key           |  LRC | l1     | Fn_(R2) |     exp_f |  unexp_f |  dP1 | l2        |      f |     f2 |       G2 | dP1_simple |
+    |:--------------|-----:|:-------|--------:|----------:|---------:|-----:|:----------|-------:|-------:|---------:|-----------:|
+    | POS~familiar  | 3.09 | POSMIR | 289,817 | 10,773.83 | 1,918.17 | 0.15 | familiar  | 12,692 | 12,895 | 3,221.81 |       0.98 |
+    | POS~larger    | 2.66 | POSMIR | 289,817 |  2,068.71 |   379.29 | 0.15 | larger    |  2,448 |  2,476 |   674.89 |       0.99 |
+    | POS~bigger    | 2.47 | POSMIR | 289,817 |  3,276.01 |   570.99 | 0.15 | bigger    |  3,847 |  3,921 |   917.07 |       0.98 |
+    | POS~similar   | 2.35 | POSMIR | 289,817 |  5,857.72 |   976.28 | 0.14 | similar   |  6,834 |  7,011 | 1,447.39 |       0.97 |
+    | POS~greater   | 2.35 | POSMIR | 289,817 |  1,878.21 |   334.79 | 0.15 | greater   |  2,213 |  2,248 |   561.42 |       0.98 |
+    | POS~higher    | 2.25 | POSMIR | 289,817 |  2,419.62 |   417.38 | 0.14 | higher    |  2,837 |  2,896 |   657.20 |       0.98 |
+    | POS~unable    | 2.22 | POSMIR | 289,817 |  1,042.71 |   196.29 | 0.16 | unable    |  1,239 |  1,248 |   371.28 |       0.99 |
+    | POS~lower     | 2.17 | POSMIR | 289,817 |  1,535.66 |   272.34 | 0.15 | lower     |  1,808 |  1,838 |   452.04 |       0.98 |
+    | POS~akin      | 2.05 | POSMIR | 289,817 |    915.71 |   172.29 | 0.16 | akin      |  1,088 |  1,096 |   325.41 |       0.99 |
+    | POS~different | 1.99 | POSMIR | 289,817 | 30,073.15 | 4,429.85 | 0.13 | different | 34,503 | 35,994 | 5,452.48 |       0.96 |
+    
+    Weakest/Minimum `F_y(C1)`
+    | key        | LRC | l1     |  exp_f | unexp_f |  dP1 | l2     |   f | F_y(C1) |  f2 |    G2 | dP1_simple |
+    |:-----------|----:|:-------|-------:|--------:|-----:|:-------|----:|--------:|----:|------:|-----------:|
+    | POS~triple |   0 | POSMIR | 101.93 |   20.07 | 0.16 | triple | 122 |     122 | 122 | 43.85 |          1 |
+    
+    Weakest/Minimum `F_n(C2)`
+    | key              |   LRC | l1     |     exp_f |   unexp_f |   dP1 | l2        |      f |     f2 |        G2 | dP1_simple |   F_n(C2) |
+    |:-----------------|------:|:-------|----------:|----------:|------:|:----------|-------:|-------:|----------:|-----------:|----------:|
+    | NEGmir~important |  1.28 | NEGMIR |  7,199.79 |  7,458.21 |  0.17 | important | 14,658 | 43,776 |  7,798.82 |       0.33 | 1,718,077 |
+    | POS~important    | -1.28 | POSMIR | 36,575.04 | -7,458.04 | -0.17 | important | 29,117 | 43,776 | -7,797.76 |       0.67 | 1,718,077 |
+    
+    Weakest/Minimum `exp_12`
+    | key              |  LRC | l1     |    exp_f |  unexp_f |  dP1 | l2        |     exp_12 |      f |     f2 |       G2 | dP1_simple |
+    |:-----------------|-----:|:-------|---------:|---------:|-----:|:----------|-----------:|-------:|-------:|---------:|-----------:|
+    | NEGmir~important | 1.28 | NEGMIR | 7,199.79 | 7,458.21 | 0.17 | important | 282,570.21 | 14,658 | 43,776 | 7,798.82 |       0.33 |
+    
+    Weakest/Minimum `exp_21`
+    | key          | LRC | l1         |  exp_f | unexp_f |  dP1 | l2       | exp_21 |   f |  f2 |    G2 | dP1_simple |
+    |:-------------|----:|:-----------|-------:|--------:|-----:|:---------|-------:|----:|----:|------:|-----------:|
+    | COM~puerto   |   0 | COMPLEMENT | 192.52 |    7.48 | 0.04 | puerto   |   7.48 | 200 | 200 | 15.25 |          1 |
+    | COM~cervical |   0 | COMPLEMENT | 192.52 |    7.48 | 0.04 | cervical |   7.48 | 200 | 200 | 15.25 |          1 |
+    
+    Weakest/Minimum `exp_22`
+    | key           |     exp_22 |   LRC | l1     |     exp_f |   unexp_f |   dP1 | l2        |      f |     f2 |        G2 | dP1_simple |
+    |:--------------|-----------:|------:|:-------|----------:|----------:|------:|:----------|-------:|-------:|----------:|-----------:|
+    | POS~important | 282,616.04 | -1.28 | POSMIR | 36,575.04 | -7,458.04 | -0.17 | important | 29,117 | 43,776 | -7,797.76 |       0.67 |
+    
+    Weakest/Minimum `t`
+    | key               | LRC | l1         |  exp_f | unexp_f |    t |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `dice`
+    | key                  | LRC | l1         | dice |  exp_f | unexp_f |  dP1 | l2               |   f |  f2 |    G2 | dP1_simple |
+    |:---------------------|----:|:-----------|-----:|-------:|--------:|-----:|:-----------------|----:|----:|------:|-----------:|
+    | COM~puerto           |   0 | COMPLEMENT | 0.00 | 192.52 |    7.48 | 0.04 | puerto           | 200 | 200 | 15.25 |       1.00 |
+    | COM~cervical         |   0 | COMPLEMENT | 0.00 | 192.52 |    7.48 | 0.04 | cervical         | 200 | 200 | 15.25 |       1.00 |
+    | COM~gut              |   0 | COMPLEMENT | 0.00 | 193.48 |    6.52 | 0.03 | gut              | 200 | 201 |  9.22 |       1.00 |
+    | COM~multiethnic      |   0 | COMPLEMENT | 0.00 | 193.48 |    6.52 | 0.03 | multiethnic      | 200 | 201 |  9.22 |       1.00 |
+    | COM~state-controlled |   0 | COMPLEMENT | 0.00 | 193.48 |    6.52 | 0.03 | state-controlled | 200 | 201 |  9.22 |       1.00 |
+    | COM~snappier         |   0 | COMPLEMENT | 0.00 | 193.48 |    6.52 | 0.03 | snappier         | 200 | 201 |  9.22 |       1.00 |
+    | COM~workin           |   0 | COMPLEMENT | 0.00 | 194.45 |    5.55 | 0.03 | workin           | 200 | 202 |  5.95 |       0.99 |
+    | COM~firsthand        |   0 | COMPLEMENT | 0.00 | 194.45 |    5.55 | 0.03 | firsthand        | 200 | 202 |  5.95 |       0.99 |
+    | COM~unclassifiable   |   0 | COMPLEMENT | 0.00 | 194.45 |    5.55 | 0.03 | unclassifiable   | 200 | 202 |  5.95 |       0.99 |
+    | COM~non-jewish       |   0 | COMPLEMENT | 0.00 | 195.41 |    4.59 | 0.02 | non-jewish       | 200 | 203 |  3.72 |       0.99 |
+    
+    Weakest/Minimum `liddell`
+    | key               | LRC | l1         | liddell |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|--------:|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT |    0.00 | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT |    0.00 | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `MI`
+    | key               | LRC | l1         |  exp_f | unexp_f |  dP1 | l2            |   f |   MI |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|:--------------|----:|-----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 0.00 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | latent        | 592 | 0.00 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `deltaP_min`
+    | key               | LRC | l1         |  exp_f | unexp_f |  dP1 | deltaP_min | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|-----------:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 |       0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 |       0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `deltaP_max`
+    | key   | LRC   | l1   | deltaP_max   | exp_f   | unexp_f   | dP1   | l2   | f   | f2   | G2   | dP1_simple   |
+    |-------|-------|------|--------------|---------|-----------|-------|------|-----|------|------|--------------|
+    
+    Weakest/Minimum `deltaP_max_abs`
+    | key               | LRC | l1         |  exp_f | unexp_f | deltaP_max_abs |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|---------------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 |           0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 |           0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `deltaP_product`
+    | key               | LRC | l1         |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple | deltaP_product |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|---------------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |           0.00 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |           0.00 |
+    
+    Weakest/Minimum `unexp_f`
+    | key               | LRC | l1         |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `unexp_r`
+    | key               | LRC | l1         | unexp_r |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|--------:|-------:|--------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT |    0.00 | 592.00 |    0.00 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT |    0.00 | 592.00 |    0.00 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `expected_sqrt`
+    | key                  |  LRC | l1     | exp_f | unexp_f |  dP1 | expected_sqrt | l2            |   f |  f2 |     G2 | dP1_simple |
+    |:---------------------|-----:|:-------|------:|--------:|-----:|--------------:|:--------------|----:|----:|-------:|-----------:|
+    | NEGmir~disheartening | 1.84 | NEGMIR | 35.20 |   91.80 | 0.43 |          5.93 | disheartening | 127 | 214 | 200.63 |       0.59 |
+    
+    Weakest/Minimum `unexp_abs_sqrt`
+    | key               | LRC | l1         |  exp_f | unexp_f | unexp_abs_sqrt |  dP1 | l2            |   f |  f2 | G2 | dP1_simple |
+    |:------------------|----:|:-----------|-------:|--------:|---------------:|-----:|:--------------|----:|----:|---:|-----------:|
+    | COM~self-absorbed |   0 | COMPLEMENT | 592.00 |    0.00 |           0.02 | 0.00 | self-absorbed | 592 | 615 |  0 |       0.96 |
+    | COM~latent        |   0 | COMPLEMENT | 592.00 |    0.00 |           0.02 | 0.00 | latent        | 592 | 615 |  0 |       0.96 |
+    
+    Weakest/Minimum `LRC`
+    | key             | LRC | l1     |  exp_f | unexp_f |  dP1 | l2          |   f |  f2 |     G2 | dP1_simple |
+    |:----------------|----:|:-------|-------:|--------:|-----:|:------------|----:|----:|-------:|-----------:|
+    | POS~daily       |   0 | POSMIR | 144.54 |   28.46 | 0.16 | daily       | 173 | 173 |  62.19 |       1.00 |
+    | POS~ongoing     |   0 | POSMIR | 120.31 |   23.69 | 0.16 | ongoing     | 144 | 144 |  51.76 |       1.00 |
+    | POS~fewer       |   0 | POSMIR | 120.31 |   23.69 | 0.16 | fewer       | 144 | 144 |  51.76 |       1.00 |
+    | POS~triple      |   0 | POSMIR | 101.93 |   20.07 | 0.16 | triple      | 122 | 122 |  43.85 |       1.00 |
+    | POS~darker      |   0 | POSMIR | 457.02 |   88.98 | 0.16 | darker      | 546 | 547 | 185.29 |       1.00 |
+    | POS~several     |   0 | POSMIR | 249.82 |   48.18 | 0.16 | several     | 298 | 299 |  97.33 |       1.00 |
+    | POS~nonexistent |   0 | POSMIR | 245.64 |   47.36 | 0.16 | nonexistent | 293 | 294 |  95.57 |       1.00 |
+    | POS~fourth      |   0 | POSMIR | 182.14 |   34.86 | 0.16 | fourth      | 217 | 218 |  68.85 |       1.00 |
+    | POS~incomplete  |   0 | POSMIR | 137.86 |   26.14 | 0.16 | incomplete  | 164 | 165 |  50.35 |       0.99 |
+    | POS~broader     |   0 | POSMIR | 134.52 |   25.48 | 0.16 | broader     | 160 | 161 |  48.97 |       0.99 |
+    
+    Weakest/Minimum `LRC_001`
+    | key                |  LRC | l1         | LRC_001 |    exp_f | unexp_f |  dP1 | l2             |     f |    f2 |     G2 | dP1_simple |
+    |:-------------------|-----:|:-----------|--------:|---------:|--------:|-----:|:---------------|------:|------:|-------:|-----------:|
+    | COM~undisclosed    | 0.20 | COMPLEMENT |       0 | 2,598.06 |   98.94 | 0.04 | undisclosed    | 2,697 | 2,699 | 185.92 |       1.00 |
+    | COM~initial        | 0.18 | COMPLEMENT |       0 | 1,673.96 |   61.04 | 0.04 | initial        | 1,735 | 1,739 | 101.97 |       1.00 |
+    | COM~scant          | 0.13 | COMPLEMENT |       0 | 1,477.59 |   50.41 | 0.03 | scant          | 1,528 | 1,535 |  73.06 |       1.00 |
+    | COM~paltry         | 0.13 | COMPLEMENT |       0 | 1,493.96 |   49.04 | 0.03 | paltry         | 1,543 | 1,552 |  66.13 |       0.99 |
+    | POS~unclear        | 0.13 | POSMIR     |       0 |   264.85 |   41.15 | 0.13 | unclear        |   306 |   317 |  54.15 |       0.97 |
+    | COM~denser         | 0.12 | COMPLEMENT |       0 | 1,526.68 |   48.32 | 0.03 | denser         | 1,575 | 1,586 |  61.08 |       0.99 |
+    | COM~ragged         | 0.11 | COMPLEMENT |       0 | 1,461.23 |   48.77 | 0.03 | ragged         | 1,510 | 1,518 |  67.80 |       0.99 |
+    | COM~low-tech       | 0.11 | COMPLEMENT |       0 | 1,544.97 |   48.03 | 0.03 | low-tech       | 1,593 | 1,605 |  58.89 |       0.99 |
+    | COM~industrialized | 0.10 | COMPLEMENT |       0 | 1,589.25 |   57.75 | 0.03 | industrialized | 1,647 | 1,651 |  95.67 |       1.00 |
+    | COM~cursory        | 0.10 | COMPLEMENT |       0 | 1,452.56 |   50.44 | 0.03 | cursory        | 1,503 | 1,509 |  75.71 |       1.00 |
+    
+    Weakest/Minimum `LRC_01`
+    | key             | LRC | l1     |  exp_f | unexp_f |  dP1 | l2          |   f |  f2 |     G2 | LRC_01 | dP1_simple |
+    |:----------------|----:|:-------|-------:|--------:|-----:|:------------|----:|----:|-------:|-------:|-----------:|
+    | POS~daily       |   0 | POSMIR | 144.54 |   28.46 | 0.16 | daily       | 173 | 173 |  62.19 |      0 |       1.00 |
+    | POS~ongoing     |   0 | POSMIR | 120.31 |   23.69 | 0.16 | ongoing     | 144 | 144 |  51.76 |      0 |       1.00 |
+    | POS~fewer       |   0 | POSMIR | 120.31 |   23.69 | 0.16 | fewer       | 144 | 144 |  51.76 |      0 |       1.00 |
+    | POS~triple      |   0 | POSMIR | 101.93 |   20.07 | 0.16 | triple      | 122 | 122 |  43.85 |      0 |       1.00 |
+    | POS~darker      |   0 | POSMIR | 457.02 |   88.98 | 0.16 | darker      | 546 | 547 | 185.29 |      0 |       1.00 |
+    | POS~several     |   0 | POSMIR | 249.82 |   48.18 | 0.16 | several     | 298 | 299 |  97.33 |      0 |       1.00 |
+    | POS~nonexistent |   0 | POSMIR | 245.64 |   47.36 | 0.16 | nonexistent | 293 | 294 |  95.57 |      0 |       1.00 |
+    | POS~fourth      |   0 | POSMIR | 182.14 |   34.86 | 0.16 | fourth      | 217 | 218 |  68.85 |      0 |       1.00 |
+    | POS~incomplete  |   0 | POSMIR | 137.86 |   26.14 | 0.16 | incomplete  | 164 | 165 |  50.35 |      0 |       0.99 |
+    | POS~broader     |   0 | POSMIR | 134.52 |   25.48 | 0.16 | broader     | 160 | 161 |  48.97 |      0 |       0.99 |
+    
+    Weakest/Minimum `LRC_05`
+    | key             | LRC_05 | LRC | l1     |  exp_f | unexp_f |  dP1 | l2          |   f |  f2 |     G2 | dP1_simple |
+    |:----------------|-------:|----:|:-------|-------:|--------:|-----:|:------------|----:|----:|-------:|-----------:|
+    | POS~daily       |      0 |   0 | POSMIR | 144.54 |   28.46 | 0.16 | daily       | 173 | 173 |  62.19 |       1.00 |
+    | POS~ongoing     |      0 |   0 | POSMIR | 120.31 |   23.69 | 0.16 | ongoing     | 144 | 144 |  51.76 |       1.00 |
+    | POS~fewer       |      0 |   0 | POSMIR | 120.31 |   23.69 | 0.16 | fewer       | 144 | 144 |  51.76 |       1.00 |
+    | POS~triple      |      0 |   0 | POSMIR | 101.93 |   20.07 | 0.16 | triple      | 122 | 122 |  43.85 |       1.00 |
+    | POS~darker      |      0 |   0 | POSMIR | 457.02 |   88.98 | 0.16 | darker      | 546 | 547 | 185.29 |       1.00 |
+    | POS~several     |      0 |   0 | POSMIR | 249.82 |   48.18 | 0.16 | several     | 298 | 299 |  97.33 |       1.00 |
+    | POS~nonexistent |      0 |   0 | POSMIR | 245.64 |   47.36 | 0.16 | nonexistent | 293 | 294 |  95.57 |       1.00 |
+    | POS~fourth      |      0 |   0 | POSMIR | 182.14 |   34.86 | 0.16 | fourth      | 217 | 218 |  68.85 |       1.00 |
+    | POS~incomplete  |      0 |   0 | POSMIR | 137.86 |   26.14 | 0.16 | incomplete  | 164 | 165 |  50.35 |       0.99 |
+    | POS~broader     |      0 |   0 | POSMIR | 134.52 |   25.48 | 0.16 | broader     | 160 | 161 |  48.97 |       0.99 |
+    
+    Weakest/Minimum `LRC_nc`
+    | key               | LRC | l1     | LRC_nc |  exp_f | unexp_f |  dP1 | l2            |   f |  f2 |    G2 | dP1_simple |
+    |:------------------|----:|:-------|-------:|-------:|--------:|-----:|:--------------|----:|----:|------:|-----------:|
+    | POS~triple        |   0 | POSMIR |      0 | 101.93 |   20.07 | 0.16 | triple        | 122 | 122 | 43.85 |       1.00 |
+    | POS~sexist        |   0 | POSMIR |      0 | 107.78 |   12.22 | 0.09 | sexist        | 120 | 129 | 10.34 |       0.93 |
+    | POS~grey          |   0 | POSMIR |      0 | 114.46 |   12.54 | 0.09 | grey          | 127 | 137 | 10.15 |       0.93 |
+    | POS~cloudy        |   0 | POSMIR |      0 | 112.79 |   12.21 | 0.09 | cloudy        | 125 | 135 |  9.73 |       0.93 |
+    | POS~ethereal      |   0 | POSMIR |      0 | 111.12 |   11.88 | 0.09 | ethereal      | 123 | 133 |  9.33 |       0.92 |
+    | POS~national      |   0 | POSMIR |      0 | 109.45 |   11.55 | 0.09 | national      | 121 | 131 |  8.92 |       0.92 |
+    | POS~philosophical |   0 | POSMIR |      0 | 120.31 |   12.69 | 0.09 | philosophical | 133 | 144 |  9.79 |       0.92 |
+    | POS~unsuitable    |   0 | POSMIR |      0 | 108.62 |   11.38 | 0.09 | unsuitable    | 120 | 130 |  8.72 |       0.92 |
+    | POS~obtuse        |   0 | POSMIR |      0 | 118.64 |   12.36 | 0.09 | obtuse        | 131 | 142 |  9.39 |       0.92 |
+    | POS~inexplicable  |   0 | POSMIR |      0 | 116.14 |   11.86 | 0.09 | inexplicable  | 128 | 139 |  8.81 |       0.92 |
+    
+    Weakest/Minimum `LRC_dv`
+    | key             | LRC | l1     | LRC_dv |  exp_f | unexp_f |  dP1 | l2          |   f |  f2 |     G2 | dP1_simple |
+    |:----------------|----:|:-------|-------:|-------:|--------:|-----:|:------------|----:|----:|-------:|-----------:|
+    | POS~daily       |   0 | POSMIR |      0 | 144.54 |   28.46 | 0.16 | daily       | 173 | 173 |  62.19 |       1.00 |
+    | POS~ongoing     |   0 | POSMIR |      0 | 120.31 |   23.69 | 0.16 | ongoing     | 144 | 144 |  51.76 |       1.00 |
+    | POS~fewer       |   0 | POSMIR |      0 | 120.31 |   23.69 | 0.16 | fewer       | 144 | 144 |  51.76 |       1.00 |
+    | POS~triple      |   0 | POSMIR |      0 | 101.93 |   20.07 | 0.16 | triple      | 122 | 122 |  43.85 |       1.00 |
+    | POS~darker      |   0 | POSMIR |      0 | 457.02 |   88.98 | 0.16 | darker      | 546 | 547 | 185.29 |       1.00 |
+    | POS~several     |   0 | POSMIR |      0 | 249.82 |   48.18 | 0.16 | several     | 298 | 299 |  97.33 |       1.00 |
+    | POS~nonexistent |   0 | POSMIR |      0 | 245.64 |   47.36 | 0.16 | nonexistent | 293 | 294 |  95.57 |       1.00 |
+    | POS~fourth      |   0 | POSMIR |      0 | 182.14 |   34.86 | 0.16 | fourth      | 217 | 218 |  68.85 |       1.00 |
+    | POS~incomplete  |   0 | POSMIR |      0 | 137.86 |   26.14 | 0.16 | incomplete  | 164 | 165 |  50.35 |       0.99 |
+    | POS~broader     |   0 | POSMIR |      0 | 134.52 |   25.48 | 0.16 | broader     | 160 | 161 |  48.97 |       0.99 |
+    
+    Weakest/Minimum `f_sqrt`
+    | key               | LRC | l1     | f_sqrt |  exp_f | unexp_f |   dP1 | l2            |   f |  f2 |    G2 | dP1_simple |
+    |:------------------|----:|:-------|-------:|-------:|--------:|------:|:--------------|----:|----:|------:|-----------:|
+    | POS~regional      |   0 | POSMIR |  10.95 | 104.44 |   15.56 |  0.12 | regional      | 120 | 125 | 19.20 |       0.96 |
+    | POS~psychological |   0 | POSMIR |  10.95 | 105.27 |   14.73 |  0.12 | psychological | 120 | 126 | 16.55 |       0.95 |
+    | POS~sexist        |   0 | POSMIR |  10.95 | 107.78 |   12.22 |  0.09 | sexist        | 120 | 129 | 10.34 |       0.93 |
+    | POS~unsuitable    |   0 | POSMIR |  10.95 | 108.62 |   11.38 |  0.09 | unsuitable    | 120 | 130 |  8.72 |       0.92 |
+    | POS~disingenuous  |   0 | POSMIR |  10.95 | 111.96 |    8.04 |  0.06 | disingenuous  | 120 | 134 |  3.94 |       0.90 |
+    | POS~sticky        |   0 | POSMIR |  10.95 | 114.46 |    5.54 |  0.04 | sticky        | 120 | 137 |  1.75 |       0.88 |
+    | POS~unnatural     |   0 | POSMIR |  10.95 | 121.98 |   -1.98 | -0.01 | unnatural     | 120 | 146 | -0.19 |       0.82 |
+    | POS~tenuous       |   0 | POSMIR |  10.95 | 123.65 |   -3.65 | -0.02 | tenuous       | 120 | 148 | -0.63 |       0.81 |
+    | POS~sinful        |   0 | POSMIR |  10.95 | 124.49 |   -4.49 | -0.03 | sinful        | 120 | 149 | -0.94 |       0.81 |
+    | POS~prestigious   |   0 | POSMIR |  10.95 | 128.67 |   -8.67 | -0.06 | prestigious   | 120 | 154 | -3.27 |       0.78 |
+    
+    Weakest/Minimum `f1_sqrt`
+    | key                  |  LRC | l1     |    exp_f |  unexp_f |  dP1 | f1_sqrt | l2            |      f |     f2 |        G2 | dP1_simple |
+    |:---------------------|-----:|:-------|---------:|---------:|-----:|--------:|:--------------|-------:|-------:|----------:|-----------:|
+    | NEGmir~early         | 5.49 | NEGMIR |   883.20 | 4,057.80 | 0.76 |  538.30 | early         |  4,941 |  5,370 | 15,068.94 |       0.92 |
+    | NEGmir~late          | 4.45 | NEGMIR | 2,163.26 | 8,744.74 | 0.67 |  538.30 | late          | 10,908 | 13,153 | 28,485.26 |       0.83 |
+    | NEGmir~fancy         | 3.11 | NEGMIR |   182.07 |   598.93 | 0.54 |  538.30 | fancy         |    781 |  1,107 |  1,596.15 |       0.71 |
+    | NEGmir~alone         | 3.06 | NEGMIR |   130.26 |   434.74 | 0.55 |  538.30 | alone         |    565 |    792 |  1,173.08 |       0.71 |
+    | NEGmir~sure          | 2.72 | NEGMIR | 1,602.58 | 4,150.42 | 0.43 |  538.30 | sure          |  5,753 |  9,744 |  9,087.14 |       0.59 |
+    | NEGmir~frustrating   | 2.72 | NEGMIR |   545.71 | 1,475.29 | 0.45 |  538.30 | frustrating   |  2,021 |  3,318 |  3,330.61 |       0.61 |
+    | NEGmir~certain       | 2.58 | NEGMIR |   311.83 |   826.17 | 0.44 |  538.30 | certain       |  1,138 |  1,896 |  1,831.75 |       0.60 |
+    | NEGmir~evident       | 2.55 | NEGMIR |   406.90 | 1,048.10 | 0.42 |  538.30 | evident       |  1,455 |  2,474 |  2,270.95 |       0.59 |
+    | NEGmir~strenuous     | 1.96 | NEGMIR |    55.59 |   139.41 | 0.41 |  538.30 | strenuous     |    195 |    338 |    294.90 |       0.58 |
+    | NEGmir~disheartening | 1.84 | NEGMIR |    35.20 |    91.80 | 0.43 |  538.30 | disheartening |    127 |    214 |    200.63 |       0.59 |
+    
+    Weakest/Minimum `f2_sqrt`
+    | key        | LRC | l1     |  exp_f | unexp_f |  dP1 | l2     | f2_sqrt |   f |  f2 |    G2 | dP1_simple |
+    |:-----------|----:|:-------|-------:|--------:|-----:|:-------|--------:|----:|----:|------:|-----------:|
+    | POS~triple |   0 | POSMIR | 101.93 |   20.07 | 0.16 | triple |   11.05 | 122 | 122 | 43.85 |          1 |
+
+
+
+```python
+for c in adj_amdf.select_dtypes(include='number').columns:
+    print(f'\nStrongest/Maximum `{c}`')
+    show_sample(
+        adj_amdf.loc[adj_amdf[c] == adj_amdf[c].max()]
+                .filter(set(FOCUS + [c])).head(10),
+        assoc=True, format='pipe')
+```
+
+    
+    Strongest/Maximum `f`
+    | key      | l1         | l2   |         f |        f2 |
+    |:---------|:-----------|:-----|----------:|----------:|
+    | COM~many | COMPLEMENT | many | 2,198,836 | 2,212,989 |
+    
+    Strongest/Maximum `exp_f`
+    | key      | l1         |        exp_f | l2   |         f |        f2 |
+    |:---------|:-----------|-------------:|:-----|----------:|----------:|
+    | COM~many | COMPLEMENT | 2,130,224.57 | many | 2,198,836 | 2,212,989 |
+    
+    Strongest/Maximum `G2`
+    | key        | l1      |         G2 | l2  |       f |      f2 |
+    |:-----------|:--------|-----------:|:----|--------:|--------:|
+    | NEGany~bad | NEGATED | 188,571.60 | bad | 105,275 | 557,528 |
+    
+    Strongest/Maximum `odds_r_disc`
+    | key          | l1         | l2       |     f | odds_r_disc |    f2 |
+    |:-------------|:-----------|:---------|------:|------------:|------:|
+    | COM~evolving | COMPLEMENT | evolving | 3,174 |        2.39 | 3,174 |
+    
+    Strongest/Maximum `dP1`
+    | key          | l1     |  dP1 | l2    |     f |    f2 |
+    |:-------------|:-------|-----:|:------|------:|------:|
+    | NEGmir~early | NEGMIR | 0.76 | early | 4,941 | 5,370 |
+    
+    Strongest/Maximum `dP2`
+    | key         | l1     |  dP2 | l2   |      f |     f2 |
+    |:------------|:-------|-----:|:-----|-------:|-------:|
+    | NEGmir~late | NEGMIR | 0.04 | late | 10,908 | 13,153 |
+    
+    Strongest/Maximum `dP1_simple`
+    | key           | l1         | l2        |     f |    f2 | dP1_simple |
+    |:--------------|:-----------|:----------|------:|------:|-----------:|
+    | POS~daily     | POSMIR     | daily     |   173 |   173 |          1 |
+    | POS~ongoing   | POSMIR     | ongoing   |   144 |   144 |          1 |
+    | POS~fewer     | POSMIR     | fewer     |   144 |   144 |          1 |
+    | POS~triple    | POSMIR     | triple    |   122 |   122 |          1 |
+    | COM~evolving  | COMPLEMENT | evolving  | 3,174 | 3,174 |          1 |
+    | COM~earliest  | COMPLEMENT | earliest  | 2,205 | 2,205 |          1 |
+    | COM~northerly | COMPLEMENT | northerly | 1,890 | 1,890 |          1 |
+    | COM~chopped   | COMPLEMENT | chopped   | 1,572 | 1,572 |          1 |
+    | COM~southerly | COMPLEMENT | southerly | 1,429 | 1,429 |          1 |
+    | COM~away      | COMPLEMENT | away      | 1,291 | 1,291 |          1 |
+    
+    Strongest/Maximum `dP2_simple`
+    | key              | dP2_simple | l1     | l2        |      f |     f2 |
+    |:-----------------|-----------:|:-------|:----------|-------:|-------:|
+    | NEGmir~important |       0.05 | NEGMIR | important | 14,658 | 43,776 |
+    
+    Strongest/Maximum `f1`
+    | key           | l1         | l2        |       f |         f1 |      f2 |
+    |:--------------|:-----------|:----------|--------:|-----------:|--------:|
+    | COM~own       | COMPLEMENT | own       |  97,774 | 83,102,035 |  97,817 |
+    | COM~least     | COMPLEMENT | least     | 120,591 | 83,102,035 | 120,663 |
+    | COM~first     | COMPLEMENT | first     | 157,877 | 83,102,035 | 158,001 |
+    | COM~recent    | COMPLEMENT | recent    | 401,330 | 83,102,035 | 401,927 |
+    | COM~few       | COMPLEMENT | few       | 271,417 | 83,102,035 | 271,845 |
+    | COM~fewer     | COMPLEMENT | fewer     |  47,388 | 83,102,035 |  47,439 |
+    | COM~cloudy    | COMPLEMENT | cloudy    |  65,221 | 83,102,035 |  65,313 |
+    | COM~broader   | COMPLEMENT | broader   |  20,436 | 83,102,035 |  20,455 |
+    | COM~unchanged | COMPLEMENT | unchanged |  20,478 | 83,102,035 |  20,498 |
+    | COM~less      | COMPLEMENT | less      | 205,313 | 83,102,035 | 205,958 |
+    
+    Strongest/Maximum `f2`
+    | key         | l1         | l2   |         f |        f2 |
+    |:------------|:-----------|:-----|----------:|----------:|
+    | COM~many    | COMPLEMENT | many | 2,198,836 | 2,212,989 |
+    | NEGany~many | NEGATED    | many |    14,152 | 2,212,989 |
+    
+    Strongest/Maximum `N`
+    | key           | l1         |          N | l2        |       f |      f2 |
+    |:--------------|:-----------|-----------:|:----------|--------:|--------:|
+    | NEGany~shabby | NEGATED    | 86,330,752 | shabby    |   5,535 |   8,008 |
+    | COM~own       | COMPLEMENT | 86,330,752 | own       |  97,774 |  97,817 |
+    | COM~least     | COMPLEMENT | 86,330,752 | least     | 120,591 | 120,663 |
+    | COM~first     | COMPLEMENT | 86,330,752 | first     | 157,877 | 158,001 |
+    | COM~recent    | COMPLEMENT | 86,330,752 | recent    | 401,330 | 401,927 |
+    | COM~few       | COMPLEMENT | 86,330,752 | few       | 271,417 | 271,845 |
+    | COM~fewer     | COMPLEMENT | 86,330,752 | fewer     |  47,388 |  47,439 |
+    | COM~cloudy    | COMPLEMENT | 86,330,752 | cloudy    |  65,221 |  65,313 |
+    | COM~broader   | COMPLEMENT | 86,330,752 | broader   |  20,436 |  20,455 |
+    | COM~unchanged | COMPLEMENT | 86,330,752 | unchanged |  20,478 |  20,498 |
+    
+    Strongest/Maximum `Fyy(Of)`
+    | key      | l1         | l2   |         f |   Fyy(Of) |        f2 |
+    |:---------|:-----------|:-----|----------:|----------:|----------:|
+    | COM~many | COMPLEMENT | many | 2,198,836 | 2,198,836 | 2,212,989 |
+    
+    Strongest/Maximum `Fyn(O12)`
+    | key                  | l1         |   Fyn(O12) | l2               |   f |  f2 |
+    |:---------------------|:-----------|-----------:|:-----------------|----:|----:|
+    | COM~puerto           | COMPLEMENT | 83,101,835 | puerto           | 200 | 200 |
+    | COM~cervical         | COMPLEMENT | 83,101,835 | cervical         | 200 | 200 |
+    | COM~gut              | COMPLEMENT | 83,101,835 | gut              | 200 | 201 |
+    | COM~multiethnic      | COMPLEMENT | 83,101,835 | multiethnic      | 200 | 201 |
+    | COM~state-controlled | COMPLEMENT | 83,101,835 | state-controlled | 200 | 201 |
+    | COM~snappier         | COMPLEMENT | 83,101,835 | snappier         | 200 | 201 |
+    | COM~workin           | COMPLEMENT | 83,101,835 | workin           | 200 | 202 |
+    | COM~firsthand        | COMPLEMENT | 83,101,835 | firsthand        | 200 | 202 |
+    | COM~unclassifiable   | COMPLEMENT | 83,101,835 | unclassifiable   | 200 | 202 |
+    | COM~non-jewish       | COMPLEMENT | 83,101,835 | non-jewish       | 200 | 203 |
+    
+    Strongest/Maximum `Fny(O21)`
+    | key         | l1      | l2   |      f |        f2 |  Fny(O21) |
+    |:------------|:--------|:-----|-------:|----------:|----------:|
+    | NEGany~many | NEGATED | many | 14,152 | 2,212,989 | 2,198,837 |
+    
+    Strongest/Maximum `Fnn(O22)`
+    | key        | l1      |   Fnn(O22) | l2  |   f |    f2 |
+    |:-----------|:--------|-----------:|:----|----:|------:|
+    | NEGany~cut | NEGATED | 83,103,341 | cut | 385 | 1,583 |
+    
+    Strongest/Maximum `Fy_(R1)`
+    | key           | l1         |    Fy_(R1) | l2        |       f |      f2 |
+    |:--------------|:-----------|-----------:|:----------|--------:|--------:|
+    | COM~own       | COMPLEMENT | 83,102,035 | own       |  97,774 |  97,817 |
+    | COM~least     | COMPLEMENT | 83,102,035 | least     | 120,591 | 120,663 |
+    | COM~first     | COMPLEMENT | 83,102,035 | first     | 157,877 | 158,001 |
+    | COM~recent    | COMPLEMENT | 83,102,035 | recent    | 401,330 | 401,927 |
+    | COM~few       | COMPLEMENT | 83,102,035 | few       | 271,417 | 271,845 |
+    | COM~fewer     | COMPLEMENT | 83,102,035 | fewer     |  47,388 |  47,439 |
+    | COM~cloudy    | COMPLEMENT | 83,102,035 | cloudy    |  65,221 |  65,313 |
+    | COM~broader   | COMPLEMENT | 83,102,035 | broader   |  20,436 |  20,455 |
+    | COM~unchanged | COMPLEMENT | 83,102,035 | unchanged |  20,478 |  20,498 |
+    | COM~less      | COMPLEMENT | 83,102,035 | less      | 205,313 | 205,958 |
+    
+    Strongest/Maximum `Fn_(R2)`
+    | key                | l1      |    Fn_(R2) | l2          |     f |     f2 |
+    |:-------------------|:--------|-----------:|:------------|------:|-------:|
+    | NEGany~shabby      | NEGATED | 83,104,539 | shabby      | 5,535 |  8,008 |
+    | NEGany~rosy        | NEGATED | 83,104,539 | rosy        | 2,076 |  6,726 |
+    | NEGany~clear-cut   | NEGATED | 83,104,539 | clear-cut   | 1,368 |  4,399 |
+    | NEGany~farfetched  | NEGATED | 83,104,539 | farfetched  |   569 |  1,777 |
+    | NEGany~dissimilar  | NEGATED | 83,104,539 | dissimilar  | 2,525 |  8,816 |
+    | NEGany~far-fetched | NEGATED | 83,104,539 | far-fetched | 1,964 |  6,844 |
+    | NEGany~flashy      | NEGATED | 83,104,539 | flashy      | 1,617 |  6,968 |
+    | NEGany~binding     | NEGATED | 83,104,539 | binding     |   684 |  2,819 |
+    | NEGany~distant     | NEGATED | 83,104,539 | distant     | 8,184 | 38,714 |
+    | NEGany~hasty       | NEGATED | 83,104,539 | hasty       |   588 |  2,517 |
+    
+    Strongest/Maximum `F_y(C1)`
+    | key         | l1         | l2   |         f |   F_y(C1) |        f2 |
+    |:------------|:-----------|:-----|----------:|----------:|----------:|
+    | COM~many    | COMPLEMENT | many | 2,198,836 | 2,212,989 | 2,212,989 |
+    | NEGany~many | NEGATED    | many |    14,152 | 2,212,989 | 2,212,989 |
+    
+    Strongest/Maximum `F_n(C2)`
+    | key          | l1         | l2       |   f |  f2 |    F_n(C2) |
+    |:-------------|:-----------|:---------|----:|----:|-----------:|
+    | COM~puerto   | COMPLEMENT | puerto   | 200 | 200 | 86,330,552 |
+    | COM~cervical | COMPLEMENT | cervical | 200 | 200 | 86,330,552 |
+    
+    Strongest/Maximum `exp_12`
+    | key          | l1         | l2       |   f |        exp_12 |  f2 |
+    |:-------------|:-----------|:---------|----:|--------------:|----:|
+    | COM~puerto   | COMPLEMENT | puerto   | 200 | 83,101,842.48 | 200 |
+    | COM~cervical | COMPLEMENT | cervical | 200 | 83,101,842.48 | 200 |
+    
+    Strongest/Maximum `exp_21`
+    | key         | l1      | l2   |      f |       exp_21 |        f2 |
+    |:------------|:--------|:-----|-------:|-------------:|----------:|
+    | NEGany~many | NEGATED | many | 14,152 | 2,130,288.76 | 2,212,989 |
+    
+    Strongest/Maximum `exp_22`
+    | key              |        exp_22 | l1      | l2        |   f |    f2 |
+    |:-----------------|--------------:|:--------|:----------|----:|------:|
+    | NEGany~unsightly | 83,103,036.34 | NEGATED | unsightly | 274 | 1,561 |
+    
+    Strongest/Maximum `t`
+    | key         | l1      |      t | l2   |       f |      f2 |
+    |:------------|:--------|-------:|:-----|--------:|--------:|
+    | NEGany~sure | NEGATED | 270.94 | sure | 128,824 | 844,981 |
+    
+    Strongest/Maximum `dice`
+    | key              | l1     | dice | l2        |      f |     f2 |
+    |:-----------------|:-------|-----:|:----------|-------:|-------:|
+    | NEGmir~important | NEGMIR | 0.09 | important | 14,658 | 43,776 |
+    
+    Strongest/Maximum `liddell`
+    | key          | l1     | liddell | l2    |     f |    f2 |
+    |:-------------|:-------|--------:|:------|------:|------:|
+    | NEGmir~early | NEGMIR |    0.76 | early | 4,941 | 5,370 |
+    
+    Strongest/Maximum `MI`
+    | key           | l1      | l2     |     f |   MI |    f2 |
+    |:--------------|:--------|:-------|------:|-----:|------:|
+    | NEGany~shabby | NEGATED | shabby | 5,535 | 1.27 | 8,008 |
+    
+    Strongest/Maximum `deltaP_min`
+    | key         | l1     | deltaP_min | l2   |      f |     f2 |
+    |:------------|:-------|-----------:|:-----|-------:|-------:|
+    | NEGmir~late | NEGMIR |       0.04 | late | 10,908 | 13,153 |
+    
+    Strongest/Maximum `deltaP_max`
+    | key          | l1     | l2    |     f |    f2 | deltaP_max |
+    |:-------------|:-------|:------|------:|------:|-----------:|
+    | NEGmir~early | NEGMIR | early | 4,941 | 5,370 |       0.76 |
+    
+    Strongest/Maximum `deltaP_max_abs`
+    | key          | l1     | deltaP_max_abs | l2    |     f |    f2 |
+    |:-------------|:-------|---------------:|:------|------:|------:|
+    | NEGmir~early | NEGMIR |           0.76 | early | 4,941 | 5,370 |
+    
+    Strongest/Maximum `deltaP_product`
+    | key         | l1     | l2   |      f |     f2 | deltaP_product |
+    |:------------|:-------|:-----|-------:|-------:|---------------:|
+    | NEGmir~late | NEGMIR | late | 10,908 | 13,153 |           0.02 |
+    
+    Strongest/Maximum `unexp_f`
+    | key         | l1      |   unexp_f | l2   |       f |      f2 |
+    |:------------|:--------|----------:|:-----|--------:|--------:|
+    | NEGany~sure | NEGATED | 97,246.74 | sure | 128,824 | 844,981 |
+    
+    Strongest/Maximum `unexp_r`
+    | key           | l1      | unexp_r | l2     |     f |    f2 |
+    |:--------------|:--------|--------:|:-------|------:|------:|
+    | NEGany~shabby | NEGATED |    0.95 | shabby | 5,535 | 8,008 |
+    
+    Strongest/Maximum `expected_sqrt`
+    | key      | l1         | expected_sqrt | l2   |         f |        f2 |
+    |:---------|:-----------|--------------:|:-----|----------:|----------:|
+    | COM~many | COMPLEMENT |      1,459.53 | many | 2,198,836 | 2,212,989 |
+    
+    Strongest/Maximum `unexp_abs_sqrt`
+    | key         | l1      | unexp_abs_sqrt | l2   |       f |      f2 |
+    |:------------|:--------|---------------:|:-----|--------:|--------:|
+    | NEGany~sure | NEGATED |         311.84 | sure | 128,824 | 844,981 |
+    
+    Strongest/Maximum `LRC`
+    | key           |  LRC | l1      | l2     |     f |    f2 |
+    |:--------------|-----:|:--------|:-------|------:|------:|
+    | NEGany~shabby | 5.66 | NEGATED | shabby | 5,535 | 8,008 |
+    
+    Strongest/Maximum `LRC_001`
+    | key           | l1      | LRC_001 | l2     |     f |    f2 |
+    |:--------------|:--------|--------:|:-------|------:|------:|
+    | NEGany~shabby | NEGATED |    5.65 | shabby | 5,535 | 8,008 |
+    
+    Strongest/Maximum `LRC_01`
+    | key           | l1      | l2     |     f |    f2 | LRC_01 |
+    |:--------------|:--------|:-------|------:|------:|-------:|
+    | NEGany~shabby | NEGATED | shabby | 5,535 | 8,008 |   5.67 |
+    
+    Strongest/Maximum `LRC_05`
+    | key           | LRC_05 | l1      | l2     |     f |    f2 |
+    |:--------------|-------:|:--------|:-------|------:|------:|
+    | NEGany~shabby |   5.68 | NEGATED | shabby | 5,535 | 8,008 |
+    
+    Strongest/Maximum `LRC_nc`
+    | key     | l1         | LRC_nc | l2  |      f |     f2 |
+    |:--------|:-----------|-------:|:----|-------:|-------:|
+    | COM~own | COMPLEMENT |   5.85 | own | 97,774 | 97,817 |
+    
+    Strongest/Maximum `LRC_dv`
+    | key           | l1      | l2     |     f |    f2 | LRC_dv |
+    |:--------------|:--------|:-------|------:|------:|-------:|
+    | NEGany~shabby | NEGATED | shabby | 5,535 | 8,008 |   5.68 |
+    
+    Strongest/Maximum `f_sqrt`
+    | key      | l1         |   f_sqrt | l2   |         f |        f2 |
+    |:---------|:-----------|---------:|:-----|----------:|----------:|
+    | COM~many | COMPLEMENT | 1,482.85 | many | 2,198,836 | 2,212,989 |
+    
+    Strongest/Maximum `f1_sqrt`
+    | key           | l1         |  f1_sqrt | l2        |       f |      f2 |
+    |:--------------|:-----------|---------:|:----------|--------:|--------:|
+    | COM~own       | COMPLEMENT | 9,116.03 | own       |  97,774 |  97,817 |
+    | COM~least     | COMPLEMENT | 9,116.03 | least     | 120,591 | 120,663 |
+    | COM~first     | COMPLEMENT | 9,116.03 | first     | 157,877 | 158,001 |
+    | COM~recent    | COMPLEMENT | 9,116.03 | recent    | 401,330 | 401,927 |
+    | COM~few       | COMPLEMENT | 9,116.03 | few       | 271,417 | 271,845 |
+    | COM~fewer     | COMPLEMENT | 9,116.03 | fewer     |  47,388 |  47,439 |
+    | COM~cloudy    | COMPLEMENT | 9,116.03 | cloudy    |  65,221 |  65,313 |
+    | COM~broader   | COMPLEMENT | 9,116.03 | broader   |  20,436 |  20,455 |
+    | COM~unchanged | COMPLEMENT | 9,116.03 | unchanged |  20,478 |  20,498 |
+    | COM~less      | COMPLEMENT | 9,116.03 | less      | 205,313 | 205,958 |
+    
+    Strongest/Maximum `f2_sqrt`
+    | key         | l1         | l2   |         f |  f2_sqrt |        f2 |
+    |:------------|:-----------|:-----|----------:|---------:|----------:|
+    | COM~many    | COMPLEMENT | many | 2,198,836 | 1,487.61 | 2,212,989 |
+    | NEGany~many | NEGATED    | many |    14,152 | 1,487.61 | 2,212,989 |
+
+
+### significant environment LRCs for context-blind *exactly* associated adjectives
+
+
+```python
+show_sample(adj_amdf
+            .sort_values(['f1','LRC'], ascending=False)
+            .filter(abbr_FOCUS).filter(regex=r'NEGany|COM', axis=0)
+            .loc[(adj_amdf.l2.isin(top_overall.l2)) & (adj_amdf.LRC>1), :],
+            format='fancy_outline',
+            assoc=True)
+```
+
+    ╒══════════════════╤═════════╤═══════╤═══════╤══════════════╤════════════╤═════════╤═══════════╤═══════════╤════════════╤═══════════╕
+    │ key              │       f │   dP1 │   LRC │   dP1_simple │         G2 │      f2 │     exp_f │   unexp_f │ l1         │ l2        │
+    ╞══════════════════╪═════════╪═══════╪═══════╪══════════════╪════════════╪═════════╪═══════════╪═══════════╪════════════╪═══════════╡
+    │ COM~same         │  55,867 │  0.03 │  2.31 │         0.99 │   2,406.02 │  56,190 │ 54,088.53 │  1,778.47 │ COMPLEMENT │ same      │
+    │ COM~zero         │  11,377 │  0.03 │  1.42 │         0.99 │     391.67 │  11,472 │ 11,042.95 │    334.05 │ COMPLEMENT │ zero      │
+    │ NEGany~sure      │ 128,824 │  0.12 │  2.19 │         0.15 │ 182,987.33 │ 844,981 │ 31,577.26 │ 97,246.74 │ NEGATED    │ sure      │
+    │ NEGany~conducive │   1,618 │  0.06 │  1.29 │         0.10 │   1,196.28 │  16,405 │    613.06 │  1,004.94 │ NEGATED    │ conducive │
+    │ NEGany~correct   │   6,864 │  0.05 │  1.21 │         0.09 │   4,049.83 │  78,240 │  2,923.86 │  3,940.14 │ NEGATED    │ correct   │
+    │ NEGany~right     │  15,740 │  0.04 │  1.04 │         0.08 │   6,902.12 │ 204,572 │  7,644.93 │  8,095.07 │ NEGATED    │ right     │
+    ╘══════════════════╧═════════╧═══════╧═══════╧══════════════╧════════════╧═════════╧═══════════╧═══════════╧════════════╧═══════════╛
+
+
+
+```python
+show_sample(adj_amdf
+            .sort_values(['f1','LRC'], ascending=False)
+            .filter(abbr_FOCUS).filter(regex=r'NEGmir|POS', axis=0)
+            .loc[(adj_amdf.l2.isin(top_overall.l2)) & (adj_amdf.LRC>1), :],
+            format='fancy_outline',
+            assoc=True)
+```
+
+    ╒═════════════╤═══════╤═══════╤═══════╤══════════════╤══════════╤═══════╤══════════╤═══════════╤════════╤══════╕
+    │ key         │     f │   dP1 │   LRC │   dP1_simple │       G2 │    f2 │    exp_f │   unexp_f │ l1     │ l2   │
+    ╞═════════════╪═══════╪═══════╪═══════╪══════════════╪══════════╪═══════╪══════════╪═══════════╪════════╪══════╡
+    │ NEGmir~sure │ 5,753 │  0.43 │  2.72 │         0.59 │ 9,087.14 │ 9,744 │ 1,602.58 │  4,150.42 │ NEGMIR │ sure │
+    ╘═════════════╧═══════╧═══════╧═══════╧══════════════╧══════════╧═══════╧══════════╧═══════════╧════════╧══════╛
+
+
+
+```python
+def interpret_polar_lrc(amdf: pd.DataFrame) -> pd.DataFrame:
+    if "LRC" not in amdf.columns: 
+        amdf = adjust_assoc_columns(amdf)
+    amdf = amdf.assign(
+        polarity=amdf.l1.apply(
+            lambda env: 'Negative' if env.startswith('NEG') else 'Positive'),
+        significant=amdf.LRC.abs() > 1,
+        attract=amdf.LRC.round() > 0)
+    amdf = amdf.assign(promote=amdf.significant & amdf.attract,
+                       prohibit=amdf.significant & ~amdf.attract)
+    
+    return amdf
+
+```
+
+
+```python
+
+adj_amdf_i = interpret_polar_lrc(adj_amdf
+                               .filter(abbr_FOCUS)
+                               .loc[adj_amdf.l2.isin(top_overall.l2), :]
+                               ).sort_values('LRC',
+                                            ascending=False)
+
+```
+
+
+```python
+pmir_conducive = sample_pickle(data=pmir_exactly, sample_size=4,
+                          columns=['all_forms_lower', 'token_str'], filters=['adj_form_lower==conducive'], 
+                          print_sample=False)
+show_sample(pmir_conducive.assign(token_str = embolden(pmir_conducive.token_str, 
+                                                          bold_regex=r' (exactly.conducive) ')))
+```
+
+    
+    - *filtering rows...*
+      - regex parsing = False
+      - Filter expression `adj_form_lower==conducive` matched zero rows. Filter not applied.
+    
+    ### 4 random rows from `input frame`
+    
+    +------------------------+---------------------------+---------------------------------------------------------+
+    | hit_id                 | all_forms_lower           | token_str                                               |
+    +========================+===========================+=========================================================+
+    | pcc_eng_01_055.9820_x0 | everything_exactly_right  | When someone is looking for a new job , it 's vital     |
+    | 889134_08:27-29-30     |                           | that they look over their various documents a number of |
+    |                        |                           | times to make sure everything is exactly right ,        |
+    |                        |                           | according to Job Monkey .                               |
+    +------------------------+---------------------------+---------------------------------------------------------+
+    | pcc_eng_13_020.1821_x0 | everything_exactly_right  | " He said essentially , ' I can see the value of these  |
+    | 309967_04:28-30-31     |                           | , but how do we ensure that we get these within         |
+    |                        |                           | compliance and that everything is exactly right ? ' "   |
+    +------------------------+---------------------------+---------------------------------------------------------+
+    | pcc_eng_15_055.8417_x0 | all_exactly_parallel      | All of the events of the preceding paragraph are        |
+    | 886350_040:01-10-11    |                           | exactly parallel to Thomas Wolfe 's life .              |
+    +------------------------+---------------------------+---------------------------------------------------------+
+    | pcc_eng_21_008.3030_x0 | something_exactly_perfect | So if something 's exactly perfect , it 's right on     |
+    | 117796_34:3-5-6        |                           | point , with no room to spare .                         |
+    +------------------------+---------------------------+---------------------------------------------------------+
+
+
+
+```python
+nmir_conducive = sample_pickle(data=nmir_exactly, sample_size=4,
+                          columns=['all_forms_lower', 'token_str'], filters=['adj_form_lower==conducive'], 
+                          print_sample=False)
+show_sample(nmir_conducive.assign(token_str = embolden(nmir_conducive.token_str, 
+                                                          bold_regex=r' (exactly.conducive) ')), format='pipe')
+```
+
+    
+    - *filtering rows...*
+      - regex parsing = False
+      - ✓ Applied filter: `adj_form_lower==conducive`
+    
+    ### All (2) row(s) matching filter(s) from `input frame`
+    
+    | hit_id                                | all_forms_lower        | token_str                                                                                                              |
+    |:--------------------------------------|:-----------------------|:-----------------------------------------------------------------------------------------------------------------------|
+    | pcc_eng_00_042.0217_x0662848_14:1-8-9 | none_exactly_conducive | None of these places or circumstances were __`exactly conducive`__ for a dog , so she " stayed " with my mom and dad . |
+    | pcc_eng_11_078.1769_x1249405_45:1-5-6 | none_exactly_conducive | None of which were __`exactly conducive`__ to climbing nice , cold mountains .                                         |
+
+
+### Context-blind *exactly* associated adjectives Polarity Preferences
+
+
+
+```python
+pd.crosstab(adj_amdf_i.l1, adj_amdf_i.promote)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>promote</th>
+      <th>False</th>
+      <th>True</th>
+    </tr>
+    <tr>
+      <th>l1</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>COMPLEMENT</th>
+      <td>9</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>NEGATED</th>
+      <td>6</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>NEGMIR</th>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>POSMIR</th>
+      <td>9</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+Of the 11 adjectives most strongly associated with _exactly_ when context is ignored: 
+- only 6 show any significant polar sensitivity in the superset data,
+    - 2 with a Positive lean
+    - 4 with a Negative lean
+- only 1 shows significant polarity sensitivity in the `mirror` subset
+    - with a tendency toward negative environments
+
+Thus, despite the overall negative propensity of *exactly*, half of the most commonly associated adjectives overall are completely neutral on their own. 
+Of those that skew toward negative environments, the effect size is relatively weak, with _sure_ garnering an LRC of 2.1-2.7 and _conducive_, _correct_, and _right_ only barely surpassing 1. 
+
+| key              |       f |  dP1 |  LRC | dP1_simple |         G2 |      f2 |
+|:-----------------|--------:|-----:|-----:|-----------:|-----------:|--------:|
+| NEGmir~sure      |   5,753 | 0.43 | 2.72 |       0.59 |   9,087.14 |   9,744 |
+| NEGany~sure      | 128,824 | 0.12 | 2.19 |       0.15 | 182,987.33 | 844,981 |
+| NEGany~conducive |   1,618 | 0.06 | 1.29 |       0.10 |   1,196.28 |  16,405 |
+| NEGany~correct   |   6,864 | 0.05 | 1.21 |       0.09 |   4,049.83 |  78,240 |
+| NEGany~right     |  15,740 | 0.04 | 1.04 |       0.08 |   6,902.12 | 204,572 |
+
+
+Even more strikingly, 2 of these adjectives even demonstrate a bias for _positive_ environments when considered independently of adverb modifier,
+although these effect sizes are also quite small, and the accuracy of the parses for these particular adjectives are questionable.
+
+| key      |      f |  dP1 |  LRC | dP1_simple |       G2 |     f2 |
+|:---------|-------:|-----:|-----:|-----------:|---------:|-------:|
+| COM~same | 55,867 | 0.03 | 2.31 |       0.99 | 2,406.02 | 56,190 |
+| COM~zero | 11,377 | 0.03 | 1.42 |       0.99 |   391.67 | 11,472 |
+
+
+
+
+```python
+show_sample(adj_amdf_i.filter(like='O', axis=0).loc[adj_amdf_i.promote, :'f2'], assoc=True, format='pipe')
+```
+
+    | key      |      f |  dP1 |  LRC | dP1_simple |       G2 |     f2 |
+    |:---------|-------:|-----:|-----:|-----------:|---------:|-------:|
+    | COM~same | 55,867 | 0.03 | 2.31 |       0.99 | 2,406.02 | 56,190 |
+    | COM~zero | 11,377 | 0.03 | 1.42 |       0.99 |   391.67 | 11,472 |
+
+
+#### REMEMBER: _The `env~adj` AM are for_ ALL _adverbs, not just_ "exactly"
+
+
+```python
+
+adj_amdf_i.loc[adj_amdf_i.promote, :].groupby('polarity').value_counts(['l1'])
+
+```
+
+
+
+
+    polarity  l1        
+    Negative  NEGATED       4
+              NEGMIR        1
+    Positive  COMPLEMENT    2
+    Name: count, dtype: int64
+
+
+
+
+```python
+# attract_only = adj_amdf_i.loc[adj_amdf_i.attract,:]
+pd.crosstab(adj_amdf_i.polarity, adj_amdf_i.LRC.apply(lambda x: 'strong_attract' if x > 2.5 else ('weak_attract' if x > 1 else ('neutral' if x > -1 else 'repel'))))
+
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>LRC</th>
+      <th>neutral</th>
+      <th>repel</th>
+      <th>strong_attract</th>
+      <th>weak_attract</th>
+    </tr>
+    <tr>
+      <th>polarity</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Negative</th>
+      <td>7</td>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Positive</th>
+      <td>13</td>
+      <td>5</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+for adj, adj_only_am in adj_amdf_i.groupby('l2'): 
+    print(f'\n#### {adj}\n')
+    show_sample(adj_only_am.filter(regex=r'^f$|^[dLGupsa]'), assoc=True, format='pipe')
+    if any(adj_only_am['promote']): 
+        polar_promoted = adj_only_am.loc[adj_only_am.promote, :]
+        for adj_in_env in polar_promoted.index:
+            lrc_val = polar_promoted.loc[adj_in_env, 'LRC'].round(3).squeeze()
+            caveat = "(but weak) " if abs(lrc_val) < 2 else ''
+            print(f'\n👀🧲 significant {caveat} LRC found for _{adj}_ adj & `{adj_in_env.split("~")[0]}` env: {lrc_val:.3f}\n')
+        show_sample(polar_promoted[['polarity', 'f', 'LRC', 'dP1','dP1_simple']], assoc=True, format='pipe')
+```
+
+    
+    #### alike
+    
+    | key          |      f |   dP1 |   LRC | dP1_simple |     G2 | unexp_f | polarity | significant | attract | promote | prohibit |
+    |:-------------|-------:|------:|------:|-----------:|-------:|--------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~alike |    698 |  0.02 |  0.21 |       0.05 |  76.53 |  202.43 | Negative | False       | False   | False   | False    |
+    | POS~alike    |    351 | -0.02 |  0.00 |       0.81 |  -1.35 |   -9.10 | Positive | False       | False   | False   | False    |
+    | COM~alike    | 12,563 | -0.02 | -0.21 |       0.95 | -76.20 | -202.05 | Positive | False       | False   | False   | False    |
+    
+    #### conducive
+    
+    | key              |      f |   dP1 |   LRC | dP1_simple |        G2 |   unexp_f | polarity | significant | attract | promote | prohibit |
+    |:-----------------|-------:|------:|------:|-----------:|----------:|----------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~conducive |  1,618 |  0.06 |  1.29 |       0.10 |  1,196.28 |  1,004.94 | Negative | True        | True    | True    | False    |
+    | POS~conducive    |    211 | -0.11 |  0.00 |       0.73 |    -22.36 |    -32.13 | Positive | False       | False   | False   | False    |
+    | COM~conducive    | 14,787 | -0.06 | -1.29 |       0.90 | -1,194.66 | -1,004.46 | Positive | True        | False   | False   | True     |
+    
+    👀🧲 significant (but weak)  LRC found for _conducive_ adj & `NEGany` env: 1.291
+    
+    | key              | polarity |     f |  LRC |  dP1 | dP1_simple |
+    |:-----------------|:---------|------:|-----:|-----:|-----------:|
+    | NEGany~conducive | Negative | 1,618 | 1.29 | 0.06 |       0.10 |
+    
+    #### correct
+    
+    | key            |      f |   dP1 |   LRC | dP1_simple |        G2 |   unexp_f | polarity | significant | attract | promote | prohibit |
+    |:---------------|-------:|------:|------:|-----------:|----------:|----------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~correct |  6,864 |  0.05 |  1.21 |       0.09 |  4,049.83 |  3,940.14 | Negative | True        | True    | True    | False    |
+    | POS~correct    |  1,459 | -0.01 |  0.00 |       0.82 |     -1.87 |    -21.51 | Positive | False       | False   | False   | False    |
+    | NEGmir~correct |    313 |  0.01 |  0.00 |       0.18 |      1.87 |     21.56 | Negative | False       | False   | False   | False    |
+    | COM~correct    | 71,372 | -0.05 | -1.21 |       0.91 | -4,050.73 | -3,941.87 | Positive | True        | False   | False   | True     |
+    
+    👀🧲 significant (but weak)  LRC found for _correct_ adj & `NEGany` env: 1.210
+    
+    | key            | polarity |     f |  LRC |  dP1 | dP1_simple |
+    |:---------------|:---------|------:|-----:|-----:|-----------:|
+    | NEGany~correct | Negative | 6,864 | 1.21 | 0.05 |       0.09 |
+    
+    #### equal
+    
+    | key          |      f |   dP1 |   LRC | dP1_simple |     G2 | unexp_f | polarity | significant | attract | promote | prohibit |
+    |:-------------|-------:|------:|------:|-----------:|-------:|--------:|:---------|:------------|:--------|:--------|:---------|
+    | POS~equal    |  1,332 |  0.10 |  0.72 |       0.94 | 132.75 |  143.91 | Positive | False       | True    | False   | False    |
+    | COM~equal    | 45,573 |  0.01 |  0.01 |       0.97 |  34.22 |  235.47 | Positive | False       | False   | False   | False    |
+    | NEGany~equal |  1,525 | -0.00 | -0.01 |       0.03 | -34.14 | -235.11 | Negative | False       | False   | False   | False    |
+    
+    #### ideal
+    
+    | key          |      f |   dP1 |   LRC | dP1_simple |      G2 | unexp_f | polarity | significant | attract | promote | prohibit |
+    |:-------------|-------:|------:|------:|-----------:|--------:|--------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~ideal |  2,399 |  0.02 |  0.45 |       0.06 |  365.69 |  803.25 | Negative | False       | False   | False   | False    |
+    | POS~ideal    |    366 |  0.00 |  0.00 |       0.84 |    0.01 |    0.88 | Positive | False       | False   | False   | False    |
+    | COM~ideal    | 40,301 | -0.02 | -0.45 |       0.94 | -365.25 | -803.01 | Positive | False       | False   | False   | False    |
+    
+    #### opposite
+    
+    | key             |     f |   dP1 | LRC | dP1_simple |    G2 | unexp_f | polarity | significant | attract | promote | prohibit |
+    |:----------------|------:|------:|----:|-----------:|------:|--------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~opposite |   327 | -0.00 |   0 |       0.03 | -1.81 |  -24.43 | Negative | False       | False   | False   | False    |
+    | COM~opposite    | 9,077 |  0.00 |   0 |       0.97 |  1.84 |   24.70 | Positive | False       | False   | False   | False    |
+    | POS~opposite    |   266 |  0.10 |   0 |       0.94 | 28.41 |   29.55 | Positive | False       | False   | False   | False    |
+    
+    #### parallel
+    
+    | key             |     f |   dP1 | LRC | dP1_simple |     G2 | unexp_f | polarity | significant | attract | promote | prohibit |
+    |:----------------|------:|------:|----:|-----------:|-------:|--------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~parallel |   231 | -0.01 |   0 |       0.03 | -10.63 |  -52.16 | Negative | False       | False   | False   | False    |
+    | COM~parallel    | 7,346 |  0.01 |   0 |       0.97 |  10.71 |   52.38 | Positive | False       | False   | False   | False    |
+    
+    #### right
+    
+    | key          |       f |   dP1 |   LRC | dP1_simple |        G2 |   unexp_f | polarity | significant | attract | promote | prohibit |
+    |:-------------|--------:|------:|------:|-----------:|----------:|----------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~right |  15,740 |  0.04 |  1.04 |       0.08 |  6,902.12 |  8,095.07 | Negative | True        | True    | True    | False    |
+    | POS~right    |  12,419 |  0.09 |  0.97 |       0.92 |    879.47 |  1,162.25 | Positive | False       | True    | False   | False    |
+    | NEGmir~right |   1,054 | -0.09 | -0.97 |       0.08 |   -879.02 | -1,161.89 | Negative | False       | False   | False   | False    |
+    | COM~right    | 188,830 | -0.04 | -1.04 |       0.92 | -6,892.09 | -8,091.13 | Positive | True        | False   | False   | True     |
+    
+    👀🧲 significant (but weak)  LRC found for _right_ adj & `NEGany` env: 1.038
+    
+    | key          | polarity |      f |  LRC |  dP1 | dP1_simple |
+    |:-------------|:---------|-------:|-----:|-----:|-----------:|
+    | NEGany~right | Negative | 15,740 | 1.04 | 0.04 |       0.08 |
+    
+    #### same
+    
+    | key         |      f |   dP1 |   LRC | dP1_simple |        G2 |   unexp_f | polarity | significant | attract | promote | prohibit |
+    |:------------|-------:|------:|------:|-----------:|----------:|----------:|:---------|:------------|:--------|:--------|:---------|
+    | COM~same    | 55,867 |  0.03 |  2.31 |       0.99 |  2,406.02 |  1,778.47 | Positive | True        | True    | True    | False    |
+    | POS~same    |    171 |  0.08 |  0.00 |       0.91 |      9.96 |     14.76 | Positive | False       | False   | False   | False    |
+    | NEGany~same |    323 | -0.03 | -2.31 |       0.01 | -2,403.15 | -1,776.84 | Negative | True        | False   | False   | True     |
+    
+    👀🧲 significant  LRC found for _same_ adj & `COM` env: 2.314
+    
+    | key      | polarity |      f |  LRC |  dP1 | dP1_simple |
+    |:---------|:---------|-------:|-----:|-----:|-----------:|
+    | COM~same | Positive | 55,867 | 2.31 | 0.03 |       0.99 |
+    
+    #### sure
+    
+    | key         |       f |   dP1 |   LRC | dP1_simple |          G2 |    unexp_f | polarity | significant | attract | promote | prohibit |
+    |:------------|--------:|------:|------:|-----------:|------------:|-----------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGmir~sure |   5,753 |  0.43 |  2.72 |       0.59 |    9,087.14 |   4,150.42 | Negative | True        | True    | True    | False    |
+    | NEGany~sure | 128,824 |  0.12 |  2.19 |       0.15 |  182,987.33 |  97,246.74 | Negative | True        | True    | True    | False    |
+    | COM~sure    | 716,157 | -0.12 | -2.19 |       0.85 | -182,826.68 | -97,222.23 | Positive | True        | False   | False   | True     |
+    | POS~sure    |   3,991 | -0.43 | -2.72 |       0.41 |   -9,085.51 |  -4,150.16 | Positive | True        | False   | False   | True     |
+    
+    👀🧲 significant  LRC found for _sure_ adj & `NEGmir` env: 2.717
+    
+    
+    👀🧲 significant  LRC found for _sure_ adj & `NEGany` env: 2.189
+    
+    | key         | polarity |       f |  LRC |  dP1 | dP1_simple |
+    |:------------|:---------|--------:|-----:|-----:|-----------:|
+    | NEGmir~sure | Negative |   5,753 | 2.72 | 0.43 |       0.59 |
+    | NEGany~sure | Negative | 128,824 | 2.19 | 0.12 |       0.15 |
+    
+    #### zero
+    
+    | key      |      f |  dP1 |  LRC | dP1_simple |     G2 | unexp_f | polarity | significant | attract | promote | prohibit |
+    |:---------|-------:|-----:|-----:|-----------:|-------:|--------:|:---------|:------------|:--------|:--------|:---------|
+    | COM~zero | 11,377 | 0.03 | 1.42 |       0.99 | 391.67 |  334.05 | Positive | True        | True    | True    | False    |
+    
+    👀🧲 significant (but weak)  LRC found for _zero_ adj & `COM` env: 1.416
+    
+    | key      | polarity |      f |  LRC |  dP1 | dP1_simple |
+    |:---------|:---------|-------:|-----:|-----:|-----------:|
+    | COM~zero | Positive | 11,377 | 1.42 | 0.03 |       0.99 |
+
+
+### Adjectives that create the most negatively skewed bigrams when modified by *exactly*
+
+Of the adjectives that most strongly negative bigrams when modified by _exactly_, 
+- 0 are independently prone to positive polarity environments
+- 5/10 are independently prone to negative environments when data superset is considered 
+- 2/9[^1] are independently predisposed to negative environments when only the negative mirrors are considered
+
+| polarity | l1         | prone | count |
+|:---------|:-----------|:------|------:|
+| Negative | NEGATED    | True  |     5 |
+| Negative | NEGATED    | False |     5 |
+| Negative | NEGMIR     | True  |     2 |
+| Negative | NEGMIR     | False |     7 |
+| Positive | COMPLEMENT | True  |     0 |
+| Positive | COMPLEMENT | False |    10 |
+| Positive | POSMIR     | True  |     0 |
+| Positive | POSMIR     | False |    10 |
+
+[^1]: only 9 of 10 adjectives identified in the strongly negative bigram selection have an entry in the mirror subset AMs
+
+
+```python
+show_sample(interpret_polar_lrc(adj_amdf.loc[adj_amdf.l2.isin(most_neg.adj),:].filter(abbr_FOCUS))
+            .groupby(['polarity','l1']).value_counts(['promote']).reset_index(), format='pipe')
+```
+
+    |   | polarity | l1         | promote | count |
+    |--:|:---------|:-----------|:--------|------:|
+    | 0 | Negative | NEGATED    | False   |     5 |
+    | 1 | Negative | NEGATED    | True    |     5 |
+    | 2 | Negative | NEGMIR     | False   |     7 |
+    | 3 | Negative | NEGMIR     | True    |     2 |
+    | 4 | Positive | COMPLEMENT | False   |    10 |
+    | 5 | Positive | POSMIR     | False   |    10 |
+
+
+
+```python
+neg_bigram_adj = interpret_polar_lrc(
+    adj_amdf.loc[adj_amdf.l2.isin(most_neg.adj), :].filter(abbr_FOCUS))
+show_sample(neg_bigram_adj.loc[(neg_bigram_adj.polarity == 'Negative') & (neg_bigram_adj.promote), :].value_counts(['l2'])
+            .to_frame('# datasets where negatively associated').reset_index(), format='pipe')
+
+```
+
+    |   | l2          | # datasets where negatively associated |
+    |--:|:------------|---------------------------------------:|
+    | 0 | clear       |                                      2 |
+    | 1 | sure        |                                      2 |
+    | 2 | easy        |                                      1 |
+    | 3 | forthcoming |                                      1 |
+    | 4 | surprising  |                                      1 |
+
+
+
+```python
+show_sample(neg_bigram_adj.loc[(neg_bigram_adj.polarity == 'Negative') & (~neg_bigram_adj.promote), :].value_counts(['l2'])
+            .to_frame('# datasets where NOT negatively associated').reset_index(), format='pipe')
+```
+
+    |   | l2         | # datasets where NOT negatively associated |
+    |--:|:-----------|-------------------------------------------:|
+    | 0 | cheap      |                                          2 |
+    | 1 | impressive |                                          2 |
+    | 2 | new        |                                          2 |
+    | 3 | practical  |                                          2 |
+    | 4 | shy        |                                          2 |
+    | 5 | easy       |                                          1 |
+    | 6 | surprising |                                          1 |
+
+
+
+```python
+show_sample(neg_bigram_adj.sort_values(['l2','l1']).loc[(neg_bigram_adj.polarity=='Negative') & ~neg_bigram_adj.promote,:'f2'], format='pipe', assoc=True)
+```
+
+    | key               |      f |   dP1 |   LRC | dP1_simple |       G2 |      f2 |
+    |:------------------|-------:|------:|------:|-----------:|---------:|--------:|
+    | NEGany~cheap      |  4,121 |  0.01 |  0.29 |       0.05 |   297.40 |  83,765 |
+    | NEGmir~cheap      |    229 | -0.04 |  0.00 |       0.13 |   -22.04 |   1,829 |
+    | NEGmir~easy       |  5,055 |  0.09 |  0.65 |       0.25 | 1,008.11 |  20,050 |
+    | NEGany~impressive |  8,912 |  0.01 |  0.21 |       0.05 |   340.20 | 195,739 |
+    | NEGmir~impressive |    937 |  0.02 |  0.00 |       0.19 |    16.73 |   5,033 |
+    | NEGany~new        | 10,471 | -0.00 | -0.13 |       0.03 |  -213.97 | 321,311 |
+    | NEGmir~new        |  2,136 | -0.00 |  0.00 |       0.16 |    -0.38 |  13,145 |
+    | NEGany~practical  |  4,133 |  0.02 |  0.63 |       0.06 |   913.41 |  67,263 |
+    | NEGmir~practical  |    193 | -0.04 |  0.00 |       0.13 |   -17.35 |   1,528 |
+    | NEGany~shy        |  1,581 | -0.01 | -0.08 |       0.03 |   -60.43 |  50,956 |
+    | NEGmir~shy        |    152 | -0.04 |  0.00 |       0.13 |   -14.44 |   1,212 |
+    | NEGmir~surprising |    907 |  0.16 |  0.96 |       0.32 |   416.44 |   2,829 |
+
+
+LRC values indicate that, while _clear_ and _sure_ show independent negative association in both datasets, _easy_ and _surprising_ show significant negative association for the superset, but not for the subset.
+The adjectives _cheap_, _impressive_, _new_, _practical_, and _shy_ do not show significant negative lean neither superset nor subset.
+Finally, _forthcoming_ only appears in the superset evaluation, where it demonstrates a preference for negative polarity environments.
+
+The only adjective in this set with a $\Delta P(\texttt{env}|\texttt{adj})$ value over 0.16, regardless of LRC value, is _sure_ evaluated on the superset at 0.43. 
+That is, the probability of an utterance showing evidence of negative polarity when it contains _sure_ is 0.59---59% of the _sure_ tokens occur with negative triggers---and 
+    0.43 when the probability when the adjective is anything else is factored in (16% of tokens for all other adjectives are found with negation.)
+
+_Adjectives in negatively associated *exactly* bigrams which show significant independent negative association_
+
+| key                |       f |  dP1 |  LRC | dP1_simple |         G2 |      f2 |
+|:-------------------|--------:|-----:|-----:|-----------:|-----------:|--------:|
+| NEGany~clear       |  72,905 | 0.11 | 2.14 |       0.15 |  99,542.75 | 491,108 |
+| NEGmir~clear       |   2,438 | 0.15 | 1.01 |       0.31 |   1,031.26 |   7,833 |
+| NEGany~easy        |  87,578 | 0.08 | 1.69 |       0.11 |  83,051.73 | 771,307 |
+| NEGany~forthcoming |   2,019 | 0.14 | 2.30 |       0.18 |   3,381.87 |  11,270 |
+| NEGany~sure        | 128,824 | 0.12 | 2.19 |       0.15 | 182,987.33 | 844,981 |
+| NEGmir~sure        |   5,753 | 0.43 | 2.72 |       0.59 |   9,087.14 |   9,744 |
+| NEGany~surprising  |  16,440 | 0.07 | 1.60 |       0.11 |  14,570.16 | 150,067 |
+
+_Adjectives in negatively associated *exactly* bigrams which **do NOT** show significant independent negative association_
+
+| key               |      f |   dP1 |   LRC | dP1_simple |       G2 |      f2 |
+|:------------------|-------:|------:|------:|-----------:|---------:|--------:|
+| NEGany~cheap      |  4,121 |  0.01 |  0.29 |       0.05 |   297.40 |  83,765 |
+| NEGmir~cheap      |    229 | -0.04 |  0.00 |       0.13 |   -22.04 |   1,829 |
+| NEGmir~easy       |  5,055 |  0.09 |  0.65 |       0.25 | 1,008.11 |  20,050 |
+| NEGany~impressive |  8,912 |  0.01 |  0.21 |       0.05 |   340.20 | 195,739 |
+| NEGmir~impressive |    937 |  0.02 |  0.00 |       0.19 |    16.73 |   5,033 |
+| NEGany~new        | 10,471 | -0.00 | -0.13 |       0.03 |  -213.97 | 321,311 |
+| NEGmir~new        |  2,136 | -0.00 |  0.00 |       0.16 |    -0.38 |  13,145 |
+| NEGany~practical  |  4,133 |  0.02 |  0.63 |       0.06 |   913.41 |  67,263 |
+| NEGmir~practical  |    193 | -0.04 |  0.00 |       0.13 |   -17.35 |   1,528 |
+| NEGany~shy        |  1,581 | -0.01 | -0.08 |       0.03 |   -60.43 |  50,956 |
+| NEGmir~shy        |    152 | -0.04 |  0.00 |       0.13 |   -14.44 |   1,212 |
+| NEGmir~surprising |    907 |  0.16 |  0.96 |       0.32 |   416.44 |   2,829 |
+
+
+
+```python
+show_sample(pd.concat([x.filter(like='new',axis=0).loc[:, ['f','dP1','LRC','G2']] for x in (most_neg, neg_bigram_adj)]), assoc=True, format='pipe')
+```
+
+    | key                |       f |   dP1 |   LRC |       G2 |
+    |:-------------------|--------:|------:|------:|---------:|
+    | NEGany~exactly_new |   1,378 |  0.93 |  8.54 | 8,697.93 |
+    | COM~new            | 310,840 |  0.00 |  0.13 |   216.46 |
+    | POS~new            |  11,009 |  0.00 |  0.00 |     0.39 |
+    | NEGmir~new         |   2,136 | -0.00 |  0.00 |    -0.38 |
+    | NEGany~new         |  10,471 | -0.00 | -0.13 |  -213.97 |
+
+
+
+```python
+show_sample(pd.concat([x.filter(like='shy',axis=0).loc[:, ['f','dP1','LRC','G2']] for x in (most_neg, neg_bigram_adj)]), assoc=True, format='pipe')
+```
+
+    | key                |      f |   dP1 |   LRC |     G2 |
+    |:-------------------|-------:|------:|------:|-------:|
+    | NEGany~exactly_shy |    124 |  0.96 |  1.53 | 815.15 |
+    | COM~shy            | 49,375 |  0.01 |  0.08 |  60.95 |
+    | POS~shy            |  1,060 |  0.04 |  0.00 |  14.46 |
+    | NEGmir~shy         |    152 | -0.04 |  0.00 | -14.44 |
+    | NEGany~shy         |  1,581 | -0.01 | -0.08 | -60.43 |
+
+
+The absence of independent negative bias for the adjectives found in the most negatively associated *exactly* bigrams makes it unlikely that *exactly*'s pattern of negative association overall is unlikely to be inherited from specific adjectives it modifies.
+For example, despite _exactly new_ showing a very strong preference for negative polarity environments, the adjective _new_ shows no significant polarity sensitivity when evaluated for all possible adverbs modifiers.
+
+| key                |       f |   dP1 |   LRC |       G2 |
+|:-------------------|--------:|------:|------:|---------:|
+| NEGany~exactly_new |   1,378 |  0.93 |  8.54 | 8,697.93 |
+| COM~new            | 310,840 |  0.00 |  0.13 |   216.46 |
+| POS~new            |  11,009 |  0.00 |  0.00 |     0.39 |
+| NEGmir~new         |   2,136 | -0.00 |  0.00 |    -0.38 |
+| NEGany~new         |  10,471 | -0.00 | -0.13 |  -213.97 |
+
+The same can be said for _(exactly) shy_. 
+
+| key                |      f |   dP1 |   LRC |     G2 |
+|:-------------------|-------:|------:|------:|-------:|
+| NEGany~exactly_shy |    124 |  0.96 |  1.53 | 815.15 |
+| COM~shy            | 49,375 |  0.01 |  0.08 |  60.95 |
+| POS~shy            |  1,060 |  0.04 |  0.00 |  14.46 |
+| NEGmir~shy         |    152 | -0.04 |  0.00 | -14.44 |
+| NEGany~shy         |  1,581 | -0.01 | -0.08 | -60.43 |
+
+If anything, these adjectives appear slightly **dis**inclined toward negative polarity environments on the whole.
+
+### `ENV~bigram` associations for top bigrams
+
+
+```python
+# for loading `polar/*/bigram/*` tables
+bigram_floor = 50
+mirror_floor = 10
+
+bigram_dfs = {d.name:
+              update_index(pd.read_pickle(
+                  tuple(d.joinpath('bigram/extra')
+                        .glob(f'*35f-7c*min{mirror_floor if d.name == "NEGmirror" else bigram_floor}x*.pkl.gz')
+                        )[0]
+                  )
+              ).filter(like='~exactly_', axis=0)
+              for d in POLAR_DIR.iterdir()}
+for pat_dir, amdf in bigram_dfs.items():
+    print(f'>> {pat_dir} <<')
+    show_sample(amdf.sample(min(len(amdf), 8)).filter(FOCUS).filter(regex=r'^([^la]|am)'), assoc=True)
+    print('.............')
+```
+
+    >> RBdirect <<
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | key                       |     f |   dP1 |   LRC |   dP1_simple |       G2 |    f2 |   exp_f |   unexp_f |
+    +===========================+=======+=======+=======+==============+==========+=======+=========+===========+
+    | NEGany~exactly_related    |    63 |  0.76 |  4.47 |         0.80 |   335.75 |    79 |    2.95 |     60.05 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | NEGany~exactly_comforting |   100 |  0.93 |  5.15 |         0.97 |   630.48 |   103 |    3.85 |     96.15 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | NEGany~exactly_subtle     |   264 |  0.94 |  6.92 |         0.97 | 1,671.02 |   271 |   10.13 |    253.87 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | NEGany~exactly_quiet      |    64 |  0.93 |  4.06 |         0.97 |   402.95 |    66 |    2.47 |     61.53 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | NEGany~exactly_new        | 1,378 |  0.93 |  8.54 |         0.97 | 8,697.93 | 1,418 |   52.99 |  1,325.01 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | COM~exactly_analogous     |    84 | -0.25 | -1.79 |         0.71 |   -88.15 |   118 |  113.59 |    -29.59 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | NEGany~exactly_clean      |    56 |  0.88 |  4.51 |         0.92 |   333.92 |    61 |    2.28 |     53.72 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    | NEGany~exactly_equal      |    72 |  0.09 |  0.94 |         0.13 |    80.78 |   560 |   20.93 |     51.07 |
+    +---------------------------+-------+-------+-------+--------------+----------+-------+---------+-----------+
+    .............
+    >> NEGmirror <<
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | key                  |   f |   dP1 |   LRC |   dP1_simple |     G2 |   f2 |   exp_f |   unexp_f |
+    +======================+=====+=======+=======+==============+========+======+=========+===========+
+    | NEGmir~exactly_wrong |  21 |  0.59 |  0.59 |         0.75 |  46.84 |   28 |    4.61 |     16.39 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | NEGmir~exactly_easy  |  20 |  0.84 |  0.00 |         1.00 |  72.20 |   20 |    3.29 |     16.71 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | POS~exactly_right    |  83 | -0.22 | -0.32 |         0.61 | -37.58 |  135 |  112.79 |    -29.79 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | POS~exactly_equal    |  10 | -0.07 |  0.00 |         0.77 |  -0.38 |   13 |   10.86 |     -0.86 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | NEGmir~exactly_sure  | 148 |  0.84 |  1.89 |         1.00 | 534.35 |  148 |   24.34 |    123.66 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | NEGmir~exactly_alike |  40 |  0.30 |  0.49 |         0.47 |  42.13 |   86 |   14.14 |     25.86 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | NEGmir~exactly_right |  52 |  0.22 |  0.32 |         0.39 |  37.59 |  135 |   22.20 |     29.80 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    | NEGmir~exactly_clear |  52 |  0.84 |  0.33 |         1.00 | 187.73 |   52 |    8.55 |     43.45 |
+    +----------------------+-----+-------+-------+--------------+--------+------+---------+-----------+
+    .............
+
+
+#### Most Polarity Sensitive Bigrams (i.e. Negative Leaning because it's _exactly_)
+
+
+```python
+exactly_bigram_amdf = adjust_assoc_columns(pd.concat(bigram_dfs.values()))
+exactly_bigram_amdf['abs_LRC'] = exactly_bigram_amdf.LRC.abs()
+exactly_bigram_amdf.nlargest(10, 'abs_LRC').filter(adjust_assoc_columns(FOCUS) + ['abs_LRC'])
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>f</th>
+      <th>dP1</th>
+      <th>LRC</th>
+      <th>dP1_simple</th>
+      <th>G2</th>
+      <th>...</th>
+      <th>l1</th>
+      <th>l2</th>
+      <th>adj</th>
+      <th>adj_total</th>
+      <th>abs_LRC</th>
+    </tr>
+    <tr>
+      <th>key</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>NEGany~exactly_sure</th>
+      <td>8860</td>
+      <td>1</td>
+      <td>9</td>
+      <td>1</td>
+      <td>54,751</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_sure</td>
+      <td>sure</td>
+      <td>844,981</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>COM~exactly_sure</th>
+      <td>441</td>
+      <td>-1</td>
+      <td>-9</td>
+      <td>0</td>
+      <td>-54,737</td>
+      <td>...</td>
+      <td>COMPLEMENT</td>
+      <td>exactly_sure</td>
+      <td>sure</td>
+      <td>844,981</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_new</th>
+      <td>1378</td>
+      <td>1</td>
+      <td>9</td>
+      <td>1</td>
+      <td>8,698</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_new</td>
+      <td>new</td>
+      <td>321,311</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_easy</th>
+      <td>1069</td>
+      <td>1</td>
+      <td>8</td>
+      <td>1</td>
+      <td>6,748</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_easy</td>
+      <td>easy</td>
+      <td>771,307</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_clear</th>
+      <td>1759</td>
+      <td>1</td>
+      <td>8</td>
+      <td>1</td>
+      <td>10,937</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_clear</td>
+      <td>clear</td>
+      <td>491,108</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>COM~exactly_clear</th>
+      <td>76</td>
+      <td>-1</td>
+      <td>-8</td>
+      <td>0</td>
+      <td>-10,934</td>
+      <td>...</td>
+      <td>COMPLEMENT</td>
+      <td>exactly_clear</td>
+      <td>clear</td>
+      <td>491,108</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_cheap</th>
+      <td>693</td>
+      <td>1</td>
+      <td>8</td>
+      <td>1</td>
+      <td>4,443</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_cheap</td>
+      <td>cheap</td>
+      <td>83,765</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_surprising</th>
+      <td>441</td>
+      <td>1</td>
+      <td>7</td>
+      <td>1</td>
+      <td>2,863</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_surprising</td>
+      <td>surprising</td>
+      <td>150,067</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_happy</th>
+      <td>441</td>
+      <td>1</td>
+      <td>7</td>
+      <td>1</td>
+      <td>2,695</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_happy</td>
+      <td>happy</td>
+      <td>528,511</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_ideal</th>
+      <td>418</td>
+      <td>1</td>
+      <td>7</td>
+      <td>1</td>
+      <td>2,546</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_ideal</td>
+      <td>ideal</td>
+      <td>42,701</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+<p>10 rows × 13 columns</p>
+</div>
+
+
+
+### _Least_ "Negative Leaning" _exactly_ bigrams
+
+
+```python
+exactly_bigram_amdf.loc[exactly_bigram_amdf.dP1<0.6, :].filter(like='NEG', axis=0).nsmallest(10, 'abs_LRC').filter(adjust_assoc_columns(FOCUS) + ['abs_LRC'])
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>f</th>
+      <th>dP1</th>
+      <th>LRC</th>
+      <th>dP1_simple</th>
+      <th>G2</th>
+      <th>...</th>
+      <th>l1</th>
+      <th>l2</th>
+      <th>adj</th>
+      <th>adj_total</th>
+      <th>abs_LRC</th>
+    </tr>
+    <tr>
+      <th>key</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>NEGany~exactly_alike</th>
+      <td>134</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_alike</td>
+      <td>alike</td>
+      <td>13,261</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_true</th>
+      <td>12</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>23</td>
+      <td>...</td>
+      <td>NEGMIR</td>
+      <td>exactly_true</td>
+      <td>true</td>
+      <td>7,402</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_right</th>
+      <td>52</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>38</td>
+      <td>...</td>
+      <td>NEGMIR</td>
+      <td>exactly_right</td>
+      <td>right</td>
+      <td>13,473</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_alike</th>
+      <td>40</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>42</td>
+      <td>...</td>
+      <td>NEGMIR</td>
+      <td>exactly_alike</td>
+      <td>alike</td>
+      <td>431</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_wrong</th>
+      <td>21</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>47</td>
+      <td>...</td>
+      <td>NEGMIR</td>
+      <td>exactly_wrong</td>
+      <td>wrong</td>
+      <td>20,866</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_equal</th>
+      <td>72</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>81</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_equal</td>
+      <td>equal</td>
+      <td>47,099</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_right</th>
+      <td>638</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>412</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_right</td>
+      <td>right</td>
+      <td>204,572</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_identical</th>
+      <td>81</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>172</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_identical</td>
+      <td>identical</td>
+      <td>52,155</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_wrong</th>
+      <td>178</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>457</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_wrong</td>
+      <td>wrong</td>
+      <td>187,720</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_correct</th>
+      <td>259</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>745</td>
+      <td>...</td>
+      <td>NEGATED</td>
+      <td>exactly_correct</td>
+      <td>correct</td>
+      <td>78,240</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+<p>10 rows × 13 columns</p>
+</div>
+
+
+
+
+```python
+am_for_blind = exactly_bigram_amdf.filter(regex='_'+r'|'.join(top_overall.l2), axis=0).filter(items=adjust_assoc_columns(FOCUS)).sort_values('LRC', ascending=False)
+am_for_blind = interpret_polar_lrc(am_for_blind)
+show_sample(am_for_blind, assoc=True, format='pipe')
+print(am_for_blind[['polarity', 'significant', 'attract', 'promote', 'prohibit']].to_markdown(floatfmt=',.2f', intfmt=','))
+
+for pol, pol_df in am_for_blind.groupby('polarity'): 
+    print(f'\n#### {pol} Association')
+    print(pol_df.filter(['f','dP1', 'LRC','promote', 'prohibit']).to_markdown(floatfmt=',.2f', intfmt=','))
+
+```
+
+    | key                      |     f |   dP1 |   LRC | dP1_simple |         G2 |    f2 |    exp_f |   unexp_f | l1         | l2                | adj       | adj_total | polarity | significant | attract | promote | prohibit |
+    |:-------------------------|------:|------:|------:|-----------:|-----------:|------:|---------:|----------:|:-----------|:------------------|:----------|----------:|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~exactly_sure      | 8,860 |  0.92 |  8.63 |       0.95 |  54,750.58 | 9,301 |   347.58 |  8,512.42 | NEGATED    | exactly_sure      | sure      |   844,981 | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_ideal     |   418 |  0.90 |  7.08 |       0.94 |   2,546.29 |   445 |    16.63 |    401.37 | NEGATED    | exactly_ideal     | ideal     |    42,701 | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_conducive |   208 |  0.93 |  6.56 |       0.97 |   1,313.09 |   214 |     8.00 |    200.00 | NEGATED    | exactly_conducive | conducive |    16,405 | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_correct   |   259 |  0.29 |  3.06 |       0.33 |     744.93 |   788 |    29.45 |    229.55 | NEGATED    | exactly_correct   | correct   |    78,240 | Negative | True        | True    | True    | False    |
+    | NEGmir~exactly_sure      |   148 |  0.84 |  1.89 |       1.00 |     534.35 |   148 |    24.34 |    123.66 | NEGMIR     | exactly_sure      | sure      |     9,744 | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_right     |   638 |  0.05 |  1.06 |       0.09 |     412.29 | 6,948 |   259.65 |    378.35 | NEGATED    | exactly_right     | right     |   204,572 | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_equal     |    72 |  0.09 |  0.94 |       0.13 |      80.78 |   560 |    20.93 |     51.07 | NEGATED    | exactly_equal     | equal     |    47,099 | Negative | False       | True    | False   | False    |
+    | NEGmir~exactly_alike     |    40 |  0.30 |  0.49 |       0.47 |      42.13 |    86 |    14.14 |     25.86 | NEGMIR     | exactly_alike     | alike     |       431 | Negative | False       | False   | False   | False    |
+    | NEGmir~exactly_right     |    52 |  0.22 |  0.32 |       0.39 |      37.59 |   135 |    22.20 |     29.80 | NEGMIR     | exactly_right     | right     |    13,473 | Negative | False       | False   | False   | False    |
+    | COM~exactly_opposite     |   485 |  0.01 |  0.00 |       0.97 |       1.97 |   498 |   479.38 |      5.62 | COMPLEMENT | exactly_opposite  | opposite  |     9,404 | Positive | False       | False   | False   | False    |
+    | NEGany~exactly_alike     |   134 |  0.01 |  0.00 |       0.04 |       3.60 | 3,040 |   113.61 |     20.39 | NEGATED    | exactly_alike     | alike     |    13,261 | Negative | False       | False   | False   | False    |
+    | COM~exactly_zero         |   330 | -0.00 |  0.00 |       0.96 |      -0.10 |   344 |   331.13 |     -1.13 | COMPLEMENT | exactly_zero      | zero      |    11,472 | Positive | False       | False   | False   | False    |
+    | COM~exactly_alike        | 2,906 | -0.01 |  0.00 |       0.96 |      -3.57 | 3,040 | 2,926.31 |    -20.31 | COMPLEMENT | exactly_alike     | alike     |    13,261 | Positive | False       | False   | False   | False    |
+    | COM~exactly_same         |   457 | -0.04 |  0.00 |       0.93 |     -13.71 |   493 |   474.56 |    -17.56 | COMPLEMENT | exactly_same      | same      |    56,190 | Positive | False       | False   | False   | False    |
+    | POS~exactly_equal        |    10 | -0.07 |  0.00 |       0.77 |      -0.38 |    13 |    10.86 |     -0.86 | POSMIR     | exactly_equal     | equal     |     1,422 | Positive | False       | False   | False   | False    |
+    | POS~exactly_right        |    83 | -0.22 | -0.32 |       0.61 |     -37.58 |   135 |   112.79 |    -29.79 | POSMIR     | exactly_right     | right     |    13,473 | Positive | False       | False   | False   | False    |
+    | POS~exactly_alike        |    46 | -0.30 | -0.49 |       0.53 |     -42.12 |    86 |    71.85 |    -25.85 | POSMIR     | exactly_alike     | alike     |       431 | Positive | False       | False   | False   | False    |
+    | COM~exactly_equal        |   488 | -0.09 | -0.94 |       0.87 |     -80.70 |   560 |   539.06 |    -51.06 | COMPLEMENT | exactly_equal     | equal     |    47,099 | Positive | False       | False   | False   | False    |
+    | COM~exactly_right        | 6,310 | -0.05 | -1.05 |       0.91 |    -411.68 | 6,948 | 6,688.15 |   -378.15 | COMPLEMENT | exactly_right     | right     |   204,572 | Positive | True        | False   | False   | True     |
+    | COM~exactly_parallel     |   179 | -0.16 | -1.39 |       0.80 |     -84.66 |   224 |   215.62 |    -36.62 | COMPLEMENT | exactly_parallel  | parallel  |     7,577 | Positive | True        | False   | False   | True     |
+    | COM~exactly_correct      |   529 | -0.29 | -3.06 |       0.67 |    -744.56 |   788 |   758.53 |   -229.53 | COMPLEMENT | exactly_correct   | correct   |    78,240 | Positive | True        | False   | False   | True     |
+    | COM~exactly_sure         |   441 | -0.92 | -8.63 |       0.05 | -54,736.84 | 9,301 | 8,953.15 | -8,512.15 | COMPLEMENT | exactly_sure      | sure      |   844,981 | Positive | True        | False   | False   | True     |
+    | key                      | polarity | significant | attract | promote | prohibit |
+    |:-------------------------|:---------|:------------|:--------|:--------|:---------|
+    | NEGany~exactly_sure      | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_ideal     | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_conducive | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_correct   | Negative | True        | True    | True    | False    |
+    | NEGmir~exactly_sure      | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_right     | Negative | True        | True    | True    | False    |
+    | NEGany~exactly_equal     | Negative | False       | True    | False   | False    |
+    | NEGmir~exactly_alike     | Negative | False       | False   | False   | False    |
+    | NEGmir~exactly_right     | Negative | False       | False   | False   | False    |
+    | COM~exactly_opposite     | Positive | False       | False   | False   | False    |
+    | NEGany~exactly_alike     | Negative | False       | False   | False   | False    |
+    | COM~exactly_zero         | Positive | False       | False   | False   | False    |
+    | COM~exactly_alike        | Positive | False       | False   | False   | False    |
+    | COM~exactly_same         | Positive | False       | False   | False   | False    |
+    | POS~exactly_equal        | Positive | False       | False   | False   | False    |
+    | POS~exactly_right        | Positive | False       | False   | False   | False    |
+    | POS~exactly_alike        | Positive | False       | False   | False   | False    |
+    | COM~exactly_equal        | Positive | False       | False   | False   | False    |
+    | COM~exactly_right        | Positive | True        | False   | False   | True     |
+    | COM~exactly_parallel     | Positive | True        | False   | False   | True     |
+    | COM~exactly_correct      | Positive | True        | False   | False   | True     |
+    | COM~exactly_sure         | Positive | True        | False   | False   | True     |
+    
+    #### Negative Association
+    | key                      |     f |  dP1 |  LRC | promote | prohibit |
+    |:-------------------------|------:|-----:|-----:|:--------|:---------|
+    | NEGany~exactly_sure      | 8,860 | 0.92 | 8.63 | True    | False    |
+    | NEGany~exactly_ideal     |   418 | 0.90 | 7.08 | True    | False    |
+    | NEGany~exactly_conducive |   208 | 0.93 | 6.56 | True    | False    |
+    | NEGany~exactly_correct   |   259 | 0.29 | 3.06 | True    | False    |
+    | NEGmir~exactly_sure      |   148 | 0.84 | 1.89 | True    | False    |
+    | NEGany~exactly_right     |   638 | 0.05 | 1.06 | True    | False    |
+    | NEGany~exactly_equal     |    72 | 0.09 | 0.94 | False   | False    |
+    | NEGmir~exactly_alike     |    40 | 0.30 | 0.49 | False   | False    |
+    | NEGmir~exactly_right     |    52 | 0.22 | 0.32 | False   | False    |
+    | NEGany~exactly_alike     |   134 | 0.01 | 0.00 | False   | False    |
+    
+    #### Positive Association
+    | key                  |     f |   dP1 |   LRC | promote | prohibit |
+    |:---------------------|------:|------:|------:|:--------|:---------|
+    | COM~exactly_opposite |   485 |  0.01 |  0.00 | False   | False    |
+    | COM~exactly_zero     |   330 | -0.00 |  0.00 | False   | False    |
+    | COM~exactly_alike    | 2,906 | -0.01 |  0.00 | False   | False    |
+    | COM~exactly_same     |   457 | -0.04 |  0.00 | False   | False    |
+    | POS~exactly_equal    |    10 | -0.07 |  0.00 | False   | False    |
+    | POS~exactly_right    |    83 | -0.22 | -0.32 | False   | False    |
+    | POS~exactly_alike    |    46 | -0.30 | -0.49 | False   | False    |
+    | COM~exactly_equal    |   488 | -0.09 | -0.94 | False   | False    |
+    | COM~exactly_right    | 6,310 | -0.05 | -1.05 | False   | True     |
+    | COM~exactly_parallel |   179 | -0.16 | -1.39 | False   | True     |
+    | COM~exactly_correct  |   529 | -0.29 | -3.06 | False   | True     |
+    | COM~exactly_sure     |   441 | -0.92 | -8.63 | False   | True     |
+
+
+
+```python
+pd.set_option('display.float_format', '{:,.1f}'.format)
+print(exactly_bigram_amdf.filter(like='O', axis=0)[['l1','adj','f', 'dP1','dP1_simple','LRC','G2']].round(1).sort_values([
+    'LRC', 
+    'dP1_simple',
+    'f'
+    ], ascending=False).to_markdown(floatfmt=',.1f'))
+```
+
+    | key                    | l1         | adj        |    f |  dP1 | dP1_simple |  LRC |        G2 |
+    |:-----------------------|:-----------|:-----------|-----:|-----:|-----------:|-----:|----------:|
+    | COM~exactly_alike      | COMPLEMENT | alike      | 2906 | -0.0 |        1.0 |  0.0 |      -3.6 |
+    | COM~exactly_opposite   | COMPLEMENT | opposite   |  485 |  0.0 |        1.0 |  0.0 |       2.0 |
+    | COM~exactly_zero       | COMPLEMENT | zero       |  330 | -0.0 |        1.0 |  0.0 |      -0.1 |
+    | COM~exactly_many       | COMPLEMENT | many       |   76 | -0.0 |        1.0 |  0.0 |      -0.0 |
+    | COM~exactly_contrary   | COMPLEMENT | contrary   |   67 |  0.0 |        1.0 |  0.0 |       5.1 |
+    | COM~exactly_same       | COMPLEMENT | same       |  457 | -0.0 |        0.9 |  0.0 |     -13.7 |
+    | COM~exactly_average    | COMPLEMENT | average    |   73 | -0.0 |        0.9 |  0.0 |      -2.5 |
+    | COM~exactly_double     | COMPLEMENT | double     |   53 | -0.0 |        0.9 |  0.0 |      -1.4 |
+    | POS~exactly_equal      | POSMIR     | equal      |   10 | -0.1 |        0.8 |  0.0 |      -0.4 |
+    | POS~exactly_right      | POSMIR     | right      |   83 | -0.2 |        0.6 | -0.3 |     -37.6 |
+    | POS~exactly_alike      | POSMIR     | alike      |   46 | -0.3 |        0.5 | -0.5 |     -42.1 |
+    | COM~exactly_similar    | COMPLEMENT | similar    |  330 | -0.1 |        0.9 | -0.7 |     -50.5 |
+    | COM~exactly_equal      | COMPLEMENT | equal      |  488 | -0.1 |        0.9 | -0.9 |     -80.7 |
+    | COM~exactly_enough     | COMPLEMENT | enough     |  241 | -0.1 |        0.9 | -0.9 |     -56.7 |
+    | COM~exactly_right      | COMPLEMENT | right      | 6310 | -0.1 |        0.9 | -1.1 |    -411.7 |
+    | COM~exactly_parallel   | COMPLEMENT | parallel   |  179 | -0.2 |        0.8 | -1.4 |     -84.7 |
+    | COM~exactly_equivalent | COMPLEMENT | equivalent |  130 | -0.2 |        0.8 | -1.6 |     -91.0 |
+    | COM~exactly_analogous  | COMPLEMENT | analogous  |   84 | -0.3 |        0.7 | -1.8 |     -88.1 |
+    | COM~exactly_identical  | COMPLEMENT | identical  |  273 | -0.2 |        0.8 | -1.9 |    -172.4 |
+    | COM~exactly_wrong      | COMPLEMENT | wrong      |  448 | -0.2 |        0.7 | -2.7 |    -456.6 |
+    | COM~exactly_correct    | COMPLEMENT | correct    |  529 | -0.3 |        0.7 | -3.1 |    -744.6 |
+    | COM~exactly_perfect    | COMPLEMENT | perfect    |  184 | -0.6 |        0.4 | -4.6 |  -1,281.2 |
+    | COM~exactly_accurate   | COMPLEMENT | accurate   |   64 | -0.8 |        0.2 | -6.1 |  -1,954.9 |
+    | COM~exactly_true       | COMPLEMENT | true       |  285 | -0.8 |        0.2 | -6.5 |  -8,033.1 |
+    | COM~exactly_clear      | COMPLEMENT | clear      |   76 | -0.9 |        0.0 | -8.3 | -10,934.4 |
+    | COM~exactly_sure       | COMPLEMENT | sure       |  441 | -0.9 |        0.0 | -8.6 | -54,736.8 |
+
+
+
+```python
+exactly_bigram_amdf.filter(like='NEG', axis=0)[['l1','adj','f', 'dP1','dP1_simple','LRC','G2']].round(1).sort_values([
+    'LRC', 
+    'dP1_simple',
+    'f'
+    ], ascending=False)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>l1</th>
+      <th>adj</th>
+      <th>f</th>
+      <th>dP1</th>
+      <th>dP1_simple</th>
+      <th>LRC</th>
+      <th>G2</th>
+    </tr>
+    <tr>
+      <th>key</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>NEGany~exactly_sure</th>
+      <td>NEGATED</td>
+      <td>sure</td>
+      <td>8860</td>
+      <td>0.9</td>
+      <td>1.0</td>
+      <td>8.6</td>
+      <td>54,750.6</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_new</th>
+      <td>NEGATED</td>
+      <td>new</td>
+      <td>1378</td>
+      <td>0.9</td>
+      <td>1.0</td>
+      <td>8.5</td>
+      <td>8,697.9</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_easy</th>
+      <td>NEGATED</td>
+      <td>easy</td>
+      <td>1069</td>
+      <td>0.9</td>
+      <td>1.0</td>
+      <td>8.4</td>
+      <td>6,747.6</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_clear</th>
+      <td>NEGATED</td>
+      <td>clear</td>
+      <td>1759</td>
+      <td>0.9</td>
+      <td>1.0</td>
+      <td>8.3</td>
+      <td>10,937.2</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_cheap</th>
+      <td>NEGATED</td>
+      <td>cheap</td>
+      <td>693</td>
+      <td>0.9</td>
+      <td>1.0</td>
+      <td>8.3</td>
+      <td>4,443.3</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_obvious</th>
+      <td>NEGATED</td>
+      <td>obvious</td>
+      <td>50</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.2</td>
+      <td>328.7</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_new</th>
+      <td>NEGMIR</td>
+      <td>new</td>
+      <td>29</td>
+      <td>0.8</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>96.3</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_easy</th>
+      <td>NEGMIR</td>
+      <td>easy</td>
+      <td>20</td>
+      <td>0.8</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>72.2</td>
+    </tr>
+    <tr>
+      <th>NEGmir~exactly_true</th>
+      <td>NEGMIR</td>
+      <td>true</td>
+      <td>12</td>
+      <td>0.5</td>
+      <td>0.7</td>
+      <td>0.0</td>
+      <td>22.6</td>
+    </tr>
+    <tr>
+      <th>NEGany~exactly_alike</th>
+      <td>NEGATED</td>
+      <td>alike</td>
+      <td>134</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.6</td>
+    </tr>
+  </tbody>
+</table>
+<p>125 rows × 7 columns</p>
+</div>
+
+
+
+## Text examples of top compositions (context-blind)
+
+
+```python
+
+def print_exactly_sample(example_df):    
+    if example_df.index.name == 'hit_id': 
+        example_df = example_df.reset_index() 
+    example_df['hit_id'] = '`' + example_df.hit_id + '`'
+    example_df = example_df.set_index('hit_id').filter(regex=r'token|bigram|trigger_lower|all_forms_lower|head')
+    example_df = example_df.assign(
+        token_str='*' + embolden(example_df.token_str, r'\b([Ee]xactly \w+)\b', mono=False).str.replace('``', '"') + '*',
+        )
+    example_df = example_df.sort_values(['trigger_lower', 'bigram_lower'] 
+                      if 'trigger_lower' in example_df.columns else 'bigram_lower'
+                      )[
+                          [c for c in ['trigger_lower', 'bigram_lower', 'token_str', 'trigger_head'] if c in example_df.columns]]
+
+    show_sample(example_df, format='pipe')
+```
+
+
+```python
+neg_bigram_ids = full_not_exactly.bigram_id
+```
+
+
+```python
+baseline_sample = pd.read_pickle(TOP_AM_DIR / 'top9adv_sample-9-hit-tables_2024-05-15.pkl.gz').filter(regex=r'bigram|token|text|lower|lemma')
+baseline_sample = baseline_sample.loc[baseline_sample.adv_form_lower =='exactly', :]
+positive_sample = baseline_sample.loc[~baseline_sample.index.isin(neg_bigram_ids),:]
+
+show_sample(sample_pickle(data=positive_sample, regex=True, sample_size=8, quiet=True, print_sample=False))
+```
+
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | hit_id                 | text_window                         | token_str                                               | adv_form_lower   | adj_form_lower   | bigram_lower      |
+    +========================+=====================================+=========================================================+==================+==================+===================+
+    | nyt_eng_19950519_0410_ | that are not exactly Biosafety      | the researchers in Zaire `` are seeing it face to face  | exactly          | biosafety        | exactly_biosafety |
+    | 10:27-28               | Level 4 ,                           | , and they 're seeing a whole lot of it in conditions   |                  |                  |                   |
+    |                        |                                     | that are not exactly Biosafety Level 4 , '' he said .   |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_06_097.4174_x1 | That is exactly right .             | That is exactly right .                                 | exactly          | right            | exactly_right     |
+    | 559563_024:3-4         |                                     |                                                         |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_12_027.8776_x0 | Find the exactly right words or     | Find the exactly right words or phrases , and presto !  | exactly          | right            | exactly_right     |
+    | 434912_05:3-4          | phrases                             |                                                         |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_12_035.4509_x0 | two bracelets are exactly alike .   | Remember that every stone is unique with its own little | exactly          | alike            | exactly_alike     |
+    | 557284_4:18-19         |                                     | nuances , so no two bracelets are exactly alike .       |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_19_029.3498_x0 | You are exactly right ..            | You are exactly right ..                                | exactly          | right            | exactly_right     |
+    | 457690_47:3-4          |                                     |                                                         |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_19_056.4406_x0 | bearing space is exactly parallel . | 3 - Spoke Ultra light aluminum built hubs are machine - | exactly          | parallel         | exactly_parallel  |
+    | 894768_03:25-26        |                                     | lathed so the outside rim is perfectly balanced and the |                  |                  |                   |
+    |                        |                                     | bearing space is exactly parallel .                     |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_19_059.9742_x0 | I 'm not exactly sure what that     | At a time when the whole food system feels somewhat     | exactly          | sure             | exactly_sure      |
+    | 952031_008:43-44       | means                               | precarious , I assume that a product labeled organic is |                  |                  |                   |
+    |                        |                                     | more healthful and safer , more " wholesome , " though  |                  |                  |                   |
+    |                        |                                     | if I stop to think about it , I 'm not exactly sure     |                  |                  |                   |
+    |                        |                                     | what that means .                                       |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+    | pcc_eng_20_083.9339_x1 | that 's not exactly true .          | Some people have said this means " no revote , " which  | exactly          | true             | exactly_true      |
+    | 340104_11:22-23        |                                     | would be pretty deadly , but that 's not exactly true . |                  |                  |                   |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-------------------+
+
+
+⚠️ There are a _lot_ of "no (two/NOUN)... exactly alike" cases that were not caught by `RBdirect` 😬
+I think this may have influenced the association measures 🤔
+
+
+```python
+positive_sample = positive_sample.loc[
+    ~positive_sample.token_str.str.lower()
+    .str.contains(r"\bn[o'e]([tr]?|ver|thing|body|where|ne|ither)\b|\bain.?t\b|\b(without|seldom|(scarce|hard|bare|rare)ly)\b", 
+                  regex=True),:].drop_duplicates('text_window')
+show_sample(sample_pickle(data=positive_sample, regex=True, sample_size=8, quiet=True, print_sample=False))
+```
+
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | hit_id                 | text_window                         | token_str                                               | adv_form_lower   | adj_form_lower   | bigram_lower          |
+    +========================+=====================================+=========================================================+==================+==================+=======================+
+    | pcc_eng_06_036.8752_x0 | That 's exactly right , and what    | That 's exactly right , and what 's interesting is when | exactly          | right            | exactly_right         |
+    | 580132_199:3-4         |                                     | you pronounce this , let 's assume that this is         |                  |                  |                       |
+    |                        |                                     | verbalized in an environment in which people are        |                  |                  |                       |
+    |                        |                                     | sensitive to how names are being used .                 |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_12_004.8028_x0 | tensor product are exactly weak (   | Our second principal result is to establish a lax       | exactly          | weak             | exactly_weak          |
+    | 061257_6:36-37         | n+ 1                                | tensor product on the category of weak $ n$ -           |                  |                  |                       |
+    |                        |                                     | categories with strict units , so that enriched         |                  |                  |                       |
+    |                        |                                     | categories with respect to this tensor product are      |                  |                  |                       |
+    |                        |                                     | exactly weak ( n+ 1 ) - categories with strict units .  |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_12_105.2376_x1 | but Simon is exactly right when he  | Only time will tell , but Simon is exactly right when   | exactly          | right            | exactly_right         |
+    | 684861_13:09-10        | says                                | he says Chevron will have to convince dozens of         |                  |                  |                       |
+    |                        |                                     | countries ( where Chevron has assets ) that an American |                  |                  |                       |
+    |                        |                                     | judge can tell their judges what to do .                |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_18_101.0293_x1 | think he 's exactly right on this   | I think he 's exactly right on this point .             | exactly          | right            | exactly_right         |
+    | 620325_13:5-6          | point                               |                                                         |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_19_009.4380_x0 | dark lord , exactly opposite of     | It was a sad story for Anakin and also for his fans ,   | exactly          | opposite         | exactly_opposite      |
+    | 136419_078:35-36       | what he                             | as we witnessed a man supposedly to be a hero , but     |                  |                  |                       |
+    |                        |                                     | turned out he became the brutal dark lord , exactly     |                  |                  |                       |
+    |                        |                                     | opposite of what he once fought against .               |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_19_061.8737_x0 | you did the exactly right thing .   | That must have been very hard to do but you did the     | exactly          | right            | exactly_right         |
+    | 982657_133:13-14       |                                     | exactly right thing .                                   |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_20_038.8944_x0 | the stringer is exactly             | Move the bottom of the stringer , as necessary , so the | exactly          | perpendicular    | exactly_perpendicular |
+    | 612473_41:15-16        | perpendicular to the face           | stringer is exactly perpendicular to the face of the    |                  |                  |                       |
+    |                        |                                     | block .                                                 |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+    | pcc_eng_20_092.7907_x1 | what is he exactly interested , for | It means he has the knowledge as to which page is the   | exactly          | interested       | exactly_interested    |
+    | 482955_14:19-20        | how                                 | customer browsing , what is he exactly interested , for |                  |                  |                       |
+    |                        |                                     | how long has he been on a particular page and even what |                  |                  |                       |
+    |                        |                                     | are the footsteps that have led him to your page .      |                  |                  |                       |
+    +------------------------+-------------------------------------+---------------------------------------------------------+------------------+------------------+-----------------------+
+
+
+    /tmp/ipykernel_21982/369532488.py:2: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+      ~positive_sample.token_str.str.lower()
+
+
+
+```python
+positive_sample['token_str'] = positive_sample.token_str.str.strip()
+```
+
+
+```python
+len(positive_sample)
+```
+
+
+
+
+    2141
+
+
+
+
+```python
+samples=[]
+top_overall_bigram_lowers = top_overall.index.str.replace('~', '_').to_list()
+for bigram in top_overall_bigram_lowers:
+    bigram_examples = sample_pickle(data=positive_sample, filters=[f'bigram_lower=={bigram}'], sample_size=10, quiet=True, print_sample=False).reset_index()
+    
+    # bigram_examples = pd.read_csv(csv)
+    # print(bigram)
+    bigram_examples['hit_id'] = '`' + bigram_examples.hit_id + '`'
+
+    bigram_sample = bigram_examples.set_index('hit_id').filter(regex=r'token|bigram')
+    bigram_sample = bigram_sample.assign(
+        token_str=embolden(bigram_sample.token_str, r'\b([Ee]xactly \w+)\b', mono=False),
+        # text_window=embolden(bigram_examples.text_window, bigram_regex)
+        )
+    # show_sample(bigram_sample.head(1))
+    samples.append(bigram_sample)
+show_sample(pd.concat(samples), format='pipe')
+```
+
+    | hit_id                                    | token_str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | bigram_lower        |
+    |:------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------|
+    | `pcc_eng_06_071.3379_x1138045_13:29-30`   | The roles and responsibilities of the PMO vary from one organization to another , and that is why it could be difficult to find job roles that are  __exactly alike__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | exactly_alike       |
+    | `pcc_eng_06_108.5352_x1739479_043:34-35`  | I undid my pants and pulled my underwear down and Gavin checked both of us out closely and told us that we had nice ones and that it was wild how they were  __exactly alike__  in girth and size .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_alike       |
+    | `pcc_eng_08_083.5511_x1336584_006:7-8`    | In fact , our decks are  __exactly alike__  , almost .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | exactly_alike       |
+    | `pcc_eng_08_091.2718_x1461256_06:6-7`     | All of those signs look  __exactly alike__  ( sort of rubbing her hands together towards the middle of her chest ) .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | exactly_alike       |
+    | `pcc_eng_12_001.6430_x0010501_31:1-2`     | __Exactly alike__  in every way , except one , and that one difference is the gender of one party , and it will be used to deny adoption .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_alike       |
+    | `pcc_eng_12_093.3888_x1493044_4:3-4`      | We think  __exactly alike__  and are always on the same page .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_alike       |
+    | `pcc_eng_12_101.4525_x1623311_08:46-47`   | Even in my younger years , I felt for the poor souls asked to review shooters , wondering how much they needed to struggle just to pad out their word counts with fluff whilst dancing around the fact that so many in the genre feel  __exactly alike__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_alike       |
+    | `pcc_eng_18_019.0979_x0293046_17:16-17`   | Have you every wondered why the produce in the supermarkets look so pretty and almost  __exactly alike__  ?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_alike       |
+    | `pcc_eng_19_054.1552_x0857810_08:7-8`     | Yet Caddo and Sam Rayburn are  __exactly alike__  in one respect :                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_alike       |
+    | `pcc_eng_20_017.4152_x0265093_082:19-20`  | I know radiators are really poorly made and some are better built than others even if they look  __exactly alike__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | exactly_alike       |
+    | `apw_eng_20070929_0681_7:4-5`             | what happened was  __exactly opposite__  of what their shallow minds had presumed , '' Ahmadinejad said late Friday after returning to Iran from his visit to the United States and Latin America .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_opposite    |
+    | `nyt_eng_19970922_0389_93:2-3`            | effects  __exactly opposite__  of what they hope to see , '' says Susan L. Johnson , an assistant professor of pediatrics at the university .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_opposite    |
+    | `pcc_eng_06_064.2491_x1023520_17:6-7`     | However , the case is  __exactly opposite__  to my early understanding about budgeting fastfoward to my PULSE assignment in Lesotho .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | exactly_opposite    |
+    | `pcc_eng_08_086.5645_x1385156_43:34-35`   | " While Secretary Ross initially ( and repeatedly ) suggested that the Department of Justice 's request triggered his consideration of the issue , it now appears that the sequence of events was  __exactly opposite__  , " Furman wrote .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_opposite    |
+    | `pcc_eng_12_005.2015_x0067646_16:16-17`   | At the same time however , such Schumpeterian processes have now and then turned into  __exactly opposite__  processes of ' destructive creation ' .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | exactly_opposite    |
+    | `pcc_eng_12_045.7650_x0723783_17:26-27`   | The reason why my ghost stories survive with such a brilliantly brained girl like Ammu is , her sense towards ghosts and ghost tales is  __exactly opposite__  to what she has got in her studies .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_opposite    |
+    | `pcc_eng_19_004.0724_x0049682_01:14-15`   | For The Lone Ranger , Disney is working with tactics that are almost  __exactly opposite__  to what Warner Bros .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_opposite    |
+    | `pcc_eng_19_012.2507_x0181730_17:40-41`   | The famous trial by the waters of jealousy , ( Numbers 5:11 - 29 ) was probably an ancient custom , which Moses found deeply seated --( But this ordeal was wholly in favor of the innocent , and  __exactly opposite__  to most ordeals .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_opposite    |
+    | `pcc_eng_19_019.4592_x0297837_09:20-21`   | Depending on what is happening in the cold water , the first part of the advice given could be  __exactly opposite__  of what you may need to be doing .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | exactly_opposite    |
+    | `pcc_eng_20_078.6791_x1255104_23:5-6`     | The grade could be  __exactly opposite__  , a downward grade .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_opposite    |
+    | `apw_eng_19980314_0912_37:23-24`          | yet actor James Black _ imported from the Alley _ gives a potent , snarling performance that makes the purple dialogue seem  __exactly right__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_right       |
+    | `apw_eng_20001220_0744_86:32-33`          | the hundreds of FBI agents , employees and family members who demonstrated last week at the White House in Washington , D.C. , and in El Paso , Texas , are  __exactly right__  : Cop-killer Leonard Peltier should remain in prison .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | exactly_right       |
+    | `nyt_eng_19981008_0402_33:8-9`            | Richard Bremmer , for one , is  __exactly right__  as Arkady Svidrigailov , the self-serving sensualist who lusts for Raskolnikov 's sister , Dounia -LRB- Lili Horvath -RRB- .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | exactly_right       |
+    | `nyt_eng_19981215_0335_27:19-20`          | for 200 years it was discarded as tasteless and over the top , but I think it is  __exactly right__  for our times _ outrageous humor juxtaposed to potent tragedy . ''                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | exactly_right       |
+    | `nyt_eng_19990820_0015_26:13-14`          | `` Whoever thought up those ribbons for the light , that was  __exactly right__  , because she brightened up many days for me , '' said Rockets\/Comets executive Carroll Dawson .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_right       |
+    | `pcc_eng_06_105.8175_x1695624_515:09-10`  | PAGE : Right , I think that 's  __exactly right__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | exactly_right       |
+    | `pcc_eng_08_101.8162_x1632465_21:6-7`     | Whatever suits you best is  __exactly right__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | exactly_right       |
+    | `pcc_eng_12_039.7579_x0626876_17:5-6`     | What I said was  __exactly right__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | exactly_right       |
+    | `pcc_eng_19_004.1488_x0050883_08:18-19`   | If the plaintiff 's attorney 's reaction to the decision is any indication , they may be  __exactly right__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_right       |
+    | `pcc_eng_20_010.1362_x0147182_26:10-11`   | Or maybe you just proved that Andy Warhol was  __exactly right__  about the future of celebrity .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_right       |
+    | `nyt_eng_19961003_0707_18:7-8`            | he took a cash salary of  __exactly zero__  _ goose eggs .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_zero        |
+    | `pcc_eng_06_100.3499_x1607064_41:4-5`     | You can get  __exactly zero__  iconic Batman poses out of it .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_zero        |
+    | `pcc_eng_08_043.1979_x0682928_09:28-29`   | In Hebert 's Acts & Facts article , he first explained that the " argument hinges on the claim that the total energy of the universe is  __exactly zero__  , " an extraordinarily unlikely sum .2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_zero        |
+    | `pcc_eng_12_083.2823_x1329530_138:4-5`    | But I see  __exactly zero__  reason why economics is different , in that light , from management science or history , for example .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_zero        |
+    | `pcc_eng_18_062.7215_x0999161_08:22-23`   | A few days ago I opined that certain GOP presidential candidates like Donald Trump , Ben Carson and Ted Cruz had  __exactly zero__  chance of securing their party 's nomination in 2016 .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_zero        |
+    | `pcc_eng_19_029.9459_x0467299_29:7-8`     | Secondly , wearing lipstick will have  __exactly zero__  effect on anything you 're telling me to do in this book .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_zero        |
+    | `pcc_eng_19_074.0214_x1179624_13:21-22`   | But at the same time , Argentina knows full well that the chances of Elliott voluntarily accepting this deal are  __exactly zero__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | exactly_zero        |
+    | `pcc_eng_20_018.9217_x0289560_05:3-4`     | So with  __exactly zero__  reasons to celebrate , let 's all get together for a ridiculous , fun , boozy shin-dig to cleanse the palette " .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | exactly_zero        |
+    | `pcc_eng_20_040.9490_x0645482_132:4-5`    | My fear being  __exactly zero__  at this point , and my curiosity impossible to control , I threw caution to the wind , and tried to reach out as far as I could for whatever it was I could feel out there .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_zero        |
+    | `pcc_eng_20_053.2086_x0843535_03:1-2`     | __Exactly zero__  people at your wedding are looking at how flat your stomach is , or the way the back of your arms jiggle when you hold your arm up in front of a mirror and try to jiggle it .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | exactly_zero        |
+    | `pcc_eng_06_096.1204_x1538464_29:11-12`   | The behavior of the present Islamic regime in Iran is  __exactly parallel__  to the Fuhrer 's regime in Germany in political psychology and structure .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | exactly_parallel    |
+    | `pcc_eng_08_033.4648_x0525677_037:8-9`    | Go low so that your hips are  __exactly parallel__  to the floor .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_parallel    |
+    | `pcc_eng_08_065.9827_x1052668_3:5-6`      | The tyrannical tiger was  __exactly parallel__  to the tyrannical landlord .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | exactly_parallel    |
+    | `pcc_eng_12_053.7649_x0853021_011:19-20`  | I know my NASA history as well as any aerospace geek and could come up with an almost  __exactly parallel__  parody article .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_parallel    |
+    | `pcc_eng_18_108.9451_x1748848_11:27-28`   | As we recite the story of our redemption of then we can pray to God and feel the joy of our redemption of now in an  __exactly parallel__  process .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | exactly_parallel    |
+    | `pcc_eng_19_056.4406_x0894768_03:25-26`   | 3 - Spoke Ultra light aluminum built hubs are machine - lathed so the outside rim is perfectly balanced and the bearing space is  __exactly parallel__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | exactly_parallel    |
+    | `pcc_eng_20_013.0780_x0194830_023:09-10`  | * Adjust your saw so the fence is  __exactly parallel__  to the blade , and                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_parallel    |
+    | `pcc_eng_20_017.6895_x0269511_36:8-9`     | The chapters on BJTs and MOSFETs are  __exactly parallel__  , so instructors can teach whichever one first that they prefer , and speed through the second topic by concentrating only on the differences between the two transistors .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | exactly_parallel    |
+    | `pcc_eng_20_049.4797_x0783038_11:27-28`   | The fact that the thermal annealing of the fission tracks and the thermal resetting of the U - Pb radioisotope system in those zircon grains were  __exactly parallel__  is unequivocal confirmation that the radioisotope ratios are a product of radioactive decay , in just the same way as the fission tracks are physical evidence of nuclear decay .                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_parallel    |
+    | `pcc_eng_20_077.3954_x1234341_59:15-16`   | An X-radiograph indicates that Lane aligned the horizon to the left of the ship  __exactly parallel__  with a canvas thread , suggesting that he followed ( or " caught " ) a thread with a straight edge .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_parallel    |
+    | `apw_eng_19980313_1035_6:3-4`             | i 'm  __exactly sure__  how long that will take because they 're dispersed in the country , because they 're in variable size . ''                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_sure        |
+    | `pcc_eng_06_016.9485_x0258019_37:4-5`     | You gotta be  __exactly sure__  of what kinda of build you wanna have .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | exactly_sure        |
+    | `pcc_eng_06_088.5188_x1415346_05:1-2`     | __Exactly sure__  of a timetable .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_sure        |
+    | `pcc_eng_08_043.2212_x0683312_033:11-12`  | My boyfriend and I weren and # 39 ; t  __exactly sure__  what to expect about this trip , but we were more than pleasantly surprised !                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | exactly_sure        |
+    | `pcc_eng_18_067.2727_x1073176_058:12-13`  | Even the leading products have been tested so as to be  __exactly sure__  of what to expect .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_sure        |
+    | `pcc_eng_18_087.2705_x1397044_09:8-9`     | Next , you will want to be  __exactly sure__  of your water meter size .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | exactly_sure        |
+    | `pcc_eng_19_070.2441_x1118288_22:8-9`     | Again due to weathering we cannot be  __exactly sure__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | exactly_sure        |
+    | `pcc_eng_19_105.4247_x1688454_30:2-3`     | Make  __exactly sure__  of what they are saying .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_sure        |
+    | `nyt_eng_19980208_0189_17:28-29`          | according to figures from the mayor 's management report , school-maintenance spending per square foot over the last three years is , when adjusted for inflation ,  __exactly equal__  to the average of the previous five .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_equal       |
+    | `pcc_eng_06_032.8242_x0514790_16:23-24`   | The Pantheon is made perfectly harmonious by the fact that the distance from the floor to the top of the dome is  __exactly equal__  to its diameter .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | exactly_equal       |
+    | `pcc_eng_06_057.7053_x0917594_5:15-16`    | Four times four times four is 64 , which is as you all know  __exactly equal__  to the number of squares on a chessboard .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_equal       |
+    | `pcc_eng_06_068.7931_x1096876_2:24-25`    | The systems are considered logically equal if they are defined by the same authority with the same identifier or if the strings are  __exactly equal__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | exactly_equal       |
+    | `pcc_eng_18_006.0072_x0081153_059:30-31`  | But other than making every single persons life more miserable , what you will accomplish is to ensure the few people still working will have a wage that is  __exactly equal__  to the wage they have today in every single respect to its ability to buy stuff .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_equal       |
+    | `pcc_eng_18_023.4738_x0363554_021:7-8`    | On that score , you are  __exactly equal__  to all other drivers .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_equal       |
+    | `pcc_eng_19_004.8722_x0062602_30:21-22`   | If we have found a solution , then and so the expected value of under the current distribution will be  __exactly equal__  to that under the data .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_equal       |
+    | `pcc_eng_19_013.0930_x0195362_16:4-5`     | If it is  __exactly equal__  , there is another test for which household provided more financial support in the past year .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_equal       |
+    | `pcc_eng_19_095.1206_x1521648_12:26-27`   | In economics , a state of the economy in which for every commodity or service ( including labor ) , total supply and demand are  __exactly equal__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | exactly_equal       |
+    | `pcc_eng_20_009.9850_x0144769_02:21-22`   | Overall Labour Cost Index wage inflation in the June quarter from a year ago was 1.7 percent , which was  __exactly equal__  to Consumer Price Index inflation .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | exactly_equal       |
+    | `pcc_eng_06_039.2491_x0618688_193:4-5`    | " That 's  __exactly right__  , " he says .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_right       |
+    | `pcc_eng_06_077.3579_x1234906_19:22-23`   | I grew up in an environment where there were very few people to be intolerant of , because nearly everyone was  __exactly alike__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | exactly_alike       |
+    | `pcc_eng_08_001.8912_x0014441_25:5-6`     | Each parent should be  __exactly clear__  on what the daycare 's policies are to avoid any disasters or message problems in the future .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | exactly_clear       |
+    | `pcc_eng_08_084.1721_x1346737_07:6-7`     | Re imagining these topics arent  __exactly appropriate__  for firstdate conversations .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | exactly_appropriate |
+    | `pcc_eng_18_004.2191_x0052218_29:4-5`     | " That 's  __exactly correct__  , your Honor , because there is the bigger issue of the -- " the attorney stated .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_correct     |
+    | `pcc_eng_18_014.5344_x0219418_004:3-4`    | It 's  __exactly midnight__  , December 12 , 2011 .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_midnight    |
+    | `pcc_eng_18_085.0309_x1360631_4:12-13`    | The " Two of a Kind " pair used to look  __exactly alike__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_alike       |
+    | `pcc_eng_19_034.4009_x0539171_12:09-10`   | Hence , Peridot , Olivine and Chrysolite are  __exactly equal__  and identical with and differ only in color .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_equal       |
+    | `pcc_eng_20_008.7059_x0124371_05:148-149` | Melanie chance to steer them well ... well it is closer to it that I know that I am I think all all that proved to the last month was that they can cooperate ... that they 're both playing Santa Claus but yet will give you tax cuts and will give you some some outstanding unemployment benefits whatever ... but as you point out come March I have to make much tougher decisions that your greatest of of ... some spending how you really widened this massive ... of of budget gap that is that on top of ... the Bay Area CSeries and a half to come together they have to find common ground at this point and what I that ... well they have to read it I mean Peter they have to do something before the death of expires right ... that 's  __exactly right__  the debt ceiling ... will expire in the spring and ... | exactly_right       |
+    | `pcc_eng_20_016.9606_x0257770_07:13-14`   | It turns out , however , that Mishkin 's mentor had it  __exactly wrong__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | exactly_wrong       |
+    | `apw_eng_19970709_1194_1:7-8`             | the referee called the ruling ``  __exactly correct__  . ''                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_correct     |
+    | `pcc_eng_06_029.1423_x0455321_75:7-8`     | On that point , he is  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_correct     |
+    | `pcc_eng_06_084.0405_x1342962_023:7-8`    | LD : Yes , that 's  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_correct     |
+    | `pcc_eng_08_076.0235_x1214627_053:22-23`  | Make sure you are going ' below parallel ' ( you can Google that term ) and that your mechanics are  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | exactly_correct     |
+    | `pcc_eng_08_077.4566_x1237901_46:4-5`     | Of course ,  __exactly correct__  in saying :                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_correct     |
+    | `pcc_eng_12_012.5471_x0186804_208:4-5`    | " That 's  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_correct     |
+    | `pcc_eng_12_041.8199_x0660085_15:7-8`     | Yes what you are envisioning is  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | exactly_correct     |
+    | `pcc_eng_18_020.7896_x0320239_31:6-7`     | Wow factors x 2 is  __exactly correct__  here in SEA .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | exactly_correct     |
+    | `pcc_eng_19_030.6374_x0478447_074:7-8`    | Mr. Liu has that last line  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | exactly_correct     |
+    | `pcc_eng_19_057.5559_x0912855_26:33-34`   | However , as one of the " slow- on - the-uptake " crowd , as he put it , I think seeking legal remedy for this unconstitutional portion of the bill is  __exactly correct__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_correct     |
+    | `pcc_eng_06_048.9069_x0775095_015:8-9`    | While the timing of his induction isnt  __exactly ideal__  , it doesnt diminish the significance of the honour in Dickensons mind .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_ideal       |
+    | `pcc_eng_08_104.4633_x1675275_16:5-6`     | " This is an  __exactly ideal__  model that you can have in agriculture production in the worst conditions in the world .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | exactly_ideal       |
+    | `pcc_eng_18_051.3747_x0815585_10:29-30`   | We have now had time to thoroughly associate ourselves with her and perhaps more importantly her with us , and by all observations her personality seems to be  __exactly ideal__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | exactly_ideal       |
+    | `pcc_eng_06_027.3983_x0427040_21:4-5`     | The quality is  __exactly same__  as if you went to the store and bought it and it has the same collector value . "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_same        |
+    | `pcc_eng_06_054.0926_x0858911_17:6-7`     | The app's user interface is  __exactly same__  as original Whatsapp application .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | exactly_same        |
+    | `pcc_eng_06_064.7461_x1031606_12:10-11`   | It is possible that someone else could use the  __exactly same__  nickname .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | exactly_same        |
+    | `pcc_eng_08_024.4521_x0379905_42:11-12`   | Fine art reproduction paintings are those artworks which are made  __exactly same__  as that of an original art piece by another artist .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | exactly_same        |
+    | `pcc_eng_08_077.1370_x1232684_092:6-7`    | TRAVELER 'S NAME MUST BE  __EXACTLY SAME__  AS PASSPORT NAME .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | exactly_same        |
+    | `pcc_eng_12_053.2439_x0844575_33:10-11`   | They might also mistakenly assume all Dominants work the  __exactly same__  .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | exactly_same        |
+    | `pcc_eng_12_098.8454_x1581263_4:24-25`    | Among the two pages , the first page is what I wanted , but the second one is a blank form which is  __exactly same__  as the first page .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_same        |
+    | `pcc_eng_18_086.3090_x1381444_75:6-7`     | If your cloned ad reads  __exactly same__  as one next to it and a million others floating around Internet daily , you 've just almost guaranteed that it will be lost , forgotten and ignored .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | exactly_same        |
+    | `pcc_eng_19_014.5079_x0218210_66:27-28`   | What bothers me , I admit , is the fact that many of the anti-science , pseudoscience - peddling , misinforming , misleading blogs use the  __EXACTLY SAME__  reasoning to stifle any criticism of their content in the comments section .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | exactly_same        |
+    | `pcc_eng_20_040.1489_x0632617_043:8-9`    | Well , I have heard the almost  __exactly same__  thing somewhere .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | exactly_same        |
+
+
+
+```python
+other_positives = positive_sample.loc[~positive_sample.bigram_lower.isin(top_overall_bigram_lowers),:]
+
+```
+
+
+```python
+other_examples = sample_pickle(data=other_positives, sample_size=60, quiet=True, print_sample=False, regex=True, 
+                               filters=['token_str!=.*(re|[ai]s)nt ']).reset_index()
+print_exactly_sample(other_examples)
+```
+
+    | hit_id                                   | bigram_lower           | token_str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    |:-----------------------------------------|:-----------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | `nyt_eng_19961030_0645_22:17-18`         | exactly_43rd           | *this year he placed in the 40s in every one of the six categories , averaging  __exactly 43rd__  and placing 43rd behind such pitchers as Steve Ontiveros , Felipe Lira , Kevin Gross , Chris Haney , Terry Mulholland and Scott Karl .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    | `pcc_eng_12_020.3504_x0313133_008:12-13` | exactly_agile          | *The thing I 'm pondering a lot right now is what  __exactly Agile__  means or is suppose to mean .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+    | `pcc_eng_18_013.9604_x0210043_063:21-22` | exactly_analogous      | *They may always write a certain word in a certain way but they may write another word to all appearance  __exactly analogous__  to the first in another way .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+    | `pcc_eng_20_041.6349_x0656559_04:23-24`  | exactly_average        | *Matthew Vaughn walked into making 2014 's " Kingsman : The Secret Service " like the kid that everyone expected would get  __exactly average__  on the midterm .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_20_016.7609_x0254536_057:19-20` | exactly_average        | *Grant Hill , Phoenix : Hill 's defensive value continues to elude plus-minus statistics ( RAPM had as  __exactly average__  on the defensive end ) , but he continually frustrates wing players .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+    | `pcc_eng_20_048.1585_x0761846_175:8-9`   | exactly_characteristic | *The appearance of a man's home is  __exactly characteristic__  of himself .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+    | `pcc_eng_20_019.2808_x0295335_13:21-22`  | exactly_circular       | *The Canarias Einstein ring is one of the most symmetrical examples of the phenomenon ever discovered , and is almost  __exactly circular__  - meaning the two galaxies are almost  __exactly aligned__  .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+    | `pcc_eng_06_106.7975_x1711491_46:6-7`    | exactly_cone-ing       | *If you 're wondering how  __exactly cone__ -ing works , check out the video below :*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+    | `pcc_eng_06_002.2677_x0020669_14:7-8`    | exactly_conjunct       | *The Full Moon in Aries is  __exactly conjunct__  ( joined ) with Eris and also Uranus .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    | `nyt_eng_19950913_0613_4:25-26`          | exactly_consistent     | *as a vice president of Carnegie Hall , I approved plans that called for the restoration of the stage in a way that was  __exactly consistent__  with the original construction .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_20_047.6841_x0754165_06:17-18`  | exactly_contemporary   | *Worse , this is a film that climaxes with a comedy football game and is almost  __exactly contemporary__  with the Marx Bros . ' football picture , Horse Feathers .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+    | `pcc_eng_06_102.2296_x1637520_266:28-29` | exactly_contrary       | *But , as a general fact , we find that those regions towards the north are the best supplied with moisture , and therefore best wooded --  __exactly contrary__  to the character of those regions which receive their moisture from the Gulf of Mexico .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+    | `pcc_eng_20_048.9803_x0775068_44:5-6`    | exactly_divisible      | *Is the number 761082  __exactly divisible__  by 9 ?*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+    | `pcc_eng_20_086.0556_x1374188_150:24-25` | exactly_double         | *The only real answer now is to get this 10 yard dumpster hauled away and to lease one other 10 yard ... costing  __exactly double__  .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+    | `apw_eng_19980604_1697_11:4-5`           | exactly_due            | *" It is  __exactly due__  to the fact they are non-nuclear states that they can be of real importance , '' said Primakov .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+    | `nyt_eng_19950727_0507_9:23-24`          | exactly_edge-on        | *the observations were possible because they were made on a day when Saturn 's rings , as seen from Earth , were  __exactly edge__ -on .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    | `pcc_eng_20_028.2704_x0440912_11:18-19`  | exactly_enough         | *From a personal perspective , though , it turns out that the beam collected last September was  __exactly enough__  for the tests I needed to do .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+    | `pcc_eng_19_050.4803_x0798726_358:17-18` | exactly_enough         | *Now , I know that Kyle has somewhat of a grasp on how texting works -  __exactly enough__  to be dangerous .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+    | `pcc_eng_19_023.0215_x0355684_31:19-20`  | exactly_enough         | *But even if an ET revolution will be difficult , it is still achievable : " We have  __exactly enough__  time , starting now , " said Friedman .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_12_005.6694_x0075135_27:25-26`  | exactly_enough         | *" What came to her mind was this : the moment when her foot connected with the ball at the perfect angle , with  __exactly enough__  force and just the right timing .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+    | `pcc_eng_12_044.6593_x0705786_21:20-21`  | exactly_enough         | *The cabbage that accompanied a Muscovy duck breast was braised with too much cinnamon , some thought , or  __exactly enough__  , thought others .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+    | `pcc_eng_12_091.2644_x1458444_051:7-8`   | exactly_fit            | *This pack seems to be just  __exactly fit__  for my type of backpacking in that it is lighter weight and smaller volume but has a lot of convenient features .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+    | `pcc_eng_12_074.3556_x1185308_46:16-17`  | exactly_forward        | *They have a minute of cellular and they dub it openly , but it is  __exactly forward__  for them when someone keeps all over our emotions .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+    | `pcc_eng_20_081.2696_x1296845_03:8-9`    | exactly_good           | *They both raise the question of what  __exactly good__  and evil are , and where to draw the distinction between them .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    | `pcc_eng_08_076.4464_x1221466_214:20-21` | exactly_good           | *So far both sides have been among the best in the tournament , though it is difficult to gauge  __exactly good__  either are .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+    | `pcc_eng_06_002.7785_x0028933_11:18-19`  | exactly_horizontal     | *try to keep your arms very high , at about 22 degrees to the horizontal rather than  __exactly horizontal__  if you know what I mean ?*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+    | `pcc_eng_19_018.9356_x0289325_22:4-5`    | exactly_identical      | *The gifts were  __exactly identical__  to pictures seen on the product page .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+    | `pcc_eng_18_047.4278_x0751397_12:11-12`  | exactly_identical      | *Of particular importance to this production , Kyle must look  __exactly identical__  to his other Super Wardens -- all wearing black costumes with entirely white , bald heads .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_12_094.1196_x1505108_083:8-9`   | exactly_identical      | *These animals are specifically bred to be  __exactly identical__  genetically and physically they are the same size and weight .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_18_105.3806_x1691175_33:6-7`    | exactly_identical      | *Also , both men are  __exactly identical__  in appearance , making this impossible to be Diaz .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+    | `pcc_eng_08_094.0965_x1507108_71:6-7`    | exactly_identical      | *This turn can be done  __exactly identical__  in folkstyle so this technique is a great way to transition the technique between both .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+    | `nyt_eng_19970625_0723_11:23-24`         | exactly_life-size      | *Gretchen Dyer 's original screenplay shows an unfortunate sitcom influence , but she has a knack for creating memorable characters who seem  __exactly life__ -size .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+    | `pcc_eng_12_031.3000_x0490676_14:09-10`  | exactly_long           | *You 'll notice that the popsicle stick is  __exactly long__  enough to reach the 2 outermost of the 3 screw holes .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+    | `pcc_eng_20_022.5344_x0348188_64:12-13`  | exactly_many           | *It is quite extremely open-handed with you in giving publicly what  __exactly many__  people could have offered for sale for an electronic book to end up making some dough for their own end , principally now that you might have tried it if you considered necessary .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+    | `pcc_eng_19_023.2678_x0359559_10:52-53`  | exactly_much           | *This book important because it offers public new information about why millions people suffer everyday with aches pains , hope rid problems they believed would live ever Need Join Gym , By Numbers For , visit TIME Health Everyone knows joining gym quote unquote good idea Now , study looks at  __exactly much__  benefit fitness club goers over rest us really should still updating Linked In Can help find next job When Michelle Sullivan ready look job , she turned Linked In , which had helped her jobs past Really , Care About Robots Getting Oct Getting Human Rights John Koetsier Contributor i Opinions expressed by Forbes Contributors are their journalist , analyst Hate Tom Brady other words , really , hate Brady But* |
+    | `pcc_eng_18_081.2099_x1298730_32:3-4`    | exactly_numb           | *It 's  __exactly numb__ *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+    | `pcc_eng_19_053.7238_x0850909_6:10-11`   | exactly_offset         | *Rising mobility among historically marginalized Scheduled Castes is almost  __exactly offset__  by declining intergenerational mobility among Muslims , a comparably sized group that has few constitutional protections .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+    | `pcc_eng_06_080.1842_x1280438_114:19-20` | exactly_overhead       | *On March 21st , the Sun rises  __exactly due__  East , travels to an elevation of 90 deg  __exactly overhead__  at high noon , and sets  __exactly due__  West .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_19_054.8574_x0869138_12:4-5`    | exactly_perpendicular  | *It is oriented  __exactly perpendicular__  to the sun , which is , of course , the source of the lens flare .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+    | `pcc_eng_06_033.5177_x0525984_05:09-10`  | exactly_premature      | *Let 's answer this by first defining what  __exactly premature__  ejaculation is ...*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+    | `pcc_eng_06_012.2427_x0181703_29:15-16`  | exactly_prominent      | *Running as North West 's the biggest band battles , you may wonder how  __exactly prominent__  the competition held by RTR Unsigned is , but when you keep an eye on it , you will easily find massive fan votes and siginificant attention they 've got for the past few months till now .*                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+    | `pcc_eng_08_004.3278_x0053846_04:7-8`    | exactly_reliable       | *These shoppers are unsure about how  __exactly reliable__  the payment process is and hence question retailer security .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+    | `pcc_eng_06_106.1976_x1701806_20:6-7`    | exactly_representative | *He is , however ,  __exactly representative__  of how I myself and many other Americans feel about our country and our government right now so I could care less what letter is next to his name on the voting card !*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+    | `pcc_eng_19_023.2014_x0358478_02:2-3`    | exactly_rough          | *The  __exactly rough__  start that I was expecting .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+    | `pcc_eng_08_092.9604_x1488658_065:24-25` | exactly_similar        | *If you are seeking to bet on five card stud on a video game , you should witness that the game play is  __exactly similar__  as at a table .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+    | `pcc_eng_20_053.3133_x0845186_04:24-25`  | exactly_similar        | *The process of finding out information about the enemy while one is dressed in civil clothes is called " spying " ; the  __exactly similar__  process when one is dressed in uniform is called " reconnoitring " or " scouting . "*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+    | `pcc_eng_12_101.4239_x1622873_14:7-8`    | exactly_similar        | *Also , the two rods are  __exactly similar__  to each other in looks .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+    | `pcc_eng_19_004.8039_x0061513_03:10-11`  | exactly_similar        | *Imagine that in front of you there are two  __exactly similar__  objects .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+    | `pcc_eng_08_030.8070_x0482608_32:8-9`    | exactly_similar        | *For example , consider two students facing  __exactly similar__  levels of stress but one goes on to take a healthy balanced diet while the other takes to more intake of fast food .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+    | `pcc_eng_12_080.2440_x1280309_23:15-16`  | exactly_specific       | *Lahne hopes to further delve into the whiskey world by next finding out how  __exactly specific__  aromas correspond to the person 's perception of the beverage 's aging , chemical makeup and other factors .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+    | `pcc_eng_20_004.1358_x0050385_14:5-6`    | exactly_square         | *If your image is  __exactly square__  , fine tuning the dimensions to avoid distortion is encouraged while keeping in mind the general size requirement . )*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+    | `pcc_eng_08_103.4140_x1658160_12:23-24`  | exactly_such           | *that is to say , in a word , Theotimus , love has such dominion over the will as to make it  __exactly such__  as it is itself .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+    | `pcc_eng_19_074.3147_x1184407_026:20-21` | exactly_symmetrical    | *On his left side , his skin becomes completely black with white spirals extending down his left arm ,  __exactly symmetrical__  to his other side , just opposite color .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+    | `pcc_eng_12_017.5502_x0267805_018:11-12` | exactly_true           | *So it has to be said that the reverse is  __exactly true__  : on each occasion , the Labor Party have opposed our reforms , they have tested their stance at the ballot box and they have lost on four occasions .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+    | `pcc_eng_06_005.4482_x0072032_09:5-6`    | exactly_true           | *And the watch is  __exactly true__  to the pictures provided on the website .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+    | `pcc_eng_08_077.5769_x1239824_127:7-8`   | exactly_wrong          | *This Paul Alexander Gusmorino III is  __exactly wrong__  .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+    | `nyt_eng_19980608_0364_11:4-5`           | exactly_wrong          | *" That is  __exactly wrong__  . ''*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+    | `nyt_eng_19960813_0746_11:21-22`         | exactly_wrong          | *this is an analysis , by the way , that House Speaker Newt Gingrich , R-Ga . , considers "  __exactly wrong__  . ''*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+    | `pcc_eng_20_082.5706_x1317843_32:12-13`  | exactly_wrong          | *Here 's CNN honcho Jon Klein getting the facts of matter  __exactly wrong__  in ordering Lou Dobbs to stand down from the story .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+    | `pcc_eng_06_014.2228_x0213701_28:18-19`  | exactly_wrong          | *In putting most of the emphasis on the museum , Governor Pataki and Mayor Bloomberg got it  __exactly wrong__  : they traded the memorial 's silent evocation of loss for the more literal experience of the relics .*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+
+
+
+```python
+adj_limited_pmir = pmir_exactly.loc[~pmir_exactly.adj_form_lower.isin(['right','same','enough','identical','alike','comfortable','correct']),:].astype('string')
+adj_limited_pmir.groupby('trigger_lower').adj_form_lower.value_counts().nlargest(10)
+```
+
+
+
+
+    trigger_lower  adj_form_lower
+    all            opposite          3
+    always         equal             3
+    everything     true              3
+                   perfect           3
+    or             wrong             3
+    all            equal             2
+    everyone       equal             2
+    everything     different         2
+    or             equal             2
+    all            parallel          1
+    Name: count, dtype: int64
+
+
+
+
+```python
+for op in ('every', 'all', 'everyone', 'everybody', 'always'): 
+    print(f'\n## *{op}*\n')
+    if op in adj_limited_pmir.trigger_lower:
+        univ_ex = sample_pickle(data=adj_limited_pmir, sample_size=30, 
+                            quiet=True, print_sample=False, regex=True, 
+                            filters=[f'trigger_lower==^{op}$', '']).reset_index()
+        print_exactly_sample(univ_ex)
+```
+
+    
+    ## *every*
+    
+    
+    ## *all*
+    
+    
+    ## *everyone*
+    
+    
+    ## *everybody*
+    
+    
+    ## *always*
+    
+
+
+
+```python
+perpendicular = sample_pickle(data=other_positives, sample_size=60, quiet=True, print_sample=False, regex=True, 
+                               filters=['token_str!=.*(re|[ai]s)nt ', 'bigram_lower==exactly_perpendicular']).reset_index()
+    
+perpendicular['hit_id'] = '`' + perpendicular.hit_id + '`'
+perpendicular = perpendicular.set_index('hit_id').filter(regex=r'token|bigram')
+perpendicular = perpendicular.assign(
+    token_str='*' + embolden(perpendicular.token_str, r'\b([Ee]xactly \w+)\b', mono=False).str.replace('``', '"') + '*',
+    ).sort_values('bigram_lower').reset_index()[['bigram_lower', 'token_str', 'hit_id']]
+
+show_sample(perpendicular, format='pipe')
+```
+
+    |    | bigram_lower          | token_str                                                                                                                                                                                                                                    | hit_id                                   |
+    |---:|:----------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------|
+    |  0 | exactly_perpendicular | *This line is  __exactly perpendicular__  to the cycloid , and if you drew a circle around this point*                                                                                                                                       | `pcc_eng_06_058.9136_x0937134_099:4-5`   |
+    |  1 | exactly_perpendicular | *In this context , the rotation of the ground floor white volume is included in order to be located  __exactly perpendicular__  to the south .*                                                                                              | `pcc_eng_06_068.5114_x1092382_26:20-21`  |
+    |  2 | exactly_perpendicular | *ACTION : Lift your legs so that they are  __exactly perpendicular__  from the floor .*                                                                                                                                                      | `pcc_eng_06_084.7837_x1354920_26:10-11`  |
+    |  3 | exactly_perpendicular | *I will line my club  __exactly perpendicular__  to that line .*                                                                                                                                                                             | `pcc_eng_12_047.6673_x0754227_10:6-7`    |
+    |  4 | exactly_perpendicular | *They set the square up on a milling machine and cut all three edges of the base  __exactly perpendicular__  to the other edge - the last two photos are with the lip hooked over the edge of the saw table .*                               | `pcc_eng_12_092.5398_x1479253_07:18-19`  |
+    |  5 | exactly_perpendicular | *This is where you can use the level to make sure the valet is  __exactly perpendicular__  to the floor .*                                                                                                                                   | `pcc_eng_18_050.1124_x0795078_49:15-16`  |
+    |  6 | exactly_perpendicular | *It is oriented  __exactly perpendicular__  to the sun , which is , of course , the source of the lens flare .*                                                                                                                              | `pcc_eng_19_054.8574_x0869138_12:4-5`    |
+    |  7 | exactly_perpendicular | *There is a reason modern tanks have angled side walls , bullets cannot hit with nearly as much energy when they hit an angled surface , a projectile hits with the most force when  __exactly perpendicular__  to the surface it strikes .* | `pcc_eng_20_010.4805_x0152677_033:35-36` |
+    |  8 | exactly_perpendicular | *the miter gauge slots are  __exactly perpendicular__  to it .*                                                                                                                                                                              | `pcc_eng_20_013.0780_x0194830_024:6-7`   |
+    |  9 | exactly_perpendicular | *The slot would be  __exactly perpendicular__  to the lip at the back .*                                                                                                                                                                     | `pcc_eng_20_026.8413_x0417781_25:5-6`    |
+    | 10 | exactly_perpendicular | *Move the bottom of the stringer , as necessary , so the stringer is  __exactly perpendicular__  to the face of the block .*                                                                                                                 | `pcc_eng_20_038.8944_x0612473_41:15-16`  |
+    | 11 | exactly_perpendicular | *Use the builder 's square to position the rail  __exactly perpendicular__  with the face frame of the cabinet .*                                                                                                                            | `pcc_eng_20_083.3782_x1331116_020:10-11` |
+
+
+
+```python
+pmir_exactly.head(3)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>bigram_id</th>
+      <th>token_str</th>
+      <th>pattern</th>
+      <th>category</th>
+      <th>adv_form</th>
+      <th>adj_form</th>
+      <th>text_window</th>
+      <th>trig_deprel</th>
+      <th>...</th>
+      <th>adv_index</th>
+      <th>adj_index</th>
+      <th>adv_form_lower</th>
+      <th>adj_form_lower</th>
+      <th>bigram_lower</th>
+      <th>all_forms_lower</th>
+      <th>trigger_lower</th>
+      <th>trigger_head</th>
+    </tr>
+    <tr>
+      <th>hit_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pcc_eng_13_045.7674_x0723903_18:08-0...</th>
+      <td>pcc_eng_13_045.7674_x0723903_18:09-10</td>
+      <td>And you know what , they 're often e...</td>
+      <td>pos-mirror-R</td>
+      <td>POSmirror</td>
+      <td>exactly</td>
+      <td>right</td>
+      <td>what , they 're often exactly right .</td>
+      <td>advmod</td>
+      <td>...</td>
+      <td>8</td>
+      <td>9</td>
+      <td>exactly</td>
+      <td>right</td>
+      <td>exactly_right</td>
+      <td>often_exactly_right</td>
+      <td>often</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_13_079.2956_x1265427_12:10-1...</th>
+      <td>pcc_eng_13_079.2956_x1265427_12:12-13</td>
+      <td>This is MLS it is suposed to be fun ...</td>
+      <td>pos-mirror-R</td>
+      <td>POSmirror</td>
+      <td>exactly</td>
+      <td>funny</td>
+      <td>suposed to be fun or more exactly fu...</td>
+      <td>cc</td>
+      <td>...</td>
+      <td>11</td>
+      <td>12</td>
+      <td>exactly</td>
+      <td>funny</td>
+      <td>exactly_funny</td>
+      <td>or_exactly_funny</td>
+      <td>or</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>pcc_eng_13_102.5595_x1641011_50:3-4-5</th>
+      <td>pcc_eng_13_102.5595_x1641011_50:4-5</td>
+      <td>I was both exactly right and exactly...</td>
+      <td>pos-mirror-R</td>
+      <td>POSmirror</td>
+      <td>exactly</td>
+      <td>right</td>
+      <td>I was both exactly right and exactly...</td>
+      <td>advmod</td>
+      <td>...</td>
+      <td>3</td>
+      <td>4</td>
+      <td>exactly</td>
+      <td>right</td>
+      <td>exactly_right</td>
+      <td>both_exactly_right</td>
+      <td>both</td>
+      <td>R</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 21 columns</p>
+</div>
+
+
+
+
+```python
+pmir_ex = sample_pickle(data=pmir_exactly, sample_size=40, quiet=True, print_sample=False, regex=True, 
+                               filters=['token_str!=.*(re|[ai]s)nt ']).reset_index()
+
+
+print_exactly_sample(pmir_ex)
+```
+
+    | hit_id                                      | trigger_lower | bigram_lower          | token_str                                                                                                                                                                                                                                                                                                                                                                                                | trigger_head |
+    |:--------------------------------------------|:--------------|:----------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
+    | `pcc_eng_05_086.7612_x1387665_32:28-29-30`  | all           | exactly_alike         | *The author describes this very hands - on research trip as a " spiritual experience , " especially after it became so obvious that " we 're all  __exactly alike__  inside . "*                                                                                                                                                                                                                         | R            |
+    | `pcc_eng_07_101.4447_x1623411_110:6-7-8`    | all           | exactly_alike         | *The Man Whose Teeth Were All  __Exactly Alike__ *                                                                                                                                                                                                                                                                                                                                                       | R            |
+    | `pcc_eng_09_086.0147_x1375339_3:15-16-17`   | all           | exactly_alike         | *Technology has enabled furniture makers to produce hundreds of tables and chairs that are all  __exactly alike__  .*                                                                                                                                                                                                                                                                                    | R            |
+    | `pcc_eng_10_092.6859_x1482321_19:12-13-14`  | all           | exactly_alike         | *The White House had seven of those fireplaces , however , all  __exactly alike__  , so no one knows whether this one was the one in the Lincoln photo .*                                                                                                                                                                                                                                                | R            |
+    | `pcc_eng_16_100.3610_x1608275_028:45-46-47` | all           | exactly_alike         | *Here the trees were arranged as on a chessboard , in straight and regular rows like ranks of soldiers , and this severe pedantic regularity , and the fact that all the trees were of the same size , and had tops and trunks all  __exactly alike__  , made them look monotonous and even dreary .*                                                                                                    | R            |
+    | `pcc_eng_24_012.7792_x0189980_12:10-11-12`  | all           | exactly_alike         | *how could we all get along if we were all  __exactly alike__  ?*                                                                                                                                                                                                                                                                                                                                        | R            |
+    | `pcc_eng_24_046.2031_x0730651_07:25-26-27`  | all           | exactly_alike         | *Humpty Dumpty in Oakland is a fine work , even if it is very despairing , and so is The Man Whose Teeth Were All  __Exactly Alike__  ( henceforth Teeth ) .*                                                                                                                                                                                                                                            | R            |
+    | `pcc_eng_09_060.3335_x0960039_08:06-22-23`  | all           | exactly_equal         | *equal Values : validates that all of the values of the Form Controls within a Form Group or Form Array are  __exactly equal__  .*                                                                                                                                                                                                                                                                       | R            |
+    | `pcc_eng_19_078.5861_x1253458_06:1-3-4`     | all           | exactly_opposite      | *All are  __exactly opposite__  of the best strategies for learning .*                                                                                                                                                                                                                                                                                                                                   | R            |
+    | `pcc_eng_09_044.5386_x0704486_15:1-4-5`     | all           | exactly_right         | *All that is  __exactly right__  , because deciding on a university is often the first really major decision of a young adult 's life .*                                                                                                                                                                                                                                                                 | R            |
+    | `pcc_eng_24_014.5823_x0218967_19:1-6-7`     | all           | exactly_right         | *All of our suspicions were  __exactly right__  .*                                                                                                                                                                                                                                                                                                                                                       | R            |
+    | `pcc_eng_29_046.5934_x0736252_76:1-5-6`     | all           | exactly_right         | *All of that is  __exactly right__  .*                                                                                                                                                                                                                                                                                                                                                                   | R            |
+    | `pcc_eng_02_014.3329_x0215708_22:10-12-13`  | always        | exactly_aware         | *I think this was very bad as they should always be  __exactly aware__  of what the offer .*                                                                                                                                                                                                                                                                                                             | R            |
+    | `pcc_eng_18_041.0445_x0647961_34:12-14-15`  | always        | exactly_horizontal    | *If you choose straight or straightish edges , will your stripes always be  __exactly horizontal__  , or will you have some on the diagonal or wedge-shaped ?*                                                                                                                                                                                                                                           | R            |
+    | `nyt_eng_20100905_0019_7:51-52-53`          | always        | exactly_right         | *the balance between the Jane who had to be harder and more driven then her male colleagues and the Jane who was compassionate and playfully feminine -LRB- often as a way to obtain information or a confession -RRB- could be obvious and heavy-handed in the script , but it was always  __exactly right__  in Mirren 's guarded eyes and her arsenal of smiles : weary , exasperated , coy , cool .* | R            |
+    | `pcc_eng_24_068.0858_x1085014_02:10-11-12`  | always        | exactly_right         | *Her first impulse , her gut feeling , is always  __exactly right__  .*                                                                                                                                                                                                                                                                                                                                  | R            |
+    | `pcc_eng_26_025.0553_x0388650_016:09-10-11` | always        | exactly_right         | *After spending an eternity where the temperature was always  __exactly right__  , suddenly it was extremely cold .*                                                                                                                                                                                                                                                                                     | R            |
+    | `pcc_eng_13_102.5595_x1641011_50:3-4-5`     | both          | exactly_right         | *I was both  __exactly right__  and  __exactly wrong__  .*                                                                                                                                                                                                                                                                                                                                               | R            |
+    | `pcc_eng_14_047.8465_x0756834_55:4-5-6`     | both          | exactly_right         | *Representative Murphy is both  __exactly right__  and spectacularly wrong .*                                                                                                                                                                                                                                                                                                                            | R            |
+    | `pcc_eng_06_077.3579_x1234906_19:20-22-23`  | everyone      | exactly_alike         | *I grew up in an environment where there were very few people to be intolerant of , because nearly everyone was  __exactly alike__  .*                                                                                                                                                                                                                                                                   | R            |
+    | `pcc_eng_01_056.7092_x0900896_84:08-12-13`  | everything    | exactly_correct       | *I really do try to make sure everything I write is  __exactly correct__  ( personal opinions excepted ! ) , but on occasion , I experience what my late great- grandmother termed a " brain fart " .*                                                                                                                                                                                                   | R            |
+    | `pcc_eng_26_081.6803_x1304416_25:12-16-17`  | everything    | exactly_correct       | *" Computers spend a lot of time and energy ensuring that everything they compute is  __exactly correct__  , " says Sampson .*                                                                                                                                                                                                                                                                           | R            |
+    | `pcc_eng_25_097.4853_x1561507_25:34-37-38`  | everything    | exactly_perfect       | *And , it 's time - aware enough ( by stating " every day " ) that your mind can accept and acknowledge linear progress while your internal vibration reorients to trust that everything IS already  __exactly perfect__  in this moment , even if it feels like it 's not - because , again , change takes time , and lasting change does n't always appear in the external world right away .*         | R            |
+    | `pcc_eng_02_067.8072_x1080644_16:45-49-50`  | everything    | exactly_relevant      | *Once , a wand I was working on for a friend fell from a table during a ritual invocation ; on another occasion , after a particularly intense invocation , I heard a person talking on their cell phone in such a way that everything they said was  __exactly relevant__  to what I had asked for .*                                                                                                   | R            |
+    | `pcc_eng_00_065.7777_x1047192_457:4-6-7`    | everything    | exactly_right         | *In theory , everything is  __exactly right__  : the lips , the Peter Lorre eyes ( as a lover said , centuries ago ) , the dimpled temples , the short hair , slightly grey and thinning , the way I like to wear it : the skinny , unremarkable body , in reasonable shape , with its tuft of chest hair .*                                                                                             | R            |
+    | `pcc_eng_06_042.8439_x0676759_37:16-18-19`  | everything    | exactly_right         | *The designer made requested changes to the text very promptly and seemed genuinely concerned that everything was  __exactly right__  .*                                                                                                                                                                                                                                                                 | R            |
+    | `pcc_eng_08_094.1834_x1508489_019:12-14-15` | everything    | exactly_right         | *This was one of those peak " vacation moments " when everything was  __exactly right__  : perfect air , no bugs , great scenery , the sound of the water falling , nobody else around , and no schedule .*                                                                                                                                                                                              | R            |
+    | `pcc_eng_13_020.1821_x0309967_04:28-30-31`  | everything    | exactly_right         | *" He said essentially , ' I can see the value of these , but how do we ensure that we get these within compliance and that everything is  __exactly right__  ? ' "*                                                                                                                                                                                                                                     | R            |
+    | `pcc_eng_19_059.5590_x0945257_358:06-10-11` | everything    | exactly_right         | *On the other hand , everything you said is  __exactly right__  .*                                                                                                                                                                                                                                                                                                                                       | R            |
+    | `pcc_eng_21_029.3239_x0457831_26:05-09-10`  | everything    | exactly_right         | *I 'm amazed how everything you suggested is  __exactly right__  for me during this healing & recovery . "*                                                                                                                                                                                                                                                                                              | R            |
+    | `pcc_eng_25_107.1034_x1717046_17:10-12-13`  | everything    | exactly_right         | *The angles , the foam , the design - everything is  __exactly right__  .*                                                                                                                                                                                                                                                                                                                               | R            |
+    | `pcc_eng_28_071.1671_x1135248_19:06-21-22`  | everything    | exactly_right         | *Everyone is complicated , and everything , right down to the period funk music from Lollywood 's heyday , is  __exactly right__  .*                                                                                                                                                                                                                                                                     | R            |
+    | `pcc_eng_04_049.0901_x0777196_02:07-09-10`  | everything    | exactly_unchanged     | *When i close the tab , everything is  __exactly unchanged__  .*                                                                                                                                                                                                                                                                                                                                         | R            |
+    | `pcc_eng_09_015.6903_x0238061_23:2-4-5`     | everything    | exactly_wrong         | *" Everything is  __exactly wrong__  , " he said .*                                                                                                                                                                                                                                                                                                                                                      | R            |
+    | `pcc_eng_16_014.2506_x0214645_03:15-20-21`  | or            | exactly_correct       | *Do you think that the estimation will be an over - or under-estimate , or will it be essentially  __exactly correct__  ?*                                                                                                                                                                                                                                                                               | R            |
+    | `pcc_eng_06_068.7931_x1096876_2:19-24-25`   | or            | exactly_equal         | *The systems are considered logically equal if they are defined by the same authority with the same identifier or if the strings are  __exactly equal__  .*                                                                                                                                                                                                                                              | R            |
+    | `pcc_eng_21_034.0405_x0534239_002:1-3-4`    | or            | exactly_more          | *Or more  __exactly more__  of a private ideological ( provided it is the right one ) entrepreneur driven program .*                                                                                                                                                                                                                                                                                     | R            |
+    | `pcc_eng_25_078.3454_x1252325_2:6-7-8`      | or            | exactly_music-related | *This may be tangentially music-related or  __exactly music__ -related , depending on where you 're sitting :*                                                                                                                                                                                                                                                                                           | R            |
+    | `pcc_eng_00_015.1929_x0229146_04:07-13-14`  | sometimes     | exactly_opposite      | *When it comes to persuasion , sometimes the most effective way is  __exactly opposite__  of what we might think .*                                                                                                                                                                                                                                                                                      | R            |
+    | `pcc_eng_25_094.7761_x1517560_16:09-13-14`  | sometimes     | exactly_right         | *And while word clouds are usually stupid , sometimes they can be  __exactly right__  .*                                                                                                                                                                                                                                                                                                                 | R            |
+
+
+
+```python
+some_ex = pmir_exactly.loc[pmir_exactly.trigger_lower.str.startswith('some'), :].sample(10).reset_index()
+print_exactly_sample(some_ex)
+```
+
+    | hit_id                                      | trigger_lower | bigram_lower       | token_str                                                                                                                                                                                                                                                                                                                                      | trigger_head |
+    |:--------------------------------------------|:--------------|:-------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
+    | `pcc_eng_17_076.5027_x1220260_178:02-12-13` | someone       | exactly_equivalent | *So someone traveling to Alpha Centauri at .99c , that 's  __exactly equivalent__  to them remaining stationary and the Earth , and Alpha Centauri and the rest of the stars moving towards the traveler at .99c , and then in that case , their clocks , all the clocks on earth would be running slow compared to the same traveler .*       | R            |
+    | `apw_eng_20070219_0931_10:22-24-25`         | something     | exactly_alien      | *Bellamy , who has a history of losing his temper , looks to be the first casualty of the dictum -- something not  __exactly alien__  to him .*                                                                                                                                                                                                | L            |
+    | `pcc_eng_04_104.1453_x1666254_08:20-21-22`  | something     | exactly_opposite   | *misrepresentation is the kind of thing you and Goerzen do where you outright lie and say that somebody said something  __exactly opposite__  to what they actually said . >*                                                                                                                                                                  | L            |
+    | `pcc_eng_15_106.5980_x1707092_015:16-17-18` | something     | exactly_related    | *What if , instead of pointing visitors to a semi-related resource , you offered them something  __exactly related__  to the post they just read ?*                                                                                                                                                                                            | L            |
+    | `pcc_eng_23_035.3368_x0554646_1:5-7-8`      | something     | exactly_right      | *used to say that something is  __exactly right__  for someone , succeeds in doing something in  __exactly the__  right way , etc .*                                                                                                                                                                                                           | R            |
+    | `pcc_eng_22_051.1450_x0810130_11:5-8-9`     | something     | exactly_right      | *When I hear that something is "  __exactly right__  , " I expect mathematical precision .*                                                                                                                                                                                                                                                    | R            |
+    | `pcc_eng_11_060.9876_x0970706_30:2-5-6`     | sometimes     | exactly_black      | *" Sometimes things are  __exactly black__  and white when it comes to accounting procedures , " the MBA President claimed in last week 's press conference .*                                                                                                                                                                                 | R            |
+    | `pcc_eng_25_094.7761_x1517560_16:09-13-14`  | sometimes     | exactly_right      | *And while word clouds are usually stupid , sometimes they can be  __exactly right__  .*                                                                                                                                                                                                                                                       | R            |
+    | `pcc_eng_07_106.5163_x1705439_100:5-8-9`    | sometimes     | exactly_right      | *And , indeed , sometimes that 's  __exactly right__  !*                                                                                                                                                                                                                                                                                       | R            |
+    | `pcc_eng_00_058.3069_x0926453_6:49-50-51`   | sometimes     | exactly_wrong      | *In his view , " the way that most in the field go about explaining international cooperation and the creation of international organizations , as the rational and functional response to objective security environments marked by uncertainty , is almost always too narrow , often obvious , and sometimes  __exactly wrong__  " ( xi ) .* | R            |
+
+
+
+```python
+FOCUS = ['f',
+         'am_p1_given2', 'am_p2_given1', 
+         'deltaP_max', 'deltaP_mean',
+         'am_p1_given2_simple', 'am_p2_given1_simple',
+         'conservative_log_ratio', 'am_log_likelihood',
+        #  'mutual_information', 'am_odds_ratio_disc', 't_score',
+         'N', 'f1', 'f2', 'E11', 'unexpected_f', 
+         'l1', 'l2']
+adv_adj_AM = pd.read_pickle(RESULT_DIR.joinpath('assoc_df/adv_adj/RBXadj/extra/AdvAdj_frq-thrMIN-7.35f_min50x_extra.pkl.gz')).filter(FOCUS)
+adv_adj_AM.info()
+```
+
+    <class 'pandas.core.frame.DataFrame'>
+    Index: 91093 entries, hip~flexor to very~more
+    Data columns (total 15 columns):
+     #   Column                  Non-Null Count  Dtype   
+    ---  ------                  --------------  -----   
+     0   f                       91093 non-null  int32   
+     1   am_p1_given2            91093 non-null  float32 
+     2   am_p2_given1            91093 non-null  float32 
+     3   deltaP_max              91093 non-null  float32 
+     4   am_p1_given2_simple     91093 non-null  float32 
+     5   am_p2_given1_simple     91093 non-null  float32 
+     6   conservative_log_ratio  91093 non-null  float32 
+     7   am_log_likelihood       91093 non-null  float64 
+     8   N                       91093 non-null  int32   
+     9   f1                      91093 non-null  int32   
+     10  f2                      91093 non-null  int32   
+     11  E11                     91093 non-null  float64 
+     12  unexpected_f            91093 non-null  float64 
+     13  l1                      91093 non-null  category
+     14  l2                      91093 non-null  category
+    dtypes: category(2), float32(6), float64(3), int32(4)
+    memory usage: 12.7 MB
+
+
+
+```python
+pd.set_option('display.float_format', '{:,.2f}'.format)
+exactly_adj_AM = adv_adj_AM.loc[adv_adj_AM.l1=='exactly', :].set_index('l2').loc[:, :'unexpected_f']
+exactly_adj_AM.index.name = 'adj'
+
+```
+
+
+```python
+exactly_adj_AM.sort_values('conservative_log_ratio', ascending=False)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>f</th>
+      <th>am_p1_given2</th>
+      <th>am_p2_given1</th>
+      <th>deltaP_max</th>
+      <th>am_p1_given2_simple</th>
+      <th>am_p2_given1_simple</th>
+      <th>conservative_log_ratio</th>
+      <th>am_log_likelihood</th>
+      <th>N</th>
+      <th>f1</th>
+      <th>f2</th>
+      <th>E11</th>
+      <th>unexpected_f</th>
+    </tr>
+    <tr>
+      <th>adj</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>alike</th>
+      <td>3040</td>
+      <td>0.23</td>
+      <td>0.05</td>
+      <td>0.23</td>
+      <td>0.23</td>
+      <td>0.05</td>
+      <td>8.55</td>
+      <td>29,939.31</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>13261</td>
+      <td>9.46</td>
+      <td>3,030.54</td>
+    </tr>
+    <tr>
+      <th>opposite</th>
+      <td>498</td>
+      <td>0.05</td>
+      <td>0.01</td>
+      <td>0.05</td>
+      <td>0.05</td>
+      <td>0.01</td>
+      <td>5.94</td>
+      <td>3,337.27</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>9404</td>
+      <td>6.71</td>
+      <td>491.29</td>
+    </tr>
+    <tr>
+      <th>right</th>
+      <td>6948</td>
+      <td>0.03</td>
+      <td>0.11</td>
+      <td>0.11</td>
+      <td>0.03</td>
+      <td>0.11</td>
+      <td>5.53</td>
+      <td>41,085.55</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>204572</td>
+      <td>145.97</td>
+      <td>6,802.03</td>
+    </tr>
+    <tr>
+      <th>zero</th>
+      <td>344</td>
+      <td>0.03</td>
+      <td>0.01</td>
+      <td>0.03</td>
+      <td>0.03</td>
+      <td>0.01</td>
+      <td>5.02</td>
+      <td>1,912.07</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>11472</td>
+      <td>8.19</td>
+      <td>335.81</td>
+    </tr>
+    <tr>
+      <th>parallel</th>
+      <td>224</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>0.03</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>4.90</td>
+      <td>1,238.35</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>7577</td>
+      <td>5.41</td>
+      <td>218.59</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>possible</th>
+      <td>51</td>
+      <td>-0.00</td>
+      <td>-0.00</td>
+      <td>-0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>-1.28</td>
+      <td>-252.55</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>364265</td>
+      <td>259.91</td>
+      <td>-208.91</td>
+    </tr>
+    <tr>
+      <th>difficult</th>
+      <td>129</td>
+      <td>-0.00</td>
+      <td>-0.01</td>
+      <td>-0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>-1.53</td>
+      <td>-542.68</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>835024</td>
+      <td>595.81</td>
+      <td>-466.81</td>
+    </tr>
+    <tr>
+      <th>good</th>
+      <td>309</td>
+      <td>-0.00</td>
+      <td>-0.02</td>
+      <td>-0.00</td>
+      <td>0.00</td>
+      <td>0.01</td>
+      <td>-1.80</td>
+      <td>-1,354.64</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>2037285</td>
+      <td>1,453.65</td>
+      <td>-1,144.65</td>
+    </tr>
+    <tr>
+      <th>much</th>
+      <td>72</td>
+      <td>-0.00</td>
+      <td>-0.02</td>
+      <td>-0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>-3.24</td>
+      <td>-2,005.57</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>1778739</td>
+      <td>1,269.17</td>
+      <td>-1,197.17</td>
+    </tr>
+    <tr>
+      <th>many</th>
+      <td>79</td>
+      <td>-0.00</td>
+      <td>-0.02</td>
+      <td>-0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>-3.46</td>
+      <td>-2,565.03</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>2212989</td>
+      <td>1,579.02</td>
+      <td>-1,500.02</td>
+    </tr>
+  </tbody>
+</table>
+<p>145 rows × 13 columns</p>
+</div>
+
+
+
+
+```python
+exactly_adj_AM.nlargest(20,'deltaP_max')
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>f</th>
+      <th>am_p1_given2</th>
+      <th>am_p2_given1</th>
+      <th>deltaP_max</th>
+      <th>am_p1_given2_simple</th>
+      <th>am_p2_given1_simple</th>
+      <th>conservative_log_ratio</th>
+      <th>am_log_likelihood</th>
+      <th>N</th>
+      <th>f1</th>
+      <th>f2</th>
+      <th>E11</th>
+      <th>unexpected_f</th>
+    </tr>
+    <tr>
+      <th>adj</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>alike</th>
+      <td>3040</td>
+      <td>0.23</td>
+      <td>0.05</td>
+      <td>0.23</td>
+      <td>0.23</td>
+      <td>0.05</td>
+      <td>8.55</td>
+      <td>29,939.31</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>13261</td>
+      <td>9.46</td>
+      <td>3,030.54</td>
+    </tr>
+    <tr>
+      <th>sure</th>
+      <td>9301</td>
+      <td>0.01</td>
+      <td>0.14</td>
+      <td>0.14</td>
+      <td>0.01</td>
+      <td>0.15</td>
+      <td>3.89</td>
+      <td>34,895.53</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>844981</td>
+      <td>602.91</td>
+      <td>8,698.09</td>
+    </tr>
+    <tr>
+      <th>right</th>
+      <td>6948</td>
+      <td>0.03</td>
+      <td>0.11</td>
+      <td>0.11</td>
+      <td>0.03</td>
+      <td>0.11</td>
+      <td>5.53</td>
+      <td>41,085.55</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>204572</td>
+      <td>145.97</td>
+      <td>6,802.03</td>
+    </tr>
+    <tr>
+      <th>opposite</th>
+      <td>498</td>
+      <td>0.05</td>
+      <td>0.01</td>
+      <td>0.05</td>
+      <td>0.05</td>
+      <td>0.01</td>
+      <td>5.94</td>
+      <td>3,337.27</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>9404</td>
+      <td>6.71</td>
+      <td>491.29</td>
+    </tr>
+    <tr>
+      <th>perpendicular</th>
+      <td>52</td>
+      <td>0.04</td>
+      <td>0.00</td>
+      <td>0.04</td>
+      <td>0.04</td>
+      <td>0.00</td>
+      <td>4.63</td>
+      <td>307.75</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>1444</td>
+      <td>1.03</td>
+      <td>50.97</td>
+    </tr>
+    <tr>
+      <th>analogous</th>
+      <td>118</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>0.03</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>4.81</td>
+      <td>669.53</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>3706</td>
+      <td>2.64</td>
+      <td>115.36</td>
+    </tr>
+    <tr>
+      <th>zero</th>
+      <td>344</td>
+      <td>0.03</td>
+      <td>0.01</td>
+      <td>0.03</td>
+      <td>0.03</td>
+      <td>0.01</td>
+      <td>5.02</td>
+      <td>1,912.07</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>11472</td>
+      <td>8.19</td>
+      <td>335.81</td>
+    </tr>
+    <tr>
+      <th>parallel</th>
+      <td>224</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>0.03</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>4.90</td>
+      <td>1,238.35</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>7577</td>
+      <td>5.41</td>
+      <td>218.59</td>
+    </tr>
+    <tr>
+      <th>stellar</th>
+      <td>177</td>
+      <td>0.02</td>
+      <td>0.00</td>
+      <td>0.02</td>
+      <td>0.03</td>
+      <td>0.00</td>
+      <td>4.61</td>
+      <td>925.08</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>6973</td>
+      <td>4.98</td>
+      <td>172.02</td>
+    </tr>
+    <tr>
+      <th>true</th>
+      <td>1740</td>
+      <td>0.00</td>
+      <td>0.02</td>
+      <td>0.02</td>
+      <td>0.00</td>
+      <td>0.03</td>
+      <td>2.63</td>
+      <td>3,826.53</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>348994</td>
+      <td>249.02</td>
+      <td>1,490.98</td>
+    </tr>
+    <tr>
+      <th>clear</th>
+      <td>1835</td>
+      <td>0.00</td>
+      <td>0.02</td>
+      <td>0.02</td>
+      <td>0.00</td>
+      <td>0.03</td>
+      <td>2.22</td>
+      <td>3,147.96</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>491108</td>
+      <td>350.42</td>
+      <td>1,484.58</td>
+    </tr>
+    <tr>
+      <th>new</th>
+      <td>1418</td>
+      <td>0.00</td>
+      <td>0.02</td>
+      <td>0.02</td>
+      <td>0.00</td>
+      <td>0.02</td>
+      <td>2.43</td>
+      <td>2,817.70</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>321311</td>
+      <td>229.26</td>
+      <td>1,188.74</td>
+    </tr>
+    <tr>
+      <th>conducive</th>
+      <td>214</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>3.68</td>
+      <td>842.32</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>16405</td>
+      <td>11.71</td>
+      <td>202.29</td>
+    </tr>
+    <tr>
+      <th>correct</th>
+      <td>788</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>3.56</td>
+      <td>2,723.36</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>78240</td>
+      <td>55.83</td>
+      <td>732.17</td>
+    </tr>
+    <tr>
+      <th>equal</th>
+      <td>560</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>3.75</td>
+      <td>2,108.45</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>47099</td>
+      <td>33.61</td>
+      <td>526.39</td>
+    </tr>
+    <tr>
+      <th>equivalent</th>
+      <td>171</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>3.47</td>
+      <td>638.32</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>14586</td>
+      <td>10.41</td>
+      <td>160.59</td>
+    </tr>
+    <tr>
+      <th>square</th>
+      <td>50</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>2.96</td>
+      <td>185.98</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>4291</td>
+      <td>3.06</td>
+      <td>46.94</td>
+    </tr>
+    <tr>
+      <th>cheap</th>
+      <td>704</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>3.28</td>
+      <td>2,195.84</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>83765</td>
+      <td>59.77</td>
+      <td>644.23</td>
+    </tr>
+    <tr>
+      <th>ideal</th>
+      <td>445</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>3.52</td>
+      <td>1,564.21</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>42701</td>
+      <td>30.47</td>
+      <td>414.53</td>
+    </tr>
+    <tr>
+      <th>revolutionary</th>
+      <td>125</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.00</td>
+      <td>3.10</td>
+      <td>423.93</td>
+      <td>86330753</td>
+      <td>61599</td>
+      <td>12784</td>
+      <td>9.12</td>
+      <td>115.88</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+mir_adv_adj_AM = pd.read_pickle(RESULT_DIR.joinpath('assoc_df/adv_adj/ANYmirror/extra/AdvAdj_frq-thrMIN-7.35f_min5x_extra.pkl.gz')
+                                    ).filter(FOCUS)
+mir_exactly_adj_AM = mir_adv_adj_AM.loc[mir_adv_adj_AM.l1=='exactly', :'unexpected_f']
+mir_exactly_adj_AM.sort_values('deltaP_max')
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>f</th>
+      <th>am_p1_given2</th>
+      <th>am_p2_given1</th>
+      <th>deltaP_max</th>
+      <th>deltaP_mean</th>
+      <th>am_p1_given2_simple</th>
+      <th>am_p2_given1_simple</th>
+      <th>conservative_log_ratio</th>
+      <th>am_log_likelihood</th>
+      <th>N</th>
+      <th>f1</th>
+      <th>f2</th>
+      <th>E11</th>
+      <th>unexpected_f</th>
+    </tr>
+    <tr>
+      <th>key</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>exactly~right</th>
+      <td>135</td>
+      <td>0.01</td>
+      <td>0.12</td>
+      <td>0.12</td>
+      <td>0.07</td>
+      <td>0.01</td>
+      <td>0.13</td>
+      <td>3.51</td>
+      <td>529.59</td>
+      <td>1761853</td>
+      <td>1034</td>
+      <td>13473</td>
+      <td>7.91</td>
+      <td>127.09</td>
+    </tr>
+    <tr>
+      <th>exactly~sure</th>
+      <td>148</td>
+      <td>0.01</td>
+      <td>0.14</td>
+      <td>0.14</td>
+      <td>0.08</td>
+      <td>0.02</td>
+      <td>0.14</td>
+      <td>4.14</td>
+      <td>701.24</td>
+      <td>1761853</td>
+      <td>1034</td>
+      <td>9744</td>
+      <td>5.72</td>
+      <td>142.28</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
