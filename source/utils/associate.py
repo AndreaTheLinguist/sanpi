@@ -25,7 +25,7 @@ else:
     import association_measures.frequencies as fq
     import association_measures.measures as am
 
-ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio', 'liddell',
+ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio', #'liddell',
                       'mutual_information', 'hypergeometric_likelihood', 'binomial_likelihood']
 ALPHA = 0.005
 READ_TAG = 'rsort-view_am-only'
@@ -45,8 +45,9 @@ UCS_DIR, DEMO_UCS_DIR = [
     R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
 AM_ENV_DIR, DEMO_AM_ENV_DIR = [
     R / 'env_prepped_tsv' for R in (UCS_DIR, DEMO_UCS_DIR)]
-AM_DF_DIR=RESULT_DIR / 'assoc_df'
-TOP_AM_DIR=RESULT_DIR / 'top_AM'
+AM_DF_DIR = RESULT_DIR / 'assoc_df'
+TOP_AM_DIR = RESULT_DIR / 'top_AM'
+POLAR_DIR = AM_DF_DIR.joinpath('polar')
 # ? Does this even do anything? This is never run as its own thing...
 confirm_dir(AM_ENV_DIR)
 
@@ -69,14 +70,14 @@ def adjust_assoc_columns(cols_or_df,
         list or DataFrame: Modified list of column names or DataFrame with modified column names.
     """
     def change_columns(columns):
-        replacements = {'conservative_log_ratio': 'LRC', 
-                                'am_log_likelihood': 'G2', 
-                                'log_likelihood': 'G2', 
-                                't_score': 't', 
-                                'mutual_information': 'MI', 
-                                'am_p1_given2': 'dP1', 
-                                'am_p2_given1': 'dP2', 
-                                }
+        replacements = {'conservative_log_ratio': 'LRC',
+                        'am_log_likelihood': 'G2',
+                        'log_likelihood': 'G2',
+                        't_score': 't',
+                        'mutual_information': 'MI',
+                        'am_p1_given2': 'dP1',
+                        'am_p2_given1': 'dP2',
+                        }
         abbreviations = {
             r'am_': '',
             r'ratio': 'r',
@@ -87,27 +88,27 @@ def adjust_assoc_columns(cols_or_df,
             r'ative': '',
             r'unexpected': 'unexp'
         }
-        for update_dict in [replacements, abbreviations]: 
+        for update_dict in [replacements, abbreviations]:
             columns = [
-                re.sub(r'|'.join([(f'^{k}' if k in 'OE' else k) 
+                re.sub(r'|'.join([(f'^{k}' if k in 'OE' else k)
                                   for k in update_dict.keys()]),
-                    #    r'am_|ratio|probability|[OE]11|ative_',
-                    lambda m:
-                    update_dict[m.group()], col)
+                       #    r'am_|ratio|probability|[OE]11|ative_',
+                       lambda m:
+                       update_dict[m.group()], col)
                 for col in columns]
         if style == 'camel':
             columns = [snake_to_camel(c) for c in columns]
         elif style == 'snake':
             columns = [camel_to_snake(c) for c in columns]
-        return columns 
-    
-    # if dataframe is given, dataframe is returned. 
+        return columns
+
+    # if dataframe is given, dataframe is returned.
     if isinstance(cols_or_df, pd.DataFrame):
         cols_or_df.columns = change_columns(cols_or_df.columns)
         return cols_or_df
-    
+
     # if iterable is given, iterable is returned.
-    else: 
+    else:
         return change_columns(cols_or_df)
 
 
@@ -128,7 +129,8 @@ def add_extra_am(df: pd.DataFrame,
                  verbose: bool = False,
                  vocab: int = None,
                  ndigits: int = 9,
-                 metrics: list = None):
+                 metrics: list = None, 
+                 disc=1):
     """
     ['z_score', 't_score', 'log_likelihood', 'simple_ll', 
     'liddell', 'dice', 'log_ratio', 'conservative_log_ratio', 
@@ -141,14 +143,14 @@ def add_extra_am(df: pd.DataFrame,
     init_cols = df.columns.to_list()
     try:
 
-        scores = am.score(df.copy(), measures=metrics,
+        scores = am.score(df.copy(), measures=metrics, disc=disc,
                           alpha=ALPHA, vocab=vocab, digits=ndigits)
     except KeyError:
         df = df.join(
-            fq.observed_frequencies(df.copy()).astype('int64').join(
-                fq.expected_frequencies(df.copy()).apply(pd.to_numeric, downcast='float'))
+            fq.observed_frequencies(df.copy()).join(
+                fq.expected_frequencies(df.copy()))
         )
-        scores = am.score(df, measures=metrics, alpha=ALPHA,
+        scores = am.score(df, measures=metrics, alpha=ALPHA, disc=disc,
                           vocab=vocab, digits=ndigits)
 
     df = df.join(scores.loc[:, ~scores.columns.isin(df.columns)])
@@ -159,25 +161,25 @@ def add_extra_am(df: pd.DataFrame,
     # * manually set conservative_log_ratio variants:
     # *      one-tailed, two-tailed, and two-tailed without correction
     df['conservative_log_ratio'] = am.conservative_log_ratio(
-        df, one_sided=False, alpha=ALPHA,
+        df, one_sided=False, alpha=ALPHA, disc=disc,
         vocab=vocab, digits=ndigits)
     # df['conservative_log_ratio_1t'] = am.conservative_log_ratio(
     #     df, one_sided=True, alpha=ALPHA,
     #     vocab=vocab, digits=ndigits)
-    # no correction performed
-    alphas = ['001', '005', '01', '05']
+    alphas = ['001', '01', '05']
     for a in alphas:
         _alpha = float(f'0.{a}')
         if ALPHA != _alpha:
             df[f'conservative_log_ratio_{a}'] = am.conservative_log_ratio(
-                df, one_sided=False, alpha=_alpha,
+                df, one_sided=False, alpha=_alpha, disc=disc,
                 vocab=vocab, digits=ndigits)
+    # no correction performed
     df['conservative_log_ratio_nc'] = am.conservative_log_ratio(
-        df, one_sided=False, alpha=ALPHA, correct=None,
+        df, one_sided=False, alpha=ALPHA, correct=None, disc=disc,
         digits=ndigits)
     # default vocab calculation
     df['conservative_log_ratio_dv'] = am.conservative_log_ratio(
-        df, one_sided=False, alpha=ALPHA,
+        df, one_sided=False, alpha=ALPHA, disc=disc,
         digits=ndigits)
 
     for col in ['f', 'f1', 'f2']:
@@ -194,7 +196,7 @@ def add_extra_am(df: pd.DataFrame,
     return df.rename(columns=TRANSPARENT_O_NAMES)
 
 
-def adjust_expectations(df):
+def adjust_expectations(df, square_root:bool=False):
     try:
         unexpect = df.unexpected_count
     except AttributeError:
@@ -202,16 +204,17 @@ def adjust_expectations(df):
         df['unexpected_f'] = unexpect
 
     df['unexpected_ratio'] = unexpect / df.f
-    df['expected_sqrt'] = df.E11.apply(sqrt)
+    if square_root: 
+        df['expected_sqrt'] = df.E11.apply(sqrt)
 
-    #! `sqrt` will crash if input is negative
-    df['unexpected_abs_sqrt'] = unexpect.abs().apply(sqrt)
+        #! `sqrt` will crash if input is negative
+        df['unexpected_abs_sqrt'] = unexpect.abs().apply(sqrt)
     return df
 
 
 def extend_deltaP(df):
     deltaP_df = df.copy().filter(regex=r'given[12]$')
-    for e in ('min', 'max', 'max_abs', 'product'):
+    for e in ('min', 'max', 'abs_max', 'mean'):
         df[f'deltaP_{e}'] = symmetric_deltaP(deltaP_df, eval=e)
 
     return df
@@ -219,7 +222,7 @@ def extend_deltaP(df):
 
 def symmetric_deltaP(_df: pd.DataFrame,
                      eval: str = 'max'):
-    if _df.shape[1] > 2: 
+    if _df.shape[1] > 2:
         _df = _df.filter(regex=r'given[12]$')
     if eval == 'min':
         return _df.min(axis=1)
@@ -227,8 +230,8 @@ def symmetric_deltaP(_df: pd.DataFrame,
         return _df.max(axis=1)
     elif eval in {'abs_max', 'max_abs'}:
         return _df.abs().max(axis=1)
-    elif eval == 'product':
-        return _df.product(axis=1)
+    elif eval == 'mean':
+        return _df.mean(axis=1)
 
 
 def get_vocab_size(all_bigrams: Path or pd.DataFrame,
@@ -267,50 +270,82 @@ def get_vocab_size(all_bigrams: Path or pd.DataFrame,
     return vocabs
 
 
-def confirm_basic_ucs(basic_ucs_path: Path, 
-                      args: BINARY_ASSOC_ARGS,
+def confirm_basic_ucs(basic_ucs_path: Path,
+                      freq_floor: int = 100,
+                      contained_counts_path: Path = None,
+                      args: BINARY_ASSOC_ARGS = None,
                       unit: str = None):
-
+    if args:
+        contained_counts_path = args.all_counts
+        freq_floor = args.min_freq
     if basic_ucs_path.is_file():
         print('+ existing UCS table found ✓')
     elif unit:
-        basic_ucs_path = confirm_polarized_ucs(basic_ucs_path, args, unit)
-    elif args.all_counts.is_file():
-        build_ucs_table(min_count=args.min_freq,
+        basic_ucs_path = confirm_polarized_ucs(basic_ucs_path=basic_ucs_path, 
+                                               args=args, 
+                                               unit=unit)
+    elif contained_counts_path and contained_counts_path.is_file():
+        build_ucs_table(min_count=freq_floor,
                         ucs_save_path=basic_ucs_path,
-                        cat_tsv_str=f'cat {args.all_counts}')
+                        cat_tsv_str=f'cat {contained_counts_path}')
     else:
         raise FileNotFoundError
     return basic_ucs_path
 
-def confirm_polarized_ucs(basic_ucs_path: Path, 
-                          args: BINARY_ASSOC_ARGS, 
-                          unit_str:str):
-    comp_path = args.compare_counts
-    neg_path = args.target_counts
-    if any(not p.is_file() for p in (comp_path, neg_path)):
-        exit(
-                f'Initial counts file not found. Check your paths...\n> {comp_path}\n> {neg_path}')
-    path_dict = prep_by_polarity(words_to_keep=unit_str, 
-                                 data_suffix=args.data_suffix,
-                                 in_paths_dict={args.comp_label: comp_path,
-                                                    args.targ_label: neg_path})
+
+def confirm_polarized_ucs(basic_ucs_path: Path,
+                          compare_freq_tsv: Path = None,
+                          target_freq_tsv: Path = None,
+                          freq_floor: int = 100,
+                          compare_label: str = 'compare',
+                          target_label: str = 'target',
+                          data_suffix: str = '.35f-7c.tsv',
+                          args: BINARY_ASSOC_ARGS = None,
+                          unit: str = 'adv'):
+    if args:
+        compare_freq_tsv = args.compare_counts
+        compare_label = args.comp_label
+        target_freq_tsv = args.target_counts
+        target_label = args.targ_label
+        data_suffix = args.data_suffix
+        freq_floor = args.min_freq
+    if any(not p.is_file() for p in (compare_freq_tsv, target_freq_tsv)):
+        exit('Initial counts file not found. Check your paths...\n'
+             f'> {compare_freq_tsv}\n'
+             f'> {target_freq_tsv}')
+    path_dict = prep_by_polarity(words_to_keep=unit,
+                                 data_suffix=data_suffix,
+                                 in_paths_dict={compare_label: compare_freq_tsv,
+                                                target_label: target_freq_tsv})
     basic_ucs_path = build_ucs_from_multiple(
-            tsv_paths=path_dict.values(),
-            min_count=args.min_freq,
-            save_path=basic_ucs_path
-        )
-    
+        tsv_paths=path_dict.values(),
+        min_count=freq_floor,
+        save_path=basic_ucs_path
+    )
+
     return basic_ucs_path
 
 
-def initialize_ucs(basic_ucs_path: Path, args: BINARY_ASSOC_ARGS, unit: str = ''):
+def manipulate_ucs(basic_ucs_path: Path, 
+                   args: BINARY_ASSOC_ARGS, 
+                   unit: str):
+
+    basic_ucs_path = initialize_ucs(basic_ucs_path=basic_ucs_path, 
+                                    args=args, unit=unit)
+    associate_ucs(basic_ucs_path)
+    return basic_ucs_path
+
+
+def initialize_ucs(basic_ucs_path: Path, 
+                   args: BINARY_ASSOC_ARGS, 
+                   unit: str = ''):
 
     print(
         '\nLocating and/or building initial frequency-only UCS table...')
     with Timer() as _timer:
         basic_ucs_path = confirm_basic_ucs(
-            basic_ucs_path, args, unit)
+            basic_ucs_path=basic_ucs_path, 
+            args=args, unit=unit)
         print(
             f'+ path to simple UCS table: `{basic_ucs_path}`')
         print(f'+ time elapsed → {_timer.elapsed()}')
@@ -326,19 +361,33 @@ def associate_ucs(basic_ucs_path):
 
 
 def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
+    """
+    Returns a Path to a CSV file containing associations based on the provided unit, arguments, and polarity.
 
-    def manipulate_ucs(basic_ucs_path: Path, args, unit: str):
+    Args:
+        unit: The unit to use for associations.
+        args: The binary association arguments.
+            >      BINARY_ASSOC_ARGS = namedtuple(
+            >       'BINARY_ASSOC_TUPLE',
+            >        ['min_freq', 'all_counts',
+            >         'compare_counts', 'comp_label', 
+            >         'target_counts', 'targ_label', 
+            >         'data_suffix', 'skew', 'verbose'])
+        is_polar: A boolean indicating whether polarity is considered.
 
-        basic_ucs_path = initialize_ucs(basic_ucs_path, args, unit)
-        associate_ucs(basic_ucs_path)
-        return basic_ucs_path
+    Returns:
+        A Path to the generated associations CSV file.
+
+    Raises:
+        FileNotFoundError: If the readable file does not exist.
+    """
 
     # > select readable/*.csv if it exists, else readable/*.txt
-    readable = seek_readable_ucs(unit,
+    readable = seek_readable_ucs(unit = unit,
                                  min_freq=args.min_freq,
                                  target_counts_dir=args.target_counts.parent,
                                  data_suffix=args.data_suffix,
-                                 all_counts=args.all_counts,
+                                 contained_counts_path=args.all_counts,
                                  is_polar=is_polar)
 
     # > create ucs tables if readable/*.txt does not exist
@@ -348,7 +397,8 @@ def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
             READ_TAG, '').strip('.')
         basic_ucs_path = readable.parent.with_name(
             f'{init_ucs_stem}.ds.gz')
-        basic_ucs_path = manipulate_ucs(basic_ucs_path, args, unit)
+        basic_ucs_path = manipulate_ucs(basic_ucs_path=basic_ucs_path, 
+                                        args=args, unit=unit)
         # if given path to readable file still does not exist
         if not readable.is_file():
             readable = basic_ucs_path.with_name('readable').joinpath(
@@ -358,27 +408,28 @@ def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
     return convert_ucs_to_csv(readable) if readable.suffix == '.txt' else readable
 
 
-def seek_readable_ucs(unit: str,
-                      min_freq: int,
-                      target_counts_dir: Path,
-                      all_counts: Path,
-                      data_suffix: str,
-                      is_polar: bool = True):
+def seek_readable_ucs(min_freq: int,
+                      target_counts_dir: Path = None,
+                      data_suffix: str = '.35f-7c.tsv',
+                      unit: str = '',
+                      is_polar: bool = True, 
+                      contained_counts_path: Path = None,
+                      ucs_subdir:str=None) -> Path:
     min_freq_flag = f'_min{min_freq}x'
 
     if unit:
         while target_counts_dir.name.lower().startswith(('ucs', 'complement')):
             target_counts_dir = target_counts_dir.parent
-        subdir = target_counts_dir.name
+        subdir = ucs_subdir or target_counts_dir.name
         pref = 'polar' if is_polar else 'eval_mirror'
         readable_parent = f'{pref}/{subdir}/{unit}'
         init_ucs_stem = (f'{pref}-{unit}_{data_suffix.strip(".tsv")}'
                          .replace('polar', 'polarized'))
 
     else:
-        subdir = 'adv_adj'
-        init_ucs_stem = all_counts.stem
-        readable_parent = all_counts.parent
+        subdir = ucs_subdir or 'adv_adj'
+        init_ucs_stem = contained_counts_path.stem
+        readable_parent = contained_counts_path.parent
         if 'ucs' in readable_parent.name.lower():
             readable_parent = readable_parent.parent
         readable_parent = f'{subdir}/{readable_parent.name}'
@@ -455,6 +506,7 @@ def build_ucs_table(min_count: int,
     if verbose:
         primary_cmd, sort_cmd = [_make_verbose(
             c) for c in [primary_cmd, sort_cmd]]
+    ucs_save_path = Path(str(ucs_save_path).replace('/readable',''))
     cmd_with_args = primary_cmd + \
         [f'--threshold={min_count}', f'{ucs_save_path}']
     full_cmd_str = f'( {cat_tsv_str} | {" ".join(cmd_with_args)} ) && {" ".join(sort_cmd)}'
@@ -594,7 +646,6 @@ def prep_by_polarity(in_paths_dict: dict,
     return polar_dict
 
 
-
 # * This function applies to the initial, `hit_id` indexed dataframe, ~ a "hit table".
 def ucs_from_hit_table(df, col_1: str, col_2: str,
                        output_dir: Path = None,
@@ -697,7 +748,7 @@ def ucs_from_frq_table(frq_df,
 
     def save_tsv_file(output_tsv_path, output_lines):
         output_tsv_path.write_text(
-            re.sub(r'^o[\._]?k[\._]?$', 'ok', '\n'.join(output_lines)), 
+            re.sub(r'^o[\._]?k[\._]?$', 'ok', '\n'.join(output_lines)),
             encoding='utf8')
         print(
             f'* Simple tab-delimited counts saved as `.tsv`:\n  * path: `{output_tsv_path}`')
@@ -808,7 +859,8 @@ def make_ucs_tsv(data_path,
                    else FREQ_DIR / data_path.parent.name / 'ucs_format')
         confirm_dir(out_dir)
         if col_1 and col_2:
-            data_name = re.search(r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
+            data_name = re.search(
+                r'(clean|f?r?q?-?thr)(.*$)', data_stem).group()
             prefix = snake_to_camel(
                 '_'.join(
                     (re.sub(r'lower|form', '', c)[:4]
@@ -830,6 +882,9 @@ def make_ucs_tsv(data_path,
         return df, stem
     
     
+    
+
+    
     df, data_stem = _load_df(data_path)
     print('# Reformatting co-occurence data for UCS analysis\n')
     print(f'* Loading from `{data_path}`')
@@ -840,8 +895,9 @@ def make_ucs_tsv(data_path,
     # > table indexed by individual hit tokens
     # if data_path.is_relative_to('/share/compling/data/sanpi'):
     if df.index.name == 'hit_id':
-        if 'adj_form_lower' in df.columns: 
-            df['adj_form_lower'] = df.adj_form_lower.astype('string').apply(lambda x: re.sub(r'^o[\._]?k[\._]?$', 'ok', x))
+        if 'adj_form_lower' in df.columns:
+            df['adj_form_lower'] = df.adj_form_lower.astype('string').apply(
+                lambda x: re.sub(r'^o[\._]?k[\._]?$', 'ok', x))
         ucs_from_hit_table(
             df, col_1, col_2,
             ucs_path=_set_out_path(data_path, data_stem, col_1, col_2))
