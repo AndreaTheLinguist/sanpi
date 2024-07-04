@@ -6,11 +6,13 @@ INDEX_TXT_PATH=${TABLE_PATH/.csv/index.txt}
 INDEX_TXT_PATH=${INDEX_TXT_PATH/hits/}
 echo "Saving index as: ${INDEX_TXT_PATH}"
 
-cut -f1 -d, ${TABLE_PATH} > ${INDEX_TXT_PATH} \
+time cut -f1 -d, ${TABLE_PATH} | tail -n+2 > ${INDEX_TXT_PATH} \
 && echo "$(basename ${TABLE_PATH/.csv/}) index successfully retrieved."
 ls -ho ${INDEX_TXT_PATH}
 WCL="$(wc -l ${INDEX_TXT_PATH})"
 echo "${WCL%% *} total ids in sanpi${TABLE_DIR##*sanpi}\
 /$(basename -s _hits.csv ${TABLE_PATH}) dataset"
+echo '...............................................................................................'
+echo 
 
 exit

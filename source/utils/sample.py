@@ -156,22 +156,26 @@ def _read_data(read_path:Path, quiet=False) -> pd.DataFrame:
     if not read_path.is_file():
         exit(f'Error: Input file not found:\n ✕ {read_path}')
 
-    read_suffix = read_path.suffix
-    if '.pkl' in read_path.suffixes:
+    read_suffixes = read_path.suffixes
+    if '.pkl' in read_suffixes:
         full_data = pd.read_pickle(read_path)
-    elif read_suffix == '.csv':
+    elif '.csv' in read_suffixes:
         full_data = pd.read_csv(read_path)
-    elif read_suffix == '.psv':
+    elif '.psv' in read_suffixes:
         full_data = pd.read_csv(read_path, delimiter='|')
-    elif read_suffix == '.tsv':
+    elif '.tsv' in read_suffixes:
         full_data = pd.read_csv(read_path, delimiter='\t')
-    elif read_suffix == '.json':
+    elif '.json' in read_suffixes:
         full_data = pd.read_json(read_path)
+    elif any(s.startswith('.parq') for s in read_suffixes):
+        full_data = pd.read_parquet(read_path)
     else:
         exit(f'Error: Input file suffix, {read_suffix}, is either '
              + 'not interpretable or not an expected suffix for a DataFrame.')
     if not quiet:
-        print(f'\n## Sampling from `{read_path}`')
+        print(
+            f'\n## Sampling from `{read_path}`\n\n{len(full_data):,} total hits in table')
+
     return full_data
 
 

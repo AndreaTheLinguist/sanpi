@@ -10,6 +10,7 @@ import numpy as np
 
 PKL_SUFF = '.pkl.gz'
 POST_PROC_DIR = Path('/share/compling/data/sanpi/4_post-processed')
+HIT_TABLES_DIR = Path('/share/compling/data/sanpi/2_hit_tables')
 SANPI_HOME = Path('/share/compling/projects/sanpi')
 DEMO_DIR = SANPI_HOME / 'DEMO'
 RESULT_DIR, DEMO_RESULT_DIR = [W / 'results' for W in (SANPI_HOME, DEMO_DIR)]
@@ -22,11 +23,13 @@ def timestamp_now() -> str:
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return datetime.now().strftime("%Y-%m-%d_%H%M")
 
+
 def timestamp_today() -> str:
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return datetime.now().strftime("%Y-%m-%d")
 
-def camel_to_snake(camel:str): 
+
+def camel_to_snake(camel: str):
     return re.sub(r'([a-z])([A-Z])', r'\1_\2', camel).lower()
 
 
@@ -140,9 +143,10 @@ def find_files(data_dir: Path(), fname_glob: str, verbose: bool = False):
 
 def gen_random_array(low, high, nvals=8, nvecs=20):
 
-    rng = np.random.default_rng(seed=int(f"{np.datetime64('now', 'h')}".replace('-', '').replace('T', '')))
+    rng = np.random.default_rng(
+        seed=int(f"{np.datetime64('now', 'h')}".replace('-', '').replace('T', '')))
     c = 0
-    while c < nvecs: 
+    while c < nvecs:
         yield rng.integers(low=low, high=high, size=nvals)
         c += 1
 
@@ -211,7 +215,7 @@ def find_glob_in_dir(dir_path: Path,
     try:
         return paths_iter[0]
     except IndexError as e:
-        if err_response: 
+        if err_response:
             if err_response == 'raise':
                 raise FileNotFoundError(
                     errno.ENOENT, strerror(errno.ENOENT), str(dir_path.joinpath(glob_expr))) from e
@@ -219,7 +223,7 @@ def find_glob_in_dir(dir_path: Path,
                 return str(dir_path.joinpath(glob_expr))
         elif verbose:
             print(f'Glob expression, "{glob_expr}", not found in {dir_path}/')
-    
+
     return
 
 
@@ -246,8 +250,9 @@ def print_iter(iter_obj,
     display_message(msg_str, logger, level)
 
 
-def run_shell_command(command_str):
-    print(f'\n```\n{command_str}')
+def run_shell_command(command_str: str, verbose: bool = False):
+    verbose_command = f'\n$ {command_str}\n' if verbose else ''
+    print(f'\n```shell{verbose_command}')
     system(command_str)
     print('```\n')
 

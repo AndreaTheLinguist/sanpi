@@ -3,11 +3,22 @@ import contextlib
 import re
 # import statistics as stat
 from collections import namedtuple
+from itertools import chain
 from math import sqrt
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from more_itertools import batched
+
+PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
+try:
+    import pyarrow
+except ImportError:
+
+    PYARROW = False
+else:
+    PYARROW = True
 
 try:
     from source.utils.general import (PKL_SUFF, confirm_dir, find_files,
@@ -23,6 +34,9 @@ OPTIMIZED_DTYPES = {
     'string': {
         'sent_id':          'string',
         'bigram_id':        'string',
+        'token_str':        'string',
+        'sent_text':        'string',
+        'colloc_id':        'string',
         'lemma_str':        'string'},
 
     # > categorical (demonstrably improves memory usage)
@@ -44,6 +58,9 @@ OPTIMIZED_DTYPES = {
         'neg_form':         'category',
         'adv_form':         'category',
         'adj_form':         'category',
+        'neg_form_lower':         'category',
+        'adv_form_lower':         'category',
+        'adj_form_lower':         'category',
         'hit_text':         'category',
         'neg_lemma':        'category',
         'adv_lemma':        'category',
@@ -60,7 +77,8 @@ OPTIMIZED_DTYPES = {
         'dep_str_rel':      'category',
         'dep_str_node_rel': 'category',
         'dep_str_mask':     'category',
-        'dep_str_mask_rel': 'category'},
+        'dep_str_mask_rel': 'category'
+    },
 
     # > NUMERICAL
     'numerical': {
@@ -128,6 +146,27 @@ def calculate_var_coeff(vector: pd.Series):
     """
 
     return vector.std() / vector.mean()
+
+
+def catify_hit_table(df, reverse: bool = False):
+    _df = df.copy()
+
+    if 'part' in _df.columns:
+        _df.loc[:, 'part'] = _df.part.astype('string')
+
+    unk_dtypes = _df.select_dtypes(include='object').columns
+    if any(unk_dtypes):
+        _df.loc[:, unk_dtypes] = _df.loc[:, unk_dtypes].astype('string')
+
+    if reverse:
+        cat_cols = _df.select_dtypes(include='category').columns
+        _df.loc[:, cat_cols] = _df.loc[:, cat_cols].astype('string')
+    else:
+        cat_cols = ~((_df.columns.str.startswith(('extend', 'text', 'dep', 'adj', 'all', 'bigram', 'colloc', 'preceding')))
+                     | (_df.columns.str.endswith(('all_dep_target', 'id', 'text', 'str'))))
+        _df.loc[:, cat_cols] = _df.loc[:, cat_cols].astype('category')
+
+    return _df
 
 
 def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables'),
@@ -222,7 +261,6 @@ def describe_counts(df: pd.DataFrame = None,
             print(
                 'Stats can only be determined from a given path if indicated file is in pickle format.')
             return
-        
 
     data_label = df_path.name.replace('.csv', '').replace(PKL_SUFF, '')
     stats_dir = df_path.parent.joinpath('descriptive_stats')
@@ -264,7 +302,7 @@ def describe_counts(df: pd.DataFrame = None,
                     most_var_row = _select_word_sample(desc)
 
     return df.loc[['SUM'] + most_var_row,
-                      ['SUM'] + most_var_col], df_path
+                  ['SUM'] + most_var_col], df_path
 
 
 def _select_word_sample(desc: pd.DataFrame, metric='var_coeff', largest=True) -> list:
@@ -281,6 +319,7 @@ def _select_word_sample(desc: pd.DataFrame, metric='var_coeff', largest=True) ->
         else top_means_metric.squeeze().nsmallest(nth).index.to_list()
     )
 
+
 def drop_margins(_df, margin_name='SUM'):
     """
     Drop marginal frequencies from frequency table DataFrame.
@@ -295,6 +334,330 @@ def drop_margins(_df, margin_name='SUM'):
 
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
+
+def translate_orth_forms(df, verbose=False):
+
+    df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
+           ] = df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
+                      ].astype('string')
+
+    def adv_is_very(df):
+        return df.adv_form_lower.str.contains(r'^v\.?$|^ve+r+y+$', regex=True)
+
+    def adv_is_def(df):
+        return df.adv_form_lower.str.contains(r'^def\.?$', regex=True)
+
+    def adj_is_ok(df):
+        return df.adj_form_lower.str.contains(r'^o*\.?k+\.?a*y*$', regex=True)
+
+    _very = adv_is_very(df)
+    _ok = adj_is_ok(df)
+    _definitely = adv_is_def(df)
+    if any(_very | _ok | _definitely):
+        if verbose:
+            print('\nTranslating some known orthographic quirks...')
+        # > variations on "very"
+        if any(_very):
+            if verbose:
+                print('\n==== very ====')
+                print(df.loc[_very, 'adv_form_lower']
+                      .astype('string').value_counts().nlargest(10).to_frame()
+                      .to_markdown(floatfmt=',.0f', intfmt=','))
+
+            df.loc[_very, :] = df.loc[_very, :].assign(
+                adv_lemma='very',
+                adv_form_lower='very')
+
+        # > variations on "ok"
+        if any(_ok):
+            if verbose:
+                print('\n==== ok ====')
+                print(df.loc[_ok, 'adj_form_lower']
+                      .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+                      .to_markdown(floatfmt=',.0f', intfmt=','))
+
+            df.loc[_ok, :] = df.loc[_ok, :].assign(
+                adj_form_lower='ok',
+                adj_lemma='ok')
+
+        # > variations on "definitely"
+        if any(_definitely):
+            if verbose:
+                print('\n==== definitely ====')
+                print(df.loc[_definitely, 'adv_form_lower']
+                      .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+                      .to_markdown(floatfmt=',.0f', intfmt=','))
+            df.loc[_definitely, :] = df.loc[_definitely, :].assign(
+                adv_form_lower='definitely',
+                adv_lemma='definitely')
+    return df.convert_dtypes()
+
+
+def remove_orth_forms(df):
+
+    df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
+           ] = df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
+                      ].astype('string')
+
+    def adv_is_very(df):
+        return df.adv_form_lower.str.contains(r'^v\.?$|^ve+r+y+$', regex=True)
+
+    def adv_is_def(df):
+        return df.adv_form_lower.str.contains(r'^def\.?$', regex=True)
+
+    def adj_is_ok(df):
+        return df.adj_form_lower.str.contains(r'^o*\.?k+\.?a*y*$', regex=True)
+
+    print('Dropping most bizarre...\n')
+    print(df.loc[df.bigram_lower.str.contains(r'[\[\\\/)]', regex=True),
+          ['adv_form_lower', 'adj_form_lower']].astype('string').value_counts()
+          .nlargest(10).to_frame().reset_index()
+          .to_markdown(floatfmt=',.0f', intfmt=','))
+    df = df.loc[~df.bigram_lower.str.contains(r'[\[\\\/)]', regex=True), :]
+
+    print('\nDropping plain numerals as adjectives')
+    print()
+    print(df.loc[df.adj_form_lower.astype('string').str.contains(r'^\d+$'), ['adv_form_lower', 'adj_form_lower', 'text_window']]
+          .astype('string').value_counts().nlargest(10).to_frame().reset_index().to_markdown(floatfmt=',.0f')
+          )
+    df = df.loc[~df.adj_form_lower.astype('string').str.contains(r'^\d+$'), :]
+
+    # > drop any single character "words"
+    print()
+    print(df.loc[df.adv_form_lower.str.contains(
+        r'^\w\W*$'), ['adv_form_lower', 'adj_form_lower']]
+        .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+        .to_markdown(floatfmt=',.0f', intfmt=','))
+    print()
+    print(df.loc[df.adj_form_lower.str.contains(
+        r'^\w\W*$'), ['adv_form_lower', 'adj_form_lower']]
+        .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+        .to_markdown())
+    df = df.loc[~((df.adv_form_lower.str.contains(r'^\w\W*$'))
+                  | (df.adj_form_lower.str.contains(r'^\w\W*$'))), :]
+
+    # > delete remaining non-word characters (esp. `.` & `*`)
+    df = df.assign(
+        adv_form_lower=df.adv_form_lower.str.strip(
+            '-').str.replace(r'[^a-z0-9&-]', '', regex=True),
+        adv_lemma=df.adv_lemma.str.strip(
+            '-').str.replace(r'[^a-zA-Z0-9&-]', '', regex=True),
+        adj_form_lower=df.adj_form_lower.str.strip(
+            '-').str.replace(r'[^a-z0-9&-]', '', regex=True),
+        adj_lemma=df.adj_lemma.str.strip(
+            '-').str.replace(r'[^a-zA-Z0-9&-]', '', regex=True)
+    )
+    df = df.loc[~df.adv_form_lower.isin({'is', 'ie'}), :]
+    print('\n'+r"** ** ** Remaining [^\w'-] ** ** **")
+
+    print(df.loc[(df.adv_form_lower.str.contains(r"[^\w'-]", regex=True))
+                 | (df.adj_form_lower.str.contains(r"[^\w'-]", regex=True)),
+                 ['adv_form_lower', 'adj_form_lower']]
+          .astype('string').value_counts()
+          .nlargest(10).to_frame().reset_index()
+          .to_markdown(floatfmt=',.0f', intfmt=',')
+          )
+
+    return df.convert_dtypes()
+
+
+def add_lower_cols(ch: pd.DataFrame) -> pd.DataFrame:
+    def get_bigram_lower(ch: pd.DataFrame) -> pd.Series:
+        try:
+            bigram_lower = (ch['adv_form'] + '_' +
+                            ch['adj_form']).str.lower()
+        except KeyError:
+            try:
+                bigram_lower = (ch['adv_form_lower'] + '_' +
+                                ch['adj_form_lower'])
+            except KeyError:
+
+                #! This should not happen, but...
+                print(f'Warning: Could not add column `{lower_col}`:',
+                      '`ad*_form(_lower)` columns not found!')
+                print('current columns:\n-',
+                      ch.columns.str.join('\n - '),
+                      end='\n\n')
+        return bigram_lower
+
+    for form_col in ['adv_form', 'adj_form', 'bigram', 'neg_form', 'mir_form']:
+        lower_col = f'{form_col}_lower'
+
+        if lower_col not in ch.columns:
+
+            if form_col in ch.columns:
+                ch.loc[:, lower_col] = ch.loc[:, form_col].str.lower()
+            elif lower_col == 'bigram_lower':
+                ch.loc[:, lower_col] = get_bigram_lower(ch)
+
+    return ch
+
+
+def filter_csv_by_index(df_csv_path: Path,
+                        index_txt_path: Path,
+                        dtype_dict: dict,
+                        outpath: Path = None):
+
+    def _gen_chunk_batch(reader, batches):
+        c = 1
+        for chunk in reader:
+            chunk = chunk.rename(columns={'colloc': 'bigram',
+                                          'colloc_id': 'bigram_id'})
+            use_index = not('bigram_id' in chunk.columns 
+                            and any(chunk.filter(regex=r'neg|mir').columns))
+            print('-'*30)
+            print(f'* {len(chunk):,} rows in csv chunk {c}')
+            c += 1
+            b = 1
+            for batch in batches:
+                # print(f'{len(batch):,} ids in index batch')
+                match_chunk = (chunk.filter(batch, axis=0)
+                               if use_index
+                               else chunk.loc[chunk.bigram_id.isin(batch), :]
+                               ).sort_index()
+                print(f'  * {len(match_chunk):,} rows matching index batch {b}')
+                print(f'    ({round(len(match_chunk)/len(chunk)*100, 1):.1f}% of chunk)')
+                b += 1
+                if len(match_chunk) > 0:
+                    print('\n    ' +
+                          match_chunk.filter(regex=r'lower|hit|win|id|at').describe().T
+                          .to_markdown(floatfmt=',.0f', intfmt=',').replace('\n', '\n    '), end='\n\n')
+                    yield match_chunk
+
+    def _add_new_cols(df, load_path):
+        df = df.assign(part=PART_LABEL_REGEX.search(load_path.stem).group())
+        df['part'] = df.part.astype('string')
+        if any(df.index.str.startswith('pcc')):
+            df['slice'] = df.index.str.split(
+                '.').str.get(0).astype('string')
+        else:
+            df['slice'] = df.index.str.split(
+                '_').str[:3].str.join('_').str[:-2].astype('string')
+        if any(df.filter(regex=r'neg_|mir_').columns):
+            if 'neg_form' in df.columns:
+                df.loc[df.neg_form.isna(), 'neg_form'] = 'None'
+                df.loc[df.neg_form_lower.isna(), 'neg_form_lower'] = 'none'
+            df['trigger_lower'] = df.filter(
+                regex=r'(neg|mir)_form_lower').squeeze()
+            df['trigger_lemma'] = df.filter(regex=r'(neg|mir)_lemma').squeeze()
+            if 'all_forms_lower' not in df.columns:
+                df['all_forms_lower'] = df.trigger_lower + '_' + df.bigram_lower
+
+        return catify_hit_table(df)
+
+    dtype_dict = dtype_dict or {k: v
+                                for c in OPTIMIZED_DTYPES.values()
+                                for k, v in c.items()}
+    keepers = set(index_txt_path.read_text().splitlines())
+    print(f'{len(keepers):,} ids in loaded index filter')
+    keep_batches = tuple(batched(keepers,  max(1000, 1 + len(keepers)//6)))
+    # keep_batches = tuple(batched(keepers, 20000))
+
+    with pd.read_csv(df_csv_path, 
+                     index_col='hit_id',
+                     skipinitialspace=True,
+                     dtype=dtype_dict, engine='c',
+                     chunksize=200000) as csv_reader:
+        csv_iter = _gen_chunk_batch(csv_reader, keep_batches)
+        if outpath and '.csv' in outpath.suffixes:
+            c = 0
+            for filter_chunk in csv_iter:
+                # > newly added adjustments to hit_tables
+                filter_chunk = add_lower_cols(filter_chunk.copy())
+                filter_chunk = translate_orth_forms(filter_chunk)
+                filter_chunk = _add_new_cols(filter_chunk,
+                                             load_path=df_csv_path)
+                filter_chunk.index.name = 'hit_id'
+                filter_chunk.to_csv(outpath,
+                                    mode=('w' if c == 0 else 'a'),
+                                    header=c == 0)
+                c += 1
+            print('\n'+'*'*30)
+        else:
+            return pd.concat(csv_iter)
+
+
+def remove_duplicates(hit_df):
+    def weed_windows(df):
+        if 'adv_index' not in df.columns:
+            df['adv_index'] = pd.to_numeric(df.index.str.split(
+                ':').str.get(-1).str.split('-').str.get(-2), downcast='integer')
+        if df.text_window.sample(min(len(df), 500)).str.count(' ').max() < 14:
+            df = extend_window(df, 7, 7)
+        over_20 = df.utt_len > 20
+        yield df.copy().loc[~over_20, :]
+
+        df_over20 = df.copy().loc[over_20, :]
+        info_df = over_20.value_counts().to_frame('sent >20 tokens')
+        compare_cols = ['text_window',
+                        ('adv_form_lower'
+                         if 'adv_form_lower' in df_over20.columns
+                         else 'bigram_lower')]
+        is_duplicated = df_over20[compare_cols].duplicated(
+            keep=False, subset=compare_cols)
+        if any(is_duplicated):
+            info_df['& is/has duplicate'] = is_duplicated.value_counts()
+            discard = df_over20[compare_cols].duplicated(
+                keep='first', subset=compare_cols)
+            info_df['& will be removed'] = discard.value_counts()
+            info_df.index.name = '# hits...'
+            print('\nCompiled Duplicatation Counts\n\n' +
+                  info_df.to_markdown(intfmt=',', floatfmt=',.0f'))
+            print('\nExample of Duplication Removal (1 kept per "text_window")\n\n```log')
+            print((df_over20[is_duplicated]
+                  .filter(['utt_len', 'bigram_lower', 'text_window', 'token_str'])
+                  # //.sort_values(['extend_window', 'bigram_lower'])
+                   .sort_values(['bigram_lower', 'text_window']))
+                  .head(6)
+                  .to_markdown(maxcolwidths=[18, None, None, 28, 50], tablefmt='rounded_grid'))
+            print('```\n')
+            yield df_over20.loc[~discard, :]
+        else:
+            print('\n> [[ No duplicates found ]]\n')
+            yield df_over20
+
+    if 'utt_len' not in hit_df.columns:
+        hit_df['utt_len'] = pd.to_numeric(
+            hit_df.token_str.str.count(' ').add(1),
+            downcast='unsigned')
+    hit_df = adjust_few_hits(hit_df)
+    hit_df = drop_long_windows(hit_df)
+    succinct = pd.concat(weed_windows(hit_df))
+    print(f'* {len(succinct):,} hits remaining after additional duplicate filtering',
+          f'  * ({len(hit_df) - len(succinct):,} hits removed as duplicates.)',
+          sep='\n')
+
+    return succinct
+
+def drop_long_windows(df): 
+    df['window_len'] = df.text_window.str.count(' ').add(1)
+    questionable_deprel = df.filter(
+        regex=r'(?:neg|mir)_deprel').squeeze().isin(
+            {'dep', 'parataxis', 'conj','mark','cc'})
+    over25 = df.window_len > 25
+    over40 = df.window_len > 40
+    drop_row = over40 | (over25 & questionable_deprel)
+    print(f'- Dropping {over40.value_counts()[True]:,} tokens with `text_window` strings longer than 40 tokens')
+    print(f'- Dropping {(over25 & questionable_deprel & ~over40).value_counts()[True]:,} tokens with `text_window` over 25 tokens and questionable deprel type')
+    return df.loc[~drop_row, :]
+
+
+def adjust_few_hits(df): 
+    init_few_count = df.neg_form_lower.value_counts()['few']
+    print('* Validating "few" tokens')
+    print(f'  * {init_few_count:,} unvalidated "few" tokens')
+    # this should match:
+    # "{the, a, those, these, her, his, their, my, your, our} 
+    #  ({lucky, next, last, fortunate, remaining, select, very, relative, chosen, etc.}) 
+    #  few"
+    a_few = df.text_window.str.lower().str.contains(r'\ba few\b', regex=True)
+    df = df.loc[~((df.neg_form_lower=='few') & a_few), :]
+    exist_few = df.text_window.str.lower().str.contains(
+        r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b', 
+        regex=True)
+    df = df.loc[~((df.neg_form_lower=='few') & exist_few), :]
+    print(f"  * {df.neg_form_lower.value_counts()['few']:,} remaining after validation")
+    return df
 
 def beef_up_dtypes(df: pd.DataFrame,
                    integers: bool = True,
@@ -474,10 +837,10 @@ def optimize_am_df(df: pd.DataFrame, verbose=False):
     _df['l1'] = _df['l1'].astype('category')
     return _df
 
-# def nb_print_table(df, n_dec:int=2, 
-#                    adjust_columns:bool=True) -> None: 
+# def nb_print_table(df, n_dec:int=2,
+#                    adjust_columns:bool=True) -> None:
 #     _df = df.copy()
-#     if adjust_columns: 
+#     if adjust_columns:
 #         _df = adjust_assoc_columns(_df)
 #     _df.columns = [f'`{c}`' for c in _df.columns]
 #     _df.index = [f'**{r}**' for r in _df.index ]
@@ -669,8 +1032,6 @@ def show_counts(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     """
 
     return df.value_counts(columns).to_frame().rename(columns={0: 'count'})
-
-
 
 
 def save_table(df: pd.DataFrame,
