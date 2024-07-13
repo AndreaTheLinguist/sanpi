@@ -6,6 +6,7 @@ from collections import namedtuple
 from itertools import chain
 from math import sqrt
 from pathlib import Path
+from time import sleep
 
 import numpy as np
 import pandas as pd
@@ -149,22 +150,24 @@ def calculate_var_coeff(vector: pd.Series):
 
 
 def catify_hit_table(df, reverse: bool = False):
-    _df = df.copy()
+    _df = df.copy().convert_dtypes()
 
-    if 'part' in _df.columns:
-        _df.loc[:, 'part'] = _df.part.astype('string')
+    # if 'part' in _df.columns:
+    #     _df.loc[:, 'part'] = _df.part.astype('string')
 
-    unk_dtypes = _df.select_dtypes(include='object').columns
-    if any(unk_dtypes):
-        _df.loc[:, unk_dtypes] = _df.loc[:, unk_dtypes].astype('string')
+    # unk_dtypes = _df.select_dtypes(include='object').columns.to_list()
+    # if any(unk_dtypes):
+    #     _df.loc[:, unk_dtypes] = _df.loc[:, unk_dtypes].convert_dtypes()
 
     if reverse:
         cat_cols = _df.select_dtypes(include='category').columns
-        _df.loc[:, cat_cols] = _df.loc[:, cat_cols].astype('string')
+        if any(cat_cols):
+            _df[cat_cols] = _df.loc[:, cat_cols].astype('string')
     else:
         cat_cols = ~((_df.columns.str.startswith(('extend', 'text', 'dep', 'adj', 'all', 'bigram', 'colloc', 'preceding')))
                      | (_df.columns.str.endswith(('all_dep_target', 'id', 'text', 'str'))))
-        _df.loc[:, cat_cols] = _df.loc[:, cat_cols].astype('category')
+        _df.loc[:, cat_cols] = _df.loc[:, cat_cols].astype(
+            'string').astype('category')
 
     return _df
 
@@ -503,8 +506,8 @@ def filter_csv_by_index(df_csv_path: Path,
         for chunk in reader:
             chunk = chunk.rename(columns={'colloc': 'bigram',
                                           'colloc_id': 'bigram_id'})
-            use_index = not('bigram_id' in chunk.columns 
-                            and any(chunk.filter(regex=r'neg|mir').columns))
+            use_index = not ('bigram_id' in chunk.columns
+                             and any(chunk.filter(regex=r'neg|mir').columns))
             print('-'*30)
             print(f'* {len(chunk):,} rows in csv chunk {c}')
             c += 1
@@ -516,11 +519,13 @@ def filter_csv_by_index(df_csv_path: Path,
                                else chunk.loc[chunk.bigram_id.isin(batch), :]
                                ).sort_index()
                 print(f'  * {len(match_chunk):,} rows matching index batch {b}')
-                print(f'    ({round(len(match_chunk)/len(chunk)*100, 1):.1f}% of chunk)')
+                print(
+                    f'    ({round(len(match_chunk)/len(chunk)*100, 1):.1f}% of chunk)')
                 b += 1
                 if len(match_chunk) > 0:
                     print('\n    ' +
-                          match_chunk.filter(regex=r'lower|hit|win|id|at').describe().T
+                          match_chunk.filter(
+                              regex=r'lower|hit|win|id|at').describe().T
                           .to_markdown(floatfmt=',.0f', intfmt=',').replace('\n', '\n    '), end='\n\n')
                     yield match_chunk
 
@@ -553,7 +558,7 @@ def filter_csv_by_index(df_csv_path: Path,
     keep_batches = tuple(batched(keepers,  max(1000, 1 + len(keepers)//6)))
     # keep_batches = tuple(batched(keepers, 20000))
 
-    with pd.read_csv(df_csv_path, 
+    with pd.read_csv(df_csv_path,
                      index_col='hit_id',
                      skipinitialspace=True,
                      dtype=dtype_dict, engine='c',
@@ -577,15 +582,21 @@ def filter_csv_by_index(df_csv_path: Path,
             return pd.concat(csv_iter)
 
 
-def remove_duplicates(hit_df):
-    def weed_windows(df):
+def remove_duplicates(hit_df: pd.DataFrame,
+                      return_index: bool = False):
+    def weed_windows(df: pd.DataFrame,
+                     return_index: bool = False):
         if 'adv_index' not in df.columns:
             df['adv_index'] = pd.to_numeric(df.index.str.split(
                 ':').str.get(-1).str.split('-').str.get(-2), downcast='integer')
-        if df.text_window.sample(min(len(df), 500)).str.count(' ').max() < 14:
+
+        if ((not any(df.filter(regex=r'neg|mir|trigger').columns))
+            and (df.text_window.sample(min(len(df), 750))
+                 .str.count(' ').add(1).max() < 14)):
             df = extend_window(df, 7, 7)
+
         over_20 = df.utt_len > 20
-        yield df.copy().loc[~over_20, :]
+        yield df.loc[~over_20].index.to_series() if return_index else df.loc[~over_20]
 
         df_over20 = df.copy().loc[over_20, :]
         info_df = over_20.value_counts().to_frame('sent >20 tokens')
@@ -611,53 +622,59 @@ def remove_duplicates(hit_df):
                   .head(6)
                   .to_markdown(maxcolwidths=[18, None, None, 28, 50], tablefmt='rounded_grid'))
             print('```\n')
-            yield df_over20.loc[~discard, :]
+            keep_over20 = df_over20.loc[~discard, :]
+            yield keep_over20.index.to_series() if return_index else keep_over20
         else:
             print('\n> [[ No duplicates found ]]\n')
-            yield df_over20
+            yield df_over20.index.to_series() if return_index else df_over20
 
     if 'utt_len' not in hit_df.columns:
         hit_df['utt_len'] = pd.to_numeric(
             hit_df.token_str.str.count(' ').add(1),
             downcast='unsigned')
-    hit_df = adjust_few_hits(hit_df)
-    hit_df = drop_long_windows(hit_df)
-    succinct = pd.concat(weed_windows(hit_df))
+
+    succinct = pd.concat(weed_windows(df=hit_df,
+                                      return_index=return_index))
     print(f'* {len(succinct):,} hits remaining after additional duplicate filtering',
           f'  * ({len(hit_df) - len(succinct):,} hits removed as duplicates.)',
           sep='\n')
 
     return succinct
 
-def drop_long_windows(df): 
+
+def drop_long_windows(df):
     df['window_len'] = df.text_window.str.count(' ').add(1)
     questionable_deprel = df.filter(
         regex=r'(?:neg|mir)_deprel').squeeze().isin(
-            {'dep', 'parataxis', 'conj','mark','cc'})
+            {'dep', 'parataxis', 'conj', 'mark', 'cc'})
     over25 = df.window_len > 25
     over40 = df.window_len > 40
     drop_row = over40 | (over25 & questionable_deprel)
-    print(f'- Dropping {over40.value_counts()[True]:,} tokens with `text_window` strings longer than 40 tokens')
-    print(f'- Dropping {(over25 & questionable_deprel & ~over40).value_counts()[True]:,} tokens with `text_window` over 25 tokens and questionable deprel type')
+    print(f'- Dropping {(over40.value_counts()[True] if any(over40) else 0):,}',
+          'tokens with `text_window` strings longer than 40 tokens')
+    print(
+        f'- Dropping {((over25 & questionable_deprel & ~over40).value_counts()[True] if any(over25 & questionable_deprel) else 0):,} tokens with `text_window` over 25 tokens and questionable deprel type')
     return df.loc[~drop_row, :]
 
 
-def adjust_few_hits(df): 
+def adjust_few_hits(df):
     init_few_count = df.neg_form_lower.value_counts()['few']
     print('* Validating "few" tokens')
     print(f'  * {init_few_count:,} unvalidated "few" tokens')
     # this should match:
-    # "{the, a, those, these, her, his, their, my, your, our} 
-    #  ({lucky, next, last, fortunate, remaining, select, very, relative, chosen, etc.}) 
+    # "{the, a, those, these, her, his, their, my, your, our}
+    #  ({lucky, next, last, fortunate, remaining, select, very, relative, chosen, etc.})
     #  few"
     a_few = df.text_window.str.lower().str.contains(r'\ba few\b', regex=True)
-    df = df.loc[~((df.neg_form_lower=='few') & a_few), :]
+    df = df.loc[~((df.neg_form_lower == 'few') & a_few), :]
     exist_few = df.text_window.str.lower().str.contains(
-        r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b', 
+        r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b',
         regex=True)
-    df = df.loc[~((df.neg_form_lower=='few') & exist_few), :]
-    print(f"  * {df.neg_form_lower.value_counts()['few']:,} remaining after validation")
+    df = df.loc[~((df.neg_form_lower == 'few') & exist_few), :]
+    print(f"  * {df.neg_form_lower.value_counts()['few']:,}",
+          "remaining after validation")
     return df
+
 
 def beef_up_dtypes(df: pd.DataFrame,
                    integers: bool = True,
@@ -686,7 +703,7 @@ def beef_up_dtypes(df: pd.DataFrame,
     return df
 
 
-def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
+def enhance_descrip(df: pd.DataFrame, strings: bool = False) -> pd.DataFrame:
     """
     Enhance the description of a DataFrame by adding additional statistical metrics.
 
@@ -733,13 +750,13 @@ def enhance_descrip(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_proc_time(start: pd.Timestamp, end: pd.Timestamp) -> str:
     t_comp = (end - start).components
-    return (
+    return "`" + (
         ":".join(
             str(c).zfill(2)
             for c in (t_comp.hours, t_comp.minutes, t_comp.seconds)
         )
         + f'.{round(t_comp.microseconds, 1)}'
-    )
+    ) + "`"
 
 
 def make_cats(orig_df: pd.DataFrame, columns: list = None) -> pd.DataFrame:  # type: ignore
@@ -1032,6 +1049,137 @@ def show_counts(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     """
 
     return df.value_counts(columns).to_frame().rename(columns={0: 'count'})
+
+
+def save_advadj_freq_tsv(final_hits, 
+                         freq_tsv_path:Path = None):
+    joint_f = final_hits.bigram_lower.value_counts().to_frame('f')
+    joint_f = joint_f.join(
+        joint_f.index.to_series()
+        .str.extract(r'^(?P<adv>[^_]+)_(?P<adj>[^_]+)$'))
+    sorts = [fx.sort_index() for __, fx in joint_f.sort_values(['f'], ascending=False).groupby('f')]
+    sorts.reverse()
+    joint_f = pd.concat(sorts, ignore_index=True)
+    print('\n  Top 10 joint frequencies:\n\n       ',
+          joint_f.nlargest(10, columns='f')
+          .to_markdown(tablefmt='plain', intfmt=',',
+                       index=False)
+          .replace('\n', '\n        '),
+          '\n')
+    if freq_tsv_path is None:
+        return joint_f
+    else:
+        joint_f.to_csv(freq_tsv_path,
+                    sep='\t',
+                    index=False,
+                    header=False)
+        print('+ basic `adv~adj` frequencies for final hits',
+            f'saved as {freq_tsv_path} ✓', sep='  \n  ')
+
+
+def save_final_info(final_hits: pd.DataFrame,
+                    data_dir: Path,
+                    tag: str = 'ALL',
+                    basic_column_filter: list = None,
+                    partition_by: list = None,
+                    max_parq_rows: int = 50000,
+                    date_flag: str = None):
+    print('')
+    partition_by = partition_by or ['category', 'part']
+    basic_column_filter = pd.Series(
+        (basic_column_filter
+         or ['hit_id', 'category',
+             'trigger_lemma',
+             'adv_form_lower', 'adj_form_lower']) + partition_by
+    ).drop_duplicates().to_list()
+
+    info_dir = data_dir.parent.parent / 'info'
+    confirm_dir(info_dir)
+    freq_tsv_dir = data_dir / 'ucs_format'
+    confirm_dir(freq_tsv_dir)
+    category = data_dir.name
+    final_hits = final_hits.assign(category=category)
+    # > set paths
+    # tag basic.replace('NEQ',f'NEQ-{timestamp_now()}')
+    date_flag = date_flag or (
+        f'.{pd.Timestamp.now().strftime("%y%m%d%H")}'
+        if tag == 'NEQ' else '')
+
+    subtotals_path = info_dir.joinpath(
+        f'{tag}_{category}_final-subtotals{date_flag}.csv')
+
+    final_index_path = data_dir.joinpath(
+        f'{tag}_{category}_final-index{date_flag}.txt')
+
+    basic_freq_tsv = freq_tsv_dir.joinpath(
+        f'AdvAdj_{tag}_{category}-final-freq{date_flag}.tsv')
+
+    final_basic_parq = info_dir.joinpath(
+        f'{tag}_final-hits_basic{date_flag}.parq')
+
+    # * save subtotals for part
+    (final_hits
+     .value_counts(['part', 'category'])
+     .to_frame('total_hits')
+     .reset_index()
+     .to_csv(subtotals_path, index=False))
+    print(f'+ Part Subtotals saved as {subtotals_path} ✓')
+
+    # >>>>>>>>>
+    sleep(1)
+
+    final_index = final_hits.index.to_list()
+    final_index.sort()
+    final_index_path.write_text('\n'.join(final_index), encoding='utf8')
+    print(f'+ `hit_id` index for final selection of `{category}` hits',
+          f'saved as {final_index_path} ✓', sep='  \n  ')
+    sleep(1)
+    # * save basic frequency TSV!
+    # final_hits['bigram_lower'] = final_hits.bigram_lower.astype('string').astype('category')
+    save_advadj_freq_tsv(final_hits, basic_freq_tsv)
+
+    # >>>>>>>>>
+    print(('\n----------------------\n'
+           '> *temporarily paused*\n'
+           '----------------------\n'))
+    sleep(30)
+
+    final_hits = final_hits.sort_index().reset_index()
+    # > save most basic info as parquet
+
+    max_parq_rows = int(
+        max_parq_rows
+        if 'slice' in partition_by
+        else max(max_parq_rows,
+                 round(((final_hits.part.value_counts().mean()//10)
+                        * 1.005), -3))
+    )
+    group_max = max_parq_rows//2
+    final_hits = catify_hit_table(final_hits
+                                  .filter(basic_column_filter))
+    final_hits.to_parquet(str(final_basic_parq),
+                          index=None,
+                          partition_cols=partition_by,
+                          engine='pyarrow',
+                          basename_template='group-{i}.parquet',
+                          use_threads=True,
+                          existing_data_behavior='delete_matching',
+                          max_rows_per_group=group_max,
+                          row_group_size=group_max,
+                          min_rows_per_group=min(
+                              final_hits.part.value_counts().min() - 1,
+                              max_parq_rows//8),
+                          max_rows_per_file=max_parq_rows)
+
+    print('+ basic final hits table',
+          f'saved as {final_basic_parq} ✓',
+          '+ partitioned by: ',
+          f'  {repr(partition_by)}',
+          '* properties included:  ',
+          '\n    ' + repr(final_hits.columns
+                          ).replace('\n', '\n      ')+'\n',
+          f'+ max rows per file: {max_parq_rows:,}',
+          sep='  \n  ')
 
 
 def save_table(df: pd.DataFrame,

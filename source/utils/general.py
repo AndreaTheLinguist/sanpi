@@ -250,7 +250,8 @@ def print_iter(iter_obj,
     display_message(msg_str, logger, level)
 
 
-def run_shell_command(command_str: str, verbose: bool = False):
+def run_shell_command(command_str: str, 
+                      verbose: bool = False):
     verbose_command = f'\n$ {command_str}\n' if verbose else ''
     print(f'\n```shell{verbose_command}')
     system(command_str)
