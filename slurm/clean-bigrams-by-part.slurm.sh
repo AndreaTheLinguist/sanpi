@@ -4,9 +4,9 @@
 #SBATCH -o %x.%j.out
 #SBATCH -e %x.%j.err
 #SBATCH --time 8:00:00
-#SBATCH -J "pre-clean-parts"
+#SBATCH -J "clean-parts"
 #SBATCH --requeue
-#SBATCH --chdir="/share/compling/projects/sanpi/logs"
+#SBATCH --chdir="/share/compling/projects/sanpi/logs/cleaning_bigrams"
 
 echo 'running additional cleaning/processing for corpus parts: `slurm/com-process_by-part.slurm.sh`'
 echo "JOB ID: ${SLURM_JOB_ID}"

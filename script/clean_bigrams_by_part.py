@@ -105,13 +105,44 @@ def gen_keep_clean(reader, keep_batches):
         yield chunk
 
 
+def write_parquet(part:str, 
+                  out_path:Path):
+    
+    df = df.assign(id_prefix=df.index.str[:(13 if part.startswith('P') else 12)])
+    print(
+        f'Saving composite cleaned "{part}" hits as parquet\n  partitioned by `id_prefix` (beginning of `hit_id`)...\n')
+    prefix_counts = df.id_prefix.value_counts()
+    print(prefix_counts.to_markdown(intfmt=',', floatfmt=',.0f'))
+    max_rows = int(
+        min(100000, int(round((prefix_counts.mean() * 1.001 // 3), -2))))
+    group_max = int(min(30000, (max_rows // 3) + 1))
+    group_min = int(min(prefix_counts.min() // 2,
+                    (max_rows // 6)+1, (group_max // 3)+1))
+    print(
+        f'\n> no more than {max_rows:,} rows per individual `group-[#].parquet`')
+    print(f'  - max rows in writing batch = {group_max:,}')
+    print(f'  - min rows in writing batch = {group_min:,}')
+    with Timer() as write_time:
+        df.to_parquet(out_path,
+                      engine='pyarrow',
+                      partition_cols=['id_prefix'],
+                      basename_template='group-{i}.parquet',
+                      use_threads=True,
+                      existing_data_behavior='delete_matching',
+                      min_rows_per_group=group_min,
+                      row_group_size=group_max,
+                      max_rows_per_file=max_rows)
+        print('Total time to write patitioned parquet ⇾', write_time.elapsed())
+    return write_time
+
+
 def _main():
 
     data_dir = HIT_TABLES_DIR.parent
     pat_hits_dir = HIT_TABLES_DIR / PAT
     # for csv_path in pat_hits_dir.glob('bigram*csv'):
-    # ! #HACK temporary for debugging
-    for csv_path in pat_hits_dir.glob('bigram*Nyt1*csv'):
+    #// ! #HACK temporary for debugging
+    for csv_path in pat_hits_dir.glob('bigram*csv'):
         part = name_regex.search(csv_path.stem).group()
         clean_index_path = pat_hits_dir / f'{part}_bigram-index_clean.35f.txt'
         out_path = pat_hits_dir / 'pre-cleaned' / \
@@ -171,31 +202,7 @@ def _main():
 
     elif out_path.suffix.startswith('.parq'):
 
-        df = df.assign(id_prefix=df.index.str[:(13 if part.startswith('P') else 12)])
-        print(
-            f'Saving composite cleaned "{part}" hits as parquet\n  partitioned by `id_prefix` (beginning of `hit_id`)...\n')
-        prefix_counts = df.id_prefix.value_counts()
-        print(prefix_counts.to_markdown(intfmt=',', floatfmt=',.0f'))
-        max_rows = int(
-            min(100000, int(round((prefix_counts.mean() * 1.001 // 3), -2))))
-        group_max = int(min(30000, (max_rows // 3) + 1))
-        group_min = int(min(prefix_counts.min() // 2,
-                        (max_rows // 6)+1, (group_max // 3)+1))
-        print(
-            f'\n> no more than {max_rows:,} rows per individual `group-[#].parquet`')
-        print(f'  - max rows in writing batch = {group_max:,}')
-        print(f'  - min rows in writing batch = {group_min:,}')
-        with Timer() as write_time:
-            df.to_parquet(out_path,
-                          engine='pyarrow',
-                          partition_cols=['id_prefix'],
-                          basename_template='group-{i}.parquet',
-                          use_threads=True,
-                          existing_data_behavior='delete_matching',
-                          min_rows_per_group=group_min,
-                          row_group_size=group_max,
-                          max_rows_per_file=max_rows)
-            print('Total time to write patitioned parquet ⇾', write_time.elapsed())
+        write_parquet(part, out_path)
 
 
 def remove_odd_orth_forms(df):
@@ -315,50 +322,15 @@ def remove_odd_orth_forms(df):
               .astype('string').value_counts().nlargest(10).to_frame().reset_index()
               .to_markdown(floatfmt=',.0f', intfmt=','))
     df = df.loc[~either_one_char, :]
-    # print(df.loc[df.adv_form_lower.str.contains(
-    #     r'^\w\W*$', regex=True), ['adv_form_lower', 'adj_form_lower']]
-    #     .astype('string').value_counts().nlargest(10).to_frame().reset_index()
-    #     .to_markdown(floatfmt=',.0f', intfmt=','))
-    # print()
-    # print(df.loc[df.adj_form_lower.str.contains(
-    #     r'^\w\W*$'), ['adv_form_lower', 'adj_form_lower']]
-    #     .astype('string').value_counts().nlargest(10).to_frame().reset_index()
-    #     .to_markdown())
-    # df = df.loc[~((df.adv_form_lower.str.contains(r'^\w\W*$'))
-    #               | (df.adj_form_lower.str.contains(r'^\w\W*$'))), :]
 
-    # # > delete remaining non-word characters (esp. `.` & `*`)
-    # df = df.assign(
-    #     adv_form_lower=df.adv_form_lower.str.strip(
-    #         '-').str.replace(r'[^a-z0-9&-]', '', regex=True),
-    #     adv_lemma=df.adv_lemma.str.strip(
-    #         '-').str.replace(r'[^a-zA-Z0-9&-]', '', regex=True),
-    #     adj_form_lower=df.adj_form_lower.str.strip(
-    #         '-').str.replace(r'[^a-z0-9&-]', '', regex=True),
-    #     adj_lemma=df.adj_lemma.str.strip(
-    #         '-').str.replace(r'[^a-zA-Z0-9&-]', '', regex=True)
-    # )
     odd_remnant = df.bigram_lower.str.contains(MISC_REGEX, regex=True)
     if any(odd_remnant):
         print('\nMiscellaneous Remaining Oddities Dropped\n')
         print(df[odd_remnant].value_counts('bigram_lower').to_markdown())
         df = df.loc[~odd_remnant, :]
     df = df.loc[~df.adv_form_lower.isin({'is', 'ie', 'etc', 'th'}), :]
-
-    # print(df.loc[(df.adv_form_lower.str.contains(r"[^\w'-]", regex=True))
-    #              | (df.adj_form_lower.str.contains(r"[^\w'-]", regex=True)),
-    #              ['adv_form_lower', 'adj_form_lower']]
-    #       .astype('string').value_counts()
-    #       .nlargest(10).to_frame().reset_index()
-    #       .to_markdown(floatfmt=',.0f', intfmt=',')
-    #       )
-    # print(df[df.adv_form_lower.str.contains(r"[^\w'-]", regex=True)].value_counts(['adv_lemma', 'adv_form_lower','adj_form_lower']))
-    # print()
-    # print(df[df.adj_form_lower.str.contains(r"[^\w'-]", regex=True)].value_counts(['adj_lemma', 'adj_form_lower','adv_form_lower']))
     df = update_bigram_lower(df)
-    # df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
-    #        ] = df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
-    #                   ].astype('category')
+
     return catify_hit_table(df)
 
 
