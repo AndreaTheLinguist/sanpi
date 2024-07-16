@@ -2,12 +2,13 @@
 echo -e "Concatenating Frequency TSVs\n> running '${0}'"
 SANPI_DATA="/share/compling/data/sanpi"
 DATA_DIR=''
-while getopts ":d:s:C:N:" opt; do
+while getopts ":d:sC:N:p:" opt; do
 	case $opt in
 	d) DATA_DIR="${OPTARG}" ;; # Set data dir
-	s) TAG_C="${OPTARG}" ;;    # Store the tsv tag
+	s) TAG_C="NEQ" ;;          # Set data tag to "NEQ" (sample)
 	C) TSV_C="${OPTARG}" ;;    # Store the comparison counts path
 	N) TSV_N="${OPTARG}" ;;    # Store the neg/target counts path
+	p) PAT_KEY="${OPTARG}" ;;  # Store the pattern key--subdirectory for env tsvs and shared element of path to `ucs_format/`
 	\?)
 		echo "Invalid option -$OPTARG" >&2
 		exit 1
@@ -15,6 +16,7 @@ while getopts ":d:s:C:N:" opt; do
 	esac
 done
 
+PAT_KEY=${PAT_KEY:-'RBdirect'}
 TAG_C=${TAG_C:-'ALL'}
 
 if [[ ${DATA_DIR} == 'DEMO' ]]; then
@@ -25,46 +27,70 @@ fi
 echo "Data --> '${DATA_DIR}'"
 
 TSV_DIR="${DATA_DIR}/5_freq_tsv"
-echo "Frequency TSV dir: '${TSV_DIR}'"
-mkdir -p "${TSV_DIR}"
+echo "Top Frequency TSV dir: '${TSV_DIR}'"
+ENV_TSVS="${TSV_DIR}/${PAT_KEY}"
+mkdir -p "${ENV_TSVS}"
+echo "Pattern specific dir: '${ENV_TSVS}'"
 
-for T in ${DATA_DIR}/2_hit_tables/*RBdirect/ucs_format/*freq.tsv; do
-	# echo "ln -srvf -t '${TSV_DIR}' '${T}'"
-	ln -srv -t "${TSV_DIR}" "${T}" 2>/dev/null
+for T in $(find ${DATA_DIR}/2_hit_tables/*${PAT_KEY}/ucs_format -name '*ALL*tsv'); do
+	ln -srv -t "${ENV_TSVS}" "${T}" 2>/dev/null
 done
 
-# > link most recent NEQ sample; 
-#! must include `--force` to replace previous link
-# echo -e "ln -srv --force  \\
-#   '$(ls -t ${DATA_DIR}/2_hit_tables/not-RBdirect/ucs_format/*NEQ*.tsv | head -1)' \\
-#   '${TSV_DIR}/AdvAdj_NEQ_not-RBdirect-final-freq.tsv'"
-ln -srv --force \
-	"$(ls -t ${DATA_DIR}/2_hit_tables/not-RBdirect/ucs_format/*NEQ*.tsv | head -1)" \
-	"${TSV_DIR}/AdvAdj_NEQ_not-RBdirect-final-freq.tsv"
-tree -lhD "${TSV_DIR}"
+# > link most recent NEQ sample;
+EXISTING_SYML=$(find ${ENV_TSVS} -type l -name '*NEQ*tsv')
+if [[ -f ${EXISTING_SYML} ]]; then
+	NEQ_PATHS=$(find -L ${SANPI_DATA}/2_hit_tables/*${PAT_KEY}/ucs_format -newer ${EXISTING_SYML} -name '*NEQ*.tsv')
+else
+	NEQ_PATHS=$(find -L ${SANPI_DATA}/2_hit_tables/*${PAT_KEY}/ucs_format -name '*NEQ*.tsv')
+fi
 
-if [[ $(ls ${TSV_DIR}/*tsv) ]]; then
+if [[ -n "${NEQ_PATHS}" ]]; then
+	unset -v LATEST
+	for FILE in ${NEQ_PATHS}; do
+		[[ ${FILE} -nt ${LATEST} ]] && LATEST=${FILE}
+	done
+
+	# #! must include `--force` or `-b` or `--backup=t/numbered` to replace previous link
+	ln -srv --backup=numbered \
+		${LATEST} \
+		"${ENV_TSVS}/$(basename ${LATEST/.[0-9]*[0-9]./.})"
+	#^ removing timestamp
+	#^ 		for direct ~ "AdvAdj_NEQ_not-RBdirect_final-freq.tsv"
+	#^ 		for mirror ~ "AdvAdj_NEQ_POSmirror_final-freq.tsv"
+else
+	echo -e "Most Recent NEQ sample already linked.\n✓ No update required." | tabulate -sep,
+fi 
+
+#> #HACK rename env tsvs: "-final-freq" --> "_final-freq"
+for X in ${ENV_TSVS}/*-final-freq*tsv; do
+	mv -v "${X}" "${X/-final-freq/_final-freq}"
+done
+
+tree -lhDC --prune -I *~* "${TSV_DIR}"
+
+if [[ $(ls ${ENV_TSVS}/*tsv) ]]; then
 	echo ''
 	(
 		echo 'frequency *.tsv, *source* last modified'
-		for f in ${TSV_DIR}/*tsv; do echo "$(basename ${f}),$(date -r ${f})"; done
+		for f in ${ENV_TSVS}/*tsv; do echo "$(basename ${f}),$(date -r ${f})"; done
 	) | tabulate -f fancy_grid -s',' -1
 fi
 
-TSV_C=${TSV_C:-${TSV_DIR}/AdvAdj_${TAG_C}_not-RBdirect-final-freq.tsv}
-TSV_N=${TSV_N:-"${TSV_DIR}/AdvAdj_ALL_RBdirect-final-freq.tsv"}
+TSV_C=${TSV_C:-"${ENV_TSVS}/AdvAdj_${TAG_C}_not-RBdirect_final-freq.tsv"}
+# echo $TSV_C
+TSV_N=${TSV_N:-"${ENV_TSVS}/AdvAdj_ALL_RBdirect_final-freq.tsv"}
 
 echo "Input Paths:"
 echo "1. Complement:"
-STEM_C=$(basename "${TSV_C%.tsv}")
-echo "   $(tree -hDlf -P "${STEM_C}*" ${TSV_DIR} | tail -n+2 | head -1)"
+STEM_C="$(basename -s '.tsv' ${TSV_C})"
+echo "   $(tree -hDlf -P *${STEM_C}* -I *~* --prune -C --noreport ${ENV_TSVS} | tail -1)"
 echo "   $(wc -l ${TSV_C} | tabulate -f tsv | cut -f1) total unique attested"
 
 echo "2. Negated:"
-STEM_N=$(basename "${TSV_N%.tsv}")
-echo "   $(tree -hDlf -P "${STEM_N}*" ${TSV_DIR} | tail -n+2 | head -1)"
+STEM_N="$(basename -s '.tsv' ${TSV_N})"
+echo "   $(tree -hDlf -P *${STEM_N}* -I *~* --prune -C --noreport ${ENV_TSVS} | tail -1)"
 echo "   $(wc -l ${TSV_N} | tabulate -f tsv | cut -f1) total unique attested"
-# echo "     $(ls -ho ${TSV_N})"
+# echo " $(ls -ho ${TSV_N})"
 
 #>>>>>>>>>>>>>>>> ARG 1 >>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -75,42 +101,46 @@ echo "  filestem:          '${STEM_C}'"
 CROSS_C=${STEM_C%%_*}
 echo "  compared features: '${CROSS_C}'"
 
-PREFIX_C=${STEM_C%_*}
+INFO_C=${STEM_C%?final*}
+PREFIX_C=${INFO_C%_*}
 TAG_C=${TAG_C:-"${PREFIX_C/*_/}"}
 echo "  sample tag:        '${TAG_C}'"
 
-ENV_C=$(basename -s "-final-freq" "${STEM_C/*${TAG_C}_/}")
+ENV_C=$(basename -s "_final-freq" "${STEM_C/*${TAG_C}_/}")
 echo "  environment:       '${ENV_C}'"
-
 #>>>>>>>>>>>>>>>> ARG 2 >>>>>>>>>>>>>>>>>>>>>>>>
 
 echo -e "\n## NEG ##"
-
 echo "  filestem:          '${STEM_N}'"
 
 CROSS_N=${STEM_N%%_*}
 echo "  compared features: '${CROSS_N}'"
 
-PREFIX_N=${STEM_N%_*}
+INFO_N="${STEM_N%?final-freq*}"
+PREFIX_N="${INFO_N%_*}"
 TAG_N=${PREFIX_N/*_/}
 echo "  sample tag:        '${TAG_N}'"
 
-ENV_N=$(basename -s "-final-freq" "${STEM_N/*${TAG_N}_/}")
+ENV_N=$(basename -s "_final-freq" "${STEM_N/*${TAG_N}_/}")
 echo "  environment:       '${ENV_N}'"
-# // echo "test completed.";  exit
 
 # >>>>>>>>> set output >>>>>>>>>>>>>>>
-OUT_TSV="${TSV_DIR}/${PREFIX_C}_any-${ENV_N//[A-Z]/}_final-freq.tsv"
-
+ENV_SUFF=${ENV_N//[A-Z]/}
+ANY_TSVS="${TSV_DIR}/ANY${ENV_SUFF,,}"
+# echo "${ANY_TSVS}"
+mkdir -p "${ANY_TSVS}"
+OUT_TSV="${ANY_TSVS}/${PREFIX_C}_any-${ENV_SUFF}_final-freq.tsv"
 echo -e "\n------------------------\n"
 echo "Combined Output: ${OUT_TSV}"
+
 echo "cat '${TSV_C}' > '${OUT_TSV}'"
 cat "${TSV_C}" >"${OUT_TSV}"
 
 echo "cat '${TSV_N}' >> '${OUT_TSV}'"
 cat "${TSV_N}" >>"${OUT_TSV}"
-tree -hDl ${TSV_DIR}
+echo
 echo "$(wc -l ${OUT_TSV} | tabulate -f tsv | cut -f1) lines in combined tsv"
+tree -hCDl --du --prune -I *~* ${TSV_DIR}
 
 echo "Finished concatenating tsv files"
 date
