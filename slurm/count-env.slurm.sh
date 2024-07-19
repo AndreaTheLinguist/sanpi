@@ -41,7 +41,8 @@ echo "processing ➡️ ${HIT_DATA_DIR//*data/..}"
 
 POST_PROC_DIR="${HIT_DATA_DIR%2_hit_tables*}4_post-processed/RBXadj"
 #> if no argument given, use most recent frequency index .txt file created in nearest 4_post-processed/RBXadj/ dir
-FRQ_FILTER=${1:-"$(ls -t1 $POST_PROC_DIR/*index_frq*.txt  | head -1)"}
+MOST_RECENT=$(ls -t1 $POST_PROC_DIR/*index_frq*.txt  | head -1)
+FRQ_FILTER=${1:-"${MOST_RECENT}"}
 #> if number given instead of path, use value to locate relevant frequency index .txt file
 if [[ ! (-f $FRQ_FILTER && -r $FRQ_FILTER) ]]; then
     FRQ_FILTER="$( (ls -t1 $POST_PROC_DIR/*index_frq*${FRQ_FILTER/./-}p*.txt || ls -t1 $POST_PROC_DIR/*index_frq*txt ) | head -1 )"

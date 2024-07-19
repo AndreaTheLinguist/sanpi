@@ -1,10 +1,11 @@
 #!/bin/bash 
 #SBATCH -N1
-#SBATCH --cpus-per-task 7
+#SBATCH --cpus-per-task 12
+#SBATCH --mem-per-cpu=1G
 #SBATCH -o %x.%j.out
 #SBATCH -e %x.%j.err
 #SBATCH --time 2:00:00
-#SBATCH -J "Collect-COM-ids"
+#SBATCH -J "GetCleanCOMix"
 #//#SBATCH -p compling
 #SBATCH --requeue
 #//#SBATCH --mail-user=andrea.r.hummel@gmail.com
@@ -24,9 +25,12 @@ eval "$(conda shell.bash hook)"
 conda activate parallel-sanpi
 
 PROG='/share/compling/projects/sanpi/script/collect_com_ids.sh'
-PARTS="$(find /share/compling/data/sanpi/2_hit_tables/RBdirect -type f -name '*_trigger_bigram-index_clean.35f.txt')"; 
-parallel -k "echo Part \#{#}: {/.}; echo 'bash ${PROG} {/.}' \
-    && bash ${PROG} {/.}" ::: ${PARTS//_trigger_bigram-index_clean.35f.txt/}
+# echo $PROG
+PATHS=$(find /share/compling/data/sanpi/2_hit_tables/RBdirect -type f -name '*_trigger_bigram-index_clean.35f.txt')
+PARTS=$(basename -a -s '_trigger_bigram-index_clean.35f.txt' ${PATHS})
+# echo ${PARTS}
+parallel -k "echo 'Part #{#}: {/.}'; echo 'bash ${PROG} {/.}' \
+    && bash ${PROG} {/.}" ::: ${PARTS}
 
 exit
 

@@ -11,8 +11,9 @@ from time import sleep
 import numpy as np
 import pandas as pd
 from more_itertools import batched
-
+HITS_DF_PATH_REGEX = re.compile(r'_hits.*$')
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
+WS_REGEX = re.compile(r'[^\S\n]')
 try:
     import pyarrow
 except ImportError:
@@ -22,14 +23,15 @@ else:
     PYARROW = True
 
 try:
-    from source.utils.general import (PKL_SUFF, confirm_dir, find_files,
+    from source.utils.general import (HIT_TABLES_DIR, PKL_SUFF, confirm_dir, find_files,
                                       snake_to_camel)
 except ModuleNotFoundError:
     try:
-        from utils.general import (PKL_SUFF, confirm_dir, find_files,
+        from utils.general import (HIT_TABLES_DIR, PKL_SUFF, confirm_dir, find_files,
                                    snake_to_camel)
     except ModuleNotFoundError:
-        from general import PKL_SUFF, confirm_dir, find_files, snake_to_camel
+        from general import (HIT_TABLES_DIR, PKL_SUFF,
+                             confirm_dir, find_files, snake_to_camel)
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -88,6 +90,38 @@ OPTIMIZED_DTYPES = {
         'adj_index':        'category',  # 'uint16'
         'utt_len':          'category'},  # 'uint16'
 }
+
+
+def add_lower_cols(hit_df: pd.DataFrame) -> pd.DataFrame:
+    def get_bigram_lower(_df: pd.DataFrame) -> pd.Series:
+        try:
+            bigram_lower = (_df['adv_form'] + '_' +
+                            _df['adj_form']).str.lower()
+        except KeyError:
+            try:
+                bigram_lower = (_df['adv_form_lower'] + '_' +
+                                _df['adj_form_lower'])
+            except KeyError:
+
+                #! This should not happen, but...
+                print(f'Warning: Could not create "bigram_lower":',
+                      '`ad*_form(_lower)` columns not found!')
+                print('current columns:\n-',
+                      _df.columns.str.join('\n - '),
+                      end='\n\n')
+        return bigram_lower
+
+    for form_col in ['adv_form', 'adj_form', 'bigram', 'neg_form', 'mir_form']:
+        lower_col = f'{form_col}_lower'
+
+        if lower_col not in hit_df.columns or any(df[lower_col].isna()):
+
+            if form_col in hit_df.columns:
+                hit_df[lower_col] = hit_df[form_col].str.lower()
+            elif lower_col == 'bigram_lower':
+                hit_df[lower_col] = get_bigram_lower(hit_df)
+
+    return hit_df
 
 
 def balance_sample(full_df: pd.DataFrame,
@@ -582,7 +616,41 @@ def filter_csv_by_index(df_csv_path: Path,
             return pd.concat(csv_iter)
 
 
+def extend_window(df,
+                  tokens_before: int = 7,
+                  tokens_after: int = 7):
+    if ('text_window' not in df.columns
+        or (df.text_window.str.count(' ').max()
+            < (tokens_before + tokens_after))):
+        # > was:
+        # # > just replace `text_window` instead of adding new column
+        # tok_lists = df.token_str.str.lower().str.split()
+        # df['text_window'] = df.apply(
+        #     lambda x: tok_lists[x.name][
+        #         max(0, x.adv_index - tokens_before):(
+        #             x.adv_index + 1 + tokens_after)],
+        #     axis=1
+        #     ).str.join(' ').astype('string')
+        # df['window_len'] = pd.to_numeric(
+        #     df.text_window.str.count(' ').add(1), downcast='unsigned')
+        # return df
+        # ^ sourcery suggestion
+        tok_lists = df.token_str.str.lower().str.split()
+        text_windows = [
+            ' '.join(tok_lists.iloc[i][max(
+                0, idx - tokens_before):(idx + 1 + tokens_after)])
+            for i, idx in enumerate(df.adv_index)
+        ]
+    df['text_window'] = pd.Series(
+        text_windows, dtype='string', index=tok_lists.index)
+    df['window_len'] = pd.to_numeric(
+        df.text_window.str.count(' ').add(1), downcast='unsigned')
+    return df
+
+
 def remove_duplicates(hit_df: pd.DataFrame,
+                      w_before: int= 7,
+                      w_after: int= 7,
                       return_index: bool = False):
     def weed_windows(df: pd.DataFrame,
                      return_index: bool = False):
@@ -590,20 +658,18 @@ def remove_duplicates(hit_df: pd.DataFrame,
             df['adv_index'] = pd.to_numeric(df.index.str.split(
                 ':').str.get(-1).str.split('-').str.get(-2), downcast='integer')
 
-        if ((not any(df.filter(regex=r'neg|mir|trigger').columns))
-            and (df.text_window.sample(min(len(df), 750))
-                 .str.count(' ').add(1).max() < 14)):
-            df = extend_window(df, 7, 7)
+        if not any(df.filter(regex=r'neg|mir|trigger').columns):
+            if (df.text_window.sample(min(len(df), 1000))
+                 .str.count(' ').max() < 14):
+                df = extend_window(df, tokens_before=7, tokens_after=7)
 
         over_20 = df.utt_len > 20
         yield df.loc[~over_20].index.to_series() if return_index else df.loc[~over_20]
 
         df_over20 = df.copy().loc[over_20, :]
         info_df = over_20.value_counts().to_frame('sent >20 tokens')
-        compare_cols = ['text_window',
-                        ('adv_form_lower'
-                         if 'adv_form_lower' in df_over20.columns
-                         else 'bigram_lower')]
+        compare_cols = df.filter(['text_window','all_forms_lower','bigram_lower','adv_form_lower']
+                                 ).columns.to_list()[:2]
         is_duplicated = df_over20[compare_cols].duplicated(
             keep=False, subset=compare_cols)
         if any(is_duplicated):
@@ -631,7 +697,7 @@ def remove_duplicates(hit_df: pd.DataFrame,
     if 'utt_len' not in hit_df.columns:
         hit_df['utt_len'] = pd.to_numeric(
             hit_df.token_str.str.count(' ').add(1),
-            downcast='unsigned')
+            downcast='integer')
 
     succinct = pd.concat(weed_windows(df=hit_df,
                                       return_index=return_index))
@@ -1051,13 +1117,14 @@ def show_counts(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     return df.value_counts(columns).to_frame().rename(columns={0: 'count'})
 
 
-def save_advadj_freq_tsv(final_hits, 
-                         freq_tsv_path:Path = None):
+def save_advadj_freq_tsv(final_hits,
+                         freq_tsv_path: Path = None):
     joint_f = final_hits.bigram_lower.value_counts().to_frame('f')
     joint_f = joint_f.join(
         joint_f.index.to_series()
         .str.extract(r'^(?P<adv>[^_]+)_(?P<adj>[^_]+)$'))
-    sorts = [fx.sort_index() for __, fx in joint_f.sort_values(['f'], ascending=False).groupby('f')]
+    sorts = [fx.sort_index() for __, fx in joint_f.sort_values(
+        ['f'], ascending=False).groupby('f')]
     sorts.reverse()
     joint_f = pd.concat(sorts, ignore_index=True)
     print('\n  Top 10 joint frequencies:\n\n       ',
@@ -1070,11 +1137,11 @@ def save_advadj_freq_tsv(final_hits,
         return joint_f
     else:
         joint_f.to_csv(freq_tsv_path,
-                    sep='\t',
-                    index=False,
-                    header=False)
+                       sep='\t',
+                       index=False,
+                       header=False)
         print('+ basic `adv~adj` frequencies for final hits',
-            f'saved as {freq_tsv_path} ✓', sep='  \n  ')
+              f'saved as {freq_tsv_path} ✓', sep='  \n  ')
 
 
 def save_final_info(final_hits: pd.DataFrame,
@@ -1182,6 +1249,33 @@ def save_final_info(final_hits: pd.DataFrame,
           sep='  \n  ')
 
 
+def save_hit_id_index_txt(index_vals: list or pd.core.indexes.base.Index,
+                          part: str,
+                          out_path: Path = None,
+                          index_path: Path = None):
+
+    if not (out_path or index_path):
+        raise ValueError('Either `out_path` or `index_path` must be provided')
+    try:
+        index_vals.sort()
+    except TypeError:
+        index_vals.sort_values()
+    ids_str = '\n'.join(index_vals)
+
+    # ? Is this necessary?
+    if WS_REGEX.search(ids_str) is not None:
+        ids_str = WS_REGEX.sub('', ids_str)
+
+    index_path = (
+        index_path
+        or (out_path.with_name(
+            HITS_DF_PATH_REGEX.sub('_index.txt',
+                                   out_path.name)))
+    )
+    index_path.write_text(ids_str, encoding='utf8')
+    return index_path
+
+
 def save_table(df: pd.DataFrame,
                save_path: Path or str,
                df_name: str = '',
@@ -1253,6 +1347,75 @@ def select_cols(df: pd.DataFrame,
             pass
             # df = df.convert_dtypes()
     return df
+
+
+def write_part_parquet(df: pd.DataFrame,
+                       part: str,
+                       out_path: Path,
+                       partition_by: list = None,
+                       data_label: str = 'cleaned bigram tokens'):
+    if not any(s.startswith('.parq') for s in out_path.suffixes):
+        raise ValueError(
+            'Parquet output path should have `.parq` or `.parquet` in suffixes.')
+    partition_by = partition_by or ['id_prefix']
+    try:
+        parted_df = df.filter(partition_by)
+    except TypeError:
+        partition_by = ['id_prefix']
+        parted_df = df.filter(partition_by)
+    if parted_df.empty: 
+        partition_by=['id_prefix']
+
+    if ('id_prefix' in partition_by and 'id_prefix' not in df.columns):
+        df.loc[:, 'id_prefix'] = select_id_prefixes(index_vals=df.index,
+                                                    part=part)
+    parted_df = df.filter(partition_by)
+    if len(partition_by) > len(parted_df.columns):
+        partition_by = parted_df.columns.to_list()
+        
+    df = catify_hit_table(df)
+    print('Saving as parquet',
+          f'  partitioned by `{repr(partition_by)}`...\n',
+          sep='\n')
+    prefix_counts = df[partition_by].squeeze().value_counts()
+    print(prefix_counts.to_markdown(intfmt=',', floatfmt=',.0f'))
+    max_rows = int(
+        min(round((prefix_counts.mean() * 1.001) // 3, -2),
+            100000)
+    )
+    group_max = int(min(30000, (max_rows // 2) + 1))
+    group_min = int(min(prefix_counts.min() // 2,
+                        (max_rows // 6)+1,
+                        (group_max // 3)+1))
+    print(f'\n> no more than {max_rows:,} rows',
+          'per individual `group-[#].parquet`')
+    print(f'  - max rows in writing batch = {group_max:,}')
+    print(f'  - min rows in writing batch = {group_min:,}')
+    with Timer() as write_time:
+        df.to_parquet(str(out_path),
+                      engine='pyarrow',
+                      partition_cols=partition_by,
+                      basename_template='group-{i}.parquet',
+                      use_threads=True,
+                      existing_data_behavior='delete_matching',
+                      min_rows_per_group=group_min,
+                      row_group_size=group_max,
+                      max_rows_per_file=max_rows)
+        print(f'\n✓ {data_label.capitalize()} for `{part}`',
+              f' successfully saved as  \n> "{out_path}"')
+        print('* Total time to write partitioned parquet ⇾ ',
+              write_time.elapsed())
+
+
+def select_id_prefixes(index_vals: pd.Index or pd.Series,
+                       part: str):
+    prefix_len = 13
+    if part.startswith(('A', 'N')):
+        prefix_len -= 1
+    elif part.endswith('Te'):
+        prefix_len += 1
+    id_prefixes = index_vals.str[:prefix_len]
+    return id_prefixes.astype('string').astype('category')
 
 
 def select_pickle_paths(n_files: int,
@@ -1461,7 +1624,7 @@ def quartile_dispersion(X: pd.Series = None):
     Returns:
         float. The Quartile Dispersion Coefficient of the input data.
 
-    suggested use: 
+    suggested use:
         df['Q_disp_coeff'] = df.apply(quartile_dispersion)
     """
 
@@ -1483,10 +1646,14 @@ def get_mad(X: pd.Series):
     Returns:
         float. The Median Absolute Deviation (MAD) of the input data.
 
-    suggested use: 
+    suggested use:
         df['MAD'] = df.apply(get_mad)
     """
 
     medX = X.median()
     abs_dev = X.apply(lambda x: x - medX).abs()
     return abs_dev.median()
+
+
+save_index_txt = save_hit_id_index_txt
+select_df_paths = select_pickle_paths

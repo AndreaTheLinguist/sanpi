@@ -22,9 +22,10 @@ echo
 eval "$(conda shell.bash hook)"
 conda activate sanpi
 
+PAT=${1:-'RBdirect'}
 PROG='/share/compling/projects/sanpi/script/update_env_hits.py'
 DATA_DIR="/share/compling/data/sanpi/2_hit_tables"
-NEG="${DATA_DIR}/RBdirect"
+PAT_DIR="${DATA_DIR}/${PAT}"
 
 eval "$(conda shell.bash hook)"
 conda activate sanpi
@@ -69,10 +70,10 @@ echo "Processing..."
 #                         corpus part tag to select both `--csv_path` and `--index_path`.
 #                         (index will default to `alpha` version.) (default: None)
 # ...
-echo -e "\nPart ${SEED}: '${CORPUS_PART}'\n"
-echo "python '${PROG}' -p '${CORPUS_PART}'"
+echo -e "\nCorpus Part #${SEED}: '${CORPUS_PART}'\n"
+echo "python '${PROG}' -p '${CORPUS_PART}' -d '${PAT_DIR}'"
 
-time python ${PROG} -p ${CORPUS_PART}
+time python "${PROG}" -p "${CORPUS_PART}" -d "${PAT_DIR}"
 
 exit
 

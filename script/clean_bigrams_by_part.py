@@ -1,16 +1,28 @@
 import re
 from pathlib import Path
-from more_itertools import batched
-import pandas as pd
 from sys import argv
-from source.utils import Timer, catify_hit_table, remove_duplicates
-from source.utils.general import POST_PROC_DIR, HIT_TABLES_DIR, PKL_SUFF, SANPI_HOME
+
+import pandas as pd
+from more_itertools import batched
+
+from source.utils import (Timer, add_lower_cols, catify_hit_table,
+                          extend_window, remove_duplicates, save_index_txt,
+                          select_id_prefixes, write_part_parquet)
+from source.utils.general import (HIT_TABLES_DIR, PKL_SUFF, POST_PROC_DIR,
+                                  SANPI_HOME, confirm_dir)
 
 try:
     PAT = argv[1]
 except IndexError:
     PAT = 'RBXadj'
-CHUNK_SZ = 500000
+
+try:
+    CHUNK_SZ = argv[2]
+except IndexError:
+    CHUNK_SZ = 500000
+
+FORCE = True
+
 OK_REGEX = re.compile(r'^o*\.?k+\.?a*y*$')
 V_REGEX = re.compile(r'^v\.?$|^ve+r+y+$')
 DEF_REGEX = re.compile(r'^def\.?$')
@@ -19,58 +31,208 @@ EDGE_PUNCT = re.compile(r'^[\W_]+|[\W_]+$')
 BRACSLASHDOT_REGEX = re.compile(r'[\[\\\/)]|\.{2,}')
 ANY_ALPHA_REGEX = re.compile(r'[a-z]')
 MISC_REGEX = re.compile(r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
-name_regex = re.compile(r'(?<=bigram-)\w+(?=_rb)')
-load_cols = ['hit_id', 'adv_form', 'adj_form', 'text_window',
-             'token_str', 'adv_lemma', 'adj_lemma', 'adv_index', 'utt_len']
-dtype_dict = {'hit_id': 'string',
-              'adv_form': 'string',  # convert to category _after_ manipulations
-              'adj_form': 'string',  # convert to category _after_ manipulations
-              'text_window': 'string',
-              'token_str': 'string',
-              'adv_lemma': 'string',  # convert to category _after_ manipulations
-              'adj_lemma': 'string',  # convert to category _after_ manipulations
-              'adv_index': 'int64'}
+WS_REGEX = re.compile(r'[^\S\n]')
+NAME_REGEX = re.compile(r'(?<=bigram-)\w+(?=_rb)')
+_LOAD_COLS = ['hit_id', 'adv_form', 'adj_form', 'text_window',
+              'token_str', 'adv_lemma', 'adj_lemma', 'adv_index', 'utt_len']
+_DTYPES = {'hit_id': 'string',
+           'adv_form': 'string',  # convert to category _after_ manipulations
+           'adj_form': 'string',  # convert to category _after_ manipulations
+           'text_window': 'string',
+           'token_str': 'string',
+           'adv_lemma': 'string',  # convert to category _after_ manipulations
+           'adj_lemma': 'string',  # convert to category _after_ manipulations
+           'adv_index': 'int64',
+           'utt_len': 'int64'}
 
 
-def add_lower_cols(ch: pd.DataFrame) -> pd.DataFrame:
-    def get_bigram_lower(ch: pd.DataFrame) -> pd.Series:
-        try:
-            bigram_lower = (ch['adv_form'] + '_' +
-                            ch['adj_form']).str.lower()
-        except KeyError:
-            try:
-                bigram_lower = (ch['adv_form_lower'] + '_' +
-                                ch['adj_form_lower'])
-            except KeyError:
+def _main():
 
-                #! This should not happen, but...
-                print(f'Warning: Could not add column `{lower_col}`:',
-                      '`ad*_form(_lower)` columns not found!')
-                print('current columns:\n-',
-                      ch.columns.str.join('\n - '),
-                      end='\n\n')
-        return bigram_lower
+    data_dir = HIT_TABLES_DIR.parent
+    pat_hits_dir = HIT_TABLES_DIR / PAT
+    cleaned_dir = pat_hits_dir / 'cleaned'
+    confirm_dir(cleaned_dir)
 
-    for form_col in ['adv_form', 'adj_form', 'bigram', 'neg_form', 'mir_form']:
-        lower_col = f'{form_col}_lower'
+    for i_part, csv_path in enumerate(pat_hits_dir.glob('bigram*csv'),
+                                      start=1):
+        use_new_index = False
+        part = NAME_REGEX.search(csv_path.stem).group()
+        preclean_index_path = (
+            pat_hits_dir
+            / f'{part}_bigram-index_clean.35f.txt')
+        out_path = (
+            cleaned_dir
+            / f"clean_{csv_path.stem.replace(f'bigram-{part}',part)}.parq")
+        new_index_path = out_path.with_stem(
+            out_path.stem.replace('_hits', '_index')
+        ).with_suffix('.txt')
+        print(f'\n## Corpus Part {i_part}:  "{part}"\n\n'
+              + pd.Series(
+                  {'csv path': csv_path.relative_to(data_dir),
+                   'index path': preclean_index_path.relative_to(data_dir),
+                   'output path': out_path.relative_to(data_dir),
+                   '*new* index path': new_index_path.relative_to(data_dir)},
+                  name=part).to_markdown(tablefmt='double_grid'),
+              end='\n\n')
+        # > if updated `cleaned/*[part]*index.txt` exists for part
+        if (new_index_path.is_file()
+                and new_index_path.stat().st_size > 2):
 
-        if lower_col not in ch.columns:
+            use_new_index = True
 
-            if form_col in ch.columns:
-                ch[lower_col] = ch[form_col].str.lower()
-            elif lower_col == 'bigram_lower':
-                ch[lower_col] = get_bigram_lower(ch)
+            if (out_path.exists()
+                    and not FORCE):
+                # this_script_age = SANPI_HOME.joinpath(
+                #     'script/clean_bigrams_by_part.py').stat().st_mtime
+                # index_age = preclean_index_path.stat().st_mtime
+                # > if corresponding data also exists
+                # //     and is more recent than the index or present code
+                # if  (and out_path.stat().st_mtime < index_age
+                # and out_path.stat().st_mtime < this_script_age)
 
-    return ch
+                print(f'✓ Corpus part {part} previously processed.',
+                      f'   Path: "{out_path.relative_to(pat_hits_dir)}"\n',
+                      sep='\n')
+                # > skip to next part --> NEXT
+                continue
+
+            # // > if new index exists, but data does not
+            # ! This can't be used because it fails other necessary manipulations
+            # else:
+            #     with Timer() as prior_t:
+            #         new_index_set = {i.strip()
+            #                          for i in new_index_path.read_text().splitlines()}
+            #         with pd.read_csv(csv_path,
+            #                          index_col='hit_id',
+            #                          usecols=_LOAD_COLS,
+            #                          dtype=_DTYPES,
+            #                          chunksize=CHUNK_SZ) as reader:
+            #             df = pd.concat((chunk.filter(new_index_set, axis=0)
+            #                             for chunk in reader))
+            #             print('> Loaded and filtered to previously saved `cleaned/*index.txt`',
+            #                   f'> ⏱️  -> {prior_t.elapsed()}', sep='\n')
+
+        # # > if no prior cleaning outputs are found
+        # else:
+        if use_new_index:
+            print('**Partial prior processing found!**',
+                  '> Using updated index to filter:',
+                  f'> "{new_index_path}"', sep='\n')
+            df, index_changed = clean_part(new_index_path,
+                                           csv_path, part,
+                                           using_prior=True)
+        else:
+            df, index_changed = clean_part(preclean_index_path,
+                                           csv_path, part)
+        if index_changed:
+            with Timer() as txt_t:
+                save_index_txt(hit_ids=df.index.to_list(),
+                            part=part,
+                            index_path=new_index_path)
+                print('\n*******',
+              f'-> 🫧  Final clean "hit_id" index for "{part}" bigram tokens saved as',
+              f'   🏷️  "{index_path}"',
+              f'   ⏱️  {txt_t.elapsed()}',
+              '*******\n',
+              sep='\n', end='\n\n')
+                
+        # (Not used unless code above is changed)
+        if '.csv' in out_path.suffixes:
+            df.to_csv(out_path)
+
+        elif out_path.suffix.startswith('.parq'):
+
+            write_parquet(df, part, out_path)
+
+
+def clean_part(clean_index_path: Path,
+               csv_path: Path,
+               part: str,
+               using_prior: bool = False):
+    keepers = {i.strip()
+               for i in clean_index_path.read_text().splitlines()}
+    print(f'{len(keepers):,} ids in loaded index filter')
+    batch_size = max(200000,
+                     int(round((len(keepers)//8)*1.01, -3)))
+    keep_batches = tuple(batched(keepers, batch_size))
+
+    with Timer() as _timer:
+        with pd.read_csv(csv_path,
+                         index_col='hit_id',
+                         usecols=_LOAD_COLS,
+                         dtype=_DTYPES,
+                         chunksize=CHUNK_SZ) as reader:
+
+            df = pd.concat(gen_keep_clean(reader, keep_batches, using_prior))
+        total_dropped = df.pop('chunk_dropped').drop_duplicates().sum()
+        print(f'\n### Chunk Processing Complete for "{part}"\n')
+        cat_len = len(df)
+        print('\n'+'*'*80+'\n')
+        print(f'{cat_len:,} rows (hits) in concatenated "{part}" chunks')
+        print(f'> {total_dropped:,} total hits removed from "{part}"')
+        if not using_prior:
+            df = remove_duplicates(df)
+            dedup_len = len(df)
+            print(
+                f'{dedup_len:,} rows after final duplicate removal pass on composite')
+            _print_diff(cat_len, dedup_len)
+        df.index.name = 'hit_id'
+        final_len = len(df)
+        raw_len = total_dropped + final_len
+        print(f'\n### `{part}` Processing{" (using prior index)" if using_prior else ""} Complete ✓\n'
+              f'+ {final_len:,} total bigram tokens remaining',
+              f'+ {round(final_len/raw_len * 100, 1):.1f}% of raw ({raw_len:,})',
+              f'+ Time to process {CHUNK_SZ:,} rows at a time ⇾ {_timer.elapsed()}',
+              sep='\n')
+        print('-'*80)
+    index_change = final_len != len(keepers)
+    return df, index_change
+
+# moved to `source.utils.dataframes`
+# def add_lower_cols(ch: pd.DataFrame) -> pd.DataFrame:
+#     def get_bigram_lower(ch: pd.DataFrame) -> pd.Series:
+#         try:
+#             bigram_lower = (ch['adv_form'] + '_' +
+#                             ch['adj_form']).str.lower()
+#         except KeyError:
+#             try:
+#                 bigram_lower = (ch['adv_form_lower'] + '_' +
+#                                 ch['adj_form_lower'])
+#             except KeyError:
+
+#                 #! This should not happen, but...
+#                 print(f'Warning: Could not add column `{lower_col}`:',
+#                       '`ad*_form(_lower)` columns not found!')
+#                 print('current columns:\n-',
+#                       ch.columns.str.join('\n - '),
+#                       end='\n\n')
+#         return bigram_lower
+
+#     for form_col in ['adv_form', 'adj_form', 'bigram', 'neg_form', 'mir_form']:
+#         lower_col = f'{form_col}_lower'
+
+#         if lower_col not in ch.columns or any(ch[lower_col].squeeze().isna()):
+
+#             if form_col in ch.columns:
+#                 ch[lower_col] = ch[form_col].str.lower()
+#             elif lower_col == 'bigram_lower':
+#                 ch[lower_col] = get_bigram_lower(ch)
+
+#     return ch
 
 
 def _print_diff(prev_len, now_len):
-    print(f'> {prev_len - now_len:,} rows dropped')
+    delta = prev_len - now_len
+    print(f'> {delta:,} rows dropped')
+    return delta
 
 
-def gen_keep_clean(reader, keep_batches):
+def gen_keep_clean(reader,  # :pd.io.parsers.readers.TextFileReader,
+                   keep_batches: tuple[tuple],
+                   using_prior: bool = False):
 
     for i, chunk in enumerate(reader, start=1):
+        succinct_len = None
         print(f'\n### Chunk {i}\n')
         init_len = len(chunk)
         print(f'{init_len:,} rows in initial chunk')
@@ -84,133 +246,75 @@ def gen_keep_clean(reader, keep_batches):
 
         chunk = add_lower_cols(chunk)
 
-        chunk = remove_odd_orth_forms(chunk)
+        chunk = fix_orth(chunk, using_prior)
         orth_fix_len = len(chunk)
         print('\n'+'*'*20,
-              f'{orth_fix_len:,} rows after dealing with odd orthography', 
+              f'{orth_fix_len:,} rows after dealing with odd orthography',
               sep='\n')
         _print_diff(prior_filter_len, orth_fix_len)
-
-        chunk = remove_duplicates(chunk)
-        succinct_len = len(chunk)
-        print(
-            f'{succinct_len:,} rows after removing duplicate `text_window` + `[bigram/all_forms]_lower` (for 20+ word sentences)')
-        _print_diff(orth_fix_len, succinct_len)
+        if using_prior:
+            print('  NOTE: "0" is expected.',
+                  '    ↪ using index from partial prior processing (all "removals" already accounted for)',
+                  '  🚧  -> except for typo fix catching one character "adj" missed before',
+                  sep='\n')
+            print('> Duplication previously handled as well,',
+                  'but still extending "text_window" strings...')
+            chunk = extend_window(chunk)
+        else:
+            chunk = remove_duplicates(chunk)
+            succinct_len = len(chunk)
+            print(
+                f'{succinct_len:,} rows after removing duplicate `text_window` + `[bigram/all_forms]_lower` (for 20+ word sentences)')
+            _print_diff(orth_fix_len, succinct_len)
 
         print('....................')
         print(f'Chunk {i} Summary')
         print('^^^^^^^^^^^^^^^^^^^^')
         print('> In total, ')
-        _print_diff(init_len, succinct_len)
-        yield chunk
+        delta = _print_diff(
+            init_len, succinct_len or orth_fix_len or prior_filter_len)
+        yield chunk.assign(chunk_dropped=delta).convert_dtypes()
+
+select_id_prefies
 
 
-def write_parquet(part:str, 
-                  out_path:Path):
-    
-    df = df.assign(id_prefix=df.index.str[:(13 if part.startswith('P') else 12)])
-    print(
-        f'Saving composite cleaned "{part}" hits as parquet\n  partitioned by `id_prefix` (beginning of `hit_id`)...\n')
-    prefix_counts = df.id_prefix.value_counts()
-    print(prefix_counts.to_markdown(intfmt=',', floatfmt=',.0f'))
-    max_rows = int(
-        min(100000, int(round((prefix_counts.mean() * 1.001 // 3), -2))))
-    group_max = int(min(30000, (max_rows // 3) + 1))
-    group_min = int(min(prefix_counts.min() // 2,
-                    (max_rows // 6)+1, (group_max // 3)+1))
-    print(
-        f'\n> no more than {max_rows:,} rows per individual `group-[#].parquet`')
-    print(f'  - max rows in writing batch = {group_max:,}')
-    print(f'  - min rows in writing batch = {group_min:,}')
-    with Timer() as write_time:
-        df.to_parquet(out_path,
-                      engine='pyarrow',
-                      partition_cols=['id_prefix'],
-                      basename_template='group-{i}.parquet',
-                      use_threads=True,
-                      existing_data_behavior='delete_matching',
-                      min_rows_per_group=group_min,
-                      row_group_size=group_max,
-                      max_rows_per_file=max_rows)
-        print('Total time to write patitioned parquet ⇾', write_time.elapsed())
-    return write_time
+
+# 👇 moved to `source.utils.dataframes`
+# def save_index_txt(hit_ids: list,
+#                    part: str,
+#                    out_path: Path = None,
+#                    index_path: Path = None):
+#     if not (out_path or index_path):
+#         raise ValueError('1 of `out_path` or `index_path` must be provided')
+#     with Timer() as txt_t:
+#         hit_ids.sort()
+#         ids_str = '\n'.join(hit_ids)
+
+#         # ? Is this necessary?
+#         if WS_REGEX.search(ids_str) is not None:
+#             ids_str = WS_REGEX.sub('', ids_str)
+
+#         index_path = (
+#             index_path
+#             or (out_path
+#                 .with_stem(out_path.stem.replace('_hits', '_index'))
+#                 .with_suffix('.txt')))
+#         index_path.write_text(ids_str, encoding='utf8')
+#         print('\n*******',
+#               f'-> 🫧  Final clean "hit_id" index for "{part}" bigram tokens saved as',
+#               f'   🏷️  "{index_path}"',
+#               f'   ⏱️  {txt_t.elapsed()}',
+#               '*******\n',
+#               sep='\n', end='\n\n')
 
 
-def _main():
+def fix_orth(df: pd.DataFrame,
+             using_prior: bool = False):
 
-    data_dir = HIT_TABLES_DIR.parent
-    pat_hits_dir = HIT_TABLES_DIR / PAT
-    # for csv_path in pat_hits_dir.glob('bigram*csv'):
-    #// ! #HACK temporary for debugging
-    for csv_path in pat_hits_dir.glob('bigram*csv'):
-        part = name_regex.search(csv_path.stem).group()
-        clean_index_path = pat_hits_dir / f'{part}_bigram-index_clean.35f.txt'
-        out_path = pat_hits_dir / 'pre-cleaned' / \
-            f'clean_{csv_path.name.split(".csv")[0]}.parq'
-        print("\n"
-              + pd.Series(
-                  {'csv path': csv_path.relative_to(data_dir),
-                   'index path': clean_index_path.relative_to(data_dir),
-                   'output path': out_path.relative_to(data_dir)},
-                  name=part).to_markdown(),
-              end='\n\n'
-              )
-        if out_path.exists():
-
-            this_script_age = SANPI_HOME.joinpath(
-                'script/get_pre-cleaned_subtables.py').stat().st_mtime
-            index_age = clean_index_path.stat().st_mtime
-            if (out_path.stat().st_mtime < index_age
-                    and out_path.stat().st_mtime < this_script_age):
-                print(f'✓ Corpus part {part} previously processed:',
-                      f'  {out_path.relative_to(pat_hits_dir)} already exists.\n', 
-                      sep='\n')
-                continue
-        keepers = {i.strip()
-                      for i in clean_index_path.read_text().splitlines()}
-        print(f'{len(keepers):,} ids in loaded index filter')
-        batch_size = max(200000,
-                         int(round((len(keepers)//8)*1.01, -3)))
-        keep_batches = tuple(batched(keepers, batch_size))
-
-        with Timer() as _timer:
-            with pd.read_csv(csv_path,
-                             index_col='hit_id',
-                             usecols=load_cols,
-                             dtype=dtype_dict,
-                             chunksize=CHUNK_SZ) as reader:
-
-                df = pd.concat(gen_keep_clean(reader, keep_batches))
-            print(f'\n### Chunk Processing Complete for `{part}`\n')
-            cat_len = len(df)
-            print('\n'+'*'*80+'\n')
-            print(f'{cat_len:,} rows (hits) in concatenated `{part}` chunks')
-            df = remove_duplicates(df)
-            dedup_len = len(df)
-            print(
-                f'{dedup_len:,} rows after final duplicate removal pass on composite')
-            _print_diff(cat_len, dedup_len)
-            df.index.name = 'hit_id'
-
-            print((f'\n### `{part}` Processing Complete ✓\n'
-                  f'\n+ Time to process {CHUNK_SZ:,} rows at a time ⇾ '),
-                  _timer.elapsed())
-            print('-'*80)
-
-    if '.csv' in out_path.suffixes:
-        df.to_csv(out_path)
-
-    elif out_path.suffix.startswith('.parq'):
-
-        write_parquet(part, out_path)
-
-
-def remove_odd_orth_forms(df):
-
-    ad_cols = df.filter(regex=r'ad._\w*l').columns.to_list()
-
-    df.loc[:, ad_cols + ['bigram_lower']
-           ] = df.loc[:, ad_cols + ['bigram_lower']].astype('string')
+    ad_cols = df.filter(regex=r'ad[vj]_\w*l').columns.to_list()
+    df = catify_hit_table(df, reverse=True)
+    # df.loc[:, ad_cols + ['bigram_lower']
+    #        ] = df.loc[:, ad_cols + ['bigram_lower']].astype('string')
 
     def update_bigram_lower(df):
 
@@ -228,31 +332,30 @@ def remove_odd_orth_forms(df):
     def adj_is_ok(df):
         return df.adj_form_lower.str.contains(OK_REGEX, regex=True)
 
-    print('Fixing "null" adjectives...')
-    df.loc[:, ['adj_form', 'adj_lemma', 'adj_form_lower']
-           ] = df.loc[:, ['adj_form', 'adj_lemma', 'adj_form_lower']
-                      ].astype('string').fillna('null')
+    print('\nFixing "null" strings interpreted as NaN...')
+    df.loc[:, ad_cols + ['adv_form', 'adj_form']
+           ] = df.filter(like='ad').astype('string').fillna('null')
     df = update_bigram_lower(df)
+    if not using_prior:
+        print('\nDropping most bizarre...\n')
+        bracket_slash_dot = (df.bigram_lower.str.contains(
+            BRACSLASHDOT_REGEX, regex=True))
+        if any(bracket_slash_dot):
+            print(df.loc[bracket_slash_dot,
+                         ['adv_form_lower', 'adj_form_lower']].astype('string').value_counts()
+                  .nlargest(10).to_frame().reset_index()
+                  .to_markdown(floatfmt=',.0f', intfmt=','))
+            df = df.loc[~bracket_slash_dot, :]
 
-    print('Dropping most bizarre...\n')
-    bracket_slash_dot = (df.bigram_lower.str.contains(
-        BRACSLASHDOT_REGEX, regex=True))
-    if any(bracket_slash_dot):
-        print(df.loc[bracket_slash_dot,
-                     ['adv_form_lower', 'adj_form_lower']].astype('string').value_counts()
-              .nlargest(10).to_frame().reset_index()
-              .to_markdown(floatfmt=',.0f', intfmt=','))
-        df = df.loc[~bracket_slash_dot, :]
-
-    print('\nDropping plain numerals as ad*')
-    alpha_adv = df.adv_form_lower.str.contains(ANY_ALPHA_REGEX, regex=True)
-    alpha_adj = df.adj_form_lower.str.contains(ANY_ALPHA_REGEX, regex=True)
-    either_no_alpha = (~alpha_adv) | (~alpha_adj)
-    if any(either_no_alpha):
-        print(df.loc[either_no_alpha, ['adv_form_lower', 'adj_form_lower', 'text_window']]
-              .astype('string').value_counts().nlargest(10).to_frame().reset_index().to_markdown(floatfmt=',.0f')
-              )
-        df = df.loc[~either_no_alpha, :]
+        print('\nDropping any ad* that contain no regular characters (a-z)')
+        alpha_adv = df.adv_form_lower.str.contains(ANY_ALPHA_REGEX, regex=True)
+        alpha_adj = df.adj_form_lower.str.contains(ANY_ALPHA_REGEX, regex=True)
+        either_no_alpha = (~alpha_adv) | (~alpha_adj)
+        if any(either_no_alpha):
+            print(df.loc[either_no_alpha, ['adv_form_lower', 'adj_form_lower', 'text_window']]
+                  .astype('string').value_counts().nlargest(10).to_frame().reset_index().to_markdown(floatfmt=',.0f')
+                  )
+            df = df.loc[~either_no_alpha, :]
 
     print('\nTranslating some known orthographic quirks...')
     # > variations on "very"
@@ -298,34 +401,37 @@ def remove_odd_orth_forms(df):
         df.loc[esp_adv, :] = df.loc[esp_adv, :].assign(adv_form_lower='especially',
                                                        adv_lemma='especially')
 
-    # Strip leading or trailing punctuation
     adv_punct = df.adv_form_lower.str.contains(EDGE_PUNCT, regex=True)
     adj_punct = df.adj_form_lower.str.contains(EDGE_PUNCT, regex=True)
     punct_edge = adv_punct | adj_punct
     if any(punct_edge):
-        print(df.loc[punct_edge].filter(ad_cols).sort_index(
-            axis=1).sort_values('adv_lemma').to_markdown())
+        print('\nStripping leading/trailing punctuation...\n')
+        print(df.loc[punct_edge].filter(
+            ad_cols).sort_values('adv_lemma').to_markdown())
         df.loc[punct_edge, ad_cols] = df.loc[punct_edge, ad_cols].apply(
             lambda a: a.apply(
                 lambda w: EDGE_PUNCT.sub('', w)))
 
     df = update_bigram_lower(df)
-
+    # if not using_prior:
+    #! realized this was only catching advs (typo listed `one_char_adv | one_char_adv`, so it needs to be rerun)
     # > drop any single character "words"
-    print()
     one_char_adv = df.adv_form_lower.str.len() == 1
     one_char_adj = df.adj_form_lower.str.len() == 1
-    either_one_char = one_char_adv | one_char_adv
+    either_one_char = one_char_adv | one_char_adj
     if any(either_one_char):
-
+        print('\nDropping any single character "words"')
         print(df.loc[either_one_char, ['adv_form_lower', 'adj_form_lower']]
-              .astype('string').value_counts().nlargest(10).to_frame().reset_index()
-              .to_markdown(floatfmt=',.0f', intfmt=','))
+                .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+                .to_markdown(floatfmt=',.0f', intfmt=','))
     df = df.loc[~either_one_char, :]
 
     odd_remnant = df.bigram_lower.str.contains(MISC_REGEX, regex=True)
     if any(odd_remnant):
         print('\nMiscellaneous Remaining Oddities Dropped\n')
+        if using_prior:
+            print(
+                'WARNING‼️ This is unexpected, since index from partial prior processing was used.')
         print(df[odd_remnant].value_counts('bigram_lower').to_markdown())
         df = df.loc[~odd_remnant, :]
     df = df.loc[~df.adv_form_lower.isin({'is', 'ie', 'etc', 'th'}), :]

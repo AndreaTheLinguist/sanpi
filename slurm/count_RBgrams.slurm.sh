@@ -9,8 +9,8 @@
 #SBATCH --requeue
 #SBATCH --chdir=/share/compling/projects/sanpi/logs/count_RBgrams
 
-# usage:    sbatch [slurm flags] count_RBgrams.slurm.sh [N_FILES] [THRESH] [DATA_DIR_NAME]
-# usage:    sbatch [slurm flags] count_RBgrams.slurm.sh '-f 3' '-t 0.001' '/share/compling/data/sanpi/debug/2_hit_tables/RBXadj'
+# usage:    sbatch [slurm flags] count_RBgrams.slurm.sh [-f N_FILES] [-t THRESH] [-d DATA_DIR_NAME]
+# usage:    sbatch [slurm flags] count_RBgrams.slurm.sh -f '-f 3' -t '-t 0.001' -d '/share/compling/data/sanpi/debug/2_hit_tables/RBXadj'
 SANPI_DATA="/share/compling/data/sanpi"
 RESULTS="/share/compling/projects/sanpi/results"
 

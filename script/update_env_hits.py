@@ -5,24 +5,25 @@ from pathlib import Path
 
 import pandas as pd
 
-from source.utils.dataframes import Timer
+from source.utils.dataframes import Timer, adjust_few_hits
 from source.utils.dataframes import catify_hit_table as catify
+from source.utils.dataframes import drop_long_windows
 from source.utils.dataframes import filter_csv_by_index as filter_csv
-from source.utils.dataframes import remove_duplicates
+from source.utils.dataframes import remove_duplicates, write_part_parquet
 from source.utils.general import HIT_TABLES_DIR, PKL_SUFF, confirm_dir
 from source.utils.general import run_shell_command as shell_cmd
 
-CLEAN_RBX_DIR = HIT_TABLES_DIR / 'RBXadj' / 'pre-cleaned'
+CLEAN_RBX_DIR = HIT_TABLES_DIR / 'RBXadj' / 'cleaned'
 SUPER_NEG_DIR = HIT_TABLES_DIR / 'RBdirect'
 COM_HIT_DIR = HIT_TABLES_DIR / 'not-RBdirect'
-CLEAN_NEG_DIR = SUPER_NEG_DIR / 'pre-cleaned'
+CLEAN_NEG_DIR = SUPER_NEG_DIR / 'cleaned'
 CONDENSED_DIR = SUPER_NEG_DIR / 'condensed'
 
 
 def _parse_args():
-
     parser = argparse.ArgumentParser(
-        description=(''),
+        description=(
+            'script to apply updated filter to pattern hits and sweep for duplicate `text_window` strings'),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
@@ -32,10 +33,15 @@ def _parse_args():
                         '(index will default to `alpha` version.)'))
 
     parser.add_argument(
+        '-d', '--data_dir',
+        type=Path,
+        default=SUPER_NEG_DIR,
+        help=('path to directory housing dataframes to process if `-p/--corpus_part` provided. '
+              '(Otherwise does nothing.)')
+    )
+    parser.add_argument(
         '-c', '--csv_path',
         type=Path,
-        # default=CLEAN_RBX_DIR / 'clean_bigram-PccVa_rb-bigram_hits.csv',
-        # 2_hit_tables/RBdirect/bigram-PccTe_direct-adj-head_hits.csv.bz2
         default=SUPER_NEG_DIR / 'bigram-PccVa_direct-adj-head_hits.csv.bz2',
         help=('path to dataframe saved as csv')
     )
@@ -49,95 +55,132 @@ def _parse_args():
         help=('path to text file containing `bigram_id` filter; id strings only separated by new lines')
     )
 
+    parser.add_argument(
+        '-F', '--force',
+        default=False,
+        action='store_true',
+        help=('option to force reprocessing of all parts')
+    )
+
     rgs = parser.parse_args()
     # if all([p.is_file() for __,p in rgs._get_kwargs()]):
     for a, p in rgs._get_kwargs():
-        if isinstance(p, Path) and not p.is_file():
+        if rgs.corpus_part and a != 'data_dir':
+            continue
+        if isinstance(p, Path) and not p.exists():
             raise FileNotFoundError(
                 f"\n* Invalid '--{a}' value\n  > '{p}' not found.")
 
     return rgs
 
 
-def run_by_part(args):
-    part = args.corpus_part
-    index_path = CLEAN_NEG_DIR.joinpath(
-        f'{part}_trigger_bigram-index_alpha-REclean.35f.txt')
-
-    dense_pickle = (
-        CONDENSED_DIR / f'{part}_all-RBdirect_unique-bigram-id_hits.pkl.gz')
-    if dense_pickle.is_file():
-        csv_path = dense_pickle.with_name(
-            dense_pickle.name.replace(PKL_SUFF, '.csv.bz2'))
-        if not csv_path.is_file(): 
-            pd.read_pickle(dense_pickle).to_csv(csv_path)
-        csv_paths = [csv_path]
-    else:
-        csv_paths = list(CLEAN_NEG_DIR.glob(f'*{part}*REclean_hits.csv.bz2'))
-        if not any(csv_paths):
-            csv_paths = list(SUPER_NEG_DIR.glob(f'*{part}*hits.csv.bz2'))
-            if not any(csv_paths):
-                csv_paths = list(SUPER_NEG_DIR.glob(f'*{part}*hits.csv'))
-
-    for csv_path in csv_paths:
-        saved_update_path = prep_csv(part, index_path, csv_path)
-        print(f'* ✓ Updated csv saved as {saved_update_path}')
-        yield saved_update_path
-
-
 def _main():
     args = _parse_args()
     if args.corpus_part is not None:
         part = args.corpus_part
-        updated_csvs = tuple(run_by_part(args))
+        updated_csvs = tuple(
+            run_by_part(part=args.corpus_part,
+                        data_dir=args.data_dir / 'cleaned',
+                        force_redo=args.force))
 
     else:
         index_path = args.index_path
         csv_path = args.csv_path
         part = re.search(r'[ANP][pwytc]{2}[VaTe\d]*', index_path.stem).group()
-        updated_csvs = [prep_csv(part, index_path, csv_path)]
+        updated_csvs = tuple(
+            prep_csv(part, index_path, csv_path, 
+                     force_redo=args.force))
 
-    df = pd.concat(pd.read_csv(
-        csv,
-        index_col='hit_id',
-        dtype=predict_dtypes(csv),
-        engine='c', low_memory=True)
+    df = pd.concat(
+        pd.read_csv(csv,
+                    index_col='hit_id',
+                    dtype=predict_dtypes(csv),
+                    engine='c',
+                    low_memory=True)
         for csv in updated_csvs)
 
     df = catify(remove_duplicates(df))
-    category = df.category.iloc[0]
-    parq_path = updated_csvs[0].parent.parent.joinpath(
-        f'{part}-{category}_final.parq')
+    cat = df.category.iloc[0]
+    parq_path = args.data_dir.joinpath(
+        f'{part}-{cat}_final.parq')
+    write_part_parquet(df, part=part, out_path=parq_path,
+                       data_label=f'Final pattern match tokens')
+    # df.sort_index().to_parquet(
+    #     str(parq_path), engine='pyarrow',
+    #     partition_cols=['slice'],
+    #     basename_template='group-{i}.parquet',
+    #     use_threads=True,
+    #     existing_data_behavior='delete_matching',
+    #     row_group_size=8000,
+    #     max_rows_per_file=8000
+    # )
+    # print(f'\n* Final pattern matching hits for `{part}` saved as parquet:',
+    #       'partitioned by "slice"',
+    #       f'path:  \n    `{parq_path}`', sep='\n  * ')
 
-    df.to_parquet(str(parq_path), engine='pyarrow', partition_cols=['slice'])
-    print(f'Final `{SUPER_NEG_DIR.parent.name}` hits for `{part}` saved as parquet:',
-          'partitioned by "slice"',
-          f'path:  \n  `{parq_path}`', sep='\n* ')
+
+def run_by_part(part: Path,
+                data_dir: Path = CLEAN_NEG_DIR,
+                force_redo: bool = False):
+    index_path = data_dir.joinpath(
+        f'clean_{part}_{data_dir.parent.name}_index.txt')
+    if not index_path.is_file():
+        try:
+            index_path = tuple(data_dir.glob(f'clean*{part}*index.txt'))[0]
+        except IndexError:
+            raise FileNotFoundError('"/share/compling/projects/sanpi/script/update_env_hits.py:114"\n'
+                                    + f'Path to corresponding "*{part}*index.txt" file not found.\n'
+                                    + f'  (Search performed from "{data_dir}")')
+    dense_pickle = (
+        CONDENSED_DIR / f'{part}_all-RBdirect_unique-bigram-id_hits.pkl.gz')
+    if dense_pickle.is_file():
+        csv_path = dense_pickle.with_name(
+            dense_pickle.name.replace(PKL_SUFF, '.csv.bz2'))
+        if not csv_path.is_file():
+            pd.read_pickle(dense_pickle).to_csv(csv_path)
+        csv_paths = [csv_path]
+    else:
+        csv_paths = list(data_dir.glob(f'*{part}*hits.csv.bz2'))
+        if not any(csv_paths):
+            csv_paths = list(data_dir.parent.glob(f'*{part}*hits.csv.bz2'))
+            if not any(csv_paths):
+                csv_paths = list(SUPER_NEG_DIR.glob(f'*{part}*hits.csv'))
+
+    for csv_path in csv_paths:
+        saved_update_path = prep_csv(part=part,
+                                     index_path=index_path,
+                                     csv_path=csv_path,
+                                     force_redo=force_redo)
+        print(f'* ✓ Updated csv saved as {saved_update_path}')
+        yield saved_update_path
 
 
 def prep_csv(part: str,
              index_path: Path,
              csv_path: Path,
-             dtype_dict: dict = None):
+             dtype_dict: dict = None,
+             force_redo: bool = False):
     pattern = csv_path.name.split(f'{part}_')[1].split('_hits')[
         0].split('_')[0]
     print(f'\n# Filtering "{pattern}" hits in "{part}"\n\n'
           f'- starting csv: `{csv_path}`\n'
           f'- filtering index: `{index_path}`')
-    if str(index_path.parent) == str(CLEAN_NEG_DIR):
-        output_csv_path = index_path.parent / (
-            f'{part}_{pattern}'
-            + re.search(r'(?<=index)[\w-]+(?=\.)',
-                        index_path.stem).group()
-            + '_hits.csv.bz2')
-    else:
-        output_csv_path = Path(
+    # if str(index_path.parent) == str(CLEAN_NEG_DIR):
+    #     added_tag = re.search(r'(?<=index)[\w-]+(?=\.)',
+    #                     index_path.stem)
+    #     added_tag = added_tag.group() if added_tag else ''
+    #     output_csv_path = CLEAN_NEG_DIR / (
+    #         f'{part}_{pattern}'
+    #         + added_tag
+    #         + '_hits.csv.bz2')
+    # else:
+    output_csv_path = Path(
             str(index_path).replace('_index.txt', '_hits.csv.bz2'))
-    print(f'- updated file: `{output_csv_path}`\n\n*********************')
+    print(f'- updated file: `{output_csv_path}`\n\n'+('*' * 30))
 
-    if output_csv_path.is_file():
+    if output_csv_path.is_file() and not force_redo:
         print(f'✓ Corpus part {part} previously processed:\n  '
-              f'{output_csv_path.relative_to(HIT_TABLES_DIR)} already exists.')
+              f'{output_csv_path.relative_to(HIT_TABLES_DIR.parent)} already exists.')
         shell_cmd(
             f'tree -hDtr --matchdirs -P "*{output_csv_path.name.split(".")[0]}*" {output_csv_path.parent} && wc -l {output_csv_path.parent}/*{part}*txt')
     else:

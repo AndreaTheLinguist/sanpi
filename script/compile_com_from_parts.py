@@ -10,9 +10,11 @@ from more_itertools import batched
 
 from source.utils.dataframes import Timer
 from source.utils.dataframes import catify_hit_table as catify
-from source.utils.dataframes import save_final_info
-from source.utils.general import (HIT_TABLES_DIR, confirm_dir,
-                                  run_shell_command)
+from source.utils.dataframes import (extend_window, save_final_info,
+                                     save_hit_id_index_txt, select_id_prefixes,
+                                     write_part_parquet)
+from source.utils.general import HIT_TABLES_DIR, confirm_dir, run_shell_command
+
 TEST_CAP = None
 try:
     import pyarrow
@@ -24,8 +26,9 @@ else:
 NEG_REGEX = re.compile(
     r"\bno\b|\bn[o']t\b|\bnobody\b|\bno one\b|\bnothing\b|\bnowhere\b|\brarel?y?\b|\bscarcely\b|\bbarely\b|\bhardly\b|\bseldoml?y?\b|\bwithout\b|\bnever\b")
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
-NUM_ID_TAG_REGEX= re.compile(r'^((?<=pcc_eng_)\d{2}|(?<=nyt_eng_)\d)')
-RBX_PC = HIT_TABLES_DIR.joinpath('RBXadj/pre-cleaned')
+NUM_ID_TAG_REGEX = re.compile(r'^((?<=pcc_eng_)\d{2}|(?<=nyt_eng_)\d)')
+RBX_CLEAN = HIT_TABLES_DIR.joinpath('RBXadj/cleaned')
+
 
 def _main():
     args = _parse_args()
@@ -43,7 +46,8 @@ def _main():
     entire_parquet = str(data_dir/'ALL_not-neg.parq')
 
     if not composite_only:
-        equal_sized_sample = _process_extras(all_enforced, data_dir, entire_parquet)
+        equal_sized_sample = _process_extras(
+            all_enforced, data_dir, entire_parquet)
 
     # ********* wait 1m before attempting to write _entire_ composite table
     print(('\n----------------------\n'
@@ -86,7 +90,7 @@ def _parse_args():
         '-F', '--force',
         default=False,
         action='store_true',
-        help=('option to force reprocessing of all parts (from "alpha" stage)')
+        help=('option to force reprocessing of all parts')
     )
 
     return parser.parse_args()
@@ -104,7 +108,8 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
 
     enforced_parqs = tuple(data_dir.joinpath('enforced').glob(
         '*[PAN][cpy]*alpha-hits.parq'))
-    print(f'* Loading predetermined selection from {len(enforced_parqs)} `*.parq` paths')
+    print(
+        f'* Loading predetermined selection from {len(enforced_parqs)} `*.parq` paths')
 
     def iter_filtered_parqs(unique_ids: pd.Series,
                             enforced_parqs: tuple[Path]):
@@ -113,9 +118,9 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
         # id_prefixes = unique_ids.str[:10]#.drop_duplicates()
         # id_tags =  id_prefixes.copy()
         id_tags = corpus_in_id.copy() + '_eng_'
-        id_tags[corpus_in_id=='nyt'] =  unique_ids[corpus_in_id=='nyt'].str[:9]
-        id_tags[corpus_in_id=='pcc'] =  unique_ids[corpus_in_id=='pcc'].str[:10]
-        
+        id_tags[corpus_in_id == 'nyt'] = unique_ids[corpus_in_id == 'nyt'].str[:9]
+        id_tags[corpus_in_id == 'pcc'] = unique_ids[corpus_in_id == 'pcc'].str[:10]
+
         for i, ep in enumerate(enforced_parqs, start=1):
             with Timer() as iter_t:
                 part = PART_LABEL_REGEX.search(ep.name).group().lower()
@@ -125,10 +130,10 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
                 # id_set = set(unique_ids
                 #                 .loc[ids_by_corpus==part[:3]]
                 #                 .loc[unique_ids.str.startswith(id_tag)])
-                id_set = set(unique_ids.loc[id_tags==id_tag])
+                id_set = set(unique_ids.loc[id_tags == id_tag])
                 pdf = pd.read_parquet(ep, engine='pyarrow',
-                                        filters=[('hit_id', 'in', id_set)],
-                                        use_threads=True)
+                                      filters=[('hit_id', 'in', id_set)],
+                                      use_threads=True)
                 print(' '*5, iter_t.elapsed())
                 yield pdf
 
@@ -137,7 +142,7 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
         try:
             prior_parqs = (iter_filtered_parqs(
                 unique_ids,
-                enforced_parqs[:TEST_CAP] if TEST_CAP 
+                enforced_parqs[:TEST_CAP] if TEST_CAP
                 else enforced_parqs))
 
         except Exception as exc:
@@ -146,7 +151,7 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
             print('\n  - '.join(('sys.exc_info(), ' +
                   repr(sys.exc_info()).strip('()')).split(', ')))
             raise exc
-        
+
         print('* Time to load, filter to final ID index',
               '🪂  by part & *part* ids',
               f'  → {load_t.elapsed()}',
@@ -155,7 +160,7 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
     with Timer() as cat_t:
         all_enforced = pd.concat(prior_parqs)
         print((f'* Time to concat all {len(enforced_parqs)} parts'),
-              '📚  by part iterator', 
+              '📚  by part iterator',
               f'  → {cat_t.elapsed()}',
               sep='\n  ', end='\n\n')
 
@@ -169,8 +174,8 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
     except Exception:
         print('failed to describe frame: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:188"')
         print(sys.exc_info())
-    #// print(f'Test Finished.\n{pd.Timestamp.now().ctime()}')
-    #// sys.exit() #!  --- ** REMOVE ** ---- 🚩⚠️
+    # // print(f'Test Finished.\n{pd.Timestamp.now().ctime()}')
+    # // sys.exit() #!  --- ** REMOVE ** ---- 🚩⚠️
     return all_enforced
 
 
@@ -207,28 +212,27 @@ def _load_from_raw(data_dir: Path,
     return all_enforced
 
 
-
 def _process_extras(all_enforced, data_dir, entire_parquet):
     print('\n### Saving `ALL` Final Info')
     save_final_info(all_enforced, data_dir)
     sleep(10)
-    
+
     timestamp = pd.Timestamp.now().strftime(".%y%m%d%H")
     sample_parq_part = (str(entire_parquet)
                         .replace('ALL', 'NEQ')
                         .replace('.parq', f'_sample{timestamp}.parq'))
-    
+
     equal_sized_sample = get_neg_equiv_sample(all_enforced, data_dir)
     print('\n### Saving `NEQ` Sample Info')
     save_final_info(equal_sized_sample, data_dir, tag='NEQ',
                     date_flag=timestamp)
-    
+
     # ***  wait 30s before attempting to write *sample* with all columns
     print(('\n----------------------\n'
            '> *temporarily paused*\n'
            '----------------------\n'))
     sleep(30)
-    
+
     save_composite_parq(equal_sized_sample,
                         sample_parq_part,
                         sample=True)
@@ -275,13 +279,14 @@ def get_neg_equiv_sample(all_enforced, data_dir):
 
 # > moved `save_final_info` to `source.utils.dataframes` "/share/compling/projects/sanpi/source/utils/dataframes.py"
 
+
 def process_parq(data_dir, parq, force: bool = False):
     with Timer() as proc_part_t:
         part = PART_LABEL_REGEX.search(parq.stem).group()
 
         try:
             com_index_filter = tuple(
-                data_dir.glob(f'*{part}*alpha*.txt'))[0]
+                data_dir.glob(f'*{part}*index.txt'))[0]
         except IndexError as e:
             if 'DEMO' in data_dir.parts:
                 return None
@@ -292,43 +297,69 @@ def process_parq(data_dir, parq, force: bool = False):
         print(f'\n## Corpus Part: `{part}`\n')
         enforced_dir = com_index_filter.with_name('enforced')
         confirm_dir(enforced_dir)
+        reject_dir = com_index_filter.with_name('rejected')
+        confirm_dir(reject_dir)
         enforced_parq = enforced_dir.joinpath(
             com_index_filter.name.replace('index.txt', 'hits.parq'))
         if force or not enforced_parq.exists():
-            df = pd.read_parquet(
+            df = catify(pd.read_parquet(
                 parq, engine='pyarrow' if PYARROW else 'fastparquet'
-            ).assign(part=part).astype('string')
+            ).assign(part=part), reverse=True)
             init_len = len(df)
-            df = df.assign(
-                utt_len=pd.to_numeric(df.utt_len, downcast='unsigned'),
-                adv_index=pd.to_numeric(df.adv_index, downcast='unsigned'))
+            # df = df.assign(
+            #     utt_len=pd.to_numeric(df.utt_len, downcast='unsigned'),
+            #     adv_index=pd.to_numeric(df.adv_index, downcast='unsigned'))
             df = pd.concat(
                 iter_enforce_filter(
                     df, parq=parq, part=part,
-                    com_ids=com_index_filter.read_text().splitlines())
+                    com_ids_path=com_index_filter,
+                    reject_dir=reject_dir)
             )
-            print('\n### Removing Duplicates from all '
-                  f'`{part}` chunks combined')
-            df = remove_duplicates(df)
+
+            with Timer() as wrt_ix_t:
+                print(f'* "Not negated"-enforced index for `{part}` saved as:',
+
+                      str(save_hit_id_index_txt(index_vals=df.index, part=part,
+                                                index_path=enforced_parq.with_name(
+                                                    re.sub(
+                                                        r'_hits.*$', '_no-neg_index.txt', enforced_parq.name)
+                                                ))),
+                      sep='\n  > 🏷️  `', end='`\n')
+                print(f'  > ⏱️  {wrt_ix_t.elapsed()}\n')
+
+            # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            # NOTE: # > Since same code is applied now at the previous cleaning stage of the _entire_ dataset,
+                # > no additional removals are expected here.
+            if 'not-RBdirect' not in enforced_parq.parts:
+                print('\n### Removing Duplicates from all '
+                      f'`{part}` chunks combined')
+                df = remove_duplicates(df)
+
+            # * 🏁✔️ Complement Processing for Part Finished
             print(
                 f'\n### `{part}` Summary\n',
                 f'* {len(df):,} remaining hits',
                 f'  ({round(len(df)/init_len*100, 1):.1f}% of loaded)',
                 f'* Time to process `{part}` corpus part → {proc_part_t.elapsed()}',
                 sep='\n')
-            with Timer() as save_time:
-                df.sort_index().to_parquet(
-                    str(enforced_parq),
-                    partition_cols=['slice'],
-                    engine='pyarrow',
-                    basename_template='group-{i}.parquet',
-                    use_threads=True,
-                    existing_data_behavior='delete_matching',
-                    row_group_size=12000,
-                    max_rows_per_file=12000)
-                print(f'* Time to save updated `{part}` as "slice" partitioned parquet'
-                      f' → {save_time.elapsed()}')
-                print(f'  + path:\n    `{enforced_parq}`')
+
+            write_part_parquet(df, part=part, out_path=enforced_parq,
+                               data_label='final negation prohibited complement tokens')
+
+            # max_rows = min(25000(round((df[partition_cols].value_counts().median() // 4) * 1.01, -2)))
+            # with Timer() as save_time:
+            #     df.sort_index().to_parquet(
+            #         str(enforced_parq),
+            #         partition_cols=partition_cols,
+            #         engine='pyarrow',
+            #         basename_template='group-{i}.parquet',
+            #         use_threads=True,
+            #         existing_data_behavior='delete_matching',
+            #         row_group_size=12000,
+            #         max_rows_per_file=12000)
+            #     print(f'* Time to save updated `{part}` as {"-".join(partition_cols)} partitioned parquet'
+            #           f' → {save_time.elapsed()}')
+            #     print(f'  + path:\n    `{enforced_parq}`')
         else:
             print(
                 f'* {part} already processed.\n  > path:  \n  > `{enforced_parq}`')
@@ -337,22 +368,28 @@ def process_parq(data_dir, parq, force: bool = False):
     return enforced_parq
 
 
-def iter_enforce_filter(df, com_ids, parq, part):
+def iter_enforce_filter(df, com_ids_path, parq, part, reject_dir):
+    com_ids = com_ids_path.read_text().splitlines()
+    reject_parq = reject_dir.joinpath(
+        com_ids_path.name.replace('_index.txt', '_reject-hits.parq'))
     for i, ix_batch in enumerate(batched(com_ids, 500000), start=1):
         print('\n### Processing',
               f'`{part}`: Chunk {i:,}\n')
-        chunk = df.filter(items=ix_batch, axis=0)
+        chunk = df.filter(items=ix_batch, axis=0).assign(chunk=i)
         print(f'* {len(chunk):,} initial hits')
-        print(f'\n#### Removing Duplicates from `{part}`:{i}\n')
-        chunk = remove_duplicates(chunk)
+        # This 👇 is now done in the `RBXadj` clean_by_part step
+        # // print(f'\n#### Removing Duplicates from `{part}`:{i}\n')
+        # // chunk = remove_duplicates(chunk)
         print(f'\n#### Enforcing Negative Prohibition for `{part}`:{i}\n')
-        yield enforce_not_neg(chunk, parq, i)
+        yield enforce_not_neg(chunk, input_path=parq,
+                              processing_index=i,
+                              reject_parq=reject_parq)
 
 
 def process_parts(data_dir: Path,
                   force_redo: bool = False):
 
-    parq_paths = tuple(RBX_PC.glob('*alpha*.parq'))
+    parq_paths = tuple(RBX_CLEAN.glob('*.parq'))
     if len(parq_paths) < 35:
         yield from process_by_csvs(data_dir)
     else:
@@ -379,7 +416,6 @@ def process_by_csvs(data_dir):
         save_path = _get_save_path(bz2_csv_path)
         updated_chunk_iter = iterate_over_part(
             bz2_csv_path, dtype_dict, save_path)
-
 
         chunks = []
         for ch_df in updated_chunk_iter:
@@ -457,6 +493,7 @@ def _get_save_path(input_path: Path, reject: bool = False) -> Path:
 
 def enforce_not_neg(com_df: pd.DataFrame,
                     input_path: Path,
+                    reject_parq: Path,
                     processing_index: int = None) -> pd.DataFrame:
     # def get_preceding_text(tok_str: pd.Series,
     #                        adv_index: pd.Series = None):
@@ -496,11 +533,32 @@ def enforce_not_neg(com_df: pd.DataFrame,
 
     preceding = get_preceding_text(
         tok_str=com_df.token_str,
-        adv_index=(com_df.adv_index if 'adv_index' in com_df.columns
+        adv_index=(com_df.adv_index
+                   if 'adv_index' in com_df.columns
                    else None))
     after_neg = preceding.str.contains(NEG_REGEX, regex=True)
 
     maybe_neg_hits = com_df.loc[after_neg, :]
+    # TODO Save `maybe_neg_hits`
+    _max_rows = (len(maybe_neg_hits)//2)+1
+    partition_by=['chunk']
+    if 'id_prefix' in maybe_neg_hits.columns:
+        partition_by.append('id_prefix')
+        part_counts=maybe_neg_hits.value_counts(partition_by)
+        _max_rows = min(part_counts.max() + 1, 10000)
+        _min_rows = min(int((part_counts.min())), 1000)
+    maybe_neg_hits.to_parquet(
+        str(reject_parq),
+        engine='pyarrow',
+        partition_cols=partition_by,
+        # ^ this enables appending basically, without having different files
+        basename_template='group-{i}.parquet',
+        use_threads=True,
+        existing_data_behavior='delete_matching',
+        min_rows_per_group=_min_rows,
+        max_rows_per_file=_max_rows,
+        row_group_size=int(min(_max_rows//2, _min_rows*5)))
+
     total_after_neg = len(maybe_neg_hits)
     print('> Sample of Potential Negations <\n\n```log',
           maybe_neg_hits[maybe_neg_hits.utt_len < 30].filter(
@@ -611,34 +669,34 @@ def save_composite_parq(df: pd.DataFrame,
     return
 
 
-def extend_window(df,
-                  tokens_before: int = 7,
-                  tokens_after: int = 7):
-    # > was:
-    # # > just replace `text_window` instead of adding new column
-    # tok_lists = df.token_str.str.lower().str.split()
-    # df['text_window'] = df.apply(
-    #     lambda x: tok_lists[x.name][
-    #         max(0, x.adv_index - tokens_before):(
-    #             x.adv_index + 1 + tokens_after)],
-    #     axis=1
-    #     ).str.join(' ').astype('string')
-    # df['window_len'] = pd.to_numeric(
-    #     df.text_window.str.count(' ').add(1), downcast='unsigned')
-    # return df
+# def extend_window(df,
+#                   tokens_before: int = 7,
+#                   tokens_after: int = 7):
+#     # > was:
+#     # # > just replace `text_window` instead of adding new column
+#     # tok_lists = df.token_str.str.lower().str.split()
+#     # df['text_window'] = df.apply(
+#     #     lambda x: tok_lists[x.name][
+#     #         max(0, x.adv_index - tokens_before):(
+#     #             x.adv_index + 1 + tokens_after)],
+#     #     axis=1
+#     #     ).str.join(' ').astype('string')
+#     # df['window_len'] = pd.to_numeric(
+#     #     df.text_window.str.count(' ').add(1), downcast='unsigned')
+#     # return df
 
-    # ^ sourcery suggestion
-    tok_lists = df.token_str.str.lower().str.split()
-    text_windows = [
-        ' '.join(tok_lists.iloc[i][max(
-            0, idx - tokens_before):(idx + 1 + tokens_after)])
-        for i, idx in enumerate(df.adv_index)
-    ]
-    df['text_window'] = pd.Series(
-        text_windows, dtype='string', index=tok_lists.index)
-    df['window_len'] = pd.to_numeric(
-        df.text_window.str.count(' ').add(1), downcast='unsigned')
-    return df
+#     # ^ sourcery suggestion
+#     tok_lists = df.token_str.str.lower().str.split()
+#     text_windows = [
+#         ' '.join(tok_lists.iloc[i][max(
+#             0, idx - tokens_before):(idx + 1 + tokens_after)])
+#         for i, idx in enumerate(df.adv_index)
+#     ]
+#     df['text_window'] = pd.Series(
+#         text_windows, dtype='string', index=tok_lists.index)
+#     df['window_len'] = pd.to_numeric(
+#         df.text_window.str.count(' ').add(1), downcast='unsigned')
+#     return df
 
 
 def remove_duplicates(hit_df, final: bool = False):
@@ -708,6 +766,6 @@ if __name__ == '__main__':
         #     print(
         #         f'\n## Enforcement and Compilation Completed ✓\n+ {pd.Timestamp.now().ctime()}')
         # finally:
-        print('Exiting script: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:760')
-        print(f'+ total time running script: `{timer.elapsed()}`')
+        # print('Exiting script: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:760')
+        print(f'+ total time running script: {timer.elapsed()}')
         #     sys.exit(code)
