@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from source.utils.dataframes import Timer, adjust_few_hits
+from source.utils.dataframes import Timer, add_new_cols, adjust_few_hits
 from source.utils.dataframes import catify_hit_table as catify
-from source.utils.dataframes import drop_long_windows
+from source.utils.dataframes import quarantine_deps, drop_not_only
 from source.utils.dataframes import filter_csv_by_index as filter_csv
 from source.utils.dataframes import remove_duplicates, write_part_parquet
 from source.utils.general import HIT_TABLES_DIR, PKL_SUFF, confirm_dir
@@ -98,13 +98,23 @@ def _main():
                     engine='c',
                     low_memory=True)
         for csv in updated_csvs)
+    
+    df = add_new_cols(df, part=part)
+    env_cat = df.category.unique()[0]
+    if env_cat in ('RBdirect', 'NEGmirror'):
+        df = adjust_few_hits(df)
+        df = drop_not_only(df)
+    
+    df = quarantine_deps(df,
+                         dep_distance_ceiling=18,
+                         dep_distance_floor=3)
+    df = remove_duplicates(df)
 
-    df = catify(remove_duplicates(df))
-    cat = df.category.iloc[0]
+    df = catify(df)
     parq_path = args.data_dir.joinpath(
-        f'{part}-{cat}_final.parq')
+        f'{part}-{env_cat}_final.parq')
     write_part_parquet(df, part=part, out_path=parq_path,
-                       data_label=f'Final pattern match tokens')
+                       data_label=f'Final `"{env_cat}"` tokens')
     # df.sort_index().to_parquet(
     #     str(parq_path), engine='pyarrow',
     #     partition_cols=['slice'],
@@ -151,7 +161,9 @@ def run_by_part(part: Path,
                                      index_path=index_path,
                                      csv_path=csv_path,
                                      force_redo=force_redo)
-        print(f'* ✓ Updated csv saved as {saved_update_path}')
+        path_message = f'* ✓ Updated csv saved as {saved_update_path}'
+        print(path_message)
+        print('-'*len(path_message)+'\n')
         yield saved_update_path
 
 
@@ -165,15 +177,7 @@ def prep_csv(part: str,
     print(f'\n# Filtering "{pattern}" hits in "{part}"\n\n'
           f'- starting csv: `{csv_path}`\n'
           f'- filtering index: `{index_path}`')
-    # if str(index_path.parent) == str(CLEAN_NEG_DIR):
-    #     added_tag = re.search(r'(?<=index)[\w-]+(?=\.)',
-    #                     index_path.stem)
-    #     added_tag = added_tag.group() if added_tag else ''
-    #     output_csv_path = CLEAN_NEG_DIR / (
-    #         f'{part}_{pattern}'
-    #         + added_tag
-    #         + '_hits.csv.bz2')
-    # else:
+
     output_csv_path = Path(
             str(index_path).replace('_index.txt', '_hits.csv.bz2'))
     print(f'- updated file: `{output_csv_path}`\n\n'+('*' * 30))
@@ -181,18 +185,10 @@ def prep_csv(part: str,
     if output_csv_path.is_file() and not force_redo:
         print(f'✓ Corpus part {part} previously processed:\n  '
               f'{output_csv_path.relative_to(HIT_TABLES_DIR.parent)} already exists.')
-        shell_cmd(
-            f'tree -hDtr --matchdirs -P "*{output_csv_path.name.split(".")[0]}*" {output_csv_path.parent} && wc -l {output_csv_path.parent}/*{part}*txt')
+        shell_cmd(f'tree -hDtr --noreport --prune --matchdirs -P "*{output_csv_path.name.split(".")[0]}*"'
+            +f' {output_csv_path.parent} && echo "Total line(breaks):"; '
+            +f'wc -l {output_csv_path.parent}/*{part}*txt')
     else:
-        # columns in `pre-cleaned/*csv`
-        #   hit_id,adv_form,adj_form,text_window,token_str,adv_lemma,adj_lemma,adv_index,adv_form_lower,adj_form_lower,bigram_lower,utt_len
-        #! convert strings to category _after_ manipulations
-        # dtype_dict = {h: ('int64' if h.endswith(('index', 'len')) else 'string')
-        #   #! strip ".bz2" to get first line only
-        #   for h in (Path(str(csv_path).strip('.bz2'))
-        #             .read_text(encoding='utf8')
-        #             .splitlines()[0].split(','))
-        #   }
 
         df = filter_csv(index_txt_path=index_path,
                         df_csv_path=csv_path,
@@ -212,7 +208,7 @@ def prep_csv(part: str,
 
 
 def predict_dtypes(csv_path: Path) -> dict:
-    snippet = pd.read_csv(csv_path, nrows=2)
+    snippet = pd.read_csv(csv_path, nrows=5)
     return dict(snippet.convert_dtypes()
                 .dtypes.astype('string'))
 

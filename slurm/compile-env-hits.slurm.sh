@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task 4
 #SBATCH -o %x.%j.out
 #SBATCH -e %x.%j.err
-#SBATCH --time 3:00:00
+#SBATCH --time 1:00:00
 #SBATCH -J "ENVcompile"
 #SBATCH --requeue
 #SBATCH --chdir="/share/compling/projects/sanpi/logs/update_env_hits"

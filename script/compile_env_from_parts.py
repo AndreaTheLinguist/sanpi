@@ -42,8 +42,8 @@ def _main():
                 reverse=True)
     print('\n## Running final duplicate sweep')
     final_ids = remove_duplicates(
-        df.filter(['utt_len', 'adv_index', 'text_window',
-                  'bigram_lower', 'adv_form_lower']),
+        df.filter(['utt_len', 'adv_index', 'neg_index', 'text_window',
+                  'bigram_lower', 'adv_form_lower', 'token_str', 'mir_index']),
         return_index=True)
     df_final = df.filter(final_ids, axis=0)
     df_final['trigger_lemma'] = (df_final.trigger_lemma

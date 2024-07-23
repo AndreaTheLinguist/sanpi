@@ -275,46 +275,12 @@ def gen_keep_clean(reader,  # :pd.io.parsers.readers.TextFileReader,
             init_len, succinct_len or orth_fix_len or prior_filter_len)
         yield chunk.assign(chunk_dropped=delta).convert_dtypes()
 
-select_id_prefies
-
-
-
-# 👇 moved to `source.utils.dataframes`
-# def save_index_txt(hit_ids: list,
-#                    part: str,
-#                    out_path: Path = None,
-#                    index_path: Path = None):
-#     if not (out_path or index_path):
-#         raise ValueError('1 of `out_path` or `index_path` must be provided')
-#     with Timer() as txt_t:
-#         hit_ids.sort()
-#         ids_str = '\n'.join(hit_ids)
-
-#         # ? Is this necessary?
-#         if WS_REGEX.search(ids_str) is not None:
-#             ids_str = WS_REGEX.sub('', ids_str)
-
-#         index_path = (
-#             index_path
-#             or (out_path
-#                 .with_stem(out_path.stem.replace('_hits', '_index'))
-#                 .with_suffix('.txt')))
-#         index_path.write_text(ids_str, encoding='utf8')
-#         print('\n*******',
-#               f'-> 🫧  Final clean "hit_id" index for "{part}" bigram tokens saved as',
-#               f'   🏷️  "{index_path}"',
-#               f'   ⏱️  {txt_t.elapsed()}',
-#               '*******\n',
-#               sep='\n', end='\n\n')
-
 
 def fix_orth(df: pd.DataFrame,
              using_prior: bool = False):
 
     ad_cols = df.filter(regex=r'ad[vj]_\w*l').columns.to_list()
     df = catify_hit_table(df, reverse=True)
-    # df.loc[:, ad_cols + ['bigram_lower']
-    #        ] = df.loc[:, ad_cols + ['bigram_lower']].astype('string')
 
     def update_bigram_lower(df):
 

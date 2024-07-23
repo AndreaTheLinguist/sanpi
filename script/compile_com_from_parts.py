@@ -8,7 +8,7 @@ from time import sleep
 import pandas as pd
 from more_itertools import batched
 
-from source.utils.dataframes import Timer
+from source.utils.dataframes import NEG_REGEX, Timer
 from source.utils.dataframes import catify_hit_table as catify
 from source.utils.dataframes import (extend_window, save_final_info,
                                      save_hit_id_index_txt, select_id_prefixes,
@@ -23,8 +23,8 @@ except ImportError:
 else:
     PYARROW = True
 
-NEG_REGEX = re.compile(
-    r"\bno\b|\bn[o']t\b|\bnobody\b|\bno one\b|\bnothing\b|\bnowhere\b|\brarel?y?\b|\bscarcely\b|\bbarely\b|\bhardly\b|\bseldoml?y?\b|\bwithout\b|\bnever\b")
+# NEG_REGEX = re.compile(
+#     r"\bno\b|\bn[o']t\b|\bnobody\b|\bno one\b|\bnothing\b|\bnowhere\b|\brarel?y?\b|\bscarcely\b|\bbarely\b|\bhardly\b|\bseldoml?y?\b|\bwithout\b|\bnever\b")
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
 NUM_ID_TAG_REGEX = re.compile(r'^((?<=pcc_eng_)\d{2}|(?<=nyt_eng_)\d)')
 RBX_CLEAN = HIT_TABLES_DIR.joinpath('RBXadj/cleaned')
@@ -33,11 +33,21 @@ RBX_CLEAN = HIT_TABLES_DIR.joinpath('RBXadj/cleaned')
 def _main():
     args = _parse_args()
     data_dir = args.data_dir
+    print(f'# Hit Table Processing for `{data_dir.name}`\n',
+          f'* start time: {pd.Timestamp.now().ctime()}', 
+          '* script:  \n  `/share/compling/projects/sanpi/script/compile_com_from_parts.py`',
+          f'* data directory:  \n  `{data_dir}/`',
+          sep='\n', end='\n\n')
     force_redo = args.force
     composite_only = args.composite_only
     final_index_txt = data_dir.joinpath(f'ALL_{data_dir.name}_final-index.txt')
-    if final_index_txt.is_file() and not force_redo:
-        all_enforced = _load_from_prior(final_index_txt, data_dir)
+    enforced_parqs = tuple(data_dir.joinpath('enforced').glob(
+        '*[PAN][cpy]*hits.parq'))
+    if (final_index_txt.is_file()
+        and (not force_redo)
+        and (len(enforced_parqs) == 35
+             or 'DEMO' in data_dir.parts)):
+        all_enforced = _load_from_prior(final_index_txt, enforced_parqs)
 
     else:
         all_enforced = _load_from_raw(data_dir, force_redo)
@@ -46,8 +56,7 @@ def _main():
     entire_parquet = str(data_dir/'ALL_not-neg.parq')
 
     if not composite_only:
-        equal_sized_sample = _process_extras(
-            all_enforced, data_dir, entire_parquet)
+        _process_extras(all_enforced, entire_parquet)
 
     # ********* wait 1m before attempting to write _entire_ composite table
     print(('\n----------------------\n'
@@ -96,9 +105,15 @@ def _parse_args():
     return parser.parse_args()
 
 
-def _load_from_prior(final_index_txt: Path, data_dir: Path):
-
-    print('> ! Prior Index for Full Complement found.')
+def _load_from_prior(final_index_txt: Path, 
+                     enforced_parqs: tuple[Path],
+                     #  data_dir: Path
+                     ):
+    print('> !!! Prior Index for Full Complement found.')
+    print('\n## Loading from Partial Prior Processing\n',
+              f'existing files:  \n  `{enforced_parqs[0].parent}/*`',
+              f'existing final index:  \n  `{final_index_txt}`', 
+              sep='\n* ')
 
     unique_ids = pd.Series(final_index_txt
                            .read_text().splitlines(),
@@ -106,14 +121,10 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
                            ).str.strip().drop_duplicates()
     print(f'* {len(unique_ids):,} `hit_id`s in final index')
 
-    enforced_parqs = tuple(data_dir.joinpath('enforced').glob(
-        '*[PAN][cpy]*alpha-hits.parq'))
-    print(
-        f'* Loading predetermined selection from {len(enforced_parqs)} `*.parq` paths')
+    print(f'* Loading predetermined selection from {len(enforced_parqs)} `*.parq` paths')
 
     def iter_filtered_parqs(unique_ids: pd.Series,
                             enforced_parqs: tuple[Path]):
-
         corpus_in_id = unique_ids.str[:3]
         # id_prefixes = unique_ids.str[:10]#.drop_duplicates()
         # id_tags =  id_prefixes.copy()
@@ -165,14 +176,15 @@ def _load_from_prior(final_index_txt: Path, data_dir: Path):
               sep='\n  ', end='\n\n')
 
     try:
-        print(all_enforced
+        print('Summary of loaded, filtered, & concatenated hits\n',
+            all_enforced
               # .select_dtypes(include='string')
-              .filter(regex=r'bigram|lemma|part')
+              .filter(regex=r'bigram|lemma|part|prefix|text_window')
               .describe().T.convert_dtypes().round()
               .to_markdown(floatfmt=',.0f', intfmt=','),
-              end='\n\n')
+              sep='\n',end='\n\n')
     except Exception:
-        print('failed to describe frame: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:188"')
+        print('failed to describe frame: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:167"')
         print(sys.exc_info())
     # // print(f'Test Finished.\n{pd.Timestamp.now().ctime()}')
     # // sys.exit() #!  --- ** REMOVE ** ---- 🚩⚠️
@@ -212,7 +224,8 @@ def _load_from_raw(data_dir: Path,
     return all_enforced
 
 
-def _process_extras(all_enforced, data_dir, entire_parquet):
+def _process_extras(all_enforced, entire_parquet):
+    data_dir = Path(entire_parquet).parent
     print('\n### Saving `ALL` Final Info')
     save_final_info(all_enforced, data_dir)
     sleep(10)
@@ -236,7 +249,6 @@ def _process_extras(all_enforced, data_dir, entire_parquet):
     save_composite_parq(equal_sized_sample,
                         sample_parq_part,
                         sample=True)
-    return equal_sized_sample
 
 
 def get_neg_equiv_sample(all_enforced, data_dir):
@@ -524,6 +536,26 @@ def enforce_not_neg(com_df: pd.DataFrame,
                                     index=tok_index).str.join(' ')
         return preceding_texts.astype('string').fillna('')
 
+    def _save_maybe_neg(maybe_neg_hits, reject_parq):
+        _max_rows = (len(maybe_neg_hits)//2)+1
+        partition_by = ['chunk']
+        if 'id_prefix' in maybe_neg_hits.columns:
+            partition_by.append('id_prefix')
+        part_counts = maybe_neg_hits.value_counts(partition_by)
+        _max_rows = min(part_counts.max() + 1, 20000)
+        _min_rows = min(int((part_counts.min())), 1000, _max_rows//2)
+        maybe_neg_hits.to_parquet(
+            str(reject_parq),
+            engine='pyarrow',
+            partition_cols=partition_by,
+            # ^ this enables appending basically, without having different files
+            basename_template='group-{i}.parquet',
+            use_threads=True,
+            existing_data_behavior='delete_matching',
+            min_rows_per_group=_min_rows,
+            max_rows_per_file=_max_rows,
+            row_group_size=int(min(_max_rows//2, _min_rows*5)))
+
     com_df = com_df.rename(columns={'Unnamed: 0': 'hit_id'})
     init_total = len(com_df)
     if 'hit_id' in com_df.columns:
@@ -539,31 +571,14 @@ def enforce_not_neg(com_df: pd.DataFrame,
     after_neg = preceding.str.contains(NEG_REGEX, regex=True)
 
     maybe_neg_hits = com_df.loc[after_neg, :]
-    # TODO Save `maybe_neg_hits`
-    _max_rows = (len(maybe_neg_hits)//2)+1
-    partition_by=['chunk']
-    if 'id_prefix' in maybe_neg_hits.columns:
-        partition_by.append('id_prefix')
-        part_counts=maybe_neg_hits.value_counts(partition_by)
-        _max_rows = min(part_counts.max() + 1, 10000)
-        _min_rows = min(int((part_counts.min())), 1000)
-    maybe_neg_hits.to_parquet(
-        str(reject_parq),
-        engine='pyarrow',
-        partition_cols=partition_by,
-        # ^ this enables appending basically, without having different files
-        basename_template='group-{i}.parquet',
-        use_threads=True,
-        existing_data_behavior='delete_matching',
-        min_rows_per_group=_min_rows,
-        max_rows_per_file=_max_rows,
-        row_group_size=int(min(_max_rows//2, _min_rows*5)))
+    # [x] Save `maybe_neg_hits`
+    _save_maybe_neg(maybe_neg_hits, reject_parq)
 
     total_after_neg = len(maybe_neg_hits)
     print('> Sample of Potential Negations <\n\n```log',
           maybe_neg_hits[maybe_neg_hits.utt_len < 30].filter(
               ['bigram_lower', 'token_str']).sample(9)
-          .to_markdown(tablefmt='rounded_grid', maxcolwidths=[18, 20, 62]),
+          .to_markdown(tablefmt='rounded_grid', maxcolwidths=[18, 22, 58]),
           '```',
           sep='\n', end='\n\n'
           )
@@ -603,7 +618,7 @@ def save_composite_parq(df: pd.DataFrame,
     partition_on = partition_on or ['part']
     data_dir = Path(parq_path).parent
 
-    print('### Saving Composite Table\n')
+    print(f'### Saving{" *NEQ Sample* " if sample else " "}Composite Table\n')
     engine_used = None
     max_parq_rows = int(max(100000,
                             round(((df.part.value_counts().mean()//10)
@@ -648,12 +663,11 @@ def save_composite_parq(df: pd.DataFrame,
         if engine_used:
             print(f'* Complement{" NEQ Sample" if sample else ""}',
                   'saved as parquet ✓',
-                  f'* engine used: "{engine_used}"',
-                  '* partitioned by: ',
-                  f'  {repr(partition_on)}',
+                  f'* engine used: `{engine_used}`',
+                  f'* partitioned by: `{repr(partition_on)}`\n',
                   '* properties included:  ',
-                  '\n    ' + repr(df.columns
-                                  ).replace('\n', '\n      ')+'\n',
+                  '\n      ' + repr(df.columns
+                                  ).replace('\n', '\n        ')+'\n\n',
                   f'* max rows per file: {max_parq_rows:,}',
                   sep='  \n  ')
             if sample:

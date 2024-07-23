@@ -4,8 +4,9 @@
 #SBATCH -e %x-%2a.%A.err      # Name of stderr output log file (%j expands to jobID)
 #SBATCH --array 0-34%12
 #SBATCH -N 1                  # Total number of nodes requested
-#SBATCH --time 4:00:00       # Time limit (hh:mm:ss)
-#SBATCH --mem 10G
+#SBATCH -c 3
+#SBATCH --time 2:00:00       # Time limit (hh:mm:ss)
+#SBATCH --mem 6G
 #SBATCH --requeue
 #SBATCH --get-user-env
 #SBATCH --chdir="/share/compling/projects/sanpi/logs/update_env_hits"

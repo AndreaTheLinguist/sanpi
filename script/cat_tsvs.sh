@@ -66,7 +66,7 @@ for X in ${ENV_TSVS}/*-final-freq*tsv; do
 	mv -v "${X}" "${X/-final-freq/_final-freq}"
 done
 
-tree -lhDC --prune -I *~* "${TSV_DIR}"
+tree -lhD --prune -I *~* "${TSV_DIR}"
 
 if [[ $(ls ${ENV_TSVS}/*tsv) ]]; then
 	echo ''
@@ -83,12 +83,12 @@ TSV_N=${TSV_N:-"${ENV_TSVS}/AdvAdj_ALL_RBdirect_final-freq.tsv"}
 echo "Input Paths:"
 echo "1. Complement:"
 STEM_C="$(basename -s '.tsv' ${TSV_C})"
-echo "   $(tree -hDlf -P *${STEM_C}* -I *~* --prune -C --noreport ${ENV_TSVS} | tail -1)"
+echo "   $(tree -hDlf -P *${STEM_C}* -I *~* --prune --noreport ${ENV_TSVS} | tail -1)"
 echo "   $(wc -l ${TSV_C} | tabulate -f tsv | cut -f1) total unique attested"
 
 echo "2. Negated:"
 STEM_N="$(basename -s '.tsv' ${TSV_N})"
-echo "   $(tree -hDlf -P *${STEM_N}* -I *~* --prune -C --noreport ${ENV_TSVS} | tail -1)"
+echo "   $(tree -hDlf -P *${STEM_N}* -I *~* --prune --noreport ${ENV_TSVS} | tail -1)"
 echo "   $(wc -l ${TSV_N} | tabulate -f tsv | cut -f1) total unique attested"
 # echo " $(ls -ho ${TSV_N})"
 
@@ -140,7 +140,7 @@ echo "cat '${TSV_N}' >> '${OUT_TSV}'"
 cat "${TSV_N}" >>"${OUT_TSV}"
 echo
 echo "$(wc -l ${OUT_TSV} | tabulate -f tsv | cut -f1) lines in combined tsv"
-tree -hCDl --du --prune -I *~* ${TSV_DIR}
+tree -hDl --du --prune -I *~* ${TSV_DIR}
 
 echo "Finished concatenating tsv files"
 date
