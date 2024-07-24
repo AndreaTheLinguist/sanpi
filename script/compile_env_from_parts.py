@@ -5,9 +5,8 @@ from pathlib import Path
 from time import sleep
 import pandas as pd
 
-from source.utils.dataframes import Timer
+from source.utils.dataframes import Timer, get_neg_equiv_sample as get_neq
 from source.utils.dataframes import catify_hit_table as catify
-from source.utils.dataframes import filter_csv_by_index as filter_csv
 from source.utils.dataframes import remove_duplicates, save_final_info
 from source.utils.general import HIT_TABLES_DIR, PKL_SUFF, confirm_dir
 from source.utils.general import run_shell_command as shell_cmd
@@ -62,12 +61,33 @@ def _main():
     sleep(60)
     print('\n## Saving Full Composite Frame')
     concat_path = data_dir.joinpath(f'ALL-{data_dir.name}_final.parq')
+    save_final_parquet(df, concat_path)
+
+    if data_dir.name == 'POSmirror': 
+        sample_posmirror(df, concat_path)
+
+def sample_posmirror(df: pd.DataFrame, concat_path: Path):
+    data_dir = concat_path.parent
+    timestamp = pd.Timestamp.now().strftime(".%y%m%d%H")
+    neq_path = (str(concat_path)
+                            .replace('ALL', 'NEQ')
+                            .replace('.parq', f'_sample{timestamp}.parq'))
+    neq = get_neq(df, data_dir, neg_name='NEGmirror')
+    print('\n### Saving `NEQ` Sample Info')
+    save_final_info(neq, data_dir, tag='NEQ',
+                        date_flag=timestamp)
+    print('\n## Saving Full Dataframe of NEQ Sample')
+    save_final_parquet(neq, neq_path)
+
+def save_final_parquet(df:pd.DataFrame, 
+                       parquet_path:Path or str):
     partition_by = ['part']
     max_parq_rows = max(5000, 
                         int(round(((df.part.value_counts().mean()//10)
                         * 1.005), -3)))
     
-    df.to_parquet(concat_path, engine='pyarrow',
+    df.to_parquet(str(parquet_path), 
+                  engine='pyarrow',
                   partition_cols=partition_by,
                   basename_template='group-{i}.parquet',
                   use_threads=True,
@@ -78,16 +98,19 @@ def _main():
                   row_group_size=max_parq_rows,
                   max_rows_per_file=max_parq_rows
                   )
+    
     print('\n+ **Successfully saved ✓**',
-          f'as `{concat_path}`',
+          f'as `{parquet_path}`',
           '+ partitioned by: ',
           f'  {repr(partition_by)}',
           '+ properties included:  ',
-          '\n    ' + repr(df.columns
-                          ).replace('\n', '\n      ')+'\n',
+          ('\n' + repr(df.columns)
+           ).replace('\n', '\n        ')+'\n',
           f'+ max rows per file: {max_parq_rows:,}',
           sep='  \n  ')
-
+        # save_composite_parq(equal_sized_sample,
+        #             sample_parq_part,
+        #             sample=True)
 
 if __name__ == '__main__':
     with Timer() as timer:

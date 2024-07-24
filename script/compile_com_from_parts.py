@@ -10,18 +10,18 @@ from more_itertools import batched
 
 from source.utils.dataframes import NEG_REGEX, Timer
 from source.utils.dataframes import catify_hit_table as catify
-from source.utils.dataframes import (extend_window, save_final_info,
-                                     save_hit_id_index_txt, select_id_prefixes,
-                                     write_part_parquet)
+from source.utils.dataframes import (extend_window, get_neg_equiv_sample,
+                                     save_final_info, save_hit_id_index_txt,
+                                     select_id_prefixes, write_part_parquet)
 from source.utils.general import HIT_TABLES_DIR, confirm_dir, run_shell_command
 
 TEST_CAP = None
-try:
-    import pyarrow
-except ImportError:
-    PYARROW = False
-else:
-    PYARROW = True
+# try:
+#     import pyarrow
+# except ImportError:
+#     PYARROW = False
+# else:
+PYARROW = True
 
 # NEG_REGEX = re.compile(
 #     r"\bno\b|\bn[o']t\b|\bnobody\b|\bno one\b|\bnothing\b|\bnowhere\b|\brarel?y?\b|\bscarcely\b|\bbarely\b|\bhardly\b|\bseldoml?y?\b|\bwithout\b|\bnever\b")
@@ -251,48 +251,13 @@ def _process_extras(all_enforced, entire_parquet):
                         sample=True)
 
 
-def get_neg_equiv_sample(all_enforced, data_dir):
-    comp_total = len(all_enforced)
-    # [x] Update this method to get total updated `RBdirect` count if it exists---use counts in `../info/` dir
-    neg_subtotals_csv = data_dir.parent.parent.joinpath(
-        'info/ALL_RBdirect_final-subtotals.csv')
-    neg_total = None
-    if neg_subtotals_csv.is_file():
-        try:
-            neg_total = pd.read_csv(neg_subtotals_csv, dtype={'total_hits': 'int'},
-                                    usecols=['total_hits']).squeeze().sum()
-        except:
-            neg_total = None
-    if neg_total is None:
-        neg_dir = data_dir.parent.joinpath('RBdirect/pre-cleaned')
-        neg_counts = neg_dir/'alpha-index_counts.txt'
-        if not neg_counts.is_file():
-            run_shell_command(
-                '; '.join(f'echo "wc -l {neg_dir}/*alpha*txt > {neg_counts}"'
-                          f'wc -l {neg_dir}/*alpha*txt > {neg_counts}')
-            )
-        neg_total = int(neg_counts.read_text(
-            encoding='utf8').splitlines()[-1].split()[0])
-
-    print(f'\n## Creating negated sample equivalent: N = {neg_total:,}\n')
-    combined_total = comp_total + neg_total
-    print('+ updated NEG:',
-          f'{round(neg_total/combined_total * 100, 1):.1f}%',
-          'of all bigrams')
-    print('+ updated COM:',
-          f'{round(comp_total/combined_total * 100, 1):.1f}%',
-          'of all bigrams')
-    print(f'+ ~{round(comp_total / neg_total)}:1 odds',
-          'that utterance is _NOT negated_')
-    print(f'+ Sample: {round(neg_total/comp_total * 100, 1):.1f}%',
-          'of entire updated complement')
-
-    return all_enforced.sample(min(comp_total, neg_total))
 
 # > moved `save_final_info` to `source.utils.dataframes` "/share/compling/projects/sanpi/source/utils/dataframes.py"
 
 
-def process_parq(data_dir, parq, force: bool = False):
+def process_parq(data_dir, parq, 
+                 force: bool = False):
+    
     with Timer() as proc_part_t:
         part = PART_LABEL_REGEX.search(parq.stem).group()
 
@@ -331,7 +296,7 @@ def process_parq(data_dir, parq, force: bool = False):
             with Timer() as wrt_ix_t:
                 print(f'* "Not negated"-enforced index for `{part}` saved as:',
 
-                      str(save_hit_id_index_txt(index_vals=df.index, part=part,
+                      str(save_hit_id_index_txt(index_vals=df.index,
                                                 index_path=enforced_parq.with_name(
                                                     re.sub(
                                                         r'_hits.*$', '_no-neg_index.txt', enforced_parq.name)

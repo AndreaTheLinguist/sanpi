@@ -36,6 +36,7 @@ for T in $(find ${DATA_DIR}/2_hit_tables/*${PAT_KEY}/ucs_format -name '*ALL*tsv'
 	ln -srv -t "${ENV_TSVS}" "${T}" 2>/dev/null
 done
 
+
 # > link most recent NEQ sample;
 EXISTING_SYML=$(find ${ENV_TSVS} -type l -name '*NEQ*tsv')
 if [[ -f ${EXISTING_SYML} ]]; then
@@ -76,10 +77,16 @@ if [[ $(ls ${ENV_TSVS}/*tsv) ]]; then
 	) | tabulate -f fancy_grid -s',' -1
 fi
 
-TSV_C=${TSV_C:-"${ENV_TSVS}/AdvAdj_${TAG_C}_not-RBdirect_final-freq.tsv"}
-# echo $TSV_C
-TSV_N=${TSV_N:-"${ENV_TSVS}/AdvAdj_ALL_RBdirect_final-freq.tsv"}
+TSV_C=${TSV_C:-"${ENV_TSVS}/AdvAdj_${TAG_C}_not-${PAT_KEY}_final-freq.tsv"}
+TSV_N=${TSV_N:-"${ENV_TSVS}/AdvAdj_ALL_${PAT_KEY}_final-freq.tsv"}
 
+if [[ "${PAT_KEY}" == "mirror" ]]; then
+	TSV_C="${ENV_TSVS}/AdvAdj_${TAG_C}_POS${PAT_KEY}_final-freq.tsv"
+	echo $TSV_C 
+	TSV_N="${ENV_TSVS}/AdvAdj_ALL_NEG${PAT_KEY}_final-freq.tsv"
+	echo $TSV_N
+
+fi
 echo "Input Paths:"
 echo "1. Complement:"
 STEM_C="$(basename -s '.tsv' ${TSV_C})"
@@ -144,3 +151,4 @@ tree -hDl --du --prune -I *~* ${TSV_DIR}
 
 echo "Finished concatenating tsv files"
 date
+# exit #// ! HACK TEMP <---- REMOVE

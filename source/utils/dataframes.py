@@ -823,6 +823,48 @@ def extend_window(df: pd.DataFrame,
     return df
 
 
+
+def get_neg_equiv_sample(all_enforced, com_dir, 
+                         neg_name:str='RBdirect'):
+    comp_total = len(all_enforced)
+    # [x] Update this method to get total updated `RBdirect` count if it exists---use counts in `../info/` dir
+    neg_subtotals_csv = com_dir.parent.parent.joinpath(
+        f'info/ALL_{neg_name}_final-subtotals.csv')
+    neg_total = None
+    
+    if neg_subtotals_csv.is_file():
+        try:
+            neg_total = pd.read_csv(neg_subtotals_csv, dtype={'total_hits': 'int'},
+                                    usecols=['total_hits']).squeeze().sum()
+        except:
+            neg_total = None
+    if neg_total is None:
+        neg_dir = com_dir.parent / neg_name / 'cleaned'
+        neg_counts = neg_dir/'index_counts.txt'
+        if not neg_counts.is_file():
+            run_shell_command(
+                '; '.join(f'echo "wc -l {neg_dir}/*txt > {neg_counts}"'
+                          f'wc -l {neg_dir}/*txt > {neg_counts}')
+            )
+        neg_total = int(neg_counts.read_text(
+            encoding='utf8').splitlines()[-1].split()[0])
+
+    print(f'\n## Creating negated sample equivalent: N = {neg_total:,}\n')
+    combined_total = comp_total + neg_total
+    print('+ updated NEG:',
+          f'{round(neg_total/combined_total * 100, 1):.1f}%',
+          'of all bigrams')
+    print('+ updated COM:',
+          f'{round(comp_total/combined_total * 100, 1):.1f}%',
+          'of all bigrams')
+    print(f'+ ~{round(comp_total / neg_total)}:1 odds',
+          'that utterance is _NOT negated_')
+    print(f'+ Sample: {round(neg_total/comp_total * 100, 1):.1f}%',
+          'of entire updated complement')
+
+    return all_enforced.sample(min(comp_total, neg_total))
+
+
 def remove_duplicates(hit_df: pd.DataFrame,
                       w_before: int = 7,
                       w_after: int = 7,
@@ -1571,8 +1613,7 @@ def print_path_info(path: Path or str,
     print(f'+ ✓ {obj_name} saved as  \n  `{path}`')
 
 
-def save_hit_id_index_txt(index_vals: list or pd.core.indexes.base.Index,
-                          part: str,
+def save_hit_id_index_txt(index_vals: list or pd.Index or pd.Series or tuple,
                           out_path: Path = None,
                           index_path: Path = None):
 
@@ -1591,8 +1632,8 @@ def save_hit_id_index_txt(index_vals: list or pd.core.indexes.base.Index,
     index_path = (
         index_path
         or (out_path.with_name(
-            HITS_DF_PATH_REGEX.sub('_index.txt',
-                                   out_path.name)))
+            HITS_DF_PATH_REGEX.sub(
+                '_index.txt', out_path.name)))
     )
     index_path.write_text(ids_str, encoding='utf8')
     return index_path
