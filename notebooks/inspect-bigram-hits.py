@@ -10,11 +10,13 @@ from pathlib import Path
 
 # %% [markdown]
 # ## Define helper functions
-# 
+#
 # ### Copied from `./source/analyze/utils/`
 # jupyter won't import them 🤷‍♀️
 
 # %%
+
+
 def find_files(data_dir: Path, fname_glob: str, verbose: bool = False):
     path_iter = data_dir.rglob(fname_glob)
     if verbose:
@@ -122,20 +124,20 @@ def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables')
     sep_dfs = []
     for p in pickles:
         df = (pd.read_pickle(p).assign(corpus=p.stem.rsplit('_', 2)[0]))
-        df = df.loc[:, 
+        df = df.loc[:,
                     cols_by_str(
-            df, end_str=('lemma', 'id', 'text', 'window', 'category', 'Pol', 'sent')) + cols_by_str(df, start_str=('corpus', 'lemma'))]
+                        df, end_str=('lemma', 'id', 'text', 'window', 'category', 'Pol', 'sent')) + cols_by_str(df, start_str=('corpus', 'lemma'))]
         df = df.convert_dtypes()
 
         dup_check_cols = cols_by_str(df, end_str=('text', 'id', 'sent'))
         df = (df.loc[~df.duplicated(subset=dup_check_cols), :])
         sep_dfs.append(df)
-    
-    c_df = pd.concat(sep_dfs)    
+
+    c_df = pd.concat(sep_dfs)
     dup_check_cols = cols_by_str(c_df, end_str=('text', 'id', 'sent'))
     c_df = (c_df.loc[~c_df.duplicated(subset=dup_check_cols), :])
     c_df = make_cats(c_df, (['corpus'] + cols_by_str(c_df, start_str=('nr', 'neg', 'adv'),
-                                                 end_str=('lemma', 'form'))))
+                                                     end_str=('lemma', 'form'))))
 
     return c_df
 
@@ -143,6 +145,8 @@ def concat_pkls(data_dir: Path = Path('/share/compling/data/sanpi/2_hit_tables')
 # ### copied from `./source/analyze_deps.py`:
 
 # %%
+
+
 def _optimize_df(df: pd.DataFrame) -> pd.DataFrame:
 
     # print('Original Dataframe:')
@@ -194,8 +198,11 @@ def _optimize_df(df: pd.DataFrame) -> pd.DataFrame:
 # ### Newly created
 
 # %%
+
+
 def show_counts(df, columns):
     return df.value_counts(columns).to_frame().rename(columns={0: 'count'})
+
 
 def summarize_text_cols(text_df: pd.DataFrame):
 
@@ -210,21 +217,27 @@ def summarize_text_cols(text_df: pd.DataFrame):
 # ## Load Data
 
 # %%
+
+
 def select_pickles():
     pickle_dir = Path(
         '/share/compling/data/sanpi/2_hit_tables/')
     # > make dataframe to load smallest files first (for testing)
     pickles = pd.DataFrame(pickle_dir.rglob(
         'bigram-*hits.pkl.gz'), columns=['path'])
-    pickles = pickles.assign(size=pickles.path.apply(lambda f: f.stat().st_size))
+    pickles = pickles.assign(
+        size=pickles.path.apply(lambda f: f.stat().st_size))
     pickles = pickles.sort_values('size')
     print_pkl_df = pickles.reset_index().astype('string')
-    print(pd.concat([print_pkl_df.head(5), print_pkl_df.tail(5)]).to_markdown())
-    #HACK : limiter for faster testing
+    print(pd.concat([print_pkl_df.head(5),
+          print_pkl_df.tail(5)]).to_markdown())
+    # HACK : limiter for faster testing
     pkl_paths = pickles.loc[pickles.path.apply(
-        lambda x: x.name.startswith(tuple('bigram-'+c for c in ('Apw','Nyt1','PccTe', 'PccVa','Pcc06')))), 'path'].squeeze().to_list()
-    print_iter(pkl_paths, header=f'\n※ testing! Hit dataframes limited to: {len(pkl_paths)} files')
+        lambda x: x.name.startswith(tuple('bigram-'+c for c in ('Apw', 'Nyt1', 'PccTe', 'PccVa', 'Pcc06')))), 'path'].squeeze().to_list()
+    print_iter(
+        pkl_paths, header=f'\n※ testing! Hit dataframes limited to: {len(pkl_paths)} files')
     return pkl_paths
+
 
 hit_pkls = select_pickles()
 
@@ -251,7 +264,7 @@ len(odf) == len(ddf)
 # # ⚠️ remove `any-direct` hits with `x_...` values filled
 
 # # %%
-# if 'x_form' in odf.columns: 
+# if 'x_form' in odf.columns:
 #     x_cols = cols_by_str(odf, start_str='x')
 #     print(x_cols)
 
@@ -259,12 +272,14 @@ len(odf) == len(ddf)
 
 # %%
 odf.loc[odf.corpus.str.contains('Pcc'), 'corpus_group'] = 'puddin'
-odf.loc[odf.corpus.str.endswith(('Nyt1', 'Nyt2', 'Apw')), 'corpus_group'] = 'news'
+odf.loc[odf.corpus.str.endswith(
+    ('Nyt1', 'Nyt2', 'Apw')), 'corpus_group'] = 'news'
 
 general_counts = show_counts(odf, ['category', 'corpus_group'])
 
 general_counts = general_counts.unstack()
-general_counts = general_counts.sort_values(('count', 'puddin'), ascending=False)  # type: ignore
+general_counts = general_counts.sort_values(
+    ('count', 'puddin'), ascending=False)  # type: ignore
 print(general_counts)
 
 # %% [markdown]
@@ -274,9 +289,8 @@ print(general_counts)
 tdf = odf.assign(conllu_id=odf.sent_id.str.rsplit('_', 2).str.get(0).str.split(
     '.').str.get(0).astype('string').astype('category'))  # type: ignore
 print(f'Total hits for all patterns: {len(tdf)}')
-#// tdf = odf[cols_by_str(odf, end_str=('lemma', 'id', 'text', 'window',
-#//                       'category', 'Pol')) + cols_by_str(odf, start_str=('corpus', 'lemma'))]
-
+# // tdf = odf[cols_by_str(odf, end_str=('lemma', 'id', 'text', 'window',
+# //                       'category', 'Pol')) + cols_by_str(odf, start_str=('corpus', 'lemma'))]
 
 
 # %% [markdown]
@@ -285,25 +299,25 @@ print(f'Total hits for all patterns: {len(tdf)}')
 # %% [markdown]
 # ### Option A
 # bare collocation tokens (`advadj.all-RB-JJs` pattern match) which do not appear as matches for any other pattern match (i.e. $NegPol$ contexts).
-# 
+#
 # *That is, the `colloc_id` (unique `ADV` & `ADJ` nodes in unique sentence tokens) is not duplicated.*
-# 
+#
 # ```{python}
 # tdfp_a = tdf.loc[(tdf.category=='advadj') & (~tdf.duplicated(subset='colloc_id', keep=False)), :]
 # ```
-# 
+#
 # ### Option B
 # categorize $NegPol$ set first (`tdfn`), then compute complement of that (i.e. $ALL - NegPol$)
-# 
+#
 # ```{python}
 # tdfn = tdf.loc[tdf.neg_lemma!='_', :]
 # tdfp = tdf.loc[~tdf.colloc_id.isin(tdfn.colloc_id), :]
 # ```
-# 
+#
 # ### Options A and B are identical
-# 
+#
 # `all(tdfp_a.index == tdfp_b.index)` evaluates as true
-# 
+#
 # So, since $NegPol$ is more directly defined, and has to be separated out anyway, it's simpler to just get the "complement", (`tdfp_b` method)
 
 # %%
@@ -311,16 +325,19 @@ tdfn = tdf.loc[tdf.neg_lemma != '_', :]
 tdfp = tdf.loc[~tdf.colloc_id.isin(tdfn.colloc_id), :]
 
 
-## %%
-print(tdfn[['neg_lemma', 'adv_lemma', 'adj_lemma', 'hit_text', 
-      'text_window', 
-    #   'sent_text'
-      ]].sample(25).to_markdown())
+# %%
+print(tdfn[['neg_lemma', 'adv_lemma', 'adj_lemma', 'hit_text',
+      'text_window',
+            #   'sent_text'
+            ]].sample(25).to_markdown())
 
-#%%
-summarize_text_cols(tdf).to_csv('/share/compling/projects/sanpi/notebooks/bigram_out/all_df_summary.csv')
-summarize_text_cols(tdfn).to_csv('/share/compling/projects/sanpi/notebooks/bigram_out/neg_df_summary.csv')
-summarize_text_cols(tdfp).to_csv('/share/compling/projects/sanpi/notebooks/bigram_out/pos_df_summary.csv')
+# %%
+summarize_text_cols(tdf).to_csv(
+    '/share/compling/projects/sanpi/notebooks/bigram_out/all_df_summary.csv')
+summarize_text_cols(tdfn).to_csv(
+    '/share/compling/projects/sanpi/notebooks/bigram_out/neg_df_summary.csv')
+summarize_text_cols(tdfp).to_csv(
+    '/share/compling/projects/sanpi/notebooks/bigram_out/pos_df_summary.csv')
 
 
 # %% [markdown]
@@ -329,7 +346,12 @@ summarize_text_cols(tdfp).to_csv('/share/compling/projects/sanpi/notebooks/bigra
 # %%
 tdfp = tdfp.assign(polarity='positive')
 tdfn = tdfn.assign(polarity='negative')
-tdfn.to_pickle('/share/compling/projects/sanpi/notebooks/bigram_out/NegPol_ALL.pkl.gz')
+tdfn.to_pickle(
+    '/share/compling/projects/sanpi/notebooks/bigram_out/NegPol_ALL.pkl.gz')
+tdfp.to_pickle(
+    '/share/compling/projects/sanpi/notebooks/bigram_out/PosPol_ALL.pkl.gz')
+
+# %%
 tdf_with_overlap = tdf
 pol_union_df = pd.concat([tdfp, tdfn]).sort_values('colloc_id')
 
@@ -357,20 +379,25 @@ print(
 # ### Simple Frequency Comparison
 
 # %%
-try: 
-    top_200 = pd.read_csv('/share/compling/projects/sanpi/notebooks/bigram_out_full/top_200.csv')
-except: 
+try:
+    top_200 = pd.read_csv(
+        '/share/compling/projects/sanpi/notebooks/bigram_out_full/top_200.csv')
+except:
     top_200 = show_counts(pol_union_df, ['polarity', 'adj_lemma']).head(200)
-    top_200.to_csv('/share/compling/projects/sanpi/notebooks/bigram_out/top_200.csv')
+    top_200.to_csv(
+        '/share/compling/projects/sanpi/notebooks/bigram_out/top_200.csv')
 print(top_200.to_markdown())
 
 
 # %%
-try: 
-    top_200_neg = pd.read_csv('/share/compling/projects/sanpi/notebooks/bigram_out_full/top_200_neg.csv')
+try:
+    top_200_neg = pd.read_csv(
+        '/share/compling/projects/sanpi/notebooks/bigram_out_full/top_200_neg.csv')
 except:
-    top_200_neg = show_counts(pol_union_df.loc[pol_union_df.polarity=='negative', :], ['polarity', 'adj_lemma']).head(200)
-    top_200_neg.to_csv('/share/compling/projects/sanpi/notebooks/bigram_out/top_200_neg.csv')
+    top_200_neg = show_counts(pol_union_df.loc[pol_union_df.polarity == 'negative', :], [
+                              'polarity', 'adj_lemma']).head(200)
+    top_200_neg.to_csv(
+        '/share/compling/projects/sanpi/notebooks/bigram_out/top_200_neg.csv')
 top_200_neg
 
 
@@ -390,13 +417,13 @@ spread_top_200.sort_values(('count', 'positive'),
 
 
 # %%
-try: 
+try:
     freq_thresh5 = pd.read_csv(
-    '/share/compling/projects/sanpi/notebooks/bigram_out_full/freq_thresh5.csv')
-except: 
+        '/share/compling/projects/sanpi/notebooks/bigram_out_full/freq_thresh5.csv')
+except FileNotFoundError:
     freq_dist = pd.crosstab(pol_union_df.adj_lemma,
-                        pol_union_df.polarity,
-                        margins=True, margins_name='TOTAL')
+                            pol_union_df.polarity,
+                            margins=True, margins_name='TOTAL')
 
     freq_dist = freq_dist.assign(
         ratio_neg=(freq_dist.negative/freq_dist.TOTAL).round(3),
@@ -411,7 +438,7 @@ except:
     freq_dist = freq_dist[['TOTAL'] + cols]
 
     print(freq_dist.sort_values('TOTAL', ascending=False).head(10))
-    
+
     freq_thresh5 = freq_dist.loc[freq_dist.TOTAL >= 5, :]
     freq_thresh5 = freq_thresh5.sort_values(
         ['bin_neg', 'TOTAL', 'ratio_neg'], ascending=False)
@@ -421,23 +448,23 @@ freq_thresh5
 
 
 # %%
-try: 
+try:
     freq_thresh100 = pd.read_csv(
-    '/share/compling/projects/sanpi/notebooks/bigram_out_full/freq_thresh100.csv')
-except: 
+        '/share/compling/projects/sanpi/notebooks/bigram_out_full/freq_thresh100.csv')
+except FileNotFoundError:
     freq_thresh100 = freq_dist.loc[freq_dist.TOTAL >= 100, :]
     freq_thresh100 = freq_thresh100.sort_values(
-        ['ratio_neg','TOTAL', 'bin_neg', ], ascending=False)
+        ['ratio_neg', 'TOTAL', 'bin_neg', ], ascending=False)
     freq_thresh100.to_csv(
         '/share/compling/projects/sanpi/notebooks/bigram_out/freq_thresh100.csv')
 freq_thresh100
 
 
 # %%
-try: 
+try:
     freq_thresh200 = pd.read_csv(
-    '/share/compling/projects/sanpi/notebooks/bigram_out_full/freq_thresh200.csv')
-except: 
+        '/share/compling/projects/sanpi/notebooks/bigram_out_full/freq_thresh200.csv')
+except:
     freq_thresh200 = freq_dist.loc[freq_dist.TOTAL >= 200, :]
     freq_thresh200 = freq_thresh200.sort_values(
         ['bin_neg', 'TOTAL', 'ratio_neg'], ascending=False)
@@ -454,31 +481,33 @@ freq_dist = freq_thresh5
 freq_dist.ratio_neg.plot(kind='hist')
 
 # %%
-freq_dist.loc[freq_dist.index!='TOTAL', ['negative', 'positive']].plot(x='negative', y ='positive', kind='scatter')
+freq_dist.loc[freq_dist.index != 'TOTAL', ['negative', 'positive']].plot(
+    x='negative', y='positive', kind='scatter')
 
-## %%
-freq_dist.loc[freq_dist.index!='TOTAL', ['negative', 'positive']].plot(x='negative', y ='positive', kind='density')
+# %%
+freq_dist.loc[freq_dist.index != 'TOTAL', ['negative', 'positive']].plot(
+    x='negative', y='positive', kind='density')
 
 # %%
 freq_dist.ratio_pos.plot(kind='hist')
 
 # %% [markdown]
 # ## Save $PosPol$ text data
-# 
+#
 # Since $PosPol$ is defined as the complement of $NegPol$, accuracy relies on $NegPol$ catching all relevant cases.
-# 
+#
 # To ensure pattern specifications are sufficiently inclusive, all sentences with supposedly positive polarity
 # should be manually inspected for any errant (uncaught) negative lemmas, as identified in the $NegPol$ pattern specifications.
-# 
+#
 # ```{ocaml}
-# NEG [lemma="hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"];  
+# NEG [lemma="hardly"|"scarcely"|"never"|"rarely"|"barely"|"seldom"|"no"|"nothing"|"none"|"nobody"|"neither"|"without"|"few"|"nor"];
 # ```
-# 
+#
 # - [x] create simplified output of $PosPol$/`tdfp` sentence text data, with necessary identifiers
 # - [x] save as csv
 # - [ ] grep `pos_sentences.csv` for each neg lemma:\
 #   *There should not be any negative lemmas an `exactly JJ` collocation in its scope.*
-# 
+#
 
 # # %%
 # select_cols = ['adj_lemma', 'text_window', 'sent_text',
@@ -500,10 +529,10 @@ freq_thresh5.describe().round(2)
 
 # %%
 # pol_union_thresh5 = pol_union_df.loc[pol_union_df.adj_lemma]
-adj_x_cat = (pd.crosstab(index=pol_union_df.adj_lemma, columns=pol_union_df.category, 
+adj_x_cat = (pd.crosstab(index=pol_union_df.adj_lemma, columns=pol_union_df.category,
                          margins=True, margins_name='TOTAL', normalize='index')
-             .rename(columns={'advadj':'PosPol', 'contig':'contig_NegPol', 
-                              'raised': 'raised_NegPol', 'scoped':'scoped_NegPol'})
+             .rename(columns={'advadj': 'PosPol', 'contig': 'contig_NegPol',
+                              'raised': 'raised_NegPol', 'scoped': 'scoped_NegPol'})
              .round(3))
 adj_x_cat.loc[adj_x_cat.index.isin(freq_thresh200.index), :]
 
@@ -511,6 +540,3 @@ adj_x_cat.loc[adj_x_cat.index.isin(freq_thresh200.index), :]
 adj_x_neg = pd.crosstab(index=pol_union_df.adj_lemma,
                         columns=pol_union_df.neg_lemma, margins=True)
 adj_x_neg.nlargest(20, columns=['All'])
-
-
-
