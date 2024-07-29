@@ -1,13 +1,17 @@
+import re
 from pathlib import Path
 from pprint import pprint
 
 import pandas as pd
 import pyarrow as pyar
+
 from source.utils.associate import POLAR_DIR, TOP_AM_DIR, adjust_assoc_columns
 from source.utils.dataframes import catify_hit_table as catify
 from source.utils.dataframes import update_assoc_index as update_index
 from source.utils.general import (confirm_dir, print_iter, snake_to_camel,
                                   timestamp_today)
+from source.utils.sample import sample_pickle as sp
+
 FOCUS = ['f',
          'am_p1_given2', 'am_p1_given2_simple',
          'conservative_log_ratio',
@@ -100,13 +104,14 @@ def filter_load_adx_am(am_path: Path, column_list: list = None) -> pd.DataFrame:
     return update_index(am_df.convert_dtypes())
 
 
-def get_top_vals(df: pd.DataFrame,
-                 index_like: str = 'NEG',
-                 metric_filter: str | list = [
-                     'am_p1_given2', 'conservative_log_ratio'],
-                 k: int = 10,
-                 val_col: str = None,
+def get_top_vals(df: pd.DataFrame, 
+                 index_like: str = 'NEG', 
+                 metric_filter: str or list = None, 
+                 k: int = 10, 
+                 val_col: str = None, 
                  ignore_neg_adv: bool = True):
+    if metric_filter is None:
+        metric_filter = ['am_p1_given2', 'conservative_log_ratio']
     env_df = df.copy().loc[df.conservative_log_ratio >=
                            1].filter(like=index_like, axis=0)
     if ignore_neg_adv:
@@ -124,12 +129,16 @@ def get_top_vals(df: pd.DataFrame,
     return top.sort_values(metric_filter, ascending=False)
 
 
-def show_top_positive(adv_df,
-                      k: int = 15,
-                      filter_and_sort: list = ['conservative_log_ratio',
-                                               'am_log_likelihood',
-                                               'am_p1_given2']):
+def show_top_positive(adv_df, 
+                      k: int = 15, 
+                      filter_and_sort: list = None):
 
+    if filter_and_sort is None:
+        filter_and_sort = [
+            'conservative_log_ratio',
+            'am_log_likelihood',
+            'am_p1_given2',
+        ]
     _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
     _N = int(adv_df.N.iat[0])
     ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith(
@@ -284,6 +293,8 @@ def combine_top_adv(df_1: pd.DataFrame,
                     data_tag: str = 'ALL',
                     env_filter: str = 'NEG',
                     filter_items: list = FOCUS,
+                    set_floor: int = 5000, 
+                    
                     k: int = 10) -> pd.DataFrame:
 
     def _fill_empties(name_1, name_2, both, loaded_paths, adv_set):
@@ -294,7 +305,7 @@ def combine_top_adv(df_1: pd.DataFrame,
             loaded_path: Path = adv_am_paths['RBdirect'],
         ) -> pd.DataFrame:
             lower_floor = lower_floor or round(
-                SET_FLOOR//3, (-2 if SET_FLOOR//3 > 100 else -1))
+                set_floor//3, (-2 if set_floor//3 > 100 else -1))
             located_paths = tuple(loaded_path.parent.glob(
                 f'{data_tag}*min{lower_floor}x*parq'))
             try:
@@ -411,3 +422,129 @@ def combine_top_adv(df_1: pd.DataFrame,
     both = _add_means(both)
     both = _add_f_ratio(both, name_2, name_1)
     return both.sort_values('mean_dP1', ascending=False)
+
+def compare_datasets(adv_am, 
+                     metric_selection:str or list = 'dP1', 
+                     k=5):
+    if isinstance(metric_selection, str): 
+        met_adv_am = adv_am.filter(like=metric_selection)
+    else:
+        met_adv_am = adv_am.filter(regex=r'|'.join([f'^{m}|mean_{m}' for m in metric_selection]))
+    if met_adv_am.empty: 
+        met_adv_am = adjust_assoc_columns(adv_am).filter(metric_selection)
+    if any(met_adv_am.columns.str.startswith('r_')):
+        is_ratio = met_adv_am.columns.str.startswith('r_')
+        met_adv_am.loc[:, is_ratio] = met_adv_am.loc[:, is_ratio] * 100
+        met_adv_am.columns = met_adv_am.columns.str.replace('r_', '%_')
+    for col in met_adv_am.columns:
+        n_dec = 2
+        if 'P' in col:
+            n_dec = 3
+        elif 'G' in col or '%' in col:
+            n_dec = 1
+        elif 'f' in col and not col.startswith(('r_', '%_', 'mean_')): 
+            n_dec = 0
+            # col = col.replace('r_', '%_')
+        print(f'Top {k} by descending `{col}`')
+        print(met_adv_am.nlargest(k, col).to_markdown(
+            floatfmt=f',.{n_dec}f', intfmt=','), '\n')
+
+def pin_top_adv(adv_am,
+                select_col='mean_dP1',
+                verbose: bool = True):
+
+    sorted_adv_am = adv_am.sort_values(select_col, ascending=False)
+    top = sorted_adv_am.index.to_series()
+    if verbose:
+        print_df = sorted_adv_am[select_col].reset_index()
+        print_df.index = print_df.index.to_series().add(1)
+        print(
+            f'Top Adverb Selection, ranked by descending `{repr(select_col)}`',
+            print_df.to_markdown(floatfmt=',.3f'),
+            sep='\n\n', end='\n\n'
+        )
+    return top.to_list(), sorted_adv_am
+
+def collect_adv_bigram_ex(amdf: pd.DataFrame,
+                     hits_df: pd.DataFrame,
+                     adv: str = 'exactly',
+                     n_bigrams: int = 10,
+                     n_examples: int = 50,
+                     verbose:bool=False,
+                     metric: str | list = ['dP1', 'LRC']) -> dict:
+    if amdf.adv.nunique() > 1: 
+        amdf = amdf.filter(like=f'~{adv}_',
+                            axis=0).nlargest(n_bigrams, metric)
+    examples = {}
+    for i, bigram in enumerate(amdf['l2'].unique(), start=1):
+        bigram_text = bigram.replace("_", " ")
+        if verbose: 
+            print(f'\n{i}. _{bigram_text}_')
+        ex_for_bigram = sp(
+            data=hits_df, print_sample=False, quiet=True,
+            sample_size=n_examples,  sort_by='all_forms_lower',
+            filters=[f'bigram_lower=={bigram}'],
+            columns=['END::lower', 'text_window', 'token_str'])
+        excerpt = embolden(ex_for_bigram.sample(min(len(ex_for_bigram), 5))[
+                        'token_str'], f' ({bigram_text}) ').to_frame()
+        excerpt.index = '`'+excerpt.index.astype('string')+'`'
+        nb_show_table(excerpt, suppress_printing=not verbose)
+        # print('\n   > ', [f'> {}' for i in ex_for_bigram.sample(3).index])
+        examples[bigram] = ex_for_bigram
+    return examples
+
+
+def populate_adv_dir(adverb, bigram_am, neg_hits, 
+                     n_bigrams:int=10, n_ex:int=50,
+                     rank_by: str | list = ['dP1', "LRC"], 
+                     verbose:bool=False):
+    output_dir = TOP_AM_DIR / 'neg_bigram_examples' / adverb
+    table_csv_path = output_dir / \
+        f'{adverb}_{n_bigrams}mostNEG-bigrams_AMscores_{timestamp_today()}.csv'
+    confirm_dir(output_dir)
+    this_adv_amdf = bigram_am.filter(
+        like=f'~{adverb}_', axis=0).sort_values(rank_by, ascending=False)
+    this_adv_amdf.to_csv(table_csv_path)
+
+    nb_show_table(this_adv_amdf.filter(['N', 'f1', 'adv_total'])
+                  .set_index(this_adv_amdf.l1 + f'_{adverb}').drop_duplicates(),
+                  n_dec=0,
+                  outpath=output_dir / f'{adverb}_MarginalFreqs_{timestamp_today()}.md', 
+                  suppress_printing=not verbose)
+    
+    nb_show_table(this_adv_amdf.filter(regex=r'^([dLGeu]|f2?$|adj_total)').round(2).sort_values(rank_by, ascending=False), n_dec=2,
+                  outpath=table_csv_path.with_suffix('.md'),
+                  suppress_printing=not verbose)
+    
+    examples = collect_adv_bigram_ex(this_adv_amdf, neg_hits, metric=rank_by, n_examples=n_ex, verbose=verbose)
+
+    print(f'\nSaving Samples in {output_dir}/...')
+
+    paths = []
+    for key, df in examples.items():
+        out_path = output_dir.joinpath(f'{key}_{n_ex}ex.csv')
+        df.to_csv(out_path)
+        paths.append(out_path)
+        
+    if verbose:
+        print_iter((f'`{p.relative_to(output_dir.parent.parent)}`' for p in paths), header='\nSamples saved as...', bullet='1.')
+
+
+def embolden(series,
+            bold_regex=None):
+    bold_regex = bold_regex or r" (n[o']t) "
+    return series.apply(
+        lambda x: re.sub(bold_regex,
+                        r' __`\1`__ ', x, flags=re.I))
+    
+def seek_top_adv_am(date_str, adv_floor, tag_top_str, tag_top_dir):
+    adv_am = []
+    while not any(adv_am):
+        try:
+            adv_am = pd.read_csv(
+            tag_top_dir / f'{tag_top_str}_NEG-ADV_combined-{adv_floor}.{date_str}.csv',
+            index_col='adv')
+        except FileNotFoundError:
+            date_str = date_str[:-1]+str(int(date_str[-1])-1)
+    adv_am = adjust_assoc_columns(adv_am).convert_dtypes()
+    return adv_am
