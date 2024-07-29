@@ -37,56 +37,6 @@ pd.set_option("styler.format.thousands", ",")
 pd.set_option("display.float_format", '{:,.2f}'.format)
 ```
 
-
-```python
-# FOCUS = ['f',
-#          'am_p1_given2', 'am_p1_given2_simple', 'conservative_log_ratio',
-#          'am_log_likelihood',
-#          'mutual_information', 
-#          'am_odds_ratio_disc', 't_score',
-#          'N', 'f1', 'f2', 'E11', 'unexpected_f', 
-#          'l1', 'l2']
-
-# def force_ints(_df):
-#     count_cols = _df.filter(regex=r'total|^[fN]').columns
-#     _df[count_cols] = _df[count_cols].astype('int')
-#     return _df
-# def nb_show_table(df, n_dec: int = 2,
-#                   adjust_columns: bool = True,
-#                    outpath:Path=None, 
-#                    return_df:bool=False) -> None: 
-#     _df = df.copy()
-#     try: 
-#         start_0 = _df.index.start == 0
-#     except AttributeError: 
-#         pass
-#     else:
-#         _df.index.name = 'rank'
-#         if start_0: 
-#             _df.index = _df.index + 1
-#     if adjust_columns: 
-#         _df = adjust_assoc_columns(_df)
-#     _df.columns = [f'`{c}`' for c in _df.columns]
-#     _df.index = [f'**{r}**' for r in _df.index ]
-#     table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
-#     if outpath:
-#         outpath.write_text(table)
-
-#     print(f'\n{table}\n')
-#     return (_df if return_df else None)
-
-
-# def update_index(df, pat_name:str = None):
-#     neg_env_name = df.filter(like='NEG', axis=0).l1.iloc[0]
-#     # > will be either `NEGATED` or `NEGMIR`
-#     #   both are shortened to just `NEG` for the keys in their separate dataframes
-#     # > replace to avoid ambiguity in `key` values when combined
-#     #! some filtering relies on 'NEG', so have to keep that prefix
-#     index_update = pat_name or ('NEGmir' if neg_env_name.endswith('MIR') else 'NEGany')
-#     df.index = df.index.str.replace('NEG', index_update)
-#     return df
-```
-
 ## Set paths and load adverb association tables
 
 
@@ -123,14 +73,14 @@ nb_show_table(setdiff_adv.sample(min(6,K)).sort_values('f2', ascending=False))
     With $f\geq5,000$ (i.e. `adv` occurs at least 5,000 times)
     
     
-    |                      |     `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |        `N` |       `f1` |    `f2` |    `exp_f` |   `unexp_f` | `l1`       | `l2`         |
-    |:---------------------|--------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|-----------:|-----------:|--------:|-----------:|------------:|:-----------|:-------------|
-    | **COM~increasingly** | 374,465 |    0.04 |   1.00 |    7.03 | 32,549.25 |   0.02 |            2.37 | 26.58 | 72,839,589 | 69,662,736 | 374,538 | 358,202.76 |   16,262.24 | COMPLEMENT | increasingly |
-    | **COM~perfectly**    | 170,123 |    0.03 |   0.98 |    1.14 |  3,340.43 |   0.01 |            0.39 | 10.57 | 72,839,589 | 69,662,736 | 173,321 | 165,761.71 |    4,361.29 | COMPLEMENT | perfectly    |
-    | **COM~mainly**       |  39,368 |    0.04 |   1.00 |    3.53 |  2,789.33 |   0.02 |            1.29 |  8.21 | 72,839,589 | 69,662,736 |  39,460 |  37,738.98 |    1,629.02 | COMPLEMENT | mainly       |
-    | **COM~morally**      |  37,522 |   -0.00 |   0.96 |    0.00 |     -1.79 |  -0.00 |           -0.01 | -0.28 | 72,839,589 | 69,662,736 |  39,290 |  37,576.39 |      -54.39 | COMPLEMENT | morally      |
-    | **COM~instantly**    |  23,684 |    0.02 |   0.97 |    0.41 |    183.82 |   0.01 |            0.21 |  2.62 | 72,839,589 | 69,662,736 |  24,343 |  23,281.29 |      402.71 | COMPLEMENT | instantly    |
-    | **COM~undoubtedly**  |  11,657 |    0.04 |   1.00 |    3.81 |    949.13 |   0.02 |            1.75 |  4.63 | 72,839,589 | 69,662,736 |  11,666 |  11,157.19 |      499.81 | COMPLEMENT | undoubtedly  |
+    |                       |    `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |    `t` |        `N` |       `f1` |    `f2` |   `exp_f` |   `unexp_f` | `l1`       | `l2`          |
+    |:----------------------|-------:|--------:|-------:|--------:|----------:|-------:|----------------:|-------:|-----------:|-----------:|--------:|----------:|------------:|:-----------|:--------------|
+    | **NEGany~all**        | 29,246 |    0.03 |   0.07 |    0.70 |  6,405.38 |   0.21 |            0.23 |  66.38 | 72,839,589 |  3,173,660 | 410,698 | 17,894.33 |   11,351.67 | NEGATED    | all           |
+    | **NEGany~super**      |  9,011 |   -0.01 |   0.03 |   -0.43 | -1,256.81 |  -0.15 |           -0.16 | -39.04 | 72,839,589 |  3,173,660 | 291,862 | 12,716.58 |   -3,705.58 | NEGATED    | super         |
+    | **COM~unbelievably**  | 23,440 |    0.04 |   1.00 |    2.91 |  1,517.85 |   0.02 |            1.12 |   6.17 | 72,839,589 | 69,662,736 |  23,521 | 22,495.15 |      944.85 | COMPLEMENT | unbelievably  |
+    | **COM~near**          | 11,172 |    0.02 |   0.97 |    0.30 |     92.39 |   0.01 |            0.22 |   1.85 | 72,839,589 | 69,662,736 |  11,477 | 10,976.44 |      195.56 | COMPLEMENT | near          |
+    | **COM~tad**           |  9,989 |    0.03 |   0.99 |    1.46 |    398.57 |   0.02 |            0.66 |   3.41 | 72,839,589 | 69,662,736 |  10,088 |  9,648.02 |      340.98 | COMPLEMENT | tad           |
+    | **COM~uncomfortably** |  6,808 |    0.02 |   0.98 |    0.51 |    112.29 |   0.01 |            0.34 |   1.96 | 72,839,589 | 69,662,736 |   6,949 |  6,645.92 |      162.08 | COMPLEMENT | uncomfortably |
     
 
 
@@ -163,14 +113,14 @@ nb_show_table(mirror_adv.sample(min(6,K)).sort_values('f2', ascending=False))
     With $f\geq300$ (i.e. `adv` occurs at least 300 times)
     
     
-    |                     |   `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `MI` |   `odds_r_disc` |    `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
-    |:--------------------|------:|--------:|-------:|--------:|---------:|-------:|----------------:|-------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
-    | **POS~entirely**    | 7,982 |   -0.06 |   0.77 |   -0.38 |  -251.22 |  -0.03 |           -0.17 |  -7.08 | 1,701,929 | 1,410,172 | 10,397 |  8,614.67 |     -632.67 | POSMIR | entirely    |
-    | **NEGmir~super**    |   573 |   -0.09 |   0.08 |   -0.85 |  -430.32 |  -0.31 |           -0.35 | -24.66 | 1,701,929 |   291,732 |  6,786 |  1,163.21 |     -590.21 | NEGMIR | super       |
-    | **POS~far**         | 5,395 |    0.14 |   0.97 |    2.29 | 1,167.20 |   0.07 |            0.86 |  10.85 | 1,701,929 | 1,410,172 |  5,549 |  4,597.75 |      797.25 | POSMIR | far         |
-    | **POS~no**          | 1,791 |    0.13 |   0.96 |    1.49 |   306.44 |   0.06 |            0.69 |   5.77 | 1,701,929 | 1,410,172 |  1,867 |  1,546.95 |      244.05 | POSMIR | no          |
-    | **POS~practically** |   426 |    0.12 |   0.95 |    0.64 |    64.87 |   0.06 |            0.61 |   2.70 | 1,701,929 | 1,410,172 |    447 |    370.37 |       55.63 | POSMIR | practically |
-    | **POS~suddenly**    |   360 |    0.15 |   0.98 |    1.05 |    82.53 |   0.07 |            0.90 |   2.86 | 1,701,929 | 1,410,172 |    369 |    305.74 |       54.26 | POSMIR | suddenly    |
+    |                     |   `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
+    |:--------------------|------:|--------:|-------:|--------:|---------:|-------:|----------------:|------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
+    | **POS~all**         | 5,216 |    0.05 |   0.88 |    0.33 |   126.47 |   0.03 |            0.19 |  4.30 | 1,701,929 | 1,410,172 |  5,920 |  4,905.15 |      310.85 | POSMIR | all         |
+    | **POS~downright**   | 4,726 |    0.17 |   0.99 |    3.88 | 1,528.70 |   0.08 |            1.52 | 11.44 | 1,701,929 | 1,410,172 |  4,755 |  3,939.86 |      786.14 | POSMIR | downright   |
+    | **POS~sometimes**   | 1,358 |    0.16 |   0.99 |    2.86 |   421.71 |   0.08 |            1.39 |  6.07 | 1,701,929 | 1,410,172 |  1,369 |  1,134.32 |      223.68 | POSMIR | sometimes   |
+    | **POS~wonderfully** | 1,014 |    0.16 |   0.99 |    2.20 |   277.75 |   0.08 |            1.13 |  5.07 | 1,701,929 | 1,410,172 |  1,029 |    852.60 |      161.40 | POSMIR | wonderfully |
+    | **NEGmir~yet**      |   320 |    0.22 |   0.39 |    1.11 |   223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 |   291,732 |    815 |    139.70 |      180.30 | NEGMIR | yet         |
+    | **POS~little**      |   529 |    0.16 |   0.99 |    1.97 |   159.96 |   0.08 |            1.30 |  3.76 | 1,701,929 | 1,410,172 |    534 |    442.46 |       86.54 | POSMIR | little      |
     
 
 
@@ -223,29 +173,6 @@ With $f\geq100$ (i.e. `adv` occurs at least 100 times)
 
 
 ```python
-# def get_top_vals(df: pd.DataFrame,
-#                  index_like: str = 'NEG',
-#                  metric_filter: str | list = ['am_p1_given2', 'conservative_log_ratio'],
-#                  k: int = 10,
-#                  val_col: str = None,
-#                  ignore_neg_adv: bool = True):
-#     env_df = df.copy().loc[df.conservative_log_ratio >=
-#                            1].filter(like=index_like, axis=0)
-#     if ignore_neg_adv:
-#         env_df = env_df.loc[~df.l2.isin(
-#             ("n't", 'not', 'barely', 'never', 'no', 'none')), :]
-#     if isinstance(metric_filter, str):
-#         metric_filter = [metric_filter]
-
-#     top = pd.concat([env_df.nlargest(k, m) for m in metric_filter]
-#                     ).drop_duplicates(keep='first')
-
-#     if val_col:
-#         top = top[[val_col] + metric_filter]
-
-#     return top.sort_values(metric_filter, ascending=False)
-
-
 [setdiff_top15, mirror_top15] = [
     get_top_vals(adv_df, k=15)
     for adv_df in (setdiff_adv, mirror_adv)
@@ -308,26 +235,30 @@ as ranked by $\Delta P(1|2)$ (`dP1`) and $LRC$
 
 
 ```python
-nb_show_table(mirror_top15.reset_index().filter(regex=r'^[^l]'))
+nb_show_table(mirror_top15
+              .assign(adv=mirror_top15.l2)
+              .filter(items = ['adv']+FOCUS)
+              .reset_index()
+              .filter(regex=r'^[^kl]'))
 ```
 
     
-    |        | `key`                |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
-    |:-------|:---------------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
-    | **1**  | NEGmir~ever          | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
-    | **2**  | NEGmir~any           | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
-    | **3**  | NEGmir~necessarily   |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
-    | **4**  | NEGmir~remotely      | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
-    | **5**  | NEGmir~that          | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
-    | **6**  | NEGmir~exactly       |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
-    | **7**  | NEGmir~particularly  | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
-    | **8**  | NEGmir~inherently    | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
-    | **9**  | NEGmir~overtly       |   391 |    0.35 |   0.53 |    1.89 |    483.89 |   0.49 |            0.73 | 13.33 | 1,701,929 | 291,732 |    743 |    127.36 |      263.64 |
-    | **10** | NEGmir~intrinsically |   433 |    0.32 |   0.49 |    1.70 |    466.38 |   0.45 |            0.66 | 13.48 | 1,701,929 | 291,732 |    890 |    152.56 |      280.44 |
-    | **11** | NEGmir~especially    | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |   0.37 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
-    | **12** | NEGmir~yet           |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 | 291,732 |    815 |    139.70 |      180.30 |
-    | **13** | NEGmir~fully         | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |   0.32 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
-    | **14** | NEGmir~terribly      | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
+    |        | `adv`         |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
+    |:-------|:--------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
+    | **1**  | ever          | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
+    | **2**  | any           | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
+    | **3**  | necessarily   |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
+    | **4**  | remotely      | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
+    | **5**  | that          | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
+    | **6**  | exactly       |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
+    | **7**  | particularly  | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
+    | **8**  | inherently    | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
+    | **9**  | overtly       |   391 |    0.35 |   0.53 |    1.89 |    483.89 |   0.49 |            0.73 | 13.33 | 1,701,929 | 291,732 |    743 |    127.36 |      263.64 |
+    | **10** | intrinsically |   433 |    0.32 |   0.49 |    1.70 |    466.38 |   0.45 |            0.66 | 13.48 | 1,701,929 | 291,732 |    890 |    152.56 |      280.44 |
+    | **11** | especially    | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |   0.37 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
+    | **12** | yet           |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 | 291,732 |    815 |    139.70 |      180.30 |
+    | **13** | fully         | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |   0.32 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
+    | **14** | terribly      | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
     
 
 
@@ -336,22 +267,23 @@ nb_show_table(mirror_top15.reset_index().filter(regex=r'^[^l]'))
 _Present Positive_ approximation  
 as ranked by $\Delta P(1|2)$ (`dP1`) and $LRC$
 
-|        | `key`                |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
-|:-------|:---------------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
-| **1**  | NEGmir~ever          | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
-| **2**  | NEGmir~any           | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
-| **3**  | NEGmir~necessarily   |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
-| **4**  | NEGmir~remotely      | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
-| **5**  | NEGmir~that          | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
-| **6**  | NEGmir~exactly       |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
-| **7**  | NEGmir~particularly  | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
-| **8**  | NEGmir~inherently    | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
-| **9**  | NEGmir~overtly       |   391 |    0.35 |   0.53 |    1.89 |    483.89 |   0.49 |            0.73 | 13.33 | 1,701,929 | 291,732 |    743 |    127.36 |      263.64 |
-| **10** | NEGmir~intrinsically |   433 |    0.32 |   0.49 |    1.70 |    466.38 |   0.45 |            0.66 | 13.48 | 1,701,929 | 291,732 |    890 |    152.56 |      280.44 |
-| **11** | NEGmir~especially    | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |   0.37 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
-| **12** | NEGmir~yet           |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 | 291,732 |    815 |    139.70 |      180.30 |
-| **13** | NEGmir~fully         | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |   0.32 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
-| **14** | NEGmir~terribly      | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
+|        | `adv`         |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
+|:-------|:--------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
+| **1**  | ever          | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
+| **2**  | any           | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
+| **3**  | necessarily   |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
+| **4**  | remotely      | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
+| **5**  | that          | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
+| **6**  | exactly       |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
+| **7**  | particularly  | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
+| **8**  | inherently    | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
+| **9**  | overtly       |   391 |    0.35 |   0.53 |    1.89 |    483.89 |   0.49 |            0.73 | 13.33 | 1,701,929 | 291,732 |    743 |    127.36 |      263.64 |
+| **10** | intrinsically |   433 |    0.32 |   0.49 |    1.70 |    466.38 |   0.45 |            0.66 | 13.48 | 1,701,929 | 291,732 |    890 |    152.56 |      280.44 |
+| **11** | especially    | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |   0.37 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
+| **12** | yet           |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 | 291,732 |    815 |    139.70 |      180.30 |
+| **13** | fully         | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |   0.32 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
+| **14** | terribly      | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
+
 
 📌 _Note that the "top 15" adverbs for the `NEGmirror` data is actually **all** adverbs s.t. $f \geq 300$ and $\texttt{LRC} > 1$._
 
@@ -360,11 +292,13 @@ as ranked by $\Delta P(1|2)$ (`dP1`) and $LRC$
 | POSMIR |                        96 |
 | NEGMIR |                        15 |
 
-
+➕ _And one of those adverbs is "not" (which is ignored)_
 
 
 ```python
+
 print(mirror_adv.loc[mirror_adv.conservative_log_ratio>1].value_counts('l1').to_frame('total adverbs $LRC > 1$').to_markdown(intfmt=','))
+catify(mirror_adv, reverse=True).filter(like='NEG', axis=0).loc[mirror_adv.conservative_log_ratio>1, 'l2']
 ```
 
     | l1     |   total adverbs $LRC > 1$ |
@@ -373,34 +307,33 @@ print(mirror_adv.loc[mirror_adv.conservative_log_ratio>1].value_counts('l1').to_
     | NEGMIR |                        15 |
 
 
+
+
+
+    key
+    NEGmir~any                        any
+    NEGmir~ever                      ever
+    NEGmir~exactly                exactly
+    NEGmir~especially          especially
+    NEGmir~fully                    fully
+    NEGmir~inherently          inherently
+    NEGmir~intrinsically    intrinsically
+    NEGmir~not                        not
+    NEGmir~necessarily        necessarily
+    NEGmir~overtly                overtly
+    NEGmir~particularly      particularly
+    NEGmir~remotely              remotely
+    NEGmir~that                      that
+    NEGmir~terribly              terribly
+    NEGmir~yet                        yet
+    Name: l2, dtype: string
+
+
+
 ### Or here, the least "negative"/most "non-negative"
 
 
 ```python
-# def show_top_positive(adv_df, 
-#                       k:int=15, 
-#                       filter_and_sort:list=['conservative_log_ratio', 
-#                                             'am_log_likelihood', 
-#                                             'am_p1_given2']):
-    
-#     _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
-#     _N = int(adv_df.N.iat[0])
-#     ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith("com") else '(`mirror`, $@P$)'
-#     print(f'#### Adverbs in top {k}',
-#           r'for $LRC$, $G^2$, and $\Delta P(\texttt{env}|\texttt{adv})$',
-#           f'measuring association with *{_l1.capitalize()}* Environments {ie}', 
-#           end='\n'*2)
-#     print(f'Total Tokens in dataset: $N = {_N:,}$')
-#     nb_show_table(
-#         get_top_vals(
-#             adv_df.filter(items=FOCUS), 
-#             k=k,
-#             metric_filter=filter_and_sort,
-#             index_like='O',  # should match "POS" & "COM", but neither "NEG*"
-#             ).round(2).sort_values(filter_and_sort, ascending=False).set_index('l2').drop(['N', 'l1'], axis=1)
-#     )
-    
-# All data
 show_top_positive(setdiff_adv, k=15)
 ```
 

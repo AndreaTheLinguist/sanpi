@@ -17,6 +17,7 @@ FOCUS = ['f',
          'N', 'f1', 'f2', 'E11', 'unexpected_f',
          'l1', 'l2',
          'adv', 'adv_total', 'adj', 'adj_total']
+ABBR_FOCUS=adjust_assoc_columns(FOCUS)
 
 
 def locate_polar_am_paths(data_tag: str = 'ALL',
@@ -98,9 +99,11 @@ def filter_load_adx_am(am_path: Path, column_list: list = None) -> pd.DataFrame:
         am_df = pd.read_pickle(am_path).filter(column_list)
     return update_index(am_df.convert_dtypes())
 
+
 def get_top_vals(df: pd.DataFrame,
                  index_like: str = 'NEG',
-                 metric_filter: str | list = ['am_p1_given2', 'conservative_log_ratio'],
+                 metric_filter: str | list = [
+                     'am_p1_given2', 'conservative_log_ratio'],
                  k: int = 10,
                  val_col: str = None,
                  ignore_neg_adv: bool = True):
@@ -120,15 +123,17 @@ def get_top_vals(df: pd.DataFrame,
 
     return top.sort_values(metric_filter, ascending=False)
 
+
 def show_top_positive(adv_df, 
-                      k:int=15, 
-                      filter_and_sort:list=['conservative_log_ratio', 
+                      k: int = 15,
+                      filter_and_sort: list = ['conservative_log_ratio',
                                             'am_log_likelihood', 
                                             'am_p1_given2']):
     
     _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
     _N = int(adv_df.N.iat[0])
-    ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith("com") else '(`mirror`, $@P$)'
+    ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith(
+        "com") else '(`mirror`, $@P$)'
     print(f'#### Adverbs in top {k}',
           r'for $LRC$, $G^2$, and $\Delta P(\texttt{env}|\texttt{adv})$',
           f'measuring association with *{_l1.capitalize()}* Environments {ie}', 
@@ -140,9 +145,9 @@ def show_top_positive(adv_df,
             k=k,
             metric_filter=filter_and_sort,
             index_like='O',  # should match "POS" & "COM", but neither "NEG*"
-            ).round(2).sort_values(filter_and_sort, ascending=False).set_index('l2').drop(['N', 'l1'], axis=1)
+        ).round(2).sort_values(filter_and_sort, ascending=False)
+        .set_index('l2').drop(['N', 'l1'], axis=1)
     )
-
 
 
 def force_ints(_df):
@@ -211,8 +216,8 @@ def show_adv_bigrams(sample_size, C,
         return adv_pat_bigrams.head(bigram_k)
 
     bigram_k = max(sample_size + 2, 10)
-    print(
-        f'## Top {bigram_k} "most negative" bigrams corresponding to top {sample_size} adverbs\n')
+    print(f'## Top {bigram_k} "most negative" bigrams',
+          f'corresponding to top {sample_size} adverbs\n')
     print(timestamp_today())
     patterns = list(bigram_dfs.keys())
     top_adverbs = C.index
@@ -227,17 +232,23 @@ def show_adv_bigrams(sample_size, C,
 
         for pat, bdf in bigram_dfs.items():
             bdf = adjust_assoc_columns(
-                bdf[[c for c in set(focus_cols + ['adj', 'adj_total', 'adv', 'adv_total']) if c in bdf.columns]])
+                bdf.loc[:, [
+                    c for c in bdf.columns
+                    if c in set(focus_cols + ['adj', 'adj_total',
+                                              'adv', 'adv_total'])]
+                        ])
             bdf = bdf.loc[bdf.LRC >= 1, :]
-            adv_pat_bigrams = get_top_bigrams(bdf, adv, bigram_k)
+            adv_pat_bigrams = get_top_bigrams(bdf, adv, bigram_k).filter(ABBR_FOCUS)
 
             if adv_pat_bigrams.empty:
                 print(f'No bigrams found in loaded `{pat}` AM table.')
             else:
-                print(
-                    f'\n#### Top {len(adv_pat_bigrams)} `{pat}` "{adv}_*" bigrams (sorted by `{selector}`; `LRC > 1`)\n')
-                column_list = column_list if column_list is not None else bdf.columns
-                nb_show_table(adv_pat_bigrams.filter(column_list), n_dec=2)
+                print(f'\n#### Top {len(adv_pat_bigrams)} `{pat}` "{adv}_*"',
+                      f'bigrams (sorted by `{selector}`; `LRC > 1`)\n')
+                column_list = column_list or adv_pat_bigrams.columns.to_list()
+                nb_show_table(adv_pat_bigrams.filter(column_list)
+                              .filter(regex=r'^[^a]|_total$'), 
+                              n_dec=2)
 
             adj_for_adv.extend(adv_pat_bigrams.adj.drop_duplicates().to_list())
             bigram_samples[adv][pat] = adv_pat_bigrams
@@ -257,13 +268,11 @@ def show_adv_bigrams(sample_size, C,
     return bigram_samples, bigram_k
 
 
-
 # def uncat(df):
 #     cats = df.select_dtypes('category').columns
 #     df[cats] = df[cats].astype('string')
 #     # print(df.dtypes)
 #     return df, cats
-
 
 
 def combine_top_adv(df_1: pd.DataFrame,
