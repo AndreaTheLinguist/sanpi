@@ -16,7 +16,7 @@ DEMO_DIR = SANPI_HOME / 'DEMO'
 RESULT_DIR, DEMO_RESULT_DIR = [W / 'results' for W in (SANPI_HOME, DEMO_DIR)]
 
 FREQ_DIR, DEMO_FREQ_DIR = [
-    R / 'freq_out' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
+    R / 'freq_tsv' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
 
 
 def timestamp_now() -> str:

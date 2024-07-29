@@ -1713,8 +1713,8 @@ def select_cols(df: pd.DataFrame,
 
 
 def write_part_parquet(df: pd.DataFrame,
-                       part: str,
-                       out_path: Path,
+                       part: str = None,
+                       out_path: Path = None,
                        partition_by: list = None,
                        data_label: str = 'cleaned bigram tokens'):
     if not any(s.startswith('.parq') for s in out_path.suffixes):
@@ -1937,6 +1937,17 @@ def unpack_dict(input_dict: dict,
         returns += (inv_flat_dict, )
 
     return returns
+
+def update_assoc_index(df, pat_name: str = None):
+    neg_env_name = df.filter(like='NEG', axis=0).l1.iloc[0]
+    # > will be either `NEGATED` or `NEGMIR`
+    #   both are shortened to just `NEG` for the keys in their separate dataframes
+    # > replace to avoid ambiguity in `key` values when combined
+    #! some filtering relies on 'NEG', so have to keep that prefix
+    index_update = pat_name or (
+        'NEGmir' if neg_env_name.endswith('MIR') else 'NEGany')
+    df.index = df.index.str.replace('NEG', index_update)
+    return df
 
 
 class Timer:

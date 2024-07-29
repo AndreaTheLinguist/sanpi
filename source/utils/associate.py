@@ -53,7 +53,8 @@ confirm_dir(AM_ENV_DIR)
 
 BINARY_ASSOC_ARGS = namedtuple(
     'BINARY_ASSOC_TUPLE',
-    ['min_freq', 'all_counts', 'compare_counts', 'comp_label', 'target_counts', 'targ_label', 'data_suffix', 'skew', 'verbose'])
+    ['min_freq', 'all_counts', 'compare_counts', 'comp_label', 
+     'target_counts', 'targ_label', 'data_suffix', 'skew', 'verbose'])
 
 
 def adjust_assoc_columns(cols_or_df,
@@ -77,6 +78,12 @@ def adjust_assoc_columns(cols_or_df,
                         'mutual_information': 'MI',
                         'am_p1_given2': 'dP1',
                         'am_p2_given1': 'dP2',
+                        'am_p1_given2_simple': 'P1',
+                        'am_p2_given1_simple': 'P2', 
+                        'dP1_simple':'P1',
+                        'dP2_simple':'P2', 
+                        'mean_dP1_simple':'mean_P1',
+                        'mean_dP2_simple':'mean_P2',
                         }
         abbreviations = {
             r'am_': '',
@@ -86,7 +93,11 @@ def adjust_assoc_columns(cols_or_df,
             r'O': 'obs_',
             r'E': 'exp_',
             r'ative': '',
-            r'unexpected': 'unexp'
+            r'unexpected': 'unexp', 
+            r'dP1_simple': 'P1',
+            r'dP1Simple': 'P1',
+            r'dP2_simple': 'P2',
+            r'dP2Simple': 'P2'
         }
         for update_dict in [replacements, abbreviations]:
             columns = [
@@ -289,7 +300,7 @@ def confirm_basic_ucs(basic_ucs_path: Path,
                         ucs_save_path=basic_ucs_path,
                         cat_tsv_str=f'cat {contained_counts_path}')
     else:
-        raise FileNotFoundError
+        raise FileNotFoundError(f'{contained_counts_path} not found')
     return basic_ucs_path
 
 
@@ -299,7 +310,7 @@ def confirm_polarized_ucs(basic_ucs_path: Path,
                           freq_floor: int = 100,
                           compare_label: str = 'compare',
                           target_label: str = 'target',
-                          data_suffix: str = '.35f-7c.tsv',
+                          data_suffix: str = 'final-direct.tsv',
                           args: BINARY_ASSOC_ARGS = None,
                           unit: str = 'adv'):
     if args:
@@ -410,7 +421,7 @@ def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
 
 def seek_readable_ucs(min_freq: int,
                       target_counts_dir: Path = None,
-                      data_suffix: str = '.35f-7c.tsv',
+                      data_suffix: str = 'final-direct.tsv',
                       unit: str = '',
                       is_polar: bool = True, 
                       contained_counts_path: Path = None,
@@ -423,7 +434,7 @@ def seek_readable_ucs(min_freq: int,
         subdir = ucs_subdir or target_counts_dir.name
         pref = 'polar' if is_polar else 'eval_mirror'
         readable_parent = f'{pref}/{subdir}/{unit}'
-        init_ucs_stem = (f'{pref}-{unit}_{data_suffix.strip(".tsv")}'
+        init_ucs_stem = (f'{pref}-{unit}_{data_suffix.replace(".tsv","")}'
                          .replace('polar', 'polarized'))
 
     else:
@@ -561,7 +572,7 @@ def build_ucs_from_multiple(tsv_paths,
 def prep_by_polarity(in_paths_dict: dict,
                      row_limit: int = None,
                      words_to_keep: str = 'bigram',
-                     data_suffix: str = ''):
+                     data_suffix: str = 'final-direct.tsv'):
 
     def _confirm_existing_tsv(tsv_obj):
         try:
@@ -609,13 +620,13 @@ def prep_by_polarity(in_paths_dict: dict,
                 yield _WORD_GAP.sub(sub_keep_str, line)
 
         prep_path = AM_ENV_DIR.joinpath(
-            f'{polarity.lower()}_{words_to_keep}_counts{data_suff}')
+            f'{polarity.lower()}_{words_to_keep}_{data_suff}')
         try:
             rel_path = tsv_path.relative_to(RESULT_DIR)
         except ValueError:
             rel_path = Path(*tsv_path.parts[-4:])
         print(
-            f'\nProcessing ../{polarity} counts loaded from {rel_path}...')
+            f'\nProcessing ../{polarity} joint frequencies loaded from {rel_path}...')
         if not prep_path.is_file():
             prep_path.write_text('\n'.join(_new_line_gen(
                 tsv_path, polarity, row_limit, words_to_keep)) + '\n')
