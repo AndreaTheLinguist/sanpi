@@ -5,13 +5,13 @@
 from pathlib import Path
 
 import pandas as pd
-from pprint import pprint
-# from source.utils import PKL_SUFF
+from am_notebooks import *
+
 from source.utils.associate import AM_DF_DIR, TOP_AM_DIR, adjust_assoc_columns
-from source.utils.general import print_iter, snake_to_camel, timestamp_today, confirm_dir, run_shell_command as run_bash
+from source.utils.general import confirm_dir
 
 SET_FLOOR = 5000
-MIR_FLOOR = min(round(SET_FLOOR//10, -2), 1000)
+MIR_FLOOR = min(round(SET_FLOOR//15, -2), 1000)
 K = 8
 
 TAG='ALL'
@@ -21,35 +21,13 @@ confirm_dir(TOP_AM_TAG_DIR)
 data_top = f'{TAG}-Top{K}'
 OUT_DIR = TOP_AM_TAG_DIR / data_top
 confirm_dir(OUT_DIR)
-
-# for loading `polar/*/bigram/*` tables
-# bigram_floor = 100
-# mirror_floor = 50
 ```
-
-
-```python
-round(SET_FLOOR//10, -2)
-```
-
-
-
-
-    500
-
-
 
 Set columns and diplay settings
 
 
 ```python
-FOCUS = ['f',
-         'am_p1_given2', 'am_p1_given2_simple', 'conservative_log_ratio',
-         'am_log_likelihood',
-        #  'mutual_information', 
-         'am_odds_ratio_disc', 't_score',
-         'N', 'f1', 'f2', 'E11', 'unexpected_f', 
-         'l1', 'l2']
+
 pd.set_option('display.max_colwidth', 20)
 pd.set_option('display.max_columns', 12)
 pd.set_option('display.width', 90)
@@ -57,149 +35,187 @@ pd.set_option("display.precision", 2)
 pd.set_option("styler.format.precision", 2)
 pd.set_option("styler.format.thousands", ",")
 pd.set_option("display.float_format", '{:,.2f}'.format)
-# pd.set_option("styler.render.repr", "html")
 ```
 
 
 ```python
-def force_ints(_df):
-    count_cols = _df.filter(regex=r'total|^[fN]').columns
-    _df[count_cols] = _df[count_cols].astype('int')
-    # _df[count_cols] = _df[:, count_cols].astype('int64')
-    # print(_df.dtypes.to_frame('dtypes'))
-    return _df
-```
+# FOCUS = ['f',
+#          'am_p1_given2', 'am_p1_given2_simple', 'conservative_log_ratio',
+#          'am_log_likelihood',
+#          'mutual_information', 
+#          'am_odds_ratio_disc', 't_score',
+#          'N', 'f1', 'f2', 'E11', 'unexpected_f', 
+#          'l1', 'l2']
+
+# def force_ints(_df):
+#     count_cols = _df.filter(regex=r'total|^[fN]').columns
+#     _df[count_cols] = _df[count_cols].astype('int')
+#     return _df
+# def nb_show_table(df, n_dec: int = 2,
+#                   adjust_columns: bool = True,
+#                    outpath:Path=None, 
+#                    return_df:bool=False) -> None: 
+#     _df = df.copy()
+#     try: 
+#         start_0 = _df.index.start == 0
+#     except AttributeError: 
+#         pass
+#     else:
+#         _df.index.name = 'rank'
+#         if start_0: 
+#             _df.index = _df.index + 1
+#     if adjust_columns: 
+#         _df = adjust_assoc_columns(_df)
+#     _df.columns = [f'`{c}`' for c in _df.columns]
+#     _df.index = [f'**{r}**' for r in _df.index ]
+#     table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
+#     if outpath:
+#         outpath.write_text(table)
+
+#     print(f'\n{table}\n')
+#     return (_df if return_df else None)
 
 
-```python
-def nb_show_table(df, n_dec: int = 2,
-                  adjust_columns: bool = True,
-                   outpath:Path=None, 
-                   return_df:bool=False) -> None: 
-    _df = df.copy()
-    try: 
-        start_0 = _df.index.start == 0
-    except AttributeError: 
-        pass
-    else:
-        _df.index.name = 'rank'
-        if start_0: 
-            _df.index = _df.index + 1
-    if adjust_columns: 
-        _df = adjust_assoc_columns(_df)
-    _df.columns = [f'`{c}`' for c in _df.columns]
-    _df.index = [f'**{r}**' for r in _df.index ]
-    table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
-    if outpath:
-        outpath.write_text(table)
-
-    print(f'\n{table}\n')
-    return (_df if return_df else None)
+# def update_index(df, pat_name:str = None):
+#     neg_env_name = df.filter(like='NEG', axis=0).l1.iloc[0]
+#     # > will be either `NEGATED` or `NEGMIR`
+#     #   both are shortened to just `NEG` for the keys in their separate dataframes
+#     # > replace to avoid ambiguity in `key` values when combined
+#     #! some filtering relies on 'NEG', so have to keep that prefix
+#     index_update = pat_name or ('NEGmir' if neg_env_name.endswith('MIR') else 'NEGany')
+#     df.index = df.index.str.replace('NEG', index_update)
+#     return df
 ```
 
 ## Set paths and load adverb association tables
 
 
 ```python
-def update_index(df, pat_name:str = None):
-    neg_env_name = df.filter(like='NEG', axis=0).l1.iloc[0]
-    # > will be either `NEGATED` or `NEGMIR`
-    #   both are shortened to just `NEG` for the keys in their separate dataframes
-    # > replace to avoid ambiguity in `key` values when combined
-    #! some filtering relies on 'NEG', so have to keep that prefix
-    index_update = pat_name or ('NEGmir' if neg_env_name.endswith('MIR') else 'NEGany')
-    df.index = df.index.str.replace('NEG', index_update)
-    return df
-```
-
-
-```python
-POLAR_DIR = AM_DF_DIR.joinpath('polar')
-
-globs = {'RBdirect': f'*{TAG}*min{SET_FLOOR}x*parq',
-        'mirror': f'*{TAG}*min{MIR_FLOOR}x*parq'}
-
-adv_am_paths = {p.name: tuple(p.joinpath('adv/extra').glob(globs[p.name])) for p in POLAR_DIR.iterdir()}
-
-bash_cmd = 'bash /share/compling/projects/sanpi/script/run_assoc.sh'
-for key, paths_tuple in adv_am_paths.items():
-    if not paths_tuple:
-        err_message = (
-            f'Provided SET_FLOOR value, {SET_FLOOR}, has no corresponding processing. Change the value or run:\n'
-            + f'  $ {bash_cmd} -m {SET_FLOOR}'
-            ) if key=='RBdirect' else (
-                f'Provided MIR_FLOOR value, {MIR_FLOOR}, has no corresponding processing. Change the value or run:\n'
-                + f'  $ {bash_cmd} -m {MIR_FLOOR} -P "mirror"')
-        raise ValueError(err_message)
-
-    adv_am_paths[key] = paths_tuple[0]
-
-pprint(adv_am_paths)
+try:
+    adv_am_paths = locate_polar_am_paths(superset_floor=SET_FLOOR,
+                                         mirror_floor=MIR_FLOOR)
+except Exception:
+    MIR_FLOOR = 100
+    adv_am_paths = locate_polar_am_paths(superset_floor=SET_FLOOR,
+                                         mirror_floor=MIR_FLOOR)
 ```
 
     {'RBdirect': PosixPath('/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/adv/extra/polarized-adv_ALL-direct_min5000x_extra.parq'),
-     'mirror': PosixPath('/share/compling/projects/sanpi/results/assoc_df/polar/mirror/adv/extra/polarized-adv_ALL-mirror_min500x_extra.parq')}
+     'mirror': PosixPath('/share/compling/projects/sanpi/results/assoc_df/polar/mirror/adv/extra/polarized-adv_ALL-mirror_min300x_extra.parq')}
 
 
 
 ```python
-setdiff_adv = update_index(pd.read_parquet(adv_am_paths['RBdirect'], columns=FOCUS))
-mirror_adv = update_index(pd.read_parquet(adv_am_paths['mirror'], columns=FOCUS))
-nb_show_table(setdiff_adv.sample(min(6,K)).sort_values('conservative_log_ratio', ascending=False))
+setdiff_adv = filter_load_adx_am(adv_am_paths['RBdirect'])
+mirror_adv = filter_load_adx_am(adv_am_paths['mirror'])
 ```
 
+
+```python
+print(r'### Sample of Superset `RBdirect` $*E\sim\texttt{adv}$ AMs', 
+      f'With $f\geq{SET_FLOOR:,}$ (i.e. `adv` occurs at least {SET_FLOOR:,} times)',
+      sep='\n\n', end = '\n\n')
+nb_show_table(setdiff_adv.sample(min(6,K)).sort_values('f2', ascending=False))
+```
+
+    ### Sample of Superset `RBdirect` $*E\sim\texttt{adv}$ AMs
     
-    |                    |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |     `t` |        `N` |       `f1` |    `f2` |   `exp_f` |   `unexp_f` | `l1`       | `l2`       |
-    |:-------------------|--------:|--------:|-------:|--------:|-----------:|----------------:|--------:|-----------:|-----------:|--------:|----------:|------------:|:-----------|:-----------|
-    | **COM~distinctly** |  29,016 |    0.04 |   0.99 |    2.54 |   1,652.03 |            0.95 |    6.59 | 72,839,589 | 69,662,736 |  29,165 | 27,892.99 |    1,123.01 | COMPLEMENT | distinctly |
-    | **NEGany~always**  | 103,883 |    0.13 |   0.17 |    2.15 | 141,898.40 |            0.67 |  240.11 | 72,839,589 |  3,173,660 | 608,062 | 26,493.59 |   77,389.41 | NEGATED    | always     |
-    | **COM~globally**   |  11,906 |    0.04 |   0.99 |    1.92 |     594.68 |            0.82 |    4.04 | 72,839,589 | 69,662,736 |  11,988 | 11,465.15 |      440.85 | COMPLEMENT | globally   |
-    | **COM~alarmingly** |   6,063 |    0.04 |   0.99 |    1.63 |     301.92 |            0.81 |    2.88 | 72,839,589 | 69,662,736 |   6,105 |  5,838.73 |      224.27 | COMPLEMENT | alarmingly |
-    | **COM~bit**        |   8,921 |    0.03 |   0.99 |    1.40 |     351.26 |            0.65 |    3.21 | 72,839,589 | 69,662,736 |   9,011 |  8,617.99 |      303.01 | COMPLEMENT | bit        |
-    | **NEGany~truly**   |   7,618 |   -0.02 |   0.02 |   -1.11 |  -6,826.80 |           -0.36 | -107.79 | 72,839,589 |  3,173,660 | 390,766 | 17,025.88 |   -9,407.88 | NEGATED    | truly      |
+    With $f\geq5,000$ (i.e. `adv` occurs at least 5,000 times)
+    
+    
+    |                      |     `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |        `N` |       `f1` |    `f2` |    `exp_f` |   `unexp_f` | `l1`       | `l2`         |
+    |:---------------------|--------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|-----------:|-----------:|--------:|-----------:|------------:|:-----------|:-------------|
+    | **COM~increasingly** | 374,465 |    0.04 |   1.00 |    7.03 | 32,549.25 |   0.02 |            2.37 | 26.58 | 72,839,589 | 69,662,736 | 374,538 | 358,202.76 |   16,262.24 | COMPLEMENT | increasingly |
+    | **COM~perfectly**    | 170,123 |    0.03 |   0.98 |    1.14 |  3,340.43 |   0.01 |            0.39 | 10.57 | 72,839,589 | 69,662,736 | 173,321 | 165,761.71 |    4,361.29 | COMPLEMENT | perfectly    |
+    | **COM~mainly**       |  39,368 |    0.04 |   1.00 |    3.53 |  2,789.33 |   0.02 |            1.29 |  8.21 | 72,839,589 | 69,662,736 |  39,460 |  37,738.98 |    1,629.02 | COMPLEMENT | mainly       |
+    | **COM~morally**      |  37,522 |   -0.00 |   0.96 |    0.00 |     -1.79 |  -0.00 |           -0.01 | -0.28 | 72,839,589 | 69,662,736 |  39,290 |  37,576.39 |      -54.39 | COMPLEMENT | morally      |
+    | **COM~instantly**    |  23,684 |    0.02 |   0.97 |    0.41 |    183.82 |   0.01 |            0.21 |  2.62 | 72,839,589 | 69,662,736 |  24,343 |  23,281.29 |      402.71 | COMPLEMENT | instantly    |
+    | **COM~undoubtedly**  |  11,657 |    0.04 |   1.00 |    3.81 |    949.13 |   0.02 |            1.75 |  4.63 | 72,839,589 | 69,662,736 |  11,666 |  11,157.19 |      499.81 | COMPLEMENT | undoubtedly  |
     
 
 
-_Initial `*RBdirect` sample_
+### Sample of Superset `RBdirect` $*E\sim\texttt{adv}$ AMs
 
-|                    |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |     `t` |        `N` |       `f1` |    `f2` |   `exp_f` |   `unexp_f` | `l1`       | `l2`       |
-|:-------------------|--------:|--------:|-------:|--------:|-----------:|----------------:|--------:|-----------:|-----------:|--------:|----------:|------------:|:-----------|:-----------|
-| **COM~distinctly** |  29,016 |    0.04 |   0.99 |    2.54 |   1,652.03 |            0.95 |    6.59 | 72,839,589 | 69,662,736 |  29,165 | 27,892.99 |    1,123.01 | COMPLEMENT | distinctly |
-| **NEGany~always**  | 103,883 |    0.13 |   0.17 |    2.15 | 141,898.40 |            0.67 |  240.11 | 72,839,589 |  3,173,660 | 608,062 | 26,493.59 |   77,389.41 | NEGATED    | always     |
-| **COM~globally**   |  11,906 |    0.04 |   0.99 |    1.92 |     594.68 |            0.82 |    4.04 | 72,839,589 | 69,662,736 |  11,988 | 11,465.15 |      440.85 | COMPLEMENT | globally   |
-| **COM~alarmingly** |   6,063 |    0.04 |   0.99 |    1.63 |     301.92 |            0.81 |    2.88 | 72,839,589 | 69,662,736 |   6,105 |  5,838.73 |      224.27 | COMPLEMENT | alarmingly |
-| **COM~bit**        |   8,921 |    0.03 |   0.99 |    1.40 |     351.26 |            0.65 |    3.21 | 72,839,589 | 69,662,736 |   9,011 |  8,617.99 |      303.01 | COMPLEMENT | bit        |
-| **NEGany~truly**   |   7,618 |   -0.02 |   0.02 |   -1.11 |  -6,826.80 |           -0.36 | -107.79 | 72,839,589 |  3,173,660 | 390,766 | 17,025.88 |   -9,407.88 | NEGATED    | truly      |
+With $f\geq5,000$ (i.e. `adv` occurs at least 5,000 times)
+
+
+|                      |    `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `MI` |   `odds_r_disc` |   `t` |        `N` |       `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`       | `l2`         |
+|:---------------------|-------:|--------:|-------:|--------:|---------:|-------:|----------------:|------:|-----------:|-----------:|-------:|----------:|------------:|:-----------|:-------------|
+| **COM~utterly**      | 80,647 |    0.03 |   0.99 |    1.83 | 3,046.17 |   0.01 |            0.63 |  9.49 | 72,839,589 | 69,662,736 | 81,506 | 77,951.17 |    2,695.83 | COMPLEMENT | utterly      |
+| **NEGany~mutually**  |  5,894 |    0.10 |   0.15 |    1.79 | 6,419.09 |   0.52 |            0.57 | 53.79 | 72,839,589 |  3,173,660 | 40,504 |  1,764.78 |    4,129.22 | NEGATED    | mutually     |
+| **COM~mainly**       | 39,368 |    0.04 |   1.00 |    3.53 | 2,789.33 |   0.02 |            1.29 |  8.21 | 72,839,589 | 69,662,736 | 39,460 | 37,738.98 |    1,629.02 | COMPLEMENT | mainly       |
+| **COM~immensely**    | 36,831 |    0.04 |   1.00 |    3.12 | 2,417.43 |   0.02 |            1.14 |  7.77 | 72,839,589 | 69,662,736 | 36,952 | 35,340.36 |    1,490.64 | COMPLEMENT | immensely    |
+| **COM~specifically** | 11,586 |   -0.04 |   0.92 |   -0.68 |  -332.82 |  -0.02 |           -0.28 | -4.32 | 72,839,589 | 69,662,736 | 12,601 | 12,051.42 |     -465.42 | COMPLEMENT | specifically |
+| **COM~additionally** |  6,342 |    0.04 |   1.00 |    2.58 |   448.18 |   0.02 |            1.27 |  3.29 | 72,839,589 | 69,662,736 |  6,357 |  6,079.74 |      262.26 | COMPLEMENT | additionally |
 
 
 
 
 ```python
-nb_show_table(mirror_adv.sample(min(6,K)).sort_values('conservative_log_ratio', ascending=False))
+print(r'### Sample of Subset `mirror` $@E\sim\texttt{adv}$ AMs', 
+      f'With $f\geq{MIR_FLOOR:,}$ (i.e. `adv` occurs at least {MIR_FLOOR:,} times)',
+      sep='\n\n', end = '\n\n')
+nb_show_table(mirror_adv.sample(min(6,K)).sort_values('f2', ascending=False))
 ```
 
+    ### Sample of Subset `mirror` $@E\sim\texttt{adv}$ AMs
     
-    |                     |   `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `odds_r_disc` |   `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
-    |:--------------------|------:|--------:|-------:|--------:|---------:|----------------:|------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
-    | **NEGmir~exactly**  |   813 |    0.61 |   0.78 |    3.57 | 1,860.72 |            1.24 | 22.25 | 1,701,929 |   291,732 |  1,041 |    178.44 |      634.56 | NEGMIR | exactly     |
-    | **POS~potentially** | 2,944 |    0.14 |   0.97 |    2.15 |   647.45 |            0.87 |  8.06 | 1,701,929 | 1,410,172 |  3,025 |  2,506.43 |      437.57 | POSMIR | potentially |
-    | **POS~immensely**   |   706 |    0.16 |   0.98 |    1.91 |   190.65 |            1.10 |  4.21 | 1,701,929 | 1,410,172 |    717 |    594.09 |      111.91 | POSMIR | immensely   |
-    | **POS~visually**    |   905 |    0.08 |   0.90 |    0.24 |    47.57 |            0.29 |  2.54 | 1,701,929 | 1,410,172 |  1,000 |    828.57 |       76.43 | POSMIR | visually    |
-    | **POS~better**      |   644 |   -0.00 |   0.82 |    0.00 |    -0.09 |           -0.01 | -0.12 | 1,701,929 | 1,410,172 |    781 |    647.12 |       -3.12 | POSMIR | better      |
-    | **POS~entirely**    | 7,982 |   -0.06 |   0.77 |   -0.38 |  -251.22 |           -0.17 | -7.08 | 1,701,929 | 1,410,172 | 10,397 |  8,614.67 |     -632.67 | POSMIR | entirely    |
+    With $f\geq300$ (i.e. `adv` occurs at least 300 times)
+    
+    
+    |                     |   `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `MI` |   `odds_r_disc` |    `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
+    |:--------------------|------:|--------:|-------:|--------:|---------:|-------:|----------------:|-------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
+    | **POS~entirely**    | 7,982 |   -0.06 |   0.77 |   -0.38 |  -251.22 |  -0.03 |           -0.17 |  -7.08 | 1,701,929 | 1,410,172 | 10,397 |  8,614.67 |     -632.67 | POSMIR | entirely    |
+    | **NEGmir~super**    |   573 |   -0.09 |   0.08 |   -0.85 |  -430.32 |  -0.31 |           -0.35 | -24.66 | 1,701,929 |   291,732 |  6,786 |  1,163.21 |     -590.21 | NEGMIR | super       |
+    | **POS~far**         | 5,395 |    0.14 |   0.97 |    2.29 | 1,167.20 |   0.07 |            0.86 |  10.85 | 1,701,929 | 1,410,172 |  5,549 |  4,597.75 |      797.25 | POSMIR | far         |
+    | **POS~no**          | 1,791 |    0.13 |   0.96 |    1.49 |   306.44 |   0.06 |            0.69 |   5.77 | 1,701,929 | 1,410,172 |  1,867 |  1,546.95 |      244.05 | POSMIR | no          |
+    | **POS~practically** |   426 |    0.12 |   0.95 |    0.64 |    64.87 |   0.06 |            0.61 |   2.70 | 1,701,929 | 1,410,172 |    447 |    370.37 |       55.63 | POSMIR | practically |
+    | **POS~suddenly**    |   360 |    0.15 |   0.98 |    1.05 |    82.53 |   0.07 |            0.90 |   2.86 | 1,701,929 | 1,410,172 |    369 |    305.74 |       54.26 | POSMIR | suddenly    |
     
 
 
-_Initial `*mirror` sample_
+### Sample of 500+ Subset `mirror` $@E\sim\texttt{adv}$ AMs
 
-|                     |   `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `odds_r_disc` |   `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
-|:--------------------|------:|--------:|-------:|--------:|---------:|----------------:|------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
-| **NEGmir~exactly**  |   813 |    0.61 |   0.78 |    3.57 | 1,860.72 |            1.24 | 22.25 | 1,701,929 |   291,732 |  1,041 |    178.44 |      634.56 | NEGMIR | exactly     |
-| **POS~potentially** | 2,944 |    0.14 |   0.97 |    2.15 |   647.45 |            0.87 |  8.06 | 1,701,929 | 1,410,172 |  3,025 |  2,506.43 |      437.57 | POSMIR | potentially |
-| **POS~immensely**   |   706 |    0.16 |   0.98 |    1.91 |   190.65 |            1.10 |  4.21 | 1,701,929 | 1,410,172 |    717 |    594.09 |      111.91 | POSMIR | immensely   |
-| **POS~visually**    |   905 |    0.08 |   0.90 |    0.24 |    47.57 |            0.29 |  2.54 | 1,701,929 | 1,410,172 |  1,000 |    828.57 |       76.43 | POSMIR | visually    |
-| **POS~better**      |   644 |   -0.00 |   0.82 |    0.00 |    -0.09 |           -0.01 | -0.12 | 1,701,929 | 1,410,172 |    781 |    647.12 |       -3.12 | POSMIR | better      |
-| **POS~entirely**    | 7,982 |   -0.06 |   0.77 |   -0.38 |  -251.22 |           -0.17 | -7.08 | 1,701,929 | 1,410,172 | 10,397 |  8,614.67 |     -632.67 | POSMIR | entirely    |
+With $f\geq500$ (i.e. `adv` occurs at least 500 times)
+
+
+|                     |    `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
+|:--------------------|-------:|--------:|-------:|--------:|---------:|-------:|----------------:|------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
+| **POS~even**        | 59,871 |    0.13 |   0.95 |    1.99 | 9,679.52 |   0.06 |            0.65 | 32.34 | 1,701,929 | 1,410,172 | 62,709 | 51,958.97 |    7,912.03 | POSMIR | even        |
+| **NEGmir~that**     |  4,308 |    0.61 |   0.78 |    3.90 | 9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 |   291,732 |  5,494 |    941.74 |    3,366.26 | NEGMIR | that        |
+| **POS~socially**    |  1,099 |    0.09 |   0.92 |    0.44 |    75.02 |   0.04 |            0.35 |  3.13 | 1,701,929 | 1,410,172 |  1,201 |    995.12 |      103.88 | POSMIR | socially    |
+| **POS~financially** |    742 |   -0.00 |   0.83 |    0.00 |    -0.03 |  -0.00 |           -0.01 | -0.08 | 1,701,929 | 1,410,172 |    898 |    744.06 |       -2.06 | POSMIR | financially |
+| **POS~strangely**   |    705 |    0.16 |   0.99 |    2.30 |   217.12 |   0.08 |            1.35 |  4.36 | 1,701,929 | 1,410,172 |    711 |    589.12 |      115.88 | POSMIR | strangely   |
+| **POS~undeniably**  |    621 |    0.16 |   0.99 |    2.11 |   187.03 |   0.08 |            1.30 |  4.07 | 1,701,929 | 1,410,172 |    627 |    519.52 |      101.48 | POSMIR | undeniably  |
+
+### Sample of 300+ Subset `mirror` $@E\sim\texttt{adv}$ AMs
+
+With $f\geq300$ (i.e. `adv` occurs at least 300 times)
+
+
+|                     |   `f` |   `dP1` |   `P1` |   `LRC` |     `G2` |   `MI` |   `odds_r_disc` |    `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`        |
+|:--------------------|------:|--------:|-------:|--------:|---------:|-------:|----------------:|-------:|----------:|----------:|-------:|----------:|------------:|:-------|:------------|
+| **POS~entirely**    | 7,982 |   -0.06 |   0.77 |   -0.38 |  -251.22 |  -0.03 |           -0.17 |  -7.08 | 1,701,929 | 1,410,172 | 10,397 |  8,614.67 |     -632.67 | POSMIR | entirely    |
+| **NEGmir~super**    |   573 |   -0.09 |   0.08 |   -0.85 |  -430.32 |  -0.31 |           -0.35 | -24.66 | 1,701,929 |   291,732 |  6,786 |  1,163.21 |     -590.21 | NEGMIR | super       |
+| **POS~far**         | 5,395 |    0.14 |   0.97 |    2.29 | 1,167.20 |   0.07 |            0.86 |  10.85 | 1,701,929 | 1,410,172 |  5,549 |  4,597.75 |      797.25 | POSMIR | far         |
+| **POS~no**          | 1,791 |    0.13 |   0.96 |    1.49 |   306.44 |   0.06 |            0.69 |   5.77 | 1,701,929 | 1,410,172 |  1,867 |  1,546.95 |      244.05 | POSMIR | no          |
+| **POS~practically** |   426 |    0.12 |   0.95 |    0.64 |    64.87 |   0.06 |            0.61 |   2.70 | 1,701,929 | 1,410,172 |    447 |    370.37 |       55.63 | POSMIR | practically |
+| **POS~suddenly**    |   360 |    0.15 |   0.98 |    1.05 |    82.53 |   0.07 |            0.90 |   2.86 | 1,701,929 | 1,410,172 |    369 |    305.74 |       54.26 | POSMIR | suddenly    |
+
+
+### Sample of 100+ Subset `mirror` $@E\sim\texttt{adv}$ AMs
+
+With $f\geq100$ (i.e. `adv` occurs at least 100 times)
+
+
+|                         |   `f` |   `dP1` |   `P1` |   `LRC` |   `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` | `l1`   | `l2`         |
+|:------------------------|------:|--------:|-------:|--------:|-------:|-------:|----------------:|------:|----------:|----------:|-------:|----------:|------------:|:-------|:-------------|
+| **POS~clearly**         | 1,955 |    0.11 |   0.94 |    1.02 | 222.84 |   0.05 |            0.50 |  5.16 | 1,701,929 | 1,410,172 |  2,084 |  1,726.75 |      228.25 | POSMIR | clearly      |
+| **POS~long**            |   808 |   -0.05 |   0.78 |    0.00 | -19.27 |  -0.03 |           -0.15 | -1.95 | 1,701,929 | 1,410,172 |  1,042 |    863.37 |      -55.37 | POSMIR | long         |
+| **POS~likely**          |   636 |    0.12 |   0.94 |    0.69 |  80.89 |   0.06 |            0.53 |  3.07 | 1,701,929 | 1,410,172 |    674 |    558.46 |       77.54 | POSMIR | likely       |
+| **POS~decidedly**       |   616 |    0.16 |   0.99 |    2.01 | 179.65 |   0.08 |            1.23 |  4.02 | 1,701,929 | 1,410,172 |    623 |    516.20 |       99.80 | POSMIR | decidedly    |
+| **NEGmir~consistently** |   119 |    0.09 |   0.26 |    0.00 |  23.64 |   0.19 |            0.24 |  3.79 | 1,701,929 |   291,732 |    453 |     77.65 |       41.35 | NEGMIR | consistently |
+| **POS~refreshingly**    |   282 |    0.17 |   1.00 |    1.63 |  96.31 |   0.08 |            1.59 |  2.83 | 1,701,929 | 1,410,172 |    283 |    234.49 |       47.51 | POSMIR | refreshingly |
 
 
 
@@ -207,27 +223,27 @@ _Initial `*mirror` sample_
 
 
 ```python
-def get_top_vals(df: pd.DataFrame,
-                 index_like: str = 'NEG',
-                 metric_filter: str | list = ['am_p1_given2', 'conservative_log_ratio'],
-                 k: int = 10,
-                 val_col: str = None,
-                 ignore_neg_adv: bool = True):
-    env_df = df.copy().loc[df.conservative_log_ratio >=
-                           1].filter(like=index_like, axis=0)
-    if ignore_neg_adv:
-        env_df = env_df.loc[~df.l2.isin(
-            ("n't", 'not', 'barely', 'never', 'no', 'none')), :]
-    if isinstance(metric_filter, str):
-        metric_filter = [metric_filter]
+# def get_top_vals(df: pd.DataFrame,
+#                  index_like: str = 'NEG',
+#                  metric_filter: str | list = ['am_p1_given2', 'conservative_log_ratio'],
+#                  k: int = 10,
+#                  val_col: str = None,
+#                  ignore_neg_adv: bool = True):
+#     env_df = df.copy().loc[df.conservative_log_ratio >=
+#                            1].filter(like=index_like, axis=0)
+#     if ignore_neg_adv:
+#         env_df = env_df.loc[~df.l2.isin(
+#             ("n't", 'not', 'barely', 'never', 'no', 'none')), :]
+#     if isinstance(metric_filter, str):
+#         metric_filter = [metric_filter]
 
-    top = pd.concat([env_df.nlargest(k, m) for m in metric_filter]
-                    ).drop_duplicates(keep='first')
+#     top = pd.concat([env_df.nlargest(k, m) for m in metric_filter]
+#                     ).drop_duplicates(keep='first')
 
-    if val_col:
-        top = top[[val_col] + metric_filter]
+#     if val_col:
+#         top = top[[val_col] + metric_filter]
 
-    return top.sort_values(metric_filter, ascending=False)
+#     return top.sort_values(metric_filter, ascending=False)
 
 
 [setdiff_top15, mirror_top15] = [
@@ -239,27 +255,31 @@ def get_top_vals(df: pd.DataFrame,
 
 
 ```python
-nb_show_table(setdiff_top15.reset_index().filter(regex=r'^[^l]'))
+nb_show_table(setdiff_top15
+              .assign(adv=setdiff_top15.l2)
+              .filter(items = ['adv']+FOCUS)
+              .reset_index()
+              .filter(regex=r'^[^kl]'))
 ```
 
     
-    |        | `key`              |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |    `t` |        `N` |      `f1` |      `f2` |    `exp_f` |   `unexp_f` |
-    |:-------|:-------------------|--------:|--------:|-------:|--------:|-----------:|----------------:|-------:|-----------:|----------:|----------:|-----------:|------------:|
-    | **1**  | NEGany~necessarily |  42,595 |    0.83 |   0.87 |    7.10 | 230,257.34 |            2.17 | 196.05 | 72,839,589 | 3,173,660 |    48,947 |   2,132.65 |   40,462.35 |
-    | **2**  | NEGany~that        | 164,768 |    0.75 |   0.79 |    6.34 | 831,137.25 |            1.94 | 383.56 | 72,839,589 | 3,173,660 |   208,262 |   9,074.09 |  155,693.91 |
-    | **3**  | NEGany~exactly     |  43,813 |    0.70 |   0.75 |    5.94 | 210,126.60 |            1.82 | 197.11 | 72,839,589 | 3,173,660 |    58,643 |   2,555.11 |   41,257.89 |
-    | **4**  | NEGany~immediately |  56,099 |    0.54 |   0.58 |    4.86 | 224,059.55 |            1.49 | 219.01 | 72,839,589 | 3,173,660 |    96,973 |   4,225.17 |   51,873.83 |
-    | **5**  | NEGany~yet         |  51,867 |    0.50 |   0.54 |    4.65 | 197,610.98 |            1.42 | 209.42 | 72,839,589 | 3,173,660 |    95,763 |   4,172.44 |   47,694.56 |
-    | **6**  | NEGany~any         |  15,384 |    0.40 |   0.45 |    4.07 |  50,880.96 |            1.25 | 111.95 | 72,839,589 | 3,173,660 |    34,382 |   1,498.04 |   13,885.96 |
-    | **7**  | NEGany~remotely    |   5,661 |    0.30 |   0.34 |    3.40 |  15,284.49 |            1.06 |  65.73 | 72,839,589 | 3,173,660 |    16,426 |     715.69 |    4,945.31 |
-    | **8**  | NEGany~terribly    |  17,949 |    0.26 |   0.30 |    3.19 |  43,741.44 |            0.98 | 114.80 | 72,839,589 | 3,173,660 |    58,964 |   2,569.09 |   15,379.91 |
-    | **9**  | NEGany~only        | 113,502 |    0.22 |   0.26 |    2.92 | 243,219.14 |            0.90 | 280.57 | 72,839,589 | 3,173,660 |   435,592 |  18,978.98 |   94,523.02 |
-    | **10** | NEGany~overly      |  24,613 |    0.20 |   0.24 |    2.77 |  49,095.72 |            0.85 | 128.88 | 72,839,589 | 3,173,660 |   100,826 |   4,393.04 |   20,219.96 |
-    | **11** | NEGany~entirely    |  63,321 |    0.19 |   0.23 |    2.70 | 121,162.48 |            0.83 | 204.57 | 72,839,589 | 3,173,660 |   271,851 |  11,844.69 |   51,476.31 |
-    | **12** | NEGany~merely      |   5,918 |    0.15 |   0.20 |    2.32 |   9,443.86 |            0.73 |  59.94 | 72,839,589 | 3,173,660 |    30,000 |   1,307.12 |    4,610.88 |
-    | **13** | NEGany~always      | 103,883 |    0.13 |   0.17 |    2.15 | 141,898.40 |            0.67 | 240.11 | 72,839,589 | 3,173,660 |   608,062 |  26,493.59 |   77,389.41 |
-    | **14** | NEGany~as          | 531,731 |    0.12 |   0.16 |    2.08 | 726,920.15 |            0.69 | 533.76 | 72,839,589 | 3,173,660 | 3,270,915 | 142,515.52 |  389,215.48 |
-    | **15** | NEGany~directly    |   8,197 |    0.12 |   0.17 |    2.04 |  10,716.83 |            0.64 |  66.87 | 72,839,589 | 3,173,660 |    49,169 |   2,142.32 |    6,054.68 |
+    |        | `adv`       |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `MI` |   `odds_r_disc` |    `t` |        `N` |      `f1` |      `f2` |    `exp_f` |   `unexp_f` |
+    |:-------|:------------|--------:|--------:|-------:|--------:|-----------:|-------:|----------------:|-------:|-----------:|----------:|----------:|-----------:|------------:|
+    | **1**  | necessarily |  42,595 |    0.83 |   0.87 |    7.10 | 230,257.34 |   1.30 |            2.17 | 196.05 | 72,839,589 | 3,173,660 |    48,947 |   2,132.65 |   40,462.35 |
+    | **2**  | that        | 164,768 |    0.75 |   0.79 |    6.34 | 831,137.25 |   1.26 |            1.94 | 383.56 | 72,839,589 | 3,173,660 |   208,262 |   9,074.09 |  155,693.91 |
+    | **3**  | exactly     |  43,813 |    0.70 |   0.75 |    5.94 | 210,126.60 |   1.23 |            1.82 | 197.11 | 72,839,589 | 3,173,660 |    58,643 |   2,555.11 |   41,257.89 |
+    | **4**  | immediately |  56,099 |    0.54 |   0.58 |    4.86 | 224,059.55 |   1.12 |            1.49 | 219.01 | 72,839,589 | 3,173,660 |    96,973 |   4,225.17 |   51,873.83 |
+    | **5**  | yet         |  51,867 |    0.50 |   0.54 |    4.65 | 197,610.98 |   1.09 |            1.42 | 209.42 | 72,839,589 | 3,173,660 |    95,763 |   4,172.44 |   47,694.56 |
+    | **6**  | any         |  15,384 |    0.40 |   0.45 |    4.07 |  50,880.96 |   1.01 |            1.25 | 111.95 | 72,839,589 | 3,173,660 |    34,382 |   1,498.04 |   13,885.96 |
+    | **7**  | remotely    |   5,661 |    0.30 |   0.34 |    3.40 |  15,284.49 |   0.90 |            1.06 |  65.73 | 72,839,589 | 3,173,660 |    16,426 |     715.69 |    4,945.31 |
+    | **8**  | terribly    |  17,949 |    0.26 |   0.30 |    3.19 |  43,741.44 |   0.84 |            0.98 | 114.80 | 72,839,589 | 3,173,660 |    58,964 |   2,569.09 |   15,379.91 |
+    | **9**  | only        | 113,502 |    0.22 |   0.26 |    2.92 | 243,219.14 |   0.78 |            0.90 | 280.57 | 72,839,589 | 3,173,660 |   435,592 |  18,978.98 |   94,523.02 |
+    | **10** | overly      |  24,613 |    0.20 |   0.24 |    2.77 |  49,095.72 |   0.75 |            0.85 | 128.88 | 72,839,589 | 3,173,660 |   100,826 |   4,393.04 |   20,219.96 |
+    | **11** | entirely    |  63,321 |    0.19 |   0.23 |    2.70 | 121,162.48 |   0.73 |            0.83 | 204.57 | 72,839,589 | 3,173,660 |   271,851 |  11,844.69 |   51,476.31 |
+    | **12** | merely      |   5,918 |    0.15 |   0.20 |    2.32 |   9,443.86 |   0.66 |            0.73 |  59.94 | 72,839,589 | 3,173,660 |    30,000 |   1,307.12 |    4,610.88 |
+    | **13** | always      | 103,883 |    0.13 |   0.17 |    2.15 | 141,898.40 |   0.59 |            0.67 | 240.11 | 72,839,589 | 3,173,660 |   608,062 |  26,493.59 |   77,389.41 |
+    | **14** | as          | 531,731 |    0.12 |   0.16 |    2.08 | 726,920.15 |   0.57 |            0.69 | 533.76 | 72,839,589 | 3,173,660 | 3,270,915 | 142,515.52 |  389,215.48 |
+    | **15** | directly    |   8,197 |    0.12 |   0.17 |    2.04 |  10,716.83 |   0.58 |            0.64 |  66.87 | 72,839,589 | 3,173,660 |    49,169 |   2,142.32 |    6,054.68 |
     
 
 
@@ -268,25 +288,23 @@ nb_show_table(setdiff_top15.reset_index().filter(regex=r'^[^l]'))
 _Absent Negative_ approximation  
 as ranked by $\Delta P(1|2)$ (`dP1`) and $LRC$
 
-|        | `key`              |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |    `t` |        `N` |      `f1` |      `f2` |    `exp_f` |   `unexp_f` |
-|:-------|:-------------------|--------:|--------:|-------:|--------:|-----------:|----------------:|-------:|-----------:|----------:|----------:|-----------:|------------:|
-| **1**  | NEGany~necessarily |  42,595 |    0.83 |   0.87 |    7.10 | 230,257.34 |            2.17 | 196.05 | 72,839,589 | 3,173,660 |    48,947 |   2,132.65 |   40,462.35 |
-| **2**  | NEGany~that        | 164,768 |    0.75 |   0.79 |    6.34 | 831,137.25 |            1.94 | 383.56 | 72,839,589 | 3,173,660 |   208,262 |   9,074.09 |  155,693.91 |
-| **3**  | NEGany~exactly     |  43,813 |    0.70 |   0.75 |    5.94 | 210,126.60 |            1.82 | 197.11 | 72,839,589 | 3,173,660 |    58,643 |   2,555.11 |   41,257.89 |
-| **4**  | NEGany~immediately |  56,099 |    0.54 |   0.58 |    4.86 | 224,059.55 |            1.49 | 219.01 | 72,839,589 | 3,173,660 |    96,973 |   4,225.17 |   51,873.83 |
-| **5**  | NEGany~yet         |  51,867 |    0.50 |   0.54 |    4.65 | 197,610.98 |            1.42 | 209.42 | 72,839,589 | 3,173,660 |    95,763 |   4,172.44 |   47,694.56 |
-| **6**  | NEGany~any         |  15,384 |    0.40 |   0.45 |    4.07 |  50,880.96 |            1.25 | 111.95 | 72,839,589 | 3,173,660 |    34,382 |   1,498.04 |   13,885.96 |
-| **7**  | NEGany~remotely    |   5,661 |    0.30 |   0.34 |    3.40 |  15,284.49 |            1.06 |  65.73 | 72,839,589 | 3,173,660 |    16,426 |     715.69 |    4,945.31 |
-| **8**  | NEGany~terribly    |  17,949 |    0.26 |   0.30 |    3.19 |  43,741.44 |            0.98 | 114.80 | 72,839,589 | 3,173,660 |    58,964 |   2,569.09 |   15,379.91 |
-| **9**  | NEGany~only        | 113,502 |    0.22 |   0.26 |    2.92 | 243,219.14 |            0.90 | 280.57 | 72,839,589 | 3,173,660 |   435,592 |  18,978.98 |   94,523.02 |
-| **10** | NEGany~overly      |  24,613 |    0.20 |   0.24 |    2.77 |  49,095.72 |            0.85 | 128.88 | 72,839,589 | 3,173,660 |   100,826 |   4,393.04 |   20,219.96 |
-| **11** | NEGany~entirely    |  63,321 |    0.19 |   0.23 |    2.70 | 121,162.48 |            0.83 | 204.57 | 72,839,589 | 3,173,660 |   271,851 |  11,844.69 |   51,476.31 |
-| **12** | NEGany~merely      |   5,918 |    0.15 |   0.20 |    2.32 |   9,443.86 |            0.73 |  59.94 | 72,839,589 | 3,173,660 |    30,000 |   1,307.12 |    4,610.88 |
-| **13** | NEGany~always      | 103,883 |    0.13 |   0.17 |    2.15 | 141,898.40 |            0.67 | 240.11 | 72,839,589 | 3,173,660 |   608,062 |  26,493.59 |   77,389.41 |
-| **14** | NEGany~as          | 531,731 |    0.12 |   0.16 |    2.08 | 726,920.15 |            0.69 | 533.76 | 72,839,589 | 3,173,660 | 3,270,915 | 142,515.52 |  389,215.48 |
-| **15** | NEGany~directly    |   8,197 |    0.12 |   0.17 |    2.04 |  10,716.83 |            0.64 |  66.87 | 72,839,589 | 3,173,660 |    49,169 |   2,142.32 |    6,054.68 |
-
-
+|        | `adv`             |     `f` | `dP1` | `P1` | `LRC` |       `G2` | `MI` | `odds_r_disc` |    `t` |        `N` |      `f1` |      `f2` |    `exp_f` |  `unexp_f` |
+|:-------|:------------------|--------:|------:|-----:|------:|-----------:|-----:|--------------:|-------:|-----------:|----------:|----------:|-----------:|-----------:|
+| **1**  | ___necessarily___ |  42,595 |  0.83 | 0.87 |  7.10 | 230,257.34 | 1.30 |          2.17 | 196.05 | 72,839,589 | 3,173,660 |    48,947 |   2,132.65 |  40,462.35 |
+| **2**  | ___that___        | 164,768 |  0.75 | 0.79 |  6.34 | 831,137.25 | 1.26 |          1.94 | 383.56 | 72,839,589 | 3,173,660 |   208,262 |   9,074.09 | 155,693.91 |
+| **3**  | ___exactly___     |  43,813 |  0.70 | 0.75 |  5.94 | 210,126.60 | 1.23 |          1.82 | 197.11 | 72,839,589 | 3,173,660 |    58,643 |   2,555.11 |  41,257.89 |
+| **4**  | _immediately_     |  56,099 |  0.54 | 0.58 |  4.86 | 224,059.55 | 1.12 |          1.49 | 219.01 | 72,839,589 | 3,173,660 |    96,973 |   4,225.17 |  51,873.83 |
+| **5**  | _yet_             |  51,867 |  0.50 | 0.54 |  4.65 | 197,610.98 | 1.09 |          1.42 | 209.42 | 72,839,589 | 3,173,660 |    95,763 |   4,172.44 |  47,694.56 |
+| **6**  | _any_             |  15,384 |  0.40 | 0.45 |  4.07 |  50,880.96 | 1.01 |          1.25 | 111.95 | 72,839,589 | 3,173,660 |    34,382 |   1,498.04 |  13,885.96 |
+| **7**  | _remotely_        |   5,661 |  0.30 | 0.34 |  3.40 |  15,284.49 | 0.90 |          1.06 |  65.73 | 72,839,589 | 3,173,660 |    16,426 |     715.69 |   4,945.31 |
+| **8**  | _terribly_        |  17,949 |  0.26 | 0.30 |  3.19 |  43,741.44 | 0.84 |          0.98 | 114.80 | 72,839,589 | 3,173,660 |    58,964 |   2,569.09 |  15,379.91 |
+| **9**  | _only_            | 113,502 |  0.22 | 0.26 |  2.92 | 243,219.14 | 0.78 |          0.90 | 280.57 | 72,839,589 | 3,173,660 |   435,592 |  18,978.98 |  94,523.02 |
+| **10** | _overly_          |  24,613 |  0.20 | 0.24 |  2.77 |  49,095.72 | 0.75 |          0.85 | 128.88 | 72,839,589 | 3,173,660 |   100,826 |   4,393.04 |  20,219.96 |
+| **11** | _entirely_        |  63,321 |  0.19 | 0.23 |  2.70 | 121,162.48 | 0.73 |          0.83 | 204.57 | 72,839,589 | 3,173,660 |   271,851 |  11,844.69 |  51,476.31 |
+| **12** | _merely_          |   5,918 |  0.15 | 0.20 |  2.32 |   9,443.86 | 0.66 |          0.73 |  59.94 | 72,839,589 | 3,173,660 |    30,000 |   1,307.12 |   4,610.88 |
+| **13** | _always_          | 103,883 |  0.13 | 0.17 |  2.15 | 141,898.40 | 0.59 |          0.67 | 240.11 | 72,839,589 | 3,173,660 |   608,062 |  26,493.59 |  77,389.41 |
+| **14** | _as_              | 531,731 |  0.12 | 0.16 |  2.08 | 726,920.15 | 0.57 |          0.69 | 533.76 | 72,839,589 | 3,173,660 | 3,270,915 | 142,515.52 | 389,215.48 |
+| **15** | _directly_        |   8,197 |  0.12 | 0.17 |  2.04 |  10,716.83 | 0.58 |          0.64 |  66.87 | 72,839,589 | 3,173,660 |    49,169 |   2,142.32 |   6,054.68 |
 
 
 ```python
@@ -294,19 +312,22 @@ nb_show_table(mirror_top15.reset_index().filter(regex=r'^[^l]'))
 ```
 
     
-    |        | `key`               |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
-    |:-------|:--------------------|------:|--------:|-------:|--------:|----------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
-    | **1**  | NEGmir~ever         | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
-    | **2**  | NEGmir~any          | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
-    | **3**  | NEGmir~necessarily  |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
-    | **4**  | NEGmir~remotely     | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
-    | **5**  | NEGmir~that         | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
-    | **6**  | NEGmir~exactly      |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
-    | **7**  | NEGmir~particularly | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
-    | **8**  | NEGmir~inherently   | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
-    | **9**  | NEGmir~especially   | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
-    | **10** | NEGmir~fully        | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
-    | **11** | NEGmir~terribly     | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
+    |        | `key`                |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
+    |:-------|:---------------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
+    | **1**  | NEGmir~ever          | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
+    | **2**  | NEGmir~any           | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
+    | **3**  | NEGmir~necessarily   |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
+    | **4**  | NEGmir~remotely      | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
+    | **5**  | NEGmir~that          | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
+    | **6**  | NEGmir~exactly       |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
+    | **7**  | NEGmir~particularly  | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
+    | **8**  | NEGmir~inherently    | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
+    | **9**  | NEGmir~overtly       |   391 |    0.35 |   0.53 |    1.89 |    483.89 |   0.49 |            0.73 | 13.33 | 1,701,929 | 291,732 |    743 |    127.36 |      263.64 |
+    | **10** | NEGmir~intrinsically |   433 |    0.32 |   0.49 |    1.70 |    466.38 |   0.45 |            0.66 | 13.48 | 1,701,929 | 291,732 |    890 |    152.56 |      280.44 |
+    | **11** | NEGmir~especially    | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |   0.37 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
+    | **12** | NEGmir~yet           |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 | 291,732 |    815 |    139.70 |      180.30 |
+    | **13** | NEGmir~fully         | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |   0.32 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
+    | **14** | NEGmir~terribly      | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
     
 
 
@@ -315,49 +336,69 @@ nb_show_table(mirror_top15.reset_index().filter(regex=r'^[^l]'))
 _Present Positive_ approximation  
 as ranked by $\Delta P(1|2)$ (`dP1`) and $LRC$
 
+|        | `key`                |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
+|:-------|:---------------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
+| **1**  | NEGmir~ever          | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
+| **2**  | NEGmir~any           | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
+| **3**  | NEGmir~necessarily   |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
+| **4**  | NEGmir~remotely      | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
+| **5**  | NEGmir~that          | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
+| **6**  | NEGmir~exactly       |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
+| **7**  | NEGmir~particularly  | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
+| **8**  | NEGmir~inherently    | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
+| **9**  | NEGmir~overtly       |   391 |    0.35 |   0.53 |    1.89 |    483.89 |   0.49 |            0.73 | 13.33 | 1,701,929 | 291,732 |    743 |    127.36 |      263.64 |
+| **10** | NEGmir~intrinsically |   433 |    0.32 |   0.49 |    1.70 |    466.38 |   0.45 |            0.66 | 13.48 | 1,701,929 | 291,732 |    890 |    152.56 |      280.44 |
+| **11** | NEGmir~especially    | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |   0.37 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
+| **12** | NEGmir~yet           |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 1,701,929 | 291,732 |    815 |    139.70 |      180.30 |
+| **13** | NEGmir~fully         | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |   0.32 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
+| **14** | NEGmir~terribly      | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
 
-|        | `key`               |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `odds_r_disc` |   `t` |       `N` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
-|:-------|:--------------------|------:|--------:|-------:|--------:|----------:|----------------:|------:|----------:|--------:|-------:|----------:|------------:|
-| **1**  | NEGmir~ever         | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |            1.82 | 55.98 | 1,701,929 | 291,732 |  5,060 |    867.35 |    3,841.65 |
-| **2**  | NEGmir~any          | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |            1.59 | 26.37 | 1,701,929 | 291,732 |  1,197 |    205.18 |      860.82 |
-| **3**  | NEGmir~necessarily  |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |            1.51 | 24.92 | 1,701,929 | 291,732 |  1,107 |    189.75 |      773.25 |
-| **4**  | NEGmir~remotely     | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |            1.25 | 33.54 | 1,701,929 | 291,732 |  2,341 |    401.28 |    1,438.72 |
-| **5**  | NEGmir~that         | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |            1.25 | 51.29 | 1,701,929 | 291,732 |  5,494 |    941.74 |    3,366.26 |
-| **6**  | NEGmir~exactly      |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |            1.24 | 22.25 | 1,701,929 | 291,732 |  1,041 |    178.44 |      634.56 |
-| **7**  | NEGmir~particularly | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |            1.09 | 72.96 | 1,701,929 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
-| **8**  | NEGmir~inherently   | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |            0.79 | 37.08 | 1,701,929 | 291,732 |  5,133 |    879.86 |    1,984.14 |
-| **9**  | NEGmir~especially   | 1,569 |    0.23 |   0.40 |    1.45 |  1,140.80 |            0.51 | 22.62 | 1,701,929 | 291,732 |  3,926 |    672.97 |      896.03 |
-| **10** | NEGmir~fully        | 1,664 |    0.19 |   0.36 |    1.23 |    957.30 |            0.44 | 21.47 | 1,701,929 | 291,732 |  4,598 |    788.15 |      875.85 |
-| **11** | NEGmir~terribly     | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |            0.40 | 19.62 | 1,701,929 | 291,732 |  4,610 |    790.21 |      776.79 |
+📌 _Note that the "top 15" adverbs for the `NEGmirror` data is actually **all** adverbs s.t. $f \geq 300$ and $\texttt{LRC} > 1$._
 
+| l1     |   total adverbs $LRC > 1$ |
+|:-------|--------------------------:|
+| POSMIR |                        96 |
+| NEGMIR |                        15 |
+
+
+
+
+```python
+print(mirror_adv.loc[mirror_adv.conservative_log_ratio>1].value_counts('l1').to_frame('total adverbs $LRC > 1$').to_markdown(intfmt=','))
+```
+
+    | l1     |   total adverbs $LRC > 1$ |
+    |:-------|--------------------------:|
+    | POSMIR |                        96 |
+    | NEGMIR |                        15 |
 
 
 ### Or here, the least "negative"/most "non-negative"
 
 
 ```python
-def show_top_positive(adv_df, 
-                      k:int=15, 
-                      filter_and_sort:list=['conservative_log_ratio', 
-                                            'am_log_likelihood', 
-                                            'am_p1_given2']):
+# def show_top_positive(adv_df, 
+#                       k:int=15, 
+#                       filter_and_sort:list=['conservative_log_ratio', 
+#                                             'am_log_likelihood', 
+#                                             'am_p1_given2']):
     
-    _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
-    _N = int(adv_df.N.iat[0])
-    ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith("com") else '(`mirror`, $@P$)'
-    print(f'#### Adverbs in top {k}',
-          r'for $LRC$, $G^2$, and $\Delta P(\texttt{env}|\texttt{adv})$',
-          f'measuring association with *{_l1.capitalize()}* Environments {ie}', 
-          end='\n'*2)
-    print(f'Total Tokens in dataset: $N = {_N:,}$')
-    nb_show_table(
-        get_top_vals(
-            adv_df.filter(items=FOCUS), 
-            k=k,
-            metric_filter=filter_and_sort,
-            index_like='O',  # should match "POS" & "COM", but neither "NEG*"
-            ).round(2).sort_values(filter_and_sort, ascending=False).set_index('l2').drop(['N', 'l1'], axis=1)
-    )
+#     _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
+#     _N = int(adv_df.N.iat[0])
+#     ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith("com") else '(`mirror`, $@P$)'
+#     print(f'#### Adverbs in top {k}',
+#           r'for $LRC$, $G^2$, and $\Delta P(\texttt{env}|\texttt{adv})$',
+#           f'measuring association with *{_l1.capitalize()}* Environments {ie}', 
+#           end='\n'*2)
+#     print(f'Total Tokens in dataset: $N = {_N:,}$')
+#     nb_show_table(
+#         get_top_vals(
+#             adv_df.filter(items=FOCUS), 
+#             k=k,
+#             metric_filter=filter_and_sort,
+#             index_like='O',  # should match "POS" & "COM", but neither "NEG*"
+#             ).round(2).sort_values(filter_and_sort, ascending=False).set_index('l2').drop(['N', 'l1'], axis=1)
+#     )
     
 # All data
 show_top_positive(setdiff_adv, k=15)
@@ -367,37 +408,37 @@ show_top_positive(setdiff_adv, k=15)
     
     Total Tokens in dataset: $N = 72,839,589$
     
-    |                    |          `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |    `t` |          `f1` |         `f2` |      `exp_f` |   `unexp_f` |
-    |:-------------------|-------------:|--------:|-------:|--------:|-----------:|----------------:|-------:|--------------:|-------------:|-------------:|------------:|
-    | **increasingly**   |   374,465.00 |    0.04 |   1.00 |    7.03 |  32,549.25 |            2.37 |  26.58 | 69,662,736.00 |   374,538.00 |   358,202.76 |   16,262.24 |
-    | **relatively**     |   583,426.00 |    0.04 |   1.00 |    5.96 |  48,820.59 |            1.93 |  32.92 | 69,662,736.00 |   583,744.00 |   558,284.37 |   25,141.63 |
-    | **almost**         |   434,507.00 |    0.04 |   1.00 |    5.26 |  35,003.16 |            1.70 |  28.17 | 69,662,736.00 |   434,904.00 |   415,935.94 |   18,571.07 |
-    | **mostly**         |   199,883.00 |    0.04 |   1.00 |    5.09 |  16,071.00 |            1.70 |  19.11 | 69,662,736.00 |   200,066.00 |   191,340.25 |    8,542.75 |
-    | **seemingly**      |   161,276.00 |    0.04 |   1.00 |    5.03 |  12,968.22 |            1.70 |  17.17 | 69,662,736.00 |   161,423.00 |   154,382.64 |    6,893.36 |
-    | **fairly**         |   371,923.00 |    0.04 |   1.00 |    4.97 |  29,366.08 |            1.61 |  25.94 | 69,662,736.00 |   372,340.00 |   356,100.62 |   15,822.38 |
-    | **pretty**         | 1,511,615.00 |    0.04 |   1.00 |    4.96 | 118,512.77 |            1.56 |  52.10 | 69,662,736.00 | 1,513,571.00 | 1,447,557.55 |   64,057.45 |
-    | **largely**        |   173,667.00 |    0.04 |   1.00 |    4.87 |  13,763.38 |            1.63 |  17.75 | 69,662,736.00 |   173,852.00 |   166,269.55 |    7,397.45 |
-    | **partly**         |    78,775.00 |    0.04 |   1.00 |    4.81 |   6,336.61 |            1.70 |  12.00 | 69,662,736.00 |    78,846.00 |    75,407.18 |    3,367.82 |
-    | **albeit**         |    15,742.00 |    0.04 |   1.00 |    4.80 |   1,365.55 |            2.31 |   5.45 | 69,662,736.00 |    15,745.00 |    15,058.29 |      683.71 |
-    | **rather**         |   363,581.00 |    0.04 |   1.00 |    4.74 |  28,124.19 |            1.53 |  25.52 | 69,662,736.00 |   364,070.00 |   348,191.32 |   15,389.68 |
-    | **sometimes**      |   141,910.00 |    0.04 |   1.00 |    4.55 |  10,971.56 |            1.53 |  15.95 | 69,662,736.00 |   142,099.00 |   135,901.44 |    6,008.56 |
-    | **also**           | 1,062,622.00 |    0.04 |   1.00 |    4.45 |  79,069.47 |            1.40 |  43.14 | 69,662,736.00 | 1,064,588.00 | 1,018,156.66 |   44,465.34 |
-    | **supposedly**     |    27,562.00 |    0.04 |   1.00 |    4.40 |   2,238.61 |            1.75 |   7.11 | 69,662,736.00 |    27,584.00 |    26,380.94 |    1,181.06 |
-    | **virtually**      |    86,032.00 |    0.04 |   1.00 |    4.32 |   6,583.57 |            1.50 |  12.39 | 69,662,736.00 |    86,156.00 |    82,398.36 |    3,633.64 |
-    | **now**            |   434,154.00 |    0.04 |   1.00 |    4.27 |  31,839.80 |            1.37 |  27.50 | 69,662,736.00 |   435,006.00 |   416,033.49 |   18,120.51 |
-    | **allegedly**      |    16,367.00 |    0.04 |   1.00 |    4.06 |   1,329.75 |            1.74 |   5.48 | 69,662,736.00 |    16,380.00 |    15,665.60 |      701.40 |
-    | **most**           | 7,137,718.00 |    0.05 |   1.00 |    4.03 | 521,448.58 |            1.27 | 109.64 | 69,662,736.00 | 7,156,931.00 | 6,844,785.94 |  292,932.06 |
-    | **still**          |   772,221.00 |    0.04 |   1.00 |    3.99 |  54,106.56 |            1.26 |  36.19 | 69,662,736.00 |   774,186.00 |   740,420.36 |   31,800.64 |
-    | **understandably** |    12,295.00 |    0.04 |   1.00 |    3.96 |   1,013.37 |            1.82 |   4.77 | 69,662,736.00 |    12,303.00 |    11,766.41 |      528.59 |
-    | **admittedly**     |    12,587.00 |    0.04 |   1.00 |    3.86 |   1,022.59 |            1.74 |   4.81 | 69,662,736.00 |    12,597.00 |    12,047.59 |      539.41 |
-    | **undoubtedly**    |    11,657.00 |    0.04 |   1.00 |    3.81 |     949.13 |            1.75 |   4.63 | 69,662,736.00 |    11,666.00 |    11,157.20 |      499.81 |
-    | **presumably**     |     7,308.00 |    0.04 |   1.00 |    3.69 |     617.82 |            1.98 |   3.69 | 69,662,736.00 |     7,311.00 |     6,992.14 |      315.86 |
-    | **highly**         |   733,697.00 |    0.04 |   1.00 |    3.64 |  48,462.47 |            1.15 |  34.67 | 69,662,736.00 |   736,102.00 |   703,997.37 |   29,699.63 |
-    | **hopefully**      |     7,183.00 |    0.04 |   1.00 |    3.45 |     589.29 |            1.78 |   3.64 | 69,662,736.00 |     7,188.00 |     6,874.50 |      308.50 |
-    | **extremely**      |   913,707.00 |    0.04 |   1.00 |    3.25 |  55,385.18 |            1.02 |  37.66 | 69,662,736.00 |   917,735.00 |   877,708.56 |   35,998.44 |
-    | **less**           | 1,156,675.00 |    0.03 |   0.99 |    1.90 |  40,981.00 |            0.60 |  34.93 | 69,662,736.00 | 1,170,138.00 | 1,119,103.16 |   37,571.83 |
-    | **more**           | 8,595,325.00 |    0.03 |   0.98 |    1.26 | 185,410.35 |            0.42 |  75.02 | 69,662,736.00 | 8,757,314.00 | 8,375,369.24 |  219,955.76 |
-    | **very**           | 9,065,101.00 |    0.03 |   0.98 |    1.10 | 163,181.02 |            0.37 |  71.02 | 69,662,736.00 | 9,254,924.00 | 8,851,276.29 |  213,824.71 |
+    |                    |       `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `MI` |   `odds_r_disc` |    `t` |       `f1` |      `f2` |      `exp_f` |   `unexp_f` |
+    |:-------------------|----------:|--------:|-------:|--------:|-----------:|-------:|----------------:|-------:|-----------:|----------:|-------------:|------------:|
+    | **increasingly**   |   374,465 |    0.04 |   1.00 |    7.03 |  32,549.25 |   0.02 |            2.37 |  26.58 | 69,662,736 |   374,538 |   358,202.76 |   16,262.24 |
+    | **relatively**     |   583,426 |    0.04 |   1.00 |    5.96 |  48,820.59 |   0.02 |            1.93 |  32.92 | 69,662,736 |   583,744 |   558,284.37 |   25,141.63 |
+    | **almost**         |   434,507 |    0.04 |   1.00 |    5.26 |  35,003.16 |   0.02 |            1.70 |  28.17 | 69,662,736 |   434,904 |   415,935.94 |   18,571.07 |
+    | **mostly**         |   199,883 |    0.04 |   1.00 |    5.09 |  16,071.00 |   0.02 |            1.70 |  19.11 | 69,662,736 |   200,066 |   191,340.25 |    8,542.75 |
+    | **seemingly**      |   161,276 |    0.04 |   1.00 |    5.03 |  12,968.22 |   0.02 |            1.70 |  17.17 | 69,662,736 |   161,423 |   154,382.64 |    6,893.36 |
+    | **fairly**         |   371,923 |    0.04 |   1.00 |    4.97 |  29,366.08 |   0.02 |            1.61 |  25.94 | 69,662,736 |   372,340 |   356,100.62 |   15,822.38 |
+    | **pretty**         | 1,511,615 |    0.04 |   1.00 |    4.96 | 118,512.77 |   0.02 |            1.56 |  52.10 | 69,662,736 | 1,513,571 | 1,447,557.55 |   64,057.45 |
+    | **largely**        |   173,667 |    0.04 |   1.00 |    4.87 |  13,763.38 |   0.02 |            1.63 |  17.75 | 69,662,736 |   173,852 |   166,269.55 |    7,397.45 |
+    | **partly**         |    78,775 |    0.04 |   1.00 |    4.81 |   6,336.61 |   0.02 |            1.70 |  12.00 | 69,662,736 |    78,846 |    75,407.18 |    3,367.82 |
+    | **albeit**         |    15,742 |    0.04 |   1.00 |    4.80 |   1,365.55 |   0.02 |            2.31 |   5.45 | 69,662,736 |    15,745 |    15,058.29 |      683.71 |
+    | **rather**         |   363,581 |    0.04 |   1.00 |    4.74 |  28,124.19 |   0.02 |            1.53 |  25.52 | 69,662,736 |   364,070 |   348,191.32 |   15,389.68 |
+    | **sometimes**      |   141,910 |    0.04 |   1.00 |    4.55 |  10,971.56 |   0.02 |            1.53 |  15.95 | 69,662,736 |   142,099 |   135,901.44 |    6,008.56 |
+    | **also**           | 1,062,622 |    0.04 |   1.00 |    4.45 |  79,069.47 |   0.02 |            1.40 |  43.14 | 69,662,736 | 1,064,588 | 1,018,156.66 |   44,465.34 |
+    | **supposedly**     |    27,562 |    0.04 |   1.00 |    4.40 |   2,238.61 |   0.02 |            1.75 |   7.11 | 69,662,736 |    27,584 |    26,380.94 |    1,181.06 |
+    | **virtually**      |    86,032 |    0.04 |   1.00 |    4.32 |   6,583.57 |   0.02 |            1.50 |  12.39 | 69,662,736 |    86,156 |    82,398.36 |    3,633.64 |
+    | **now**            |   434,154 |    0.04 |   1.00 |    4.27 |  31,839.80 |   0.02 |            1.37 |  27.50 | 69,662,736 |   435,006 |   416,033.49 |   18,120.51 |
+    | **allegedly**      |    16,367 |    0.04 |   1.00 |    4.06 |   1,329.75 |   0.02 |            1.74 |   5.48 | 69,662,736 |    16,380 |    15,665.60 |      701.40 |
+    | **most**           | 7,137,718 |    0.05 |   1.00 |    4.03 | 521,448.58 |   0.02 |            1.27 | 109.64 | 69,662,736 | 7,156,931 | 6,844,785.94 |  292,932.06 |
+    | **still**          |   772,221 |    0.04 |   1.00 |    3.99 |  54,106.56 |   0.02 |            1.26 |  36.19 | 69,662,736 |   774,186 |   740,420.36 |   31,800.64 |
+    | **understandably** |    12,295 |    0.04 |   1.00 |    3.96 |   1,013.37 |   0.02 |            1.82 |   4.77 | 69,662,736 |    12,303 |    11,766.41 |      528.59 |
+    | **admittedly**     |    12,587 |    0.04 |   1.00 |    3.86 |   1,022.59 |   0.02 |            1.74 |   4.81 | 69,662,736 |    12,597 |    12,047.59 |      539.41 |
+    | **undoubtedly**    |    11,657 |    0.04 |   1.00 |    3.81 |     949.13 |   0.02 |            1.75 |   4.63 | 69,662,736 |    11,666 |    11,157.20 |      499.81 |
+    | **presumably**     |     7,308 |    0.04 |   1.00 |    3.69 |     617.82 |   0.02 |            1.98 |   3.69 | 69,662,736 |     7,311 |     6,992.14 |      315.86 |
+    | **highly**         |   733,697 |    0.04 |   1.00 |    3.64 |  48,462.47 |   0.02 |            1.15 |  34.67 | 69,662,736 |   736,102 |   703,997.37 |   29,699.63 |
+    | **hopefully**      |     7,183 |    0.04 |   1.00 |    3.45 |     589.29 |   0.02 |            1.78 |   3.64 | 69,662,736 |     7,188 |     6,874.50 |      308.50 |
+    | **extremely**      |   913,707 |    0.04 |   1.00 |    3.25 |  55,385.18 |   0.02 |            1.02 |  37.66 | 69,662,736 |   917,735 |   877,708.56 |   35,998.44 |
+    | **less**           | 1,156,675 |    0.03 |   0.99 |    1.90 |  40,981.00 |   0.01 |            0.60 |  34.93 | 69,662,736 | 1,170,138 | 1,119,103.16 |   37,571.83 |
+    | **more**           | 8,595,325 |    0.03 |   0.98 |    1.26 | 185,410.35 |   0.01 |            0.42 |  75.02 | 69,662,736 | 8,757,314 | 8,375,369.24 |  219,955.76 |
+    | **very**           | 9,065,101 |    0.03 |   0.98 |    1.10 | 163,181.02 |   0.01 |            0.37 |  71.02 | 69,662,736 | 9,254,924 | 8,851,276.29 |  213,824.71 |
     
 
 
@@ -405,37 +446,37 @@ show_top_positive(setdiff_adv, k=15)
 
 Total Tokens in dataset: $N = 72,839,589$
 
-|                    |          `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |    `t` |          `f1` |         `f2` |      `exp_f` |   `unexp_f` |
-|:-------------------|-------------:|--------:|-------:|--------:|-----------:|----------------:|-------:|--------------:|-------------:|-------------:|------------:|
-| **increasingly**   |   374,465.00 |    0.04 |   1.00 |    7.03 |  32,549.25 |            2.37 |  26.58 | 69,662,736.00 |   374,538.00 |   358,202.76 |   16,262.24 |
-| **relatively**     |   583,426.00 |    0.04 |   1.00 |    5.96 |  48,820.59 |            1.93 |  32.92 | 69,662,736.00 |   583,744.00 |   558,284.37 |   25,141.63 |
-| **almost**         |   434,507.00 |    0.04 |   1.00 |    5.26 |  35,003.16 |            1.70 |  28.17 | 69,662,736.00 |   434,904.00 |   415,935.94 |   18,571.07 |
-| **mostly**         |   199,883.00 |    0.04 |   1.00 |    5.09 |  16,071.00 |            1.70 |  19.11 | 69,662,736.00 |   200,066.00 |   191,340.25 |    8,542.75 |
-| **seemingly**      |   161,276.00 |    0.04 |   1.00 |    5.03 |  12,968.22 |            1.70 |  17.17 | 69,662,736.00 |   161,423.00 |   154,382.64 |    6,893.36 |
-| **fairly**         |   371,923.00 |    0.04 |   1.00 |    4.97 |  29,366.08 |            1.61 |  25.94 | 69,662,736.00 |   372,340.00 |   356,100.62 |   15,822.38 |
-| **pretty**         | 1,511,615.00 |    0.04 |   1.00 |    4.96 | 118,512.77 |            1.56 |  52.10 | 69,662,736.00 | 1,513,571.00 | 1,447,557.55 |   64,057.45 |
-| **largely**        |   173,667.00 |    0.04 |   1.00 |    4.87 |  13,763.38 |            1.63 |  17.75 | 69,662,736.00 |   173,852.00 |   166,269.55 |    7,397.45 |
-| **partly**         |    78,775.00 |    0.04 |   1.00 |    4.81 |   6,336.61 |            1.70 |  12.00 | 69,662,736.00 |    78,846.00 |    75,407.18 |    3,367.82 |
-| **albeit**         |    15,742.00 |    0.04 |   1.00 |    4.80 |   1,365.55 |            2.31 |   5.45 | 69,662,736.00 |    15,745.00 |    15,058.29 |      683.71 |
-| **rather**         |   363,581.00 |    0.04 |   1.00 |    4.74 |  28,124.19 |            1.53 |  25.52 | 69,662,736.00 |   364,070.00 |   348,191.32 |   15,389.68 |
-| **sometimes**      |   141,910.00 |    0.04 |   1.00 |    4.55 |  10,971.56 |            1.53 |  15.95 | 69,662,736.00 |   142,099.00 |   135,901.44 |    6,008.56 |
-| **also**           | 1,062,622.00 |    0.04 |   1.00 |    4.45 |  79,069.47 |            1.40 |  43.14 | 69,662,736.00 | 1,064,588.00 | 1,018,156.66 |   44,465.34 |
-| **supposedly**     |    27,562.00 |    0.04 |   1.00 |    4.40 |   2,238.61 |            1.75 |   7.11 | 69,662,736.00 |    27,584.00 |    26,380.94 |    1,181.06 |
-| **virtually**      |    86,032.00 |    0.04 |   1.00 |    4.32 |   6,583.57 |            1.50 |  12.39 | 69,662,736.00 |    86,156.00 |    82,398.36 |    3,633.64 |
-| **now**            |   434,154.00 |    0.04 |   1.00 |    4.27 |  31,839.80 |            1.37 |  27.50 | 69,662,736.00 |   435,006.00 |   416,033.49 |   18,120.51 |
-| **allegedly**      |    16,367.00 |    0.04 |   1.00 |    4.06 |   1,329.75 |            1.74 |   5.48 | 69,662,736.00 |    16,380.00 |    15,665.60 |      701.40 |
-| **most**           | 7,137,718.00 |    0.05 |   1.00 |    4.03 | 521,448.58 |            1.27 | 109.64 | 69,662,736.00 | 7,156,931.00 | 6,844,785.94 |  292,932.06 |
-| **still**          |   772,221.00 |    0.04 |   1.00 |    3.99 |  54,106.56 |            1.26 |  36.19 | 69,662,736.00 |   774,186.00 |   740,420.36 |   31,800.64 |
-| **understandably** |    12,295.00 |    0.04 |   1.00 |    3.96 |   1,013.37 |            1.82 |   4.77 | 69,662,736.00 |    12,303.00 |    11,766.41 |      528.59 |
-| **admittedly**     |    12,587.00 |    0.04 |   1.00 |    3.86 |   1,022.59 |            1.74 |   4.81 | 69,662,736.00 |    12,597.00 |    12,047.59 |      539.41 |
-| **undoubtedly**    |    11,657.00 |    0.04 |   1.00 |    3.81 |     949.13 |            1.75 |   4.63 | 69,662,736.00 |    11,666.00 |    11,157.20 |      499.81 |
-| **presumably**     |     7,308.00 |    0.04 |   1.00 |    3.69 |     617.82 |            1.98 |   3.69 | 69,662,736.00 |     7,311.00 |     6,992.14 |      315.86 |
-| **highly**         |   733,697.00 |    0.04 |   1.00 |    3.64 |  48,462.47 |            1.15 |  34.67 | 69,662,736.00 |   736,102.00 |   703,997.37 |   29,699.63 |
-| **hopefully**      |     7,183.00 |    0.04 |   1.00 |    3.45 |     589.29 |            1.78 |   3.64 | 69,662,736.00 |     7,188.00 |     6,874.50 |      308.50 |
-| **extremely**      |   913,707.00 |    0.04 |   1.00 |    3.25 |  55,385.18 |            1.02 |  37.66 | 69,662,736.00 |   917,735.00 |   877,708.56 |   35,998.44 |
-| **less**           | 1,156,675.00 |    0.03 |   0.99 |    1.90 |  40,981.00 |            0.60 |  34.93 | 69,662,736.00 | 1,170,138.00 | 1,119,103.16 |   37,571.83 |
-| **more**           | 8,595,325.00 |    0.03 |   0.98 |    1.26 | 185,410.35 |            0.42 |  75.02 | 69,662,736.00 | 8,757,314.00 | 8,375,369.24 |  219,955.76 |
-| **very**           | 9,065,101.00 |    0.03 |   0.98 |    1.10 | 163,181.02 |            0.37 |  71.02 | 69,662,736.00 | 9,254,924.00 | 8,851,276.29 |  213,824.71 |
+|                    |       `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `MI` |   `odds_r_disc` |    `t` |       `f1` |      `f2` |      `exp_f` |   `unexp_f` |
+|:-------------------|----------:|--------:|-------:|--------:|-----------:|-------:|----------------:|-------:|-----------:|----------:|-------------:|------------:|
+| **increasingly**   |   374,465 |    0.04 |   1.00 |    7.03 |  32,549.25 |   0.02 |            2.37 |  26.58 | 69,662,736 |   374,538 |   358,202.76 |   16,262.24 |
+| **relatively**     |   583,426 |    0.04 |   1.00 |    5.96 |  48,820.59 |   0.02 |            1.93 |  32.92 | 69,662,736 |   583,744 |   558,284.37 |   25,141.63 |
+| **almost**         |   434,507 |    0.04 |   1.00 |    5.26 |  35,003.16 |   0.02 |            1.70 |  28.17 | 69,662,736 |   434,904 |   415,935.94 |   18,571.07 |
+| **mostly**         |   199,883 |    0.04 |   1.00 |    5.09 |  16,071.00 |   0.02 |            1.70 |  19.11 | 69,662,736 |   200,066 |   191,340.25 |    8,542.75 |
+| **seemingly**      |   161,276 |    0.04 |   1.00 |    5.03 |  12,968.22 |   0.02 |            1.70 |  17.17 | 69,662,736 |   161,423 |   154,382.64 |    6,893.36 |
+| **fairly**         |   371,923 |    0.04 |   1.00 |    4.97 |  29,366.08 |   0.02 |            1.61 |  25.94 | 69,662,736 |   372,340 |   356,100.62 |   15,822.38 |
+| **pretty**         | 1,511,615 |    0.04 |   1.00 |    4.96 | 118,512.77 |   0.02 |            1.56 |  52.10 | 69,662,736 | 1,513,571 | 1,447,557.55 |   64,057.45 |
+| **largely**        |   173,667 |    0.04 |   1.00 |    4.87 |  13,763.38 |   0.02 |            1.63 |  17.75 | 69,662,736 |   173,852 |   166,269.55 |    7,397.45 |
+| **partly**         |    78,775 |    0.04 |   1.00 |    4.81 |   6,336.61 |   0.02 |            1.70 |  12.00 | 69,662,736 |    78,846 |    75,407.18 |    3,367.82 |
+| **albeit**         |    15,742 |    0.04 |   1.00 |    4.80 |   1,365.55 |   0.02 |            2.31 |   5.45 | 69,662,736 |    15,745 |    15,058.29 |      683.71 |
+| **rather**         |   363,581 |    0.04 |   1.00 |    4.74 |  28,124.19 |   0.02 |            1.53 |  25.52 | 69,662,736 |   364,070 |   348,191.32 |   15,389.68 |
+| **sometimes**      |   141,910 |    0.04 |   1.00 |    4.55 |  10,971.56 |   0.02 |            1.53 |  15.95 | 69,662,736 |   142,099 |   135,901.44 |    6,008.56 |
+| **also**           | 1,062,622 |    0.04 |   1.00 |    4.45 |  79,069.47 |   0.02 |            1.40 |  43.14 | 69,662,736 | 1,064,588 | 1,018,156.66 |   44,465.34 |
+| **supposedly**     |    27,562 |    0.04 |   1.00 |    4.40 |   2,238.61 |   0.02 |            1.75 |   7.11 | 69,662,736 |    27,584 |    26,380.94 |    1,181.06 |
+| **virtually**      |    86,032 |    0.04 |   1.00 |    4.32 |   6,583.57 |   0.02 |            1.50 |  12.39 | 69,662,736 |    86,156 |    82,398.36 |    3,633.64 |
+| **now**            |   434,154 |    0.04 |   1.00 |    4.27 |  31,839.80 |   0.02 |            1.37 |  27.50 | 69,662,736 |   435,006 |   416,033.49 |   18,120.51 |
+| **allegedly**      |    16,367 |    0.04 |   1.00 |    4.06 |   1,329.75 |   0.02 |            1.74 |   5.48 | 69,662,736 |    16,380 |    15,665.60 |      701.40 |
+| **most**           | 7,137,718 |    0.05 |   1.00 |    4.03 | 521,448.58 |   0.02 |            1.27 | 109.64 | 69,662,736 | 7,156,931 | 6,844,785.94 |  292,932.06 |
+| **still**          |   772,221 |    0.04 |   1.00 |    3.99 |  54,106.56 |   0.02 |            1.26 |  36.19 | 69,662,736 |   774,186 |   740,420.36 |   31,800.64 |
+| **understandably** |    12,295 |    0.04 |   1.00 |    3.96 |   1,013.37 |   0.02 |            1.82 |   4.77 | 69,662,736 |    12,303 |    11,766.41 |      528.59 |
+| **admittedly**     |    12,587 |    0.04 |   1.00 |    3.86 |   1,022.59 |   0.02 |            1.74 |   4.81 | 69,662,736 |    12,597 |    12,047.59 |      539.41 |
+| **undoubtedly**    |    11,657 |    0.04 |   1.00 |    3.81 |     949.13 |   0.02 |            1.75 |   4.63 | 69,662,736 |    11,666 |    11,157.20 |      499.81 |
+| **presumably**     |     7,308 |    0.04 |   1.00 |    3.69 |     617.82 |   0.02 |            1.98 |   3.69 | 69,662,736 |     7,311 |     6,992.14 |      315.86 |
+| **highly**         |   733,697 |    0.04 |   1.00 |    3.64 |  48,462.47 |   0.02 |            1.15 |  34.67 | 69,662,736 |   736,102 |   703,997.37 |   29,699.63 |
+| **hopefully**      |     7,183 |    0.04 |   1.00 |    3.45 |     589.29 |   0.02 |            1.78 |   3.64 | 69,662,736 |     7,188 |     6,874.50 |      308.50 |
+| **extremely**      |   913,707 |    0.04 |   1.00 |    3.25 |  55,385.18 |   0.02 |            1.02 |  37.66 | 69,662,736 |   917,735 |   877,708.56 |   35,998.44 |
+| **less**           | 1,156,675 |    0.03 |   0.99 |    1.90 |  40,981.00 |   0.01 |            0.60 |  34.93 | 69,662,736 | 1,170,138 | 1,119,103.16 |   37,571.83 |
+| **more**           | 8,595,325 |    0.03 |   0.98 |    1.26 | 185,410.35 |   0.01 |            0.42 |  75.02 | 69,662,736 | 8,757,314 | 8,375,369.24 |  219,955.76 |
+| **very**           | 9,065,101 |    0.03 |   0.98 |    1.10 | 163,181.02 |   0.01 |            0.37 |  71.02 | 69,662,736 | 9,254,924 | 8,851,276.29 |  213,824.71 |
 
 
 
@@ -449,34 +490,35 @@ show_top_positive(mirror_adv, k=15)
     
     Total Tokens in dataset: $N = 1,701,929$
     
-    |                  |        `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `odds_r_disc` |   `t` |         `f1` |       `f2` |    `exp_f` |   `unexp_f` |
-    |:-----------------|-----------:|--------:|-------:|--------:|----------:|----------------:|------:|-------------:|-----------:|-----------:|------------:|
-    | **pretty**       |  24,593.00 |    0.17 |   0.99 |    4.71 |  8,175.85 |            1.61 | 26.21 | 1,410,172.00 |  24,720.00 |  20,482.32 |    4,110.68 |
-    | **rather**       |   8,383.00 |    0.17 |   1.00 |    4.62 |  2,853.50 |            1.73 | 15.41 | 1,410,172.00 |   8,415.00 |   6,972.44 |    1,410.56 |
-    | **plain**        |   5,062.00 |    0.17 |   1.00 |    4.44 |  1,739.08 |            1.78 | 12.00 | 1,410,172.00 |   5,079.00 |   4,208.32 |      853.68 |
-    | **fairly**       |   5,703.00 |    0.17 |   1.00 |    4.32 |  1,922.67 |            1.68 | 12.68 | 1,410,172.00 |   5,727.00 |   4,745.24 |      957.76 |
-    | **somewhat**     |   4,482.00 |    0.17 |   1.00 |    4.31 |  1,532.10 |            1.75 | 11.28 | 1,410,172.00 |   4,498.00 |   3,726.92 |      755.08 |
-    | **otherwise**    |   6,857.00 |    0.17 |   0.99 |    4.06 |  2,220.20 |            1.53 | 13.78 | 1,410,172.00 |   6,899.00 |   5,716.32 |    1,140.68 |
-    | **maybe**        |   2,672.00 |    0.17 |   1.00 |    3.98 |    917.02 |            1.77 |  8.72 | 1,410,172.00 |   2,681.00 |   2,221.40 |      450.60 |
-    | **downright**    |   4,726.00 |    0.17 |   0.99 |    3.88 |  1,528.70 |            1.52 | 11.44 | 1,410,172.00 |   4,755.00 |   3,939.86 |      786.14 |
-    | **already**      |   4,275.00 |    0.17 |   0.99 |    3.80 |  1,377.50 |            1.51 | 10.87 | 1,410,172.00 |   4,302.00 |   3,564.52 |      710.48 |
-    | **relatively**   |   5,307.00 |    0.16 |   0.99 |    3.79 |  1,681.55 |            1.46 | 12.06 | 1,410,172.00 |   5,345.00 |   4,428.72 |      878.28 |
-    | **almost**       |   5,247.00 |    0.16 |   0.99 |    3.70 |  1,640.95 |            1.42 | 11.95 | 1,410,172.00 |   5,288.00 |   4,381.49 |      865.51 |
-    | **equally**      |   7,316.00 |    0.16 |   0.99 |    3.58 |  2,195.55 |            1.32 | 13.96 | 1,410,172.00 |   7,389.00 |   6,122.32 |    1,193.68 |
-    | **perhaps**      |   3,526.00 |    0.16 |   0.99 |    3.52 |  1,105.47 |            1.42 |  9.80 | 1,410,172.00 |   3,553.00 |   2,943.92 |      582.08 |
-    | **highly**       |   9,134.00 |    0.16 |   0.99 |    3.26 |  2,535.26 |            1.16 | 15.26 | 1,410,172.00 |   9,264.00 |   7,675.90 |    1,458.10 |
-    | **slightly**     |   7,559.00 |    0.16 |   0.99 |    3.22 |  2,104.79 |            1.17 | 13.89 | 1,410,172.00 |   7,665.00 |   6,351.01 |    1,207.99 |
-    | **extremely**    |  17,231.00 |    0.16 |   0.98 |    3.14 |  4,506.02 |            1.07 | 20.57 | 1,410,172.00 |  17,537.00 |  14,530.68 |    2,700.32 |
-    | **also**         |   6,878.00 |    0.16 |   0.99 |    3.12 |  1,887.00 |            1.14 | 13.20 | 1,410,172.00 |   6,980.00 |   5,783.44 |    1,094.56 |
-    | **simply**       |   7,799.00 |    0.16 |   0.98 |    3.01 |  2,062.00 |            1.09 | 13.90 | 1,410,172.00 |   7,931.00 |   6,571.41 |    1,227.59 |
-    | **still**        |  13,308.00 |    0.15 |   0.98 |    2.96 |  3,364.12 |            1.03 | 17.90 | 1,410,172.00 |  13,569.00 |  11,242.90 |    2,065.10 |
-    | **surprisingly** |   1,424.00 |    0.16 |   0.99 |    2.93 |    445.52 |            1.41 |  6.23 | 1,410,172.00 |   1,435.00 |   1,189.00 |      235.00 |
-    | **incredibly**   |   8,831.00 |    0.15 |   0.98 |    2.90 |  2,251.34 |            1.04 | 14.63 | 1,410,172.00 |   8,999.00 |   7,456.33 |    1,374.67 |
-    | **sometimes**    |   1,358.00 |    0.16 |   0.99 |    2.86 |    421.71 |            1.39 |  6.07 | 1,410,172.00 |   1,369.00 |   1,134.32 |      223.68 |
-    | **just**         |  27,910.00 |    0.15 |   0.97 |    2.68 |  6,262.48 |            0.89 | 24.91 | 1,410,172.00 |  28,662.00 |  23,748.55 |    4,161.45 |
-    | **strangely**    |     705.00 |    0.16 |   0.99 |    2.30 |    217.12 |            1.35 |  4.36 | 1,410,172.00 |     711.00 |     589.12 |      115.88 |
-    | **even**         |  59,871.00 |    0.13 |   0.95 |    1.99 |  9,679.52 |            0.65 | 32.34 | 1,410,172.00 |  62,709.00 |  51,958.97 |    7,912.03 |
-    | **very**         | 176,341.00 |    0.14 |   0.95 |    1.95 | 28,647.86 |            0.66 | 54.40 | 1,410,172.00 | 185,255.00 | 153,497.25 |   22,843.75 |
+    |                 |     `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |      `f1` |    `f2` |    `exp_f` |   `unexp_f` |
+    |:----------------|--------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-----------:|------------:|
+    | **pretty**      |  24,593 |    0.17 |   0.99 |    4.71 |  8,175.85 |   0.08 |            1.61 | 26.21 | 1,410,172 |  24,720 |  20,482.32 |    4,110.68 |
+    | **rather**      |   8,383 |    0.17 |   1.00 |    4.62 |  2,853.50 |   0.08 |            1.73 | 15.41 | 1,410,172 |   8,415 |   6,972.44 |    1,410.56 |
+    | **plain**       |   5,062 |    0.17 |   1.00 |    4.44 |  1,739.08 |   0.08 |            1.78 | 12.00 | 1,410,172 |   5,079 |   4,208.32 |      853.68 |
+    | **fairly**      |   5,703 |    0.17 |   1.00 |    4.32 |  1,922.67 |   0.08 |            1.68 | 12.68 | 1,410,172 |   5,727 |   4,745.24 |      957.76 |
+    | **somewhat**    |   4,482 |    0.17 |   1.00 |    4.31 |  1,532.10 |   0.08 |            1.75 | 11.28 | 1,410,172 |   4,498 |   3,726.92 |      755.08 |
+    | **otherwise**   |   6,857 |    0.17 |   0.99 |    4.06 |  2,220.20 |   0.08 |            1.53 | 13.78 | 1,410,172 |   6,899 |   5,716.32 |    1,140.68 |
+    | **maybe**       |   2,672 |    0.17 |   1.00 |    3.98 |    917.02 |   0.08 |            1.77 |  8.72 | 1,410,172 |   2,681 |   2,221.40 |      450.60 |
+    | **downright**   |   4,726 |    0.17 |   0.99 |    3.88 |  1,528.70 |   0.08 |            1.52 | 11.44 | 1,410,172 |   4,755 |   3,939.86 |      786.14 |
+    | **already**     |   4,275 |    0.17 |   0.99 |    3.80 |  1,377.50 |   0.08 |            1.51 | 10.87 | 1,410,172 |   4,302 |   3,564.52 |      710.48 |
+    | **relatively**  |   5,307 |    0.16 |   0.99 |    3.79 |  1,681.55 |   0.08 |            1.46 | 12.06 | 1,410,172 |   5,345 |   4,428.72 |      878.28 |
+    | **almost**      |   5,247 |    0.16 |   0.99 |    3.70 |  1,640.95 |   0.08 |            1.42 | 11.95 | 1,410,172 |   5,288 |   4,381.49 |      865.51 |
+    | **equally**     |   7,316 |    0.16 |   0.99 |    3.58 |  2,195.55 |   0.08 |            1.32 | 13.96 | 1,410,172 |   7,389 |   6,122.32 |    1,193.68 |
+    | **perhaps**     |   3,526 |    0.16 |   0.99 |    3.52 |  1,105.47 |   0.08 |            1.42 |  9.80 | 1,410,172 |   3,553 |   2,943.92 |      582.08 |
+    | **highly**      |   9,134 |    0.16 |   0.99 |    3.26 |  2,535.26 |   0.08 |            1.16 | 15.26 | 1,410,172 |   9,264 |   7,675.90 |    1,458.10 |
+    | **slightly**    |   7,559 |    0.16 |   0.99 |    3.22 |  2,104.79 |   0.08 |            1.17 | 13.89 | 1,410,172 |   7,665 |   6,351.01 |    1,207.99 |
+    | **extremely**   |  17,231 |    0.16 |   0.98 |    3.14 |  4,506.02 |   0.07 |            1.07 | 20.57 | 1,410,172 |  17,537 |  14,530.68 |    2,700.32 |
+    | **also**        |   6,878 |    0.16 |   0.99 |    3.12 |  1,887.00 |   0.08 |            1.14 | 13.20 | 1,410,172 |   6,980 |   5,783.44 |    1,094.56 |
+    | **simply**      |   7,799 |    0.16 |   0.98 |    3.01 |  2,062.00 |   0.07 |            1.09 | 13.90 | 1,410,172 |   7,931 |   6,571.41 |    1,227.59 |
+    | **still**       |  13,308 |    0.15 |   0.98 |    2.96 |  3,364.12 |   0.07 |            1.03 | 17.90 | 1,410,172 |  13,569 |  11,242.90 |    2,065.10 |
+    | **incredibly**  |   8,831 |    0.15 |   0.98 |    2.90 |  2,251.34 |   0.07 |            1.04 | 14.63 | 1,410,172 |   8,999 |   7,456.33 |    1,374.67 |
+    | **just**        |  27,910 |    0.15 |   0.97 |    2.68 |  6,262.48 |   0.07 |            0.89 | 24.91 | 1,410,172 |  28,662 |  23,748.55 |    4,161.45 |
+    | **even**        |  59,871 |    0.13 |   0.95 |    1.99 |  9,679.52 |   0.06 |            0.65 | 32.34 | 1,410,172 |  62,709 |  51,958.97 |    7,912.03 |
+    | **eerily**      |     402 |    0.17 |   1.00 |    1.96 |    133.04 |   0.08 |            1.52 |  3.35 | 1,410,172 |     404 |     334.74 |       67.26 |
+    | **very**        | 176,341 |    0.14 |   0.95 |    1.95 | 28,647.86 |   0.06 |            0.66 | 54.40 | 1,410,172 | 185,255 | 153,497.25 |   22,843.75 |
+    | **lightly**     |     399 |    0.17 |   1.00 |    1.95 |    131.94 |   0.08 |            1.52 |  3.34 | 1,410,172 |     401 |     332.26 |       66.74 |
+    | **darn**        |     439 |    0.16 |   0.99 |    1.94 |    139.78 |   0.08 |            1.41 |  3.47 | 1,410,172 |     442 |     366.23 |       72.77 |
+    | **chronically** |     325 |    0.17 |   0.99 |    1.65 |    104.92 |   0.08 |            1.43 |  3.00 | 1,410,172 |     327 |     270.94 |       54.06 |
     
 
 
@@ -484,178 +526,179 @@ show_top_positive(mirror_adv, k=15)
 
 Total Tokens in dataset: $N = 1,701,929$
 
-|                  |        `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `odds_r_disc` |   `t` |         `f1` |       `f2` |    `exp_f` |   `unexp_f` |
-|:-----------------|-----------:|--------:|-------:|--------:|----------:|----------------:|------:|-------------:|-----------:|-----------:|------------:|
-| **pretty**       |  24,593.00 |    0.17 |   0.99 |    4.71 |  8,175.85 |            1.61 | 26.21 | 1,410,172.00 |  24,720.00 |  20,482.32 |    4,110.68 |
-| **rather**       |   8,383.00 |    0.17 |   1.00 |    4.62 |  2,853.50 |            1.73 | 15.41 | 1,410,172.00 |   8,415.00 |   6,972.44 |    1,410.56 |
-| **plain**        |   5,062.00 |    0.17 |   1.00 |    4.44 |  1,739.08 |            1.78 | 12.00 | 1,410,172.00 |   5,079.00 |   4,208.32 |      853.68 |
-| **fairly**       |   5,703.00 |    0.17 |   1.00 |    4.32 |  1,922.67 |            1.68 | 12.68 | 1,410,172.00 |   5,727.00 |   4,745.24 |      957.76 |
-| **somewhat**     |   4,482.00 |    0.17 |   1.00 |    4.31 |  1,532.10 |            1.75 | 11.28 | 1,410,172.00 |   4,498.00 |   3,726.92 |      755.08 |
-| **otherwise**    |   6,857.00 |    0.17 |   0.99 |    4.06 |  2,220.20 |            1.53 | 13.78 | 1,410,172.00 |   6,899.00 |   5,716.32 |    1,140.68 |
-| **maybe**        |   2,672.00 |    0.17 |   1.00 |    3.98 |    917.02 |            1.77 |  8.72 | 1,410,172.00 |   2,681.00 |   2,221.40 |      450.60 |
-| **downright**    |   4,726.00 |    0.17 |   0.99 |    3.88 |  1,528.70 |            1.52 | 11.44 | 1,410,172.00 |   4,755.00 |   3,939.86 |      786.14 |
-| **already**      |   4,275.00 |    0.17 |   0.99 |    3.80 |  1,377.50 |            1.51 | 10.87 | 1,410,172.00 |   4,302.00 |   3,564.52 |      710.48 |
-| **relatively**   |   5,307.00 |    0.16 |   0.99 |    3.79 |  1,681.55 |            1.46 | 12.06 | 1,410,172.00 |   5,345.00 |   4,428.72 |      878.28 |
-| **almost**       |   5,247.00 |    0.16 |   0.99 |    3.70 |  1,640.95 |            1.42 | 11.95 | 1,410,172.00 |   5,288.00 |   4,381.49 |      865.51 |
-| **equally**      |   7,316.00 |    0.16 |   0.99 |    3.58 |  2,195.55 |            1.32 | 13.96 | 1,410,172.00 |   7,389.00 |   6,122.32 |    1,193.68 |
-| **perhaps**      |   3,526.00 |    0.16 |   0.99 |    3.52 |  1,105.47 |            1.42 |  9.80 | 1,410,172.00 |   3,553.00 |   2,943.92 |      582.08 |
-| **highly**       |   9,134.00 |    0.16 |   0.99 |    3.26 |  2,535.26 |            1.16 | 15.26 | 1,410,172.00 |   9,264.00 |   7,675.90 |    1,458.10 |
-| **slightly**     |   7,559.00 |    0.16 |   0.99 |    3.22 |  2,104.79 |            1.17 | 13.89 | 1,410,172.00 |   7,665.00 |   6,351.01 |    1,207.99 |
-| **extremely**    |  17,231.00 |    0.16 |   0.98 |    3.14 |  4,506.02 |            1.07 | 20.57 | 1,410,172.00 |  17,537.00 |  14,530.68 |    2,700.32 |
-| **also**         |   6,878.00 |    0.16 |   0.99 |    3.12 |  1,887.00 |            1.14 | 13.20 | 1,410,172.00 |   6,980.00 |   5,783.44 |    1,094.56 |
-| **simply**       |   7,799.00 |    0.16 |   0.98 |    3.01 |  2,062.00 |            1.09 | 13.90 | 1,410,172.00 |   7,931.00 |   6,571.41 |    1,227.59 |
-| **still**        |  13,308.00 |    0.15 |   0.98 |    2.96 |  3,364.12 |            1.03 | 17.90 | 1,410,172.00 |  13,569.00 |  11,242.90 |    2,065.10 |
-| **surprisingly** |   1,424.00 |    0.16 |   0.99 |    2.93 |    445.52 |            1.41 |  6.23 | 1,410,172.00 |   1,435.00 |   1,189.00 |      235.00 |
-| **incredibly**   |   8,831.00 |    0.15 |   0.98 |    2.90 |  2,251.34 |            1.04 | 14.63 | 1,410,172.00 |   8,999.00 |   7,456.33 |    1,374.67 |
-| **sometimes**    |   1,358.00 |    0.16 |   0.99 |    2.86 |    421.71 |            1.39 |  6.07 | 1,410,172.00 |   1,369.00 |   1,134.32 |      223.68 |
-| **just**         |  27,910.00 |    0.15 |   0.97 |    2.68 |  6,262.48 |            0.89 | 24.91 | 1,410,172.00 |  28,662.00 |  23,748.55 |    4,161.45 |
-| **strangely**    |     705.00 |    0.16 |   0.99 |    2.30 |    217.12 |            1.35 |  4.36 | 1,410,172.00 |     711.00 |     589.12 |      115.88 |
-| **even**         |  59,871.00 |    0.13 |   0.95 |    1.99 |  9,679.52 |            0.65 | 32.34 | 1,410,172.00 |  62,709.00 |  51,958.97 |    7,912.03 |
-| **very**         | 176,341.00 |    0.14 |   0.95 |    1.95 | 28,647.86 |            0.66 | 54.40 | 1,410,172.00 | 185,255.00 | 153,497.25 |   22,843.75 |
-
-
+|                 |     `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |      `f1` |    `f2` |    `exp_f` |   `unexp_f` |
+|:----------------|--------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|----------:|--------:|-----------:|------------:|
+| **pretty**      |  24,593 |    0.17 |   0.99 |    4.71 |  8,175.85 |   0.08 |            1.61 | 26.21 | 1,410,172 |  24,720 |  20,482.32 |    4,110.68 |
+| **rather**      |   8,383 |    0.17 |   1.00 |    4.62 |  2,853.50 |   0.08 |            1.73 | 15.41 | 1,410,172 |   8,415 |   6,972.44 |    1,410.56 |
+| **plain**       |   5,062 |    0.17 |   1.00 |    4.44 |  1,739.08 |   0.08 |            1.78 | 12.00 | 1,410,172 |   5,079 |   4,208.32 |      853.68 |
+| **fairly**      |   5,703 |    0.17 |   1.00 |    4.32 |  1,922.67 |   0.08 |            1.68 | 12.68 | 1,410,172 |   5,727 |   4,745.24 |      957.76 |
+| **somewhat**    |   4,482 |    0.17 |   1.00 |    4.31 |  1,532.10 |   0.08 |            1.75 | 11.28 | 1,410,172 |   4,498 |   3,726.92 |      755.08 |
+| **otherwise**   |   6,857 |    0.17 |   0.99 |    4.06 |  2,220.20 |   0.08 |            1.53 | 13.78 | 1,410,172 |   6,899 |   5,716.32 |    1,140.68 |
+| **maybe**       |   2,672 |    0.17 |   1.00 |    3.98 |    917.02 |   0.08 |            1.77 |  8.72 | 1,410,172 |   2,681 |   2,221.40 |      450.60 |
+| **downright**   |   4,726 |    0.17 |   0.99 |    3.88 |  1,528.70 |   0.08 |            1.52 | 11.44 | 1,410,172 |   4,755 |   3,939.86 |      786.14 |
+| **already**     |   4,275 |    0.17 |   0.99 |    3.80 |  1,377.50 |   0.08 |            1.51 | 10.87 | 1,410,172 |   4,302 |   3,564.52 |      710.48 |
+| **relatively**  |   5,307 |    0.16 |   0.99 |    3.79 |  1,681.55 |   0.08 |            1.46 | 12.06 | 1,410,172 |   5,345 |   4,428.72 |      878.28 |
+| **almost**      |   5,247 |    0.16 |   0.99 |    3.70 |  1,640.95 |   0.08 |            1.42 | 11.95 | 1,410,172 |   5,288 |   4,381.49 |      865.51 |
+| **equally**     |   7,316 |    0.16 |   0.99 |    3.58 |  2,195.55 |   0.08 |            1.32 | 13.96 | 1,410,172 |   7,389 |   6,122.32 |    1,193.68 |
+| **perhaps**     |   3,526 |    0.16 |   0.99 |    3.52 |  1,105.47 |   0.08 |            1.42 |  9.80 | 1,410,172 |   3,553 |   2,943.92 |      582.08 |
+| **highly**      |   9,134 |    0.16 |   0.99 |    3.26 |  2,535.26 |   0.08 |            1.16 | 15.26 | 1,410,172 |   9,264 |   7,675.90 |    1,458.10 |
+| **slightly**    |   7,559 |    0.16 |   0.99 |    3.22 |  2,104.79 |   0.08 |            1.17 | 13.89 | 1,410,172 |   7,665 |   6,351.01 |    1,207.99 |
+| **extremely**   |  17,231 |    0.16 |   0.98 |    3.14 |  4,506.02 |   0.07 |            1.07 | 20.57 | 1,410,172 |  17,537 |  14,530.68 |    2,700.32 |
+| **also**        |   6,878 |    0.16 |   0.99 |    3.12 |  1,887.00 |   0.08 |            1.14 | 13.20 | 1,410,172 |   6,980 |   5,783.44 |    1,094.56 |
+| **simply**      |   7,799 |    0.16 |   0.98 |    3.01 |  2,062.00 |   0.07 |            1.09 | 13.90 | 1,410,172 |   7,931 |   6,571.41 |    1,227.59 |
+| **still**       |  13,308 |    0.15 |   0.98 |    2.96 |  3,364.12 |   0.07 |            1.03 | 17.90 | 1,410,172 |  13,569 |  11,242.90 |    2,065.10 |
+| **incredibly**  |   8,831 |    0.15 |   0.98 |    2.90 |  2,251.34 |   0.07 |            1.04 | 14.63 | 1,410,172 |   8,999 |   7,456.33 |    1,374.67 |
+| **just**        |  27,910 |    0.15 |   0.97 |    2.68 |  6,262.48 |   0.07 |            0.89 | 24.91 | 1,410,172 |  28,662 |  23,748.55 |    4,161.45 |
+| **even**        |  59,871 |    0.13 |   0.95 |    1.99 |  9,679.52 |   0.06 |            0.65 | 32.34 | 1,410,172 |  62,709 |  51,958.97 |    7,912.03 |
+| **eerily**      |     402 |    0.17 |   1.00 |    1.96 |    133.04 |   0.08 |            1.52 |  3.35 | 1,410,172 |     404 |     334.74 |       67.26 |
+| **very**        | 176,341 |    0.14 |   0.95 |    1.95 | 28,647.86 |   0.06 |            0.66 | 54.40 | 1,410,172 | 185,255 | 153,497.25 |   22,843.75 |
+| **lightly**     |     399 |    0.17 |   1.00 |    1.95 |    131.94 |   0.08 |            1.52 |  3.34 | 1,410,172 |     401 |     332.26 |       66.74 |
+| **darn**        |     439 |    0.16 |   0.99 |    1.94 |    139.78 |   0.08 |            1.41 |  3.47 | 1,410,172 |     442 |     366.23 |       72.77 |
+| **chronically** |     325 |    0.17 |   0.99 |    1.65 |    104.92 |   0.08 |            1.43 |  3.00 | 1,410,172 |     327 |     270.94 |       54.06 |
 
 ## Compile top NEG~adverb associations across both approximation methods
 
 ### Define the functions
 
+[_moved to `./am_notebooks.py`_]
+
 
 ```python
-def load_backup(
-                adv_set:set,
-    lower_floor: int = None,
-                loaded_path: Path = adv_am_paths['RBdirect'], 
-                ) -> pd.DataFrame:
-    lower_floor = lower_floor or round(SET_FLOOR//3, (-2 if SET_FLOOR//3 > 100 else -1))
-    located_paths = tuple(loaded_path.parent.glob(
-        f'{TAG}*min{lower_floor}x*parq'))
-    try:
-        backup_path = located_paths[0] 
-    except IndexError: 
-        try:
-            backup_path = tuple(loaded_path.parent.glob(f'*{TAG}*min5x*parq'))[0]
-        except IndexError as e: 
-            raise FileNotFoundError('Error. Backup data not found. [in fill_empties()]') from e
+# def load_backup(
+#                 adv_set:set,
+#     lower_floor: int = None,
+#                 loaded_path: Path = adv_am_paths['RBdirect'], 
+#                 ) -> pd.DataFrame:
+#     lower_floor = lower_floor or round(SET_FLOOR//3, (-2 if SET_FLOOR//3 > 100 else -1))
+#     located_paths = tuple(loaded_path.parent.glob(
+#         f'{TAG}*min{lower_floor}x*parq'))
+#     try:
+#         backup_path = located_paths[0] 
+#     except IndexError: 
+#         try:
+#             backup_path = tuple(loaded_path.parent.glob(f'*{TAG}*min5x*parq'))[0]
+#         except IndexError as e: 
+#             raise FileNotFoundError('Error. Backup data not found. [in fill_empties()]') from e
     
-    backup_df = pd.read_parquet(backup_path, columns=FOCUS, filters=[('l2', 'in', adv_set)])
+#     backup_df = pd.read_parquet(backup_path, columns=FOCUS, filters=[('l2', 'in', adv_set)])
 
-    backup_df = backup_df.filter(like='NEG', axis=0).reset_index().set_index('l2')
-    backup_df.index.name = 'adv'
+#     backup_df = backup_df.filter(like='NEG', axis=0).reset_index().set_index('l2')
+#     backup_df.index.name = 'adv'
     
-    return backup_df
+#     return backup_df
 
 
 
-def uncat(df):
-    cats = df.select_dtypes('category').columns
-    df[cats] = df[cats].astype('string')
-    # print(df.dtypes)
-    return df, cats
+# def uncat(df):
+#     cats = df.select_dtypes('category').columns
+#     df[cats] = df[cats].astype('string')
+#     # print(df.dtypes)
+#     return df, cats
 
 
-def fill_empties(name_1, name_2, both, loaded_paths, adv_set):
-    for name in (name_1, name_2):
-        name = name.strip('_')
-        path = loaded_paths['RBdirect'] if name == 'SET' else loaded_paths['mirror']
-        if any(both[f'f_{name}'].isna()):
+# def fill_empties(name_1, name_2, both, loaded_paths, adv_set):
+#     for name in (name_1, name_2):
+#         name = name.strip('_')
+#         path = loaded_paths['RBdirect'] if name == 'SET' else loaded_paths['mirror']
+#         if any(both[f'f_{name}'].isna()):
 
-            floor = 10
-            neg_backup = load_backup(lower_floor=floor, loaded_path=path, adv_set=adv_set)
+#             floor = 10
+#             neg_backup = load_backup(lower_floor=floor, loaded_path=path, adv_set=adv_set)
 
-            neg_backup.columns = (pd.Series(adjust_assoc_columns(neg_backup.columns)
-                                            ) + f'_{name}').to_list()
-            both, cats = uncat(both)
-            neg_backup, __ = uncat(neg_backup)
+#             neg_backup.columns = (pd.Series(adjust_assoc_columns(neg_backup.columns)
+#                                             ) + f'_{name}').to_list()
+#             both, cats = uncat(both)
+#             neg_backup, __ = uncat(neg_backup)
 
-            undefined_adv = both.loc[
-                both[f'f_{name}'].isna(), :].index.to_list()
+#             undefined_adv = both.loc[
+#                 both[f'f_{name}'].isna(), :].index.to_list()
 
-            both.loc[undefined_adv,
-                     neg_backup.columns] = neg_backup.filter(items=undefined_adv, axis=0)
+#             both.loc[undefined_adv,
+#                      neg_backup.columns] = neg_backup.filter(items=undefined_adv, axis=0)
 
-            both[cats] = both[cats].astype('category')
+#             both[cats] = both[cats].astype('category')
 
-    return both
-
-
-def combine_top(df_1: pd.DataFrame,
-                name_1: str,
-                df_2: pd.DataFrame,
-                name_2: str,
-                env_filter: str = 'NEG',
-                filter_items: list = FOCUS,
-                k: int = 10) -> pd.DataFrame:
-    print(f'### `{TAG}` Most Negative Adverb Selections')
-    top_dfs = [
-        (get_top_vals(adv_df,  k=k,
-                      index_like=env_filter,
-                      metric_filter=['am_p1_given2',
-                                     'conservative_log_ratio'])
-         .sort_values('conservative_log_ratio', ascending=False))
-        for adv_df in [df_1, df_2]
-    ]
-    for i, name in enumerate([name_1, name_2]):
-
-        print_iter(
-            [f'_{w}_' for w in top_dfs[i].l2], bullet='1.',
-            header=(f'`{name}`: union of top {k} adverbs ranked by '
-                    r'$LRC$ & $\Delta P(\texttt{env}|\texttt{adv})$'))
-    top_adv_lists = [dx.l2.to_list() for dx in top_dfs]
-    top_adv = pd.Series(top_adv_lists[0] + top_adv_lists[1]).drop_duplicates()
-    # top_adv = pd.concat((top_dfs[0].l2, top_dfs[1].l2)).drop_duplicates()
-
-    print_iter(
-        [f'_{w}_' for w in top_adv], bullet='1.',
-        header=f'Union of top adverbs for `{name_1}` and `{name_2}`. (Novel `{name_2}` adverbs listed last)')
-    print(f'\n### `{name_1}` Adverb Associations (in initially loaded table)\n')
-    df_1 = narrow_selection(df_1, top_adv, env_filter, filter_items)
-    print(f'\n### `{name_2}` Adverb Associations (in initially loaded table)\n')
-    df_2 = narrow_selection(df_2, top_adv, env_filter, filter_items)
-
-    name_1, name_2 = [f"_{n.strip('_')}" for n in [name_1, name_2]]
-    both = df_1.join(df_2, how="outer", lsuffix=name_1, rsuffix=name_2)
-
-    # ! Empty cells need to be filled _before_ calculating mean
-    both = fill_empties(name_1, name_2, both, adv_am_paths, adv_set=set(top_adv))
-    both = force_ints(both)
-    both = add_means(both)
-    both = add_f_ratio(both, name_2, name_1)
-    return both.sort_values('mean_dP1', ascending=False)
+#     return both
 
 
-def add_f_ratio(df, subset_name, superset_name):
-    counts = df.filter(regex=r'^[Nf][12]?').columns.str.split(
-        '_').str.get(0).drop_duplicates()
-    for count in counts:
-        ratio_col = f'ratio_{count}{subset_name}'
-        df[ratio_col] = (df[f'{count}{subset_name}']
-                         / df[f'{count}{superset_name}'])
-        # print(df.filter(like=count))
-    return df
+# def combine_top(df_1: pd.DataFrame,
+#                 name_1: str,
+#                 df_2: pd.DataFrame,
+#                 name_2: str,
+#                 env_filter: str = 'NEG',
+#                 filter_items: list = FOCUS,
+#                 k: int = 10) -> pd.DataFrame:
+#     print(f'### `{TAG}` Most Negative Adverb Selections')
+#     top_dfs = [
+#         (get_top_vals(adv_df,  k=k,
+#                       index_like=env_filter,
+#                       metric_filter=['am_p1_given2',
+#                                      'conservative_log_ratio'])
+#          .sort_values('conservative_log_ratio', ascending=False))
+#         for adv_df in [df_1, df_2]
+#     ]
+#     for i, name in enumerate([name_1, name_2]):
+
+#         print_iter(
+#             [f'_{w}_' for w in top_dfs[i].l2], bullet='1.',
+#             header=(f'`{name}`: union of top {k} adverbs ranked by '
+#                     r'$LRC$ & $\Delta P(\texttt{env}|\texttt{adv})$'))
+#     top_adv_lists = [dx.l2.to_list() for dx in top_dfs]
+#     top_adv = pd.Series(top_adv_lists[0] + top_adv_lists[1]).drop_duplicates()
+#     # top_adv = pd.concat((top_dfs[0].l2, top_dfs[1].l2)).drop_duplicates()
+
+#     print_iter(
+#         [f'_{w}_' for w in top_adv], bullet='1.',
+#         header=f'Union of top adverbs for `{name_1}` and `{name_2}`. (Novel `{name_2}` adverbs listed last)')
+#     print(f'\n### `{name_1}` Adverb Associations (in initially loaded table)\n')
+#     df_1 = narrow_selection(df_1, top_adv, env_filter, filter_items)
+#     print(f'\n### `{name_2}` Adverb Associations (in initially loaded table)\n')
+#     df_2 = narrow_selection(df_2, top_adv, env_filter, filter_items)
+
+#     name_1, name_2 = [f"_{n.strip('_')}" for n in [name_1, name_2]]
+#     both = df_1.join(df_2, how="outer", lsuffix=name_1, rsuffix=name_2)
+
+#     # ! Empty cells need to be filled _before_ calculating mean
+#     both = fill_empties(name_1, name_2, both, adv_am_paths, adv_set=set(top_adv))
+#     both = force_ints(both)
+#     both = add_means(both)
+#     both = add_f_ratio(both, name_2, name_1)
+#     return both.sort_values('mean_dP1', ascending=False)
 
 
-def add_means(both):
-    for metric in (both.select_dtypes(include='number').columns.to_series()
-                   .str.replace(r'_(MIR|SET)$', '', regex=True).unique()):
-        both[f'mean_{snake_to_camel(metric)}'] = both.filter(
-            regex=f"^{metric}").agg('mean', axis='columns')
-    return both
+# def add_f_ratio(df, subset_name, superset_name):
+#     counts = df.filter(regex=r'^[Nf][12]?').columns.str.split(
+#         '_').str.get(0).drop_duplicates()
+#     for count in counts:
+#         ratio_col = f'ratio_{count}{subset_name}'
+#         df[ratio_col] = (df[f'{count}{subset_name}']
+#                          / df[f'{count}{superset_name}'])
+#         # print(df.filter(like=count))
+#     return df
 
 
-def narrow_selection(df: pd.DataFrame,
-                     top_adv: list,
-                     env_filter: str = 'NEG',
-                     filter_items: list = FOCUS):
-    df = adjust_assoc_columns(
-        df.filter(items=filter_items)
-        .filter(like=env_filter, axis=0)
-        .reset_index().set_index('l2')
-        .filter(top_adv, axis=0)).sort_values(['LRC', 'dP1'], ascending=False)
-    df.index.name = 'adv'
-    nb_show_table(df.drop(['N', 'key', 'l1'], axis=1).round(
-        2).sort_values(['LRC', 'dP1', ], ascending=False))
+# def add_means(both):
+#     for metric in (both.select_dtypes(include='number').columns.to_series()
+#                    .str.replace(r'_(MIR|SET)$', '', regex=True).unique()):
+#         both[f'mean_{snake_to_camel(metric)}'] = both.filter(
+#             regex=f"^{metric}").agg('mean', axis='columns')
+#     return both
 
-    return df
+
+# def narrow_selection(df: pd.DataFrame,
+#                      top_adv: list,
+#                      env_filter: str = 'NEG',
+#                      filter_items: list = FOCUS):
+#     df = adjust_assoc_columns(
+#         df.filter(items=filter_items)
+#         .filter(like=env_filter, axis=0)
+#         .reset_index().set_index('l2')
+#         .filter(top_adv, axis=0)).sort_values(['LRC', 'dP1'], ascending=False)
+#     df.index.name = 'adv'
+#     nb_show_table(df.drop(['N', 'key', 'l1'], axis=1).round(
+#         2).sort_values(['LRC', 'dP1', ], ascending=False))
+
+#     return df
 
 ```
 
@@ -663,8 +706,9 @@ def narrow_selection(df: pd.DataFrame,
 
 
 ```python
-C = combine_top(setdiff_adv, 'SET',
-                mirror_adv, 'MIR', k=K)
+C = combine_top_adv(setdiff_adv, 'SET',
+                mirror_adv, 'MIR',adv_am_paths=adv_am_paths,
+                k=K)
 ```
 
     ### `ALL` Most Negative Adverb Selections
@@ -705,35 +749,37 @@ C = combine_top(setdiff_adv, 'SET',
     ### `SET` Adverb Associations (in initially loaded table)
     
     
-    |                  |        `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |    `t` |         `f1` |       `f2` |   `exp_f` |   `unexp_f` |
-    |:-----------------|-----------:|--------:|-------:|--------:|-----------:|----------------:|-------:|-------------:|-----------:|----------:|------------:|
-    | **necessarily**  |  42,595.00 |    0.83 |   0.87 |    7.10 | 230,257.34 |            2.17 | 196.05 | 3,173,660.00 |  48,947.00 |  2,132.65 |   40,462.35 |
-    | **that**         | 164,768.00 |    0.75 |   0.79 |    6.34 | 831,137.25 |            1.94 | 383.56 | 3,173,660.00 | 208,262.00 |  9,074.09 |  155,693.91 |
-    | **exactly**      |  43,813.00 |    0.70 |   0.75 |    5.94 | 210,126.60 |            1.82 | 197.11 | 3,173,660.00 |  58,643.00 |  2,555.11 |   41,257.89 |
-    | **immediately**  |  56,099.00 |    0.54 |   0.58 |    4.86 | 224,059.55 |            1.49 | 219.01 | 3,173,660.00 |  96,973.00 |  4,225.17 |   51,873.83 |
-    | **yet**          |  51,867.00 |    0.50 |   0.54 |    4.65 | 197,610.98 |            1.42 | 209.42 | 3,173,660.00 |  95,763.00 |  4,172.44 |   47,694.56 |
-    | **any**          |  15,384.00 |    0.40 |   0.45 |    4.07 |  50,880.96 |            1.25 | 111.95 | 3,173,660.00 |  34,382.00 |  1,498.04 |   13,885.96 |
-    | **remotely**     |   5,661.00 |    0.30 |   0.34 |    3.40 |  15,284.49 |            1.06 |  65.73 | 3,173,660.00 |  16,426.00 |    715.69 |    4,945.31 |
-    | **terribly**     |  17,949.00 |    0.26 |   0.30 |    3.19 |  43,741.44 |            0.98 | 114.80 | 3,173,660.00 |  58,964.00 |  2,569.09 |   15,379.91 |
-    | **inherently**   |   6,743.00 |    0.10 |   0.14 |    1.75 |   7,022.02 |            0.56 |  56.75 | 3,173,660.00 |  47,803.00 |  2,082.80 |    4,660.20 |
-    | **particularly** |  55,527.00 |    0.06 |   0.11 |    1.38 |  37,272.74 |            0.43 | 140.66 | 3,173,660.00 | 513,668.00 | 22,380.79 |   33,146.21 |
-    | **ever**         |   5,932.00 |    0.01 |   0.05 |    0.16 |     183.92 |            0.08 |  12.49 | 3,173,660.00 | 114,075.00 |  4,970.31 |      961.69 |
+    |                  |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `MI` |   `odds_r_disc` |    `t` |      `f1` |    `f2` |   `exp_f` |   `unexp_f` |
+    |:-----------------|--------:|--------:|-------:|--------:|-----------:|-------:|----------------:|-------:|----------:|--------:|----------:|------------:|
+    | **necessarily**  |  42,595 |    0.83 |   0.87 |    7.10 | 230,257.34 |   1.30 |            2.17 | 196.05 | 3,173,660 |  48,947 |  2,132.65 |   40,462.35 |
+    | **that**         | 164,768 |    0.75 |   0.79 |    6.34 | 831,137.25 |   1.26 |            1.94 | 383.56 | 3,173,660 | 208,262 |  9,074.09 |  155,693.91 |
+    | **exactly**      |  43,813 |    0.70 |   0.75 |    5.94 | 210,126.60 |   1.23 |            1.82 | 197.11 | 3,173,660 |  58,643 |  2,555.11 |   41,257.89 |
+    | **immediately**  |  56,099 |    0.54 |   0.58 |    4.86 | 224,059.55 |   1.12 |            1.49 | 219.01 | 3,173,660 |  96,973 |  4,225.17 |   51,873.83 |
+    | **yet**          |  51,867 |    0.50 |   0.54 |    4.65 | 197,610.98 |   1.09 |            1.42 | 209.42 | 3,173,660 |  95,763 |  4,172.44 |   47,694.56 |
+    | **any**          |  15,384 |    0.40 |   0.45 |    4.07 |  50,880.96 |   1.01 |            1.25 | 111.95 | 3,173,660 |  34,382 |  1,498.04 |   13,885.96 |
+    | **remotely**     |   5,661 |    0.30 |   0.34 |    3.40 |  15,284.49 |   0.90 |            1.06 |  65.73 | 3,173,660 |  16,426 |    715.69 |    4,945.31 |
+    | **terribly**     |  17,949 |    0.26 |   0.30 |    3.19 |  43,741.44 |   0.84 |            0.98 | 114.80 | 3,173,660 |  58,964 |  2,569.09 |   15,379.91 |
+    | **inherently**   |   6,743 |    0.10 |   0.14 |    1.75 |   7,022.02 |   0.51 |            0.56 |  56.75 | 3,173,660 |  47,803 |  2,082.80 |    4,660.20 |
+    | **particularly** |  55,527 |    0.06 |   0.11 |    1.38 |  37,272.74 |   0.39 |            0.43 | 140.66 | 3,173,660 | 513,668 | 22,380.79 |   33,146.21 |
+    | **ever**         |   5,932 |    0.01 |   0.05 |    0.16 |     183.92 |   0.08 |            0.08 |  12.49 | 3,173,660 | 114,075 |  4,970.31 |      961.69 |
     
     
     ### `MIR` Adverb Associations (in initially loaded table)
     
     
-    |                  |      `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `odds_r_disc` |   `t` |       `f1` |      `f2` |   `exp_f` |   `unexp_f` |
-    |:-----------------|---------:|--------:|-------:|--------:|----------:|----------------:|------:|-----------:|----------:|----------:|------------:|
-    | **ever**         | 4,709.00 |    0.76 |   0.93 |    5.63 | 14,253.57 |            1.82 | 55.98 | 291,732.00 |  5,060.00 |    867.35 |    3,841.65 |
-    | **any**          | 1,066.00 |    0.72 |   0.89 |    4.65 |  2,985.75 |            1.59 | 26.37 | 291,732.00 |  1,197.00 |    205.18 |      860.82 |
-    | **necessarily**  |   963.00 |    0.70 |   0.87 |    4.39 |  2,597.68 |            1.51 | 24.92 | 291,732.00 |  1,107.00 |    189.75 |      773.25 |
-    | **that**         | 4,308.00 |    0.61 |   0.78 |    3.90 |  9,957.37 |            1.25 | 51.29 | 291,732.00 |  5,494.00 |    941.74 |    3,366.26 |
-    | **remotely**     | 1,840.00 |    0.62 |   0.79 |    3.79 |  4,256.34 |            1.25 | 33.54 | 291,732.00 |  2,341.00 |    401.28 |    1,438.72 |
-    | **exactly**      |   813.00 |    0.61 |   0.78 |    3.57 |  1,860.72 |            1.24 | 22.25 | 291,732.00 |  1,041.00 |    178.44 |      634.56 |
-    | **particularly** | 9,243.00 |    0.54 |   0.71 |    3.43 | 18,583.81 |            1.09 | 72.96 | 291,732.00 | 13,003.00 |  2,228.88 |    7,014.12 |
-    | **inherently**   | 2,864.00 |    0.39 |   0.56 |    2.40 |  3,925.31 |            0.79 | 37.08 | 291,732.00 |  5,133.00 |    879.86 |    1,984.14 |
-    | **terribly**     | 1,567.00 |    0.17 |   0.34 |    1.09 |    764.44 |            0.40 | 19.62 | 291,732.00 |  4,610.00 |    790.21 |      776.79 |
+    |                  |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
+    |:-----------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|--------:|-------:|----------:|------------:|
+    | **ever**         | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 291,732 |  5,060 |    867.35 |    3,841.65 |
+    | **any**          | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 291,732 |  1,197 |    205.18 |      860.82 |
+    | **necessarily**  |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 291,732 |  1,107 |    189.75 |      773.25 |
+    | **that**         | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 291,732 |  5,494 |    941.74 |    3,366.26 |
+    | **remotely**     | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 291,732 |  2,341 |    401.28 |    1,438.72 |
+    | **exactly**      |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 291,732 |  1,041 |    178.44 |      634.56 |
+    | **particularly** | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
+    | **inherently**   | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 291,732 |  5,133 |    879.86 |    1,984.14 |
+    | **yet**          |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 291,732 |    815 |    139.70 |      180.30 |
+    | **terribly**     | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 291,732 |  4,610 |    790.21 |      776.79 |
+    | **immediately**  |   403 |    0.17 |   0.34 |    0.84 |    191.88 |   0.29 |            0.39 |  9.87 | 291,732 |  1,195 |    204.84 |      198.16 |
     
 
 
@@ -775,37 +821,37 @@ Union of top adverbs for `SET` and `MIR`. (Novel `MIR` adverbs listed last)
 ### `SET` Adverb Associations (in initially loaded table)
 
 
-|                  |        `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `odds_r_disc` |    `t` |         `f1` |       `f2` |   `exp_f` |   `unexp_f` |
-|:-----------------|-----------:|--------:|-------:|--------:|-----------:|----------------:|-------:|-------------:|-----------:|----------:|------------:|
-| **necessarily**  |  42,595.00 |    0.83 |   0.87 |    7.10 | 230,257.34 |            2.17 | 196.05 | 3,173,660.00 |  48,947.00 |  2,132.65 |   40,462.35 |
-| **that**         | 164,768.00 |    0.75 |   0.79 |    6.34 | 831,137.25 |            1.94 | 383.56 | 3,173,660.00 | 208,262.00 |  9,074.09 |  155,693.91 |
-| **exactly**      |  43,813.00 |    0.70 |   0.75 |    5.94 | 210,126.60 |            1.82 | 197.11 | 3,173,660.00 |  58,643.00 |  2,555.11 |   41,257.89 |
-| **immediately**  |  56,099.00 |    0.54 |   0.58 |    4.86 | 224,059.55 |            1.49 | 219.01 | 3,173,660.00 |  96,973.00 |  4,225.17 |   51,873.83 |
-| **yet**          |  51,867.00 |    0.50 |   0.54 |    4.65 | 197,610.98 |            1.42 | 209.42 | 3,173,660.00 |  95,763.00 |  4,172.44 |   47,694.56 |
-| **any**          |  15,384.00 |    0.40 |   0.45 |    4.07 |  50,880.96 |            1.25 | 111.95 | 3,173,660.00 |  34,382.00 |  1,498.04 |   13,885.96 |
-| **remotely**     |   5,661.00 |    0.30 |   0.34 |    3.40 |  15,284.49 |            1.06 |  65.73 | 3,173,660.00 |  16,426.00 |    715.69 |    4,945.31 |
-| **terribly**     |  17,949.00 |    0.26 |   0.30 |    3.19 |  43,741.44 |            0.98 | 114.80 | 3,173,660.00 |  58,964.00 |  2,569.09 |   15,379.91 |
-| **inherently**   |   6,743.00 |    0.10 |   0.14 |    1.75 |   7,022.02 |            0.56 |  56.75 | 3,173,660.00 |  47,803.00 |  2,082.80 |    4,660.20 |
-| **particularly** |  55,527.00 |    0.06 |   0.11 |    1.38 |  37,272.74 |            0.43 | 140.66 | 3,173,660.00 | 513,668.00 | 22,380.79 |   33,146.21 |
-| **ever**         |   5,932.00 |    0.01 |   0.05 |    0.16 |     183.92 |            0.08 |  12.49 | 3,173,660.00 | 114,075.00 |  4,970.31 |      961.69 |
+|                  |     `f` |   `dP1` |   `P1` |   `LRC` |       `G2` |   `MI` |   `odds_r_disc` |    `t` |      `f1` |    `f2` |   `exp_f` |   `unexp_f` |
+|:-----------------|--------:|--------:|-------:|--------:|-----------:|-------:|----------------:|-------:|----------:|--------:|----------:|------------:|
+| **necessarily**  |  42,595 |    0.83 |   0.87 |    7.10 | 230,257.34 |   1.30 |            2.17 | 196.05 | 3,173,660 |  48,947 |  2,132.65 |   40,462.35 |
+| **that**         | 164,768 |    0.75 |   0.79 |    6.34 | 831,137.25 |   1.26 |            1.94 | 383.56 | 3,173,660 | 208,262 |  9,074.09 |  155,693.91 |
+| **exactly**      |  43,813 |    0.70 |   0.75 |    5.94 | 210,126.60 |   1.23 |            1.82 | 197.11 | 3,173,660 |  58,643 |  2,555.11 |   41,257.89 |
+| **immediately**  |  56,099 |    0.54 |   0.58 |    4.86 | 224,059.55 |   1.12 |            1.49 | 219.01 | 3,173,660 |  96,973 |  4,225.17 |   51,873.83 |
+| **yet**          |  51,867 |    0.50 |   0.54 |    4.65 | 197,610.98 |   1.09 |            1.42 | 209.42 | 3,173,660 |  95,763 |  4,172.44 |   47,694.56 |
+| **any**          |  15,384 |    0.40 |   0.45 |    4.07 |  50,880.96 |   1.01 |            1.25 | 111.95 | 3,173,660 |  34,382 |  1,498.04 |   13,885.96 |
+| **remotely**     |   5,661 |    0.30 |   0.34 |    3.40 |  15,284.49 |   0.90 |            1.06 |  65.73 | 3,173,660 |  16,426 |    715.69 |    4,945.31 |
+| **terribly**     |  17,949 |    0.26 |   0.30 |    3.19 |  43,741.44 |   0.84 |            0.98 | 114.80 | 3,173,660 |  58,964 |  2,569.09 |   15,379.91 |
+| **inherently**   |   6,743 |    0.10 |   0.14 |    1.75 |   7,022.02 |   0.51 |            0.56 |  56.75 | 3,173,660 |  47,803 |  2,082.80 |    4,660.20 |
+| **particularly** |  55,527 |    0.06 |   0.11 |    1.38 |  37,272.74 |   0.39 |            0.43 | 140.66 | 3,173,660 | 513,668 | 22,380.79 |   33,146.21 |
+| **ever**         |   5,932 |    0.01 |   0.05 |    0.16 |     183.92 |   0.08 |            0.08 |  12.49 | 3,173,660 | 114,075 |  4,970.31 |      961.69 |
 
 
 ### `MIR` Adverb Associations (in initially loaded table)
 
 
-|                  |      `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `odds_r_disc` |   `t` |       `f1` |      `f2` |   `exp_f` |   `unexp_f` |
-|:-----------------|---------:|--------:|-------:|--------:|----------:|----------------:|------:|-----------:|----------:|----------:|------------:|
-| **ever**         | 4,709.00 |    0.76 |   0.93 |    5.63 | 14,253.57 |            1.82 | 55.98 | 291,732.00 |  5,060.00 |    867.35 |    3,841.65 |
-| **any**          | 1,066.00 |    0.72 |   0.89 |    4.65 |  2,985.75 |            1.59 | 26.37 | 291,732.00 |  1,197.00 |    205.18 |      860.82 |
-| **necessarily**  |   963.00 |    0.70 |   0.87 |    4.39 |  2,597.68 |            1.51 | 24.92 | 291,732.00 |  1,107.00 |    189.75 |      773.25 |
-| **that**         | 4,308.00 |    0.61 |   0.78 |    3.90 |  9,957.37 |            1.25 | 51.29 | 291,732.00 |  5,494.00 |    941.74 |    3,366.26 |
-| **remotely**     | 1,840.00 |    0.62 |   0.79 |    3.79 |  4,256.34 |            1.25 | 33.54 | 291,732.00 |  2,341.00 |    401.28 |    1,438.72 |
-| **exactly**      |   813.00 |    0.61 |   0.78 |    3.57 |  1,860.72 |            1.24 | 22.25 | 291,732.00 |  1,041.00 |    178.44 |      634.56 |
-| **particularly** | 9,243.00 |    0.54 |   0.71 |    3.43 | 18,583.81 |            1.09 | 72.96 | 291,732.00 | 13,003.00 |  2,228.88 |    7,014.12 |
-| **inherently**   | 2,864.00 |    0.39 |   0.56 |    2.40 |  3,925.31 |            0.79 | 37.08 | 291,732.00 |  5,133.00 |    879.86 |    1,984.14 |
-| **terribly**     | 1,567.00 |    0.17 |   0.34 |    1.09 |    764.44 |            0.40 | 19.62 | 291,732.00 |  4,610.00 |    790.21 |      776.79 |
-
-
+|                  |   `f` |   `dP1` |   `P1` |   `LRC` |      `G2` |   `MI` |   `odds_r_disc` |   `t` |    `f1` |   `f2` |   `exp_f` |   `unexp_f` |
+|:-----------------|------:|--------:|-------:|--------:|----------:|-------:|----------------:|------:|--------:|-------:|----------:|------------:|
+| **ever**         | 4,709 |    0.76 |   0.93 |    5.63 | 14,253.57 |   0.73 |            1.82 | 55.98 | 291,732 |  5,060 |    867.35 |    3,841.65 |
+| **any**          | 1,066 |    0.72 |   0.89 |    4.65 |  2,985.75 |   0.72 |            1.59 | 26.37 | 291,732 |  1,197 |    205.18 |      860.82 |
+| **necessarily**  |   963 |    0.70 |   0.87 |    4.39 |  2,597.68 |   0.71 |            1.51 | 24.92 | 291,732 |  1,107 |    189.75 |      773.25 |
+| **that**         | 4,308 |    0.61 |   0.78 |    3.90 |  9,957.37 |   0.66 |            1.25 | 51.29 | 291,732 |  5,494 |    941.74 |    3,366.26 |
+| **remotely**     | 1,840 |    0.62 |   0.79 |    3.79 |  4,256.34 |   0.66 |            1.25 | 33.54 | 291,732 |  2,341 |    401.28 |    1,438.72 |
+| **exactly**      |   813 |    0.61 |   0.78 |    3.57 |  1,860.72 |   0.66 |            1.24 | 22.25 | 291,732 |  1,041 |    178.44 |      634.56 |
+| **particularly** | 9,243 |    0.54 |   0.71 |    3.43 | 18,583.81 |   0.62 |            1.09 | 72.96 | 291,732 | 13,003 |  2,228.88 |    7,014.12 |
+| **inherently**   | 2,864 |    0.39 |   0.56 |    2.40 |  3,925.31 |   0.51 |            0.79 | 37.08 | 291,732 |  5,133 |    879.86 |    1,984.14 |
+| **yet**          |   320 |    0.22 |   0.39 |    1.11 |    223.08 |   0.36 |            0.50 | 10.08 | 291,732 |    815 |    139.70 |      180.30 |
+| **terribly**     | 1,567 |    0.17 |   0.34 |    1.09 |    764.44 |   0.30 |            0.40 | 19.62 | 291,732 |  4,610 |    790.21 |      776.79 |
+| **immediately**  |   403 |    0.17 |   0.34 |    0.84 |    191.88 |   0.29 |            0.39 |  9.87 | 291,732 |  1,195 |    204.84 |      198.16 |
 
 
 ```python
@@ -960,19 +1006,19 @@ nb_show_table(main_C.sort_values('mean_dP1', ascending=False), return_df=True)
 ```
 
     
-    |                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |    `f_SET` |   `f_MIR` |     `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
-    |:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|-----------:|----------:|-------------:|-----------:|-----------:|-----------:|
-    | **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |  42,595.00 |    963.00 | 3,173,660.00 | 291,732.00 |  48,947.00 |   1,107.00 |
-    | **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 | 164,768.00 |  4,308.00 | 3,173,660.00 | 291,732.00 | 208,262.00 |   5,494.00 |
-    | **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |  43,813.00 |    813.00 | 3,173,660.00 | 291,732.00 |  58,643.00 |   1,041.00 |
-    | **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |  15,384.00 |  1,066.00 | 3,173,660.00 | 291,732.00 |  34,382.00 |   1,197.00 |
-    | **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |   5,661.00 |  1,840.00 | 3,173,660.00 | 291,732.00 |  16,426.00 |   2,341.00 |
-    | **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |   5,932.00 |  4,709.00 | 3,173,660.00 | 291,732.00 | 114,075.00 |   5,060.00 |
-    | **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |  51,867.00 |    320.00 | 3,173,660.00 | 291,732.00 |  95,763.00 |     815.00 |
-    | **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |  56,099.00 |    403.00 | 3,173,660.00 | 291,732.00 |  96,973.00 |   1,195.00 |
-    | **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |  55,527.00 |  9,243.00 | 3,173,660.00 | 291,732.00 | 513,668.00 |  13,003.00 |
-    | **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |   6,743.00 |  2,864.00 | 3,173,660.00 | 291,732.00 |  47,803.00 |   5,133.00 |
-    | **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |  17,949.00 |  1,567.00 | 3,173,660.00 | 291,732.00 |  58,964.00 |   4,610.00 |
+    |                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |   `f_SET` |   `f_MIR` |   `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
+    |:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|----------:|----------:|-----------:|-----------:|-----------:|-----------:|
+    | **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |    42,595 |       963 |  3,173,660 |    291,732 |     48,947 |      1,107 |
+    | **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 |   164,768 |     4,308 |  3,173,660 |    291,732 |    208,262 |      5,494 |
+    | **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |    43,813 |       813 |  3,173,660 |    291,732 |     58,643 |      1,041 |
+    | **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |    15,384 |     1,066 |  3,173,660 |    291,732 |     34,382 |      1,197 |
+    | **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |     5,661 |     1,840 |  3,173,660 |    291,732 |     16,426 |      2,341 |
+    | **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |     5,932 |     4,709 |  3,173,660 |    291,732 |    114,075 |      5,060 |
+    | **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |    51,867 |       320 |  3,173,660 |    291,732 |     95,763 |        815 |
+    | **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |    56,099 |       403 |  3,173,660 |    291,732 |     96,973 |      1,195 |
+    | **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |    55,527 |     9,243 |  3,173,660 |    291,732 |    513,668 |     13,003 |
+    | **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |     6,743 |     2,864 |  3,173,660 |    291,732 |     47,803 |      5,133 |
+    | **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |    17,949 |     1,567 |  3,173,660 |    291,732 |     58,964 |      4,610 |
     
 
 
@@ -1197,19 +1243,19 @@ nb_show_table(main_C.sort_values('mean_dP1', ascending=False), return_df=True)
 
 
 
-|                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |    `f_SET` |   `f_MIR` |     `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
-|:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|-----------:|----------:|-------------:|-----------:|-----------:|-----------:|
-| **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |  42,595.00 |    963.00 | 3,173,660.00 | 291,732.00 |  48,947.00 |   1,107.00 |
-| **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 | 164,768.00 |  4,308.00 | 3,173,660.00 | 291,732.00 | 208,262.00 |   5,494.00 |
-| **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |  43,813.00 |    813.00 | 3,173,660.00 | 291,732.00 |  58,643.00 |   1,041.00 |
-| **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |  15,384.00 |  1,066.00 | 3,173,660.00 | 291,732.00 |  34,382.00 |   1,197.00 |
-| **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |   5,661.00 |  1,840.00 | 3,173,660.00 | 291,732.00 |  16,426.00 |   2,341.00 |
-| **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |   5,932.00 |  4,709.00 | 3,173,660.00 | 291,732.00 | 114,075.00 |   5,060.00 |
-| **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |  51,867.00 |    320.00 | 3,173,660.00 | 291,732.00 |  95,763.00 |     815.00 |
-| **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |  56,099.00 |    403.00 | 3,173,660.00 | 291,732.00 |  96,973.00 |   1,195.00 |
-| **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |  55,527.00 |  9,243.00 | 3,173,660.00 | 291,732.00 | 513,668.00 |  13,003.00 |
-| **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |   6,743.00 |  2,864.00 | 3,173,660.00 | 291,732.00 |  47,803.00 |   5,133.00 |
-| **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |  17,949.00 |  1,567.00 | 3,173,660.00 | 291,732.00 |  58,964.00 |   4,610.00 |
+|                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |   `f_SET` |   `f_MIR` |   `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
+|:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|----------:|----------:|-----------:|-----------:|-----------:|-----------:|
+| **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |    42,595 |       963 |  3,173,660 |    291,732 |     48,947 |      1,107 |
+| **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 |   164,768 |     4,308 |  3,173,660 |    291,732 |    208,262 |      5,494 |
+| **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |    43,813 |       813 |  3,173,660 |    291,732 |     58,643 |      1,041 |
+| **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |    15,384 |     1,066 |  3,173,660 |    291,732 |     34,382 |      1,197 |
+| **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |     5,661 |     1,840 |  3,173,660 |    291,732 |     16,426 |      2,341 |
+| **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |     5,932 |     4,709 |  3,173,660 |    291,732 |    114,075 |      5,060 |
+| **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |    51,867 |       320 |  3,173,660 |    291,732 |     95,763 |        815 |
+| **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |    56,099 |       403 |  3,173,660 |    291,732 |     96,973 |      1,195 |
+| **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |    55,527 |     9,243 |  3,173,660 |    291,732 |    513,668 |     13,003 |
+| **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |     6,743 |     2,864 |  3,173,660 |    291,732 |     47,803 |      5,133 |
+| **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |    17,949 |     1,567 |  3,173,660 |    291,732 |     58,964 |      4,610 |
 
 
 
@@ -1462,7 +1508,7 @@ C
     </tr>
   </tbody>
 </table>
-<p>11 rows × 44 columns</p>
+<p>11 rows × 47 columns</p>
 </div>
 
 
@@ -1494,35 +1540,75 @@ nb_show_table(C[main_cols_ordered])
 ```
 
     
-    |                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |    `f_SET` |   `f_MIR` |     `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
-    |:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|-----------:|----------:|-------------:|-----------:|-----------:|-----------:|
-    | **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |  42,595.00 |    963.00 | 3,173,660.00 | 291,732.00 |  48,947.00 |   1,107.00 |
-    | **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 | 164,768.00 |  4,308.00 | 3,173,660.00 | 291,732.00 | 208,262.00 |   5,494.00 |
-    | **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |  43,813.00 |    813.00 | 3,173,660.00 | 291,732.00 |  58,643.00 |   1,041.00 |
-    | **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |  15,384.00 |  1,066.00 | 3,173,660.00 | 291,732.00 |  34,382.00 |   1,197.00 |
-    | **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |   5,661.00 |  1,840.00 | 3,173,660.00 | 291,732.00 |  16,426.00 |   2,341.00 |
-    | **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |   5,932.00 |  4,709.00 | 3,173,660.00 | 291,732.00 | 114,075.00 |   5,060.00 |
-    | **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |  51,867.00 |    320.00 | 3,173,660.00 | 291,732.00 |  95,763.00 |     815.00 |
-    | **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |  56,099.00 |    403.00 | 3,173,660.00 | 291,732.00 |  96,973.00 |   1,195.00 |
-    | **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |  55,527.00 |  9,243.00 | 3,173,660.00 | 291,732.00 | 513,668.00 |  13,003.00 |
-    | **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |   6,743.00 |  2,864.00 | 3,173,660.00 | 291,732.00 |  47,803.00 |   5,133.00 |
-    | **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |  17,949.00 |  1,567.00 | 3,173,660.00 | 291,732.00 |  58,964.00 |   4,610.00 |
+    |                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |   `f_SET` |   `f_MIR` |   `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
+    |:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|----------:|----------:|-----------:|-----------:|-----------:|-----------:|
+    | **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |    42,595 |       963 |  3,173,660 |    291,732 |     48,947 |      1,107 |
+    | **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 |   164,768 |     4,308 |  3,173,660 |    291,732 |    208,262 |      5,494 |
+    | **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |    43,813 |       813 |  3,173,660 |    291,732 |     58,643 |      1,041 |
+    | **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |    15,384 |     1,066 |  3,173,660 |    291,732 |     34,382 |      1,197 |
+    | **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |     5,661 |     1,840 |  3,173,660 |    291,732 |     16,426 |      2,341 |
+    | **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |     5,932 |     4,709 |  3,173,660 |    291,732 |    114,075 |      5,060 |
+    | **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |    51,867 |       320 |  3,173,660 |    291,732 |     95,763 |        815 |
+    | **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |    56,099 |       403 |  3,173,660 |    291,732 |     96,973 |      1,195 |
+    | **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |    55,527 |     9,243 |  3,173,660 |    291,732 |    513,668 |     13,003 |
+    | **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |     6,743 |     2,864 |  3,173,660 |    291,732 |     47,803 |      5,133 |
+    | **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |    17,949 |     1,567 |  3,173,660 |    291,732 |     58,964 |      4,610 |
     
 
 
 
-|                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |    `f_SET` |   `f_MIR` |     `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
-|:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|-----------:|----------:|-------------:|-----------:|-----------:|-----------:|
-| **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |  42,595.00 |    963.00 | 3,173,660.00 | 291,732.00 |  48,947.00 |   1,107.00 |
-| **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 | 164,768.00 |  4,308.00 | 3,173,660.00 | 291,732.00 | 208,262.00 |   5,494.00 |
-| **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |  43,813.00 |    813.00 | 3,173,660.00 | 291,732.00 |  58,643.00 |   1,041.00 |
-| **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |  15,384.00 |  1,066.00 | 3,173,660.00 | 291,732.00 |  34,382.00 |   1,197.00 |
-| **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |   5,661.00 |  1,840.00 | 3,173,660.00 | 291,732.00 |  16,426.00 |   2,341.00 |
-| **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |   5,932.00 |  4,709.00 | 3,173,660.00 | 291,732.00 | 114,075.00 |   5,060.00 |
-| **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |  51,867.00 |    320.00 | 3,173,660.00 | 291,732.00 |  95,763.00 |     815.00 |
-| **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |  56,099.00 |    403.00 | 3,173,660.00 | 291,732.00 |  96,973.00 |   1,195.00 |
-| **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |  55,527.00 |  9,243.00 | 3,173,660.00 | 291,732.00 | 513,668.00 |  13,003.00 |
-| **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |   6,743.00 |  2,864.00 | 3,173,660.00 | 291,732.00 |  47,803.00 |   5,133.00 |
-| **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |  17,949.00 |  1,567.00 | 3,173,660.00 | 291,732.00 |  58,964.00 |   4,610.00 |
+|                  |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `dP1_SET` |   `P1_SET` |   `dP1_MIR` |   `P1_MIR` |   `mean_dP1` |   `mean_P1` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |   `f_SET` |   `f_MIR` |   `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
+|:-----------------|------------:|------------:|-------------:|------------:|-----------:|------------:|-----------:|-------------:|------------:|-----------:|-----------:|------------:|----------:|----------:|-----------:|-----------:|-----------:|-----------:|
+| **necessarily**  |        7.10 |        4.39 |         5.74 |        0.83 |       0.87 |        0.70 |       0.87 |         0.76 |        0.87 | 230,257.34 |   2,597.68 |  116,427.51 |    42,595 |       963 |  3,173,660 |    291,732 |     48,947 |      1,107 |
+| **that**         |        6.34 |        3.90 |         5.12 |        0.75 |       0.79 |        0.61 |       0.78 |         0.68 |        0.79 | 831,137.25 |   9,957.37 |  420,547.31 |   164,768 |     4,308 |  3,173,660 |    291,732 |    208,262 |      5,494 |
+| **exactly**      |        5.94 |        3.57 |         4.76 |        0.70 |       0.75 |        0.61 |       0.78 |         0.66 |        0.76 | 210,126.60 |   1,860.72 |  105,993.66 |    43,813 |       813 |  3,173,660 |    291,732 |     58,643 |      1,041 |
+| **any**          |        4.07 |        4.65 |         4.36 |        0.40 |       0.45 |        0.72 |       0.89 |         0.56 |        0.67 |  50,880.96 |   2,985.75 |   26,933.36 |    15,384 |     1,066 |  3,173,660 |    291,732 |     34,382 |      1,197 |
+| **remotely**     |        3.40 |        3.79 |         3.59 |        0.30 |       0.34 |        0.62 |       0.79 |         0.46 |        0.57 |  15,284.49 |   4,256.34 |    9,770.42 |     5,661 |     1,840 |  3,173,660 |    291,732 |     16,426 |      2,341 |
+| **ever**         |        0.16 |        5.63 |         2.90 |        0.01 |       0.05 |        0.76 |       0.93 |         0.38 |        0.49 |     183.92 |  14,253.57 |    7,218.74 |     5,932 |     4,709 |  3,173,660 |    291,732 |    114,075 |      5,060 |
+| **yet**          |        4.65 |        1.11 |         2.88 |        0.50 |       0.54 |        0.22 |       0.39 |         0.36 |        0.47 | 197,610.98 |     223.08 |   98,917.03 |    51,867 |       320 |  3,173,660 |    291,732 |     95,763 |        815 |
+| **immediately**  |        4.86 |        0.84 |         2.85 |        0.54 |       0.58 |        0.17 |       0.34 |         0.35 |        0.46 | 224,059.55 |     191.88 |  112,125.71 |    56,099 |       403 |  3,173,660 |    291,732 |     96,973 |      1,195 |
+| **particularly** |        1.38 |        3.43 |         2.40 |        0.06 |       0.11 |        0.54 |       0.71 |         0.30 |        0.41 |  37,272.74 |  18,583.81 |   27,928.28 |    55,527 |     9,243 |  3,173,660 |    291,732 |    513,668 |     13,003 |
+| **inherently**   |        1.75 |        2.40 |         2.07 |        0.10 |       0.14 |        0.39 |       0.56 |         0.24 |        0.35 |   7,022.02 |   3,925.31 |    5,473.66 |     6,743 |     2,864 |  3,173,660 |    291,732 |     47,803 |      5,133 |
+| **terribly**     |        3.19 |        1.09 |         2.14 |        0.26 |       0.30 |        0.17 |       0.34 |         0.22 |        0.32 |  43,741.44 |     764.44 |   22,252.94 |    17,949 |     1,567 |  3,173,660 |    291,732 |     58,964 |      4,610 |
+
+
+
+
+```python
+nb_show_table(C.filter(like='mean_').sort_values('mean_dP1', ascending=False))
+
+```
+
+    
+    |                  |   `mean_f` |   `mean_dP1` |   `mean_P1` |   `mean_LRC` |   `mean_G2` |   `mean_MI` |   `mean_oddsRDisc` |   `mean_t` |      `mean_N` |    `mean_f1` |   `mean_f2` |   `mean_expF` |   `mean_unexpF` |
+    |:-----------------|-----------:|-------------:|------------:|-------------:|------------:|------------:|-------------------:|-----------:|--------------:|-------------:|------------:|--------------:|----------------:|
+    | **necessarily**  | 593,167.33 |         0.76 |        0.87 |         5.74 |  116,427.51 |        1.00 |               1.84 |     110.48 | 37,270,759.00 | 1,732,696.00 |   25,027.00 |      1,161.20 |       20,617.80 |
+    | **that**         | 641,370.67 |         0.68 |        0.79 |         5.12 |  420,547.31 |        0.96 |               1.60 |     217.42 | 37,270,759.00 | 1,732,696.00 |  106,878.00 |      5,007.91 |       79,530.09 |
+    | **exactly**      | 594,950.33 |         0.66 |        0.76 |         4.76 |  105,993.66 |        0.95 |               1.53 |     109.68 | 37,270,759.00 | 1,732,696.00 |   29,842.00 |      1,366.77 |       20,946.23 |
+    | **any**          | 586,236.83 |         0.56 |        0.67 |         4.36 |   26,933.36 |        0.86 |               1.42 |      69.16 | 37,270,759.00 | 1,732,696.00 |   17,789.50 |        851.61 |        7,373.39 |
+    | **remotely**     | 581,943.33 |         0.46 |        0.57 |         3.59 |    9,770.42 |        0.78 |               1.16 |      49.63 | 37,270,759.00 | 1,732,696.00 |    9,383.50 |        558.48 |        3,192.02 |
+    | **ever**         | 599,194.67 |         0.38 |        0.49 |         2.90 |    7,218.74 |        0.41 |               0.95 |      34.23 | 37,270,759.00 | 1,732,696.00 |   59,567.50 |      2,918.83 |        2,401.67 |
+    | **yet**          | 602,359.50 |         0.36 |        0.47 |         2.88 |   98,917.03 |        0.73 |               0.96 |     109.75 | 37,270,759.00 | 1,732,696.00 |   48,289.00 |      2,156.07 |       23,937.43 |
+    | **immediately**  | 603,343.67 |         0.35 |        0.46 |         2.85 |  112,125.71 |        0.71 |               0.94 |     114.44 | 37,270,759.00 | 1,732,696.00 |   49,084.00 |      2,215.00 |       26,036.00 |
+    | **particularly** | 676,138.83 |         0.30 |        0.41 |         2.40 |   27,928.28 |        0.51 |               0.76 |     106.81 | 37,270,759.00 | 1,732,696.00 |  263,335.50 |     12,304.83 |       20,080.17 |
+    | **inherently**   | 587,989.17 |         0.24 |        0.35 |         2.07 |    5,473.66 |        0.51 |               0.67 |      46.91 | 37,270,759.00 | 1,732,696.00 |   26,468.00 |      1,481.33 |        3,322.17 |
+    | **terribly**     | 591,413.67 |         0.22 |        0.32 |         2.14 |   22,252.94 |        0.57 |               0.69 |      67.21 | 37,270,759.00 | 1,732,696.00 |   31,787.00 |      1,679.65 |        8,078.35 |
+    
+
+
+
+|                  |   `mean_f` |   `mean_dP1` |   `mean_P1` |   `mean_LRC` |   `mean_G2` |   `mean_MI` |   `mean_oddsRDisc` |   `mean_t` |      `mean_N` |    `mean_f1` |   `mean_f2` |   `mean_expF` |   `mean_unexpF` |
+|:-----------------|-----------:|-------------:|------------:|-------------:|------------:|------------:|-------------------:|-----------:|--------------:|-------------:|------------:|--------------:|----------------:|
+| **necessarily**  | 593,167.33 |         0.76 |        0.87 |         5.74 |  116,427.51 |        1.00 |               1.84 |     110.48 | 37,270,759.00 | 1,732,696.00 |   25,027.00 |      1,161.20 |       20,617.80 |
+| **that**         | 641,370.67 |         0.68 |        0.79 |         5.12 |  420,547.31 |        0.96 |               1.60 |     217.42 | 37,270,759.00 | 1,732,696.00 |  106,878.00 |      5,007.91 |       79,530.09 |
+| **exactly**      | 594,950.33 |         0.66 |        0.76 |         4.76 |  105,993.66 |        0.95 |               1.53 |     109.68 | 37,270,759.00 | 1,732,696.00 |   29,842.00 |      1,366.77 |       20,946.23 |
+| **any**          | 586,236.83 |         0.56 |        0.67 |         4.36 |   26,933.36 |        0.86 |               1.42 |      69.16 | 37,270,759.00 | 1,732,696.00 |   17,789.50 |        851.61 |        7,373.39 |
+| **remotely**     | 581,943.33 |         0.46 |        0.57 |         3.59 |    9,770.42 |        0.78 |               1.16 |      49.63 | 37,270,759.00 | 1,732,696.00 |    9,383.50 |        558.48 |        3,192.02 |
+| **ever**         | 599,194.67 |         0.38 |        0.49 |         2.90 |    7,218.74 |        0.41 |               0.95 |      34.23 | 37,270,759.00 | 1,732,696.00 |   59,567.50 |      2,918.83 |        2,401.67 |
+| **yet**          | 602,359.50 |         0.36 |        0.47 |         2.88 |   98,917.03 |        0.73 |               0.96 |     109.75 | 37,270,759.00 | 1,732,696.00 |   48,289.00 |      2,156.07 |       23,937.43 |
+| **immediately**  | 603,343.67 |         0.35 |        0.46 |         2.85 |  112,125.71 |        0.71 |               0.94 |     114.44 | 37,270,759.00 | 1,732,696.00 |   49,084.00 |      2,215.00 |       26,036.00 |
+| **particularly** | 676,138.83 |         0.30 |        0.41 |         2.40 |   27,928.28 |        0.51 |               0.76 |     106.81 | 37,270,759.00 | 1,732,696.00 |  263,335.50 |     12,304.83 |       20,080.17 |
+| **inherently**   | 587,989.17 |         0.24 |        0.35 |         2.07 |    5,473.66 |        0.51 |               0.67 |      46.91 | 37,270,759.00 | 1,732,696.00 |   26,468.00 |      1,481.33 |        3,322.17 |
+| **terribly**     | 591,413.67 |         0.22 |        0.32 |         2.14 |   22,252.94 |        0.57 |               0.69 |      67.21 | 37,270,759.00 | 1,732,696.00 |   31,787.00 |      1,679.65 |        8,078.35 |
 
 
