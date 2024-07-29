@@ -1,9 +1,0 @@
-key,unit,stage,path
-adv~adj_initial,adv~adj,initial,/share/compling/projects/sanpi/results/assoc_df/adv_adj/ANYmirror/AdvAdj_ALL_any-mirror_final-freq_min5000x.parq
-bigram_initial,bigram,initial,/share/compling/projects/sanpi/results/assoc_df/polar/mirror/bigram/polarized-bigram_ALL-mirror_min5000x.parq
-adv_initial,adv,initial,/share/compling/projects/sanpi/results/assoc_df/polar/mirror/adv/polarized-adv_ALL-mirror_min5000x.parq
-adj_initial,adj,initial,/share/compling/projects/sanpi/results/assoc_df/polar/mirror/adj/polarized-adj_ALL-mirror_min5000x.parq
-adv~adj_extra,adv~adj,extra,/share/compling/projects/sanpi/results/assoc_df/adv_adj/ANYmirror/extra/AdvAdj_ALL_any-mirror_final-freq_min5000x_extra.parq
-bigram_extra,bigram,extra,/share/compling/projects/sanpi/results/assoc_df/polar/mirror/bigram/extra/polarized-bigram_ALL-mirror_min5000x_extra.parq
-adv_extra,adv,extra,/share/compling/projects/sanpi/results/assoc_df/polar/mirror/adv/extra/polarized-adv_ALL-mirror_min5000x_extra.parq
-adj_extra,adj,extra,/share/compling/projects/sanpi/results/assoc_df/polar/mirror/adj/extra/polarized-adj_ALL-mirror_min5000x_extra.parq

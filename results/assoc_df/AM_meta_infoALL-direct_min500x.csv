@@ -1,9 +1,0 @@
-,key,unit,stage,path
-0,adv~adj_initial,adv~adj,initial,/share/compling/projects/sanpi/results/assoc_df/adv_adj/ANYdirect/AdvAdj_ALL_any-direct_final-freq_min500x.parq
-1,bigram_initial,bigram,initial,/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/bigram/polarized-bigram_ALL-direct_min500x.parq
-2,adv_initial,adv,initial,/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/adv/polarized-adv_ALL-direct_min500x.parq
-3,adj_initial,adj,initial,/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/adj/polarized-adj_ALL-direct_min500x.parq
-4,adv~adj_extra,adv~adj,extra,/share/compling/projects/sanpi/results/assoc_df/adv_adj/ANYdirect/extra/AdvAdj_ALL_any-direct_final-freq_min500x_extra.parq
-5,bigram_extra,bigram,extra,/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/bigram/extra/polarized-bigram_ALL-direct_min500x_extra.parq
-6,adv_extra,adv,extra,/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/adv/extra/polarized-adv_ALL-direct_min500x_extra.parq
-7,adj_extra,adj,extra,/share/compling/projects/sanpi/results/assoc_df/polar/RBdirect/adj/extra/polarized-adj_ALL-direct_min500x_extra.parq
