@@ -17,7 +17,7 @@ FOCUS = ['f',
          'N', 'f1', 'f2', 'E11', 'unexpected_f',
          'l1', 'l2',
          'adv', 'adv_total', 'adj', 'adj_total']
-ABBR_FOCUS=adjust_assoc_columns(FOCUS)
+ABBR_FOCUS = adjust_assoc_columns(FOCUS)
 
 
 def locate_polar_am_paths(data_tag: str = 'ALL',
@@ -86,14 +86,14 @@ def filter_load_adx_am(am_path: Path, column_list: list = None) -> pd.DataFrame:
             am_df = pd.read_parquet(am_path, columns=column_list)
         except pyar.ArrowInvalid:
             am_df = pd.read_parquet(am_path, columns=backup_columns)
-            
+
     elif am_path.suffix.startswith('.csv'):
         snippet_cols = pd.read_csv(am_path, nrows=3).columns
         am_df = pd.read_csv(
             am_path,
             usecols=['key'] + (column_list
-                     if any(snippet_cols.str.startswith(('adv', 'adj')))
-                     else backup_columns), 
+                               if any(snippet_cols.str.startswith(('adv', 'adj')))
+                               else backup_columns),
             index_col='key')
     elif '.pkl' in am_path.suffixes:
         am_df = pd.read_pickle(am_path).filter(column_list)
@@ -124,24 +124,24 @@ def get_top_vals(df: pd.DataFrame,
     return top.sort_values(metric_filter, ascending=False)
 
 
-def show_top_positive(adv_df, 
+def show_top_positive(adv_df,
                       k: int = 15,
                       filter_and_sort: list = ['conservative_log_ratio',
-                                            'am_log_likelihood', 
-                                            'am_p1_given2']):
-    
+                                               'am_log_likelihood',
+                                               'am_p1_given2']):
+
     _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
     _N = int(adv_df.N.iat[0])
     ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith(
         "com") else '(`mirror`, $@P$)'
     print(f'#### Adverbs in top {k}',
           r'for $LRC$, $G^2$, and $\Delta P(\texttt{env}|\texttt{adv})$',
-          f'measuring association with *{_l1.capitalize()}* Environments {ie}', 
+          f'measuring association with *{_l1.capitalize()}* Environments {ie}',
           end='\n'*2)
     print(f'Total Tokens in dataset: $N = {_N:,}$')
     nb_show_table(
         get_top_vals(
-            adv_df.filter(items=FOCUS), 
+            adv_df.filter(items=FOCUS),
             k=k,
             metric_filter=filter_and_sort,
             index_like='O',  # should match "POS" & "COM", but neither "NEG*"
@@ -238,7 +238,8 @@ def show_adv_bigrams(sample_size, C,
                                               'adv', 'adv_total'])]
                         ])
             bdf = bdf.loc[bdf.LRC >= 1, :]
-            adv_pat_bigrams = get_top_bigrams(bdf, adv, bigram_k).filter(ABBR_FOCUS)
+            adv_pat_bigrams = (get_top_bigrams(bdf, adv, bigram_k)
+                               .filter(adjust_assoc_columns(focus_cols)))
 
             if adv_pat_bigrams.empty:
                 print(f'No bigrams found in loaded `{pat}` AM table.')
@@ -247,7 +248,7 @@ def show_adv_bigrams(sample_size, C,
                       f'bigrams (sorted by `{selector}`; `LRC > 1`)\n')
                 column_list = column_list or adv_pat_bigrams.columns.to_list()
                 nb_show_table(adv_pat_bigrams.filter(column_list)
-                              .filter(regex=r'^[^a]|_total$'), 
+                              .filter(regex=r'^[^a]|_total$'),
                               n_dec=2)
 
             adj_for_adv.extend(adv_pat_bigrams.adj.drop_duplicates().to_list())
@@ -276,38 +277,43 @@ def show_adv_bigrams(sample_size, C,
 
 
 def combine_top_adv(df_1: pd.DataFrame,
-                name_1: str,
-                df_2: pd.DataFrame,
-                name_2: str,
-                adv_am_paths, 
-                data_tag:str='ALL',
-                env_filter: str = 'NEG',
-                filter_items: list = FOCUS,
-                k: int = 10) -> pd.DataFrame:
+                    name_1: str,
+                    df_2: pd.DataFrame,
+                    name_2: str,
+                    adv_am_paths,
+                    data_tag: str = 'ALL',
+                    env_filter: str = 'NEG',
+                    filter_items: list = FOCUS,
+                    k: int = 10) -> pd.DataFrame:
 
     def _fill_empties(name_1, name_2, both, loaded_paths, adv_set):
 
         def load_backup(
-                        adv_set:set,
+            adv_set: set,
             lower_floor: int = None,
-                        loaded_path: Path = adv_am_paths['RBdirect'], 
-                        ) -> pd.DataFrame:
-            lower_floor = lower_floor or round(SET_FLOOR//3, (-2 if SET_FLOOR//3 > 100 else -1))
+            loaded_path: Path = adv_am_paths['RBdirect'],
+        ) -> pd.DataFrame:
+            lower_floor = lower_floor or round(
+                SET_FLOOR//3, (-2 if SET_FLOOR//3 > 100 else -1))
             located_paths = tuple(loaded_path.parent.glob(
                 f'{data_tag}*min{lower_floor}x*parq'))
             try:
-                backup_path = located_paths[0] 
-            except IndexError: 
+                backup_path = located_paths[0]
+            except IndexError:
                 try:
-                    backup_path = tuple(loaded_path.parent.glob(f'*{data_tag}*min5x*parq'))[0]
-                except IndexError as e: 
-                    raise FileNotFoundError('Error. Backup data not found. [in fill_empties()]') from e
-            
-            backup_df = pd.read_parquet(backup_path, columns=FOCUS, filters=[('l2', 'in', adv_set)])
+                    backup_path = tuple(loaded_path.parent.glob(
+                        f'*{data_tag}*min5x*parq'))[0]
+                except IndexError as e:
+                    raise FileNotFoundError(
+                        'Error. Backup data not found. [in fill_empties()]') from e
 
-            backup_df = backup_df.filter(like='NEG', axis=0).reset_index().set_index('l2')
+            backup_df = pd.read_parquet(backup_path, columns=FOCUS, filters=[
+                                        ('l2', 'in', adv_set)])
+
+            backup_df = backup_df.filter(
+                like='NEG', axis=0).reset_index().set_index('l2')
             backup_df.index.name = 'adv'
-            
+
             return backup_df
 
         for name in (name_1, name_2):
@@ -316,7 +322,8 @@ def combine_top_adv(df_1: pd.DataFrame,
             if any(both[f'f_{name}'].isna()):
 
                 floor = 10
-                neg_backup = load_backup(lower_floor=floor, loaded_path=path, adv_set=adv_set)
+                neg_backup = load_backup(
+                    lower_floor=floor, loaded_path=path, adv_set=adv_set)
 
                 neg_backup.columns = (pd.Series(adjust_assoc_columns(neg_backup.columns)
                                                 ) + f'_{name}').to_list()
@@ -327,12 +334,11 @@ def combine_top_adv(df_1: pd.DataFrame,
                     both[f'f_{name}'].isna(), :].index.to_list()
 
                 both.loc[undefined_adv,
-                        neg_backup.columns] = neg_backup.filter(items=undefined_adv, axis=0)
+                         neg_backup.columns] = neg_backup.filter(items=undefined_adv, axis=0)
 
                 both[cats] = both[cats].astype('category')
 
         return both
-
 
     def _add_f_ratio(df, subset_name, superset_name):
         counts = df.filter(regex=r'^[Nf][12]?').columns.str.split(
@@ -340,23 +346,21 @@ def combine_top_adv(df_1: pd.DataFrame,
         for count in counts:
             ratio_col = f'ratio_{count}{subset_name}'
             df[ratio_col] = (df[f'{count}{subset_name}']
-                            / df[f'{count}{superset_name}'])
+                             / df[f'{count}{superset_name}'])
             # print(df.filter(like=count))
         return df
 
-
     def _add_means(both):
         for metric in (both.select_dtypes(include='number').columns.to_series()
-                    .str.replace(r'_(MIR|SET)$', '', regex=True).unique()):
+                       .str.replace(r'_(MIR|SET)$', '', regex=True).unique()):
             both[f'mean_{snake_to_camel(metric)}'] = both.filter(
                 regex=f"^{metric}").agg('mean', axis='columns')
         return both
 
-
     def _narrow_selection(df: pd.DataFrame,
-                        top_adv: list,
-                        env_filter: str = 'NEG',
-                        filter_items: list = FOCUS):
+                          top_adv: list,
+                          env_filter: str = 'NEG',
+                          filter_items: list = FOCUS):
         df = adjust_assoc_columns(
             df.filter(items=filter_items)
             .filter(like=env_filter, axis=0)
@@ -367,9 +371,9 @@ def combine_top_adv(df_1: pd.DataFrame,
             2).sort_values(['LRC', 'dP1', ], ascending=False))
 
         return df
-    
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     
+
+    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
     print(f'### `{data_tag}` Most Negative Adverb Selections')
     top_dfs = [
         (get_top_vals(adv_df,  k=k,
@@ -401,7 +405,8 @@ def combine_top_adv(df_1: pd.DataFrame,
     both = df_1.join(df_2, how="outer", lsuffix=name_1, rsuffix=name_2)
 
     # ! Empty cells need to be filled _before_ calculating mean
-    both = _fill_empties(name_1, name_2, both, adv_am_paths, adv_set=set(top_adv))
+    both = _fill_empties(name_1, name_2, both,
+                         adv_am_paths, adv_set=set(top_adv))
     both = force_ints(both)
     both = _add_means(both)
     both = _add_f_ratio(both, name_2, name_1)
