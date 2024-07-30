@@ -39,8 +39,9 @@ FOCUS_DICT = {
         'adv_adj': BASIC_FOCUS + P2_COLS,
         'polar': BASIC_FOCUS + P2_COLS + ADX_COLS
     }}
-FOCUS = BASIC_FOCUS
-ABBR_FOCUS = adjust_am_names(FOCUS)
+
+NEG_WORDS = ("n't", 'not', 'barely', 'hardly', 'scarcely', 'rarely',
+             'without', 'nowhere', 'nothing', 'nor', 'non', 'never', 'no', 'none')
 
 
 def _set_priorities():
@@ -95,25 +96,13 @@ def locate_polar_am_paths(data_tag: str = 'ALL',
 
         am_paths[key] = paths_tuple[0]
 
-    show_sample(format='fancy_grid',
-                df=pd.DataFrame.from_dict(
-                    am_paths, orient='index',
-                    columns=['path to selected AM dataframe']))
+    print(pd.DataFrame.from_dict(am_paths, orient='index',
+                                 columns=['path to selected AM dataframe'])
+          .to_markdown(tablefmt='fancy_grid', maxcolwidths=[None, 72]))
     return am_paths
 
 
 def locate_bigram_am_paths(data_tag, mirror_floor, bigram_floor):
-    # // def floor(name):
-    # //     return mirror_floor if name.endswith("mirror") else bigram_floor
-    # // paths_dict = {
-    # //     d.name: tuple(
-    # //         d.joinpath('bigram/extra').glob(
-    # //             f'*{data_tag}*min{floor(d.name)}x*extra.parq')
-    # //     )[0]
-    # //     for d in POLAR_DIR.iterdir()
-    # // }
-    # // pprint(paths_dict)
-    # // return paths_dict
 
     return locate_polar_am_paths(data_tag, unit='bigram',
                                  superset_floor=bigram_floor,
@@ -133,9 +122,12 @@ def load_bigram_dfs(bigram_am_paths) -> dict:
 
 
 def filter_load_adx_am(am_path: Path, column_list: list = None) -> pd.DataFrame:
-    column_list = column_list or FOCUS
+    _tag = 'NEQ' if am_path.name.count('NEQ') != 0 else 'ALL'
+    column_list = column_list or FOCUS_DICT[_tag]['polar']
+
     backup_columns = pd.Series(column_list + ['adv', 'adv_total', 'adj', 'adj_total']
                                ).drop_duplicates(keep=False).tolist()
+
     if am_path.suffix.startswith('.parq'):
         try:
             am_df = pd.read_parquet(am_path, columns=column_list)
@@ -150,62 +142,97 @@ def filter_load_adx_am(am_path: Path, column_list: list = None) -> pd.DataFrame:
                                if any(snippet_cols.str.startswith(('adv', 'adj')))
                                else backup_columns),
             index_col='key')
+
     elif '.pkl' in am_path.suffixes:
         am_df = pd.read_pickle(am_path).filter(column_list)
+
     return update_index(am_df.convert_dtypes())
 
 
 def get_top_vals(df: pd.DataFrame,
                  index_like: str = 'NEG',
                  metric_filter: str or list = None,
+                 data_tag: str = 'ALL',
                  k: int = 10,
-                 val_col: str = None,
+                 eval_type: str = 'polar',
+                 val_col: str = 'adv',
                  ignore_neg_adv: bool = True):
+
     if metric_filter is None:
         metric_filter = ['am_p1_given2', 'conservative_log_ratio']
-    env_df = df.copy().loc[df.conservative_log_ratio >=
-                           1].filter(like=index_like, axis=0)
-    if ignore_neg_adv:
-        env_df = env_df.loc[~df.l2.isin(
-            ("n't", 'not', 'barely', 'never', 'no', 'none')), :]
-    if isinstance(metric_filter, str):
+    elif isinstance(metric_filter, str):
         metric_filter = [metric_filter]
 
+    # > get filter list and columns on the same page ---> adjust everything
+    metric_filter = adjust_am_names(metric_filter)
+    env_df = adjust_am_names(df.copy()
+                             .filter(like=index_like, axis=0))
+
+    # > filter to only "significant" association, based on LRC
+    env_df = env_df.loc[env_df.LRC >= 1, :]
+
+    if ignore_neg_adv:
+
+        if 'l2' in env_df.columns:
+            if not any(env_df.l2.str.contains('_')):
+                env_df = env_df.loc[~env_df.l2.isin(NEG_WORDS), :]
+            else:
+                l2_has_neg = ((env_df.l2.str.startswith(NEG_WORDS))
+                              |
+                              (env_df.l2.str.endswith(NEG_WORDS)))
+
+                env_df = env_df.loc[~l2_has_neg, :]
+        elif any(env_df.filter(['adv', 'adj'])):
+            adx_has_neg = any(
+                env_df.filter(['adv', 'adj'])
+                .apply(lambda adx: adx.isin(NEG_WORDS)), axis=1)
+            env_df = env_df.loc[~adx_has_neg, :]
+
+    env_df = adjust_am_names(env_df)
     top = pd.concat([env_df.nlargest(k, m) for m in metric_filter]
                     ).drop_duplicates(keep='first')
 
     if val_col:
-        top = top[[val_col] + metric_filter]
+        top = top.filter([val_col] + metric_filter +
+                         adjust_am_names(FOCUS_DICT[data_tag][eval_type]))
 
     return top.sort_values(metric_filter, ascending=False)
 
 
 def show_top_positive(adv_df,
+                      data_tag: str,
                       k: int = 15,
                       filter_and_sort: list = None):
 
     if filter_and_sort is None:
-        filter_and_sort = [
-            'conservative_log_ratio',
-            'am_log_likelihood',
-            'am_p1_given2',
-        ]
+        filter_and_sort = METRIC_PRIORITY_DICT[data_tag][:3]
     _l1 = adv_df.filter(like='O', axis=0).l1.iat[0].lower().strip()
     _N = int(adv_df.N.iat[0])
+
     ie = '(`set_diff`, $*\complement_{N^+}$)' if _l1.startswith(
         "com") else '(`mirror`, $@P$)'
-    print(f'#### Adverbs in top {k}',
-          r'for $LRC$, $G^2$, and $\Delta P(\texttt{env}|\texttt{adv})$',
-          f'measuring association with *{_l1.capitalize()}* Environments {ie}',
+    print(f'#### Top {k} Adverbs in *{_l1.capitalize()}* Polarity Environment {ie}\n\n'
+          f'> ranked by `{repr(filter_and_sort)}`',
           end='\n'*2)
-    print(f'Total Tokens in dataset: $N = {_N:,}$')
+    print(f'**Total Tokens in dataset**: $N = {_N:,}$')
+
+    _focus_cols = adjust_am_names(FOCUS_DICT[data_tag]['polar'])
+    adv_df = adjust_am_names(adv_df)
+    focused_df = adv_df.filter(_focus_cols)
+
+    if focused_df.empty:
+        raise ValueError('Dataframe is empty. Cannot select top values.')
+
+    top = get_top_vals(
+        focused_df,
+        k=k,
+        metric_filter=filter_and_sort,
+        # > should match "POS" & "COM", but neither "NEG*"
+        index_like='O',
+    )
+
     nb_show_table(
-        get_top_vals(
-            adv_df.filter(items=FOCUS),
-            k=k,
-            metric_filter=filter_and_sort,
-            index_like='O',  # should match "POS" & "COM", but neither "NEG*"
-        ).round(2).sort_values(filter_and_sort, ascending=False)
+        top.round(2).sort_values(filter_and_sort, ascending=False)
         .set_index('l2').drop(['N', 'l1'], axis=1)
     )
 
@@ -248,15 +275,14 @@ def show_adv_bigrams(sample_size, C,
                      bigram_dfs,
                      selector: str = 'dP1',
                      column_list: list = None,
-                     focus_cols: list = FOCUS) -> dict:
-    def _force_ints(_df):
-        count_cols = _df.filter(regex=r'total$|^[fN]').columns
-        _df.loc[:, count_cols] = _df.loc[:, count_cols].apply(
-            pd.to_numeric, downcast='unsigned')
-        return _df
+                     focus_cols: list = None,
+                     data_tag: str = None) -> dict:
+    if not data_tag:
+        n_vals = bigram_dfs[0].l1.value_counts().to_list()
+        data_tag = 'NEQ' if (n_vals[0] - n_vals[1]) < 10 else 'ALL'
 
     def get_top_bigrams(bdf, adv, bigram_k):
-        bdf = _force_ints(bdf.loc[bdf.adv == adv, :])
+        bdf = bdf.loc[bdf.adv == adv, :].convert_dtypes()
         top_by_metric = [bdf.nlargest(bigram_k * 2, m) for m in ['dP1', 'LRC']]
         half_k = bigram_k // 2
         adv_pat_bigrams = pd.concat(
@@ -330,13 +356,6 @@ def show_adv_bigrams(sample_size, C,
     return bigram_samples, bigram_k
 
 
-# def uncat(df):
-#     cats = df.select_dtypes('category').columns
-#     df[cats] = df[cats].astype('string')
-#     # print(df.dtypes)
-#     return df, cats
-
-
 def combine_top_adv(df_1: pd.DataFrame,
                     name_1: str,
                     df_2: pd.DataFrame,
@@ -344,40 +363,42 @@ def combine_top_adv(df_1: pd.DataFrame,
                     adv_am_paths,
                     data_tag: str = 'ALL',
                     env_filter: str = 'NEG',
-                    filter_items: list = FOCUS,
+                    filter_items: list = None,
                     set_floor: int = 5000,
 
                     k: int = 10) -> pd.DataFrame:
 
+    if filter_items is None or not any(df_1.filter(filter_items)):
+        filter_items = FOCUS_DICT[data_tag]['polar']
+
     def _fill_empties(name_1, name_2, both, loaded_paths, adv_set):
 
-        def load_backup(
-            adv_set: set,
-            lower_floor: int = None,
-            loaded_path: Path = adv_am_paths['RBdirect'],
-        ) -> pd.DataFrame:
+        def load_fallback(adv_set: set,
+                          lower_floor: int = None,
+                          loaded_path: Path = adv_am_paths['RBdirect'],
+                          ) -> pd.DataFrame:
             lower_floor = lower_floor or round(
                 set_floor//3, (-2 if set_floor//3 > 100 else -1))
             located_paths = tuple(loaded_path.parent.glob(
                 f'{data_tag}*min{lower_floor}x*parq'))
             try:
-                backup_path = located_paths[0]
+                fallback_path = located_paths[0]
             except IndexError:
                 try:
-                    backup_path = tuple(loaded_path.parent.glob(
+                    fallback_path = tuple(loaded_path.parent.glob(
                         f'*{data_tag}*min5x*parq'))[0]
                 except IndexError as e:
                     raise FileNotFoundError(
                         'Error. Backup data not found. [in fill_empties()]') from e
 
-            backup_df = pd.read_parquet(backup_path, columns=FOCUS, filters=[
-                                        ('l2', 'in', adv_set)])
+            fallback_df = pd.read_parquet(fallback_path,
+                                          filters=[('l2', 'in', adv_set)])
 
-            backup_df = backup_df.filter(
+            fallback_df = fallback_df.filter(
                 like='NEG', axis=0).reset_index().set_index('l2')
-            backup_df.index.name = 'adv'
+            fallback_df.index.name = 'adv'
 
-            return backup_df
+            return fallback_df
 
         for name in (name_1, name_2):
             name = name.strip('_')
@@ -385,19 +406,21 @@ def combine_top_adv(df_1: pd.DataFrame,
             if any(both[f'f_{name}'].isna()):
 
                 floor = 10
-                neg_backup = load_backup(
+                neg_fallback = load_fallback(
                     lower_floor=floor, loaded_path=path, adv_set=adv_set)
 
-                neg_backup.columns = (pd.Series(adjust_am_names(neg_backup.columns)
-                                                ) + f'_{name}').to_list()
+                neg_fallback.columns = (
+                    pd.Series(adjust_am_names(neg_fallback.columns))
+                    + f'_{name}').to_list()
                 both, cats = catify(both, reverse=True)
-                neg_backup, __ = catify(neg_backup, reverse=True)
+                neg_fallback, __ = catify(neg_fallback, reverse=True)
 
                 undefined_adv = both.loc[
                     both[f'f_{name}'].isna(), :].index.to_list()
 
-                both.loc[undefined_adv,
-                         neg_backup.columns] = neg_backup.filter(items=undefined_adv, axis=0)
+                both.loc[undefined_adv, neg_fallback.columns
+                         ] = neg_fallback.filter(
+                             items=undefined_adv, axis=0)
 
                 both[cats] = both[cats].astype('category')
 
@@ -423,46 +446,59 @@ def combine_top_adv(df_1: pd.DataFrame,
     def _narrow_selection(df: pd.DataFrame,
                           top_adv: list,
                           env_filter: str = 'NEG',
-                          filter_items: list = FOCUS):
+                          sort_by: list = None,
+                          column_filter: list = None):
+        # if not any(f.startswith(('LRC','dP', 'P', 'G', 'exp_', 'unexp_')) for f in filter_items):
+        column_filter = adjust_am_names(column_filter)
         df = adjust_am_names(
-            df.filter(items=filter_items)
+            df.filter(items=column_filter)
             .filter(like=env_filter, axis=0)
             .reset_index().set_index('l2')
-            .filter(top_adv, axis=0)).sort_values(['LRC', 'dP1'], ascending=False)
+            .filter(top_adv, axis=0)).sort_values(sort_by, ascending=False)
         df.index.name = 'adv'
-        nb_show_table(df.drop(['N', 'key', 'l1'], axis=1).round(
-            2).sort_values(['LRC', 'dP1', ], ascending=False))
+        nb_show_table(df.drop(columns=['N', 'key', 'l1']).round(
+            2).sort_values(sort_by, ascending=False))
 
         return df
 
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+    metric_filter = METRIC_PRIORITY_DICT[data_tag][:2]
     print(f'### `{data_tag}` Most Negative Adverb Selections')
     top_dfs = [
         (get_top_vals(adv_df,  k=k,
                       index_like=env_filter,
-                      metric_filter=['am_p1_given2',
-                                     'conservative_log_ratio'])
-         .sort_values('conservative_log_ratio', ascending=False))
-        for adv_df in [df_1, df_2]
+                      metric_filter=metric_filter)
+         .sort_values(metric_filter[0], ascending=False))
+        for adv_df in [adjust_am_names(d) for d in (df_1, df_2)]
     ]
     for i, name in enumerate([name_1, name_2]):
 
         print_iter(
             [f'_{w}_' for w in top_dfs[i].l2], bullet='1.',
             header=(f'`{name}`: union of top {k} adverbs ranked by '
-                    r'$LRC$ & $\Delta P(\texttt{env}|\texttt{adv})$'))
+                    f'`{repr(metric_filter)}`\n'))
     top_adv_lists = [dx.l2.to_list() for dx in top_dfs]
     top_adv = pd.Series(top_adv_lists[0] + top_adv_lists[1]).drop_duplicates()
     # top_adv = pd.concat((top_dfs[0].l2, top_dfs[1].l2)).drop_duplicates()
 
     print_iter(
         [f'_{w}_' for w in top_adv], bullet='1.',
-        header=f'Union of top adverbs for `{name_1}` and `{name_2}`. (Novel `{name_2}` adverbs listed last)')
+        header=(f'Union of top adverbs for `{name_1}` and `{name_2}`. '
+                f'(Novel `{name_2}` adverbs listed last)'))
+
     print(f'\n### `{name_1}` Adverb Associations (in initially loaded table)\n')
-    df_1 = _narrow_selection(df_1, top_adv, env_filter, filter_items)
+    df_1 = _narrow_selection(df_1,
+                             top_adv=top_adv,
+                             env_filter=env_filter,
+                             sort_by=metric_filter,
+                             column_filter=filter_items)
+
     print(f'\n### `{name_2}` Adverb Associations (in initially loaded table)\n')
-    df_2 = _narrow_selection(df_2, top_adv, env_filter, filter_items)
+    df_2 = _narrow_selection(df_2,
+                             top_adv=top_adv,
+                             env_filter=env_filter,
+                             sort_by=metric_filter,
+                             column_filter=filter_items)
 
     name_1, name_2 = [f"_{n.strip('_')}" for n in [name_1, name_2]]
     both = df_1.join(df_2, how="outer", lsuffix=name_1, rsuffix=name_2)
@@ -473,7 +509,7 @@ def combine_top_adv(df_1: pd.DataFrame,
     both = force_ints(both)
     both = _add_means(both)
     both = _add_f_ratio(both, name_2, name_1)
-    return both.sort_values('mean_dP1', ascending=False)
+    return both.sort_values(f'mean_{metric_filter[0]}', ascending=False)
 
 
 def compare_datasets(adv_am,
@@ -744,13 +780,13 @@ def seek_top_adv_am(date_str: str,
     adv_am = []
     while not any(adv_am):
         try:
+            path = tag_top_dir.joinpath(
+                f'{tag_top_str}_NEG-ADV_combined-{adv_floor}.{date_str}.csv')
             adv_am = pd.read_csv(
-                tag_top_dir /
-                f'{tag_top_str}_NEG-ADV_combined-{adv_floor}.{date_str}.csv',
-                index_col='adv')
+                path, index_col='adv')
         except FileNotFoundError:
             date_str = day_before(date_str)
-
+    print(f'> Loaded top adv AM table from  \n> `{path}`')
     adv_am = adjust_am_names(adv_am).convert_dtypes()
     return adv_am
 
