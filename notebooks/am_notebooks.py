@@ -7,6 +7,7 @@ import pyarrow as pyar
 
 from source.utils.associate import POLAR_DIR, TOP_AM_DIR, adjust_am_names
 from source.utils.dataframes import catify_hit_table as catify
+from source.utils.dataframes import show_sample
 from source.utils.dataframes import update_assoc_index as update_index
 from source.utils.dataframes import write_part_parquet as parq_it
 from source.utils.general import (confirm_dir, print_iter, run_shell_command,
@@ -94,7 +95,10 @@ def locate_polar_am_paths(data_tag: str = 'ALL',
 
         am_paths[key] = paths_tuple[0]
 
-    pprint(am_paths)
+    show_sample(format='fancy_grid',
+                df=pd.DataFrame.from_dict(
+                    am_paths, orient='index',
+                    columns=['path to selected AM dataframe']))
     return am_paths
 
 
@@ -114,6 +118,12 @@ def locate_bigram_am_paths(data_tag, mirror_floor, bigram_floor):
     return locate_polar_am_paths(data_tag, unit='bigram',
                                  superset_floor=bigram_floor,
                                  mirror_floor=mirror_floor)
+
+
+def verify_columns(am_df):
+    if 'adj' in am_df.columns and any(am_df['adj'].isna()):
+        am_df[['adv', 'adj']] = am_df.l2.str.extract(
+            r'^(?P<adv>[^_]+)_(?P<adj>[^_]+)$')
 
 
 def load_bigram_dfs(bigram_am_paths) -> dict:
@@ -286,12 +296,11 @@ def show_adv_bigrams(sample_size, C,
             bdf = adjust_am_names(
                 bdf.loc[:, [
                     c for c in bdf.columns
-                    if c in set(focus_cols + ['adj', 'adj_total',
-                                              'adv', 'adv_total'])]
-                        ])
+                    if c in set(focus_cols + ADX_COLS)]
+                ])
             bdf = bdf.loc[bdf.LRC >= 1, :]
             adv_pat_bigrams = (get_top_bigrams(bdf, adv, bigram_k)
-                               .filter(adjust_am_names(focus_cols)))
+                               .filter(adjust_am_names(focus_cols + ADX_COLS)))
 
             if adv_pat_bigrams.empty:
                 print(f'No bigrams found in loaded `{pat}` AM table.')
@@ -611,7 +620,7 @@ def sample_adv_bigrams(adverb: str,
     paths = []
     for key, df in examples.items():
         out_path = output_dir.joinpath(f'{key}_{n_ex}ex~{len(df)}.csv')
-        if out_path.is_file() and len(df) < n_ex:
+        if out_path.is_file() and not len(df) < n_ex:
             alt_dir = output_dir.joinpath('alt_ex')
             run_shell_command(f'echo "Renaming existing sample..."; mkdir -p "{alt_dir}"; '
                               f'mv -v --backup=numbered "{out_path}" "{alt_dir}/" ; '
@@ -647,7 +656,7 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
     for i, bigram in enumerate(bigrams, start=1):
         bigram_text = bigram.replace("_", " ")
         if verbose:
-            print(f'\n{i}. _{bigram_text}_')
+            print(f'\n### {i}. _{bigram_text}_\n')
 
         ex_for_bigram = sp(
             data=hits_df, print_sample=False, quiet=True,
@@ -657,13 +666,14 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
             filters=[f'bigram_lower=={bigram}'],
             columns=['END::lower', 'text_window', 'token_str'])
         excerpt = embolden(
-            ex_for_bigram.sample(min(len(ex_for_bigram), 5))[
+            ex_for_bigram.sample(min(len(ex_for_bigram), 8))[
                 'token_str'],
             bold_regex=f' ({bigram_text}) '
         ).to_frame()
         excerpt.index = '`'+excerpt.index.astype('string')+'`'
         # TODO: modify this to save markdown example table as file
-        nb_show_table(excerpt, suppress_printing=not verbose)
+        nb_show_table(excerpt, suppress_printing=not verbose,
+                      outpath=output_dir.joinpath(f'{bigram}_ex.md'))
         # print('\n   > ', [f'> {}' for i in ex_for_bigram.sample(3).index])
         examples[bigram] = ex_for_bigram
     return examples
@@ -724,7 +734,13 @@ def embolden(series,
                          r' __`\1`__ ', x, flags=re.I))
 
 
-def seek_top_adv_am(date_str, adv_floor, tag_top_str, tag_top_dir):
+def seek_top_adv_am(date_str: str,
+                    adv_floor: int,
+                    tag_top_dir: Path,
+                    tag_top_str: str = None
+                    ) -> pd.DataFrame:
+    if tag_top_str is None:
+        tag_top_str = tag_top_dir.name
     adv_am = []
     while not any(adv_am):
         try:
@@ -734,8 +750,10 @@ def seek_top_adv_am(date_str, adv_floor, tag_top_str, tag_top_dir):
                 index_col='adv')
         except FileNotFoundError:
             date_str = day_before(date_str)
+
     adv_am = adjust_am_names(adv_am).convert_dtypes()
     return adv_am
+
 
 def day_before(date_str):
     return date_str[:-1]+str(int(date_str[-1])-1)
