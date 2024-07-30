@@ -6,7 +6,7 @@ from source.utils.associate import (BINARY_ASSOC_ARGS, add_extra_am,
                                     associate_ucs, confirm_basic_ucs)
 from source.utils.associate import convert_ucs_to_csv as ucs2csv
 from source.utils.associate import get_associations_csv as init_am, AM_DF_DIR
-from source.utils.associate import manipulate_ucs, seek_readable_ucs, adjust_assoc_columns
+from source.utils.associate import manipulate_ucs, seek_readable_ucs, adjust_am_names
 pd.set_option('display.float_format', '{:,.2f}'.format)
 
 # %% [markdown]
@@ -137,7 +137,7 @@ print(readable.relative_to(RESULT_DIR))
 
 # %% [markdown]
 # Snippet of starting frequency data (`TRIG_TSV`)
-! head -5 {TRIG_TSV} | column -t
+! head - 5 {TRIG_TSV} | column - t
 
 # %% [markdown]
 # 2. Run `confirm_basic_ucs()` (if needed)
@@ -157,7 +157,7 @@ if not readable.is_file():
 init_readable = UCS_DIR.joinpath(
     f'pattern_eval/{PAT_DIR}/readable'
 ).joinpath(f'{TRIG_TSV.name.replace(".tsv","")}_min{FRQ_FLOOR}x.init.txt')
-! head -7 {init_readable}
+! head - 7 {init_readable}
 
 
 # %% [markdown]
@@ -167,9 +167,9 @@ if not readable.is_file():
     associate_ucs(basic_ucs_path)
 
 transform_ucs_log = f'/share/compling/projects/sanpi/logs/associate/ucs//ucs-{PAT_DIR}_Patt{UNIT}_frq-thrMIN-7-35f_min{FRQ_FLOOR}x*.log'
-! head -15 `ls -t1 {transform_ucs_log} | head -1`
+! head - 15 `ls - t1 {transform_ucs_log} | head - 1`
 ! echo '...'
-! tail -2 `ls -t1 {transform_ucs_log} | head -1`
+! tail - 2 `ls - t1 {transform_ucs_log} | head - 1`
 
 # %% [markdown]
 # Define dictionary containing relevant vocab sizes
@@ -184,19 +184,19 @@ transform_ucs_log = f'/share/compling/projects/sanpi/logs/associate/ucs//ucs-{PA
 # | Adv  |      23,125 |       5,004 |      18,121 |
 # | Adj  |      83,422 |      21,562 |      61,860 |
 
-#> _trigger_ vocabs, not pattern
-#// VOCABS = {'ANYmirror': {'Adv': 23125, 'Bigr': 395338, 'Adj': 83422},
-#//           'NEGmirror': {'Adv': 5004, 'Bigr': 64644, 'Adj': 21562},
-#//           'POSmirror': {'Adv': 18121, 'Bigr': 330694, 'Adj': 61860}
-#//           }  # HACK
-#// VOCAB = VOCABS[PAT_DIR][UNIT]
+# > _trigger_ vocabs, not pattern
+# // VOCABS = {'ANYmirror': {'Adv': 23125, 'Bigr': 395338, 'Adj': 83422},
+# //           'NEGmirror': {'Adv': 5004, 'Bigr': 64644, 'Adj': 21562},
+# //           'POSmirror': {'Adv': 18121, 'Bigr': 330694, 'Adj': 61860}
+# //           }  # HACK
+# // VOCAB = VOCABS[PAT_DIR][UNIT]
 VOCAB = None
 pd.DataFrame(VOCABS)
 
 # %% [markdown]
 # 4. Run `ucs_to_csv()` to convert `ucs/[PAT_DIR]/readable/*.txt` to format that `pandas` can parse as a dataframe
 
-! head -5 {readable}
+! head - 5 {readable}
 csv_path = ucs2csv(readable)
 print(f'CSV: `{csv_path.relative_to(RESULT_DIR)}`')
 
@@ -257,7 +257,7 @@ if not df_extra_pkl.is_file():
 
 # %%
 ex_patt_full = ex_patt_amdf.copy()
-ex_patt_abbr = adjust_assoc_columns(
+ex_patt_abbr = adjust_am_names(
     ex_patt_amdf[[c for c in ['polarity', 'quant'] + FOCUS if c in ex_patt_amdf.columns]]).sort_values('LRC', ascending=False)
 cols = ex_patt_abbr.columns
 

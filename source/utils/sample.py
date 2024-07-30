@@ -10,14 +10,13 @@ try:
     from utils.general import print_iter  # pylint: disable=import-error
 except ModuleNotFoundError:
     with contextlib.suppress(ModuleNotFoundError):
-        from source.utils.associate import adjust_assoc_columns
+        from source.utils.associate import adjust_am_names
         from source.utils.dataframes import set_pd_display
         from source.utils.general import print_iter
 else:
-    from utils.associate import adjust_assoc_columns
+    from utils.associate import adjust_am_names
     from utils.dataframes import set_pd_display
 SANPI_DATA = Path('/share/compling/data/sanpi')
-
 
 def sample_pickle(data,
                   sample_size: int = 20,
@@ -122,7 +121,7 @@ def _get_data_sample(sample_size: int,
     if isinstance(data, Path):
         full_frame = _read_data(data, quiet)
         data_name = data.name
-    else: 
+    else:
         full_frame = data
         data_name = 'input frame'
 
@@ -141,7 +140,7 @@ def _get_data_sample(sample_size: int,
     return data
 
 
-def _read_data(read_path:Path, quiet=False) -> pd.DataFrame:
+def _read_data(read_path: Path, quiet=False) -> pd.DataFrame:
     """
     Reads data from a file based on the file format and returns the corresponding DataFrame.
 
@@ -361,16 +360,16 @@ def _select_columns(data_selection: pd.DataFrame,
 
             # > check to see if original index has been included
             # >     if not, add it
-            if index_col_name not in selected_cols: 
+            if index_col_name not in selected_cols:
                 selected_cols.append(index_col_name)
             # > if `selected_cols` was not *only* the index, apply column filter
-            if len(selected_cols) != 1: 
+            if len(selected_cols) != 1:
                 df = df[selected_cols]
-                
+
             #! otherwise, do not filter
             #   index will be returned to original:
             #   if column selection contains no other columns, returned `_df` will be empty
-        
+
         df = df.set_index(index_col_name)
 
     return df
@@ -494,7 +493,7 @@ def _print_table(data_sample: pd.DataFrame,
 
     float_cols = data_sample.select_dtypes(include='float').columns
     data_sample[float_cols] = data_sample[float_cols].apply(
-            round, ndigits=n_dec, axis=round_ax)
+        round, ndigits=n_dec, axis=round_ax)
 
     if any([piped, markdown, tabbed, comma, grid, fancy, outline]):
         if data_sample.shape[1] > max_cols:
@@ -504,9 +503,9 @@ def _print_table(data_sample: pd.DataFrame,
             columns = data_sample.columns
             fmt = set_tablefmt(outline, grid, fancy, markdown)
             if any(columns.str.startswith(
-                       ('am_', 'E11', 'O11', 'f_', 'log_', 'odds_', 
+                ('am_', 'E11', 'O11', 'f_', 'log_', 'odds_',
                         'l1', 'l2', 'conservative_log_ratio'))):
-                columns = adjust_assoc_columns(columns, style='camel')
+                columns = adjust_am_names(columns)
             print(tabulate(data_sample,
                            headers=columns,
                            tablefmt=fmt,

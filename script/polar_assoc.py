@@ -10,7 +10,7 @@ from tabulate import tabulate
 
 from source.utils.associate import (AM_DF_DIR, BINARY_ASSOC_ARGS, READ_TAG,
                                     RESULT_DIR, UCS_DIR, add_extra_am,
-                                    adjust_assoc_columns, get_associations_csv,
+                                    adjust_am_names, get_associations_csv,
                                     get_vocab_size)
 from source.utils.dataframes import (Timer, beef_up_dtypes, corners, save_table,
                                      print_md_table)
@@ -39,21 +39,22 @@ def _main():
 
     args = _parse_args()
     meta_info_path = AM_DF_DIR.joinpath(
-            f'AM_meta_info{args.data_suffix}'.replace('.tsv', f'_min{args.min_freq}x.csv'))
-    if meta_info_path.is_file(): 
-        print(f'Association Meta Info found. Loading from {meta_info_path.relative_to(RESULT_DIR)}')
+        f'AM_meta_info{args.data_suffix}'.replace('.tsv', f'_min{args.min_freq}x.csv'))
+    if meta_info_path.is_file():
+        print(
+            f'Association Meta Info found. Loading from {meta_info_path.relative_to(RESULT_DIR)}')
         data = pd.read_csv(meta_info_path)
-        
+
     else:
         data = designate_data(args)
         data = extend_tables(data, args)
-    
+
     ex_data = data.filter(like='extra', axis=0)
     if 'frame' not in ex_data.columns:
         ex_data['frame'] = ex_data.index.to_series().apply(
-                lambda i: load_from_pickle(
-                    unit=ex_data.unit[i], pkl_path=ex_data.path[i], extra=True))
-        
+            lambda i: load_from_pickle(
+                unit=ex_data.unit[i], pkl_path=ex_data.path[i], extra=True))
+
     if args.verbose:
         for i, assoc_inquiry in enumerate(ex_data.index):
             idf = ex_data.frame.iat[i]
@@ -70,11 +71,11 @@ def _main():
 
         get_skews(ex_data, args.verbose)
 
-        
     save_table(data.filter(regex=r'^[^f]'),
-        meta_info_path, 
-        df_name=f"Association Meta Info for {args.data_suffix.replace('.tsv','')} & displayed joint f >={args.min_freq}"
-        )
+               meta_info_path,
+               df_name=f"Association Meta Info for {args.data_suffix.split('.tsv')[0]} & displayed joint f >={args.min_freq}"
+               )
+
 
 def _parse_args():
     base_freq_tsv_name = 'AdvAdj_frq-thrMIN-7.35f.tsv'
@@ -117,7 +118,7 @@ def _parse_args():
         "counts for bigram tokens with no *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'positive polarity' environments.) "
         "The transformed frequency data will be saved as "
-        "`polarity_prepped_tsv/[COMP_LABEL]_bigram_counts[DATA_SUFFIX]`"
+        "`polarity_prepped_tsv/[COMP_LABEL]_bigram_[DATA_SUFFIX]`"
     )
     comp_label_help = (
         "Option to set the label for comparison (set difference, not negated, 'positive', etc.) counts. "
@@ -128,7 +129,7 @@ def _parse_args():
         "counts for bigram tokens with *identified* negation dependencies. "
         "(An approximation of bigrams occurring in 'negative polarity' environments.) "
         "The transformed frequency data will be saved as "
-        "`polarity_prepped_tsv/[NEG_LABEL]_bigram_counts[DATA_SUFFIX]`"
+        "`polarity_prepped_tsv/[NEG_LABEL]_bigram_[DATA_SUFFIX]`"
     )
     target_label_help = (
         "Option to set the label for target counts; "
@@ -189,13 +190,15 @@ def _parse_args():
     # // # !   or the following assignments will be messed up.
     # // args_tuple = BINARY_ASSOC_ARGS._make(args.__dict__.values())
     # Explicit assignement is safer 🦺
-    return BINARY_ASSOC_ARGS(min_freq=args.min_freq,
-                             all_counts=args.all_counts,
-                             compare_counts=args.compare_counts,
-                             comp_label=args.comp_label,
-                             target_counts=args.target_counts,
-                             targ_label=args.targ_label,
-                             data_suffix=args.data_suffix,
+    return BINARY_ASSOC_ARGS(min_freq=int(str(args.min_freq).strip()),
+                             all_counts=Path(str(args.all_counts).strip()),
+                             compare_counts=Path(
+                                 str(args.compare_counts).strip()),
+                             comp_label=str(args.comp_label).strip(),
+                             target_counts=Path(
+                                 str(args.target_counts).strip()),
+                             targ_label=str(args.targ_label).strip(),
+                             data_suffix=str(args.data_suffix).strip(),
                              skew=args.skew,
                              verbose=args.verbose
                              )
@@ -226,7 +229,7 @@ def designate_data(args):
             # >     i.e. not starting with "r_" (so no "ranks")
             # >     ! `?` required in order to allow single character columns, `"f"` and `"N"`
             print_df = df.copy().filter(regex=r'^[^r][^_]?')
-            print_df.columns = adjust_assoc_columns(print_df.columns)
+            print_df.columns = adjust_am_names(print_df.columns)
 
             visible_order = ['key',
                              'f', 'expected_f', 'expect_diff',
@@ -323,7 +326,6 @@ def gen_init_ucs_tables(args):
             input_path=csv_path, added_measures=True)
         stage = 'initial'
 
-
         if df_extra_path.is_file():
             df = load_from_pickle(unit, df_extra_path, extra=True)
             df_path = df_extra_path
@@ -371,13 +373,14 @@ def gen_init_ucs_tables(args):
         yield unit, stage, df_path, df
 
 
-def load_from_pickle(unit:str, 
-                     pkl_path:Path, 
+def load_from_pickle(unit: str,
+                     pkl_path: Path,
                      extra: bool = False):
     _extra = "_extra" if extra else ""
     print(f'\n> Loading `{unit}` data',
-            f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
+          f'from *{_extra}.pkl.gz: {pkl_path.relative_to(RESULT_DIR)}')
     return pd.read_pickle(pkl_path)
+
 
 def handle_word_null(df, csv_path):
     """
@@ -503,9 +506,9 @@ def _extend_assoc_data(data: pd.DataFrame,
 
     extended = pd.concat([data.loc[data.stage == stage_name], new_extend])
     if (f'bigram_{stage_name}' in extended.index
-            and any(adx_col not in
-                    extended.at[f'bigram_{stage_name}', 'frame'].columns
-                    for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
+        and any(adx_col not in
+                        extended.at[f'bigram_{stage_name}', 'frame'].columns
+                        for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
         ):
 
         if all(adx in extended.unit.unique() for adx in ('adv', 'adj', 'bigram')):
@@ -525,7 +528,7 @@ def _extend_assoc_data(data: pd.DataFrame,
                         _data.frame[f'{x}_extra'].filter(regex=r'^[fl]'), adx=x)
                     for x in ('adv', 'adj')]
                 # TODO? add ad* joint f as well as total
-                # def get_adx_polar_f(adx_df: pd.DataFrame, adx: str) -> pd.Series: 
+                # def get_adx_polar_f(adx_df: pd.DataFrame, adx: str) -> pd.Series:
                 #     adx_df = adx_df.copy()[['l1', 'l2', 'f']]
                 #     pass
                 #
@@ -999,7 +1002,8 @@ def get_am_df_path(input_path: Path | str,
     confirm_dir(out_dir)
     #! manually set stem, bc `.stem` attribute yields "STEM.pkl" for "STEM.pkl.gz" paths
     output_stem = (
-        input_path.name.replace('.csv', '').replace(PKL_SUFF, '')
+        input_path.name.replace('.csv', '').replace(
+            PKL_SUFF, '').replace('.parq', '')
         .replace(READ_TAG, '').strip('.'))
 
     if 'SKEW' in output_stem.upper():
@@ -1012,7 +1016,8 @@ def get_am_df_path(input_path: Path | str,
         out_dir = out_dir / 'extra'
         output_stem += '_extra'
     confirm_dir(out_dir)
-    return out_dir.joinpath(output_stem + PKL_SUFF)
+    # return out_dir.joinpath(output_stem + PKL_SUFF)
+    return out_dir.joinpath(output_stem + '.parq')
 
 # def downcast_number(numerical: pd.Series, n_dec: int = 5,
 #                     downcast: str = 'float'):
@@ -1021,18 +1026,39 @@ def get_am_df_path(input_path: Path | str,
 
 
 def _save_am_dataframe(out_path: Path,
-                    _df: pd.DataFrame,
-                    force: bool = False):
+                       _df: pd.DataFrame,
+                       force: bool = False):
 
     def _write_df(out_path: Path, _df):
         csv_too = ''
         out_dir = out_path.parent
-
+        as_pickle = False
         confirm_dir(out_dir)
-        _df.to_pickle(out_path)
-        if len(_df) <= 6500 and _df.size <= 250000:
+        if '.pkl' in out_path.suffixes:
+            as_pickle = True
+            _df.to_pickle(out_path)
+        elif out_path.suffix.startswith('.par'):
+            if 'polar' in out_path.parts:
+
+                partition_by = ['l1']
+                                        
+            else: 
+                partition_by = ['first_char']
+                _df['first_char'] = _df['l1'].str[0].astype('string').astype('category')
+            _df.to_parquet(str(out_path),
+                           engine='pyarrow', 
+                           use_threads=True,
+                           partition_cols=partition_by,
+                           basename_template='group-{i}.parquet',
+                           existing_data_behavior='delete_matching',
+                           row_group_size=500,
+                           max_rows_per_file=1000, 
+                           )
+        if len(_df) <= 5000 and _df.size <= 250000:
             csv_too = " (+ `.csv`)"
-            _df.to_csv(str(out_path).replace(PKL_SUFF, '.csv'))
+            _df.to_csv(str(out_path).replace(PKL_SUFF, '.csv')
+                       if as_pickle
+                       else out_path.with_suffix('.csv'))
         print(
             f'* Dataframe saved: `{out_path.relative_to(RESULT_DIR)}`{csv_too}')
 

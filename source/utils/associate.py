@@ -25,7 +25,7 @@ else:
     import association_measures.frequencies as fq
     import association_measures.measures as am
 
-ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio', #'liddell',
+ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio',  # 'liddell',
                       'mutual_information', 'hypergeometric_likelihood', 'binomial_likelihood']
 ALPHA = 0.005
 READ_TAG = 'rsort-view_am-only'
@@ -53,12 +53,12 @@ confirm_dir(AM_ENV_DIR)
 
 BINARY_ASSOC_ARGS = namedtuple(
     'BINARY_ASSOC_TUPLE',
-    ['min_freq', 'all_counts', 'compare_counts', 'comp_label', 
+    ['min_freq', 'all_counts', 'compare_counts', 'comp_label',
      'target_counts', 'targ_label', 'data_suffix', 'skew', 'verbose'])
 
 
-def adjust_assoc_columns(cols_or_df,
-                         style: str = None) -> list:
+def adjust_am_names(cols_or_df,
+                    style: str = None) -> list:
     """Adjust association columns based on specified style.
 
     This function adjusts association columns by applying replacements and abbreviations based on the specified style.
@@ -71,20 +71,21 @@ def adjust_assoc_columns(cols_or_df,
         list or DataFrame: Modified list of column names or DataFrame with modified column names.
     """
     def change_columns(columns):
-        replacements = {'conservative_log_ratio': 'LRC',
-                        'am_log_likelihood': 'G2',
-                        'log_likelihood': 'G2',
-                        't_score': 't',
-                        'mutual_information': 'MI',
-                        'am_p1_given2': 'dP1',
-                        'am_p2_given1': 'dP2',
-                        'am_p1_given2_simple': 'P1',
-                        'am_p2_given1_simple': 'P2', 
-                        'dP1_simple':'P1',
-                        'dP2_simple':'P2', 
-                        'mean_dP1_simple':'mean_P1',
-                        'mean_dP2_simple':'mean_P2',
-                        }
+        replacements = {
+            'conservative_log_ratio': 'LRC',
+            'am_log_likelihood': 'G2',
+            'log_likelihood': 'G2',
+            't_score': 't',
+            'mutual_information': 'MI',
+            'am_p1_given2': 'dP1',
+            'am_p2_given1': 'dP2',
+            'am_p1_given2_simple': 'P1',
+            'am_p2_given1_simple': 'P2',
+            'dP1_simple': 'P1',
+            'dP2_simple': 'P2',
+            'mean_dP1_simple': 'mean_P1',
+            'mean_dP2_simple': 'mean_P2',
+        }
         abbreviations = {
             r'am_': '',
             r'ratio': 'r',
@@ -93,7 +94,7 @@ def adjust_assoc_columns(cols_or_df,
             r'O': 'obs_',
             r'E': 'exp_',
             r'ative': '',
-            r'unexpected': 'unexp', 
+            r'unexpected': 'unexp',
             r'dP1_simple': 'P1',
             r'dP1Simple': 'P1',
             r'dP2_simple': 'P2',
@@ -140,7 +141,7 @@ def add_extra_am(df: pd.DataFrame,
                  verbose: bool = False,
                  vocab: int = None,
                  ndigits: int = 9,
-                 metrics: list = None, 
+                 metrics: list = None,
                  disc=1):
     """
     ['z_score', 't_score', 'log_likelihood', 'simple_ll', 
@@ -207,7 +208,7 @@ def add_extra_am(df: pd.DataFrame,
     return df.rename(columns=TRANSPARENT_O_NAMES)
 
 
-def adjust_expectations(df, square_root:bool=False):
+def adjust_expectations(df, square_root: bool = False):
     try:
         unexpect = df.unexpected_count
     except AttributeError:
@@ -215,7 +216,7 @@ def adjust_expectations(df, square_root:bool=False):
         df['unexpected_f'] = unexpect
 
     df['unexpected_ratio'] = unexpect / df.f
-    if square_root: 
+    if square_root:
         df['expected_sqrt'] = df.E11.apply(sqrt)
 
         #! `sqrt` will crash if input is negative
@@ -292,8 +293,8 @@ def confirm_basic_ucs(basic_ucs_path: Path,
     if basic_ucs_path.is_file():
         print('+ existing UCS table found ✓')
     elif unit:
-        basic_ucs_path = confirm_polarized_ucs(basic_ucs_path=basic_ucs_path, 
-                                               args=args, 
+        basic_ucs_path = confirm_polarized_ucs(basic_ucs_path=basic_ucs_path,
+                                               args=args,
                                                unit=unit)
     elif contained_counts_path and contained_counts_path.is_file():
         build_ucs_table(min_count=freq_floor,
@@ -337,25 +338,25 @@ def confirm_polarized_ucs(basic_ucs_path: Path,
     return basic_ucs_path
 
 
-def manipulate_ucs(basic_ucs_path: Path, 
-                   args: BINARY_ASSOC_ARGS, 
+def manipulate_ucs(basic_ucs_path: Path,
+                   args: BINARY_ASSOC_ARGS,
                    unit: str):
 
-    basic_ucs_path = initialize_ucs(basic_ucs_path=basic_ucs_path, 
+    basic_ucs_path = initialize_ucs(basic_ucs_path=basic_ucs_path,
                                     args=args, unit=unit)
     associate_ucs(basic_ucs_path)
     return basic_ucs_path
 
 
-def initialize_ucs(basic_ucs_path: Path, 
-                   args: BINARY_ASSOC_ARGS, 
+def initialize_ucs(basic_ucs_path: Path,
+                   args: BINARY_ASSOC_ARGS,
                    unit: str = ''):
 
     print(
         '\nLocating and/or building initial frequency-only UCS table...')
     with Timer() as _timer:
         basic_ucs_path = confirm_basic_ucs(
-            basic_ucs_path=basic_ucs_path, 
+            basic_ucs_path=basic_ucs_path,
             args=args, unit=unit)
         print(
             f'+ path to simple UCS table: `{basic_ucs_path}`')
@@ -394,7 +395,7 @@ def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
     """
 
     # > select readable/*.csv if it exists, else readable/*.txt
-    readable = seek_readable_ucs(unit = unit,
+    readable = seek_readable_ucs(unit=unit,
                                  min_freq=args.min_freq,
                                  target_counts_dir=args.target_counts.parent,
                                  data_suffix=args.data_suffix,
@@ -408,7 +409,7 @@ def get_associations_csv(unit, args: BINARY_ASSOC_ARGS, is_polar) -> Path:
             READ_TAG, '').strip('.')
         basic_ucs_path = readable.parent.with_name(
             f'{init_ucs_stem}.ds.gz')
-        basic_ucs_path = manipulate_ucs(basic_ucs_path=basic_ucs_path, 
+        basic_ucs_path = manipulate_ucs(basic_ucs_path=basic_ucs_path,
                                         args=args, unit=unit)
         # if given path to readable file still does not exist
         if not readable.is_file():
@@ -423,9 +424,9 @@ def seek_readable_ucs(min_freq: int,
                       target_counts_dir: Path = None,
                       data_suffix: str = 'final-direct.tsv',
                       unit: str = '',
-                      is_polar: bool = True, 
+                      is_polar: bool = True,
                       contained_counts_path: Path = None,
-                      ucs_subdir:str=None) -> Path:
+                      ucs_subdir: str = None) -> Path:
     min_freq_flag = f'_min{min_freq}x'
 
     if unit:
@@ -517,7 +518,7 @@ def build_ucs_table(min_count: int,
     if verbose:
         primary_cmd, sort_cmd = [_make_verbose(
             c) for c in [primary_cmd, sort_cmd]]
-    ucs_save_path = Path(str(ucs_save_path).replace('/readable',''))
+    ucs_save_path = Path(str(ucs_save_path).replace('/readable', ''))
     cmd_with_args = primary_cmd + \
         [f'--threshold={min_count}', f'{ucs_save_path}']
     full_cmd_str = f'( {cat_tsv_str} | {" ".join(cmd_with_args)} ) && {" ".join(sort_cmd)}'
@@ -891,11 +892,7 @@ def make_ucs_tsv(data_path,
             if 'hit_id' in df.columns:
                 df = df.set_index('hit_id')
         return df, stem
-    
-    
-    
 
-    
     df, data_stem = _load_df(data_path)
     print('# Reformatting co-occurence data for UCS analysis\n')
     print(f'* Loading from `{data_path}`')
@@ -981,7 +978,7 @@ def print_ex_assoc(df,
         sort_by, ascending=sort_by.startswith(('r_', 'l1', 'l2', 'ad')))
 
     example = example.filter(regex=r'^[a-z]|E11').filter(regex=columns_like)
-    example.columns = adjust_assoc_columns(example.columns)
+    example.columns = adjust_am_names(example.columns)
     example = example.iloc[:20, :]
     example = example.loc[:, example.columns != 'expect_diff']
     print_md_table(
