@@ -165,7 +165,7 @@ if [[ ${MIN} != '0' ]]; then
     ( execute_py_script $TSV_STEM $FRQ_FLOOR $SANPI ${N} ${C} ${A} ${N_NAME} ${C_NAME} ${SUFF} ) 1>${LOG} 2>&1
 
 else 
-    for FRQ_FLOOR in 2000 1000 500 300 100 50 25 5 3; do
+    for FRQ_FLOOR in 5000 1000 500 300 100 50 25 10 5 3; do
         LOG="${LOG_PREFIX}${FRQ_FLOOR}x.${DAY}-$(date +%H%M).log"
 
         echo "${FRQ_FLOOR}+ log: '${LOG}'" 

@@ -39,7 +39,8 @@ def _main():
 
     args = _parse_args()
     meta_info_path = AM_DF_DIR.joinpath(
-        f'AM_meta_info{args.data_suffix}'.replace('.tsv', f'_min{args.min_freq}x.csv'))
+        f'meta-info/AM_meta-info_{args.data_suffix}'.replace('.tsv', f'_min{args.min_freq}x.csv'))
+    confirm_dir(meta_info_path.parent)
     if meta_info_path.is_file():
         print(
             f'Association Meta Info found. Loading from {meta_info_path.relative_to(RESULT_DIR)}')
