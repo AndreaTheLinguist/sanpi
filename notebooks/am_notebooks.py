@@ -273,17 +273,19 @@ def nb_show_table(df, n_dec: int = 2,
 
 def show_adv_bigrams(sample_size, C,
                      bigram_dfs,
-                     selector: str = 'dP1',
+                     selector: str = None,
                      column_list: list = None,
                      focus_cols: list = None,
                      data_tag: str = None) -> dict:
     if not data_tag:
-        n_vals = bigram_dfs[0].l1.value_counts().to_list()
-        data_tag = 'NEQ' if (n_vals[0] - n_vals[1]) < 10 else 'ALL'
-
+        data_tag = infer_data_tag(list(bigram_dfs.values())[0])
+    if not focus_cols: 
+        focus_cols = FOCUS_DICT[data_tag]['polar']
+    if selector is None: 
+        selector = METRIC_PRIORITY_DICT[data_tag][0]
     def get_top_bigrams(bdf, adv, bigram_k):
         bdf = bdf.loc[bdf.adv == adv, :].convert_dtypes()
-        top_by_metric = [bdf.nlargest(bigram_k * 2, m) for m in ['dP1', 'LRC']]
+        top_by_metric = [bdf.nlargest(bigram_k * 2, m) for m in METRIC_PRIORITY_DICT[data_tag][:2]]
         half_k = bigram_k // 2
         adv_pat_bigrams = pd.concat(
             [top_bigrams.head(half_k) for top_bigrams in top_by_metric]).drop_duplicates()
@@ -320,10 +322,7 @@ def show_adv_bigrams(sample_size, C,
 
         for pat, bdf in bigram_dfs.items():
             bdf = adjust_am_names(
-                bdf.loc[:, [
-                    c for c in bdf.columns
-                    if c in set(focus_cols + ADX_COLS)]
-                ])
+                bdf.filter(focus_cols + ADX_COLS))
             bdf = bdf.loc[bdf.LRC >= 1, :]
             adv_pat_bigrams = (get_top_bigrams(bdf, adv, bigram_k)
                                .filter(adjust_am_names(focus_cols + ADX_COLS)))
@@ -354,6 +353,11 @@ def show_adv_bigrams(sample_size, C,
     bigram_samples['bigrams'] = set(bigrams)
     bigram_samples['adj'] = set(adj)
     return bigram_samples, bigram_k
+
+def infer_data_tag(_df):
+    n_vals = _df.l1.value_counts().to_list()
+    return ('NEQ' if (n_vals[0] - n_vals[1]) < 10 
+            else 'ALL')
 
 
 def combine_top_adv(df_1: pd.DataFrame,
