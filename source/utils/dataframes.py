@@ -48,6 +48,11 @@ except ModuleNotFoundError:
     except ModuleNotFoundError:
         from general import (HIT_TABLES_DIR, PKL_SUFF,
                              confirm_dir, find_files, snake_to_camel)
+#         from associate import adjust_am_names
+#     else:
+#         from utils.associate import adjust_am_names
+# else:
+#     from source.utils.associate import adjust_am_names
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -1074,7 +1079,7 @@ def show_sample(df: pd.DataFrame,
         if assoc:
             if not bool(n_dec):
                 n_dec = 2
-            _df = adjust_assoc_columns(_df)
+            _df = adjust_am_names(_df)
 
         print(_df.to_markdown(
             floatfmt=f',.{n_dec}f', intfmt=',',

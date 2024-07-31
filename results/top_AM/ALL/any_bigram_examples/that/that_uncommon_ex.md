@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                         |
+|:------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_012.7769_x0190128_37:12-13-14`**  | Been a bunch of players switching agents lately , which is not __`that uncommon`__ this time of year .                              |
+| **`pcc_eng_05_006.7923_x0094128_02:4-5-6`**     | Finch irruptions are not __`that uncommon`__ .                                                                                      |
+| **`pcc_eng_26_034.0160_x0533685_272:23-25-26`** | If I had to say the breakdown -- it 's hard to say , but maybe 50 - 50 , which may not be __`that uncommon`__ for games .           |
+| **`pcc_eng_13_003.8856_x0046453_09:13-14-15`**  | Getting kicked off a bus or streetcar for an unknown reason is not __`that uncommon`__ .                                            |
+| **`pcc_eng_20_001.7986_x0012709_05:16-17-18`**  | Now , unfortunately , with the insane people out there , orders of protection are n't __`that uncommon`__ in the sports world .     |
+| **`pcc_eng_28_073.0575_x1165564_113:4-5-6`**    | Apparently seizures are not __`that uncommon`__ in pregnant women .                                                                 |
+| **`pcc_eng_22_087.1685_x1392875_04:7-8-9`**     | Run-ins on the high seas are not __`that uncommon`__ , but the manner in which a country 's warships react to challenge , matters . |
+| **`pcc_eng_23_083.5754_x1334435_10:19-20-21`**  | Finding them as a side dish for all meals , breakfast , lunch , and dinner , is n't __`that uncommon`__ at all .                    |

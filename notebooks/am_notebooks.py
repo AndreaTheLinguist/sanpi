@@ -1,16 +1,16 @@
 import re
 from pathlib import Path
 from pprint import pprint
-
+from os import system
 import pandas as pd
 import pyarrow as pyar
 
 from source.utils.associate import POLAR_DIR, TOP_AM_DIR, adjust_am_names
-from source.utils.dataframes import catify_hit_table as catify
-from source.utils.dataframes import show_sample
+from source.utils.dataframes import catify_hit_table as catify, REGNOT
+# from source.utils.dataframes import show_sample
 from source.utils.dataframes import update_assoc_index as update_index
 from source.utils.dataframes import write_part_parquet as parq_it
-from source.utils.general import (confirm_dir, print_iter, run_shell_command,
+from source.utils.general import (confirm_dir, print_iter,
                                   snake_to_camel, timestamp_today)
 from source.utils.sample import sample_pickle as sp
 
@@ -40,7 +40,7 @@ FOCUS_DICT = {
         'polar': BASIC_FOCUS + P2_COLS + ADX_COLS
     }}
 
-NEG_WORDS = ("n't", 'not', 'barely', 'hardly', 'scarcely', 'rarely',
+NEG_WORDS = ("n't", 'not', 'seldom', 'barely', 'hardly', 'scarcely', 'rarely', 'rare', 'scarce', 'seldomly',
              'without', 'nowhere', 'nothing', 'nor', 'non', 'never', 'no', 'none')
 
 
@@ -57,7 +57,8 @@ def _set_priorities():
         _priority_dict[f'{tag}_init'] = cols
         _priority_dict[f'{tag}'] = adjust_am_names(cols)
         blind_cols = ['conservative_log_ratio',
-                      'deltaP_mean', 'deltaP_max', 'unexpected_ratio']
+                      'am_log_likelihood', 
+                      'deltaP_max', 'deltaP_mean']
         _priority_dict[f'{tag}_blind'] = adjust_am_names(blind_cols)
     return _priority_dict
 
@@ -65,6 +66,57 @@ def _set_priorities():
 METRIC_PRIORITY_DICT = _set_priorities()
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+def set_col_widths(df):
+    cols = df.copy().reset_index().columns
+    width_dict = (
+        {c: None for c in cols}
+        | {c: 21 for c in cols[cols.str.contains('_id')]}
+        | {c: 50 for c in cols[cols.str.contains('text')]}
+        | {c: 32 for c in cols[cols.str.contains('form')]}
+        | {c: 62 for c in cols[cols.str.contains('_str')]})
+    return list(width_dict.values())
+
+
+def embolden(strings: pd.Series,
+             bold_regex: str = None,
+             mono: bool = True) -> pd.Series:
+    # def embolden(series,
+    #          bold_regex=None):
+    bold_regex = re.compile(bold_regex, flags=re.I) if bold_regex else REGNOT
+    # bold_regex = bold_regex or r" (n[o']t) "
+    # return series.apply(
+    #     lambda x: re.sub(bold_regex,
+    #                      r' __`\1`__ ', x, flags=re.I))
+    if mono:
+        return strings.apply(lambda x: bold_regex.sub(r' __`\1`__ ', x))
+    else:
+        return strings.apply(lambda x: bold_regex.sub(r' __\1__ ', x))
+
+
+def show_sample(df: pd.DataFrame,
+                format: str = 'grid',
+                n_dec: int = 0,
+                limit_cols: bool = True,
+                assoc: bool = False):
+    _df = df.copy().convert_dtypes()
+    if limit_cols and format != 'pipe' and not assoc:
+        print(_df.to_markdown(
+            floatfmt=f',.{n_dec}f', intfmt=',',
+            maxcolwidths=set_col_widths(_df),
+            tablefmt=format
+        ))
+    else:
+        if assoc:
+            if not bool(n_dec):
+                n_dec = 2
+            _df = adjust_am_names(_df)
+
+        print(_df.to_markdown(
+            floatfmt=f',.{n_dec}f', intfmt=',',
+            tablefmt=format
+        ))
 
 
 def locate_polar_am_paths(data_tag: str = 'ALL',
@@ -600,7 +652,7 @@ def load_hit_table(adv_set, pos_hits, neg_hits, tag_top_dir, adv_floor):
         hit_df = catify(
             hit_df
             .drop_duplicates('text_window').filter(
-                regex=r'token_str|text_window|bigram_lower|adv_form_lower|adj_form_lower'))
+                regex=r'token_str|text_window|lower|polarity|pattern'))
 
     return hit_df
 
@@ -656,18 +708,19 @@ def sample_adv_bigrams(adverb: str,
         n_examples=n_ex, n_bigrams=n_top_bigrams,
         verbose=verbose, output_dir=output_dir)
 
-    print(f'\nSaving Samples in {output_dir}/...')
+    print(f'\nSaving Samples in `{output_dir}/`...')
     paths = []
     for key, df in examples.items():
         out_path = output_dir.joinpath(f'{key}_{n_ex}ex~{len(df)}.csv')
         if out_path.is_file() and not len(df) < n_ex:
             alt_dir = output_dir.joinpath('alt_ex')
-            run_shell_command(f'echo "Renaming existing sample..."; mkdir -p "{alt_dir}"; '
-                              f'mv -v --backup=numbered "{out_path}" "{alt_dir}/" ; '
-                              f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r ')
+            print(f"* Renaming existing version of `{out_path.name}`")
+            system(f'mkdir -p "{alt_dir}"; '
+                              f'mv --backup=numbered "{out_path}" "{alt_dir}/" ; '
+                              f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r > /dev/null 2>&1')
         df.to_csv(out_path)
         paths.append(out_path)
-    print_iter(paths, header='\nSamples saved as...', bullet='+')
+    print_iter([f'`{p}`' for p in paths], header='\nSamples saved as...', bullet='+')
 
 # * bigram-polarity
 
@@ -764,14 +817,6 @@ def populate_adv_dir(adverb: str,
     if verbose:
         print_iter((f'`{p.relative_to(output_dir.parent.parent)}`' for p in paths),
                    header='\nSamples saved as...', bullet='1.')
-
-
-def embolden(series,
-             bold_regex=None):
-    bold_regex = bold_regex or r" (n[o']t) "
-    return series.apply(
-        lambda x: re.sub(bold_regex,
-                         r' __`\1`__ ', x, flags=re.I))
 
 
 def seek_top_adv_am(date_str: str,

@@ -30,7 +30,9 @@ ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio',  # 'liddell',
 ALPHA = 0.005
 READ_TAG = 'rsort-view_am-only'
 _UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
-_WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
+# ! Error: this causes any adverbs containing numbers to mess up the formatting and cause errors
+# // _WORD_GAP = re.compile(r"(\b[a-z'-]+)\t([^_\s\t]+\b)")
+_WORD_GAP = re.compile(r"(?<=\d\t)(\S+)\t(\S+)\b")
 TRANSPARENT_O_NAMES = {
     'O12': 'Fyn(O12)',
     'O21': 'Fny(O21)',
@@ -40,6 +42,58 @@ TRANSPARENT_O_NAMES = {
     'R2': 'Fn_(R2)',
     'C1': 'F_y(C1)',
     'C2': 'F_n(C2)'}
+
+# # HACK for testing:
+# test_str = pd.Series([
+#     '3	12th	best',
+#     '3	2nd	worst',
+#     '3	4th	largest',
+#     '3	4x	faster',
+#     '3	7th	largest',
+#     '3	9th	best',
+#     '2	10th	best',
+#     '2	22yrs	old',
+#     '2	2nd	highest',
+#     '2	2x	better',
+#     '2	4x	higher',
+#     '2	4x	larger',
+#     '2	4x	more',
+#     '2	5th	best',
+#     '2	6th	largest',
+#     '2	8th	highest',
+#     '1	0t	afraid',
+#     '1	10-year-olds	stupi',
+#     '1	10th	largest',
+#     '1	10th	worst',
+#     '1	10x	easier',
+#     '1	10x	faster',
+#     '1	10x	harder',
+#     '1	10x	stronger',
+#     '1	10x	worse',
+#     '1	11th	quickest',
+#     '1	11th	strongest',
+#     '2	10x	better',
+#     '2	2nd	best',
+#     '1	10th	lowest',
+#     '1	10x	harder',
+#     '1	12v	hot',
+#     '1	1hr	more',
+#     '1	1st	great',
+#     '1	20o	colder',
+#     '1	210px	high',
+#     '1	2nd	highest',
+#     '1	2nd	worst',
+#     '1	2x	fast',
+#     '1	2x	weak',
+#     '1	3-d	compatible',
+#     '1	30th	best',
+#     '1	3d	capable',
+#     '1	4gx	compatible',
+#     '1	4th-most	serious',
+#     '1	7th	best',
+#     '1	7th	dimensional',
+# ])
+# print(test_str.str.extract(_WORD_GAP))
 
 UCS_DIR, DEMO_UCS_DIR = [
     R / 'ucs' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
