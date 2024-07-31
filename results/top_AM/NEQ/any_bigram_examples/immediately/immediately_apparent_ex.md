@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                                                      |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_27_085.3847_x1364701_05:5-6`**       | The main issue is __`immediately apparent`__ ; Church members do not grant interviews .                                                                          |
+| **`pcc_eng_23_001.3790_x0006061_24:16-17-18`**  | I think the purpose for this NSA program is being missed , because it is not __`immediately apparent`__ .                                                        |
+| **`pcc_eng_09_036.8836_x0580852_110:23-24-25`** | Why the physical landscape of the city should make you want to do pull-ups , squats , and Olympic-style weight lifting is not __`immediately apparent`__ .       |
+| **`pcc_eng_06_027.2289_x0424319_125:09-10`**    | Moreover a severe shortage of Catholic priests was __`immediately apparent`__ .                                                                                  |
+| **`pcc_eng_16_058.1336_x0924960_31:08-10-11`**  | The final result of your surgery may not be __`immediately apparent`__ .                                                                                         |
+| **`pcc_eng_26_089.5722_x1432274_032:19-20-21`** | The crisis that had faced Timothy Henzel on the death of his father Paul in early 1898 was not __`immediately apparent`__ .                                      |
+| **`pcc_eng_00_065.2288_x1038412_27:19-21-22`**  | ( This is used in some cases where the negative effects of a crime are ongoing and may not be __`immediately apparent`__ , like in medical malpractice cases ) . |
+| **`pcc_eng_21_023.1885_x0358406_15:6-8-9`**     | Initially , that style may not be __`immediately apparent`__ in Dunedin .                                                                                        |

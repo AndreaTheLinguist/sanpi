@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                            |
+|:-----------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_29_048.7228_x0770662_36:11-12-13`** | I was born and raised in Arkansas , which is n't __`terribly exciting`__ .                                                                             |
+| **`pcc_eng_10_029.2611_x0456823_46:11-12-13`** | Wonder Woman came with the right leg , which was n't __`terribly exciting`__ on its own but is obviously vital to building the figure .                |
+| **`pcc_eng_14_007.4135_x0103643_11:4-5-6`**    | ( It is not __`terribly exciting`__ , but it gets the job done . )                                                                                     |
+| **`pcc_eng_14_039.1564_x0616445_77:3-4-5`**    | There is nothing __`terribly exciting`__ to be found here .                                                                                            |
+| **`pcc_eng_23_009.0860_x0130506_06:1-2-3`**    | Nothing __`terribly exciting`__ happening in my life at the moment - and that 's a good thing .                                                        |
+| **`pcc_eng_12_038.7931_x0611311_14:4-5-6`**    | If Dreamer is n't __`terribly exciting`__ , Gatins picks up steam in the home stretch ( when it counts ) .                                             |
+| **`pcc_eng_29_032.6929_x0511559_12:08-09-10`** | While that in and of itself is n't __`terribly exciting`__ , the fact it can wirelessly charge compatible smartphones is more than a little uncommon . |
+| **`pcc_eng_06_079.5061_x1269433_74:6-7-8`**    | Cat Ba town itself is not __`terribly exciting`__ though it does have a few hidden gems if you look for them .                                         |

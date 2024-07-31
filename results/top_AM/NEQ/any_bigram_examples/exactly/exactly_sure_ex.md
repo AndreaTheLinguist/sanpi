@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                                   |
+|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_074.4047_x1185878_385:13-14-15`** | He 's also rumored to be an otaku , but I 'm not __`exactly sure`__ what that 's supposed to mean in the context of this book .               |
+| **`pcc_eng_17_071.0850_x1132383_81:4-5-6`**     | Sally hesitated , not __`exactly sure`__ how to answer that .                                                                                 |
+| **`pcc_eng_20_018.8027_x0287584_004:3-4-5`**    | I 'm not __`exactly sure`__ when I was first introduced to the concept of the cosmic waitress .                                               |
+| **`pcc_eng_29_042.4315_x0669229_04:4-5-6`**     | But we 're not __`exactly sure`__ why .                                                                                                       |
+| **`pcc_eng_22_082.5211_x1317724_3:3-4-5`**      | We 're not __`exactly sure`__ what " positive energy " is supposed to mean .                                                                  |
+| **`pcc_eng_03_018.1113_x0276685_123:08-09-10`** | As Professor Chomsky said , we 're not __`exactly sure`__ .                                                                                   |
+| **`pcc_eng_23_030.5638_x0477289_22:24-25-26`**  | This is the code I have at the moment - there are certainly some areas that it can be improved but I 'm not __`exactly sure`__ how to do it . |
+| **`pcc_eng_09_082.6614_x1321119_3:4-5-6`**      | " I 'm not __`exactly sure`__ when they got there , but her personal friends arrived late last night . "                                      |

@@ -1,0 +1,10 @@
+|                                               | `token_str`                                                                                                                                     |
+|:----------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_23_081.5329_x1301265_357:3-4-5`**  | That 's not __`exactly right`__ , though .                                                                                                      |
+| **`pcc_eng_29_009.1046_x0131022_055:4-5-6`**  | If it was n't __`exactly right`__ , even then , or if it was a little short , then he had a table of shorts and he would drop one of those in . |
+| **`pcc_eng_02_064.0708_x1020109_20:13-14`**   | There is just something in the writing that no one can get __`exactly right`__ .                                                                |
+| **`pcc_eng_21_101.7951_x1628716_100:7-8`**    | Brenner : I think you 're __`exactly right`__ .                                                                                                 |
+| **`pcc_eng_10_037.9185_x0597201_029:8-9`**    | MP : __`Exactly right`__ -- that 's __`exactly right`__ !                                                                                       |
+| **`pcc_eng_29_102.0130_x1632084_315:7-8`**    | I think what Nia said is __`exactly right`__ .                                                                                                  |
+| **`pcc_eng_15_045.4644_x0719015_12:4-5`**     | '' That 's __`exactly right`__ , '' Kendall said .                                                                                              |
+| **`pcc_eng_13_003.8230_x0045419_0013:4-5-6`** | But drifted was not __`exactly right`__ .                                                                                                       |

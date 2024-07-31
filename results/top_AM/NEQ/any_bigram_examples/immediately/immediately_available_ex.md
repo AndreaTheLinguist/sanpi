@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                      |
+|:-----------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_27_051.7020_x0819454_70:12-13-14`** | If you have questions or encounter difficulty when technical staff is not __`immediately available`__ , go to the conference registration desk . |
+| **`apw_eng_19980722_1229_10:5-6-7`**           | Mordechai 's aide was not __`immediately available`__ for comment .                                                                              |
+| **`nyt_eng_19960719_0366_18:5-6-7`**           | the after-tax figure was n't __`immediately available`__ .                                                                                       |
+| **`pcc_eng_13_047.7595_x0756076_16:3-4-5`**    | Google was n't __`immediately available`__ for comment on its plans for the patent .                                                             |
+| **`apw_eng_20030129_0653_7:7-8-9`**            | the length of the sentence was n't __`immediately available`__ .                                                                                 |
+| **`apw_eng_19980324_0062_18:7-8-9`**           | the details of their deaths were not __`immediately available`__ .                                                                               |
+| **`apw_eng_20030812_0590_3:09-10-11`**         | the man 's name and the charges were not __`immediately available`__ .                                                                           |
+| **`pcc_eng_09_070.0229_x1116556_05:21-22`**    | A program spokesman said Blackmon will " continue to be evaluated , " though no timetable for a return was __`immediately available`__ .         |

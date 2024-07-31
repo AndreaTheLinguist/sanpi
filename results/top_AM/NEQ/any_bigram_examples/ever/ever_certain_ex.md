@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                               |
+|:-----------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_12_063.4103_x1009071_14:13-15-16`** | At first , Abigail Salmon clings on to the thought that " nothing is __`ever certain`__ " .                                                               |
+| **`pcc_eng_13_008.6655_x0123750_36:2-4-5`**    | While nothing is __`ever certain`__ in the crazy world of college football , everybody else definitely has an uphill climb to get past the Crimson Tide . |
+| **`pcc_eng_24_078.9703_x1261259_11:07-09-10`** | But Ferguson knows from experience that nothing is __`ever certain`__ in football .                                                                       |
+| **`pcc_eng_27_058.7436_x0933359_11:1-3-4`**    | Nothing is __`ever certain`__ of course but , the more information the better if needing to profile an account reasonably quickly                         |
+| **`pcc_eng_14_044.1696_x0697560_045:2-4-5`**   | But nothing is __`ever certain`__ in sports , it 's why we watch them .                                                                                   |
+| **`pcc_eng_26_037.5848_x0591549_09:23-25-26`** | About a month ago , Smaldone and Ward were tipped off that a cover shot was a possibility with the caveat that nothing is __`ever certain`__ .            |
+| **`nyt_eng_19981024_0272_9:2-6-7`**            | but nothing about Tyson is __`ever certain`__ .                                                                                                           |
+| **`pcc_eng_28_047.0273_x0744787_44:1-3-4`**    | Nothing is __`ever certain`__ in Sitka .                                                                                                                  |
