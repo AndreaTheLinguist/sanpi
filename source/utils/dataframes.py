@@ -16,13 +16,14 @@ HITS_DF_PATH_REGEX = re.compile(r'_hits.*$')
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
 WS_REGEX = re.compile(r'[^\S\n]')
 REGNOT = re.compile(
-    r"\b(n[o']t?|none|never|neither|nor|nothing|nowhere|[br]arely|hardly|without)\b")
+    r"\b(n[o']t|non?e?|never|neither|nor|nothing|nowhere|(?:[br]are|scarce|seldom)l?y?|hardly|without)\b", 
+    flags=re.I)
 # NEG_REGEX = re.compile(
 #     r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
 NEG_REGEX = re.compile(
-    (r"\b(?P<no>no)\b|\b(?P<noX>n[o'](?:[tr]|ne?|body|thing|where))\b"
-        r"|\b(?<!\w a|the|[oe]se) (?P<few>few)\b|\b(?P<NEGly>(?:[br]are|scarce|seldom)l?y?|hardly)\b"
-        r"|\b(?P<aint>ain'?t)\b|\b(?P<neither>neither)\b|\b(?P<without>without)\b|\b(?P<never>never)\b"),
+    (r"\b(?P<neg>no|n[o'](?:[tr]|ne?|body|thing|where)"
+        r"|(?:rare|scarce|seldom)l?y?|(?:hard|bare)ly"
+        r"|ain'?t|neither|without|never|few)\b"),
     flags=re.I)
 POS_FEW_REGEX= re.compile(r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b')
 
