@@ -16,9 +16,14 @@ HITS_DF_PATH_REGEX = re.compile(r'_hits.*$')
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
 WS_REGEX = re.compile(r'[^\S\n]')
 REGNOT = re.compile(
-    r" (n[o']t?|none|never|neither|nor|nothing|nowhere|[br]arely|hardly|without) ")
+    r"\b(n[o']t?|none|never|neither|nor|nothing|nowhere|[br]arely|hardly|without)\b")
+# NEG_REGEX = re.compile(
+#     r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
 NEG_REGEX = re.compile(
-    r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
+    (r"\b(?P<no>no)\b|\b(?P<noX>n[o'](?:[tr]|ne?|body|thing|where))\b"
+        r"|\b(?<!\w a|the|[oe]se) (?P<few>few)\b|\b(?P<NEGly>(?:[br]are|scarce|seldom)l?y?|hardly)\b"
+        r"|\b(?P<aint>ain'?t)\b|\b(?P<neither>neither)\b|\b(?P<without>without)\b|\b(?P<never>never)\b"),
+    flags=re.I)
 POS_FEW_REGEX= re.compile(r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b')
 
 OK_REGEX = re.compile(r'^o*\.?k+\.?a*y*$')
@@ -30,6 +35,8 @@ BRACSLASHDOT_REGEX = re.compile(r'[\[\\\/)]|\.{2,}')
 ANY_ALPHA_REGEX = re.compile(r'[a-z]')
 MISC_REGEX = re.compile(r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
 NAME_REGEX = re.compile(r'(?<=bigram-)\w+(?=_rb)')
+INDEX_FROM_ID_REGEX = r'(?P<adv_index>\d+)-(?P<adj_index>\d+)$'
+
 # try:
 #     import pyarrow
 # except ImportError:
@@ -392,6 +399,26 @@ def drop_margins(_df, margin_name='SUM'):
     """
 
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
+
+
+def get_preceding_text(tok_str: pd.Series,
+                        adv_index: pd.Series = None):
+    tok_index = tok_str.index.to_series()
+    if adv_index is None:
+        ix_from_id = tok_index.str.extract(
+            INDEX_FROM_ID_REGEX)
+        adv_index = ix_from_id['adv_index']
+                                    
+    adv_index = pd.to_numeric(adv_index, downcast='unsigned')
+    tok_lists = tok_str.str.lower().str.split()
+    
+    preceding_texts = pd.Series((tl[:ax] for tl, ax 
+                                #  in zip(tok_lists, adv_index.add(1))),
+                                 in zip(tok_lists, adv_index)),
+                                index=tok_index).str.join(' ')
+    return preceding_texts.astype('string').fillna('')
+
+
 
 def fix_orth(df: pd.DataFrame,
              using_prior: bool = False):

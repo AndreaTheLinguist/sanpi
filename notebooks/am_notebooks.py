@@ -28,6 +28,7 @@ BASIC_FOCUS = ['f',
                't_score',
                'mutual_information',
                ]
+FREQ_COLS = ['f', 'f1', 'f2']
 ADX_COLS = ['adv', 'adv_total', 'adj', 'adj_total']
 P2_COLS = ['am_p2_given1', 'am_p2_given1_simple']
 DELTA_COLS = ['deltaP_max', 'deltaP_mean']
@@ -36,7 +37,7 @@ FOCUS_DICT = {
         'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS,
         'polar': BASIC_FOCUS + ADX_COLS},
     'NEQ': {
-        'adv_adj': BASIC_FOCUS + P2_COLS,
+        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS,
         'polar': BASIC_FOCUS + P2_COLS + ADX_COLS
     }}
 
@@ -57,7 +58,7 @@ def _set_priorities():
         _priority_dict[f'{tag}_init'] = cols
         _priority_dict[f'{tag}'] = adjust_am_names(cols)
         blind_cols = ['conservative_log_ratio',
-                      'am_log_likelihood', 
+                      'am_log_likelihood',
                       'deltaP_max', 'deltaP_mean']
         _priority_dict[f'{tag}_blind'] = adjust_am_names(blind_cols)
     return _priority_dict
@@ -68,43 +69,85 @@ METRIC_PRIORITY_DICT = _set_priorities()
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-def set_col_widths(df):
+def set_col_widths(df, override:dict=None):
+    """
+    **To be used with `tabulate`**
+    e.g.: 
+    ```python
+    df.to_markdown(tablefmt='rounded_grid', maxcolwidths=set_col_widths(df))
+
+    tabulate(df, tablefmt='grid', header=True, maxcolwidths=set_col_widths(df))
+    ```
+    Sets the column widths based on the column names in the DataFrame.
+
+    Args:
+        df: The DataFrame to determine column widths.
+
+    Returns:
+        list: The list of column widths based on the column names.
+    """
+
     cols = df.copy().reset_index().columns
     width_dict = (
         {c: None for c in cols}
         | {c: 21 for c in cols[cols.str.contains('_id')]}
-        | {c: 50 for c in cols[cols.str.contains('text')]}
+        | {c: 48 for c in cols[cols.str.contains('text')]}
         | {c: 32 for c in cols[cols.str.contains('form')]}
-        | {c: 62 for c in cols[cols.str.contains('_str')]})
+        | {c: 60 for c in cols[cols.str.contains('_str')]})
+    if override is not None: 
+        width_dict.update(override)
+        
     return list(width_dict.values())
 
 
 def embolden(strings: pd.Series,
              bold_regex: str = None,
              mono: bool = True) -> pd.Series:
-    # def embolden(series,
-    #          bold_regex=None):
+    """
+    Applies bold formatting to strings based on a specified regex pattern.
+
+    Args:
+        strings: The Series of strings to format.
+        bold_regex: The regex pattern for bold formatting. Defaults to None.
+        mono: Whether to apply monospace formatting. Defaults to True.
+
+    Returns:
+        pd.Series: The Series of strings with applied bold formatting.
+    """
+
     bold_regex = re.compile(bold_regex, flags=re.I) if bold_regex else REGNOT
-    # bold_regex = bold_regex or r" (n[o']t) "
-    # return series.apply(
-    #     lambda x: re.sub(bold_regex,
-    #                      r' __`\1`__ ', x, flags=re.I))
+
     if mono:
-        return strings.apply(lambda x: bold_regex.sub(r' __`\1`__ ', x))
+        return strings.apply(lambda x: bold_regex.sub(r'__`\1`__', x))
     else:
-        return strings.apply(lambda x: bold_regex.sub(r' __\1__ ', x))
+        return strings.apply(lambda x: bold_regex.sub(r'__\1__', x))
 
 
 def show_sample(df: pd.DataFrame,
                 format: str = 'grid',
                 n_dec: int = 0,
                 limit_cols: bool = True,
-                assoc: bool = False):
+                assoc: bool = False, 
+                width_override: dict=None):
+    """
+    Displays a formatted DataFrame using the specified format and options.
+
+    Args:
+        df: The DataFrame to display.
+        format: The format for displaying the DataFrame. Defaults to 'grid'.
+        n_dec: The number of decimal places to show. Defaults to 0.
+        limit_cols: Whether to limit the columns based on the format. Defaults to True.
+        assoc: Whether the DataFrame is associated. Defaults to False.
+
+    Returns:
+        None
+    """
+
     _df = df.copy().convert_dtypes()
     if limit_cols and format != 'pipe' and not assoc:
         print(_df.to_markdown(
             floatfmt=f',.{n_dec}f', intfmt=',',
-            maxcolwidths=set_col_widths(_df),
+            maxcolwidths=set_col_widths(_df, override=width_override),
             tablefmt=format
         ))
     else:
@@ -298,9 +341,10 @@ def force_ints(_df):
 
 def nb_show_table(df, n_dec: int = 2,
                   adjust_columns: bool = True,
-                  outpath: Path = None,
+                  outpath: Path or str = None,
                   return_df: bool = False,
-                  suppress_printing: bool = False
+                  suppress_printing: bool = False,
+                  transpose: bool = False
                   ) -> None or pd.DataFrame:
     _df = df.copy()
     try:
@@ -311,16 +355,36 @@ def nb_show_table(df, n_dec: int = 2,
         _df.index.name = 'rank'
         if start_0:
             _df.index = _df.index + 1
-    if adjust_columns:
+    if adjust_columns and not any(
+        _df.filter(['text_window', 'token_str', 
+                    'bigram_lower', 'all_forms_lower'])):
         _df = adjust_am_names(_df)
+        
+
+    _df = italicize_df_for_md(_df)
+    if transpose:
+        _df = _df.T
+        _df.index = [f'`{i}`' for i in _df.index] 
+           
     _df.columns = [f'`{c}`' for c in _df.columns]
     _df.index = [f'**{r}**' for r in _df.index]
     table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
     if outpath:
-        outpath.write_text(table)
+        Path(outpath).write_text(table)
     if not suppress_printing:
         print(f'\n{table}\n')
     return (_df if return_df else None)
+
+
+def italicize_df_for_md(_df):
+    str_df = _df.select_dtypes(include='string')
+    if any(str_df):
+        text_cols = str_df.columns[str_df.apply(
+            lambda c: any(c.str.contains(' ')))]
+        if any(text_cols):
+            _df[text_cols] = _df[text_cols].apply(italic)
+            # print(_df.sample(2)[text_cols[0]])
+    return _df
 
 
 def show_adv_bigrams(sample_size, C,
@@ -330,14 +394,16 @@ def show_adv_bigrams(sample_size, C,
                      focus_cols: list = None,
                      data_tag: str = None) -> dict:
     if not data_tag:
-        data_tag = infer_data_tag(list(bigram_dfs.values())[0])
-    if not focus_cols: 
+        data_tag = infer_data_tag_from_l1(list(bigram_dfs.values())[0].l1)
+    if not focus_cols:
         focus_cols = FOCUS_DICT[data_tag]['polar']
-    if selector is None: 
+    if selector is None:
         selector = METRIC_PRIORITY_DICT[data_tag][0]
+
     def get_top_bigrams(bdf, adv, bigram_k):
         bdf = bdf.loc[bdf.adv == adv, :].convert_dtypes()
-        top_by_metric = [bdf.nlargest(bigram_k * 2, m) for m in METRIC_PRIORITY_DICT[data_tag][:2]]
+        top_by_metric = [bdf.nlargest(bigram_k * 2, m)
+                         for m in METRIC_PRIORITY_DICT[data_tag][:2]]
         half_k = bigram_k // 2
         adv_pat_bigrams = pd.concat(
             [top_bigrams.head(half_k) for top_bigrams in top_by_metric]).drop_duplicates()
@@ -406,9 +472,19 @@ def show_adv_bigrams(sample_size, C,
     bigram_samples['adj'] = set(adj)
     return bigram_samples, bigram_k
 
-def infer_data_tag(_df):
-    n_vals = _df.l1.value_counts().to_list()
-    return ('NEQ' if (n_vals[0] - n_vals[1]) < 10 
+
+def infer_data_tag_from_l1(l1_vals: pd.Series):
+    """
+    Infers the data tag based on the provided l1 values.
+
+    Args:
+        l1_vals: The Series of l1 values to analyze.
+
+    Returns:
+        str: The inferred data tag ('NEQ' or 'ALL').
+    """
+    n_vals = l1_vals.value_counts().to_list()
+    return ('NEQ' if (n_vals[0] - n_vals[1]) < 10
             else 'ALL')
 
 
@@ -571,29 +647,58 @@ def combine_top_adv(df_1: pd.DataFrame,
 def compare_datasets(adv_am,
                      metric_selection: str or list = 'dP1',
                      k=5):
-    if isinstance(metric_selection, str):
-        met_adv_am = adv_am.filter(like=metric_selection)
-    else:
-        met_adv_am = adv_am.filter(regex=r'|'.join(
-            [f'^{m}|mean_{m}' for m in metric_selection]))
+    """
+    Compares datasets based on the selected metric(s) and displays the top values for each metric column.
+
+    Args:
+        adv_am: The dataset to compare.
+        metric_selection: The selected metric(s) to compare. Defaults to 'dP1'.
+        k: The number of top values to display. Defaults to 5.
+
+    Returns:
+        None
+    """
+
+    met_adv_am = (adv_am.filter(like=metric_selection)
+                  if isinstance(metric_selection, str)
+                  else adv_am.filter(regex=r'|'.join([f'^{m}|mean_{m}'
+                                                      for m in metric_selection])))
+
     if met_adv_am.empty:
         met_adv_am = adjust_am_names(adv_am).filter(metric_selection)
+
     if any(met_adv_am.columns.str.startswith('r_')):
         is_ratio = met_adv_am.columns.str.startswith('r_')
-        met_adv_am.loc[:, is_ratio] = met_adv_am.loc[:, is_ratio] * 100
+        met_adv_am.loc[:, is_ratio] *= 100
         met_adv_am.columns = met_adv_am.columns.str.replace('r_', '%_')
+
     for col in met_adv_am.columns:
-        n_dec = 2
-        if 'P' in col:
-            n_dec = 3
-        elif 'G' in col or '%' in col:
-            n_dec = 1
-        elif 'f' in col and not col.startswith(('r_', '%_', 'mean_')):
-            n_dec = 0
-            # col = col.replace('r_', '%_')
+
         print(f'Top {k} by descending `{col}`')
-        print(met_adv_am.nlargest(k, col).to_markdown(
-            floatfmt=f',.{n_dec}f', intfmt=','), '\n')
+        nb_show_table(met_adv_am.nlargest(k, col),
+                      n_dec=infer_am_decimals(col))
+
+
+def infer_am_decimals(col: str) -> int:
+    """
+    Infers the number of decimal places based on the column name.
+
+    Args:
+        col: The column name to determine the decimal places.
+
+    Returns:
+        int: The inferred number of decimal places.
+    """
+
+    if 'P' in col:
+        return 3
+    if 'G' in col or col:
+        return 1
+    if 'f' in col:
+        if col.startswith('r_'):
+            return 2
+        return 1 if col.startswith(('%_', 'mean_')) else 0
+    return 2
 
 
 def pin_top_adv(adv_am,
@@ -716,11 +821,12 @@ def sample_adv_bigrams(adverb: str,
             alt_dir = output_dir.joinpath('alt_ex')
             print(f"* Renaming existing version of `{out_path.name}`")
             system(f'mkdir -p "{alt_dir}"; '
-                              f'mv --backup=numbered "{out_path}" "{alt_dir}/" ; '
-                              f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r > /dev/null 2>&1')
+                   f'mv --backup=numbered "{out_path}" "{alt_dir}/" ; '
+                   f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r > /dev/null 2>&1')
         df.to_csv(out_path)
         paths.append(out_path)
-    print_iter([f'`{p}`' for p in paths], header='\nSamples saved as...', bullet='+')
+    print_iter([f'`{p}`' for p in paths],
+               header='\nSamples saved as...', bullet='+')
 
 # * bigram-polarity
 
@@ -728,6 +834,7 @@ def sample_adv_bigrams(adverb: str,
 def collect_adv_bigram_ex(amdf: pd.DataFrame,
                           hits_df: pd.DataFrame,
                           adv: str = 'exactly',
+                          polarity: str = None,
                           n_bigrams: int = 10,
                           n_examples: int = 50,
                           verbose: bool = False,
@@ -772,28 +879,30 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
     return examples
 
 
+def italic(text_vals: pd.Series):
+    return '*' + text_vals + '*'
+
+
 def populate_adv_dir(adverb: str,
                      bigram_am: pd.DataFrame,
                      hits_df: pd.DataFrame,
-                     data_tag: str,
+                     data_dir: Path,
+                     adv_ex_stem: str = None,
                      n_bigrams: int = 10,
                      n_ex: int = 50,
                      rank_by: str | list = ['dP1', "LRC"],
                      verbose: bool = False):
-    output_dir = TOP_AM_DIR / data_tag / 'neg_bigram_examples' / adverb
-    table_csv_path = output_dir / \
-        f'{adverb}_{n_bigrams}mostNEG-bigrams_AMscores_{timestamp_today()}.csv'
-    confirm_dir(output_dir)
+
+    data_tag = infer_data_tag_from_l1(bigram_am.l1)
+    adv_ex_dir = data_dir / 'neg_bigram_examples' / adverb
+    confirm_dir(adv_ex_dir)
+    if adv_ex_stem is None:
+        adv_ex_stem = f'{data_tag}-{adverb}_{n_bigrams}mostNEG-bigrams_AMscores'
+    table_csv_path = cobble_dated_path(
+        timestamp_today, adv_ex_dir, adv_ex_stem)
     this_adv_amdf = bigram_am.filter(
         like=f'~{adverb}_', axis=0).sort_values(rank_by, ascending=False)
     this_adv_amdf.to_csv(table_csv_path)
-
-    nb_show_table(this_adv_amdf.filter(['N', 'f1', 'adv_total'])
-                  .set_index(this_adv_amdf.l1 + f'_{adverb}').drop_duplicates(),
-                  n_dec=0,
-                  outpath=output_dir /
-                  f'{adverb}_MarginalFreqs_{timestamp_today()}.md',
-                  suppress_printing=not verbose)
 
     nb_show_table((this_adv_amdf
                    .filter(regex=r'^([dLGeu]|f2?$|adj_total)')
@@ -803,45 +912,146 @@ def populate_adv_dir(adverb: str,
                   outpath=table_csv_path.with_suffix('.md'),
                   suppress_printing=not verbose)
 
-    examples = collect_adv_bigram_ex(
-        this_adv_amdf, hits_df, metric_selection=rank_by, n_examples=n_ex, verbose=verbose)
+    nb_show_table(this_adv_amdf.filter(['N', 'f1', 'adv_total'])
+                  .set_index(this_adv_amdf.l1 + f'_{adverb}').drop_duplicates(),
+                  n_dec=0,
+                  outpath=adv_ex_dir /
+                  f'{adverb}_MarginalFreqs_{timestamp_today()}.md',
+                  suppress_printing=not verbose)
 
-    print(f'\nSaving Samples in {output_dir}/...')
+    examples = collect_adv_bigram_ex(
+        this_adv_amdf, hits_df, metric_selection=rank_by,
+        n_examples=n_ex, verbose=verbose,
+        output_dir=adv_ex_dir)
+
+    print(f'\nSaving Samples in {adv_ex_dir}/...')
 
     paths = []
     for key, df in examples.items():
-        out_path = output_dir.joinpath(f'{key}_{n_ex}ex.csv')
+        out_path = adv_ex_dir.joinpath(f'{key}_{n_ex}ex.csv')
         df.to_csv(out_path)
         paths.append(out_path)
 
     if verbose:
-        print_iter((f'`{p.relative_to(output_dir.parent.parent)}`' for p in paths),
+        print_iter((f'`{p.relative_to(adv_ex_dir.parent.parent)}`' for p in paths),
                    header='\nSamples saved as...', bullet='1.')
 
 
 def seek_top_adv_am(date_str: str,
                     adv_floor: int,
                     tag_top_dir: Path,
-                    tag_top_str: str = None
+                    tag_top_str: str = None,
+                    verbose: bool = False
                     ) -> pd.DataFrame:
-    if tag_top_str is None:
-        tag_top_str = tag_top_dir.name
-    adv_am = []
-    while not any(adv_am):
-        try:
-            path = tag_top_dir.joinpath(
-                f'{tag_top_str}_NEG-ADV_combined-{adv_floor}.{date_str}.csv')
-            adv_am = pd.read_csv(
-                path, index_col='adv')
-        except FileNotFoundError:
-            date_str = day_before(date_str)
+    """
+    Seeks and loads the top adverb association mining (AM) table based on the input date, directory, and adverb floor.
+
+    Args:
+        date_str: The input date string.
+        adv_floor: The adverb floor value.
+        tag_top_dir: The directory path for the top AM files.
+        tag_top_str: The tag string for the top directory. Defaults to None.
+        verbose: Whether to print verbose information. Defaults to False.
+
+    Returns:
+        pd.DataFrame: The loaded and converted top adverb AM table.
+    """
+
+    tag_top_str = tag_top_str or tag_top_dir.name
+    undated_stem = f'{tag_top_str}_NEG-ADV_combined-{adv_floor}'
+    # path = None
+    path = cobble_dated_path(date_str=date_str, data_dir=tag_top_dir,
+                             undated_stem=undated_stem)
+    if verbose:
+        print(f'"first stab" path: `{path}`')
+    if not (path and path.is_file()):
+        if verbose:
+            print('* could not find 👆  \n  seeking alternates...')
+        path = find_most_recent_top_am(
+            date_str=date_str, data_dir=tag_top_dir,
+            undated_stem=undated_stem, verbose=verbose)
+    if path.is_file():
+
+        adv_am = pd.read_csv(path, index_col='adv')
+    else:
+        raise FileNotFoundError(
+            f'Alternate file search failed. No recent path matching "{undated_stem}*.csv" found.')
+
     print(f'> Loaded top adv AM table from  \n> `{path}`')
-    adv_am = adjust_am_names(adv_am).convert_dtypes()
-    return adv_am
+    return adjust_am_names(adv_am).convert_dtypes()
 
 
-def day_before(date_str):
-    return date_str[:-1]+str(int(date_str[-1])-1)
+def cobble_dated_path(date_str, data_dir, undated_stem, suffix: str = '.csv'):
+    """
+    Constructs a dated file path based on the input date string, directory, stem, and suffix.
+
+    Args:
+        date_str (str): The input date string.
+        data_dir: The directory path where the file will be located.
+        undated_stem (str): The stem of the undated file.
+        suffix (str): The file suffix.
+
+    Returns:
+        Path: The constructed dated file path.
+    """
+    if not undated_stem.endswith('_'):
+        undated_stem = f'{undated_stem}.'
+    return data_dir.joinpath(f'{undated_stem}{date_str}{suffix}')
+
+
+def find_most_recent_top_am(date_str: str,
+                            data_dir: Path,
+                            undated_stem: str,
+                            suffix: str = '.csv',
+                            verbose: bool = False):
+    """
+    Finds the most recent top AM file path based on the input date string, directory, stem, and suffix.
+
+    Args:
+        date_str: The input date string.
+        data_dir: The directory path where the files are located.
+        undated_stem: The stem of the undated file.
+        suffix: The file suffix. Defaults to '.csv'.
+        verbose: Whether to print verbose information. Defaults to False.
+    """
+
+    if verbose:
+        print('_inputs_',
+              date_str, data_dir, undated_stem, suffix,
+              sep='\n* ')
+    init_date_str = date_str
+    dated_path = cobble_dated_path(date_str=date_str, data_dir=data_dir,
+                                   undated_stem=undated_stem, suffix=suffix)
+    days_past = 0
+    while not (dated_path.exists() or days_past > 60):
+        date_str = day_before(date_str)
+        if verbose:
+            print('  > seeking...', date_str)
+        dated_path = cobble_dated_path(date_str=date_str, data_dir=data_dir,
+                                       undated_stem=undated_stem, suffix=suffix)
+        days_past += 1
+    if dated_path.exists():
+        if verbose:
+            print(f'\n* Selected Path Match: `{dated_path}`')
+        return dated_path
+
+    print(f'⚠️ no file found for `{date_str}`')
+    print(f'  --> seeking original file matching `{init_date_str}`')
+    print('      full path:',
+          f'`{cobble_dated_path(date_str=init_date_str, data_dir=data_dir, undated_stem=undated_stem, suffix=suffix)}`')
+
+
+def day_before(date_str: str):
+    """
+    Returns the date string representing the day before the input date string.
+
+    Args:
+        date_str (str): The input date string in the format '%Y-%m-%d'.
+
+    Returns:
+        str: The date string representing the day before the input date.
+    """
+    return (pd.Timestamp(date_str) - pd.Timedelta(days=1)).date().strftime(r'%Y-%m-%d')
 
 
 def save_top_bigrams_overall_md(bigram_am: pd.DataFrame,
@@ -867,3 +1077,23 @@ def save_top_bigrams_overall_md(bigram_am: pd.DataFrame,
     nb_show_table(bigram_am.round(2).nlargest(overall_k, columns=metric_columns),
                   outpath=outpath,
                   suppress_printing=suppress)
+
+
+def clarify_neg_categories(neg_hits, verbose=False):
+
+    def lemma_aint_to_not(neg_hits: pd.DataFrame, verbose):
+
+        neg_hits['neg_lemma'] = (neg_hits.neg_lemma.astype('string')
+                                 .str.replace('aint', "not")
+                                 .str.replace("ain't", 'not'))
+        if verbose:
+            print('Updated `neg_lemma` counts with "ain(\')t" merged with "not"',
+                  neg_hits.neg_lemma.value_counts().to_markdown(floatfmt=',.0f', intfmt=','),
+                  sep='\n\n')
+        return neg_hits
+
+    neg_hits = lemma_aint_to_not(neg_hits, verbose)
+    # word_cols = neg_hits.filter(regex=r'head|lower|lemma').columns
+    # #> drop empty categories if already categorical; make categorical if not already
+    # neg_hits.loc[:, word_cols] = neg_hits[word_cols]
+    return catify(neg_hits)

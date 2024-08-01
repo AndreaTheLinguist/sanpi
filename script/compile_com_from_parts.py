@@ -11,8 +11,9 @@ from more_itertools import batched
 from source.utils.dataframes import NEG_REGEX, Timer
 from source.utils.dataframes import catify_hit_table as catify
 from source.utils.dataframes import (extend_window, get_neg_equiv_sample,
-                                     save_final_info, save_hit_id_index_txt,
-                                     select_id_prefixes, write_part_parquet)
+                                     get_preceding_text, save_final_info,
+                                     save_hit_id_index_txt, select_id_prefixes,
+                                     write_part_parquet)
 from source.utils.general import HIT_TABLES_DIR, confirm_dir, run_shell_command
 
 TEST_CAP = None
@@ -488,18 +489,7 @@ def enforce_not_neg(com_df: pd.DataFrame,
     #         :pre_adv_index[x]]).str.join(' ')
 
     #     return preceding_texts.astype('string').fillna('')
-    def get_preceding_text(tok_str: pd.Series,
-                           adv_index: pd.Series = None):
-        tok_index = tok_str.index.to_series()
-        if adv_index is None:
-            adv_index = pd.to_numeric(tok_index.str.extract(r':(\d+)-')[0],
-                                      downcast='unsigned')
-        else:
-            adv_index = pd.to_numeric(adv_index, downcast='unsigned')
-        tok_lists = tok_str.str.lower().str.split()
-        preceding_texts = pd.Series((tl[:ax] for tl, ax in zip(tok_lists, adv_index.add(1))),
-                                    index=tok_index).str.join(' ')
-        return preceding_texts.astype('string').fillna('')
+
 
     def _save_maybe_neg(maybe_neg_hits, reject_parq):
         _max_rows = (len(maybe_neg_hits)//2)+1
@@ -533,9 +523,17 @@ def enforce_not_neg(com_df: pd.DataFrame,
         adv_index=(com_df.adv_index
                    if 'adv_index' in com_df.columns
                    else None))
-    after_neg = preceding.str.contains(NEG_REGEX, regex=True)
+    #> test to see if adjective was included and remove is necessary
+    preceding_words = preceding.str.lower().str.split()
+    ultimate = preceding_words.str.get(-1)
+    penultimate = preceding_words.str.get(-2)
+    if any((ultimate == com_df.adj_form_lower) & (penultimate == com_df.adv_form_lower)): 
+        preceding = preceding_words.str[:-1].str.join(' ')
+        
+    found_neg = preceding.str.extract(NEG_REGEX, regex=True)
+    adj_follows_neg = found_neg.apply(any, axis=1)
 
-    maybe_neg_hits = com_df.loc[after_neg, :]
+    maybe_neg_hits = com_df.loc[adj_follows_neg, :]
     # [x] Save `maybe_neg_hits`
     _save_maybe_neg(maybe_neg_hits, reject_parq)
 
@@ -549,14 +547,14 @@ def enforce_not_neg(com_df: pd.DataFrame,
           )
     print(f'* _removed_ {total_after_neg:,} potentially negated hits.')
 
-    not_neg = com_df.loc[~after_neg, :]
+    not_neg = com_df.loc[~adj_follows_neg, :]
     total_not_neg = len(not_neg)
     print(f'* _keeping_ {total_not_neg:,} (likely) "not negated" hits.')
     print(f'* { total_not_neg / init_total * 100:.1f}% of hits retained.')
     if '.csv' in input_path.suffixes:
-        append_hits_to_csv(not_neg.loc[after_neg, :],
+        append_hits_to_csv(not_neg.loc[adj_follows_neg, :],
                            input_path, processing_index == 1, reject=True)
-        append_hits_to_csv(not_neg.loc[~after_neg, :],
+        append_hits_to_csv(not_neg.loc[~adj_follows_neg, :],
                            input_path, processing_index == 1)
 
     return not_neg
