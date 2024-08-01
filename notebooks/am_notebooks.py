@@ -69,7 +69,7 @@ METRIC_PRIORITY_DICT = _set_priorities()
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-def set_col_widths(df, override:dict=None):
+def set_col_widths(df, override: dict = None):
     """
     **To be used with `tabulate`**
     e.g.: 
@@ -94,9 +94,9 @@ def set_col_widths(df, override:dict=None):
         | {c: 48 for c in cols[cols.str.contains('text')]}
         | {c: 32 for c in cols[cols.str.contains('form')]}
         | {c: 60 for c in cols[cols.str.contains('_str')]})
-    if override is not None: 
+    if override is not None:
         width_dict.update(override)
-        
+
     return list(width_dict.values())
 
 
@@ -127,8 +127,8 @@ def show_sample(df: pd.DataFrame,
                 format: str = 'grid',
                 n_dec: int = 0,
                 limit_cols: bool = True,
-                assoc: bool = False, 
-                width_override: dict=None):
+                assoc: bool = False,
+                width_override: dict = None):
     """
     Displays a formatted DataFrame using the specified format and options.
 
@@ -356,16 +356,15 @@ def nb_show_table(df, n_dec: int = 2,
         if start_0:
             _df.index = _df.index + 1
     if adjust_columns and not any(
-        _df.filter(['text_window', 'token_str', 
+        _df.filter(['text_window', 'token_str',
                     'bigram_lower', 'all_forms_lower'])):
         _df = adjust_am_names(_df)
-        
 
     _df = italicize_df_for_md(_df)
     if transpose:
         _df = _df.T
-        _df.index = [f'`{i}`' for i in _df.index] 
-           
+        _df.index = [f'`{i}`' for i in _df.index]
+
     _df.columns = [f'`{c}`' for c in _df.columns]
     _df.index = [f'**{r}**' for r in _df.index]
     table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
@@ -904,13 +903,14 @@ def populate_adv_dir(adverb: str,
         like=f'~{adverb}_', axis=0).sort_values(rank_by, ascending=False)
     this_adv_amdf.to_csv(table_csv_path)
 
-    nb_show_table((this_adv_amdf
-                   .filter(regex=r'^([dLGeu]|f2?$|adj_total)')
-                   .round(2)
-                   .sort_values(rank_by, ascending=False)),
-                  n_dec=2,
-                  outpath=table_csv_path.with_suffix('.md'),
-                  suppress_printing=not verbose)
+    nb_show_table(
+        (this_adv_amdf
+         .filter(regex=r'^([dLGeu]|f2?$|adj_total)' + r'|'.join(rank_by))
+         .round(2)
+         .sort_values(rank_by, ascending=False)),
+        n_dec=2,
+        outpath=table_csv_path.with_suffix('.md'),
+        suppress_printing=not verbose)
 
     nb_show_table(this_adv_amdf.filter(['N', 'f1', 'adv_total'])
                   .set_index(this_adv_amdf.l1 + f'_{adverb}').drop_duplicates(),
