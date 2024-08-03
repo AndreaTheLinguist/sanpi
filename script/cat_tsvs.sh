@@ -36,7 +36,6 @@ for T in $(find ${DATA_DIR}/2_hit_tables/*${PAT_KEY}/ucs_format -name '*ALL*tsv'
 	ln -srv -t "${ENV_TSVS}" "${T}" 2>/dev/null
 done
 
-
 # > link most recent NEQ sample;
 EXISTING_SYML=$(find ${ENV_TSVS} -type l -name '*NEQ*tsv')
 if [[ -f ${EXISTING_SYML} ]]; then
@@ -85,8 +84,8 @@ if [[ "${PAT_KEY}" == "mirror" ]]; then
 	echo $TSV_C 
 	TSV_N="${ENV_TSVS}/AdvAdj_ALL_NEG${PAT_KEY}_final-freq.tsv"
 	echo $TSV_N
-
 fi
+
 echo "Input Paths:"
 echo "1. Complement:"
 STEM_C="$(basename -s '.tsv' ${TSV_C})"
@@ -134,11 +133,11 @@ echo "  environment:       '${ENV_N}'"
 # >>>>>>>>> set output >>>>>>>>>>>>>>>
 ENV_SUFF=${ENV_N//[A-Z]/}
 ANY_TSVS="${TSV_DIR}/ANY${ENV_SUFF,,}"
-# echo "${ANY_TSVS}"
+echo "${ANY_TSVS}"
 mkdir -p "${ANY_TSVS}"
 OUT_TSV="${ANY_TSVS}/${PREFIX_C}_any-${ENV_SUFF}_final-freq.tsv"
-echo -e "\n------------------------\n"
-echo "Combined Output: ${OUT_TSV}"
+echo -e "\n------------------------
+\nCombined Output: '${OUT_TSV}'"
 
 echo "cat '${TSV_C}' > '${OUT_TSV}'"
 cat "${TSV_C}" >"${OUT_TSV}"
@@ -149,6 +148,21 @@ echo
 echo "$(wc -l ${OUT_TSV} | tabulate -f tsv | cut -f1) lines in combined tsv"
 tree -hDl --du --prune -I *~* ${TSV_DIR}
 
-echo "Finished concatenating tsv files"
+echo -e '\n🏁 😸  Finished catting tsv files
+\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+
+# >>>>>>>>> copy to results/freq_tsv/* >>>>>>>>>>>>>>>
+echo '🗃️  Copying to "../projects/sanpi/results/freq_tsv/"\n'
+
+RESULTS_ENV_TSVS="/share/compling/projects/sanpi/results/freq_tsv/$(basename ${ENV_TSVS})/"
+mkdir -p "${RESULTS_ENV_TSVS}"
+cd "${ENV_TSVS}"
+find "${ENV_TSVS}" -name '*.tsv' -type l # -exec cp -Lv --backup=numbered '{}' "$RESULTS_ENV_TSVS" \;
+
+RESULTS_ANY_TSVS="/share/compling/projects/sanpi/results/freq_tsv/$(basename ${ANY_TSVS})"
+mkdir -p "${RESULTS_ANY_TSVS}"
+cd "${ANY_TSVS}"
+find "${ANY_TSVS}" -name '*.tsv' # -exec cp --backup=numbered -v '{}' "$RESULTS_ANY_TSVS" \;
+
 date
 # exit #// ! HACK TEMP <---- REMOVE
