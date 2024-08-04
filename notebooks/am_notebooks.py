@@ -344,7 +344,8 @@ def nb_show_table(df, n_dec: int = 2,
                   outpath: Path or str = None,
                   return_df: bool = False,
                   suppress_printing: bool = False,
-                  transpose: bool = False
+                  transpose: bool = False, 
+                  italics: bool = True
                   ) -> None or pd.DataFrame:
     _df = df.copy()
     try:
