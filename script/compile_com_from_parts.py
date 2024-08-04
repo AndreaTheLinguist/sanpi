@@ -8,12 +8,13 @@ from time import sleep
 import pandas as pd
 from more_itertools import batched
 
-from source.utils.dataframes import NEG_REGEX, Timer
+from source.utils.dataframes import NEG_REGEX, POS_FEW_REGEX, Timer
 from source.utils.dataframes import catify_hit_table as catify
-from source.utils.dataframes import (extend_window, get_neg_equiv_sample,
-                                     get_preceding_text, save_final_info,
+from source.utils.dataframes import (drop_underscores, embolden, extend_window,
+                                     get_neg_equiv_sample, get_preceding_text,
+                                     print_path_info, save_final_info,
                                      save_hit_id_index_txt, select_id_prefixes,
-                                     write_part_parquet)
+                                     show_sample, write_part_parquet)
 from source.utils.general import HIT_TABLES_DIR, confirm_dir, run_shell_command
 
 TEST_CAP = None
@@ -34,8 +35,8 @@ RBX_CLEAN = HIT_TABLES_DIR.joinpath('RBXadj/cleaned')
 def _main():
     args = _parse_args()
     data_dir = args.data_dir
-    print(f'# Hit Table Processing for `{data_dir.name}`\n',
-          f'* start time: {pd.Timestamp.now().ctime()}', 
+    print(f'\n# Hit Table Processing for `{data_dir.name}`\n',
+          f'* start time: {pd.Timestamp.now().ctime()}',
           '* script:  \n  `/share/compling/projects/sanpi/script/compile_com_from_parts.py`',
           f'* data directory:  \n  `{data_dir}/`',
           sep='\n', end='\n\n')
@@ -53,17 +54,13 @@ def _main():
     else:
         all_enforced = _load_from_raw(data_dir, force_redo)
 
-    all_enforced = catify(all_enforced)
-    entire_parquet = str(data_dir/'ALL_not-neg.parq')
+    all_enforced = catify(drop_underscores(all_enforced))
+    entire_parquet = str(data_dir/f'ALL_{data_dir.name}.parq')
 
     if not composite_only:
         _process_extras(all_enforced, entire_parquet)
 
-    # ********* wait 1m before attempting to write _entire_ composite table
-    print(('\n----------------------\n'
-           '> *temporarily paused*\n'
-           '----------------------\n'))
-    sleep(60)
+    sleep(5)
     save_composite_parq(all_enforced, entire_parquet)
 
 
@@ -106,15 +103,15 @@ def _parse_args():
     return parser.parse_args()
 
 
-def _load_from_prior(final_index_txt: Path, 
+def _load_from_prior(final_index_txt: Path,
                      enforced_parqs: tuple[Path],
                      #  data_dir: Path
                      ):
     print('> !!! Prior Index for Full Complement found.')
     print('\n## Loading from Partial Prior Processing\n',
-              f'existing files:  \n  `{enforced_parqs[0].parent}/*`',
-              f'existing final index:  \n  `{final_index_txt}`', 
-              sep='\n* ')
+          f'existing files:  \n  `{enforced_parqs[0].parent}/*`',
+          f'existing final index:  \n  `{final_index_txt}`',
+          sep='\n* ')
 
     unique_ids = pd.Series(final_index_txt
                            .read_text().splitlines(),
@@ -122,7 +119,8 @@ def _load_from_prior(final_index_txt: Path,
                            ).str.strip().drop_duplicates()
     print(f'* {len(unique_ids):,} `hit_id`s in final index')
 
-    print(f'* Loading predetermined selection from {len(enforced_parqs)} `*.parq` paths')
+    print(
+        f'* Loading predetermined selection from {len(enforced_parqs)} `*.parq` paths')
 
     def iter_filtered_parqs(unique_ids: pd.Series,
                             enforced_parqs: tuple[Path]):
@@ -178,12 +176,12 @@ def _load_from_prior(final_index_txt: Path,
 
     try:
         print('Summary of loaded, filtered, & concatenated hits\n',
-            all_enforced
+              all_enforced
               # .select_dtypes(include='string')
               .filter(regex=r'bigram|lemma|part|prefix|text_window')
               .describe().T.convert_dtypes().round()
               .to_markdown(floatfmt=',.0f', intfmt=','),
-              sep='\n',end='\n\n')
+              sep='\n', end='\n\n')
     except Exception:
         print('failed to describe frame: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:167"')
         print(sys.exc_info())
@@ -241,24 +239,19 @@ def _process_extras(all_enforced, entire_parquet):
     save_final_info(equal_sized_sample, data_dir, tag='NEQ',
                     date_flag=timestamp)
 
-    # ***  wait 30s before attempting to write *sample* with all columns
-    print(('\n----------------------\n'
-           '> *temporarily paused*\n'
-           '----------------------\n'))
-    sleep(30)
+    sleep(5)
 
     save_composite_parq(equal_sized_sample,
                         sample_parq_part,
                         sample=True)
 
 
+# > moved `_info` to `source.utils.dataframes` "/share/compling/projects/sanpi/source/utils/dataframes.py"
 
-# > moved `save_final_info` to `source.utils.dataframes` "/share/compling/projects/sanpi/source/utils/dataframes.py"
 
-
-def process_parq(data_dir, parq, 
+def process_parq(data_dir, parq,
                  force: bool = False):
-    
+
     with Timer() as proc_part_t:
         part = PART_LABEL_REGEX.search(parq.stem).group()
 
@@ -297,11 +290,11 @@ def process_parq(data_dir, parq,
             with Timer() as wrt_ix_t:
                 print(f'* "Not negated"-enforced index for `{part}` saved as:',
 
-                      str(save_hit_id_index_txt(index_vals=df.index,
+                      save_hit_id_index_txt(index_vals=df.index,
                                                 index_path=enforced_parq.with_name(
                                                     re.sub(
                                                         r'_hits.*$', '_no-neg_index.txt', enforced_parq.name)
-                                                ))),
+                                                )),
                       sep='\n  > 🏷️  `', end='`\n')
                 print(f'  > ⏱️  {wrt_ix_t.elapsed()}\n')
 
@@ -473,23 +466,6 @@ def enforce_not_neg(com_df: pd.DataFrame,
                     input_path: Path,
                     reject_parq: Path,
                     processing_index: int = None) -> pd.DataFrame:
-    # def get_preceding_text(tok_str: pd.Series,
-    #                        adv_index: pd.Series = None):
-    #     tok_index = tok_str.index.to_series()
-    #     pre_adv_index = (
-    #         pd.to_numeric(adv_index, downcast='unsigned') if adv_index is not None
-    #         else
-    #         pd.to_numeric((tok_index
-    #                        .str.split(':').str.get(-1)
-    #                        .str.split('-').str.get(0)),
-    #                       downcast='unsigned')
-    #     ) - 1
-
-    #     preceding_texts = tok_index.apply(lambda x: tok_str[x].split()[
-    #         :pre_adv_index[x]]).str.join(' ')
-
-    #     return preceding_texts.astype('string').fillna('')
-
 
     def _save_maybe_neg(maybe_neg_hits, reject_parq):
         _max_rows = (len(maybe_neg_hits)//2)+1
@@ -510,6 +486,8 @@ def enforce_not_neg(com_df: pd.DataFrame,
             min_rows_per_group=_min_rows,
             max_rows_per_file=_max_rows,
             row_group_size=int(min(_max_rows//2, _min_rows*5)))
+        print_path_info(
+            reject_parq, 'dataframe of hits rejected due to potential negations', )
 
     com_df = com_df.rename(columns={'Unnamed: 0': 'hit_id'})
     init_total = len(com_df)
@@ -523,33 +501,64 @@ def enforce_not_neg(com_df: pd.DataFrame,
         adv_index=(com_df.adv_index
                    if 'adv_index' in com_df.columns
                    else None))
-    #> test to see if adjective was included and remove is necessary
-    preceding_words = preceding.str.lower().str.split()
-    ultimate = preceding_words.str.get(-1)
-    penultimate = preceding_words.str.get(-2)
-    if any((ultimate == com_df.adj_form_lower) & (penultimate == com_df.adv_form_lower)): 
-        preceding = preceding_words.str[:-1].str.join(' ')
-        
-    found_neg = preceding.str.extract(NEG_REGEX, regex=True)
-    adj_follows_neg = found_neg.apply(any, axis=1)
 
-    maybe_neg_hits = com_df.loc[adj_follows_neg, :]
-    # [x] Save `maybe_neg_hits`
+    # This shouldn't be necessary anymore---determined source of discrepancy.
+    #   See comments in `get_preceding_text()`
+    # #// > test to see if adjective was included and remove is necessary
+    # // preceding_words = preceding.str.lower().str.split()
+    # // ultimate = preceding_words.str.get(-1)
+    # // penultimate = preceding_words.str.get(-2)
+    # // if any((ultimate == com_df.adj_form_lower) & (penultimate == com_df.adv_form_lower)):
+    # //     preceding = preceding_words.str[:-1].str.join(' ')
+
+    # found_neg = preceding.str.extract(NEG_REGEX, expand=False).fillna(''); print('-> **Using `extract`**')
+    # print('-> **Using `findall`**')
+    found_neg = preceding.str.findall(NEG_REGEX).str.join(';')
+    adj_follows_neg = found_neg.astype('bool')
+
+    # ! `extract` only returns the *first* match, but `findall` returns *all* matches (and then `join` converts list to str)
+    #   so `found_neg == 'few'` really means, "few" was found and *nothing else*
+    #   e.g. "a __few__ days later we are __no__ closer to a deal..." yields --> ['few', 'no'] (& becomes -> "few;no")
+    #     but when "few" is the only `NEG_REGEX` match found, the value in `found_neg` is just "few"
+    adj_follows_neg = allow_positive_few(preceding, found_neg, adj_follows_neg)
+
+    chunk = com_df.chunk.iat[0]
+    part = com_df.part.iat[0]
+    _count_maybe_neg_in_chunk(adj_follows_neg, chunk, part, preceding)
+
+    maybe_neg_hits = com_df.copy().assign(
+        potential_negation=found_neg.astype('string'),
+        nearest_neg=(found_neg.str.split(';')
+                     .str.get(-1).astype('string'))
+    ).loc[adj_follows_neg, :]
+
+
     _save_maybe_neg(maybe_neg_hits, reject_parq)
 
-    total_after_neg = len(maybe_neg_hits)
-    print('> Sample of Potential Negations <\n\n```log',
-          maybe_neg_hits[maybe_neg_hits.utt_len < 30].filter(
-              ['bigram_lower', 'token_str']).sample(9)
-          .to_markdown(tablefmt='rounded_grid', maxcolwidths=[18, 22, 58]),
+    total_maybe_neg = len(maybe_neg_hits)
+    _sample_neg = pd.concat(
+        d.sample() for __, d
+        in maybe_neg_hits.loc[
+            maybe_neg_hits.utt_len < 30,
+            ['bigram_lower', 'token_str', 'nearest_neg']]
+        .groupby('nearest_neg')
+    )
+    _sample_neg['token_str'] = embolden(_sample_neg.token_str, mono=False)
+
+    print('\n> Sample of Potential Negations',
+          '> (1 ex per type)\n',
+          '```log',
+          _sample_neg.to_markdown(tablefmt='simple_grid',
+                                   maxcolwidths=[18, 22, 58]),
           '```',
           sep='\n', end='\n\n'
           )
-    print(f'* _removed_ {total_after_neg:,} potentially negated hits.')
 
+    print(f'* _drop_ {total_maybe_neg:,} potentially negated hits', 
+          f'from `{part}`, chunk {chunk}.')
     not_neg = com_df.loc[~adj_follows_neg, :]
     total_not_neg = len(not_neg)
-    print(f'* _keeping_ {total_not_neg:,} (likely) "not negated" hits.')
+    print(f'* _keep_ {total_not_neg:,} (likely) "not negated" hits.')
     print(f'* { total_not_neg / init_total * 100:.1f}% of hits retained.')
     if '.csv' in input_path.suffixes:
         append_hits_to_csv(not_neg.loc[adj_follows_neg, :],
@@ -558,6 +567,50 @@ def enforce_not_neg(com_df: pd.DataFrame,
                            input_path, processing_index == 1)
 
     return not_neg
+
+
+def _count_maybe_neg_in_chunk(adj_follows_neg, chunk, part, preceding):
+    print(f'\nEnforcement Summary for chunk {chunk} of `{part}`\n')
+    maybe_neg_totals = (adj_follows_neg.value_counts()
+                        .to_frame('# hits'))
+    maybe_neg_totals.index.name = f"`{part}`, chunk {chunk}..."
+    show_sample(
+        df=(maybe_neg_totals
+            .rename(index={'0': '_without_ potential negation(s)',
+                           'False': '_without_ potential negation(s)',
+                           False: '_without_ potential negation(s)',
+                           '1': '**with** potential negation(s)',
+                           'True': '**with** potential negation(s)',
+                           True: '**with** potential negation(s)',
+                           })),
+        format='pipe')
+
+    observed_unique_neg = preceding.str.extractall(NEG_REGEX).neg
+    observed_unique_neg = observed_unique_neg.value_counts().to_frame().assign(
+        percent=(observed_unique_neg
+                 .value_counts(normalize=True) * 100
+                 ).round(1))
+    print('\nPotential Negations Identified: Type Subtotals',
+          observed_unique_neg.to_markdown(intfmt=','),
+          sep='\n\n', end='\n\n')
+
+
+def allow_positive_few(preceding, found_neg, adj_follows_neg):
+    just_few = found_neg == 'few'
+    if any(just_few):
+        few_is_pos = preceding.str.contains(POS_FEW_REGEX, na=False)
+        just_pos_few = just_few & few_is_pos
+        _few_ignores = (preceding[just_pos_few]
+                        .str.findall(POS_FEW_REGEX).str.join('; ')
+                        .value_counts().to_frame())
+        print(f'* {_few_ignores["count"].sum():,} '
+              '"positive few" matches permitted as "not negative"\n'
+              '    (and no other negation match in text preceding bigram)')
+        _few_ignores.index.name = '"positive few" match'
+        show_sample(_few_ignores, format='simple_outline')
+        adj_follows_neg = adj_follows_neg & ~just_pos_few
+        print()
+    return adj_follows_neg
 
 
 def append_hits_to_csv(hits_chunk: pd.DataFrame,
@@ -581,7 +634,7 @@ def save_composite_parq(df: pd.DataFrame,
     partition_on = partition_on or ['part']
     data_dir = Path(parq_path).parent
 
-    print(f'### Saving{" *NEQ Sample* " if sample else " "}Composite Table\n')
+    print(f'\n### Saving{" *NEQ Sample* " if sample else " "}Composite Table\n')
     engine_used = None
     max_parq_rows = int(max(100000,
                             round(((df.part.value_counts().mean()//10)
@@ -613,7 +666,7 @@ def save_composite_parq(df: pd.DataFrame,
             except ImportError:
                 with Timer() as time_csv:
                     entire_csv_bz2 = parq_path.replace('.parq', '.csv.bz2')
-                    all_enforced.to_csv(entire_csv_bz2)
+                    df.to_csv(entire_csv_bz2)
                     print('* Complement saved as compressed csv ✓',
                           f'  * Path: `{entire_csv_bz2.relative_to(HIT_TABLES_DIR.parent)}`',
                           f'  * Time elapsed: {time_csv.elapsed()}',
@@ -630,7 +683,7 @@ def save_composite_parq(df: pd.DataFrame,
                   f'* partitioned by: `{repr(partition_on)}`\n',
                   '* properties included:  ',
                   '\n      ' + repr(df.columns
-                                  ).replace('\n', '\n        ')+'\n\n',
+                                    ).replace('\n', '\n        ')+'\n\n',
                   f'* max rows per file: {max_parq_rows:,}',
                   sep='  \n  ')
             if sample:
@@ -701,7 +754,7 @@ def remove_duplicates(hit_df, final: bool = False):
                 keep='first', subset=compare_cols)
             info_df['& will be removed'] = discard.value_counts()
             info_df.index.name = '# hits...'
-            print('\nCompiled Duplicatation Counts\n\n' +
+            print('\nCompiled Duplication Counts\n\n' +
                   info_df.to_markdown(intfmt=',', floatfmt=',.0f'))
             # print('\nExample of Duplication Removal (1 kept per "text_window")')
             # print('\n```log')
@@ -731,18 +784,7 @@ def remove_duplicates(hit_df, final: bool = False):
 
 if __name__ == '__main__':
     with Timer() as timer:
-        # try:
+
         _main()
 
-        # except Exception as e:
-        #     code=1
-        #     print(sys.exc_info())
-        #     raise e
-        # else:
-        #     code=0
-        #     print(
-        #         f'\n## Enforcement and Compilation Completed ✓\n+ {pd.Timestamp.now().ctime()}')
-        # finally:
-        # print('Exiting script: "/share/compling/projects/sanpi/script/compile_com_from_parts.py:760')
         print(f'+ total time running script: {timer.elapsed()}')
-        #     sys.exit(code)

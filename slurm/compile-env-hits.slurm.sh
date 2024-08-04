@@ -21,7 +21,7 @@ echo
 eval "$(conda shell.bash hook)"
 conda activate sanpi
 
-LOG_FILE=${SLURM_JOB_NAME}.${SLURM_JOB_ID}_$(date +%y%m%d_%I%p).log.md
+LOG_FILE=${SLURM_JOB_NAME}.${SLURM_JOB_ID}.log.md
 DATA_ARG=${1:-''}
 if [[ -n $DATA_ARG ]]; then
     DATA_ARG="-d ${DATA_ARG} "

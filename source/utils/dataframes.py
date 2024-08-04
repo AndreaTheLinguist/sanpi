@@ -16,16 +16,21 @@ HITS_DF_PATH_REGEX = re.compile(r'_hits.*$')
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
 WS_REGEX = re.compile(r'[^\S\n]')
 REGNOT = re.compile(
-    r"\b(n[o']t|non?e?|never|neither|nor|nothing|nowhere|(?:[br]are|scarce|seldom)l?y?|hardly|without)\b", 
+    r"\b(n[o'][tr]|none|no(?! ?\. \d)|never|neither|nothing|nowhere|(?:[br]are|scarce|seldom)l?y?|hardly|without)\b",
     flags=re.I)
-# NEG_REGEX = re.compile(
-#     r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
+#// NEG_REGEX = re.compile(
+#//     r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
 NEG_REGEX = re.compile(
-    (r"\b(?P<neg>no|n[o'](?:[tr]|ne?|body|thing|where)"
+    (r"\b(?P<neg>nor?|n[o'](?:t|ne|body|thing|where)"
         r"|(?:rare|scarce|seldom)l?y?|(?:hard|bare)ly"
-        r"|ain'?t|neither|without|never|few)\b"),
+        # r"|question|whether|if"
+        r"|ain'?t|neither|without|never|few|doubt)\b"),
     flags=re.I)
-POS_FEW_REGEX= re.compile(r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b')
+# QUES_REGEX = re.compile(
+#     (r"(?P<Q>\b(?:question|wonder|ask(?:s|ed|ing| ?)|whether|if|what|when|why|where|how)\b|^do\b)"))    
+
+POS_FEW_REGEX = re.compile(
+    r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b')
 
 OK_REGEX = re.compile(r'^o*\.?k+\.?a*y*$')
 V_REGEX = re.compile(r'^v\.?$|^ve+r+y+$')
@@ -37,30 +42,24 @@ ANY_ALPHA_REGEX = re.compile(r'[a-z]')
 MISC_REGEX = re.compile(r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
 NAME_REGEX = re.compile(r'(?<=bigram-)\w+(?=_rb)')
 INDEX_FROM_ID_REGEX = r'(?P<adv_index>\d+)-(?P<adj_index>\d+)$'
-
-# try:
-#     import pyarrow
-# except ImportError:
-
-#     PYARROW = False
-# else:
 PYARROW = True
 
 try:
-    from source.utils.general import (HIT_TABLES_DIR, PKL_SUFF, confirm_dir, find_files,
-                                      snake_to_camel)
+    from source.utils.general import (PKL_SUFF, confirm_dir, find_files, 
+                                      run_shell_command)
 except ModuleNotFoundError:
     try:
-        from utils.general import (HIT_TABLES_DIR, PKL_SUFF, confirm_dir, find_files,
-                                   snake_to_camel)
+        from utils.general import (PKL_SUFF, confirm_dir, find_files,
+                                   run_shell_command)
     except ModuleNotFoundError:
-        from general import (HIT_TABLES_DIR, PKL_SUFF,
-                             confirm_dir, find_files, snake_to_camel)
-#         from associate import adjust_am_names
-#     else:
-#         from utils.associate import adjust_am_names
+        from general import (PKL_SUFF, confirm_dir, find_files,
+                             run_shell_command)
+
+#     else: 
+#         from utils import adjust_am_names
 # else:
-#     from source.utils.associate import adjust_am_names
+#     from source.utils import adjust_am_names
+
 
 OPTIMIZED_DTYPES = {
     'string': {
@@ -278,10 +277,6 @@ def cols_by_str(df: pd.DataFrame, start_str=None, end_str=None) -> list:
     return cols.to_list()
 
 
-# def count_uniq(series: pd.Series) -> int:
-#     return len(series.unique())
-
-
 def corners(df, size: int = 5, n_dec: int = None):
     """
     Extract the corner values of a DataFrame and display them in a new DataFrame.
@@ -356,7 +351,7 @@ def describe_counts(df: pd.DataFrame = None,
                 save_table(
                     desc,
                     f'{stats_dir}/{param[:4].strip("_-").upper()}-{out_path_stem}',
-                    f'{param} descriptive statististics for {out_path_stem}',
+                    f'{param} descriptive statistics for {out_path_stem}',
                     ['csv'])
                 print_md_table(desc.sample(min(len(desc), 6)).round(),
                                title=f'Sample {param} Stats ')
@@ -402,23 +397,37 @@ def drop_margins(_df, margin_name='SUM'):
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
 
+
+def drop_underscores(df):
+    if any(df.bigram_lower.str.count('_') > 1):
+        print('\nWARNING: Some underscores slipped through. Dropping the following hits...')
+        show_sample(df.loc[(df.bigram_lower.str.count('_') > 1), :]
+                    .filter(regex=r'ad.*lower|_window'), format='simple_grid')
+        df = df.loc[
+            df.bigram_lower.str.count('_') == 1, :]
+            
+    return df
+
+
+
 def get_preceding_text(tok_str: pd.Series,
-                        adv_index: pd.Series = None):
+                       adv_index: pd.Series = None):
     tok_index = tok_str.index.to_series()
     if adv_index is None:
-        ix_from_id = tok_index.str.extract(
-            INDEX_FROM_ID_REGEX)
-        adv_index = ix_from_id['adv_index']
-                                    
+        ix_from_id = tok_index.str.extract(INDEX_FROM_ID_REGEX)
+        # ! numbers in `hit_id` are conllu object's "id" values:
+        # !     word numbering in conllu objects starts at 1, not 0!
+        # `adv_index` as stored in dataframes is word indexing starting from 0
+        adv_index = ix_from_id['adv_index'] - 1
+
     adv_index = pd.to_numeric(adv_index, downcast='unsigned')
     tok_lists = tok_str.str.lower().str.split()
-    
-    preceding_texts = pd.Series((tl[:ax] for tl, ax 
-                                #  in zip(tok_lists, adv_index.add(1))),
-                                 in zip(tok_lists, adv_index)),
+
+    preceding_texts = pd.Series((tl[:ax] for tl, ax
+                                # this includes the adv node in the selected str
+                                 in zip(tok_lists, adv_index.add(1))),
                                 index=tok_index).str.join(' ')
     return preceding_texts.astype('string').fillna('')
-
 
 
 def fix_orth(df: pd.DataFrame,
@@ -442,11 +451,11 @@ def fix_orth(df: pd.DataFrame,
 
     def adj_is_ok(df):
         return df.adj_form_lower.str.contains(OK_REGEX, regex=True)
-    
+
     if any(df.adj_form_lower.isna()) or any(df.adv_form_lower.isna()):
         print('\nFixing "null" strings interpreted as NaN...')
         df.loc[:, ad_cols + ['adv_form', 'adj_form']
-            ] = df.filter(like='ad').astype('string').fillna('null')
+               ] = df.filter(like='ad').astype('string').fillna('null')
         df = update_bigram_lower(df)
     if not using_prior:
         print('\nDropping most bizarre...\n')
@@ -479,8 +488,8 @@ def fix_orth(df: pd.DataFrame,
         if any(v_adv):
             print('\n==== very ====')
             print(df.loc[v_adv, 'adv_form_lower']
-                .astype('string').value_counts().nlargest(10).to_frame()
-                .to_markdown(floatfmt=',.0f', intfmt=','))
+                  .astype('string').value_counts().nlargest(10).to_frame()
+                  .to_markdown(floatfmt=',.0f', intfmt=','))
             df.loc[v_adv, :] = df.loc[v_adv, :].assign(
                 adv_lemma='very',
                 adv_form_lower='very')
@@ -489,8 +498,8 @@ def fix_orth(df: pd.DataFrame,
         if any(ok_adj):
             print('\n==== ok ====')
             print(df.loc[ok_adj, 'adj_form_lower']
-                .astype('string').value_counts().nlargest(10).to_frame().reset_index()
-                .to_markdown(floatfmt=',.0f', intfmt=','))
+                  .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+                  .to_markdown(floatfmt=',.0f', intfmt=','))
             df.loc[ok_adj, :] = df.loc[ok_adj, :].assign(
                 adj_form_lower='ok',
                 adj_lemma='ok')
@@ -499,19 +508,19 @@ def fix_orth(df: pd.DataFrame,
         if any(definitely_adv):
             print('\n==== definitely ====')
             print(df.loc[definitely_adv, 'adv_form_lower']
-                .astype('string').value_counts().nlargest(10).to_frame().reset_index()
-                .to_markdown(floatfmt=',.0f', intfmt=','))
+                  .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+                  .to_markdown(floatfmt=',.0f', intfmt=','))
             df.loc[definitely_adv, :] = df.loc[definitely_adv, :].assign(adv_form_lower='definitely',
-                                                                        adv_lemma='definitely')
+                                                                         adv_lemma='definitely')
 
         # > variations on "especially"
         if any(esp_adv):
             print('\n==== especially ====')
             print(df.loc[esp_adv, 'adv_form_lower']
-                .astype('string').value_counts().nlargest(10).to_frame().reset_index()
-                .to_markdown(floatfmt=',.0f', intfmt=','))
+                  .astype('string').value_counts().nlargest(10).to_frame().reset_index()
+                  .to_markdown(floatfmt=',.0f', intfmt=','))
             df.loc[esp_adv, :] = df.loc[esp_adv, :].assign(adv_form_lower='especially',
-                                                        adv_lemma='especially')
+                                                           adv_lemma='especially')
 
     adv_punct = df.adv_form_lower.str.contains(EDGE_PUNCT, regex=True)
     adj_punct = df.adj_form_lower.str.contains(EDGE_PUNCT, regex=True)
@@ -549,11 +558,13 @@ def fix_orth(df: pd.DataFrame,
     df = df.loc[~df.adv_form_lower.isin({'is', 'ie', 'etc', 'th'}), :]
     df = update_bigram_lower(df)
     if any(df.filter(regex=r'(?:mir|neg)*lower').columns):
-        df['all_forms_lower'] = df.filter(regex=r'(?:mir|neg)\w*lower').squeeze() + '_' + df.bigram_lower
+        df['all_forms_lower'] = df.filter(
+            regex=r'(?:mir|neg)\w*lower').squeeze() + '_' + df.bigram_lower
     return catify_hit_table(df)
 
+
 def translate_orth_forms(df, verbose=False):
-    ## ! OLD version
+    # ! OLD version
     df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
            ] = df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
                       ].astype('string')
@@ -570,7 +581,7 @@ def translate_orth_forms(df, verbose=False):
     _very = adv_is_very(df)
     _ok = adj_is_ok(df)
     _definitely = adv_is_def(df)
-    if verbose and any(_very|_ok|_defin):
+    if verbose and any(_very | _ok | _defin):
         print('\nTranslating some known orthographic quirks...')
     # > variations on "very"
     if any(_very):
@@ -610,7 +621,7 @@ def translate_orth_forms(df, verbose=False):
 
 
 def remove_orth_forms(df):
-    ## ! OLD version
+    # ! OLD version
     df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
            ] = df.loc[:, ['adv_form_lower', 'adj_form_lower', 'adj_lemma', 'adv_lemma']
                       ].astype('string')
@@ -726,7 +737,7 @@ def add_new_cols(df, load_path: Path = None, part: str = None):
         if 'neg_form' in df.columns:
             df.loc[df.neg_form.isna(), 'neg_form'] = 'None'
             df.loc[df.neg_form_lower.isna(), 'neg_form_lower'] = 'none'
-            
+
         df['trigger_lower'] = df.filter(
             regex=r'(neg|mir)_form_lower').squeeze()
         df['trigger_lemma'] = df.filter(regex=r'(neg|mir)_lemma').squeeze()
@@ -787,10 +798,10 @@ def filter_csv_by_index(df_csv_path: Path,
             c = 0
             for filter_chunk in csv_iter:
                 # > newly added adjustments to hit_tables
-                #// filter_chunk = add_lower_cols(filter_chunk.copy())
-                #// filter_chunk = translate_orth_forms(filter_chunk)
+                # // filter_chunk = add_lower_cols(filter_chunk.copy())
+                # // filter_chunk = translate_orth_forms(filter_chunk)
                 filter_chunk = add_new_cols(filter_chunk,
-                                             load_path=df_csv_path)
+                                            load_path=df_csv_path)
                 filter_chunk = fix_orth(filter_chunk, using_prior=True)
                 filter_chunk.index.name = 'hit_id'
                 filter_chunk.to_csv(outpath,
@@ -818,9 +829,10 @@ def extend_window(df: pd.DataFrame,
         adv_indices = df.adv_index.tolist()
 
         yield from (
-            ' '.join(tok_list[max(0, idx - tokens_before):(idx + 1 + tokens_after)])
+            ' '.join(tok_list[max(0, idx - tokens_before)                     :(idx + 1 + tokens_after)])
             for tok_list, idx in zip(tok_lists, adv_indices)
         )
+
     def _get_triggered_window():
 
         tok_lists = df.token_str.str.lower().str.split()
@@ -829,13 +841,13 @@ def extend_window(df: pd.DataFrame,
         ix_df['extend_end'] = ix_df.adv_index.add(1) + tokens_after
         ix_df['extend_start'] = ix_df.adv_index - tokens_before
         ix_df['max_before'] = ix_df[['_tmp_zero', 'extend_start']].max(axis=1)
-        ex_win_start =(ix_df.filter(['max_before', 'neg_index', 'mir_index'])
-                                .min(axis=1))
+        ex_win_start = (ix_df.filter(['max_before', 'neg_index', 'mir_index'])
+                        .min(axis=1))
         ex_win_end = ix_df[['extend_end', 'utt_len']].min(axis=1)
 
         # print(ix_df
-        #       .assign(ex_win_start=ex_win_start, 
-        #               ex_win_end=ex_win_end, 
+        #       .assign(ex_win_start=ex_win_start,
+        #               ex_win_end=ex_win_end,
         #              new_window_len=ex_win_end - ex_win_start)
         #       .sample(30)
         #       .to_markdown(tablefmt='rounded_grid', index=False))
@@ -856,20 +868,19 @@ def extend_window(df: pd.DataFrame,
     return df
 
 
-
-def get_neg_equiv_sample(all_enforced, com_dir, 
-                         neg_name:str='RBdirect'):
+def get_neg_equiv_sample(all_enforced, com_dir,
+                         neg_name: str = 'RBdirect'):
     comp_total = len(all_enforced)
     # [x] Update this method to get total updated `RBdirect` count if it exists---use counts in `../info/` dir
     neg_subtotals_csv = com_dir.parent.parent.joinpath(
         f'info/ALL_{neg_name}_final-subtotals.csv')
     neg_total = None
-    
+
     if neg_subtotals_csv.is_file():
         try:
             neg_total = pd.read_csv(neg_subtotals_csv, dtype={'total_hits': 'int'},
                                     usecols=['total_hits']).squeeze().sum()
-        except:
+        except Exception:
             neg_total = None
     if neg_total is None:
         neg_dir = com_dir.parent / neg_name / 'cleaned'
@@ -937,14 +948,14 @@ def remove_duplicates(hit_df: pd.DataFrame,
                 keep='first', subset=compare_cols)
             info_df['& will be removed'] = discard.value_counts()
             info_df.index.name = '# hits...'
-            print('\nCompiled Duplicatation Counts\n\n' +
+            print('\nCompiled Duplication Counts\n\n' +
                   info_df.to_markdown(intfmt=',', floatfmt=',.0f'))
             print('\nExample of Duplication Removal (1 kept per "text_window")\n\n```log')
             print((df_over20[is_duplicated]
                   .filter(['utt_len', 'bigram_lower', 'text_window', 'token_str'])
                    .sort_values(['bigram_lower', 'text_window']))
                   .head(6)
-                  .to_markdown(maxcolwidths=[18, None, None, 28, 50], 
+                  .to_markdown(maxcolwidths=[18, None, None, 28, 50],
                                tablefmt='rounded_grid'))
             print('```\n')
             keep_over20 = df_over20.loc[~discard, :]
@@ -1009,18 +1020,19 @@ def deprel_quarantine(df):
 
 
 def drop_not_only(df):
-    pos_not_only = ((df.hit_text.str.lower().str.startswith('not only') )
-                    & (df.adv_form_lower != 'only') 
-                    & (df.trigger_lemma=='not'))
+    pos_not_only = ((df.hit_text.str.lower().str.startswith('not only'))
+                    & (df.adv_form_lower != 'only')
+                    & (df.trigger_lemma == 'not'))
     init_len = len(df)
     if any(pos_not_only):
         drops = df[pos_not_only]
-        drop_ex = drops.sample(min(5,len(drops)))
-        show_sample(drop_ex[['all_forms_lower','hit_text']], format='fancy_grid')
+        drop_ex = drops.sample(min(5, len(drops)))
+        show_sample(drop_ex[['all_forms_lower', 'hit_text']],
+                    format='fancy_grid')
         df = df.loc[~pos_not_only, :]
         print(f'* {len(df):,} hits remaining ({(len(df)/init_len * 100):.1f}%)',
-            'after excluding "not only (*) ADV ADJ" from negated environment', 
-            f'* {len(drops):,} excluded', sep='\n  ')
+              'after excluding "not only (*) ADV ADJ" from negated environment',
+              f'* {len(drops):,} excluded', sep='\n  ')
     return df
 
 
@@ -1049,7 +1061,7 @@ def quarantine_deps(df,
             drop_ex = df[over_max].sample(
                 min(10, n_distant)).sort_values('dep_distance')
             show_sample(drop_ex.filter(['dep_distance', 'all_forms_lower',  # 'hit_text',
-                                        'text_window', 'neg_deprel', 'mir_deprel']), 
+                                        'text_window', 'neg_deprel', 'mir_deprel']),
                         format='fancy_grid')
         if any(over_min & in_quarantine):
             n_quarantine = (drop_row & ~over_max).value_counts()[True]
@@ -1060,12 +1072,12 @@ def quarantine_deps(df,
             drop_ex = df[drop_row & ~over_max].nsmallest(min(n_quarantine, 10), columns=[
                                                          'dep_distance']).sort_values('dep_distance')
             show_sample(drop_ex.filter(['dep_distance', 'all_forms_lower',  # 'hit_text', 'token_str',
-                                        'text_window', 'neg_deprel', 'mir_deprel', 'neg_head', 'mir_head']), 
+                                        'text_window', 'neg_deprel', 'mir_deprel', 'neg_head', 'mir_head']),
                         format='fancy_grid')
         df = df.loc[~drop_row, :]
-    print(f'* {len(df):,} remaining hits after validating dependencies', 
+    print(f'* {len(df):,} remaining hits after validating dependencies',
           f'* {len(df)/init_len*100:.1f}% of pre-validation.',
-          f'* ({init_len - len(df):,} dropped.)', 
+          f'* ({init_len - len(df):,} dropped.)',
           sep='\n  ')
     return df
 
@@ -1086,9 +1098,9 @@ def embolden(strings: pd.Series,
              mono: bool = True) -> pd.Series:
     bold_regex = re.compile(bold_regex, flags=re.I) if bold_regex else REGNOT
     if mono:
-        return strings.apply(lambda x: bold_regex.sub(r' __`\1`__ ', x))
+        return strings.apply(lambda x: bold_regex.sub(r'__`\1`__', x))
     else:
-        return strings.apply(lambda x: bold_regex.sub(r' __\1__ ', x))
+        return strings.apply(lambda x: bold_regex.sub(r'__\1__', x))
 
 
 def show_sample(df: pd.DataFrame,
@@ -1107,7 +1119,8 @@ def show_sample(df: pd.DataFrame,
         if assoc:
             if not bool(n_dec):
                 n_dec = 2
-            _df = adjust_am_names(_df)
+            # FIXME cannot import this from utils.associate due to circular import
+            # _df = adjust_am_names(_df)
 
         print(_df.to_markdown(
             floatfmt=f',.{n_dec}f', intfmt=',',
@@ -1118,7 +1131,7 @@ def show_sample(df: pd.DataFrame,
 def adjust_few_hits(df):
     init_few_count = df.neg_form_lower.value_counts()['few']
     print('* Validating "few" tokens')
-    print(f'  * {init_few_count:,} unvalidated "few" tokens')
+    print(f'  * {init_few_count:,} non-validated "few" tokens')
     # this should match:
     # "{the, a, those, these, her, his, their, my, your, our}
     #  ({lucky, next, last, fortunate, remaining, select, very, relative, chosen, etc.})
@@ -1514,7 +1527,12 @@ def save_advadj_freq_tsv(final_hits: pd.DataFrame,
     joint_f = final_hits.bigram_lower.value_counts().to_frame('f')
     joint_f = joint_f.join(
         joint_f.index.to_series()
-        .str.extract(r'^(?P<adv>[^_]+)_(?P<adj>[^_]+)$'))
+        .str.extract(r'^(?P<adv>[^_]+)_(?P<adj>[^_]+)$')).fillna('')
+    for adx in ['adv', 'adj']:
+        if any(joint_f[adx] == ''):
+            print(f"WARNING: blank values for {adx}!")
+            print(joint_f.loc[joint_f[adx] == '', :].to_csv(sep='\t'))
+
     sorts = [fx.sort_index() for __, fx in joint_f.sort_values(
         ['f'], ascending=False).groupby('f')]
     sorts.reverse()
@@ -1525,15 +1543,15 @@ def save_advadj_freq_tsv(final_hits: pd.DataFrame,
                        index=False)
           .replace('\n', '\n        '),
           '\n')
-    
+
     if freq_tsv_path is None:
         return joint_f
 
     joint_f.to_csv(freq_tsv_path,
-                    sep='\t',
-                    index=False,
-                    header=False)
-    print_path_info(freq_tsv_path, 
+                   sep='\t',
+                   index=False,
+                   header=False)
+    print_path_info(freq_tsv_path,
                     'basic `adv~adj` frequencies for final hits')
 
 
@@ -1583,7 +1601,7 @@ def save_final_info(final_hits: pd.DataFrame,
      .to_frame('total_hits')
      .reset_index()
      .to_csv(subtotals_path, index=False))
-    obj_name='Part Subtotals'
+    obj_name = 'Part Subtotals'
     print_path_info(subtotals_path, obj_name)
 
     # >>>>>>>>>
@@ -1593,17 +1611,14 @@ def save_final_info(final_hits: pd.DataFrame,
     final_index.sort()
     final_index_path.write_text('\n'.join(final_index), encoding='utf8')
     print_path_info(obj_name=f'`hit_id` index for final selection of `{category}` hits',
-          path=final_index_path)
+                    path=final_index_path)
     sleep(1)
     # * save basic frequency TSV!
     # final_hits['bigram_lower'] = final_hits.bigram_lower.astype('string').astype('category')
     save_advadj_freq_tsv(final_hits, basic_freq_tsv)
 
     # >>>>>>>>>
-    print(('\n----------------------\n'
-           '> *temporarily paused*\n'
-           '----------------------\n'))
-    sleep(30)
+    sleep(5)
 
     final_hits = final_hits.sort_index().reset_index()
     # > save most basic info as parquet
@@ -1634,15 +1649,16 @@ def save_final_info(final_hits: pd.DataFrame,
 
     print_path_info(final_basic_parq, 'basic final hits table')
     print(
-          f'+ partitioned by: `{repr(partition_by)}`',
-          '* properties included:  ',
-          ('\n' + repr(final_hits.columns
-                          )).replace('\n', '\n      ')+'\n',
-          f'+ max rows per file: {max_parq_rows:,}',
-          sep='  \n  ')
+        f'+ partitioned by: `{repr(partition_by)}`',
+        '* properties included:  ',
+        ('\n' + repr(final_hits.columns
+                     )).replace('\n', '\n      ')+'\n',
+        f'+ max rows per file: {max_parq_rows:,}',
+        sep='  \n  ')
 
-def print_path_info(path: Path or str, 
-                    obj_name:str='Data'):
+
+def print_path_info(path: Path or str,
+                    obj_name: str = 'Data'):
     print(f'+ ✓ {obj_name} saved as  \n  `{path}`')
 
 
@@ -1970,6 +1986,7 @@ def unpack_dict(input_dict: dict,
         returns += (inv_flat_dict, )
 
     return returns
+
 
 def update_assoc_index(df, pat_name: str = None):
     neg_env_name = df.filter(like='NEG', axis=0).l1.iloc[0]

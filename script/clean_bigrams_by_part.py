@@ -5,7 +5,7 @@ from sys import argv
 import pandas as pd
 from more_itertools import batched
 
-from source.utils import (Timer, add_lower_cols, catify_hit_table,
+from source.utils.dataframes import (Timer, add_lower_cols, catify_hit_table,
                           extend_window, remove_duplicates, save_index_txt,
                           select_id_prefixes, write_part_parquet)
 from source.utils.general import (HIT_TABLES_DIR, PKL_SUFF, POST_PROC_DIR,

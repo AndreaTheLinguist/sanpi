@@ -4,8 +4,8 @@ import argparse
 import contextlib
 import re
 with contextlib.suppress(ImportError):
-    from utils import Timer
-from utils import convert_ucs_to_csv
+    from utils.dataframes import Timer
+from utils.general import convert_ucs_to_csv
 
 
 def _main():

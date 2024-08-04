@@ -19,7 +19,7 @@ from transformers import (AutoModel,
                           pipeline)
 from utils.LexicalCategories import ADJ_BY_SCALE as ADJ_SETS
 from utils.LexicalCategories import ADV_OF_INTEREST as ADV_SETS
-from utils import get_proc_time
+from utils.dataframes import get_proc_time
 
 pd.set_option('display.max_colwidth', 70)
 pd.set_option("display.precision", 5)

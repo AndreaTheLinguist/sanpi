@@ -3,10 +3,13 @@ import argparse
 # import re
 from pathlib import Path
 from time import sleep
+
 import pandas as pd
 
-from source.utils.dataframes import Timer, get_neg_equiv_sample as get_neq
+from source.utils.dataframes import Timer
 from source.utils.dataframes import catify_hit_table as catify
+from source.utils.dataframes import drop_underscores
+from source.utils.dataframes import get_neg_equiv_sample as get_neq
 from source.utils.dataframes import remove_duplicates, save_final_info
 from source.utils.general import HIT_TABLES_DIR, PKL_SUFF, confirm_dir
 from source.utils.general import run_shell_command as shell_cmd
@@ -44,7 +47,7 @@ def _main():
         df.filter(['utt_len', 'adv_index', 'neg_index', 'text_window',
                   'bigram_lower', 'adv_form_lower', 'token_str', 'mir_index']),
         return_index=True)
-    df_final = df.filter(final_ids, axis=0)
+    df_final = drop_underscores(df.filter(final_ids, axis=0))
     df_final['trigger_lemma'] = (df_final.trigger_lemma
                                  .str.replace("'", "")
                                  .str.replace('aint', 'not'))
@@ -55,10 +58,8 @@ def _main():
                                          'trigger_lemma', 'bigram_lower',
                                          'all_forms_lower'], 
                     partition_by=['category', 'part'])
-    print(('\n----------------------\n'
-           '> *temporarily paused*\n'
-           '----------------------\n'))
-    sleep(60)
+
+    sleep(10)
     print('\n## Saving Full Composite Frame')
     concat_path = data_dir.joinpath(f'ALL-{data_dir.name}_final.parq')
     save_final_parquet(df, concat_path)
