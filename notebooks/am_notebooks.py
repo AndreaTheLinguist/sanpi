@@ -904,7 +904,7 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
         excerpt = embolden(
             ex_for_bigram.sample(min(len(ex_for_bigram), 8))[
                 'token_str'],
-            bold_regex=f' ({bigram_text}) '
+            bold_regex=r'\b('+bigram_text + r')\b'
         ).to_frame()
         excerpt.index = '`'+excerpt.index.astype('string')+'`'
         # TODO: modify this to save markdown example table as file
