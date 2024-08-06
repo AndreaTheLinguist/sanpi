@@ -1,10 +1,10 @@
-|                                                 | `token_str`                                                                                                |
-|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|
-| **`pcc_eng_29_097.0130_x1551083_082:3-4-5`**    | Korea is not __`that stupid`__ .                                                                           |
-| **`pcc_eng_29_049.5919_x0784612_140:10-11-12`** | Or , as he put it to himself , not __`that stupid`__ .                                                     |
-| **`nyt_eng_20000125_0017_31:4-5-6`**            | `` I 'm not __`that stupid`__ , '' Payton said .                                                           |
-| **`pcc_eng_01_005.6993_x0075794_82:3-4`**       | Are you __`that stupid`__ , or just uneducated in what the word unspeakable means ?                        |
-| **`nyt_eng_20070410_0111_35:13-15-16`**         | `` The worst stuff is not going to happen because we ca n't be __`that stupid`__ , ''                      |
-| **`pcc_eng_04_103.8801_x1662060_03:22-23-24`**  | Not at 1.04 + Despite of all the attacks I 've had on me , I still believe that people are not that stupid |
-| **`pcc_eng_02_005.8183_x0077944_73:11-12-13`**  | Maybe we could call it stupidity , but humans are not __`that stupid`__ .                                  |
-| **`pcc_eng_13_003.6636_x0042865_40:16-18-19`**  | I hope that this story will remain fictitious ... or if not , I will not be __`that stupid`__ .            |
+|                                                | `token_str`                                                                                                                                                    |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_068.7237_x1096245_18:18-19`**    | Of course , this is the Big Three , so it 's possible that they could be__``that stupid``__.                                                                   |
+| **`pcc_eng_04_003.2094_x0035859_64:1-4-5`**    | Nobody could be__``that stupid``__, right ?                                                                                                                    |
+| **`pcc_eng_10_051.9586_x0824265_47:4-5-6`**    | " They were n't__``that stupid``__. "                                                                                                                          |
+| **`pcc_eng_11_068.7251_x1096264_07:26-27-28`** | I find myself analyzing the stupidest little every day things but the more I think on them , the more I realize it 's really not__``that stupid``__after all . |
+| **`pcc_eng_26_045.9991_x0727726_048:3-4-5`**   | Mexicans are not__``that stupid``__.                                                                                                                           |
+| **`pcc_eng_16_081.8759_x1308918_13:5-7-8`**    | Surely , they ca n't be__``that stupid``__.                                                                                                                    |
+| **`pcc_eng_00_066.4760_x1058446_102:5-6`**     | " Are you really__``that stupid``__? " she spat .                                                                                                              |
+| **`pcc_eng_26_096.9618_x1551590_25:2-3-4`**    | Is n't__``that stupid``__? "                                                                                                                                   |
