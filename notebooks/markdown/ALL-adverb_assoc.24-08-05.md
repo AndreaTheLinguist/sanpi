@@ -2,6 +2,7 @@
 
 
 ```python
+
 from source.utils.associate import TOP_AM_DIR
 from source.utils.general import confirm_dir
 
@@ -16,7 +17,8 @@ K = 8
 TAG='ALL'
 TOP_AM_TAG_DIR = TOP_AM_DIR / TAG
 confirm_dir(TOP_AM_TAG_DIR)
-
+METRIC_PRIORITIES = METRIC_PRIORITY_DICT[TAG]
+METRIC_PRI_2 = METRIC_PRIORITIES[:2]
 data_top = f'{TAG}-Top{K}'
 OUT_DIR = TOP_AM_TAG_DIR / data_top
 confirm_dir(OUT_DIR)
@@ -47,20 +49,10 @@ parameters = {
         'description': '_date of processing_',
     }
 }
+save_prefix=f'{data_top}_NEG-ADV_combined-{SET_FLOOR}'
+combined_top_csv_output = OUT_DIR / f'{save_prefix}.{timestamp_today()}.csv'
 # nb_show_table(pd.DataFrame(parameters, dtype='string').T)
 ```
-
-    
-    |                 | `value`                                                       | `description`                                         |
-    |:----------------|:--------------------------------------------------------------|:------------------------------------------------------|
-    | **`SET_FLOOR`** | $5,000$                                                       | *_`*direct` superset minimum `env~adv` co-occurence_* |
-    | **`MIR_FLOOR`** | $500$                                                         | *_`*mirror` subset minimum `env~adv` co-occurence_*   |
-    | **`TAG`**       | `"ALL"`                                                       | *_frequency data evaluated_*                          |
-    | **`K`**         | $8$                                                           | *_# top adverbs sought_*                              |
-    | **`OUT_DIR`**   | `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/` | *_output directory_*                                  |
-    | **`DATE`**      | 2024-08-05                                                    | *_date of processing_*                                |
-    
-
 
 
 |                 | `value`                                                       | `description`                                         |
@@ -148,22 +140,6 @@ With $f\geq5,000$ (i.e. `adv` occurs in given environment at least 5,000 times)
 # nb_show_table(mirror_adv.sample(min(6,K)).sort_values('unexp_r', ascending=False))
 ```
 
-    ### Sample of Subset `mirror` $@E\sim\texttt{adv}$ AMs
-    
-    With $f\geq500$ (i.e. `adv` occurs in given environment at least 500 times)
-    
-    
-    |                     |    `f` |   `dP1` |   `LRC` |   `P1` |     `G2` | `l1`   | `l2`        |      `f1` |   `f2` |       `N` |   `exp_f` |   `unexp_f` |   `unexp_r` |   `odds_r_disc` |   `t` |   `MI` |
-    |:--------------------|-------:|--------:|--------:|-------:|---------:|:-------|:------------|----------:|-------:|----------:|----------:|------------:|------------:|----------------:|------:|-------:|
-    | **POS~somehow**     |    927 |    0.16 |    2.26 |   0.99 |   267.12 | POSMIR | somehow     | 1,388,898 |    939 | 1,680,633 |    776.00 |      151.00 |        0.16 |            1.19 |  4.96 |   0.08 |
-    | **POS~wonderfully** |  1,010 |    0.16 |    2.22 |   0.99 |   281.26 | POSMIR | wonderfully | 1,388,898 |  1,025 | 1,680,633 |    847.07 |      162.93 |        0.16 |            1.14 |  5.13 |   0.08 |
-    | **POS~simply**      |  7,745 |    0.16 |    3.02 |   0.98 | 2,080.71 | POSMIR | simply      | 1,388,898 |  7,877 | 1,680,633 |  6,509.66 |    1,235.34 |        0.16 |            1.09 | 14.04 |   0.08 |
-    | **POS~extremely**   | 17,152 |    0.16 |    3.15 |   0.98 | 4,561.58 | POSMIR | extremely   | 1,388,898 | 17,458 | 1,680,633 | 14,427.53 |    2,724.47 |        0.16 |            1.08 | 20.80 |   0.08 |
-    | **POS~horribly**    |    795 |    0.12 |    0.89 |   0.95 |   112.21 | POSMIR | horribly    | 1,388,898 |    839 | 1,680,633 |    693.36 |      101.64 |        0.13 |            0.57 |  3.60 |   0.06 |
-    | **POS~wholly**      |    971 |   -0.13 |   -0.59 |   0.70 |  -134.02 | POSMIR | wholly      | 1,388,898 |  1,388 | 1,680,633 |  1,147.06 |     -176.06 |       -0.18 |           -0.31 | -5.65 |  -0.07 |
-    
-
-
 ### Sample of Subset `mirror` $@E\sim\texttt{adv}$ AMs
 
 With $f\geq500$ (i.e. `adv` occurs in given environment at least 500 times)
@@ -217,7 +193,7 @@ nb_show_table(
 
 
 ```python
-def show_top_any_env(adv_df:pd.DataFrame, k=10) -> None:
+def show_top_any_env(adv_df:pd.DataFrame, save_path:Path, k:int=10) -> None:
     _top = get_top_vals(adjust_am_names(adv_df),
                  k=k, index_like=None, 
                  metric_filter=METRIC_PRI_2)
@@ -228,11 +204,17 @@ def show_top_any_env(adv_df:pd.DataFrame, k=10) -> None:
         f'ranked by {" & ".join([f"`{m}`" for m in METRIC_PRI_2])}', 
         sep='\n+ ')
     nb_show_table(_top.reset_index()
-              .filter(items = ['key','adv','l1'] + adjust_am_names(FOCUS)).sort_values(METRIC_PRI_2, ascending=False)
-              )
+              .filter(items = ['key','adv','l1'] + adjust_am_names(FOCUS))
+              .sort_values(METRIC_PRI_2, ascending=False), outpath=save_path)
+    # print(f'\n> saved as:  \n> `{save_path}`\n')
+            #   results/top_AM/NEQ/NEQ-Top8/NEQ-Top8_POS-ADV_combined-5000.2024-08-05.csv
     
 for adv_df in (setdiff_adv, mirror_adv):
-    show_top_any_env(adjust_am_names(adv_df).filter(adjust_am_names(FOCUS)))
+    category='super' if 'COMPLEMENT' in adv_df.l1.unique() else 'mirror'
+    show_top_any_env(adjust_am_names(adv_df).filter(adjust_am_names(FOCUS)), 
+                     save_path=combined_top_csv_output.with_name(
+                         combined_top_csv_output.name.replace('NEG', 'ANY')
+                         .replace('combined', category)))
 ```
 
 ### 10 Most Strongly Associated Environment~Adverb Pairs for ALL _superset_ data
@@ -259,6 +241,10 @@ for adv_df in (setdiff_adv, mirror_adv):
 | **15** | COM~seemingly      | COMPLEMENT | 160,011 |    0.04 |    5.04 |   1.00 |  13,017.97 | seemingly    | 68,787,692 | 160,158 | 71,961,373 | 153,094.62 |    6,916.38 |        0.04 |            1.70 |  17.29 |   0.02 |
 | **16** | COM~fairly         | COMPLEMENT | 370,708 |    0.04 |    4.99 |   1.00 |  29,631.19 | fairly       | 68,787,692 | 371,125 | 71,961,373 | 354,757.44 |   15,950.56 |        0.04 |            1.61 |  26.20 |   0.02 |
 
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_ANY-ADV_super-5000.2024-08-05.csv`
+
 ### 10 Most Strongly Associated Environment~Adverb Pairs for ALL _mirror subset_ data
 
 + _Present Positive_ approximation
@@ -282,6 +268,10 @@ for adv_df in (setdiff_adv, mirror_adv):
 | **14** | POS~somewhat        | POSMIR |  4,475 |    0.17 |    4.33 |   1.00 |  1,552.53 | somewhat     | 1,388,898 |  4,491 | 1,680,633 |  3,711.42 |      763.58 |        0.17 |            1.76 | 11.41 |   0.08 |
 | **15** | POS~fairly          | POSMIR |  5,661 |    0.17 |    4.33 |   1.00 |  1,936.22 | fairly       | 1,388,898 |  5,685 | 1,680,633 |  4,698.16 |      962.84 |        0.17 |            1.69 | 12.80 |   0.08 |
 | **16** | POS~otherwise       | POSMIR |  6,653 |    0.17 |    4.04 |   0.99 |  2,179.49 | otherwise    | 1,388,898 |  6,695 | 1,680,633 |  5,532.84 |    1,120.16 |        0.17 |            1.52 | 13.73 |   0.08 |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_ANY-ADV_mirror-5000.2024-08-05.csv`
 
 
 
@@ -425,7 +415,10 @@ print(f'* Total unique mirror adv where LRC >= 1 and f > {MIR_FLOOR:,}',
 
 
 ```python
-show_top_positive(setdiff_adv, k=15, data_tag=TAG, filter_and_sort=METRIC_PRI_2)
+show_top_positive(setdiff_adv, k=15, data_tag=TAG, filter_and_sort=METRIC_PRI_2, 
+                  save_path =combined_top_csv_output.with_name(
+                         combined_top_csv_output.name.replace('NEG', 'POS')
+                         .replace('combined', 'super')))
 ```
 
 #### Top 15 Adverbs in *Complement* Polarity Environment (`set_diff`, $*\complement_{N^+}$)
@@ -460,41 +453,19 @@ show_top_positive(setdiff_adv, k=15, data_tag=TAG, filter_and_sort=METRIC_PRI_2)
 | **hopefully**      |    0.04 |    3.46 |     7,173 |   1.00 |     595.63 | 68,787,692 |     7,178 |     6,861.43 |      311.57 |        0.04 |            1.78 |   3.68 |   0.02 |
 
 
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_POS-ADV_super-5000.2024-08-05.csv`
+
+
 
 
 ```python
 # Mirror Data ~ explicitly positive ~ positive trigger present
-# show_top_positive(mirror_adv, k=15, data_tag=TAG, filter_and_sort=METRIC_PRI_2)
+show_top_positive(mirror_adv, k=15, data_tag=TAG, filter_and_sort=METRIC_PRI_2, 
+                  save_path =combined_top_csv_output.with_name(
+                         combined_top_csv_output.name.replace('NEG', 'POS')
+                         .replace('combined', 'mirror')))
 ```
-
-    #### Top 15 Adverbs in *Posmir* Polarity Environment (`mirror`, $@P$)
-    
-    > ranked by `['dP1', 'LRC']`
-    
-    **Total Tokens in dataset**: $N = 1,680,633$
-    
-    |                  |   `dP1` |   `LRC` |    `f` |   `P1` |     `G2` |      `f1` |   `f2` |   `exp_f` |   `unexp_f` |   `unexp_r` |   `odds_r_disc` |   `t` |   `MI` |
-    |:-----------------|--------:|--------:|-------:|-------:|---------:|----------:|-------:|----------:|------------:|------------:|----------------:|------:|-------:|
-    | **pretty**       |    0.17 |    4.73 | 24,525 |   0.99 | 8,277.42 | 1,388,898 | 24,652 | 20,372.75 |    4,152.25 |        0.17 |            1.61 | 26.51 |   0.08 |
-    | **rather**       |    0.17 |    4.63 |  8,364 |   1.00 | 2,889.54 | 1,388,898 |  8,396 |  6,938.57 |    1,425.43 |        0.17 |            1.74 | 15.59 |   0.08 |
-    | **plain**        |    0.17 |    4.45 |  5,025 |   1.00 | 1,751.25 | 1,388,898 |  5,042 |  4,166.78 |      858.22 |        0.17 |            1.78 | 12.11 |   0.08 |
-    | **somewhat**     |    0.17 |    4.33 |  4,475 |   1.00 | 1,552.53 | 1,388,898 |  4,491 |  3,711.42 |      763.58 |        0.17 |            1.76 | 11.41 |   0.08 |
-    | **fairly**       |    0.17 |    4.33 |  5,661 |   1.00 | 1,936.22 | 1,388,898 |  5,685 |  4,698.16 |      962.84 |        0.17 |            1.69 | 12.80 |   0.08 |
-    | **otherwise**    |    0.17 |    4.04 |  6,653 |   0.99 | 2,179.49 | 1,388,898 |  6,695 |  5,532.84 |    1,120.16 |        0.17 |            1.52 | 13.73 |   0.08 |
-    | **maybe**        |    0.17 |    4.00 |  2,654 |   1.00 |   924.01 | 1,388,898 |  2,663 |  2,200.74 |      453.26 |        0.17 |            1.77 |  8.80 |   0.08 |
-    | **downright**    |    0.17 |    3.89 |  4,691 |   0.99 | 1,539.76 | 1,388,898 |  4,720 |  3,900.67 |      790.33 |        0.17 |            1.53 | 11.54 |   0.08 |
-    | **already**      |    0.17 |    3.81 |  4,238 |   0.99 | 1,385.51 | 1,388,898 |  4,265 |  3,524.65 |      713.35 |        0.17 |            1.51 | 10.96 |   0.08 |
-    | **relatively**   |    0.17 |    3.81 |  5,287 |   0.99 | 1,701.02 | 1,388,898 |  5,325 |  4,400.65 |      886.35 |        0.17 |            1.46 | 12.19 |   0.08 |
-    | **almost**       |    0.17 |    3.73 |  5,265 |   0.99 | 1,674.01 | 1,388,898 |  5,306 |  4,384.95 |      880.05 |        0.17 |            1.43 | 12.13 |   0.08 |
-    | **perhaps**      |    0.17 |    3.52 |  3,479 |   0.99 | 1,106.00 | 1,388,898 |  3,506 |  2,897.41 |      581.59 |        0.17 |            1.43 |  9.86 |   0.08 |
-    | **surprisingly** |    0.17 |    2.96 |  1,426 |   0.99 |   453.41 | 1,388,898 |  1,437 |  1,187.56 |      238.44 |        0.17 |            1.42 |  6.31 |   0.08 |
-    | **sometimes**    |    0.17 |    2.87 |  1,349 |   0.99 |   425.24 | 1,388,898 |  1,360 |  1,123.92 |      225.08 |        0.17 |            1.39 |  6.13 |   0.08 |
-    | **strangely**    |    0.17 |    2.30 |    698 |   0.99 |   218.10 | 1,388,898 |    704 |    581.80 |      116.20 |        0.17 |            1.35 |  4.40 |   0.08 |
-    | **equally**      |    0.16 |    3.58 |  7,197 |   0.99 | 2,188.88 | 1,388,898 |  7,270 |  6,008.03 |    1,188.97 |        0.17 |            1.32 | 14.02 |   0.08 |
-    | **highly**       |    0.16 |    3.27 |  9,093 |   0.99 | 2,565.38 | 1,388,898 |  9,223 |  7,622.01 |    1,470.99 |        0.16 |            1.17 | 15.43 |   0.08 |
-    | **slightly**     |    0.16 |    3.24 |  7,552 |   0.99 | 2,139.28 | 1,388,898 |  7,658 |  6,328.68 |    1,223.32 |        0.16 |            1.18 | 14.08 |   0.08 |
-    
-
 
 #### Top 15 Adverbs in *Posmir* Polarity Environment (`mirror`, $@P$)
 
@@ -522,6 +493,10 @@ show_top_positive(setdiff_adv, k=15, data_tag=TAG, filter_and_sort=METRIC_PRI_2)
 | **equally**      |    0.16 |    3.58 |  7,197 |   0.99 | 2,188.88 | 1,388,898 |  7,270 |  6,008.03 |    1,188.97 |        0.17 |            1.32 | 14.02 |   0.08 |
 | **highly**       |    0.16 |    3.27 |  9,093 |   0.99 | 2,565.38 | 1,388,898 |  9,223 |  7,622.01 |    1,470.99 |        0.16 |            1.17 | 15.43 |   0.08 |
 | **slightly**     |    0.16 |    3.24 |  7,552 |   0.99 | 2,139.28 | 1,388,898 |  7,658 |  6,328.68 |    1,223.32 |        0.16 |            1.18 | 14.08 |   0.08 |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_POS-ADV_mirror-5000.2024-08-05.csv`
 
 
 
@@ -628,32 +603,6 @@ Union of top adverbs for `SET` and `MIR`. (Novel `MIR` adverbs listed last)
 #               .sort_values(['f_minus_f2', 'ratio_f_MIR'], ascending=False),
 #               n_dec=1, adjust_columns=False)
 ```
-
-    
-    ```python
-    nb_show_table(C.filter(regex=r'^ratio_f2?_')
-                  .assign(f_minus_f2=C.ratio_f_MIR - C.ratio_f2_MIR)
-                  .multiply(100).round(1)
-                  .sort_values(['f_minus_f2', 'ratio_f_MIR'], ascending=False),
-                  n_dec=1, adjust_columns=False)
-    ```
-    
-    
-    |                  |   `ratio_f_MIR` |   `ratio_f2_MIR` |   `f_minus_f2` |
-    |:-----------------|----------------:|-----------------:|---------------:|
-    | **ever**         |            79.4 |              4.5 |           74.8 |
-    | **longer**       |            60.1 |              8.1 |           52.0 |
-    | **remotely**     |            32.5 |             15.0 |           17.5 |
-    | **particularly** |            16.6 |              2.5 |           14.1 |
-    | **any**          |             6.9 |              3.6 |            3.3 |
-    | **terribly**     |             8.7 |              7.8 |            0.9 |
-    | **that**         |             2.6 |              2.6 |           -0.0 |
-    | **necessarily**  |             2.3 |              2.2 |            0.0 |
-    | **exactly**      |             1.9 |              1.8 |            0.0 |
-    | **yet**          |             0.6 |              0.9 |           -0.2 |
-    | **immediately**  |             0.7 |              1.3 |           -0.6 |
-    
-
 
 ## Representation of Adverbs in `NEGmirror`
 
@@ -819,10 +768,6 @@ print('Saving Combined "Most Negative Adverbs" AM table as csv:  '
 C.to_csv(combined_top_csv_output, float_format='{:.4f}'.format)
 ```
 
-    Saving Combined "Most Negative Adverbs" AM table as csv:  
-    > `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_NEG-ADV_combined-5000.2024-08-05.csv`
-
-
 Saving Combined "Most Negative Adverbs" AM table as csv:  
 > `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_NEG-ADV_combined-5000.2024-08-05.csv`
 
@@ -845,30 +790,6 @@ nb_show_table(C[main_cols_ordered],
 )
 
 ```
-
-    
-    ```python
-    nb_show_table(C[main_cols_ordered],
-        outpath=OUT_DIR.joinpath(
-            f'{save_prefix}_MAIN_{timestamp_today()}.md'))
-    ```
-    
-    
-    |                  |   `dP1_SET` |   `dP1_MIR` |   `mean_dP1` |   `LRC_SET` |   `LRC_MIR` |   `mean_LRC` |   `G2_SET` |   `G2_MIR` |   `mean_G2` |   `P1_SET` |   `P1_MIR` |   `mean_P1` |   `f_SET` |   `f_MIR` |   `f1_SET` |   `f1_MIR` |   `f2_SET` |   `f2_MIR` |
-    |:-----------------|------------:|------------:|-------------:|------------:|------------:|-------------:|-----------:|-----------:|------------:|-----------:|-----------:|------------:|----------:|----------:|-----------:|-----------:|-----------:|-----------:|
-    | **necessarily**  |        0.83 |        0.71 |         0.77 |        7.15 |        4.50 |         5.82 | 230,465.59 |   2,631.06 |  116,548.32 |       0.88 |       0.88 |        0.88 |    42,595 |       963 |  3,173,681 |    291,735 |     48,641 |      1,092 |
-    | **that**         |        0.75 |        0.62 |         0.69 |        6.37 |        3.91 |         5.14 | 831,669.72 |   9,933.37 |  420,801.54 |       0.80 |       0.79 |        0.79 |   164,768 |     4,308 |  3,173,681 |    291,735 |    206,801 |      5,465 |
-    | **exactly**      |        0.74 |        0.62 |         0.68 |        6.19 |        3.61 |         4.90 | 216,169.98 |   1,868.34 |  109,019.16 |       0.78 |       0.79 |        0.78 |    43,813 |       813 |  3,173,681 |    291,735 |     56,109 |      1,031 |
-    | **any**          |        0.43 |        0.74 |         0.59 |        4.22 |        4.91 |         4.57 |  53,087.82 |   3,078.62 |   28,083.22 |       0.48 |       0.91 |        0.70 |    15,384 |     1,066 |  3,173,681 |    291,735 |     32,161 |      1,169 |
-    | **remotely**     |        0.32 |        0.62 |         0.47 |        3.52 |        3.84 |         3.68 |  15,974.28 |   4,286.74 |   10,130.51 |       0.37 |       0.80 |        0.58 |     5,661 |     1,840 |  3,173,681 |    291,735 |     15,394 |      2,314 |
-    | **longer**       |        0.08 |        0.73 |         0.40 |        1.35 |        4.69 |         3.02 |   1,098.23 |   2,328.22 |    1,713.22 |       0.12 |       0.90 |        0.51 |     1,366 |       821 |  3,173,681 |    291,735 |     11,259 |        910 |
-    | **ever**         |        0.01 |        0.76 |         0.39 |        0.18 |        5.67 |         2.93 |     216.40 |  14,226.71 |    7,221.55 |       0.05 |       0.93 |        0.49 |     5,932 |     4,709 |  3,173,681 |    291,735 |    110,979 |      5,042 |
-    | **immediately**  |        0.57 |        0.17 |         0.37 |        5.04 |        0.84 |         2.94 | 231,721.98 |     191.24 |  115,956.61 |       0.61 |       0.34 |        0.48 |    56,099 |       403 |  3,173,681 |    291,735 |     91,746 |      1,183 |
-    | **yet**          |        0.50 |        0.22 |         0.36 |        4.66 |        1.10 |         2.88 | 197,895.38 |     220.72 |   99,058.05 |       0.55 |       0.40 |        0.47 |    51,867 |       320 |  3,173,681 |    291,735 |     94,755 |        810 |
-    | **particularly** |        0.06 |        0.54 |         0.30 |        1.36 |        3.43 |         2.40 |  36,699.74 |  18,490.40 |   27,595.07 |       0.11 |       0.71 |        0.41 |    55,527 |     9,243 |  3,173,681 |    291,735 |    511,734 |     12,946 |
-    | **terribly**     |        0.26 |        0.17 |         0.22 |        3.19 |        1.08 |         2.13 |  43,629.29 |     753.12 |   22,191.21 |       0.31 |       0.34 |        0.32 |    17,949 |     1,567 |  3,173,681 |    291,735 |     58,529 |      4,583 |
-    
-
 
 
 ```python
