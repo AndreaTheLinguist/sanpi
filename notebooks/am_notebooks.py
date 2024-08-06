@@ -24,21 +24,21 @@ BASIC_FOCUS = ['f',
                'N',
                'E11', 'unexpected_f',
                'unexpected_ratio',
-               'am_odds_ratio_disc',
-               't_score',
-               'mutual_information',
                ]
+MISC_AM = ['am_odds_ratio_disc',
+           't_score',
+           'mutual_information',]
 FREQ_COLS = ['f', 'f1', 'f2']
 ADX_COLS = ['adv', 'adv_total', 'adj', 'adj_total']
 P2_COLS = ['am_p2_given1', 'am_p2_given1_simple']
 DELTA_COLS = ['deltaP_max', 'deltaP_mean']
 FOCUS_DICT = {
     'ALL': {
-        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS,
-        'polar': BASIC_FOCUS + ADX_COLS},
+        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS + MISC_AM,
+        'polar': BASIC_FOCUS + ADX_COLS + MISC_AM},
     'NEQ': {
-        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS,
-        'polar': BASIC_FOCUS + P2_COLS + ADX_COLS
+        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS + MISC_AM,
+        'polar': BASIC_FOCUS + P2_COLS + ADX_COLS + MISC_AM
     }}
 
 NEG_WORDS = ("n't", 'not', 'seldom', 'barely', 'hardly', 'scarcely', 'rarely', 'rare', 'scarce', 'seldomly',
@@ -67,6 +67,33 @@ def _set_priorities():
 METRIC_PRIORITY_DICT = _set_priorities()
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+def md_frame_code(code_block: str, 
+                      lang: str = 'python', 
+                      indent: int = 0):
+    # if `code_block` has multiple lines, run as
+    # ```
+    # print_framed_code("""CODE_BLOCK""")
+    # ```
+    # And beware of embedded special characters like '\n':
+    #   use `r"""CODE_BLOCK"""` in such cases.
+    #
+    # Example:
+    # print_framed_code(
+    # r"""def print_framed_code(code_block:str, lang:str='python', indent:int=0):
+    #
+    # indent_str = ' '*indent if indent else ''
+    # print(f'```{lang}',
+    #       *code_block.splitlines(),
+    #       '```',
+    #       sep=f'\n{indent_str}', end='\n\n')""")
+    indent_str = ' '*indent if indent else ''
+    print('',
+          f'```{lang}',
+          *code_block.splitlines(),
+          '```',
+          sep=f'\n{indent_str}', end='\n\n')
 
 
 def set_col_widths(df, override: dict = None):
@@ -118,7 +145,7 @@ def embolden(strings: pd.Series,
     bold_regex = re.compile(bold_regex, flags=re.I) if bold_regex else REGNOT
 
     if mono:
-        return strings.apply(lambda x: bold_regex.sub(r'__`\1`__', x))
+        return strings.apply(lambda x: bold_regex.sub(r'__``\1``__', x))
     else:
         return strings.apply(lambda x: bold_regex.sub(r'__\1__', x))
 
@@ -171,7 +198,7 @@ def locate_polar_am_paths(data_tag: str = 'ALL',
     if data_tag not in ('NEQ', 'ALL'):
         raise ValueError(
             f'Invalid data tag, "{data_tag}". Options are: "NEQ" or "ALL".')
-
+    pprint(globs)
     am_paths = {
         p.name:
             tuple((p/unit/'extra').glob(globs[p.name]))
@@ -260,8 +287,9 @@ def get_top_vals(df: pd.DataFrame,
 
     # > get filter list and columns on the same page ---> adjust everything
     metric_filter = adjust_am_names(metric_filter)
-    env_df = adjust_am_names(df.copy()
-                             .filter(like=index_like, axis=0))
+    env_df = adjust_am_names(df.copy())
+    if index_like:
+        env_df = env_df.filter(like=index_like, axis=0)
 
     # > filter to only "significant" association, based on LRC
     env_df = env_df.loc[env_df.LRC >= 1, :]
@@ -296,6 +324,7 @@ def get_top_vals(df: pd.DataFrame,
 
 def show_top_positive(adv_df,
                       data_tag: str,
+                      save_path:Path, 
                       k: int = 15,
                       filter_and_sort: list = None):
 
@@ -328,15 +357,15 @@ def show_top_positive(adv_df,
 
     nb_show_table(
         top.round(2).sort_values(filter_and_sort, ascending=False)
-        .set_index('l2').drop(['N', 'l1'], axis=1)
+        .set_index('l2').drop(['N', 'l1'], axis=1), outpath=save_path
     )
 
 
 def force_ints(_df):
-    count_cols = _df.filter(regex=r'total|^[fN]').columns
-    _df[count_cols] = _df[count_cols].astype('int')
+    # count_cols = _df.filter(regex=r'total|^[fN]').columns
+    # _df[count_cols] = _df[count_cols].astype('int')
 
-    return _df
+    return _df.convert_dtypes()
 
 
 def nb_show_table(df, n_dec: int = 2,
@@ -344,8 +373,9 @@ def nb_show_table(df, n_dec: int = 2,
                   outpath: Path or str = None,
                   return_df: bool = False,
                   suppress_printing: bool = False,
-                  transpose: bool = False, 
-                  italics: bool = True
+                  transpose: bool = False,
+                  italics: bool = True,
+                  title: str = None
                   ) -> None or pd.DataFrame:
     _df = df.copy()
     try:
@@ -372,7 +402,10 @@ def nb_show_table(df, n_dec: int = 2,
     if outpath:
         Path(outpath).write_text(table)
     if not suppress_printing:
-        print(f'\n{table}\n')
+        title = title.strip('\n')+'\n\n' if title else ''
+        print(f'\n{title}{table}\n')
+    if outpath: 
+        print(f'\n> saved as:  \n> `{outpath}`\n')
     return (_df if return_df else None)
 
 
@@ -537,26 +570,30 @@ def combine_top_adv(df_1: pd.DataFrame,
             path = loaded_paths['RBdirect'] if name == 'SET' else loaded_paths['mirror']
             if any(both[f'f_{name}'].isna()):
 
-                floor = 10
-                neg_fallback = load_fallback(
-                    lower_floor=floor, loaded_path=path, adv_set=adv_set)
-
-                neg_fallback.columns = (
-                    pd.Series(adjust_am_names(neg_fallback.columns))
-                    + f'_{name}').to_list()
-                both, cats = catify(both, reverse=True)
-                neg_fallback, __ = catify(neg_fallback, reverse=True)
-
+                both = catify(both, reverse=True)
                 undefined_adv = both.loc[
                     both[f'f_{name}'].isna(), :].index.to_list()
+                floor = 10
+                neg_fallback = adjust_am_names(load_fallback(
+                    lower_floor=floor, loaded_path=path,
+                    adv_set=adv_set
+                    # adv_set=undefined_adv
+                ))
 
-                both.loc[undefined_adv, neg_fallback.columns
-                         ] = neg_fallback.filter(
-                             items=undefined_adv, axis=0)
+                neg_fallback.columns = neg_fallback.columns.astype(
+                    'str') + f'_{name}'
+                neg_fallback = catify(
+                    neg_fallback, reverse=True).loc[both.index, :]
 
-                both[cats] = both[cats].astype('category')
+                # both_c = both.copy()
+                both.update(neg_fallback)
+                # both = pd.merge(left=both, right=neg_fallback.filter(both.columns),
+                #                 how='left', left_index=True, right_index=True, indicator=False)
+                # both.loc[undefined_adv, neg_fallback.columns
+                #          ] = neg_fallback.filter(
+                #              items=undefined_adv, axis=0)
 
-        return both
+        return catify(both)
 
     def _add_f_ratio(df, subset_name, superset_name):
         counts = df.filter(regex=r'^[Nf][12]?').columns.str.split(
@@ -663,6 +700,8 @@ def compare_datasets(adv_am,
                   if isinstance(metric_selection, str)
                   else adv_am.filter(regex=r'|'.join([f'^{m}|mean_{m}'
                                                       for m in metric_selection])))
+    if met_adv_am.empty:
+        met_adv_am = adv_am.filter(regex=metric_selection)
 
     if met_adv_am.empty:
         met_adv_am = adjust_am_names(adv_am).filter(metric_selection)
@@ -704,17 +743,14 @@ def infer_am_decimals(col: str) -> int:
 def pin_top_adv(adv_am,
                 select_col='mean_dP1',
                 verbose: bool = True):
-
-    sorted_adv_am = adv_am.sort_values(select_col, ascending=False)
-    top = sorted_adv_am.index.to_series()
+    if isinstance(select_col, str):
+        select_col = [select_col,]
+    sort_vals = adv_am.copy().filter(select_col).round(2 if len(select_col) > 1 else 5)
+    top = (sort_vals.sort_values(select_col, ascending=False).index.to_series())
+    sorted_adv_am = adv_am.loc[top, :]
     if verbose:
-        print_df = sorted_adv_am[select_col].reset_index()
-        print_df.index = print_df.index.to_series().add(1)
-        print(
-            f'Top Adverb Selection, ranked by descending `{repr(select_col)}`',
-            print_df.to_markdown(floatfmt=',.3f'),
-            sep='\n\n', end='\n\n'
-        )
+        print(f'## Top Adverb Selection, as ranked by descending `{repr(select_col)}`')
+        nb_show_table(sorted_adv_am[select_col].reset_index(), n_dec=3)
     return top.to_list(), sorted_adv_am
 
 # * bigram-composition
@@ -892,6 +928,23 @@ def populate_adv_dir(adverb: str,
                      n_ex: int = 50,
                      rank_by: str | list = ['dP1', "LRC"],
                      verbose: bool = False):
+    """
+    Populates the adverb directory with relevant data based on the provided parameters.
+
+    Args:
+        adverb: The adverb to populate the directory for.
+        bigram_am: The DataFrame containing bigram association measure data.
+        hits_df: The DataFrame containing data for individual hits.
+        data_dir: The directory path for storing the data (i.e. where 'neg_bigram_examples/' subdir will be made.)
+        adv_ex_stem: The stem for the adverb examples. Defaults to None.
+        n_bigrams: The number of bigrams for the  given adverb. Defaults to 10.
+        n_ex: The number of examples per bigram. Defaults to 50.
+        rank_by: The metric(s) to rank by. Defaults to ['dP1', "LRC"].
+        verbose: Whether to print verbose information. Defaults to False.
+
+    Returns:
+        None
+    """
 
     data_tag = infer_data_tag_from_l1(bigram_am.l1)
     adv_ex_dir = data_dir / 'neg_bigram_examples' / adverb
@@ -902,6 +955,8 @@ def populate_adv_dir(adverb: str,
         timestamp_today, adv_ex_dir, adv_ex_stem)
     this_adv_amdf = bigram_am.filter(
         like=f'~{adverb}_', axis=0).sort_values(rank_by, ascending=False)
+    if not all(pd.Series(rank_by).isin(bigram_am.columns)):
+        bigram_am = adjust_am_names(bigram_am)
     this_adv_amdf.to_csv(table_csv_path)
 
     nb_show_table(
@@ -961,8 +1016,16 @@ def seek_top_adv_am(date_str: str,
     tag_top_str = tag_top_str or tag_top_dir.name
     undated_stem = f'{tag_top_str}_NEG-ADV_combined-{adv_floor}'
     # path = None
+    if tag_top_dir.name != tag_top_str:
+        _data_dir = tag_top_dir.joinpath(tag_top_str)
+        if _data_dir.is_dir():
+            tag_top_dir = _data_dir
+        else:
+            raise ValueError(
+                f'Invalid path supplied for `tag_top_dir`: {tag_top_dir}')
     path = cobble_dated_path(date_str=date_str, data_dir=tag_top_dir,
                              undated_stem=undated_stem)
+
     if verbose:
         print(f'"first stab" path: `{path}`')
     if not (path and path.is_file()):
@@ -997,7 +1060,7 @@ def cobble_dated_path(date_str, data_dir, undated_stem, suffix: str = '.csv'):
     """
     if not undated_stem.endswith('_'):
         undated_stem = f'{undated_stem}.'
-    return data_dir.joinpath(f'{undated_stem}{date_str}{suffix}')
+    return Path(data_dir).joinpath(f'{undated_stem}{date_str}{suffix}')
 
 
 def find_most_recent_top_am(date_str: str,
