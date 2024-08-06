@@ -1,0 +1,3315 @@
+```python
+from am_notebooks import *
+
+from source.utils import HIT_TABLES_DIR
+from source.utils.associate import TOP_AM_DIR, AM_DF_DIR
+
+TAG='ALL'
+K=8
+BK = max(K+2, 10)
+BIGRAM_F_FLOOR=50 if TAG == 'ALL' else 25
+
+ADV_F_FLOOR=5000
+
+TOP_AM_TAG_DIR = TOP_AM_DIR / TAG
+TAG_TOP_STR = f'{TAG}-Top{K}'
+TAG_TOP_DIR = TOP_AM_TAG_DIR / TAG_TOP_STR
+DATE=timestamp_today()
+FOCUS_ORIG = ['f', 'E11', 'unexpected_f',
+              'am_p1_given2', 'am_p1_given2_simple', 
+              'am_p2_given1', 'am_p2_given1_simple', 
+              'conservative_log_ratio',
+              'am_log_likelihood', 
+              'N', 'f1', 'f2', 'l1', 'l2']
+FOCUS = adjust_am_names(FOCUS_ORIG)
+pd.set_option("display.float_format", '{:,.2f}'.format)
+pd.set_option("display.max_colwidth", 80)
+
+```
+
+
+```python
+adv_am = seek_top_adv_am(date_str=DATE, adv_floor=ADV_F_FLOOR, 
+                         tag_top_str=TAG_TOP_STR, tag_top_dir=TAG_TOP_DIR)
+```
+
+> Loaded top adv AM table from  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8_NEG-ADV_combined-5000.2024-08-05.csv`
+
+
+
+```python
+NEG_HITS_PATH = HIT_TABLES_DIR /'RBdirect'/'ALL-RBdirect_final.parq'
+POS_HITS_PATH = HIT_TABLES_DIR /'not-RBdirect'/f'{TAG}_not-RBdirect_final.parq'
+```
+
+
+```python
+adv_list = adv_am.index.to_list()
+# print_iter(adv_list, header=f'## Top {K} Most Negative Adverbs',bullet = '1.')
+```
+
+## Top 8 Most Negative Adverbs
+
+1. necessarily
+1. that
+1. exactly
+1. any
+1. remotely
+1. longer
+1. ever
+1. immediately
+1. yet
+1. particularly
+1. terribly
+
+## Load AM table for `adv~adj` comparison (bigram composition)
+
+
+```python
+blind_am_iter = AM_DF_DIR.joinpath('adv_adj').rglob(f'AdvAdj_{TAG}*min{BIGRAM_F_FLOOR}x_extra.parq')
+blam_dict = {blamp.parent.parent.name.strip('ANY'): blamp for blamp in blind_am_iter}
+print(pd.Series(blam_dict)
+       .to_frame('path to "context-blind" AM scores')
+       .to_markdown(tablefmt='rounded_grid', maxcolwidths=[None, 72]))
+
+```
+
+```log
+╭────────┬──────────────────────────────────────────────────────────────────────────╮
+│        │ path to "context-blind" AM scores                                        │
+├────────┼──────────────────────────────────────────────────────────────────────────┤
+│ mirror │ /share/compling/projects/sanpi/results/assoc_df/adv_adj/ANYmirror/extra/ │
+│        │ AdvAdj_ALL_any-mirror_final-freq_min50x_extra.parq                       │
+├────────┼──────────────────────────────────────────────────────────────────────────┤
+│ direct │ /share/compling/projects/sanpi/results/assoc_df/adv_adj/ANYdirect/extra/ │
+│        │ AdvAdj_ALL_any-direct_final-freq_min50x_extra.parq                       │
+╰────────┴──────────────────────────────────────────────────────────────────────────╯
+```
+
+
+```python
+def peek_am(peek_metric, blamin):
+    peek = blamin.reset_index().groupby('l1').apply(
+        lambda x: x.nlargest(1, peek_metric)
+        ).reset_index(drop=True).set_index('key')
+    print(f'\n_Bigrams with the highest `{peek_metric}` value for each adverb_\n')
+    return peek.sort_values(peek_metric, ascending=False)
+
+blind_priority_cols = METRIC_PRIORITY_DICT[f'{TAG}_blind']
+blam_dfs = {}
+for blam_kind, blam_path in blam_dict.items():
+    print(f'\n### Loading `{blam_kind}` AM scores\n\n Path: `{blam_path.relative_to(AM_DF_DIR.parent)}`\n')
+    blamin = pd.read_parquet(
+        blam_path, engine='pyarrow',
+        filters=[('l1', 'in', adv_list)],
+        columns=FOCUS_DICT[TAG]['adv_adj'])
+    blamin['dataset']=blam_kind
+    blamin = catify(adjust_am_names(blamin),
+                    reverse=True)
+    
+    # for peek_metric in blind_priority_cols:
+    #     nb_show_table(peek_am(peek_metric, blamin).filter(blind_priority_cols), n_dec=3)
+    blamin.index = f'[_{blam_kind}_] ' + blamin.index
+    blam_dfs[blam_kind] = blamin
+```
+
+
+### Loading `mirror` AM scores
+
+ Path: `assoc_df/adv_adj/ANYmirror/extra/AdvAdj_ALL_any-mirror_final-freq_min50x_extra.parq`
+
+
+_Bigrams with the highest `LRC` value for each adverb_
+
+
+|                              |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:-----------------------------|--------:|----------:|---------------:|----------------:|
+| **exactly~alike**            |   7.695 |   822.853 |          0.203 |           0.142 |
+| **longer~viable**            |   6.796 |   513.935 |          0.121 |           0.091 |
+| **immediately~recognizable** |   5.940 |   439.808 |          0.089 |           0.068 |
+| **any~closer**               |   5.633 |   482.274 |          0.067 |           0.062 |
+| **terribly~wrong**           |   4.842 | 9,162.777 |          0.361 |           0.221 |
+| **particularly~noteworthy**  |   4.238 |   492.552 |          0.209 |           0.108 |
+| **ever~certain**             |   4.158 |   680.842 |          0.078 |           0.053 |
+| **that~great**               |   3.889 | 1,395.601 |          0.059 |           0.059 |
+| **necessarily~wrong**        |   3.467 |   836.412 |          0.186 |           0.098 |
+| **remotely~close**           |   3.309 |   915.585 |          0.105 |           0.061 |
+
+
+_Bigrams with the highest `G2` value for each adverb_
+
+
+|                           |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:--------------------------|--------:|----------:|---------------:|----------------:|
+| **terribly~wrong**        |   4.842 | 9,162.777 |          0.361 |           0.221 |
+| **any~better**            |   5.097 | 2,484.403 |          0.345 |           0.188 |
+| **immediately~available** |   4.850 | 1,546.238 |          0.225 |           0.126 |
+| **that~great**            |   3.889 | 1,395.601 |          0.059 |           0.059 |
+| **remotely~close**        |   3.309 |   915.585 |          0.105 |           0.061 |
+| **ever~perfect**          |   3.985 |   907.422 |          0.063 |           0.051 |
+| **necessarily~wrong**     |   3.467 |   836.412 |          0.186 |           0.098 |
+| **exactly~alike**         |   7.695 |   822.853 |          0.203 |           0.142 |
+| **particularly~fond**     |   3.715 |   639.621 |          0.134 |           0.073 |
+| **longer~viable**         |   6.796 |   513.935 |          0.121 |           0.091 |
+
+
+_Bigrams with the highest `deltaP_max` value for each adverb_
+
+
+|                             |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:----------------------------|--------:|----------:|---------------:|----------------:|
+| **terribly~wrong**          |   4.842 | 9,162.777 |          0.361 |           0.221 |
+| **any~better**              |   5.097 | 2,484.403 |          0.345 |           0.188 |
+| **immediately~available**   |   4.850 | 1,546.238 |          0.225 |           0.126 |
+| **particularly~noteworthy** |   4.238 |   492.552 |          0.209 |           0.108 |
+| **exactly~alike**           |   7.695 |   822.853 |          0.203 |           0.142 |
+| **necessarily~wrong**       |   3.467 |   836.412 |          0.186 |           0.098 |
+| **longer~viable**           |   6.796 |   513.935 |          0.121 |           0.091 |
+| **remotely~close**          |   3.309 |   915.585 |          0.105 |           0.061 |
+| **that~good**               |   2.290 | 1,236.258 |          0.094 |           0.055 |
+| **ever~certain**            |   4.158 |   680.842 |          0.078 |           0.053 |
+
+
+_Bigrams with the highest `deltaP_mean` value for each adverb_
+
+
+|                             |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:----------------------------|--------:|----------:|---------------:|----------------:|
+| **terribly~wrong**          |   4.842 | 9,162.777 |          0.361 |           0.221 |
+| **any~better**              |   5.097 | 2,484.403 |          0.345 |           0.188 |
+| **exactly~alike**           |   7.695 |   822.853 |          0.203 |           0.142 |
+| **immediately~available**   |   4.850 | 1,546.238 |          0.225 |           0.126 |
+| **particularly~noteworthy** |   4.238 |   492.552 |          0.209 |           0.108 |
+| **necessarily~wrong**       |   3.467 |   836.412 |          0.186 |           0.098 |
+| **longer~viable**           |   6.796 |   513.935 |          0.121 |           0.091 |
+| **remotely~close**          |   3.309 |   915.585 |          0.105 |           0.061 |
+| **that~great**              |   3.889 | 1,395.601 |          0.059 |           0.059 |
+| **ever~certain**            |   4.158 |   680.842 |          0.078 |           0.053 |
+
+
+### Loading `direct` AM scores
+
+ Path: `assoc_df/adv_adj/ANYdirect/extra/AdvAdj_ALL_any-direct_final-freq_min50x_extra.parq`
+
+
+_Bigrams with the highest `LRC` value for each adverb_
+
+
+|                            |   `LRC` |       `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:---------------------------|--------:|-----------:|---------------:|----------------:|
+| **remotely~detonated**     |  12.792 |  1,222.941 |          0.884 |           0.444 |
+| **longer~focal**           |  11.152 |  2,191.507 |          0.394 |           0.204 |
+| **yet~unborn**             |  10.118 |  4,166.574 |          0.715 |           0.360 |
+| **immediately~accretive**  |   8.595 |  2,435.256 |          0.448 |           0.226 |
+| **that~purported**         |   8.455 |    760.832 |          0.791 |           0.395 |
+| **ever~olympic**           |   8.289 |  2,147.787 |          0.449 |           0.225 |
+| **necessarily~indicative** |   8.030 | 13,007.531 |          0.172 |           0.101 |
+| **terribly~awry**          |   7.989 |  1,726.731 |          0.257 |           0.130 |
+| **any~happier**            |   6.830 |  7,387.710 |          0.058 |           0.043 |
+| **exactly~alike**          |   6.637 |  5,879.140 |          0.087 |           0.051 |
+| **particularly~hard-hit**  |   5.641 |    998.462 |          0.389 |           0.195 |
+
+
+_Bigrams with the highest `G2` value for each adverb_
+
+
+|                             |   `LRC` |        `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:----------------------------|--------:|------------:|---------------:|----------------:|
+| **immediately~clear**       |   5.938 | 170,699.860 |          0.279 |           0.177 |
+| **that~bad**                |   4.007 |  74,557.569 |          0.089 |           0.066 |
+| **any~better**              |   5.268 |  62,406.829 |          0.326 |           0.172 |
+| **exactly~sure**            |   5.425 |  51,388.703 |          0.154 |           0.094 |
+| **yet~clear**               |   4.482 |  46,991.546 |          0.106 |           0.067 |
+| **longer~lasting**          |  10.114 |  43,975.640 |          0.315 |           0.238 |
+| **ever~closer**             |   6.248 |  42,481.895 |          0.111 |           0.083 |
+| **terribly~wrong**          |   5.678 |  38,459.157 |          0.105 |           0.074 |
+| **particularly~interested** |   2.916 |  33,095.472 |          0.047 |           0.035 |
+| **necessarily~true**        |   4.363 |  15,076.325 |          0.068 |           0.041 |
+| **remotely~close**          |   3.780 |   5,239.389 |          0.085 |           0.044 |
+
+
+_Bigrams with the highest `deltaP_max` value for each adverb_
+
+
+|                            |   `LRC` |       `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:---------------------------|--------:|-----------:|---------------:|----------------:|
+| **remotely~detonated**     |  12.792 |  1,222.941 |          0.884 |           0.444 |
+| **that~purported**         |   8.455 |    760.832 |          0.791 |           0.395 |
+| **yet~unborn**             |  10.118 |  4,166.574 |          0.715 |           0.360 |
+| **immediately~appealable** |   8.591 |    842.134 |          0.569 |           0.285 |
+| **ever~quarterly**         |   8.087 |  1,356.241 |          0.449 |           0.225 |
+| **longer~focal**           |  11.152 |  2,191.507 |          0.394 |           0.204 |
+| **particularly~hard-hit**  |   5.641 |    998.462 |          0.389 |           0.195 |
+| **any~better**             |   5.268 | 62,406.829 |          0.326 |           0.172 |
+| **terribly~awry**          |   7.989 |  1,726.731 |          0.257 |           0.130 |
+| **necessarily~indicative** |   8.030 | 13,007.531 |          0.172 |           0.101 |
+| **exactly~sure**           |   5.425 | 51,388.703 |          0.154 |           0.094 |
+
+
+_Bigrams with the highest `deltaP_mean` value for each adverb_
+
+
+|                            |   `LRC` |       `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:---------------------------|--------:|-----------:|---------------:|----------------:|
+| **remotely~detonated**     |  12.792 |  1,222.941 |          0.884 |           0.444 |
+| **that~purported**         |   8.455 |    760.832 |          0.791 |           0.395 |
+| **yet~unborn**             |  10.118 |  4,166.574 |          0.715 |           0.360 |
+| **immediately~appealable** |   8.591 |    842.134 |          0.569 |           0.285 |
+| **longer~lasting**         |  10.114 | 43,975.640 |          0.315 |           0.238 |
+| **ever~olympic**           |   8.289 |  2,147.787 |          0.449 |           0.225 |
+| **particularly~hard-hit**  |   5.641 |    998.462 |          0.389 |           0.195 |
+| **any~better**             |   5.268 | 62,406.829 |          0.326 |           0.172 |
+| **terribly~awry**          |   7.989 |  1,726.731 |          0.257 |           0.130 |
+| **necessarily~indicative** |   8.030 | 13,007.531 |          0.172 |           0.101 |
+| **exactly~sure**           |   5.425 | 51,388.703 |          0.154 |           0.094 |
+
+
+
+
+```python
+blam_df = pd.concat(blam_dfs.values()).sort_values(blind_priority_cols[0], ascending=False)
+# print(f'### Top 15 *context-blind* `{blind_priority_cols[0]}` values across all adverbs and datasets\n')
+# nb_show_table(blam_df.head(15))
+```
+
+### Top 15 *context-blind* `LRC` values across all adverbs and datasets
+
+
+|                                       |   `f` |   `dP1` |   `LRC` |   `P1` |      `G2` | `l1`        | `l2`        |    `f1` |   `f2` |        `N` |   `exp_f` |   `unexp_f` |   `unexp_r` |   `dP2` |   `P2` |   `deltaP_max` |   `deltaP_mean` |   `odds_r_disc` |   `t` |   `MI` | `dataset`   |
+|:--------------------------------------|------:|--------:|--------:|-------:|----------:|:------------|:------------|--------:|-------:|-----------:|----------:|------------:|------------:|--------:|-------:|---------------:|----------------:|----------------:|------:|-------:|:------------|
+| **[_direct_] remotely~detonated**     |    76 |    0.88 |   12.79 |   0.88 |  1,222.94 | remotely    | detonated   |  15,394 |     86 | 71,961,373 |      0.02 |       75.98 |        1.00 |    0.00 |   0.00 |           0.88 |            0.44 |            4.53 |  8.72 |   3.62 | direct      |
+| **[_direct_] longer~focal**           |   155 |    0.39 |   11.15 |   0.39 |  2,191.51 | longer      | focal       |  11,259 |    393 | 71,961,373 |      0.06 |      154.94 |        1.00 |    0.01 |   0.01 |           0.39 |            0.20 |            3.63 | 12.44 |   3.40 | direct      |
+| **[_direct_] longer~lead**            |   264 |    0.21 |   10.15 |   0.21 |  3,344.40 | longer      | lead        |  11,259 |  1,250 | 71,961,373 |      0.20 |      263.80 |        1.00 |    0.02 |   0.02 |           0.21 |            0.12 |            3.24 | 16.24 |   3.13 | direct      |
+| **[_direct_] yet~unborn**             |   359 |    0.72 |   10.12 |   0.72 |  4,166.57 | yet         | unborn      |  94,755 |    501 | 71,961,373 |      0.66 |      358.34 |        1.00 |    0.00 |   0.00 |           0.72 |            0.36 |            3.28 | 18.91 |   2.74 | direct      |
+| **[_direct_] longer~lasting**         | 3,545 |    0.16 |   10.11 |   0.16 | 43,975.64 | longer      | lasting     |  11,259 | 21,954 | 71,961,373 |      3.43 |    3,541.57 |        1.00 |    0.31 |   0.31 |           0.31 |            0.24 |            3.25 | 59.48 |   3.01 | direct      |
+| **[_direct_] remotely~exploitable**   |   142 |    0.15 |    8.86 |   0.15 |  1,595.53 | remotely    | exploitable |  15,394 |    964 | 71,961,373 |      0.21 |      141.79 |        1.00 |    0.01 |   0.01 |           0.15 |            0.08 |            2.91 | 11.90 |   2.84 | direct      |
+| **[_direct_] immediately~accretive**  |   237 |    0.45 |    8.59 |   0.45 |  2,435.26 | immediately | accretive   |  91,746 |    527 | 71,961,373 |      0.67 |      236.33 |        1.00 |    0.00 |   0.00 |           0.45 |            0.23 |            2.81 | 15.35 |   2.55 | direct      |
+| **[_direct_] immediately~appealable** |    77 |    0.57 |    8.59 |   0.57 |    842.13 | immediately | appealable  |  91,746 |    135 | 71,961,373 |      0.17 |       76.83 |        1.00 |    0.00 |   0.00 |           0.57 |            0.28 |            3.02 |  8.76 |   2.65 | direct      |
+| **[_direct_] that~purported**         |    73 |    0.79 |    8.45 |   0.79 |    760.83 | that        | purported   | 206,801 |     92 | 71,961,373 |      0.26 |       72.74 |        1.00 |    0.00 |   0.00 |           0.79 |            0.40 |            3.12 |  8.51 |   2.44 | direct      |
+| **[_direct_] immediately~adjacent**   | 1,572 |    0.33 |    8.36 |   0.33 | 14,989.71 | immediately | adjacent    |  91,746 |  4,711 | 71,961,373 |      6.01 |    1,565.99 |        1.00 |    0.02 |   0.02 |           0.33 |            0.17 |            2.60 | 39.50 |   2.42 | direct      |
+| **[_direct_] yet~unnamed**            |   737 |    0.35 |    8.31 |   0.35 |  7,068.31 | yet         | unnamed     |  94,755 |  2,095 | 71,961,373 |      2.76 |      734.24 |        1.00 |    0.01 |   0.01 |           0.35 |            0.18 |            2.62 | 27.05 |   2.43 | direct      |
+| **[_direct_] ever~olympic**           |   217 |    0.45 |    8.29 |   0.45 |  2,147.79 | ever        | olympic     | 110,979 |    482 | 71,961,373 |      0.74 |      216.26 |        1.00 |    0.00 |   0.00 |           0.45 |            0.23 |            2.73 | 14.68 |   2.47 | direct      |
+| **[_direct_] ever~quarterly**         |   137 |    0.45 |    8.09 |   0.45 |  1,356.24 | ever        | quarterly   | 110,979 |    304 | 71,961,373 |      0.47 |      136.53 |        1.00 |    0.00 |   0.00 |           0.45 |            0.23 |            2.73 | 11.66 |   2.47 | direct      |
+| **[_direct_] necessarily~indicative** | 1,397 |    0.17 |    8.03 |   0.17 | 13,007.53 | necessarily | indicative  |  48,641 |  8,068 | 71,961,373 |      5.45 |    1,391.55 |        1.00 |    0.03 |   0.03 |           0.17 |            0.10 |            2.50 | 37.23 |   2.41 | direct      |
+| **[_direct_] terribly~awry**          |   176 |    0.26 |    7.99 |   0.26 |  1,726.73 | terribly    | awry        |  58,529 |    682 | 71,961,373 |      0.55 |      175.45 |        1.00 |    0.00 |   0.00 |           0.26 |            0.13 |            2.63 | 13.22 |   2.50 | direct      |
+
+`
+
+
+```python
+# nb_show_table(blam_df
+#               .filter(like='mirror', axis=0)
+#               .sample(5)
+#               .filter(blind_priority_cols)
+#               .sort_values(blind_priority_cols[0], ascending=False))
+```
+
+```python
+nb_show_table(blam_df
+              .filter(like='mirror', axis=0)
+              .sample(5)
+              .filter(blind_priority_cols)
+              .sort_values(blind_priority_cols[0], ascending=False))
+```
+
+|                                    |   `LRC` |   `G2` |   `deltaP_max` |   `deltaP_mean` |
+|:-----------------------------------|--------:|-------:|---------------:|----------------:|
+| **[_mirror_] necessarily~true**    |    2.75 | 206.44 |           0.05 |            0.03 |
+| **[_mirror_] exactly~clear**       |    2.47 | 170.92 |           0.05 |            0.03 |
+| **[_mirror_] particularly~useful** |    0.97 | 113.55 |           0.02 |            0.01 |
+| **[_mirror_] ever~available**      |    0.00 |  11.84 |           0.00 |            0.00 |
+| **[_mirror_] particularly~great**  |    0.00 |  18.27 |           0.01 |            0.00 |
+
+
+
+
+```python
+perspective_cols = blind_priority_cols + ['dP1', 'dP2', 'f', 'f2', 'unexp_r']
+filter_blam = (blam_df.copy()
+               .filter(perspective_cols)
+               .round(2))
+perspectives = [perspective_cols[i:i+2] for i in range(0,2)]
+perspectives.extend([['dP1', 'LRC'], ['dP2', 'LRC']])
+
+# for ia, _adv in enumerate(adv_list[:8], start=1):
+#     print(f'### {ia}. Sampling _{_adv}_ context-blind bigram AMs\n')
+#     adv_blam = filter_blam.filter(like=f' {_adv}~', axis=0)
+                
+#     for ip, col_list in enumerate(perspectives, start=1): 
+#         print(f'#### {ia}.{ip}. _{_adv}_ Highest and Lowest `{col_list[0]}`\n\n(_tie-breaker: `{col_list[1]}`_)')
+#         x_blam = adv_blam.sort_values(col_list, ascending=False)
+#         nb_show_table(pd.concat([x_blam.head(3),
+#                                  x_blam.tail(3)]))
+#     print('\n---\n')
+```
+
+### 1. Sampling _necessarily_ context-blind bigram AMs
+
+#### 1.1. _necessarily_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                                           |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] necessarily~indicative**     |    8.03 | 13,007.53 |           0.17 |            0.10 |    0.17 |    0.03 | 1,397 |     8,068 |        1.00 |
+| **[_direct_] necessarily~cause**          |    5.48 |    385.16 |           0.07 |            0.04 |    0.07 |    0.00 |    52 |       730 |        0.99 |
+| **[_direct_] necessarily~representative** |    4.97 |  2,682.51 |           0.03 |            0.02 |    0.03 |    0.01 |   491 |    18,160 |        0.98 |
+| **[_direct_] necessarily~common**         |   -1.75 |   -398.82 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    51 |   513,728 |       -5.81 |
+| **[_direct_] necessarily~more**           |   -1.89 |   -619.21 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    85 |   815,328 |       -5.48 |
+| **[_direct_] necessarily~important**      |   -2.04 | -1,454.70 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   231 | 2,001,942 |       -4.86 |
+
+#### 1.2. _necessarily_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                                       |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:--------------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] necessarily~true**       |    4.36 | 15,076.32 |           0.07 |            0.04 |    0.01 |    0.07 | 3,437 |   227,128 |        0.96 |
+| **[_direct_] necessarily~indicative** |    8.03 | 13,007.53 |           0.17 |            0.10 |    0.17 |    0.03 | 1,397 |     8,068 |        1.00 |
+| **[_direct_] necessarily~bad**        |    2.75 |  5,127.17 |           0.04 |            0.02 |    0.00 |    0.04 | 2,180 |   425,797 |        0.87 |
+| **[_direct_] necessarily~popular**    |   -1.72 |   -540.01 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    91 |   765,023 |       -4.68 |
+| **[_direct_] necessarily~more**       |   -1.89 |   -619.21 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    85 |   815,328 |       -5.48 |
+| **[_direct_] necessarily~important**  |   -2.04 | -1,454.70 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   231 | 2,001,942 |       -4.86 |
+
+#### 1.3. _necessarily_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                                           |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] necessarily~indicative**     |    8.03 | 13,007.53 |           0.17 |            0.10 |    0.17 |    0.03 | 1,397 |     8,068 |        1.00 |
+| **[_direct_] necessarily~cause**          |    5.48 |    385.16 |           0.07 |            0.04 |    0.07 |    0.00 |    52 |       730 |        0.99 |
+| **[_direct_] necessarily~representative** |    4.97 |  2,682.51 |           0.03 |            0.02 |    0.03 |    0.01 |   491 |    18,160 |        0.98 |
+| **[_direct_] necessarily~common**         |   -1.75 |   -398.82 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    51 |   513,728 |       -5.81 |
+| **[_direct_] necessarily~more**           |   -1.89 |   -619.21 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    85 |   815,328 |       -5.48 |
+| **[_direct_] necessarily~important**      |   -2.04 | -1,454.70 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   231 | 2,001,942 |       -4.86 |
+
+#### 1.4. _necessarily_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                                      |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:-------------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_mirror_] necessarily~wrong**     |    3.47 |    836.41 |           0.19 |            0.10 |    0.01 |    0.19 |   216 |    20,727 |        0.94 |
+| **[_direct_] necessarily~true**      |    4.36 | 15,076.32 |           0.07 |            0.04 |    0.01 |    0.07 | 3,437 |   227,128 |        0.96 |
+| **[_mirror_] necessarily~true**      |    2.75 |    206.44 |           0.05 |            0.03 |    0.01 |    0.05 |    58 |     6,098 |        0.93 |
+| **[_direct_] necessarily~common**    |   -1.75 |   -398.82 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    51 |   513,728 |       -5.81 |
+| **[_direct_] necessarily~more**      |   -1.89 |   -619.21 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    85 |   815,328 |       -5.48 |
+| **[_direct_] necessarily~important** |   -2.04 | -1,454.70 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   231 | 2,001,942 |       -4.86 |
+
+
+---
+
+### 2. Sampling _that_ context-blind bigram AMs
+
+#### 2.1. _that_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                                |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |    `f2` |   `unexp_r` |
+|:-------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|--------:|------------:|
+| **[_direct_] that~purported**  |    8.45 |    760.83 |           0.79 |            0.40 |    0.79 |    0.00 |    73 |      92 |        1.00 |
+| **[_direct_] that~uncommon**   |    4.45 |  3,696.56 |           0.07 |            0.04 |    0.07 |    0.00 |   804 |  11,144 |        0.96 |
+| **[_direct_] that~dissimilar** |    4.13 |  1,363.48 |           0.06 |            0.03 |    0.06 |    0.00 |   307 |   4,598 |        0.96 |
+| **[_direct_] that~easier**     |   -2.19 |   -752.57 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    72 | 208,626 |       -7.33 |
+| **[_direct_] that~better**     |   -2.40 | -2,074.81 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |   231 | 600,470 |       -6.47 |
+| **[_direct_] that~likely**     |   -3.76 | -4,169.01 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   116 | 884,149 |      -20.90 |
+
+#### 2.2. _that_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                            |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |    `f` |      `f2` |   `unexp_r` |
+|:---------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|-------:|----------:|------------:|
+| **[_direct_] that~bad**    |    4.01 | 74,557.57 |           0.09 |            0.07 |    0.04 |    0.09 | 19,613 |   425,797 |        0.94 |
+| **[_direct_] that~great**  |    3.71 | 40,086.00 |           0.05 |            0.04 |    0.04 |    0.05 | 11,740 |   306,251 |        0.93 |
+| **[_direct_] that~easy**   |    2.90 | 30,741.28 |           0.05 |            0.04 |    0.02 |    0.05 | 12,779 |   578,041 |        0.87 |
+| **[_direct_] that~better** |   -2.40 | -2,074.81 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    231 |   600,470 |       -6.47 |
+| **[_direct_] that~likely** |   -3.76 | -4,169.01 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    116 |   884,149 |      -20.90 |
+| **[_direct_] that~many**   |   -1.97 | -4,844.38 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |  1,149 | 1,835,842 |       -3.59 |
+
+#### 2.3. _that_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                                |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |    `f2` |   `unexp_r` |
+|:-------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|--------:|------------:|
+| **[_direct_] that~purported**  |    8.45 |    760.83 |           0.79 |            0.40 |    0.79 |    0.00 |    73 |      92 |        1.00 |
+| **[_direct_] that~uncommon**   |    4.45 |  3,696.56 |           0.07 |            0.04 |    0.07 |    0.00 |   804 |  11,144 |        0.96 |
+| **[_direct_] that~farfetched** |    3.75 |    419.72 |           0.07 |            0.03 |    0.07 |    0.00 |    92 |   1,296 |        0.96 |
+| **[_direct_] that~easier**     |   -2.19 |   -752.57 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    72 | 208,626 |       -7.33 |
+| **[_direct_] that~better**     |   -2.40 | -2,074.81 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |   231 | 600,470 |       -6.47 |
+| **[_direct_] that~likely**     |   -3.76 | -4,169.01 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   116 | 884,149 |      -20.90 |
+
+#### 2.4. _that_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                            |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |    `f` |      `f2` |   `unexp_r` |
+|:---------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|-------:|----------:|------------:|
+| **[_direct_] that~bad**    |    4.01 | 74,557.57 |           0.09 |            0.07 |    0.04 |    0.09 | 19,613 |   425,797 |        0.94 |
+| **[_mirror_] that~good**   |    2.29 |  1,236.26 |           0.09 |            0.06 |    0.02 |    0.09 |    614 |    31,461 |        0.83 |
+| **[_mirror_] that~easy**   |    2.74 |  1,311.50 |           0.08 |            0.05 |    0.02 |    0.08 |    508 |    18,697 |        0.88 |
+| **[_direct_] that~better** |   -2.40 | -2,074.81 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    231 |   600,470 |       -6.47 |
+| **[_direct_] that~likely** |   -3.76 | -4,169.01 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    116 |   884,149 |      -20.90 |
+| **[_direct_] that~many**   |   -1.97 | -4,844.38 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |  1,149 | 1,835,842 |       -3.59 |
+
+
+---
+
+### 3. Sampling _exactly_ context-blind bigram AMs
+
+#### 3.1. _exactly_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                                 |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:--------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_mirror_] exactly~alike**    |    7.69 |    822.85 |           0.20 |            0.14 |    0.20 |    0.08 |    83 |       408 |        1.00 |
+| **[_direct_] exactly~alike**    |    6.64 |  5,879.14 |           0.09 |            0.05 |    0.09 |    0.01 |   776 |     8,804 |        0.99 |
+| **[_direct_] exactly~opposite** |    5.82 |  3,087.08 |           0.05 |            0.03 |    0.05 |    0.01 |   467 |     8,461 |        0.99 |
+| **[_direct_] exactly~good**     |   -1.72 | -1,181.66 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   287 | 1,670,122 |       -3.54 |
+| **[_direct_] exactly~much**     |   -3.30 | -1,680.26 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    53 | 1,336,122 |      -18.66 |
+| **[_direct_] exactly~many**     |   -3.72 | -2,429.77 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    55 | 1,835,842 |      -25.03 |
+
+#### 3.2. _exactly_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                              |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:-----------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] exactly~sure**  |    5.42 | 51,388.70 |           0.15 |            0.09 |    0.03 |    0.15 | 8,840 |   256,817 |        0.98 |
+| **[_direct_] exactly~right** |    5.79 | 39,335.77 |           0.11 |            0.08 |    0.04 |    0.11 | 6,269 |   141,227 |        0.98 |
+| **[_direct_] exactly~alike** |    6.64 |  5,879.14 |           0.09 |            0.05 |    0.09 |    0.01 |   776 |     8,804 |        0.99 |
+| **[_direct_] exactly~good**  |   -1.72 | -1,181.66 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   287 | 1,670,122 |       -3.54 |
+| **[_direct_] exactly~much**  |   -3.30 | -1,680.26 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    53 | 1,336,122 |      -18.66 |
+| **[_direct_] exactly~many**  |   -3.72 | -2,429.77 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    55 | 1,835,842 |      -25.03 |
+
+#### 3.3. _exactly_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                                 |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:--------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_mirror_] exactly~alike**    |    7.69 |    822.85 |           0.20 |            0.14 |    0.20 |    0.08 |    83 |       408 |        1.00 |
+| **[_direct_] exactly~alike**    |    6.64 |  5,879.14 |           0.09 |            0.05 |    0.09 |    0.01 |   776 |     8,804 |        0.99 |
+| **[_direct_] exactly~opposite** |    5.82 |  3,087.08 |           0.05 |            0.03 |    0.05 |    0.01 |   467 |     8,461 |        0.99 |
+| **[_direct_] exactly~good**     |   -1.72 | -1,181.66 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   287 | 1,670,122 |       -3.54 |
+| **[_direct_] exactly~much**     |   -3.30 | -1,680.26 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    53 | 1,336,122 |      -18.66 |
+| **[_direct_] exactly~many**     |   -3.72 | -2,429.77 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    55 | 1,835,842 |      -25.03 |
+
+#### 3.4. _exactly_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                              |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:-----------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] exactly~sure**  |    5.42 | 51,388.70 |           0.15 |            0.09 |    0.03 |    0.15 | 8,840 |   256,817 |        0.98 |
+| **[_mirror_] exactly~sure**  |    4.52 |    795.75 |           0.14 |            0.08 |    0.02 |    0.14 |   148 |     6,736 |        0.97 |
+| **[_mirror_] exactly~right** |    4.61 |    736.60 |           0.13 |            0.07 |    0.02 |    0.13 |   133 |     5,535 |        0.97 |
+| **[_direct_] exactly~good**  |   -1.72 | -1,181.66 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   287 | 1,670,122 |       -3.54 |
+| **[_direct_] exactly~much**  |   -3.30 | -1,680.26 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    53 | 1,336,122 |      -18.66 |
+| **[_direct_] exactly~many**  |   -3.72 | -2,429.77 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    55 | 1,835,842 |      -25.03 |
+
+
+---
+
+### 4. Sampling _any_ context-blind bigram AMs
+
+#### 4.1. _any_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                            |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:---------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] any~happier** |    6.83 |  7,387.71 |           0.06 |            0.04 |    0.06 |    0.03 |   942 |    16,177 |        0.99 |
+| **[_direct_] any~clearer** |    6.57 |  4,447.68 |           0.05 |            0.03 |    0.05 |    0.02 |   586 |    11,328 |        0.99 |
+| **[_direct_] any~closer**  |    5.85 | 10,386.72 |           0.05 |            0.04 |    0.03 |    0.05 | 1,611 |    55,736 |        0.98 |
+| **[_direct_] any~smaller** |    1.27 |    199.49 |           0.00 |            0.00 |    0.00 |    0.00 |   160 |    91,288 |        0.75 |
+| **[_direct_] any~greater** |    1.03 |    180.60 |           0.00 |            0.00 |    0.00 |    0.00 |   191 |   134,451 |        0.69 |
+| **[_direct_] any~good**    |   -0.34 |   -131.14 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |   459 | 1,670,122 |       -0.63 |
+
+#### 4.2. _any_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                            |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |    `f` |      `f2` |   `unexp_r` |
+|:---------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|-------:|----------:|------------:|
+| **[_direct_] any~better**  |    5.27 | 62,406.83 |           0.33 |            0.17 |    0.02 |    0.33 | 10,743 |   600,470 |        0.98 |
+| **[_direct_] any~worse**   |    5.45 | 21,231.52 |           0.11 |            0.07 |    0.02 |    0.11 |  3,606 |   170,565 |        0.98 |
+| **[_direct_] any~easier**  |    4.47 | 10,556.78 |           0.07 |            0.04 |    0.01 |    0.07 |  2,307 |   208,626 |        0.96 |
+| **[_direct_] any~quicker** |    2.10 |    180.51 |           0.00 |            0.00 |    0.00 |    0.00 |     67 |    15,993 |        0.89 |
+| **[_direct_] any~darker**  |    1.86 |    142.63 |           0.00 |            0.00 |    0.00 |    0.00 |     56 |    14,517 |        0.88 |
+| **[_direct_] any~good**    |   -0.34 |   -131.14 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    459 | 1,670,122 |       -0.63 |
+
+#### 4.3. _any_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                            |   `LRC` |     `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:---------------------------|--------:|---------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_mirror_] any~closer**  |    5.63 |   482.27 |           0.07 |            0.06 |    0.07 |    0.06 |    66 |       972 |        0.99 |
+| **[_direct_] any~happier** |    6.83 | 7,387.71 |           0.06 |            0.04 |    0.06 |    0.03 |   942 |    16,177 |        0.99 |
+| **[_direct_] any~clearer** |    6.57 | 4,447.68 |           0.05 |            0.03 |    0.05 |    0.02 |   586 |    11,328 |        0.99 |
+| **[_direct_] any~smaller** |    1.27 |   199.49 |           0.00 |            0.00 |    0.00 |    0.00 |   160 |    91,288 |        0.75 |
+| **[_direct_] any~greater** |    1.03 |   180.60 |           0.00 |            0.00 |    0.00 |    0.00 |   191 |   134,451 |        0.69 |
+| **[_direct_] any~good**    |   -0.34 |  -131.14 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |   459 | 1,670,122 |       -0.63 |
+
+#### 4.4. _any_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                            |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |    `f` |      `f2` |   `unexp_r` |
+|:---------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|-------:|----------:|------------:|
+| **[_mirror_] any~better**  |    5.10 |  2,484.40 |           0.35 |            0.19 |    0.03 |    0.35 |    413 |    13,606 |        0.98 |
+| **[_direct_] any~better**  |    5.27 | 62,406.83 |           0.33 |            0.17 |    0.02 |    0.33 | 10,743 |   600,470 |        0.98 |
+| **[_direct_] any~worse**   |    5.45 | 21,231.52 |           0.11 |            0.07 |    0.02 |    0.11 |  3,606 |   170,565 |        0.98 |
+| **[_direct_] any~smaller** |    1.27 |    199.49 |           0.00 |            0.00 |    0.00 |    0.00 |    160 |    91,288 |        0.75 |
+| **[_direct_] any~greater** |    1.03 |    180.60 |           0.00 |            0.00 |    0.00 |    0.00 |    191 |   134,451 |        0.69 |
+| **[_direct_] any~good**    |   -0.34 |   -131.14 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    459 | 1,670,122 |       -0.63 |
+
+
+---
+
+### 5. Sampling _remotely_ context-blind bigram AMs
+
+#### 5.1. _remotely_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                                     |   `LRC` |     `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------------|--------:|---------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] remotely~detonated**   |   12.79 | 1,222.94 |           0.88 |            0.44 |    0.88 |    0.00 |    76 |        86 |        1.00 |
+| **[_direct_] remotely~exploitable** |    8.86 | 1,595.53 |           0.15 |            0.08 |    0.15 |    0.01 |   142 |       964 |        1.00 |
+| **[_direct_] remotely~comparable**  |    5.88 | 1,577.01 |           0.02 |            0.02 |    0.02 |    0.01 |   226 |    12,202 |        0.99 |
+| **[_direct_] remotely~successful**  |    0.00 |    -9.82 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    52 |   364,190 |       -0.50 |
+| **[_direct_] remotely~good**        |   -0.74 |  -183.11 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   136 | 1,670,122 |       -1.63 |
+| **[_direct_] remotely~likely**      |   -0.76 |  -128.71 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    57 |   884,149 |       -2.32 |
+
+#### 5.2. _remotely_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                                    |   `LRC` |     `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:-----------------------------------|--------:|---------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] remotely~close**      |    3.78 | 5,239.39 |           0.08 |            0.04 |    0.00 |    0.08 | 1,395 |   407,539 |        0.94 |
+| **[_direct_] remotely~interested** |    3.92 | 3,978.19 |           0.06 |            0.03 |    0.00 |    0.06 | 1,004 |   259,727 |        0.94 |
+| **[_direct_] remotely~related**    |    4.41 | 2,826.98 |           0.04 |            0.02 |    0.01 |    0.04 |   602 |   104,872 |        0.96 |
+| **[_direct_] remotely~successful** |    0.00 |    -9.82 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    52 |   364,190 |       -0.50 |
+| **[_direct_] remotely~likely**     |   -0.76 |  -128.71 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    57 |   884,149 |       -2.32 |
+| **[_direct_] remotely~good**       |   -0.74 |  -183.11 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   136 | 1,670,122 |       -1.63 |
+
+#### 5.3. _remotely_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                                     |   `LRC` |     `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------------|--------:|---------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] remotely~detonated**   |   12.79 | 1,222.94 |           0.88 |            0.44 |    0.88 |    0.00 |    76 |        86 |        1.00 |
+| **[_direct_] remotely~exploitable** |    8.86 | 1,595.53 |           0.15 |            0.08 |    0.15 |    0.01 |   142 |       964 |        1.00 |
+| **[_direct_] remotely~comparable**  |    5.88 | 1,577.01 |           0.02 |            0.02 |    0.02 |    0.01 |   226 |    12,202 |        0.99 |
+| **[_direct_] remotely~concerned**   |    0.00 |     9.33 |           0.00 |            0.00 |    0.00 |    0.00 |    68 |   214,339 |        0.33 |
+| **[_direct_] remotely~good**        |   -0.74 |  -183.11 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   136 | 1,670,122 |       -1.63 |
+| **[_direct_] remotely~likely**      |   -0.76 |  -128.71 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    57 |   884,149 |       -2.32 |
+
+#### 5.4. _remotely_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                                    |   `LRC` |     `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:-----------------------------------|--------:|---------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_mirror_] remotely~close**      |    3.31 |   915.58 |           0.10 |            0.06 |    0.02 |    0.10 |   261 |    13,768 |        0.93 |
+| **[_direct_] remotely~close**      |    3.78 | 5,239.39 |           0.08 |            0.04 |    0.00 |    0.08 | 1,395 |   407,539 |        0.94 |
+| **[_direct_] remotely~interested** |    3.92 | 3,978.19 |           0.06 |            0.03 |    0.00 |    0.06 | 1,004 |   259,727 |        0.94 |
+| **[_direct_] remotely~concerned**  |    0.00 |     9.33 |           0.00 |            0.00 |    0.00 |    0.00 |    68 |   214,339 |        0.33 |
+| **[_direct_] remotely~good**       |   -0.74 |  -183.11 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   136 | 1,670,122 |       -1.63 |
+| **[_direct_] remotely~likely**     |   -0.76 |  -128.71 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    57 |   884,149 |       -2.32 |
+
+
+---
+
+### 6. Sampling _longer_ context-blind bigram AMs
+
+#### 6.1. _longer_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                                 |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |    `f2` |   `unexp_r` |
+|:--------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|--------:|------------:|
+| **[_direct_] longer~focal**     |   11.15 |  2,191.51 |           0.39 |            0.20 |    0.39 |    0.01 |   155 |     393 |        1.00 |
+| **[_direct_] longer~lead**      |   10.15 |  3,344.40 |           0.21 |            0.12 |    0.21 |    0.02 |   264 |   1,250 |        1.00 |
+| **[_direct_] longer~lasting**   |   10.11 | 43,975.64 |           0.31 |            0.24 |    0.16 |    0.31 | 3,545 |  21,954 |        1.00 |
+| **[_direct_] longer~possible**  |    0.00 |     12.60 |           0.00 |            0.00 |    0.00 |    0.00 |    61 | 238,712 |        0.39 |
+| **[_direct_] longer~open**      |    0.00 |      6.96 |           0.00 |            0.00 |    0.00 |    0.00 |    51 | 220,078 |        0.32 |
+| **[_direct_] longer~available** |    0.00 |     -0.09 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    97 | 639,462 |       -0.03 |
+
+#### 6.2. _longer_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                                 |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |    `f2` |   `unexp_r` |
+|:--------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|--------:|------------:|
+| **[_direct_] longer~lasting**   |   10.11 | 43,975.64 |           0.31 |            0.24 |    0.16 |    0.31 | 3,545 |  21,954 |        1.00 |
+| **[_direct_] longer~lead**      |   10.15 |  3,344.40 |           0.21 |            0.12 |    0.21 |    0.02 |   264 |   1,250 |        1.00 |
+| **[_direct_] longer~focal**     |   11.15 |  2,191.51 |           0.39 |            0.20 |    0.39 |    0.01 |   155 |     393 |        1.00 |
+| **[_direct_] longer~possible**  |    0.00 |     12.60 |           0.00 |            0.00 |    0.00 |    0.00 |    61 | 238,712 |        0.39 |
+| **[_direct_] longer~open**      |    0.00 |      6.96 |           0.00 |            0.00 |    0.00 |    0.00 |    51 | 220,078 |        0.32 |
+| **[_direct_] longer~available** |    0.00 |     -0.09 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    97 | 639,462 |       -0.03 |
+
+#### 6.3. _longer_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                                 |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |    `f2` |   `unexp_r` |
+|:--------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|--------:|------------:|
+| **[_direct_] longer~focal**     |   11.15 |  2,191.51 |           0.39 |            0.20 |    0.39 |    0.01 |   155 |     393 |        1.00 |
+| **[_direct_] longer~lead**      |   10.15 |  3,344.40 |           0.21 |            0.12 |    0.21 |    0.02 |   264 |   1,250 |        1.00 |
+| **[_direct_] longer~lasting**   |   10.11 | 43,975.64 |           0.31 |            0.24 |    0.16 |    0.31 | 3,545 |  21,954 |        1.00 |
+| **[_direct_] longer~open**      |    0.00 |      6.96 |           0.00 |            0.00 |    0.00 |    0.00 |    51 | 220,078 |        0.32 |
+| **[_direct_] longer~available** |    0.00 |     -0.09 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    97 | 639,462 |       -0.03 |
+| **[_direct_] longer~able**      |    0.00 |     14.39 |           0.00 |            0.00 |    0.00 |    0.00 |    57 | 210,786 |        0.42 |
+
+#### 6.4. _longer_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                                 |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |    `f2` |   `unexp_r` |
+|:--------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|--------:|------------:|
+| **[_direct_] longer~lasting**   |   10.11 | 43,975.64 |           0.31 |            0.24 |    0.16 |    0.31 | 3,545 |  21,954 |        1.00 |
+| **[_mirror_] longer~viable**    |    6.80 |    513.94 |           0.12 |            0.09 |    0.12 |    0.06 |    57 |     471 |        1.00 |
+| **[_mirror_] longer~lasting**   |    6.69 |    490.14 |           0.11 |            0.09 |    0.11 |    0.06 |    55 |     477 |        1.00 |
+| **[_direct_] longer~open**      |    0.00 |      6.96 |           0.00 |            0.00 |    0.00 |    0.00 |    51 | 220,078 |        0.32 |
+| **[_direct_] longer~available** |    0.00 |     -0.09 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    97 | 639,462 |       -0.03 |
+| **[_direct_] longer~able**      |    0.00 |     14.39 |           0.00 |            0.00 |    0.00 |    0.00 |    57 | 210,786 |        0.42 |
+
+
+---
+
+### 7. Sampling _ever_ context-blind bigram AMs
+
+#### 7.1. _ever_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                               |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] ever~olympic**   |    8.29 |  2,147.79 |           0.45 |            0.23 |    0.45 |    0.00 |   217 |       482 |        1.00 |
+| **[_direct_] ever~quarterly** |    8.09 |  1,356.24 |           0.45 |            0.23 |    0.45 |    0.00 |   137 |       304 |        1.00 |
+| **[_direct_] ever~watchful**  |    7.08 |  3,410.23 |           0.22 |            0.11 |    0.22 |    0.00 |   415 |     1,850 |        0.99 |
+| **[_direct_] ever~difficult** |   -3.20 | -1,760.84 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    65 |   729,385 |      -16.31 |
+| **[_direct_] ever~many**      |   -3.45 | -4,412.48 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   174 | 1,835,842 |      -15.27 |
+| **[_direct_] ever~much**      |   -3.75 | -3,428.62 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    88 | 1,336,122 |      -22.42 |
+
+#### 7.2. _ever_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                               |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] ever~closer**    |    6.25 | 42,481.90 |           0.11 |            0.08 |    0.11 |    0.06 | 6,269 |    55,736 |        0.99 |
+| **[_direct_] ever~present**   |    5.63 | 40,972.70 |           0.07 |            0.07 |    0.07 |    0.06 | 6,871 |    90,775 |        0.98 |
+| **[_direct_] ever~greater**   |    4.12 | 15,478.40 |           0.03 |            0.03 |    0.03 |    0.03 | 3,858 |   134,451 |        0.95 |
+| **[_direct_] ever~much**      |   -3.75 | -3,428.62 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    88 | 1,336,122 |      -22.42 |
+| **[_direct_] ever~important** |   -2.40 | -3,593.50 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   454 | 2,001,942 |       -5.80 |
+| **[_direct_] ever~many**      |   -3.45 | -4,412.48 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   174 | 1,835,842 |      -15.27 |
+
+#### 7.3. _ever_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                               |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] ever~olympic**   |    8.29 |  2,147.79 |           0.45 |            0.23 |    0.45 |    0.00 |   217 |       482 |        1.00 |
+| **[_direct_] ever~quarterly** |    8.09 |  1,356.24 |           0.45 |            0.23 |    0.45 |    0.00 |   137 |       304 |        1.00 |
+| **[_direct_] ever~watchful**  |    7.08 |  3,410.23 |           0.22 |            0.11 |    0.22 |    0.00 |   415 |     1,850 |        0.99 |
+| **[_direct_] ever~difficult** |   -3.20 | -1,760.84 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    65 |   729,385 |      -16.31 |
+| **[_direct_] ever~many**      |   -3.45 | -4,412.48 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   174 | 1,835,842 |      -15.27 |
+| **[_direct_] ever~much**      |   -3.75 | -3,428.62 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    88 | 1,336,122 |      -22.42 |
+
+#### 7.4. _ever_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                               |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] ever~closer**    |    6.25 | 42,481.90 |           0.11 |            0.08 |    0.11 |    0.06 | 6,269 |    55,736 |        0.99 |
+| **[_direct_] ever~present**   |    5.63 | 40,972.70 |           0.07 |            0.07 |    0.07 |    0.06 | 6,871 |    90,775 |        0.98 |
+| **[_mirror_] ever~easy**      |    2.33 |    789.83 |           0.06 |            0.04 |    0.02 |    0.06 |   369 |    18,697 |        0.85 |
+| **[_direct_] ever~important** |   -2.40 | -3,593.50 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   454 | 2,001,942 |       -5.80 |
+| **[_direct_] ever~many**      |   -3.45 | -4,412.48 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   174 | 1,835,842 |      -15.27 |
+| **[_direct_] ever~much**      |   -3.75 | -3,428.62 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    88 | 1,336,122 |      -22.42 |
+
+
+---
+
+### 8. Sampling _immediately_ context-blind bigram AMs
+
+#### 8.1. _immediately_ Highest and Lowest `LRC`
+
+(_tie-breaker: `G2`_)
+
+|                                       |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:--------------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] immediately~accretive**  |    8.59 |  2,435.26 |           0.45 |            0.23 |    0.45 |    0.00 |   237 |       527 |        1.00 |
+| **[_direct_] immediately~appealable** |    8.59 |    842.13 |           0.57 |            0.28 |    0.57 |    0.00 |    77 |       135 |        1.00 |
+| **[_direct_] immediately~adjacent**   |    8.36 | 14,989.71 |           0.33 |            0.17 |    0.33 |    0.02 | 1,572 |     4,711 |        1.00 |
+| **[_direct_] immediately~better**     |   -2.22 |   -941.99 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    97 |   600,470 |       -6.89 |
+| **[_direct_] immediately~different**  |   -3.33 | -1,655.25 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    50 |   802,192 |      -19.45 |
+| **[_direct_] immediately~important**  |   -4.08 | -4,413.42 |          -0.00 |           -0.01 |   -0.00 |   -0.03 |    87 | 2,001,942 |      -28.34 |
+
+#### 8.2. _immediately_ Highest and Lowest `G2`
+
+(_tie-breaker: `deltaP_max`_)
+
+|                                      |   `LRC` |       `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |    `f` |      `f2` |   `unexp_r` |
+|:-------------------------------------|--------:|-----------:|---------------:|----------------:|--------:|--------:|-------:|----------:|------------:|
+| **[_direct_] immediately~clear**     |    5.94 | 170,699.86 |           0.28 |            0.18 |    0.07 |    0.28 | 26,002 |   346,404 |        0.98 |
+| **[_direct_] immediately~available** |    4.93 | 129,075.81 |           0.26 |            0.15 |    0.04 |    0.26 | 24,769 |   639,462 |        0.97 |
+| **[_direct_] immediately~apparent**  |    6.17 |  32,633.82 |           0.09 |            0.07 |    0.09 |    0.05 |  4,864 |    53,415 |        0.99 |
+| **[_direct_] immediately~better**    |   -2.22 |    -941.99 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |     97 |   600,470 |       -6.89 |
+| **[_direct_] immediately~different** |   -3.33 |  -1,655.25 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |     50 |   802,192 |      -19.45 |
+| **[_direct_] immediately~important** |   -4.08 |  -4,413.42 |          -0.00 |           -0.01 |   -0.00 |   -0.03 |     87 | 2,001,942 |      -28.34 |
+
+#### 8.3. _immediately_ Highest and Lowest `dP1`
+
+(_tie-breaker: `LRC`_)
+
+|                                       |   `LRC` |      `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |
+|:--------------------------------------|--------:|----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|
+| **[_direct_] immediately~appealable** |    8.59 |    842.13 |           0.57 |            0.28 |    0.57 |    0.00 |    77 |       135 |        1.00 |
+| **[_direct_] immediately~accretive**  |    8.59 |  2,435.26 |           0.45 |            0.23 |    0.45 |    0.00 |   237 |       527 |        1.00 |
+| **[_direct_] immediately~adjacent**   |    8.36 | 14,989.71 |           0.33 |            0.17 |    0.33 |    0.02 | 1,572 |     4,711 |        1.00 |
+| **[_direct_] immediately~better**     |   -2.22 |   -941.99 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |    97 |   600,470 |       -6.89 |
+| **[_direct_] immediately~different**  |   -3.33 | -1,655.25 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |    50 |   802,192 |      -19.45 |
+| **[_direct_] immediately~important**  |   -4.08 | -4,413.42 |          -0.00 |           -0.01 |   -0.00 |   -0.03 |    87 | 2,001,942 |      -28.34 |
+
+#### 8.4. _immediately_ Highest and Lowest `dP2`
+
+(_tie-breaker: `LRC`_)
+
+|                                      |   `LRC` |       `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |    `f` |      `f2` |   `unexp_r` |
+|:-------------------------------------|--------:|-----------:|---------------:|----------------:|--------:|--------:|-------:|----------:|------------:|
+| **[_direct_] immediately~clear**     |    5.94 | 170,699.86 |           0.28 |            0.18 |    0.07 |    0.28 | 26,002 |   346,404 |        0.98 |
+| **[_direct_] immediately~available** |    4.93 | 129,075.81 |           0.26 |            0.15 |    0.04 |    0.26 | 24,769 |   639,462 |        0.97 |
+| **[_mirror_] immediately~available** |    4.85 |   1,546.24 |           0.23 |            0.13 |    0.03 |    0.23 |    273 |     9,846 |        0.97 |
+| **[_direct_] immediately~better**    |   -2.22 |    -941.99 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |     97 |   600,470 |       -6.89 |
+| **[_direct_] immediately~different** |   -3.33 |  -1,655.25 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |     50 |   802,192 |      -19.45 |
+| **[_direct_] immediately~important** |   -4.08 |  -4,413.42 |          -0.00 |           -0.01 |   -0.00 |   -0.03 |     87 | 2,001,942 |      -28.34 |
+
+
+```python
+hits_df = load_hit_table(
+    adv_set=set(adv_list), 
+    adv_floor=ADV_F_FLOOR, tag_top_dir=TAG_TOP_DIR, 
+    pos_hits=POS_HITS_PATH, neg_hits=NEG_HITS_PATH)
+
+```
+
+Saving as parquet
+  partitioned by `['adv_form_lower']`...
+
+| adv_form_lower   |   count |
+|:-----------------|--------:|
+| particularly     | 147,072 |
+| that             |  56,200 |
+| ever             |  31,759 |
+| yet              |  26,949 |
+| immediately      |  25,180 |
+| terribly         |  16,236 |
+| exactly          |  15,450 |
+| necessarily      |  13,392 |
+| any              |   8,869 |
+| remotely         |   4,491 |
+| longer           |   3,299 |
+
+> no more than 10,600 rows per individual `group-[#].parquet`
+  - max rows in writing batch = 5,301
+  - min rows in writing batch = 1,649
+
+✓ Sample of bigram tokens for `ALL-Top8[5000]`  successfully saved as  
+> "/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8adv_sample-hits_2024-08-06.parq"
+* Total time to write partitioned parquet ⇾  `00:00:00.457`
+
+
+<!-- 
+| adv_form_lower   |   count |
+|:-----------------|--------:|
+| particularly     | 101,341 |
+| that             |  53,554 |
+| longer           |  26,322 |
+| yet              |  22,946 |
+| immediately      |  22,486 |
+| ever             |  21,513 |
+| exactly          |  15,047 |
+| necessarily      |  12,891 |
+| terribly         |  12,762 |
+| any              |   7,948 |
+| remotely         |   3,656 |
+
+> no more than 9,100 rows per individual `group-[#].parquet`
+  - max rows in writing batch = 4,551
+  - min rows in writing batch = 1,517
+
+✓ Sample of bigram tokens for `ALL-Top8[5000]`  successfully saved as  
+> "/share/compling/projects/sanpi/results/top_AM/ALL/ALL-Top8/ALL-Top8adv_sample-hits_2024-08-05.parq"
+* Total time to write partitioned parquet ⇾  `00:00:01.161` 
+-->
+
+
+
+```python
+show_sample(hits_df.filter(['all_forms_lower', 'token_str']).sample(10).sort_values('all_forms_lower'))
+```
+
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | hit_id                | all_forms_lower            | token_str                                                    |
+    +=======================+============================+==============================================================+
+    | pcc_eng_26_073.6893_x | (+)_ever_entertaining      | If you want more insights from the great man check out this  |
+    | 1174857_22:18-19      |                            | 30 minute interview from the ever entertaining DP /30 .      |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_22_057.8335_x | (+)_ever_greater           | As easily extractable resources are depleted , seismic       |
+    | 0918665_14:22-23      |                            | surveys are continually spreading to more sensitive marine   |
+    |                       |                            | habitats and being conducted to ever greater depths .        |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_17_046.1819_x | (+)_particularly_impactful | Many life scientists utilize research tools built on         |
+    | 0729898_08:22-23      |                            | principles first explored and defined by physics , and mass  |
+    |                       |                            | spectrometry is a particularly impactful example .           |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_24_060.7330_x | (+)_particularly_intimate  | It 's a particularly intimate and personal way of killing    |
+    | 0966364_8:4-5         |                            | someone , versus shooting them from a distance away .        |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_27_032.5912_x | (+)_particularly_true      | This is particularly true for Detroit , where economic       |
+    | 0510089_02:3-4        |                            | crises have left large swathes of the city impoverished and  |
+    |                       |                            | with few prospects .                                         |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_29_092.5989_x | n't_that_great             | I will say that the user experience is n't that great .      |
+    | 1479638_461:09-10-11  |                            |                                                              |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_10_021.6081_x | n't_that_great             | Most people have a vague desire to make things better , on   |
+    | 0332918_21:20-22-23   |                            | the basis that the status quo is n't all that great .        |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_08_107.7935_x | not_that_bad               | Montreal has many secrets - rendez-vous locations , after-   |
+    | 1729064_19:27-28-29   |                            | hours parties - but let me tell you a secret about winter in |
+    |                       |                            | Montreal : it 's really not that bad .                       |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | nyt_eng_19981103_0113 | not_that_radical           | first , the conception is not all that radical by            |
+    | _29:6-8-9             |                            | contemporary standards .                                     |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+    | pcc_eng_03_002.3181_x | not_yet_sure               | Arsenal will welcome back Robin van Persie and Samir Nasri , |
+    | 0021303_05:22-23-24   |                            | who were banned for the last game though it is not yet sure  |
+    |                       |                            | whether or not Nasri will take part in the competition which |
+    |                       |                            | would make him cup-tied .                                    |
+    +-----------------------+----------------------------+--------------------------------------------------------------+
+
+
+
+```python
+# perspect_blam = (blam_df
+#                  .filter(regex=r'|'.join(adv_list[:5]), axis=0)
+#                  .filter(perspective_cols + adjust_am_names(FOCUS_DICT[TAG]['adv_adj']))
+#                  .filter(regex=r'^[^laN]').iloc[:,:14]
+#                  .sort_values(blind_priority_cols, ascending=False))
+# nb_show_table(pd.concat([perspect_blam.head(20), perspect_blam.tail(10)]))
+```
+
+```py
+perspect_blam = (blam_df
+                 .filter(regex=r'|'.join(adv_list[:5]), axis=0)
+                 .filter(perspective_cols + adjust_am_names(FOCUS_DICT[TAG]['adv_adj']))
+                 .filter(regex=r'^[^laN]').iloc[:,:14]
+                 .sort_values(blind_priority_cols, ascending=False))
+nb_show_table(pd.concat([perspect_blam.head(20), perspect_blam.tail(10)]))
+```
+
+|                                       |   `LRC` |       `G2` |   `deltaP_max` |   `deltaP_mean` |   `dP1` |   `dP2` |   `f` |      `f2` |   `unexp_r` |   `P1` |    `f1` |   `exp_f` |   `unexp_f` |   `P2` |
+|:--------------------------------------|--------:|-----------:|---------------:|----------------:|--------:|--------:|------:|----------:|------------:|-------:|--------:|----------:|------------:|-------:|
+| **[_direct_] remotely~detonated**     |   12.79 |   1,222.94 |           0.88 |            0.44 |    0.88 |    0.00 |    76 |        86 |        1.00 |   0.88 |  15,394 |      0.02 |       75.98 |   0.00 |
+| **[_direct_] remotely~exploitable**   |    8.86 |   1,595.53 |           0.15 |            0.08 |    0.15 |    0.01 |   142 |       964 |        1.00 |   0.15 |  15,394 |      0.21 |      141.79 |   0.01 |
+| **[_direct_] that~purported**         |    8.45 |     760.83 |           0.79 |            0.40 |    0.79 |    0.00 |    73 |        92 |        1.00 |   0.79 | 206,801 |      0.26 |       72.74 |   0.00 |
+| **[_direct_] necessarily~indicative** |    8.03 |  13,007.53 |           0.17 |            0.10 |    0.17 |    0.03 | 1,397 |     8,068 |        1.00 |   0.17 |  48,641 |      5.45 |    1,391.55 |   0.03 |
+| **[_mirror_] exactly~alike**          |    7.69 |     822.85 |           0.20 |            0.14 |    0.20 |    0.08 |    83 |       408 |        1.00 |   0.20 |   1,031 |      0.25 |       82.75 |   0.08 |
+| **[_direct_] any~happier**            |    6.83 |   7,387.71 |           0.06 |            0.04 |    0.06 |    0.03 |   942 |    16,177 |        0.99 |   0.06 |  32,161 |      7.23 |      934.77 |   0.03 |
+| **[_direct_] exactly~alike**          |    6.64 |   5,879.14 |           0.09 |            0.05 |    0.09 |    0.01 |   776 |     8,804 |        0.99 |   0.09 |  56,109 |      6.86 |      769.14 |   0.01 |
+| **[_direct_] any~clearer**            |    6.57 |   4,447.68 |           0.05 |            0.03 |    0.05 |    0.02 |   586 |    11,328 |        0.99 |   0.05 |  32,161 |      5.06 |      580.94 |   0.02 |
+| **[_direct_] remotely~comparable**    |    5.88 |   1,577.01 |           0.02 |            0.02 |    0.02 |    0.01 |   226 |    12,202 |        0.99 |   0.02 |  15,394 |      2.61 |      223.39 |   0.01 |
+| **[_direct_] any~closer**             |    5.85 |  10,386.72 |           0.05 |            0.04 |    0.03 |    0.05 | 1,611 |    55,736 |        0.98 |   0.03 |  32,161 |     24.91 |    1,586.09 |   0.05 |
+| **[_direct_] exactly~opposite**       |    5.82 |   3,087.08 |           0.05 |            0.03 |    0.05 |    0.01 |   467 |     8,461 |        0.99 |   0.06 |  56,109 |      6.60 |      460.40 |   0.01 |
+| **[_direct_] exactly~right**          |    5.79 |  39,335.77 |           0.11 |            0.08 |    0.04 |    0.11 | 6,269 |   141,227 |        0.98 |   0.04 |  56,109 |    110.12 |    6,158.88 |   0.11 |
+| **[_mirror_] any~closer**             |    5.63 |     482.27 |           0.07 |            0.06 |    0.07 |    0.06 |    66 |       972 |        0.99 |   0.07 |   1,169 |      0.68 |       65.32 |   0.06 |
+| **[_direct_] any~cuter**              |    5.59 |     561.09 |           0.04 |            0.02 |    0.04 |    0.00 |    78 |     1,819 |        0.99 |   0.04 |  32,161 |      0.81 |       77.19 |   0.00 |
+| **[_direct_] necessarily~cause**      |    5.48 |     385.16 |           0.07 |            0.04 |    0.07 |    0.00 |    52 |       730 |        0.99 |   0.07 |  48,641 |      0.49 |       51.51 |   0.00 |
+| **[_direct_] any~safer**              |    5.46 |   3,341.26 |           0.02 |            0.02 |    0.02 |    0.02 |   547 |    22,065 |        0.98 |   0.02 |  32,161 |      9.86 |      537.14 |   0.02 |
+| **[_direct_] any~worse**              |    5.45 |  21,231.52 |           0.11 |            0.07 |    0.02 |    0.11 | 3,606 |   170,565 |        0.98 |   0.02 |  32,161 |     76.23 |    3,529.77 |   0.11 |
+| **[_direct_] exactly~sure**           |    5.42 |  51,388.70 |           0.15 |            0.09 |    0.03 |    0.15 | 8,840 |   256,817 |        0.98 |   0.03 |  56,109 |    200.24 |    8,639.76 |   0.16 |
+| **[_direct_] any~truer**              |    5.39 |     403.92 |           0.04 |            0.02 |    0.04 |    0.00 |    56 |     1,293 |        0.99 |   0.04 |  32,161 |      0.58 |       55.42 |   0.00 |
+| **[_direct_] any~wiser**              |    5.27 |     669.52 |           0.03 |            0.02 |    0.03 |    0.00 |   102 |     3,253 |        0.99 |   0.03 |  32,161 |      1.45 |      100.55 |   0.00 |
+| **[_direct_] necessarily~important**  |   -2.04 |  -1,454.70 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   231 | 2,001,942 |       -4.86 |   0.00 |  48,641 |  1,353.18 |   -1,122.18 |   0.00 |
+| **[_direct_] that~proud**             |   -2.08 |    -717.44 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    79 |   207,420 |       -6.55 |   0.00 | 206,801 |    596.08 |     -517.08 |   0.00 |
+| **[_direct_] that~easier**            |   -2.19 |    -752.57 |          -0.00 |           -0.00 |   -0.00 |   -0.00 |    72 |   208,626 |       -7.33 |   0.00 | 206,801 |    599.54 |     -527.54 |   0.00 |
+| **[_direct_] that~better**            |   -2.40 |  -2,074.81 |          -0.00 |           -0.00 |   -0.00 |   -0.01 |   231 |   600,470 |       -6.47 |   0.00 | 206,801 |  1,725.62 |   -1,494.62 |   0.00 |
+| **[_direct_] exactly~much**           |   -3.30 |  -1,680.26 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    53 | 1,336,122 |      -18.66 |   0.00 |  56,109 |  1,041.79 |     -988.79 |   0.00 |
+| **[_direct_] ever~many**              |   -3.45 |  -4,412.48 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   174 | 1,835,842 |      -15.27 |   0.00 | 110,979 |  2,831.24 |   -2,657.24 |   0.00 |
+| **[_direct_] exactly~many**           |   -3.72 |  -2,429.77 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |    55 | 1,835,842 |      -25.03 |   0.00 |  56,109 |  1,431.42 |   -1,376.42 |   0.00 |
+| **[_direct_] that~likely**            |   -3.76 |  -4,169.01 |          -0.00 |           -0.01 |   -0.00 |   -0.01 |   116 |   884,149 |      -20.90 |   0.00 | 206,801 |  2,540.85 |   -2,424.85 |   0.00 |
+| **[_direct_] yet~many**               |   -3.85 |  -4,058.31 |          -0.00 |           -0.01 |   -0.00 |   -0.02 |   100 | 1,835,842 |      -23.17 |   0.00 |  94,755 |  2,417.34 |   -2,317.34 |   0.00 |
+| **[_direct_] particularly~many**      |   -6.54 | -25,574.55 |          -0.01 |           -0.02 |   -0.01 |   -0.03 |    79 | 1,835,842 |     -164.25 |   0.00 | 511,734 | 13,055.10 |  -12,976.10 |   0.00 |
+
+
+
+
+```python
+# print(timestamp_today())
+# for adverb in adv_am.index:
+#     sample_adv_bigrams(
+#         adverb, data_tag=TAG, verbose=True,
+#         amdf=blam_df, hits_df=hits_df,
+#         n_top_bigrams=BK, bigram_floor=BIGRAM_F_FLOOR)
+```
+
+```python
+print(timestamp_today())
+for adverb in adv_am.index:
+    sample_adv_bigrams(
+        adverb, data_tag=TAG, verbose=True,
+        amdf=blam_df, hits_df=hits_df,
+        n_top_bigrams=BK, bigram_floor=BIGRAM_F_FLOOR)
+```
+
+2024-08-06
+
+## *necessarily*
+
+
+|                                           |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1`        | `l2`           |   `f1` |    `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:------------------------------------------|------:|------:|------:|-----:|----------:|:------------|:---------------|-------:|--------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] necessarily~indicative**     | 1,397 |  0.17 |  8.03 | 0.17 | 13,007.53 | necessarily | indicative     | 48,641 |   8,068 | 71,961,373 |    5.45 |  1,391.55 |      1.00 |  0.03 | 0.03 |         0.17 |          0.10 |          2.50 | 37.23 | 2.41 | direct    |
+| **[_direct_] necessarily~cause**          |    52 |  0.07 |  5.48 | 0.07 |    385.16 | necessarily | cause          | 48,641 |     730 | 71,961,373 |    0.49 |     51.51 |      0.99 |  0.00 | 0.00 |         0.07 |          0.04 |          2.06 |  7.14 | 2.02 | direct    |
+| **[_direct_] necessarily~representative** |   491 |  0.03 |  4.97 | 0.03 |  2,682.51 | necessarily | representative | 48,641 |  18,160 | 71,961,373 |   12.27 |    478.73 |      0.98 |  0.01 | 0.01 |         0.03 |          0.02 |          1.62 | 21.60 | 1.60 | direct    |
+| **[_direct_] necessarily~predictive**     |    57 |  0.02 |  3.92 | 0.02 |    296.30 | necessarily | predictive     | 48,641 |   2,401 | 71,961,373 |    1.62 |     55.38 |      0.97 |  0.00 | 0.00 |         0.02 |          0.01 |          1.56 |  7.33 | 1.55 | direct    |
+| **[_direct_] necessarily~incompatible**   |   111 |  0.02 |  4.13 | 0.02 |    550.94 | necessarily | incompatible   | 48,641 |   5,273 | 71,961,373 |    3.56 |    107.44 |      0.97 |  0.00 | 0.00 |         0.02 |          0.01 |          1.51 | 10.20 | 1.49 | direct    |
+| **[_direct_] necessarily~synonymous**     |   167 |  0.02 |  4.30 | 0.02 |    827.81 | necessarily | synonymous     | 48,641 |   7,964 | 71,961,373 |    5.38 |    161.62 |      0.97 |  0.00 | 0.00 |         0.02 |          0.01 |          1.50 | 12.51 | 1.49 | direct    |
+| **[_direct_] necessarily~reflective**     |   183 |  0.02 |  3.97 | 0.02 |    818.65 | necessarily | reflective     | 48,641 |  11,190 | 71,961,373 |    7.56 |    175.44 |      0.96 |  0.00 | 0.00 |         0.02 |          0.01 |          1.39 | 12.97 | 1.38 | direct    |
+| **[_direct_] necessarily~incomplete**     |   122 |  0.02 |  3.79 | 0.02 |    543.08 | necessarily | incomplete     | 48,641 |   7,541 | 71,961,373 |    5.10 |    116.90 |      0.96 |  0.00 | 0.00 |         0.02 |          0.01 |          1.39 | 10.58 | 1.38 | direct    |
+| **[_direct_] necessarily~wiser**          |    51 |  0.02 |  3.23 | 0.02 |    223.86 | necessarily | wiser          | 48,641 |   3,253 | 71,961,373 |    2.20 |     48.80 |      0.96 |  0.00 | 0.00 |         0.02 |          0.01 |          1.38 |  6.83 | 1.37 | direct    |
+| **[_direct_] necessarily~true**           | 3,437 |  0.01 |  4.36 | 0.02 | 15,076.33 | necessarily | true           | 48,641 | 227,128 | 71,961,373 |  153.52 |  3,283.48 |      0.96 |  0.07 | 0.07 |         0.07 |          0.04 |          1.39 | 56.01 | 1.35 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/ALL-necessarily_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _necessarily indicative_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                 |
+|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_09_030.0856_x0470876_041:13-14-15`** | The interim results reflected in the unaudited condensed consolidated financial statements are not __``necessarily indicative``__ of expected results for the full year .                                                   |
+| **`pcc_eng_10_042.0474_x0664123_52:16-17-18`**  | However , the nature of this relationship is complex , and measurement of BR is not __``necessarily indicative``__ of PR .                                                                                                  |
+| **`nyt_eng_20000112_0376_19:18-19-20`**         | `` Headlong flight _ wherever it occurs _ is the consummate act of evasion : it is not __``necessarily indicative``__ of wrongdoing , but it is certainly suggestive of such , '' he said .                                 |
+| **`pcc_eng_20_081.4736_x1300144_053:11-12-13`** | The results of operations for the interim periods presented are not __``necessarily indicative``__ of the results expected for the entire year .                                                                            |
+| **`pcc_eng_27_059.5415_x0946245_268:5-6-7`**    | While the result is n't __``necessarily indicative``__ of things to come , it seems to have had a lasting effect on the mindset and subsequent performance of Matt Schaub .                                                 |
+| **`pcc_eng_08_076.8108_x1227469_36:12-13-14`**  | The previous overall performance of any trading system or methodology is not __``necessarily indicative``__ of                                                                                                              |
+| **`pcc_eng_25_009.3045_x0134450_37:4-5-6`**     | This research is not __``necessarily indicative``__ of the population as a whole ; in fact , it is probably an underestimate .                                                                                              |
+| **`pcc_eng_01_065.6198_x1045215_23:6-7-8`**     | The pro forma data is not __``necessarily indicative``__ of what the Company 's financial position or results of operations actually would have been had the Company completed the transactions as of the dates indicated . |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_indicative_ex.md`
+
+
+### 2. _necessarily cause_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                      |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_00_067.7784_x1079285_18:17-18-19`** | While it appears problematic , economists with the federal government say a negative savings rate is n't __``necessarily cause``__ for concern .                                                                                 |
+| **`pcc_eng_08_103.7341_x1663397_40:10-11-12`** | Small changes in color , smell or taste are not __``necessarily cause``__ for alarm , adds Dr. Goldstone .                                                                                                                       |
+| **`pcc_eng_11_068.0100_x1084620_43:3-4-5`**    | This is not __``necessarily cause``__ for concern .                                                                                                                                                                              |
+| **`pcc_eng_test_2.05409_x24786_01:11-12-13`**  | The likes of botulism and anthrax in the air are n't __``necessarily cause``__ for alarm .                                                                                                                                       |
+| **`pcc_eng_09_080.7578_x1290219_66:19-20-21`** | So , a mild and gradual loss of weight and body mass in an older greyhound , is not __``necessarily cause``__ for concern , particularly if the dog is vetted routinely , and there are no symptoms of distress or dysfunction . |
+| **`pcc_eng_15_012.6241_x0187604_4:3-4-5`**     | This is not __``necessarily cause``__ for alarm .                                                                                                                                                                                |
+| **`pcc_eng_02_098.4559_x1575696_01:4-5-6`**    | This change is not __``necessarily cause``__ for a meltdown : Wait and taste the 42 % before you freak out .                                                                                                                     |
+| **`pcc_eng_05_089.5717_x1432874_45:11-12-13`** | A test showing small amphetamine concentrations in your body is not __``necessarily cause``__ for alarm .                                                                                                                        |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_cause_ex.md`
+
+
+### 3. _necessarily representative_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                                                                                     |
+|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_21_017.7401_x0270204_10:5-6-7`**     | While these families are not __``necessarily representative``__ of the total sample , they illustrate recurring themes : households struggling with income volatility , unplanned expenses , and finding ways to save and invest , but also using creative -- and sometimes counterintuitive -- budget and money management strategies to help make ends meet . |
+| **`pcc_eng_29_085.9236_x1371750_35:35-36-37`**  | In such a case , one should not include very small groups in such a comparison , since the individual test-taker has a disproportionate influence on the average , and thus the average is not __``necessarily representative``__ of all potential test-takers fromthat language .                                                                              |
+| **`pcc_eng_16_050.7947_x0806065_24:6-7-8`**     | However , the NFSS is n't __``necessarily representative``__ of the current situation either .                                                                                                                                                                                                                                                                  |
+| **`pcc_eng_09_039.7110_x0626514_02:4-5-6`**     | My characters are not __``necessarily representative``__ of the communities in which they live , and I will not hesitate to make them Armenian or Catholic or Pakistani , even if they 're not portrayed as perfectly emblematic of Armenians , Catholics or Pakistanis as a whole .                                                                            |
+| **`pcc_eng_05_033.2076_x0521749_274:08-09-10`** | Also , research done on powerlifters is not __``necessarily representative``__ of anyone else who should deadlift .                                                                                                                                                                                                                                             |
+| **`pcc_eng_22_007.0094_x0096898_121:4-5-6`**    | The sample is not __``necessarily representative``__ , for people have many reasons to click " like " on the movement 's well - tailored page -- I have been following Casa Pound for several years -- but the report observes that Casa Pound 's supporters tend to be male and tend to distrust institutions .                                                |
+| **`pcc_eng_06_108.8997_x1745532_27:35-36-37`**  | The polling industry 's professional body , the Marketing Research and Intelligence Association , says online surveys cannot be assigned a margin of error as they are not a random sample and therefore are not __``necessarily representative``__ of the whole population .                                                                                   |
+| **`pcc_eng_11_098.5959_x1579848_18:11-12-13`**  | Top dating sites for lesbians Mingle dating site Experiences are not __``necessarily representative``__ of , credits for an hour is all that online dating really something works both you , but he has no say in how .                                                                                                                                         |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_representative_ex.md`
+
+
+### 4. _necessarily predictive_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                    |
+|:------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_29_097.7421_x1563023_31:7-8-9`**     | That said , these results are not __``necessarily predictive``__ of any case .                                                                                                                                                                                                 |
+| **`pcc_eng_29_031.5709_x0493344_044:7-8-9`**    | Assuming SEC prices , which are not __``necessarily predictive``__ of forward strip prices , the pre-tax present value discounted at 10 % ( " pre-tax PV - 10 " ) of the December 31 , 2016 estimated proved reserves was $ 3.7 billion , a 1 % increase from year- end 2015 . |
+| **`pcc_eng_23_083.8751_x1339268_06:5-6-7`**     | Animal model outcomes are not __``necessarily predictive``__ of human results and should , therefore , be interpreted cautiously with respect to potential applicability to human conditions .                                                                                 |
+| **`pcc_eng_16_029.7005_x0464510_11:12-13-14`**  | We note that this is only one data point and is not __``necessarily predictive``__ of 1Q performance .                                                                                                                                                                         |
+| **`pcc_eng_03_037.7182_x0594676_10:14-15-16`**  | One of the biggest problems with all rating systems is that they are not __``necessarily predictive``__ in nature .                                                                                                                                                            |
+| **`pcc_eng_18_086.5054_x1384629_026:21-22-23`** | There are varying degrees of offensive prowess sprinkled throughout the list of the hardest-hitters in baseball , so it is n't __``necessarily predictive``__ of anything other than solid-average offense - but it 's a good sign nevertheless .                              |
+| **`pcc_eng_01_102.6723_x1643252_091:4-5-6`**    | The number is not __``necessarily predictive``__ because Democrats are typically more likely to vote early than Republicans "                                                                                                                                                  |
+| **`pcc_eng_01_041.9764_x0662242_26:09-11-12`**  | The system , the article says , was not " __``necessarily predictive``__ of academic trouble .                                                                                                                                                                                 |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_predictive_ex.md`
+
+
+### 5. _necessarily incompatible_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                                                                                         |
+|:------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_17_059.0826_x0938273_15:4-5-6`**     | These are all not __``necessarily incompatible``__ , and neither are culture and traveling uninteresting ; but he implied that I 've become much less interested in the world at large , from a socio-economic perspective , as a result of a never-ending Travelife , and therefore less stimulating company at dinner .                                           |
+| **`pcc_eng_19_075.0718_x1196624_05:55-56-57`**  | However , what makes " Life Forms and Meaning Structure " of a particular interest for a phenomenologist , besides all the other points , is to see why and how Schutz displays dissatisfaction with , up to those days available , phenomenological analyses and how Schutz would progress with an alternative ( but not __``necessarily incompatible``__ ) path . |
+| **`pcc_eng_25_008.4050_x0120105_66:11-12-13`**  | Though independent of cultures , the Gospel and evangelization are not __``necessarily incompatible``__ with them ; rather they are capable of permeating them all without becoming subject to any one of them .                                                                                                                                                    |
+| **`nyt_eng_19970620_0504_16:16-17-18`**         | in a 3-0 decision , the panel said the officer 's Social Security application was n't __``necessarily incompatible``__ with his ADA claim , because Social Security does n't focus on whether a reasonable accommodation would allow him to work .                                                                                                                  |
+| **`pcc_eng_02_038.3155_x0603758_19:17-18-19`**  | Poland needs the creation and development of more and larger domestic companies , but this is not __``necessarily incompatible``__ with the need to attract and retain foreign investment .                                                                                                                                                                         |
+| **`apw_eng_20090520_0695_5:14-15-16`**          | but Schiffer says the countries ' interests in the crucial region `` are not __``necessarily incompatible``__ . ''                                                                                                                                                                                                                                                  |
+| **`pcc_eng_23_096.7808_x1547968_167:08-09-10`** | I have always maintained that technology is not __``necessarily incompatible``__ with the preservation of our values and freedoms .                                                                                                                                                                                                                                 |
+| **`pcc_eng_03_031.4026_x0492406_4:34-35-36`**   | Beyond funding , others have raised worries that an FPL plan for 100 - foot new towers along U.S. 1 could also imperil the idea , though FPL says the two projects are n't __``necessarily incompatible``__ .                                                                                                                                                       |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_incompatible_ex.md`
+
+
+### 6. _necessarily synonymous_
+
+
+|                                                | `token_str`                                                                                                                                                                                                 |
+|:-----------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_064.6241_x1029721_07:13-14-15`** | I judiciously and perhaps generously decided that being a good attorney was not __``necessarily synonymous``__ with being a good liar , even though I have seen Johnny Cochran in action .                  |
+| **`pcc_eng_27_058.0485_x0922129_10:23-24-25`** | On Causes , a cause can be started by anyone , whether an organization or an individual , and a cause is not __``necessarily synonymous``__ with a specific nonprofit .                                     |
+| **`pcc_eng_09_042.5969_x0672943_21:11-12-13`** | Hair that grows -- Hair growth and hair length are not __``necessarily synonymous``__ .                                                                                                                     |
+| **`pcc_eng_09_004.9862_x0064763_21:7-8-9`**    | Keep in mind that praise is not __``necessarily synonymous``__ with " nice . "                                                                                                                              |
+| **`pcc_eng_09_089.7942_x1436727_08:18-19-20`** | From bassheads and trance addicts to festival bros and flag-wavers , stages were drawing crowds that were n't __``necessarily synonymous``__ with any particular artist 's following .                      |
+| **`pcc_eng_11_066.7502_x1064204_31:30-31-32`** | And this discussion always seems to come back to what we find attractive and appealing , instead of what we know to be healthy ( which research shows is not __``necessarily synonymous``__ with thin ) .   |
+| **`pcc_eng_05_037.6873_x0594044_34:17-18-19`** | Series is an experiment ; an effort to bring attention to the fact that Disability is n't __``necessarily synonymous``__ with Ugly - as in Ugly Laws , which proliferated this country for over a century . |
+| **`pcc_eng_06_076.1175_x1214893_08:13-14-15`** | However , acknowledging the aforementioned and actively seeking out a relationship are not __``necessarily synonymous``__ - and I can be the first one to [...]                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_synonymous_ex.md`
+
+
+### 7. _necessarily reflective_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                        |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_18_086.9264_x1391477_46:4-5-6`**     | Narratives are therefore not __``necessarily reflective``__ of reality .                                                                                                                                                                           |
+| **`pcc_eng_01_090.9465_x1454416_14:29-30-31`**  | Rav Shteinman is in the Intensive Care Unit because , Dr. Weinberg explained , the centenarian gadol can receive more comprehensive treatment there ; the ICU location is not __``necessarily reflective``__ of his health status , he explained . |
+| **`pcc_eng_01_034.6986_x0544460_175:15-16-17`** | Opinions of the roundtable participants are the opinions of each individual contributor and are not __``necessarily reflective``__ of their respective companies .                                                                                 |
+| **`pcc_eng_12_033.1471_x0520304_40:08-09-10`**  | These views are the author 's and not __``necessarily reflective``__ of the Tribune 's views .                                                                                                                                                     |
+| **`pcc_eng_08_071.4225_x1140309_46:19-20-21`**  | NOTE : It is important that the donor understands these are hypothetical allocations of the money , and not __``necessarily reflective``__ of where the money goes directly from them .                                                            |
+| **`pcc_eng_08_043.2554_x0683868_51:13-14-15`**  | The views and opinions expressed in his column are his own and not __``necessarily reflective``__ of any organizations he works for .                                                                                                              |
+| **`pcc_eng_04_072.2843_x1151335_15:17-18-19`**  | On the Arab street , however , a new image of Turkey is emerging that is not __``necessarily reflective``__ of a realistic reading of the policies and statements made in Ankara .                                                                 |
+| **`pcc_eng_14_088.5171_x1414621_38:14-15-16`**  | Prior to this , the information may be less complete , and therefore not __``necessarily reflective``__ of the true rate of cancer .                                                                                                               |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_reflective_ex.md`
+
+
+### 8. _necessarily incomplete_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                                                                                |
+|:--------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_17_063.0284_x1001966_34:5-6`**   | Particularly interesting , although __``necessarily incomplete``__ , are the statistical tables for the various types of words which are attested .                                                                                                                                                                                                        |
+| **`pcc_eng_24_096.8717_x1550685_06:17-18`** | and third , preliminary assessments of the voting process in this year 's general election are __``necessarily incomplete``__ , since provisional ballots have yet to be counted and other aspects of the process remain unfinished ( a point I made in my own previous post in this series ) .                                                            |
+| **`pcc_eng_12_004.6036_x0058018_04:5-6`**   | Treatment is expensive and __``necessarily incomplete``__ .                                                                                                                                                                                                                                                                                                |
+| **`pcc_eng_15_006.6985_x0091939_30:37-38`** | But such a reading would only suit too well the Stuff White People Like cliche of San Francisco -- the city as an affluent , gentrified playground -- which in certain respects is true , albeit __``necessarily incomplete``__ .                                                                                                                          |
+| **`pcc_eng_19_036.0071_x0565261_32:19-20`** | Under a policy regime which stops these conditions being properly examined or reported , getting this kind of __``necessarily incomplete``__ but deeply revealing personal insight is extremely powerful .                                                                                                                                                 |
+| **`pcc_eng_25_107.5458_x1724156_8:15-16`**  | Debates about the future equity and sustainability of the health and welfare systems are __``necessarily incomplete``__ without a serious discussion about the design , impacts and sustainability of social insurance schemes .                                                                                                                           |
+| **`pcc_eng_23_010.5425_x0154066_02:13-14`** | Here 's a helpful ( ahem , Pete Prisco ) , but __``necessarily incomplete``__ timeline of concussion research and the NFL 's response .                                                                                                                                                                                                                    |
+| **`pcc_eng_08_059.7093_x0950737_45:31-32`** | It is difficult to believe in both Creation and a history of life that is based on scientific theories that have been formulated from geological evidence ; evidence that is __``necessarily incomplete``__ given that there is no way to analyze every single crack , crevice , layer , and water depth that comprise the complex environments of Earth . |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_incomplete_ex.md`
+
+
+### 9. _necessarily wiser_
+
+
+|                                                 | `token_str`                                                                                                                                                                      |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_02_091.6736_x1466000_126:14-15-16`** | Kyren are taller , slimmer , more attractive , and intelligent ( though not __``necessarily wiser``__ ) than other goblins .                                                     |
+| **`pcc_eng_04_076.2278_x1214949_10:27-28-29`**  | Today the generational divide opened up to me again on this subject , this time with me sitting on the side of the elder - although not __``necessarily wiser``__ , generation . |
+| **`pcc_eng_17_108.00939_x1732468_55:22-23-24`** | At the beginning we are thrust into strange territory , and by the end we are back on familiar grounds , not __``necessarily wiser``__ but definitely changed .                  |
+| **`pcc_eng_25_045.7341_x0724136_17:12-13-14`**  | Campbell confirmed that he would star as an older , but not __``necessarily wiser``__ , Ash .                                                                                    |
+| **`pcc_eng_19_072.8203_x1160118_17:17-18-19`**  | Yet his failure to alert the children 's parents of their intentions may prove older is not __``necessarily wiser``__ .                                                          |
+| **`pcc_eng_25_081.1930_x1298308_21:7-8-9`**     | We find an older - but not __``necessarily wiser``__ - Ash strapping himself in , but not to a chainsaw / shotgun brace , rather a man size girdle .                             |
+| **`pcc_eng_26_003.6055_x0041889_229:16-17-18`** | I 'm inclined to say no simply because he 's much older now - although not __``necessarily wiser``__ - but he may not have the energy and resolve for that kind of move .        |
+| **`pcc_eng_03_007.1202_x0098909_25:17-18-19`**  | You 'd like to know that the person you 're talking to is older , if not __``necessarily wiser``__ , and has a little perspective on what looks terribly scary . "               |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_wiser_ex.md`
+
+
+### 10. _necessarily true_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                   |
+|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_056.1805_x0890578_13:3-4-5`**     | This is n't __``necessarily true``__ though - it can mean a whole range of different things , for example :                                                                                                                                                                                   |
+| **`pcc_eng_19_042.0713_x0663043_028:26-27-28`** | I found my greatest success when I told myself that I could offer them as much as they , I . Even if it is n't __``necessarily true``__ , that perspective puts the two groups on equal footing .                                                                                             |
+| **`pcc_eng_12_035.0106_x0550205_21:20-21-22`**  | " A lot of them think we 're just sitting there and drawing a salary , but that 's not __``necessarily true``__ . "                                                                                                                                                                           |
+| **`pcc_eng_10_043.4239_x0686500_04:4-5-6`**     | But this is not __``necessarily true``__ .                                                                                                                                                                                                                                                    |
+| **`pcc_eng_15_006.8082_x0093715_20:38-39-40`**  | It could be that both groups lost 5 lbs of fat , but the high- carbohydrate group gained 2lbs in water , therefore allotting for the results of the study , but showing that the conclusion was not __``necessarily true``__ .                                                                |
+| **`apw_eng_19971210_1504_23:08-09-10`**         | what is true for New York is not __``necessarily true``__ for London and for Cairo .                                                                                                                                                                                                          |
+| **`pcc_eng_29_002.9234_x0031048_60:10-11-12`**  | Net neutrality proponents have pointed out that this is n't __``necessarily true``__ , as the FCC can issue Title II rules on Internet service without enforcing every possible Title II rule .                                                                                               |
+| **`pcc_eng_29_099.1804_x1586329_033:55-56-57`** | There 's are all kinds of guest ranches out there , from the hokey , git-along - lil ' - doggies , tenderfoot tourist mills ( this is just a personal quirk , but I tend to think of these places as " dude , " rather than guest ranches , although that 's not __``necessarily true``__ ) . |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_true_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/`...
+* Renaming existing version of `necessarily_indicative_80ex~80.csv`
+* Renaming existing version of `necessarily_representative_80ex~80.csv`
+* Renaming existing version of `necessarily_true_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_indicative_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_cause_80ex~10.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_representative_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_predictive_80ex~20.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_incompatible_80ex~29.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_synonymous_80ex~49.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_reflective_80ex~49.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_incomplete_80ex~30.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_wiser_80ex~15.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/necessarily/necessarily_true_80ex~80.csv`
+
+## *that*
+
+
+|                                |    `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1` | `l2`       |    `f1` |    `f2` |        `N` |  `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |    `t` | `MI` | `dataset` |
+|:-------------------------------|-------:|------:|------:|-----:|----------:|:-----|:-----------|--------:|--------:|-----------:|---------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|-------:|-----:|:----------|
+| **[_direct_] that~purported**  |     73 |  0.79 |  8.45 | 0.79 |    760.83 | that | purported  | 206,801 |      92 | 71,961,373 |     0.26 |     72.74 |      1.00 |  0.00 | 0.00 |         0.79 |          0.40 |          3.12 |   8.51 | 2.44 | direct    |
+| **[_direct_] that~uncommon**   |    804 |  0.07 |  4.45 | 0.07 |  3,696.56 | that | uncommon   | 206,801 |  11,144 | 71,961,373 |    32.03 |    771.97 |      0.96 |  0.00 | 0.00 |         0.07 |          0.04 |          1.43 |  27.23 | 1.40 | direct    |
+| **[_direct_] that~farfetched** |     92 |  0.07 |  3.75 | 0.07 |    419.72 | that | farfetched | 206,801 |   1,296 | 71,961,373 |     3.72 |     88.28 |      0.96 |  0.00 | 0.00 |         0.07 |          0.03 |          1.43 |   9.20 | 1.39 | direct    |
+| **[_direct_] that~dissimilar** |    307 |  0.06 |  4.13 | 0.07 |  1,363.48 | that | dissimilar | 206,801 |   4,598 | 71,961,373 |    13.21 |    293.79 |      0.96 |  0.00 | 0.00 |         0.06 |          0.03 |          1.40 |  16.77 | 1.37 | direct    |
+| **[_mirror_] that~great**      |    340 |  0.06 |  3.89 | 0.06 |  1,395.60 | that | great      |   5,465 |   5,513 |  1,680,633 |    17.93 |    322.07 |      0.95 |  0.06 | 0.06 |         0.06 |          0.06 |          1.33 |  17.47 | 1.28 | mirror    |
+| **[_direct_] that~bad**        | 19,613 |  0.04 |  4.01 | 0.05 | 74,557.57 | that | bad        | 206,801 | 425,797 | 71,961,373 | 1,223.65 | 18,389.35 |      0.94 |  0.09 | 0.09 |         0.09 |          0.07 |          1.26 | 131.31 | 1.20 | direct    |
+| **[_direct_] that~great**      | 11,740 |  0.04 |  3.71 | 0.04 | 40,086.00 | that | great      | 206,801 | 306,251 | 71,961,373 |   880.10 | 10,859.90 |      0.93 |  0.05 | 0.06 |         0.05 |          0.04 |          1.16 | 100.23 | 1.13 | direct    |
+| **[_direct_] that~hard**       | 10,373 |  0.03 |  3.32 | 0.03 | 30,367.38 | that | hard       | 206,801 | 349,907 | 71,961,373 | 1,005.55 |  9,367.44 |      0.90 |  0.05 | 0.05 |         0.05 |          0.04 |          1.05 |  91.97 | 1.01 | direct    |
+| **[_direct_] that~gullible**   |     71 |  0.03 |  2.29 | 0.03 |    203.93 | that | gullible   | 206,801 |   2,413 | 71,961,373 |     6.93 |     64.07 |      0.90 |  0.00 | 0.00 |         0.03 |          0.01 |          1.03 |   7.60 | 1.01 | direct    |
+| **[_mirror_] that~bad**        |    300 |  0.03 |  2.76 | 0.03 |    810.78 | that | bad        |   5,465 |  10,150 |  1,680,633 |    33.01 |    266.99 |      0.89 |  0.05 | 0.05 |         0.05 |          0.04 |          0.99 |  15.41 | 0.96 | mirror    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/ALL-that_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _that purported_
+
+
+|                                      | `token_str`                                                                                                                                                                                                                                                                                                                       |
+|:-------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20010508_0228_20:12-13`** | last month , another group of researchers described an unpublished study __``that purported``__ to show that children who spend most of their time in child care are three times as likely to exhibit behavioral problems in kindergarten as those who are cared for primarily by their mothers .                                 |
+| **`nyt_eng_20000908_0442_11:28-29`** | the Democratic television ad , which began appearing Friday , reprises a `` man in the street '' style that the party used in an earlier commercial __``that purported``__ to show everyday New Yorkers reacting in shock and dismay at Lazio 's positions on health care and other topics .                                      |
+| **`apw_eng_20051127_0316_21:18-19`** | Piers Morgan , the editor of the Daily Mirror , stepped down last year after publishing photographs __``that purported``__ to show British troops abusing Iraqi detainees .                                                                                                                                                       |
+| **`nyt_eng_20001113_0335_24:17-18`** | Benham noted that in Davis ' most recent appeals , his lawyers put into evidence affidavits __``that purported``__ to show that executions by electrocution have been plagued by `` shocking and grotesque errors '' and that there is a substantial risk they result in `` unnecessary infliction of pain and disfigurement . '' |
+| **`nyt_eng_20060617_0120_3:16-17`**  | the reporter , Jayson Blair , 27 , misled readers and Times colleagues with dispatches __``that purported``__ to be from Maryland , Texas and other states , when often he was far away , in New York .                                                                                                                           |
+| **`nyt_eng_20100924_0177_8:22-23`**  | from 1976 to 1984 he wrote and illustrated the syndicated comic strip `` Inside Woody Allen , a series of panels __``that purported``__ to reveal the mind of that famous comedian and film director in all its self-analytical , overly worried , oversexed , death-obsessed glory .                                             |
+| **`nyt_eng_19980824_0185_1:13-14`**  | last June , the American Film Institute released an extremely silly list __``that purported``__ to rank the 100 greatest American movies .                                                                                                                                                                                        |
+| **`apw_eng_19970903_0659_29:17-18`** | Britain 's top-selling tabloid , The Sun , was humiliated last October when it published pictures __``that purported``__ to show Diana frolicking with her one-time lover James Hewitt .                                                                                                                                          |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_purported_ex.md`
+
+
+### 2. _that uncommon_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                            |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_01_097.6945_x1563201_37:33-34-35`**  | However as mentioned above , do not forget that if the supply of your baby 's identify is a tv present , novel , or movie star , the title is probably not __``that uncommon``__ when they start college several years down the road . |
+| **`pcc_eng_27_058.0585_x0922294_436:07-09-10`** | While these sorts of suits are not all __``that uncommon``__ , this one has a bit of a sharper edge than most .                                                                                                                        |
+| **`pcc_eng_06_077.4849_x1236958_5:4-5-6`**      | Senate appointments are n't __``that uncommon``__ .                                                                                                                                                                                    |
+| **`pcc_eng_02_047.9302_x0759242_30:4-5-6`**     | The situation is not __``that uncommon``__ but certainly a crisis for the bull .                                                                                                                                                       |
+| **`pcc_eng_13_093.6782_x1498138_25:10-11-12`**  | Having your hand fall asleep now and then is not __``that uncommon``__ .                                                                                                                                                               |
+| **`nyt_eng_20050630_0285_9:5-6-7`**             | `` Our situation is n't __``that uncommon``__ in the western part of the state , where we were seeing rainfall every three or four days , '' Peterson said .                                                                           |
+| **`nyt_eng_19990323_0152_18:11-13-14`**         | but if you talk to restaurateurs , solo diners are not actually __``that uncommon``__ in New York .                                                                                                                                    |
+| **`pcc_eng_00_019.1102_x0292414_03:15-16-17`**  | Now , demos played on easy difficulty settings or " god mode " are n't __``that uncommon``__ .                                                                                                                                         |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_uncommon_ex.md`
+
+
+### 3. _that farfetched_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                      |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_25_099.1596_x1588547_18:08-09-10`**  | As such , off grid systems are not __``that farfetched``__ an idea .                                                                                                                                             |
+| **`nyt_eng_19990128_0247_64:15-16-17`**         | after the kind of year the NFL officials had in1998 , the possibility is n't __``that farfetched``__ .                                                                                                           |
+| **`pcc_eng_14_015.6855_x0237125_37:5-6-7`**     | And the technology is not __``that farfetched``__ . "                                                                                                                                                            |
+| **`pcc_eng_29_095.2460_x1522562_11:13-14-15`**  | The idea that God can bring us back from the dead is not __``that farfetched``__ ...                                                                                                                             |
+| **`pcc_eng_16_024.0073_x0372368_4:24-25-26`**   | It does sound like they 've run out of ideas , but pets are popular in other games too , so it 's not __``that farfetched``__ .                                                                                  |
+| **`pcc_eng_24_023.0920_x0357012_60:39-40-41`**  | Wish the guy all the best for all the enjoyment he 's brought us , but the whole thing reminds me a bit of Apple / Jobs ... of course taking a huge pay off and retiring is n't __``that farfetched``__ either . |
+| **`pcc_eng_03_081.3969_x1301997_43:29-30-31`**  | What we do know is that the strain of a global nuclear war on the ecosystem would be so severe that the blasted landscape of Fallout 4 is not __``that farfetched``__ .                                          |
+| **`pcc_eng_18_010.6902_x0156781_216:08-09-10`** | And the cool thing is it 's not __``that farfetched``__ .                                                                                                                                                        |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_farfetched_ex.md`
+
+
+### 4. _that dissimilar_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                                                                                |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_15_007.7081_x0108299_02:35-36-37`**  | The new mobile operating system is a big visual change , and is likely to feel somewhat disorienting to users upgrading from i OS 6 , but in most important ways , it 's not __``that dissimilar``__ from what you 're used to , and many of the changes are definitely for the best .                                                                     |
+| **`pcc_eng_07_054.1593_x0859256_074:13-14-15`** | Yes - it 's abhorrent and morally unjustifiable , but it 's not __``that dissimilar``__ to robbing a bank . "                                                                                                                                                                                                                                              |
+| **`pcc_eng_11_002.7255_x0028007_08:26-27-28`**  | If you ever need a pick me up when you 're enduring another dinner of supermarket brand soup , remember : being a student is not __``that dissimilar``__ to behaving like you 're stinking rich .                                                                                                                                                          |
+| **`nyt_eng_20070223_0015_31:4-5-6`**            | `` It 's not __``that dissimilar``__ from a suit we still sell , '' Macko said , adding dryly , `` The price has changed a bit . ''                                                                                                                                                                                                                        |
+| **`nyt_eng_20060328_0154_15:16-18-19`**         | the end goals were radically different , of course , but the sales pitch was n't all __``that dissimilar``__ .                                                                                                                                                                                                                                             |
+| **`pcc_eng_03_086.7031_x1387766_09:12-13-14`**  | " The Universal Sony survey found that in reality we are not __``that dissimilar``__ to the Snow White fairytale ideal , with the research results mirroring the plot involving thecharacters of the evil queen Ravenna , ( Charlize Theron ) and Snow White ( Kristen Stewart ) , where a beautiful appearance is inferior to a kind heart , " she said . |
+| **`pcc_eng_28_063.0013_x1003202_76:50-51-52`**  | And then the software is going to get better and figure out these tricks to play and a fiction that makes sense in the game to use it , and we 're going to end up with something that 's not like a first-person shooter of today , but not __``that dissimilar``__ , and gives you 100 percent of what you want . "                                      |
+| **`pcc_eng_02_010.0479_x0146168_75:4-5-6`**     | Their motives are n't __``that dissimilar``__ , either .                                                                                                                                                                                                                                                                                                   |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_dissimilar_ex.md`
+
+
+### 5. _that great_
+
+
+|                                                 | `token_str`                                                                                                                                              |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_27_029.0299_x0452545_08:3-5-6`**     | It has n't been __``that great``__ the last two years . "                                                                                                |
+| **`nyt_eng_19990608_0014_25:09-11-12`**         | `` The schools out where I lived were n't all __``that great``__ , '' she said .                                                                         |
+| **`pcc_eng_27_068.6438_x1093612_18:12-13-14`**  | I 'm somewhat miffed with it because : a) It 's not __``that great``__ of a song b)                                                                      |
+| **`pcc_eng_19_026.6028_x0413324_20:11-13-14`**  | Let 's not bemoan the loss of journalism that was n't all __``that great``__ in the first place .                                                        |
+| **`pcc_eng_21_096.7868_x1547662_026:08-09-10`** | The problem is that it just is n't __``that great``__ of a bourbon .                                                                                     |
+| **`pcc_eng_18_034.9824_x0550077_12:16-17-18`**  | The listener then had to guess the song , but Amy and Fallon clearly are n't __``that great``__ as they both had to use EXTRA clues to get the answers ! |
+| **`nyt_eng_19970425_0754_24:18-19-20`**         | he said he would `` quickly burn '' the transcript because the grades listed on it were n't __``that great``__ .                                         |
+| **`pcc_eng_11_013.0813_x0195279_749:2-3-4`**    | Ai n't __``that great``__ .                                                                                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_great_ex.md`
+
+
+### 6. _that bad_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                          |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_00_007.3200_x0101995_18:3-5-6`**    | People might not be __``that bad``__ , but they actually feed a list they do n't even know they have .                                                                                                                                                               |
+| **`pcc_eng_13_069.6037_x1108948_27:4-5`**      | The conference is __``that bad``__ .                                                                                                                                                                                                                                 |
+| **`pcc_eng_11_080.9271_x1293722_05:3-4`**      | Is it __``that bad``__ when a lot of people like electronic music ? "                                                                                                                                                                                                |
+| **`pcc_eng_02_036.3003_x0571332_01:51-52-53`** | Well the thing about proxy farming is you might die alot , but you are not worth more then a minion ... because you are just farming and not getting any champ kills you will be worth like 15g ... that 's why in the end dying / feeding is n't __``that bad``__ . |
+| **`pcc_eng_15_002.5356_x0024542_83:17-19-20`** | " Some of you will have your heart broken at the end , but it wo n't be __``that bad``__ , because you had such an incredible process getting there . "                                                                                                              |
+| **`pcc_eng_26_071.7682_x1143873_13:8-9`**      | Yea , it was said to be __``that bad``__ .                                                                                                                                                                                                                           |
+| **`pcc_eng_23_008.4008_x0119451_30:4-5-6`**    | So it 's not __``that bad``__ really , " he said .                                                                                                                                                                                                                   |
+| **`pcc_eng_29_086.0212_x1373306_13:09-10-11`** | So when my life is portrayed as " not __``that bad``__ " or maybe even a bit charming , what kind of message does that send ?                                                                                                                                        |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_bad_ex.md`
+
+
+### 7. _that hard_
+
+
+|                                                 | `token_str`                                                                                                                                                                      |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_04_030.9809_x0484401_86:5-6`**       | Surely it cannot be __``that hard``__ .                                                                                                                                          |
+| **`pcc_eng_15_048.9782_x0775627_07:11-12-13`**  | That can sound a bit daunting but it really is n't __``that hard``__ to do .                                                                                                     |
+| **`pcc_eng_06_077.4800_x1236881_160:12-13-14`** | And with his cock that measures 9 inches , it was n't __``that hard``__ to achieve this .                                                                                        |
+| **`pcc_eng_17_071.5939_x1140742_22:26-27-28`**  | And maybe it 's a little much to complain about such a thing in an exploitation film , but you know , it 's probably not __``that hard``__ to make it make a little more sense . |
+| **`pcc_eng_08_005.6864_x0075730_280:4-5-6`**    | ' It 's not __``that hard``__ to cast a spell , kid .                                                                                                                            |
+| **`pcc_eng_04_072.6973_x1157991_053:18-19-20`** | Or you could even experiment and try your hands at a chocolate souffle ( they 're really not __``that hard``__ ) .                                                               |
+| **`pcc_eng_20_086.3721_x1379328_32:10-11-12`**  | I 've done exploratory essays before and they are n't __``that hard``__ to master in under 15 minutes .                                                                          |
+| **`pcc_eng_06_099.5569_x1594223_5:2-3-4`**      | Is not __``that hard``__ to put two and two together after that one , and specially after that woman says " and you go to the Volturi ... "                                      |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_hard_ex.md`
+
+
+### 8. _that gullible_
+
+
+|                                                 | `token_str`                                                                                                                                                  |
+|:------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_01_066.6673_x1062229_11:08-09-10`**  | Sorry Hillary , the American people are n't __``that gullible``__ .                                                                                          |
+| **`pcc_eng_17_012.2702_x0182119_14:5-6`**       | Whether they are truly __``that gullible``__ , or they have something to hide themselves , it 's clear that they 've difficult lives .                       |
+| **`pcc_eng_17_066.4710_x1057671_06:3-4`**       | We are __``that gullible``__ .                                                                                                                               |
+| **`pcc_eng_05_078.9488_x1261700_216:15-16`**    | Sorry , Charlie , but 20 years ago was the last time I was __``that gullible``__ ( and then only because I thought I 'd be related to the first family ) ... |
+| **`pcc_eng_17_015.2160_x0229946_14:20-21`**     | So the question remains , have Hollywood special effects really gotten that good , or are many people just __``that gullible``__ ?                           |
+| **`pcc_eng_15_042.2038_x0666244_129:26-27-28`** | The Clinton war room of the 90 's may have been able to spin their way out of a pickle jar , but Millennials are n't __``that gullible``__ .                 |
+| **`pcc_eng_28_073.3620_x1170486_27:5-6`**       | Yes , I am __``that gullible``__ , or rather idealistic .                                                                                                    |
+| **`pcc_eng_03_002.1584_x0018748_122:12-13-14`** | Simply put , they are n't that smart and we are n't __``that gullible``__ .                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_gullible_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/`...
+* Renaming existing version of `that_uncommon_80ex~80.csv`
+* Renaming existing version of `that_dissimilar_80ex~80.csv`
+* Renaming existing version of `that_great_80ex~80.csv`
+* Renaming existing version of `that_bad_80ex~80.csv`
+* Renaming existing version of `that_hard_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_purported_80ex~13.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_uncommon_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_farfetched_80ex~22.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_dissimilar_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_great_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_bad_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_hard_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/that/that_gullible_80ex~18.csv`
+
+## *exactly*
+
+
+|                                      |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1`    | `l2`          |   `f1` |    `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:-------------------------------------|------:|------:|------:|-----:|----------:|:--------|:--------------|-------:|--------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_mirror_] exactly~alike**         |    83 |  0.20 |  7.69 | 0.20 |    822.85 | exactly | alike         |  1,031 |     408 |  1,680,633 |    0.25 |     82.75 |      1.00 |  0.08 | 0.08 |         0.20 |          0.14 |          2.66 |  9.08 | 2.52 | mirror    |
+| **[_direct_] exactly~alike**         |   776 |  0.09 |  6.64 | 0.09 |  5,879.14 | exactly | alike         | 56,109 |   8,804 | 71,961,373 |    6.86 |    769.14 |      0.99 |  0.01 | 0.01 |         0.09 |          0.05 |          2.10 | 27.61 | 2.05 | direct    |
+| **[_direct_] exactly~opposite**      |   467 |  0.05 |  5.82 | 0.06 |  3,087.08 | exactly | opposite      | 56,109 |   8,461 | 71,961,373 |    6.60 |    460.40 |      0.99 |  0.01 | 0.01 |         0.05 |          0.03 |          1.88 | 21.30 | 1.85 | direct    |
+| **[_direct_] exactly~right**         | 6,269 |  0.04 |  5.79 | 0.04 | 39,335.77 | exactly | right         | 56,109 | 141,227 | 71,961,373 |  110.12 |  6,158.88 |      0.98 |  0.11 | 0.11 |         0.11 |          0.08 |          1.83 | 77.79 | 1.76 | direct    |
+| **[_direct_] exactly~perpendicular** |    50 |  0.04 |  4.41 | 0.04 |    299.49 | exactly | perpendicular | 56,109 |   1,228 | 71,961,373 |    0.96 |     49.04 |      0.98 |  0.00 | 0.00 |         0.04 |          0.02 |          1.74 |  6.94 | 1.72 | direct    |
+| **[_direct_] exactly~sure**          | 8,840 |  0.03 |  5.42 | 0.03 | 51,388.70 | exactly | sure          | 56,109 | 256,817 | 71,961,373 |  200.24 |  8,639.76 |      0.98 |  0.15 | 0.16 |         0.15 |          0.09 |          1.73 | 91.89 | 1.64 | direct    |
+| **[_direct_] exactly~analogous**     |   102 |  0.03 |  4.58 | 0.03 |    572.73 | exactly | analogous     | 56,109 |   3,024 | 71,961,373 |    2.36 |     99.64 |      0.98 |  0.00 | 0.00 |         0.03 |          0.02 |          1.65 |  9.87 | 1.64 | direct    |
+| **[_direct_] exactly~zero**          |   306 |  0.03 |  4.94 | 0.03 |  1,701.35 | exactly | zero          | 56,109 |   9,343 | 71,961,373 |    7.28 |    298.72 |      0.98 |  0.01 | 0.01 |         0.03 |          0.02 |          1.64 | 17.08 | 1.62 | direct    |
+| **[_direct_] exactly~stellar**       |   172 |  0.03 |  4.73 | 0.03 |    949.65 | exactly | stellar       | 56,109 |   5,349 | 71,961,373 |    4.17 |    167.83 |      0.98 |  0.00 | 0.00 |         0.03 |          0.02 |          1.63 | 12.80 | 1.62 | direct    |
+| **[_direct_] exactly~parallel**      |   204 |  0.03 |  4.78 | 0.03 |  1,122.64 | exactly | parallel      | 56,109 |   6,404 | 71,961,373 |    4.99 |    199.01 |      0.98 |  0.00 | 0.00 |         0.03 |          0.02 |          1.63 | 13.93 | 1.61 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/ALL-exactly_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _exactly alike_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                                                           |
+|:-----------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_14_096.9775_x1551668_17:28-29`**    | They have " worked " on it at home and the result s are a nice little flower that has a button in the center and petals __``exactly alike``__ all neatly arranged around it .                                                                                                                                                         |
+| **`pcc_eng_21_062.0754_x0987221_07:26-27`**    | Let us return for a moment at the beginning , where we said that " the scientific evidence , is based on four overlapping truths __``exactly alike``__ . "                                                                                                                                                                            |
+| **`pcc_eng_16_065.9849_x1051865_083:20-21`**   | And when our friends called upon the High Ki the next morning they found the two maids again dressed __``exactly alike``__ in yellow robes , with strings of sparkling emeralds for ornament .                                                                                                                                        |
+| **`pcc_eng_21_035.2825_x0554389_47:14-15`**    | In the quest for the individuality of the world we wind up becoming __``exactly alike``__ , enslaved to the latest ' movement , ' mere fragments of a homogeneity that tyrannically imposes its will on us , valuable only to the extent that we serve the purposes of the group , mere individuals rather than true unique persons . |
+| **`pcc_eng_21_055.4101_x0879684_01:11-12`**    | This video features two adorable Scottish Fold kittens who look __``exactly alike``__ !                                                                                                                                                                                                                                               |
+| **`pcc_eng_12_093.0912_x1488248_10:2-3`**      | Dressed __``exactly alike``__ and in the same pose , these fictional twins are an anomaly of their time .                                                                                                                                                                                                                             |
+| **`pcc_eng_18_030.8118_x0482529_11:07-09-10`** | While school and home environments may not be __``exactly alike``__ , schools can still promote general safety strategies and ease parental concerns .                                                                                                                                                                                |
+| **`pcc_eng_21_066.6369_x1060712_20:14-17-18`** | Authentic blown Murano Glass Beads in a sasso , pebble approximately 20 mm no to ever __``exactly alike``__ due to the handwork .                                                                                                                                                                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_alike_ex.md`
+
+
+### 2. _exactly opposite_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                            |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_20_101.0043_x1615840_3:15-16`**  | At what time immediately prior to Six O'clock the hands of the clock are __``exactly opposite``__ to each other .                                                                                                                      |
+| **`pcc_eng_07_093.3240_x1492099_012:5-6`**  | But the result is __``exactly opposite``__ -- the paper actually warms up ( Figure 2 ) !                                                                                                                                               |
+| **`pcc_eng_19_016.6978_x0253232_31:11-12`** | Interestingly , they seem to succeed and fail in almost __``exactly opposite``__ ways : Freaks is not afraid to depict a truly disabled person but in a not-too-flattering context , and Me Before                                     |
+| **`pcc_eng_27_019.2038_x0294346_28:19-20`** | The Melbourne tour packages from India or a Sydney tour package from India , has the advantage of __``exactly opposite``__ weather , so travelers enjoy the beautiful stunning beaches of Australia when it is freezing in New Delhi . |
+| **`pcc_eng_27_089.7609_x1435653_74:3-4`**   | This is __``exactly opposite``__ to the conclusion that appellant was asking the jury to reach .                                                                                                                                       |
+| **`pcc_eng_11_002.9328_x0031378_02:3-4`**   | It is __``exactly opposite``__ to the I . F. S. C which is the financial district in Dublin .                                                                                                                                          |
+| **`pcc_eng_01_074.2468_x1184777_42:09-10`** | For winter hiking , however , it is __``exactly opposite``__ .                                                                                                                                                                         |
+| **`pcc_eng_01_008.5663_x0122220_21:23-24`** | It was as if his top priority was to launch a new war in the Middle East in a way that was __``exactly opposite``__ from what George W. Bush did .                                                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_opposite_ex.md`
+
+
+### 3. _exactly right_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                   |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_val_2.11154_x34307_05:18-19`**    | I offer guidance , support and advice to help ensure the farewell for your loved one is __``exactly right``__ for you and your family .                                                                                       |
+| **`pcc_eng_08_066.0646_x1053979_38:11-12`**  | Otherwise , " blighted " and " abandoned " are __``exactly right``__ .                                                                                                                                                        |
+| **`pcc_eng_09_101.2411_x1621910_203:5-6`**   | COLL : That 's __``exactly right``__ .                                                                                                                                                                                        |
+| **`pcc_eng_23_006.4170_x0087477_09:26-27`**  | Ed Surge writer Katrina Stevens referred to the 54 - hour event as an " inspiring , incubator- like environment , " and she 's __``exactly right``__ .                                                                        |
+| **`pcc_eng_21_091.4372_x1461554_76:3-4`**    | You 're __``exactly right``__ - if the CNY were to appreciate faster , Chinese goods would become more expensive .                                                                                                            |
+| **`pcc_eng_18_044.4900_x0703917_129:33-34`** | The machine is concreted in , so the current machine has to be jackhammered out , a new concrete floor put in and then the alignment of the machine has to be __``exactly right``__ to measure out the radiation required . " |
+| **`pcc_eng_28_034.6090_x0543512_664:5-6`**   | LIERLE : That 's __``exactly right``__ .                                                                                                                                                                                      |
+| **`pcc_eng_20_105.3640_x1686451_193:5-6`**   | RABINOWITZ : That is __``exactly right``__ .                                                                                                                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_right_ex.md`
+
+
+### 4. _exactly perpendicular_
+
+
+|                                                 | `token_str`                                                                                                                                                                                  |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_05_096.5764_x1546328_51:23-24`**     | All I did was extend , join OA with the light line and draw a line ( OA ' ) which is __``exactly perpendicular``__ to the first line OA and the same length .                                |
+| **`pcc_eng_18_006.4208_x0087883_039:13-14-15`** | Note that there are still some perspective errors since the camera is not __``exactly perpendicular``__ to the direction of motion .                                                         |
+| **`pcc_eng_12_003.4983_x0040384_03:20-21-22`**  | The legs are a tiny bit too short , so you have to put the switch in at a not __``exactly perpendicular``__ angle to the front panel .                                                       |
+| **`pcc_eng_17_045.6612_x0721413_091:11-12`**    | The line of sight of the telescope needed to be __``exactly perpendicular``__ to the axis of rotation .                                                                                      |
+| **`pcc_eng_28_047.0130_x0744575_22:16-17`**     | This is a bit more difficult since it is nearly impossible to take a photo __``exactly perpendicular``__ to the picture so the slight angle will create a small bit of distortion .          |
+| **`pcc_eng_06_084.7837_x1354920_26:10-11`**     | ACTION : Lift your legs so that they are __``exactly perpendicular``__ from the floor .                                                                                                      |
+| **`pcc_eng_02_057.6308_x0916136_20:11-12`**     | These characteristics include flatness of the nozzles and nozzle array __``exactly perpendicular``__ to the axis , an optical polish , and edges of nozzles chip free and slightly rounded . |
+| **`pcc_eng_18_050.1124_x0795078_49:15-16`**     | This is where you can use the level to make sure the valet is __``exactly perpendicular``__ to the floor .                                                                                   |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_perpendicular_ex.md`
+
+
+### 5. _exactly sure_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                     |
+|:------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_082.1881_x1312636_17:3-4-5`**     | I 'm not __``exactly sure``__ but i think the Peru Uncovered tour starts with the Adventurer tour and then we just continue on to Argentina and Brazil .                                                                                                                        |
+| **`pcc_eng_10_045.6854_x0722975_089:25-26-27`** | It will be itself absorbing and re-radiating some of the EMF it is now ' receiving ' and conducting , and while we 're not __``exactly sure``__ , we fear some of that transmission may be into itself and whatever is inside .                                                 |
+| **`pcc_eng_25_004.5099_x0057311_003:10-11-12`** | When I arrived back here in Thompsonville I was n't __``exactly sure``__ of what I should expect , as even from my own relatively short life experience I had already found that time has a habit of changing people .                                                          |
+| **`pcc_eng_22_007.8478_x0110560_24:47-48-49`**  | He told me a lot of personal , uncomfortable details about himself , and I , as a 19 year old girl who has been conditioned by society to not rattle anyone 's cage and just accept and try to politely defuse the situation , was n't __``exactly sure``__ what to say or do . |
+| **`pcc_eng_15_097.0997_x1553283_10:1-2-3`**     | Not __``exactly sure``__ what 's going with these douche bags people .                                                                                                                                                                                                          |
+| **`pcc_eng_02_082.9429_x1324954_14:34-35-36`**  | When I know I 've spent too much , I hate logging into my credit card and bank accounts , but I know that I ca n't fix the problem if I 'm not __``exactly sure``__ what that problem is .                                                                                      |
+| **`pcc_eng_25_007.8576_x0111231_085:3-4-5`**    | I am not __``exactly sure``__ how or when this occurred .                                                                                                                                                                                                                       |
+| **`pcc_eng_07_101.1744_x1619049_03:3-4-5`**     | I 'm not __``exactly sure``__ how this material could have achieved adequate suspense , but the filmmakers cannot be criticized for not trying .                                                                                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_sure_ex.md`
+
+
+### 6. _exactly analogous_
+
+
+|                                              | `token_str`                                                                                                                                                                            |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_12_093.5346_x1495547_05:4-5`**    | " It 's __``exactly analogous``__ to a standing press vs .                                                                                                                             |
+| **`apw_eng_20021213_0683_18:18-19-20`**      | that is not the history of North Korea for the last 50 years , so it 's not __``exactly analogous``__ , '' Fleischer said .                                                            |
+| **`pcc_eng_03_022.8779_x0353848_10:19-20`**  | Yet the reaction of many public health professionals and politicians has been to choose a ) in an __``exactly analogous``__ situation relating to nicotine .                           |
+| **`pcc_eng_13_068.7568_x1095176_12:3-4`**    | This is __``exactly analogous``__ to the frequently deceptive appearance of great strength of will .                                                                                   |
+| **`pcc_eng_26_038.7179_x0609905_084:3-4`**   | That is __``exactly analogous``__ to what a married couple should be doing .                                                                                                           |
+| **`pcc_eng_13_042.6200_x0672908_50:4-5`**    | This process is __``exactly analogous``__ to passing a requirement through a succession of online translations :                                                                       |
+| **`pcc_eng_10_059.2453_x0941786_006:21-22`** | The " brotherhoods , " " charities " and commercial " companies " of the Romance - language countries are __``exactly analogous``__ to the hanses and guilds of the Germanic regions . |
+| **`pcc_eng_02_043.0615_x0680513_304:4-5`**   | This situation is __``exactly analogous``__ to the references to Christian piety that form a thin tissue over the pagan warrior values espoused in " Beowulf . "                       |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_analogous_ex.md`
+
+
+### 7. _exactly zero_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                                                                 |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_18_047.8563_x0758447_31:20-21`**  | Following their revelation of the perils of women entering the work force , the authors support their conclusion with __``exactly zero``__ evidence that the increase in female employment has any relation to the supposed millions of men ( the majority of whom , the writers admit , have no more than a high school education ) currently orbiting the fringes of productive society . |
+| **`pcc_eng_25_066.8094_x1066213_19:09-10`**  | The degree of regulation so far has been __``exactly zero``__ .                                                                                                                                                                                                                                                                                                                             |
+| **`pcc_eng_25_012.7020_x0189262_10:25-26`**  | I passed these women in their baseball caps pulled low over greasy ponytails , their unwashed , exhausted faces , and I paid them __``exactly zero``__ attention .                                                                                                                                                                                                                          |
+| **`pcc_eng_21_099.3973_x1589739_25:1-2`**    | __``Exactly zero``__ .                                                                                                                                                                                                                                                                                                                                                                      |
+| **`pcc_eng_28_108.01391_x1732856_08:14-15`** | That number , if you do that calculation , turns out to be __``exactly zero``__ .                                                                                                                                                                                                                                                                                                           |
+| **`pcc_eng_12_083.2823_x1329530_138:4-5`**   | But I see __``exactly zero``__ reason why economics is different , in that light , from management science or history , for example .                                                                                                                                                                                                                                                       |
+| **`pcc_eng_22_044.8305_x0708411_60:2-3`**    | " __``Exactly zero``__ people told me that I should do what I am doing today , " said Berry , now a 40 - year - old general partner of Flagship .                                                                                                                                                                                                                                           |
+| **`pcc_eng_00_094.9028_x1518518_31:18-19`**  | On Twitter , several Stanford fans wondered aloud how the Cardinal -- a team that had showed __``exactly zero``__ propensity for playing from behind , especially when down big -- would score two touchdowns .                                                                                                                                                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_zero_ex.md`
+
+
+### 8. _exactly stellar_
+
+
+|                                                 | `token_str`                                                                                                                                            |
+|:------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_00_060.5275_x0962471_058:08-09-10`** | No , the list of wins was n't __``exactly stellar``__ ( no victory over team with a winning FBS record ) , but the losses were n't exactly duds .      |
+| **`pcc_eng_02_085.1625_x1360689_21:08-09-10`**  | * Since 2011 , the Hounds are not __``exactly stellar``__ in season finales , going 1 - 4 - 1 .                                                        |
+| **`pcc_eng_11_098.9221_x1585132_034:09-10-11`** | Fourth , reviews of the Nutrition Guide were not __``exactly stellar``__ .                                                                             |
+| **`pcc_eng_29_037.8362_x0594555_15:14-15-16`**  | We miss Virgil Van Dijk more than ever , and Steven Davis was n't __``exactly stellar``__ as captain , but Romeu put in a solid shift this afternoon . |
+| **`pcc_eng_15_106.1427_x1699691_080:09-10-11`** | Like many 1973 Topps , the photo is not __``exactly stellar``__ .                                                                                      |
+| **`pcc_eng_17_053.2280_x0843824_21:6-7-8`**     | 2 . The options were n't __``exactly stellar``__ .                                                                                                     |
+| **`pcc_eng_20_003.1658_x0034741_07:13-14-15`**  | " Grey " sites are n't exceedingly difficult , but they 're not __``exactly stellar``__ about facilitating the process , either .                      |
+| **`pcc_eng_25_006.6422_x0091662_07:7-8-9`**     | Well , in seminary I was not __``exactly stellar``__ at the pastoral care department , and I am a big fan of everyone becoming Christian .             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_stellar_ex.md`
+
+
+### 9. _exactly parallel_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                   |
+|:-----------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_13_045.4324_x0718450_10:13-14-15`** | You need to be hitting the ledge at a slight angle , not __``exactly parallel``__ .                                                                                                                                                                                                           |
+| **`pcc_eng_16_099.2753_x1590802_043:8-9`**     | The current state of the environment is __``exactly parallel``__ to our inner state .                                                                                                                                                                                                         |
+| **`nyt_eng_20050813_0098_10:5-6-7`**           | if the situation is not __``exactly parallel``__ , the stakes are : the survival of a free country at peace with itself and its neighbors .                                                                                                                                                   |
+| **`pcc_eng_14_029.1620_x0454993_067:17-18`**   | The curves of normal temperature , of typhoid fever , and of malarial fevers are almost __``exactly parallel``__ , except that the culmination of the fever curve , in September for Iowa , October for the Eastern States , is behind that of the temperature curve , which occurs in July . |
+| **`pcc_eng_08_065.9827_x1052668_3:5-6`**       | The tyrannical tiger was __``exactly parallel``__ to the tyrannical landlord .                                                                                                                                                                                                                |
+| **`pcc_eng_02_031.1436_x0487887_56:10-11-12`** | If your serving , make an effort to serve not __``exactly parallel``__ to your position ... serve it on an angle , so when the return comes in , you can see the shuttle .                                                                                                                    |
+| **`pcc_eng_26_069.1815_x1102449_15:3-4`**      | It 's __``exactly parallel``__ to the federal government .                                                                                                                                                                                                                                    |
+| **`pcc_eng_04_030.0708_x0469650_59:5-6`**      | " It 's an __``exactly parallel``__ story , " says Iversen .                                                                                                                                                                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_parallel_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/`...
+* Renaming existing version of `exactly_alike_80ex~80.csv`
+* Renaming existing version of `exactly_opposite_80ex~80.csv`
+* Renaming existing version of `exactly_right_80ex~80.csv`
+* Renaming existing version of `exactly_sure_80ex~80.csv`
+* Renaming existing version of `exactly_zero_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_alike_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_opposite_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_right_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_perpendicular_80ex~16.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_sure_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_analogous_80ex~28.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_zero_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_stellar_80ex~45.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/exactly/exactly_parallel_80ex~59.csv`
+
+## *any*
+
+
+|                            |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1` | `l2`    |   `f1` |   `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:---------------------------|------:|------:|------:|-----:|----------:|:-----|:--------|-------:|-------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_mirror_] any~closer**  |    66 |  0.07 |  5.63 | 0.07 |    482.27 | any  | closer  |  1,169 |    972 |  1,680,633 |    0.68 |     65.32 |      0.99 |  0.06 | 0.06 |         0.07 |          0.06 |          2.05 |  8.04 | 1.99 | mirror    |
+| **[_direct_] any~happier** |   942 |  0.06 |  6.83 | 0.06 |  7,387.71 | any  | happier | 32,161 | 16,177 | 71,961,373 |    7.23 |    934.77 |      0.99 |  0.03 | 0.03 |         0.06 |          0.04 |          2.15 | 30.46 | 2.11 | direct    |
+| **[_direct_] any~clearer** |   586 |  0.05 |  6.57 | 0.05 |  4,447.68 | any  | clearer | 32,161 | 11,328 | 71,961,373 |    5.06 |    580.94 |      0.99 |  0.02 | 0.02 |         0.05 |          0.03 |          2.09 | 24.00 | 2.06 | direct    |
+| **[_direct_] any~truer**   |    56 |  0.04 |  5.39 | 0.04 |    403.92 | any  | truer   | 32,161 |  1,293 | 71,961,373 |    0.58 |     55.42 |      0.99 |  0.00 | 0.00 |         0.04 |          0.02 |          2.01 |  7.41 | 1.99 | direct    |
+| **[_direct_] any~cuter**   |    78 |  0.04 |  5.59 | 0.04 |    561.09 | any  | cuter   | 32,161 |  1,819 | 71,961,373 |    0.81 |     77.19 |      0.99 |  0.00 | 0.00 |         0.04 |          0.02 |          2.00 |  8.74 | 1.98 | direct    |
+| **[_direct_] any~nearer**  |    50 |  0.03 |  4.98 | 0.03 |    338.70 | any  | nearer  | 32,161 |  1,435 | 71,961,373 |    0.64 |     49.36 |      0.99 |  0.00 | 0.00 |         0.03 |          0.02 |          1.91 |  6.98 | 1.89 | direct    |
+| **[_direct_] any~wiser**   |   102 |  0.03 |  5.27 | 0.03 |    669.52 | any  | wiser   | 32,161 |  3,253 | 71,961,373 |    1.45 |    100.55 |      0.99 |  0.00 | 0.00 |         0.03 |          0.02 |          1.86 |  9.96 | 1.85 | direct    |
+| **[_mirror_] any~better**  |   413 |  0.03 |  5.10 | 0.03 |  2,484.40 | any  | better  |  1,169 | 13,606 |  1,680,633 |    9.46 |    403.54 |      0.98 |  0.35 | 0.35 |         0.35 |          0.19 |          1.84 | 19.86 | 1.64 | mirror    |
+| **[_direct_] any~closer**  | 1,611 |  0.03 |  5.85 | 0.03 | 10,386.72 | any  | closer  | 32,161 | 55,736 | 71,961,373 |   24.91 |  1,586.09 |      0.98 |  0.05 | 0.05 |         0.05 |          0.04 |          1.85 | 39.52 | 1.81 | direct    |
+| **[_direct_] any~weirder** |    76 |  0.03 |  4.94 | 0.03 |    480.94 | any  | weirder | 32,161 |  2,726 | 71,961,373 |    1.22 |     74.78 |      0.98 |  0.00 | 0.00 |         0.03 |          0.01 |          1.81 |  8.58 | 1.80 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/ALL-any_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _any closer_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                         |
+|:------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_27_049.4394_x0782739_17:7-8`**       | But does that mean AI is __``any closer``__ to being able to write the Great American Novel , say ?                                                                                                                                 |
+| **`pcc_eng_26_004.8324_x0061787_02:22-23-24`**  | NASA has released stunning new views of those mysterious bright spots on the dwarf planet Ceres - but we 're still not __``any closer``__ to working out what they are .                                                            |
+| **`pcc_eng_09_082.5325_x1319025_23:26-27-28`**  | So we make our scientists into the kinds of people we already admire on wholly other grounds -- thus creating a new caricature that 's not __``any closer``__ to reality than the older caricature of the absent-minded professor . |
+| **`nyt_eng_19970112_0123_7:4-6-7`**             | `` We 're not really __``any closer``__ to creating a computer with common sense than we were in the mid - '60s . ''                                                                                                                |
+| **`pcc_eng_18_004.6571_x0059251_12:24-26-27`**  | Now at 28 years old , I 've not only come to peace with my body , but seriously , my ears could n't be __``any closer``__ to my head - I literally have no idea what my nine year old self was seeing .                             |
+| **`nyt_eng_19960607_0205_24:28-30-31`**         | the difference is that at the store you 're paying for somebody else 's interpretation of `` We Can Work It Out , '' and it may not be __``any closer``__ to the original than Wright 's version .                                  |
+| **`pcc_eng_25_043.3794_x0686066_052:15-16-17`** | Billions of US $ $ have been spent on this department and we are not __``any closer``__ to independence .                                                                                                                           |
+| **`pcc_eng_01_066.4015_x1057934_154:10-11-12`** | The Wall Street banking giant said that it is not __``any closer``__ to offering cryptocurrency products amid this year 's bear market according to Bloomberg .                                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_closer_ex.md`
+
+
+### 2. _any happier_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                                                                                                                  |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_25_032.4021_x0508221_10:3-5-6`**    | We could n't be __``any happier``__ ! "                                                                                                                                                                                                                                                                                                                                                      |
+| **`pcc_eng_val_1.6789_x11004_18:14-16-17`**    | Everyday I am faced with a new challenge , but I still could n't be __``any happier``__ .                                                                                                                                                                                                                                                                                                    |
+| **`pcc_eng_08_100.7446_x1614989_10:17-19-20`** | I 've been purchasing products from Custom Earth Promos for almost a year now and could n't be __``any happier``__ about finding out about them .                                                                                                                                                                                                                                            |
+| **`pcc_eng_21_065.6623_x1044894_37:21-23-24`** | " It has been a very long road to get back to the Greater Taunton area , and I could not be __``any happier``__ , " Azar said .                                                                                                                                                                                                                                                              |
+| **`pcc_eng_29_098.5881_x1576684_36:15-17-18`** | My case was dismissed and no ticket is on my record and I could not be __``any happier``__ .                                                                                                                                                                                                                                                                                                 |
+| **`pcc_eng_24_090.2230_x1443046_14:11-12`**    | And , particularly , how many of us would be __``any happier``__ if we got the things we want ?                                                                                                                                                                                                                                                                                              |
+| **`pcc_eng_12_068.1118_x1084491_03:65-67-68`** | I have used Christina 's services for furniture and drapes - Everything turned out perfect - her eye for detail separates her from the rest of the designers I have had experience with - I recommend her to all my fiends and they have thanked me for it - Christina also has great follow - up on her deliveries and installations - I could n't be __``any happier``__ !- Linda Pederson |
+| **`nyt_eng_19990302_0157_24:15-17-18`**        | a long-term study by two universities found that couples with great communications skills are n't necessarily __``any happier``__ .                                                                                                                                                                                                                                                          |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_happier_ex.md`
+
+
+### 3. _any clearer_
+
+
+|                                                | `token_str`                                                                                                                                                 |
+|:-----------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_29_049.8251_x0788437_06:08-10-11`** | And the task ahead of him could not be __``any clearer``__ .                                                                                                |
+| **`pcc_eng_29_049.8438_x0788751_18:07-09-10`** | The spin on this one ca n't be __``any clearer``__ :                                                                                                        |
+| **`pcc_eng_07_024.0069_x0371931_07:17-19-20`** | Dn B scene don Goldie headlining , their statement of intent to not be pigeonholed could n't be __``any clearer``__ .                                       |
+| **`pcc_eng_21_096.9614_x1550391_29:15-16-17`** | Otherwise , the film is generally low fidelity in visuals , and this is n't __``any clearer``__ than during the pre-concert fight between Q-Tip and Phife . |
+| **`pcc_eng_13_073.3196_x1168943_05:4-5`**      | It cannot be __``any clearer``__ than , say , a film like ' Accepted ' , which was about ( not ) getting accepted into college .                            |
+| **`pcc_eng_15_094.7823_x1515809_13:10-11`**    | 20,000 Premier Leagues below Europa - Can , Ibe __``any clearer``__ ?                                                                                       |
+| **`pcc_eng_15_095.3153_x1524455_08:06-09-10`** | The response from Sampras could not have been __``any clearer``__ as he aimed a serve directly at Agassi 's head .                                          |
+| **`nyt_eng_19961113_0574_47:5-7-8`**           | `` The rules ca n't be __``any clearer``__ , '' said Louis W. Prentiss Jr. , a retired commander of Fort Leonard Wood .                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_clearer_ex.md`
+
+
+### 4. _any truer_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                           |
+|:------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_25_030.4255_x0476166_06:4-6-7`**     | And this could n't be __``any truer``__ than of spring .                                                                                                                                                                              |
+| **`pcc_eng_27_069.2390_x1103317_11:3-5-6`**     | That could n't be __``any truer``__ here !                                                                                                                                                                                            |
+| **`pcc_eng_29_086.2332_x1376705_23:26-27`**     | If most people already see the battle of the sexes through the fragmented perspective of this black and white kaleidoscope , does that make it __``any truer``__ than the gray shades of complexity that define human relationships ? |
+| **`pcc_eng_26_045.6389_x0721892_18:07-09-10`**  | In Highpoint 's case it could not be __``any truer``__ .                                                                                                                                                                              |
+| **`pcc_eng_28_076.5038_x1221257_07:5-7-8`**     | And this fact ca n't be __``any truer``__ , than in connection to the corporate world , where skills and requirements change every day .                                                                                              |
+| **`pcc_eng_13_032.5970_x0510899_090:19-21-22`** | Someone said its best to hire professionals to do something that you cannot do , and this has never been __``any truer``__ than with lawn care services .                                                                             |
+| **`pcc_eng_26_024.0722_x0372945_46:25-26`**     | Learning in the digital age is meant to be embraced , and for students who have a paper to finish , it cannot be __``any truer``__ .                                                                                                  |
+| **`pcc_eng_14_049.9455_x0790884_03:5-6`**       | This belief cannot be __``any truer``__ as the need to effective communication between the business and the software developer is extremely integral to the overall success of the development project .                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_truer_ex.md`
+
+
+### 5. _any cuter_
+
+
+|                                              | `token_str`                                                                                                                                                              |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_021.6343_x0333837_010:5-6-7`** | But this behavior is n't __``any cuter``__ when theologians do it .                                                                                                      |
+| **`pcc_eng_19_018.0670_x0275325_02:12-13`**  | It might just be impossible to make your favorite baby boy __``any cuter``__ , but at The Best Dressed Child , we sure are going to try !                                |
+| **`pcc_eng_06_039.9737_x0630262_15:4-5`**    | Does it get __``any cuter``__ than this ?                                                                                                                                |
+| **`pcc_eng_28_059.8247_x0951769_05:7-8`**    | Could it make Pokemon mascot Pikachu __``any cuter``__ , though ?                                                                                                        |
+| **`pcc_eng_03_094.7903_x1518636_087:4-6-7`** | " You could not be __``any cuter``__ ! "                                                                                                                                 |
+| **`pcc_eng_21_022.4017_x0345646_26:3-5-6`**  | It could n't be __``any cuter``__ .                                                                                                                                      |
+| **`pcc_eng_12_001.9611_x0015509_57:1-2-3`**  | Not __``any cuter``__ than Bocas but its CLEAN so you do n't have to look past the rubbish to see the cute timber houses , or the kids playing hopscotch in the street . |
+| **`pcc_eng_06_020.7268_x0319136_209:4-6-7`** | The pair could n't be __``any cuter``__ !                                                                                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_cuter_ex.md`
+
+
+### 6. _any nearer_
+
+
+|                                                  | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+|:-------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_24_090.7579_x1451623_0163:8-9`**      | Should she , after all , go __``any nearer``__ ?                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **`pcc_eng_19_056.2032_x0890941_3:09-10-11`**    | The migrant catastrophe on Europe 's doorstep is not __``any nearer``__ to a settlement .                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **`pcc_eng_22_003.7619_x0044796_37:4-5`**        | Will we be __``any nearer``__ to finding a true market value for this " information " ?                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **`pcc_eng_27_061.3397_x0975269_024:07-09-10`**  | One may be drunk with love without being __``any nearer``__ to finding his mate .                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| **`pcc_eng_21_069.5591_x1107968_10:16-17-18`**   | Some 76 days after over 200 girls were abducted from Chibok , the girls are not __``any nearer``__ home today than they were on the day they were abducted , and all the clueless and ineffective Administration of President Jonathan can do is to engage in image laundering that has caused the taxpayers US $ 1.2 million ; witch - hunt the media as well as those perceived to be opponents of the Administration and engage in a continuous and unprecedented abuse of national institutions . |
+| **`pcc_eng_18_004.0207_x0048937_2893:20-21-22`** | Far or near was all one to me , as if one could never get any further but also never __``any nearer``__ to her secret : the state like that of some strange wild faiths that get hold of mankind with the cruel mystic grip of unattainable perfection , robbing them of both liberty and felicity on earth .                                                                                                                                                                                         |
+| **`pcc_eng_00_031.9647_x0500415_29:20-21-22`**   | Some statements from official sources you want to believe , and some you consider lies , but you 're not __``any nearer``__ to knowing the final result than anyone else outside those with actual knowledge of which way " the US " position is set .                                                                                                                                                                                                                                                |
+| **`apw_eng_19980812_0179_14:16-18-19`**          | and despite an intensification of diplomatic efforts have been stepped up , though they do n't appear __``any nearer``__ to a solution than last month .                                                                                                                                                                                                                                                                                                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_nearer_ex.md`
+
+
+### 7. _any wiser_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                              |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_003.4857_x0040043_23:25-26-27`**  | If , however , during this slow-down there commences vigorous education from government skeptics -- those who know that people working for government are n't __``any wiser``__ or more virtuous than are those working in the marker place -- then perhaps some serious benefit can be reaped from it . |
+| **`pcc_eng_05_005.3735_x0071115_36:3-4-5`**     | They 're not __``any wiser``__ -- they were born wise , have always been wise , possessing the instincts ( a gift of their landscape ) that Flannery O' Connor ( who almost surely would have been a DBT fan ) called " wise blood . "                                                                   |
+| **`pcc_eng_29_038.2705_x0601613_11:07-09-10`**  | However sadly I suspect we wo n't be __``any wiser``__ in March than we are now beyond what the newspapers and broadcasters have to share with us .                                                                                                                                                      |
+| **`pcc_eng_00_065.4053_x1041249_040:10-13-14`** | Some of these babes are fucking around on camera without hubby being __``any wiser``__ to it !                                                                                                                                                                                                           |
+| **`pcc_eng_05_033.1232_x0520358_31:33-35-36`**  | If we already believe in emergence or Darwinism ( " competition among the resulting patterns " ) , we will find the new ideas compatible with our existing beliefs but we wo n't be __``any wiser``__ about consciousness .                                                                              |
+| **`pcc_eng_15_053.5050_x0848581_61:20-21`**     | Armed with Zizek 's apercus disseminated in numerous books and articles circulated all over the world , are we __``any wiser``__ or more fully informed of the total picture of the world today after his brilliant disclosure ?                                                                         |
+| **`pcc_eng_17_106.5170_x1705885_230:4-5-6`**    | But I was n't __``any wiser``__ after reading it .                                                                                                                                                                                                                                                       |
+| **`apw_eng_19980121_1418_74:13-14`**            | what if my birthday were to fall tomorrow ? Will I be __``any wiser``__ tomorrow , having reached 18 ?                                                                                                                                                                                                   |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_wiser_ex.md`
+
+
+### 8. _any better_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                           |
+|:------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_07_076.5612_x1221019_32:28-29`**     | But when these experts have visited our facility and were put to the test under carefully - controlled conditions , they invariably failed to yield a score __``any better``__ than chance .                                                          |
+| **`pcc_eng_04_078.1103_x1245595_056:7-8`**      | Can I understand my new role __``any better``__ than the old ?                                                                                                                                                                                        |
+| **`pcc_eng_11_086.9102_x1390617_07:16-18-19`**  | To be quite frank , I knew that the future $ 9.99 budget titles wo n't be __``any better``__ , while some of them were , they were still below average .                                                                                              |
+| **`pcc_eng_00_010.3944_x0151537_201:4-5`**      | Does life get __``any better``__ than that ?                                                                                                                                                                                                          |
+| **`pcc_eng_04_072.4542_x1154129_15:11-12`**     | So ... the burning question - has my skin got __``any better``__ since taking Accutane ?                                                                                                                                                              |
+| **`pcc_eng_17_077.7076_x1239585_35:11-12-13`**  | And the third survivor , my young sister Precilla , hardly __``any better``__ , you would have thought , with no place to turn , you would think .                                                                                                    |
+| **`pcc_eng_22_052.0150_x0824184_074:37-39-40`** | Currently professional media is n't necessarily doing a good job of facilitating quality ( and in the case of major corporates , it is n't economically viable from a business perspective ) , but grassroots is n't necesaarily __``any better``__ . |
+| **`pcc_eng_02_037.8252_x0595902_41:09-11-12`**  | " The title is beautiful , it could not be __``any better``__ because it is a true story of amour fou .                                                                                                                                               |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_better_ex.md`
+
+
+### 9. _any weirder_
+
+
+|                                                 | `token_str`                                                                                                                                                                                          |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_029.3488_x0458671_59:3-4-5`**     | We are not __``any weirder``__ than you .                                                                                                                                                            |
+| **`pcc_eng_16_037.2817_x0587137_029:10-11`**    | It 's hard to imagine how platypuses could get __``any weirder``__ , what with their egg-laying , beaver tails , and poisonous feet .                                                                |
+| **`pcc_eng_01_032.0824_x0502356_29:09-11-12`**  | " To be honest , this case could n't be __``any weirder``__ if a stork had dropped him out of the sky . "                                                                                            |
+| **`pcc_eng_19_019.2095_x0293719_039:08-09-10`** | But for the horses , it 's not __``any weirder``__ than moving forward in response to bilateral leg pressure .                                                                                       |
+| **`pcc_eng_26_006.5011_x0088677_16:09-10`**     | Alright , I 'll stop before this gets __``any weirder``__ .                                                                                                                                          |
+| **`pcc_eng_02_035.0487_x0551119_18:25-26`**     | Over the years I 've catalogued Santo films both good and bad , but it 's very difficult to think of another that 's __``any weirder``__ than this .                                                 |
+| **`pcc_eng_13_004.4352_x0055378_17:21-22`**     | It has certainly been the case that this entire political season has provoked a lot of " can it get __``any weirder``__ than this ? " moments , followed by even stranger and sillier developments . |
+| **`pcc_eng_00_015.8536_x0239707_01:07-10-11`**  | When you think this day could n't possibly be __``any weirder``__ , here comes a Nintendo Lifeexclusive bombshell .                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_weirder_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/`...
+* Renaming existing version of `any_closer_80ex~80.csv`
+* Renaming existing version of `any_happier_80ex~80.csv`
+* Renaming existing version of `any_clearer_80ex~80.csv`
+* Renaming existing version of `any_better_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_closer_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_happier_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_clearer_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_truer_80ex~14.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_cuter_80ex~21.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_nearer_80ex~10.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_wiser_80ex~22.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_better_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/any/any_weirder_80ex~22.csv`
+
+## *remotely*
+
+
+|                                     | `f` | `dP1` | `LRC` | `P1` |     `G2` | `l1`     | `l2`        |   `f1` |   `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:------------------------------------|----:|------:|------:|-----:|---------:|:---------|:------------|-------:|-------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] remotely~detonated**   |  76 |  0.88 | 12.79 | 0.88 | 1,222.94 | remotely | detonated   | 15,394 |     86 | 71,961,373 |    0.02 |     75.98 |      1.00 |  0.00 | 0.00 |         0.88 |          0.44 |          4.53 |  8.72 | 3.62 | direct    |
+| **[_direct_] remotely~exploitable** | 142 |  0.15 |  8.86 | 0.15 | 1,595.53 | remotely | exploitable | 15,394 |    964 | 71,961,373 |    0.21 |    141.79 |      1.00 |  0.01 | 0.01 |         0.15 |          0.08 |          2.91 | 11.90 | 2.84 | direct    |
+| **[_mirror_] remotely~related**     |  73 |  0.02 |  2.99 | 0.02 |   267.14 | remotely | related     |  2,314 |  3,417 |  1,680,633 |    4.70 |     68.30 |      0.94 |  0.03 | 0.03 |         0.03 |          0.02 |          1.22 |  7.99 | 1.19 | mirror    |
+| **[_direct_] remotely~comparable**  | 226 |  0.02 |  5.88 | 0.02 | 1,577.01 | remotely | comparable  | 15,394 | 12,202 | 71,961,373 |    2.61 |    223.39 |      0.99 |  0.01 | 0.01 |         0.02 |          0.02 |          1.95 | 14.86 | 1.94 | direct    |
+| **[_mirror_] remotely~close**       | 261 |  0.02 |  3.31 | 0.02 |   915.58 | remotely | close       |  2,314 | 13,768 |  1,680,633 |   18.96 |    242.04 |      0.93 |  0.10 | 0.11 |         0.10 |          0.06 |          1.20 | 14.98 | 1.14 | mirror    |
+| **[_mirror_] remotely~possible**    |  50 |  0.02 |  2.37 | 0.02 |   158.38 | remotely | possible    |  2,314 |  3,028 |  1,680,633 |    4.17 |     45.83 |      0.92 |  0.02 | 0.02 |         0.02 |          0.02 |          1.10 |  6.48 | 1.08 | mirror    |
+| **[_mirror_] remotely~similar**     | 105 |  0.01 |  2.66 | 0.02 |   317.06 | remotely | similar     |  2,314 |  6,966 |  1,680,633 |    9.59 |     95.41 |      0.91 |  0.04 | 0.05 |         0.04 |          0.03 |          1.07 |  9.31 | 1.04 | mirror    |
+| **[_mirror_] remotely~true**        |  66 |  0.01 |  1.94 | 0.01 |   158.96 | remotely | true        |  2,314 |  6,098 |  1,680,633 |    8.40 |     57.60 |      0.87 |  0.02 | 0.03 |         0.02 |          0.02 |          0.91 |  7.09 | 0.90 | mirror    |
+| **[_direct_] remotely~plausible**   | 156 |  0.01 |  4.71 | 0.01 |   866.93 | remotely | plausible   | 15,394 | 17,222 | 71,961,373 |    3.68 |    152.32 |      0.98 |  0.01 | 0.01 |         0.01 |          0.01 |          1.64 | 12.20 | 1.63 | direct    |
+| **[_mirror_] remotely~funny**       |  50 |  0.01 |  1.54 | 0.01 |   107.19 | remotely | funny       |  2,314 |  5,362 |  1,680,633 |    7.38 |     42.62 |      0.85 |  0.02 | 0.02 |         0.02 |          0.01 |          0.85 |  6.03 | 0.83 | mirror    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/ALL-remotely_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _remotely detonated_
+
+
+|                                      | `token_str`                                                                                                                                                                                                                                                                   |
+|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20070310_0101_27:7-8`**   | that 's the effect of a __``remotely detonated``__ IED , an improvised explosive device , a term for makeshift bombs so common in the news that it no longer registers with many Americans .                                                                                  |
+| **`nyt_eng_20000128_0230_37:28-29`** | some time laer , after parts of electronics had been surgically removed from her , Lyons learned that she was injured and Sanderson was killed by a __``remotely detonated``__ bomb .                                                                                         |
+| **`nyt_eng_20050804_0173_13:8-9`**   | it was unclear whether the mines were __``remotely detonated``__ or were triggered using some type of fuse , said the officer , who spoke on the condition of anonymity because the conclusion about the cause of the blast was preliminary and under review .                |
+| **`apw_eng_20051119_0007_11:23-24`** | in Lisbon , Portuguese Armed Forces Chief Jose Mendes Cabecadas declined to say whether the blast was a land mine or a __``remotely detonated``__ device .                                                                                                                    |
+| **`apw_eng_20081101_0509_11:26-27`** | in the deadliest attack , the mayor of this border village and a resident were killed by what the Georgian Interior Ministry says was a __``remotely detonated``__ landmine .                                                                                                 |
+| **`apw_eng_20090709_0294_5:38-39`**  | after police arrived to clear the road , militants apparently decided to blow up the truck , Khan said , adding that authorities believe the explosives were mixed with timber in the back of the vehicle and __``remotely detonated``__ .                                    |
+| **`apw_eng_20090804_0026_4:7-8`**    | Afghan police said the bomb was __``remotely detonated``__ , killing a woman , a 12-year-old girl , seven civilian men , including several fruit vendors , and two police officers .                                                                                          |
+| **`apw_eng_20090709_0249_4:44-45`**  | after police arrived to clear the road , militants apparently decided to blow up the truck where it overturned , Khan said , adding that authorities believe the explosives were mingled with timber in the back of the truck and that they were __``remotely detonated``__ . |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_detonated_ex.md`
+
+
+### 2. _remotely exploitable_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                             |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_13_108.01009_x1731606_10:16-17`** | RHSA - 2001:007-03 - Updated bind packages available - Some security problems , including a __``remotely exploitable``__ information leak allowing anyone to read the stack , have been found in bind versions prior to January 26 , 2001                                                                                                               |
+| **`pcc_eng_23_004.1249_x0050306_27:12-13`**  | " The GAO report authors have failed to distinguish between ' __``remotely exploitable``__ ' and ' exploitable from the internet , ' " Williams says in a recent SANS Institute email newsletter .                                                                                                                                                      |
+| **`pcc_eng_27_012.8015_x0190792_03:19-20`**  | Within the CPU , Fusion Middleware has the most fixes ( 21 ) , 16 of which are __``remotely exploitable``__ .                                                                                                                                                                                                                                           |
+| **`pcc_eng_16_064.6980_x1031050_03:10-11`**  | Of the 40 bugs , all but three are __``remotely exploitable``__ over a network without the need for a username or password .                                                                                                                                                                                                                            |
+| **`pcc_eng_13_046.6364_x0737823_15:23-24`**  | Looking at the contents of Oracle's February Critical Patch Update for Java reveals that 49 of the 50 flaws being fixed are __``remotely exploitable``__ without authentication .                                                                                                                                                                       |
+| **`pcc_eng_27_071.8617_x1145745_18:10-11`**  | Here , I present a breakdown of recent serious __``remotely exploitable``__ ( omitting denial - of- service or locally exploitable issues ) vulnerabilities in various versions of WU - FTP , with details of working exploit scripts .                                                                                                                 |
+| **`pcc_eng_25_083.4115_x1333813_02:22-23`**  | We put Blue Lane Virtual Shield to the test and found its unique patching approach an effective way to protect against __``remotely exploitable``__ vulnerabilities targeting VMware .                                                                                                                                                                  |
+| **`pcc_eng_23_069.1663_x1101170_19:12-13`**  | After Google researcher Neel Mehta uncovered Heartbleed , a serious and __``remotely exploitable``__ vulnerability in a component of Open SSL , the software community was shocked to learn that the project was largely the responsibility of what Jim Zemlin , executive director of the Linux Foundation , referred to as " two guys named Steve . " |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_exploitable_ex.md`
+
+
+### 3. _remotely related_
+
+
+|                                               | `token_str`                                                                                                                                                                                                                                                                                                                                                                             |
+|:----------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_test_2.10822_x33593_24:26-27-28`** | Have you ever had a manager who told you to do something , only to find out later that what should have been done was n't __``remotely related``__ to what he really wanted ?                                                                                                                                                                                                           |
+| **`pcc_eng_03_055.2003_x0877860_04:27-28`**   | If you were an elected official looking to score easy points last week , then the quickest way to do that was to bash everything even __``remotely related``__ to Arizona - saguaro cacti , the Grand Canyon , Tombstone Pizza , Pace Picante Sauce ( we 're not sure those last two have anything to do with Arizona , but better safe than sorry ) , and tough new immigration laws . |
+| **`pcc_eng_16_002.9543_x0031860_1:27-28`**    | I know that practically everyone who 's currently being buried in snow will probably give me an exasperated look at the mere thought of something even __``remotely related``__ to snow , but hey , this is the closest thing we get to that white stuff where I live !                                                                                                                 |
+| **`pcc_eng_19_083.9544_x1340296_47:23-24`**   | " If the actuaries are going to force the checks to be written and reduce the rate of returned assumptions to anything __``remotely related``__ to reality , then we wo n't be laughing anymore looking in the rear view mirror at the riots in the streets of Athens a few years back , " Di Martino Booth warned .                                                                    |
+| **`pcc_eng_14_037.2254_x0585264_16:22-23`**   | Anyone pretending to be a reputable purveyor of Apple news who is still citing Digitimes as a reliable source on anything __``remotely related``__ to Apple is not worth a tinker 's damn .                                                                                                                                                                                             |
+| **`pcc_eng_07_001.2484_x0003990_004:7-8`**    | The only elements that were even __``remotely related``__ to the legend were the Lady in the Lake , a magic sword , a round table and a castle called Camelot .                                                                                                                                                                                                                         |
+| **`pcc_eng_04_057.6805_x0915467_04:14-15`**   | It 's actually quite uncommon to hear of health benefits of anything even __``remotely related``__ to tobacco , so this study comes as somewhat of a surprise to many within the medical community as well as to consumers around the country .                                                                                                                                         |
+| **`pcc_eng_24_043.9890_x0694930_04:39-40`**   | In the wake of the heinous Las Vegas shooting , the medical politicians of the American Medical Association and the public health establishment -- which is to the left side of politics on just about any topic even __``remotely related``__ to medicine -- have rallied to the cause of gun control political propaganda , rather than science .                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_related_ex.md`
+
+
+### 4. _remotely comparable_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                 |
+|:------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_10_019.2527_x0295016_57:5-6-7`**     | The two situations are n't __``remotely comparable``__ , and in fact I think they differ in at least six key ways :                                                                                                                         |
+| **`apw_eng_19980204_0856_30:6-7-8`**            | note that we could accomplish nothing __``remotely comparable``__ on the basis of the Court\/rebel scenes .                                                                                                                                 |
+| **`pcc_eng_27_056.5249_x0897571_130:10-11-12`** | So , I think that those two situations are not __``remotely comparable``__ , in terms of the harm that Ellsberg did to the country , which I think was trivial , relative to what Snowden has done , which arguably is far more serious .   |
+| **`pcc_eng_06_076.1177_x1214896_30:7-8`**       | I challenge anyone to find a __``remotely comparable``__ example from any other studio in film history .                                                                                                                                    |
+| **`pcc_eng_18_005.3210_x0070058_121:27-28`**    | Has there been a better day for Scotland in this tournament Scrolling through an exceedingly modest level of achievement , it is hard to find anything __``remotely comparable``__ to the stirring victories mustered by Lawrie and Laird . |
+| **`pcc_eng_19_015.8839_x0240157_042:8-9`**      | If , like the other drugs of __``remotely comparable``__ power , mescalin were notoriously toxic , the taking of it would be enough , of itself , to cause anxiety .                                                                        |
+| **`pcc_eng_13_011.8378_x0174845_18:30-31`**     | The uncomfortable reality is that we live in a society where sexual harassment and sexual violence against women is accepted and condoned to a far greater extent than any __``remotely comparable``__ violence against men .               |
+| **`pcc_eng_05_087.5005_x1399656_41:16-18-19`**  | It 's a mistake to equate elections with private-sector performance reviews , because they 're not even __``remotely comparable``__ .                                                                                                       |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_comparable_ex.md`
+
+
+### 5. _remotely close_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                                          |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_15_093.6272_x1497253_06:29-35-36`** | Johnson himself broke the news welcoming " Jumanji juniors " Madison Iseman , Ser'Darius Blain , Alex Wolff and Morgan Turner have joined the production , and while none of these actors are even __``remotely close``__ to star power of the above four , the movie will actually see them sharing a unique bond . |
+| **`pcc_eng_01_068.3546_x1089543_59:3-4-5`**    | It was n't __``remotely close``__ to a full roster .                                                                                                                                                                                                                                                                 |
+| **`pcc_eng_03_091.9382_x1472474_56:2-5-6`**    | And neither is even __``remotely close``__ to the truth .                                                                                                                                                                                                                                                            |
+| **`pcc_eng_05_080.8645_x1292637_30:25-27-28`** | ISFA board member James Reynolds Jr. , an Emanuel appointee , said , " the qualifications between these two candidates for this position are not even __``remotely close``__ . "                                                                                                                                     |
+| **`pcc_eng_06_050.1498_x0795286_17:09-10`**    | The next time that Sharpe has something even __``remotely close``__ to being negative about anybody in either the Ravens or Broncos organization , it will be the first time .                                                                                                                                       |
+| **`pcc_eng_13_003.5078_x0040372_26:32-37-38`** | It seems highly likely that the DOH review will recommend further consideration of the health impacts - particularly in light of the specific reference to the three studies mentioned above , none of which will be __``remotely close``__ to completion within a " few weeks . "                                   |
+| **`pcc_eng_09_015.6699_x0237729_07:23-24`**    | Therefore , is there much probability that the answers that your advisor 's software generates based on these inputs will be anything __``remotely close``__ to what you actually experience throughout your lifetime ?                                                                                              |
+| **`pcc_eng_23_005.2717_x0068907_47:20-21`**    | Ketchup is considered a vegetable in our house since it 's the only thing that Blake eats that 's __``remotely close``__ to a vegetable , although tomatoes really are fruits .                                                                                                                                      |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_close_ex.md`
+
+
+### 6. _remotely possible_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                    |
+|:------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_083.7052_x1338585_063:4-6-7`**    | " It is not even __``remotely possible``__ that Trump will be able to bring back employment in coal or total manufacturing back anywhere near the level of the mid-20th century .                                              |
+| **`pcc_eng_01_047.7651_x0755626_40:40-41`**     | To elaborate on this simple beauty and why it 's important anyway , I will , if I may , make a non-musical allusion and bring in Indiana Jones and the Last Crusade ( which I do whenever even __``remotely possible``__ ) .   |
+| **`pcc_eng_16_055.7032_x0885357_51:3-5-6`**     | It 's not even __``remotely possible``__ that all inequality everywhere is due to the extension of patents and copyrights since 1981 .                                                                                         |
+| **`pcc_eng_19_046.5472_x0735100_251:24-25-26`** | His first reaction was that the guy from the motel , Hugh Mc Intyre , had found him already , but that was n't __``remotely possible``__ .                                                                                     |
+| **`pcc_eng_10_026.0570_x0404809_33:4-5`**       | Is it even __``remotely possible``__ that pols and pundits will ever again consistently do , or say , " what 's right ; " even when it 's not best for them ?                                                                  |
+| **`pcc_eng_17_055.3431_x0877988_07:20-21`**     | We have been critical of some of the ways Republicans have described the plan , but is this even __``remotely possible``__ ?                                                                                                   |
+| **`pcc_eng_25_083.0902_x1328663_28:22-23`**     | More to the point , it was trying to do something new , something that has only recently been made even __``remotely possible``__ ; in this case , measuring the overall emotional state of the entire city of San Francisco . |
+| **`pcc_eng_29_080.2067_x1279548_12:16-17`**     | Now most camera apps have far too man controls and options to make it even __``remotely possible``__ to capture a moment .                                                                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_possible_ex.md`
+
+
+### 7. _remotely similar_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                                                                                                   |
+|:------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_05_071.6600_x1143473_56:21-22`**     | But as this remarkable moment has come to a close , with the Trump administration highly unlikely to do anything __``remotely similar``__ , there is good reason to be troubled by the randomness of the decisions and profoundly saddened for all the deserving inmates left behind , the thousands and thousands whose hopes were raised so high and now have been dashed . |
+| **`pcc_eng_11_006.8734_x0095065_064:13-15-16`** | Basically what you are telling me is that JV and Bosh are not even __``REMOTELY similar``__ because of energy level and the amount of play near the rim ?                                                                                                                                                                                                                     |
+| **`pcc_eng_03_088.0188_x1409076_04:18-19-20`**  | There were a few bus lines in Springfield , Illinois , where I grew up , but nothing __``remotely similar``__ to the CTA .                                                                                                                                                                                                                                                    |
+| **`pcc_eng_24_100.3273_x1606937_18:11-13-14`**  | It is also called " cruise " but it is not even __``remotely similar``__ to big time cruises .                                                                                                                                                                                                                                                                                |
+| **`pcc_eng_15_001.7287_x0011657_148:12-14-15`** | And you say , " Um , so baby humans are not " __``remotely similar``__ to human beings " ? "                                                                                                                                                                                                                                                                                  |
+| **`pcc_eng_29_091.2775_x1458164_4:33-34`**      | On the other side of this idea however you have the fans who spread your work like the crusades , by destroying , demeaning , or getting butthurt over everything / one __``remotely similar``__ to your own work .                                                                                                                                                           |
+| **`pcc_eng_08_044.2107_x0699261_65:3-4-5`**     | There 's nothing __``remotely similar``__ between the Cuban Ry J and the Dominican , but it 's all about turning a buck , is n't it .                                                                                                                                                                                                                                         |
+| **`pcc_eng_04_041.4375_x0653615_07:23-24`**     | With a six stall barn , numerous other outbuildings and amenities , this property is truly one of a kind and anything __``remotely similar``__ is rarely available in our market .                                                                                                                                                                                            |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_similar_ex.md`
+
+
+### 8. _remotely true_
+
+
+|                                                 | `token_str`                                                                                                                                                                                          |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_20_006.3181_x0085665_11:10-11-12`**  | This is a lovely sentiment , but it 's not __``remotely true``__ .                                                                                                                                   |
+| **`pcc_eng_14_041.4911_x0654240_47:09-10`**     | Even if the items I imagined had been __``remotely true``__ , we would have handled them on Monday .                                                                                                 |
+| **`pcc_eng_23_012.0536_x0178318_108:1-6-7`**    | Neither of those things are __``remotely true``__ , but I made Top 8 and this is my list .                                                                                                           |
+| **`pcc_eng_test_3.01795_x37265_16:34-35-36`**   | This is such a great question because I think there 's a popular perception that all a historian really needs is a great memory for names and dates , which is of course not __``remotely true``__ . |
+| **`pcc_eng_00_004.9132_x0063132_2:4-5-6`**      | " It is not __``remotely true``__ that we are interested in Lichtsteiner , " he said in a press conference on the eve of their trip to Ajaccio on Friday .                                           |
+| **`pcc_eng_26_008.0465_x0113678_033:13-15-16`** | In fact , not only is that inherently contradictory , it is not even __``remotely true``__ .                                                                                                         |
+| **`pcc_eng_22_057.1873_x0908045_41:04-10-11`**  | Of course , none of this could be even __``remotely true``__ because I 'm not a data scientist or statistician .                                                                                     |
+| **`pcc_eng_14_070.8574_x1129385_25:5-6`**       | IF this is even __``remotely true``__ then why is our entire Sunday morning experience focused on what we read and say ?!?                                                                           |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_true_ex.md`
+
+
+### 9. _remotely plausible_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|:-----------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_14_024.5748_x0380847_27:8-9`**      | Mulder -- " I think it 's __``remotely plausible``__ that someone might think you 're hot . "                                                                                                                                                                                                                                                                                                                                |
+| **`pcc_eng_28_089.0850_x1424964_17:13-14`**    | But of course , the only way to make that unsupported speculation __``remotely plausible``__ is by ignoring the fact that the Mavi Marmara was the only ship whose passengers brutally attacked the soldiers .                                                                                                                                                                                                               |
+| **`pcc_eng_28_045.8592_x0725948_65:5-7-8`**    | In the end , neither is __``remotely plausible``__ .                                                                                                                                                                                                                                                                                                                                                                         |
+| **`pcc_eng_09_044.3244_x0701049_45:3-4`**      | Is this __``remotely plausible``__ to anyone ?                                                                                                                                                                                                                                                                                                                                                                               |
+| **`pcc_eng_val_1.8183_x13288_11:19-20`**       | The bad news is that much of The Joker 's appeal -- and all of what makes him __``remotely plausible``__ -- is that nobody is sure who or what he is .                                                                                                                                                                                                                                                                       |
+| **`pcc_eng_11_045.4591_x0719470_09:18-19`**    | How many locked doors have come open in the past few years to make this conversation even __``remotely plausible``__ ?                                                                                                                                                                                                                                                                                                       |
+| **`pcc_eng_28_005.7114_x0076117_31:48-49`**    | Given that guns are mechanical devices utilizing a chemical reaction ( rapid oxidation ) to propel projectiles , and would only be affected by a very powerful nearby magnetic field ( which would pull on them ) it 's extremely difficult to come up with an even __``remotely plausible``__ explanation of how such a device would work , and how it would n't affect devices far more magnetically sensitive than guns . |
+| **`pcc_eng_09_003.0485_x0033174_12:14-15-16`** | For all I know this actually happened , but on screen it is n't __``remotely plausible``__ .                                                                                                                                                                                                                                                                                                                                 |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_plausible_ex.md`
+
+
+### 10. _remotely funny_
+
+
+|                                                 | `token_str`                                                                                                                                                                                                                                                                                                                                                 |
+|:------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_16_037.6293_x0592724_06:45-46`**     | Interviewing with morning shows is strange in one respect : because they 're trying to keep the show 's energy level high and make their listeners feel good about being awake so godawful early , they laugh at everything you say that 's even __``remotely funny``__ .                                                                                   |
+| **`pcc_eng_21_077.8633_x1242034_08:1-5-6`**     | None of this is __``remotely funny``__ , despite screenwriter Wayne Conley 's resorting to virtually every known stereotype                                                                                                                                                                                                                                 |
+| **`pcc_eng_09_023.1908_x0359219_097:15-16`**    | Mostly you have to be under the age of nineteen to think it 's __``remotely funny``__ .                                                                                                                                                                                                                                                                     |
+| **`pcc_eng_13_081.4916_x1301037_149:08-09-10`** | Not just stupid , the jokes were n't __``remotely funny``__ , which some have pointed out might be the most pressing worry for fans of a comedy program .                                                                                                                                                                                                   |
+| **`pcc_eng_27_004.7603_x0060341_40:15-16-17`**  | Yeah , I know , I 'm a big softy , and this was n't __``remotely funny``__ .                                                                                                                                                                                                                                                                                |
+| **`pcc_eng_20_007.1232_x0098645_19:20-22-23`**  | In the last two months I 've read so many topics where FSUIPC was the culprit , it 's not even __``remotely funny``__ . ]                                                                                                                                                                                                                                   |
+| **`pcc_eng_04_036.1083_x0567538_44:62-63`**     | I learned a lot during this time : that there is a finite number of times I can listen to The Wheels on the Bus before having a compound nervous breakdown , that I should always keep my mouth closed and breathe through my nose during flu season , and that children will instantly remember and repeat anything they think is __``remotely funny``__ . |
+| **`pcc_eng_20_030.2939_x0473614_15:1-2-3`**     | Not __``remotely funny``__ .                                                                                                                                                                                                                                                                                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_funny_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/`...
+* Renaming existing version of `remotely_related_80ex~80.csv`
+* Renaming existing version of `remotely_close_80ex~80.csv`
+* Renaming existing version of `remotely_possible_80ex~80.csv`
+* Renaming existing version of `remotely_similar_80ex~80.csv`
+* Renaming existing version of `remotely_true_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_detonated_80ex~16.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_exploitable_80ex~37.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_related_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_comparable_80ex~69.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_close_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_possible_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_similar_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_true_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_plausible_80ex~43.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/remotely/remotely_funny_80ex~66.csv`
+
+## *longer*
+
+
+|                                  |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1`   | `l2`       |   `f1` |   `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:---------------------------------|------:|------:|------:|-----:|----------:|:-------|:-----------|-------:|-------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] longer~focal**      |   155 |  0.39 | 11.15 | 0.39 |  2,191.51 | longer | focal      | 11,259 |    393 | 71,961,373 |    0.06 |    154.94 |      1.00 |  0.01 | 0.01 |         0.39 |          0.20 |          3.63 | 12.44 | 3.40 | direct    |
+| **[_direct_] longer~lead**       |   264 |  0.21 | 10.15 | 0.21 |  3,344.40 | longer | lead       | 11,259 |  1,250 | 71,961,373 |    0.20 |    263.80 |      1.00 |  0.02 | 0.02 |         0.21 |          0.12 |          3.24 | 16.24 | 3.13 | direct    |
+| **[_direct_] longer~lasting**    | 3,545 |  0.16 | 10.11 | 0.16 | 43,975.64 | longer | lasting    | 11,259 | 21,954 | 71,961,373 |    3.43 |  3,541.57 |      1.00 |  0.31 | 0.31 |         0.31 |          0.24 |          3.25 | 59.48 | 3.01 | direct    |
+| **[_mirror_] longer~viable**     |    57 |  0.12 |  6.80 | 0.12 |    513.94 | longer | viable     |    910 |    471 |  1,680,633 |    0.26 |     56.74 |      1.00 |  0.06 | 0.06 |         0.12 |          0.09 |          2.44 |  7.52 | 2.35 | mirror    |
+| **[_mirror_] longer~lasting**    |    55 |  0.11 |  6.69 | 0.12 |    490.14 | longer | lasting    |    910 |    477 |  1,680,633 |    0.26 |     54.74 |      1.00 |  0.06 | 0.06 |         0.11 |          0.09 |          2.41 |  7.38 | 2.33 | mirror    |
+| **[_direct_] longer~historical** |   108 |  0.02 |  5.95 | 0.02 |    806.87 | longer | historical | 11,259 |  6,196 | 71,961,373 |    0.97 |    107.03 |      0.99 |  0.01 | 0.01 |         0.02 |          0.01 |          2.06 | 10.30 | 2.05 | direct    |
+| **[_direct_] longer~overall**    |    65 |  0.02 |  5.61 | 0.02 |    480.08 | longer | overall    | 11,259 |  3,884 | 71,961,373 |    0.61 |     64.39 |      0.99 |  0.01 | 0.01 |         0.02 |          0.01 |          2.04 |  7.99 | 2.03 | direct    |
+| **[_direct_] longer~healthier**  |   120 |  0.01 |  5.18 | 0.01 |    761.91 | longer | healthier  | 11,259 | 12,105 | 71,961,373 |    1.89 |    118.11 |      0.98 |  0.01 | 0.01 |         0.01 |          0.01 |          1.81 | 10.78 | 1.80 | direct    |
+| **[_direct_] longer~pink**       |    52 |  0.01 |  4.25 | 0.01 |    298.97 | longer | pink       | 11,259 |  7,089 | 71,961,373 |    1.11 |     50.89 |      0.98 |  0.00 | 0.00 |         0.01 |          0.01 |          1.68 |  7.06 | 1.67 | direct    |
+| **[_direct_] longer~average**    |    69 |  0.00 |  3.79 | 0.00 |    336.35 | longer | average    | 11,259 | 14,735 | 71,961,373 |    2.31 |     66.69 |      0.97 |  0.01 | 0.01 |         0.01 |          0.01 |          1.48 |  8.03 | 1.48 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/ALL-longer_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _longer focal_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                             |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_21_072.9718_x1163157_35:7-8`**    | However , the apertures of the __``longer focal``__ length lenses will have to be made slightly larger so that each will transmit the same amount of light to the negative .                                                                            |
+| **`pcc_eng_21_009.7107_x0140613_20:7-8`**    | Unusually for me I used a __``longer focal``__ length lens to compress the perspective of the mountain ranges around me .                                                                                                                               |
+| **`pcc_eng_00_102.8004_x1646532_185:27-28`** | On the other hand , in the scenes where we see more of his inner state of mind , or the minds of other characters , __``longer focal``__ lengths are used , putting all the focus on the eyes , or specific part of the character that is highlighted . |
+| **`pcc_eng_24_033.3237_x0522911_09:6-7`**    | The turned edge has a __``longer focal``__ length than the rest of the mirror so the grating is further from the focal point of the edge .                                                                                                              |
+| **`pcc_eng_19_062.6541_x0995296_7:17-18`**   | The Tele Vue Ethos is essentially multiple eyepieces , delivering the true field size of a __``longer focal``__ length , narrower apparent field eyepiece with the benefits of higher power and darker sky background .                                 |
+| **`pcc_eng_27_103.4050_x1656674_31:12-13`**  | If blurry backgrounds are something you desire , you want a __``longer focal``__ length macro lens .                                                                                                                                                    |
+| **`pcc_eng_00_102.8004_x1646532_290:2-3`**   | The __``longer focal``__ length does ask for a tripod , right focusing and enough light on the subject to make it of good quality .                                                                                                                     |
+| **`pcc_eng_29_031.4666_x0491674_56:15-16`**  | A wider focal length reveals more reflections and repetition in the scene whereas a __``longer focal``__ length allows you to focus ( literally and compositionally ) on just a few reflections .                                                       |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_focal_ex.md`
+
+
+### 2. _longer lead_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                               |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_079.5453_x1268945_086:8-9`**   | I usually like to have a much __``longer lead``__ time than that .                                                                                                                                                                                                                                        |
+| **`pcc_eng_29_068.6422_x1092728_06:23-24`**  | In case you 've missed it , last week the New York Times ran this article on the one - year or __``longer lead``__ -time between turning in a manuscript and seeing the book in print .                                                                                                                   |
+| **`pcc_eng_07_004.6676_x0059234_072:7-8`**   | ' There are risks , like __``longer lead``__ times , longer distances and immature infrastructure . '                                                                                                                                                                                                     |
+| **`pcc_eng_07_091.9801_x1470296_5:3-4`**     | Sometimes much __``longer lead``__ times may occur due to manufacturing delays and raw material shortages .                                                                                                                                                                                               |
+| **`pcc_eng_07_074.5211_x1188160_21:17-18`**  | Alex also marks the first Atlantic storm against which forecasters are giving county and city officials __``longer lead``__ times for watches and warnings , notes Chris Landsea , the science and operations officer at the National Hurricane Center .                                                  |
+| **`pcc_eng_08_055.6784_x0885380_090:20-21`** | " It will give us the ability to provide more accurate warnings of severe weather at finer scales and __``longer lead``__ times that will provide much better protection of lives and property , " says Brian D. Gross , deputy director of high performance computing and communications at the agency . |
+| **`pcc_eng_27_041.1935_x0649343_14:14-15`**  | " He also stressed the need for network TV shows to be given __``longer lead``__ times in production and , particularly in the case of mythos- rich serialized shows , shorter orders than 22 , " Variety adds .                                                                                          |
+| **`pcc_eng_07_006.7650_x0093339_07:11-12`**  | Customization and additional colors are available , but require a __``longer lead``__ time and a higher minimum order quantity .                                                                                                                                                                          |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_lead_ex.md`
+
+
+### 3. _longer lasting_
+
+
+|                                             | `token_str`                                                                                                                                                                                                 |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_09_055.6834_x0884636_28:1-2`**   | __``Longer Lasting``__ Roofs                                                                                                                                                                                |
+| **`pcc_eng_27_049.2684_x0779985_03:35-36`** | I was probably about five years old when I reached my Double Dribble prime , but the effect that all of those strange , straight - armed jumpers had on my psyche were far __``longer lasting``__ .         |
+| **`pcc_eng_09_100.0778_x1603059_12:10-11`** | O'Malley says the keys to success are new , __``longer lasting``__ material and surgical precision .                                                                                                        |
+| **`pcc_eng_03_002.2230_x0019780_04:16-17`** | Due to a higher concentration of oil in the fragrance , eau de toilettes are __``longer lasting``__ and more potent than aftershaves .                                                                      |
+| **`pcc_eng_02_023.8801_x0370316_19:20-21`** | " We are also working with partners to explore alternative products that will help to make repairs easier and __``longer lasting``__ . "                                                                    |
+| **`pcc_eng_11_077.3267_x1235610_11:27-28`** | However the effects of the impact would have been felt as far away as New Zealand , where the heat would have been less intense but __``longer lasting``__ , enough to enable live plant matter to ignite . |
+| **`pcc_eng_21_011.0146_x0161631_13:21-22`** | SWEPCO 's high performance roof designs , cold process application technology and superior cold process products combine to produce a __``longer lasting``__ , more problem free roof .                     |
+| **`pcc_eng_20_001.4470_x0007078_10:5-6`**   | If you want a __``longer lasting``__ effect , apply the glitters when the make - up is still a little wet .                                                                                                 |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_lasting_ex.md`
+
+
+### 4. _longer viable_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                          |
+|:--------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19990120_0551_7:08-09-10`**      | the 4 percent target for 1999 was no __``longer viable``__ , they argued .                                                                                                                                                                                                                           |
+| **`nyt_eng_20051221_0312_40:41-42-43`**     | and one thing Boras correctly pointed out in the massive negotiating manifesto he was schlepping around the baseball world the past month or so was that Damon 's value to a team will not automatically cease the minute he is no __``longer viable``__ as either a center fielder or leadoff man . |
+| **`apw_eng_19970424_1005_11:23-24-25`**     | with regard to shipbuilders in Spain , Wijers said , `` at the end of next year , if the shipyards are no __``longer viable``__ they will cease . ''                                                                                                                                                 |
+| **`nyt_eng_20001230_0097_5:38-39-40`**      | his current one , Aetna U.S. Healthcare , will drop all 52,330 Medicare HMO beneficiaries in Ohio on Jan. 1 , having concluded that `` inadequate government reimbursements have made operating a number of our Medicare HMOs no __``longer viable``__ . ''                                          |
+| **`apw_eng_19980518_0693_23:27-28-29`**     | `` But while competition is good , we do n't want a situation whereby cellular phone operators deliberately undercut prices as this will make the industry no __``longer viable``__ , '' he said .                                                                                                   |
+| **`apw_eng_19970709_0356_10:45-46-47`**     | David Thomas , chief executive of Whitbread PLC , which has sponsored the race since it started in 1973-74 , said the company 's prime business interests _ retail and beer products _ were in Britain and that sponsorship of the worldwide event was no __``longer viable``__ .                    |
+| **`apw_eng_19980203_1320_20:30-31-32`**     | such a situation provides an excuse or a basis for the other party to pull out of the arrangement as the business for which the property is purchased is no __``longer viable``__ or a similar property can be purchased cheaper elsewhere .                                                         |
+| **`pcc_eng_10_021.0357_x0323741_14:14-15`** | Other expensive items include Mats and Singlets , which even though have a __``longer viable``__ lifetime , throughout the years over wear and tear , must be replenished every few years .                                                                                                          |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_viable_ex.md`
+
+
+### 5. _longer historical_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_28_088.1517_x1410011_51:19-20`**  | Some researchers now suspect that this ability to stand outside of one 's immediate context and take a __``longer historical``__ view , like other forms of genius , may have physical correlates in the brain .                                                                                                                                                                                                                                                                                                                                                                                 |
+| **`pcc_eng_11_062.2439_x0991197_41:11-12`**  | And as I said , looking at it in the __``longer historical``__ timeframe , the reality is that these states never had long histories of complete independence .                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **`pcc_eng_13_040.6143_x0640542_24:09-10`**  | I like to think of this along a __``longer historical``__ arc .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **`pcc_eng_00_087.8554_x1404281_015:11-12`** | Gumbinger says today 's standards should be seen in a __``longer historical``__ perspective .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **`pcc_eng_27_049.7279_x0787432_036:44-45`** | Several other major advisors were also invited by Kennedy to team up with the group , they included : Robert Lovett and Dean Acheson , who earlier own worked under President Harry Truman and would assist Kennedy view the then present crisis in __``longer historical``__ point of view , Llewellyn ( Tommy ) Thomson , the US former ambassador to the Soviet Union , almost certainly the person within Kennedy 's circle that was best familiar with Khrushchev ; and C Douglas Dillon , who was earlier on high ranks under Eisenhower and linked Kennedy to the Republican Leadership . |
+| **`pcc_eng_16_001.1170_x0001880_11:20-21`**  | If you take a slightly __``longer historical``__ perspective , this immersion learning alongside family and community enjoys a much __``longer historical``__ precedent than does compulsory schooling .                                                                                                                                                                                                                                                                                                                                                                                         |
+| **`pcc_eng_11_038.1037_x0600596_13:42-43`**  | The massive remote sensing archives at the USGS Earth Resources Observation and Science Center ( USGS - EROS ) supply historical satellite data from the last 20 years that are critical in establishing a sound comparison of normal conditions over a __``longer historical``__ period ...                                                                                                                                                                                                                                                                                                     |
+| **`pcc_eng_03_002.0700_x0017338_5:28-29`**   | Contributors focus on the period from 2007 to 2015 , the global financial crisis and the period of fiscal consolidation that followed , while also providing a __``longer historical``__ context - austerity is not a new phenomenon .                                                                                                                                                                                                                                                                                                                                                           |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_historical_ex.md`
+
+
+### 6. _longer overall_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                     |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_29_031.7504_x0496201_1:15-16`**  | A four-gene expression ratio test prospectively distinguished mesothelioma patients who had a statistically significant __``longer overall``__ survival from those who had shorter survival , according to researchers from the Brigham and Women 's Hospital . |
+| **`pcc_eng_27_048.5284_x0767979_17:22-23`** | Among other questions , the experts will be asked whether the preliminary results reported by Genentech are likely to result in __``longer overall``__ survival for patients .                                                                                  |
+| **`pcc_eng_02_036.6659_x0577312_33:25-26`** | The reduce door height led the committee to explore different kinds of aerials that provided for lower overall heights , but the designs meant __``longer overall``__ lengths .                                                                                 |
+| **`pcc_eng_01_017.9199_x0273529_13:28-29`** | While the guide for Sonoma County 's new Tobacco Retailer License policy demonstrates teen usage of e-cigs has tripled , increased vaping among teens coincides with a __``longer overall``__ trend of declining youth tobacco smoking rates .                  |
+| **`nyt_eng_19980914_0372_28:6-7`**          | the coupe is 1.2 inches __``longer overall``__ than the '97 model , but has a wheelbase 1.8 inches shorter .                                                                                                                                                    |
+| **`pcc_eng_25_080.6413_x1289188_08:22-23`** | This growing interest in remanufactured parts can be explained by such factors as a larger proportion of older vehicles and their __``longer overall``__ useful life .                                                                                          |
+| **`pcc_eng_21_099.2382_x1587165_35:1-2`**   | __``Longer overall``__ life                                                                                                                                                                                                                                     |
+| **`pcc_eng_15_022.0054_x0339373_14:27-28`** | Understanding the superior schedule as well as the superior combination of drugs can both delay the onset to castrate resistance as well as provide for a __``longer overall``__ survival ( OS ) .                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_overall_ex.md`
+
+
+### 7. _longer healthier_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                             |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_25_029.2742_x0457604_53:20-21`**  | We also fight to keep the option open for future generations to allow them a less harmful environment and __``longer healthier``__ lifestyle .                                                                                                          |
+| **`pcc_eng_11_061.5762_x0980331_13:17-18`**  | This proves to be an asset as it is environment friendly and also cheaper ensuring a __``longer healthier``__ life for your pet .                                                                                                                       |
+| **`pcc_eng_27_031.3165_x0489308_19:35-36`**  | It would provide greater flexibility in responding to future demographic changes , and eliminate the need for future governments to have to deal with this issue if Canadians are blessed with developments leading to __``longer healthier``__ lives . |
+| **`pcc_eng_28_020.3366_x0312613_063:34-35`** | In making a small investment of your time and energy today , you will be making an important step in preventing a physically debilitating condition in the future and look forward to a __``longer healthier``__ life !                                 |
+| **`pcc_eng_10_026.5433_x0412753_19:33-34`**  | Throughout our site you will find information and links to external sites , that will help you control your cholesterol , fight the battle against atherosclerosis and heart disease and live a __``longer healthier``__ life .                         |
+| **`pcc_eng_12_017.1681_x0261573_21:24-25`**  | The findings suggest that fitness compresses the disease into a shorter amount of time at the end of life , giving people a __``longer healthier``__ life , says Berry .                                                                                |
+| **`pcc_eng_27_069.2219_x1103064_096:10-11`** | Research shows that working and thinking leads to a __``longer healthier``__ life .                                                                                                                                                                     |
+| **`pcc_eng_12_063.5742_x1011751_21:30-31`**  | I am looking forward to working with staff , the local community and partners to ensure we have the best community and hospital services that help local people live __``longer healthier``__ lives .                                                   |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_healthier_ex.md`
+
+
+### 8. _longer pink_
+
+
+|                                                 | `token_str`                                                                                                                                                                                |
+|:------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19990609_0159_39:14-15-16`**         | bake in 325-degree oven about 45 minutes or until chicken is tender and no __``longer pink``__ .                                                                                           |
+| **`pcc_eng_03_033.7772_x0530908_13:25-26-27`**  | When you flip the chicken for the last time , brush with the reserved barbecue sauce mixture and continue cooking until the chicken is not __``longer pink``__ and registers 160 degrees . |
+| **`nyt_eng_20000815_0227_55:13-14-15`**         | stir-fry for 1 to 2 minutes , or until the pork is no __``longer pink``__ .                                                                                                                |
+| **`nyt_eng_19990623_0145_82:09-10-11`**         | Simmer about 4 minutes or until chicken is no __``longer pink``__ .                                                                                                                        |
+| **`pcc_eng_29_098.1553_x1569691_029:10-11-12`** | Bake in the preheated oven until the chicken is not __``longer pink``__ in the center , and crispy on the outside , about 45 minutes .                                                     |
+| **`nyt_eng_19991020_0189_2:11-12-13`**          | add half the pork and stir-fry 3 minutes , until no __``longer pink``__ .                                                                                                                  |
+| **`nyt_eng_19990214_0151_65:7-8-9`**            | Cook just until the middle is no __``longer pink``__ .                                                                                                                                     |
+| **`nyt_eng_20050810_0048_12:21-22-23`**         | while crust bakes , in a large skillet over medium heat , cook the beef until it crumbles and is no __``longer pink``__ .                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_pink_ex.md`
+
+
+### 9. _longer average_
+
+
+|                                              | `token_str`                                                                                                                                                                                                           |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_14_075.3670_x1202433_12:17-18`**  | In addition , a 28 percent increase in sentence lengths from 2002 to 2012 led to __``longer average``__ prison stays , even while the percent of the sentence served by Mississippi offenders dropped by 22 percent . |
+| **`pcc_eng_11_014.6308_x0220470_12:12-13`**  | Knight Frank 's report notes that these hotels also typically experience __``longer average``__ lengths of stays than city hotels .                                                                                   |
+| **`pcc_eng_18_004.6354_x0058901_12:26-27`**  | Using data on intervals between bus arrivals , we find that the fixed - wage contract leads to more bunching of buses , and hence __``longer average``__ passenger wait times .                                       |
+| **`pcc_eng_24_096.9274_x1551622_067:14-15`** | If visitors are watching a video for several minutes , this indicates a __``longer average``__ time on site , which Google tends to compensate with increased page rankings .                                         |
+| **`pcc_eng_21_062.0432_x0986724_39:21-22`**  | The State of Digital blog has observed correlations between content length and lower bounce rates , higher engagement rates and __``longer average``__ time on site .                                                 |
+| **`pcc_eng_02_057.5720_x0915170_15:6-7`**    | This would then create a __``longer average``__ length of prescription because so many questionable short - term acute pain patients have been taken out of the mix .                                                 |
+| **`pcc_eng_20_003.5391_x0040717_018:09-10`** | It should be expected that Cairngorms has a __``longer average``__ decision time as they have no householder applications in their case mix .                                                                         |
+| **`pcc_eng_13_022.0437_x0340182_12:22-23`**  | Gender also affects run speed , and -- given equal levels of fitness -- a female runner will usually have a __``longer average``__ time .                                                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_average_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/`...
+* Renaming existing version of `longer_lasting_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_focal_80ex~49.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_lead_80ex~68.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_lasting_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_viable_80ex~14.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_historical_80ex~28.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_overall_80ex~9.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_healthier_80ex~37.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_pink_80ex~9.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/longer/longer_average_80ex~20.csv`
+
+## *ever*
+
+
+|                                 |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1` | `l2`        |    `f1` |   `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:--------------------------------|------:|------:|------:|-----:|----------:|:-----|:------------|--------:|-------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] ever~quarterly**   |   137 |  0.45 |  8.09 | 0.45 |  1,356.24 | ever | quarterly   | 110,979 |    304 | 71,961,373 |    0.47 |    136.53 |      1.00 |  0.00 | 0.00 |         0.45 |          0.23 |          2.73 | 11.66 | 2.47 | direct    |
+| **[_direct_] ever~olympic**     |   217 |  0.45 |  8.29 | 0.45 |  2,147.79 | ever | olympic     | 110,979 |    482 | 71,961,373 |    0.74 |    216.26 |      1.00 |  0.00 | 0.00 |         0.45 |          0.23 |          2.73 | 14.68 | 2.47 | direct    |
+| **[_direct_] ever~watchful**    |   415 |  0.22 |  7.08 | 0.22 |  3,410.23 | ever | watchful    | 110,979 |  1,850 | 71,961,373 |    2.85 |    412.15 |      0.99 |  0.00 | 0.00 |         0.22 |          0.11 |          2.27 | 20.23 | 2.16 | direct    |
+| **[_direct_] ever~diminishing** |    69 |  0.16 |  5.76 | 0.16 |    515.52 | ever | diminishing | 110,979 |    431 | 71,961,373 |    0.66 |     68.34 |      0.99 |  0.00 | 0.00 |         0.16 |          0.08 |          2.09 |  8.23 | 2.02 | direct    |
+| **[_direct_] ever~nearer**      |   220 |  0.15 |  6.24 | 0.15 |  1,623.45 | ever | nearer      | 110,979 |  1,435 | 71,961,373 |    2.21 |    217.79 |      0.99 |  0.00 | 0.00 |         0.15 |          0.08 |          2.07 | 14.68 | 2.00 | direct    |
+| **[_direct_] ever~scarcer**     |    82 |  0.15 |  5.77 | 0.15 |    602.34 | ever | scarcer     | 110,979 |    543 | 71,961,373 |    0.84 |     81.16 |      0.99 |  0.00 | 0.00 |         0.15 |          0.08 |          2.06 |  8.96 | 1.99 | direct    |
+| **[_direct_] ever~joint**       |   197 |  0.14 |  6.02 | 0.14 |  1,405.39 | ever | joint       | 110,979 |  1,441 | 71,961,373 |    2.22 |    194.78 |      0.99 |  0.00 | 0.00 |         0.14 |          0.07 |          2.01 | 13.88 | 1.95 | direct    |
+| **[_direct_] ever~shrinking**   |   116 |  0.12 |  5.61 | 0.12 |    798.16 | ever | shrinking   | 110,979 |    956 | 71,961,373 |    1.47 |    114.53 |      0.99 |  0.00 | 0.00 |         0.12 |          0.06 |          1.95 | 10.63 | 1.90 | direct    |
+| **[_direct_] ever~closer**      | 6,269 |  0.11 |  6.25 | 0.11 | 42,481.89 | ever | closer      | 110,979 | 55,736 | 71,961,373 |   85.96 |  6,183.04 |      0.99 |  0.06 | 0.06 |         0.11 |          0.08 |          1.94 | 78.09 | 1.86 | direct    |
+| **[_direct_] ever~vigilant**    |   911 |  0.09 |  5.82 | 0.10 |  5,837.17 | ever | vigilant    | 110,979 |  9,449 | 71,961,373 |   14.57 |    896.43 |      0.98 |  0.01 | 0.01 |         0.09 |          0.05 |          1.84 | 29.70 | 1.80 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ALL-ever_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _ever quarterly_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                        |
+|:--------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_12_086.6120_x1383397_03:5-6`**   | Berkshire posted its biggest- __``ever quarterly``__ loss of $ 50 billion , due to about $ 55 billion in investment losses .                                                                                                                                       |
+| **`pcc_eng_00_063.2229_x1005964_03:6-7`**   | Microsoft 's reported its first __``ever quarterly``__ loss since floating on the stock market in 1986 .                                                                                                                                                           |
+| **`pcc_eng_12_080.4338_x1283355_1:28-29`**  | Verizon Communications gained net wireless subscribers in the quarter , as the continued expansion of its unlimited wireless data plans helped the company recover from its first __``ever quarterly``__ net subscriber loss last quarter .                        |
+| **`pcc_eng_21_055.1764_x0875785_03:13-14`** | The NOK 154 million improvements against last year make it the best __``ever quarterly``__ result for Hurtigruten .                                                                                                                                                |
+| **`pcc_eng_04_004.4454_x0055860_16:25-26`** | Well , it seems that Goldman Sachs , whose stock has lost 43 % of its value since 2010 and has reported its first- __``ever quarterly``__ loss , still has its priorities ; mainly , stealing from everybody so a few guys can stuff their pockets with millions . |
+| **`pcc_eng_26_030.8371_x0482143_51:16-17`** | " MBIA Inc , the world 's largest bond insurer , posted its biggest - __``ever quarterly``__ loss and said it is considering new ways to raise capital after a slump in the value of subprime- mortgage securities the company guarantee " .                       |
+| **`pcc_eng_16_054.9024_x0872363_02:22-23`** | Shares of Twitter are getting hit hard in after hours , despite coming in ahead of revenue expectations in its first __``ever quarterly``__ earnings report , which was released on Wednesday .                                                                    |
+| **`pcc_eng_28_095.7328_x1532591_14:7-8`**   | It was the company 's biggest __``ever quarterly``__ profit .                                                                                                                                                                                                      |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_quarterly_ex.md`
+
+
+### 2. _ever olympic_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                             |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_071.7638_x1144881_03:17-18`**  | Nothe course on Monday in a race that saw the island of Cyprus win its first __``ever Olympic``__ medal , a silver in the same Laser class .                                                                                                            |
+| **`pcc_eng_26_040.4130_x0637325_02:28-29`**  | Sochi , Russia ( Sports Network.com ) - Anze Kopitar was one of three third - period scorers for Slovenia to help the country earn its first __``ever Olympic``__ hockey win in a 3 - 1 victory over Slovakia in Saturday 's game at Bolshoy Ice Dome . |
+| **`pcc_eng_02_018.8112_x0288309_02:27-28`**  | Jessie Diggins , Kikkan Randall and their teammates entered the Sochi Winter Games draped in hype and hope , primed to bring the U.S. its first- __``ever Olympic``__ medal in women 's cross-country skiing .                                          |
+| **`pcc_eng_28_035.5061_x0557958_13:15-16`**  | Hakuho 's father is regarded as a national hero as the country 's first- __``ever Olympic``__ medallist , when he won silver for wrestling in 1968 .                                                                                                    |
+| **`pcc_eng_20_107.10038_x1729235_05:14-15`** | The Stockholm Are 2026 proposal , which would see Sweden host its first __``ever Olympic``__ and Paralympic Winter Games , features competition across four venues including Stockholm , Are , Falun - and the neighbouring Latvian city of Sigulda .   |
+| **`pcc_eng_10_041.8616_x0661156_3:12-13`**   | Also on Monday , Kenyan-born Ruth Jebet won Bahrain 's first __``ever Olympic``__ gold when she claimed the women 's 3000 m steeplechase , and Poland 's Anita Wlodarczyk broke her own world record en route to the women 's hammer title .            |
+| **`pcc_eng_05_066.5006_x1059638_67:27-28`**  | This year the two teams will be aiming to build on their previous successes and help build the foundations that will lead Africa to her first __``ever Olympic``__ medal in sailing .                                                                   |
+| **`pcc_eng_24_019.0733_x0291890_05:20-21`**  | BURLINGTON - It was 14 years ago that Team USA made history , shocking Canada and winning the first __``ever Olympic``__ gold for women 's hockey with a 3 - 1 win in the decisive game .                                                               |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_olympic_ex.md`
+
+
+### 3. _ever watchful_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                              |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_15_075.6223_x1205712_067:21-22`** | In the performance of this duty , the State maintains and supports , at great expense , and with an __``ever watchful``__ solicitude , public schools throughout its territory , and secures to its youth the privilege of attendance therein .                                                                          |
+| **`pcc_eng_13_012.6492_x0187962_30:8-9`**    | The elder guardians of demure convention , __``ever watchful``__ for anything that might be designated as a threat to public morality , openly loathed them with a vengeance .                                                                                                                                           |
+| **`pcc_eng_05_073.6164_x1175136_17:3-4`**    | Gribbit , __``ever watchful``__ of things to lie about , has generated a post called " Boxer : The UN knows better than you how to raise your child . "                                                                                                                                                                  |
+| **`pcc_eng_07_053.0043_x0840623_33:7-8`**    | Incredible theology of grace and the __``ever watchful``__ love of Jesus .                                                                                                                                                                                                                                               |
+| **`pcc_eng_15_106.2622_x1701631_19:1-2`**    | __``Ever watchful``__ police , water cannon at the ready .                                                                                                                                                                                                                                                               |
+| **`pcc_eng_28_054.7703_x0869996_5:49-50`**   | Of course , whatever the role in which we conceive of the Judeo- Christian God , unless we flirt with heresy we anticipate that he is responsible for his creation , that he has thought out its end as well as its beginning , and that he is __``ever watchful``__ to see that his universe runs according to design . |
+| **`pcc_eng_18_004.9653_x0064274_096:22-23`** | Amid the glitter of precious stones and shining metals Hugh Myddleton was set to work on some menial task under the __``ever watchful``__ eye of his master .                                                                                                                                                            |
+| **`pcc_eng_13_009.9564_x0144517_305:5-6`**   | It was Amelia , __``ever watchful``__ , who noticed that although they drank freely and whenever they wanted , the wine skin never emptied .                                                                                                                                                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_watchful_ex.md`
+
+
+### 4. _ever diminishing_
+
+
+|                                              | `token_str`                                                                                                                                                             |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_02_067.8611_x1081504_058:13-14`** | Miners create a block after a time period that is worth an __``ever diminishing``__ amount of money or some type of benefit in order to ensure the shortfall .          |
+| **`pcc_eng_08_089.1689_x1427349_083:13-14`** | Miners create a block after a time frame which is worth an __``ever diminishing``__ amount of money or some sort of wages in order to ensure the shortfall .            |
+| **`pcc_eng_10_098.6602_x1579036_099:13-14`** | Miners create a block after a time period that is worth an __``ever diminishing``__ amount of money or some kind of reward in order to ensure the shortfall .           |
+| **`pcc_eng_25_035.7919_x0563213_82:13-14`**  | Miners create a block after a time frame which is worth an __``ever diminishing``__ amount of currency or some sort of wages in order to ensure the shortfall .         |
+| **`pcc_eng_01_065.0750_x1036263_026:14-15`** | Miners create a block after a period of time that 's worth an __``ever diminishing``__ amount of money or some form of benefit in order to ensure the shortage .        |
+| **`pcc_eng_24_092.8487_x1485473_012:14-15`** | Miners create a block after a period of time that is worth an __``ever diminishing``__ amount of currency or some kind of benefit so that you can ensure the shortage . |
+| **`pcc_eng_13_013.7182_x0205382_047:13-14`** | Miners create a block after a time frame that is worth an __``ever diminishing``__ amount of money or some form of wages in order to ensure the shortfall .             |
+| **`pcc_eng_17_022.3218_x0345153_092:14-15`** | Miners create a block after a period of time that 's worth an __``ever diminishing``__ amount of money or some sort of benefit to be able to ensure the deficit .       |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_diminishing_ex.md`
+
+
+### 5. _ever nearer_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                         |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_048.7900_x0771216_07:6-7`**    | Book signing day is getting __``ever nearer``__ .                                                                                                                                                                                   |
+| **`pcc_eng_00_034.4536_x0540481_2:13-14`**   | As we move into April , the 2014 FIFA World Cup comes __``ever nearer``__ , and video advertisers and marketers are gearing up to take advantage of what may be the biggest online event we 've seen yet .                          |
+| **`pcc_eng_12_107.08075_x1726380_11:18-19`** | And all the while the armies of the Dark Lord are massing as the One Ring draws __``ever nearer``__ to the Cracks of Doom .                                                                                                         |
+| **`pcc_eng_01_101.5443_x1625061_22:34-35`**  | A tourist at Jigokudani Monkey Park , Japan , was so desperate to get a close - up of this young Japanese macaque in a natural hot spring that she held her phone __``ever nearer``__ to her subject .                              |
+| **`pcc_eng_23_008.4292_x0119922_03:13-14`**  | Today is the day my baby book goes into production , drawing __``ever nearer``__ to the spring 2010 release date .                                                                                                                  |
+| **`pcc_eng_12_081.0317_x1293035_31:24-25`**  | As greater network speed encourages more devices to come online , it will also encourage a greater frequency of updates , bringing us __``ever nearer``__ to the Liquid Software ideal where Io T will thrive .                     |
+| **`pcc_eng_08_036.2081_x0570168_04:35-36`**  | As God 's involvement in the affairs of this world unfolds and the final intense dramas of conflict and confusion multiply , convinced Bible believers know the visible involvement of God 's intervention is __``ever nearer``__ . |
+| **`pcc_eng_06_085.7004_x1369849_08:17-18`**  | Luc 's 200 m freestyle time of was a very credible time these times take him __``ever nearer``__ to his national qualifying times needed to attend the National ASA Championships in the future .                                   |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_nearer_ex.md`
+
+
+### 6. _ever scarcer_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                     |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20080612_0082_13:4-5`**          | with jobs becoming __``ever scarcer``__ , these two are forced to work on a cruise ship catering to Westerners who want to see the ghost cities that are about to be lost forever .                                                                                                             |
+| **`pcc_eng_24_043.8301_x0692320_07:8-9`**   | As public funding for conservation efforts grows __``ever scarcer``__ and the private sector is brimming with ideas about how its role -- along with its profits -- can grow , market forces have found their way into environmental management to a degree unimaginable only a few years ago . |
+| **`pcc_eng_22_033.7317_x0528616_27:6-7`**   | Croaker and spot are becoming __``ever scarcer``__ .                                                                                                                                                                                                                                            |
+| **`pcc_eng_17_028.9066_x0451591_26:7-8`**   | As food in the market becomes __``ever scarcer``__ , and that which is available continues to escalate in price , we anticipate more displacement .                                                                                                                                             |
+| **`pcc_eng_09_104.7518_x1679086_59:24-25`** | All the gold would have been sent to China or Japan and caused the other deflation , the deflation that results from an __``ever scarcer``__ currency instead of increased production .                                                                                                         |
+| **`pcc_eng_09_014.2421_x0214540_063:7-8`**  | Funding for conservation continued to become __``ever scarcer``__ .                                                                                                                                                                                                                             |
+| **`nyt_eng_20100905_0078_40:27-28`**        | now , because of technology that can pinpoint what people online are viewing -- and more -- newspapers can make more scientific decisions about allocating their __``ever scarcer``__ resources .                                                                                               |
+| **`pcc_eng_06_031.6980_x0496597_06:12-13`** | The challenge is that they are finite resources that are becoming __``ever scarcer``__ .                                                                                                                                                                                                        |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_scarcer_ex.md`
+
+
+### 7. _ever joint_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                                         |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_22_040.7832_x0642814_09:18-19`** | India is also trying to transform this forum as strategic / defence oriented , therefore first - __``ever joint``__ Army exercise started in Pune on Monday .                                                                                                                                                       |
+| **`pcc_eng_14_052.7054_x0835841_17:20-21`** | That 's why key industry players have come together to form the Cybersecurity Tech Accord : the largest - __``ever joint``__ commitment by private sector technology and security companies to protect customers and improve cybersecurity .                                                                        |
+| **`pcc_eng_00_022.7551_x0351544_2:10-11`**  | B&Q and Castorama unveil 2014 product innovations at first __``ever joint``__ product show - October 2013                                                                                                                                                                                                           |
+| **`pcc_eng_12_018.5759_x0284353_07:13-14`** | In May , the armies of the two countries held their biggest __``ever joint``__ exercise - Balance Iroquois - in the northern Indian city of Agra .                                                                                                                                                                  |
+| **`pcc_eng_26_043.9283_x0694242_03:7-8`**   | If anyone thought that the first __``ever joint``__ counter terror exercise carried out by Indian and Chinese militaries in Kunming in China 's Yunnan province would be an out and out serious affair , then one is grossly mistaken as it had a lot to do with cultural extravaganza and friendly bonhomie also . |
+| **`pcc_eng_13_047.6467_x0754291_03:26-27`** | After being so private for so long , Prince Harry and Meghan Markle finally starting engaging with the public and sat down for their first- __``ever joint``__ interview where they revealed so much about their relationship that no one ever knew .                                                               |
+| **`pcc_eng_06_017.1588_x0261394_03:22-23`** | The commentary piece condemned South Korean officials for allegedly holding talks with the US as they plan to host the biggest __``ever joint``__ military drill to antagonise the hermit state .                                                                                                                   |
+| **`pcc_eng_25_067.1172_x1071206_3:23-24`**  | Kremlin spokesman Dmitry Peskov made the comments on June 7 , a day after NATO members and partners launched their biggest - __``ever joint``__ exercise in Poland .                                                                                                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_joint_ex.md`
+
+
+### 8. _ever shrinking_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                  |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_28_026.8059_x0416740_04:15-16`**  | You are planning a wedding with a ton of stuff to do and an __``ever shrinking``__ budget ; you do n't have to apologise for not ticking everything off your to do list - your wedding will survive .                                                                                        |
+| **`pcc_eng_15_055.2734_x0877126_38:11-12`**  | Once in a black hole you are trapped in an __``ever shrinking``__ sphere .                                                                                                                                                                                                                   |
+| **`pcc_eng_18_048.7214_x0772391_084:38-39`** | Instead , messages such as " It 's your money " ( the mantra of the first George W. Bush campaign in 2000 ) , and frames such as " the ownership society , " stress an __``ever shrinking``__ role for government and much more individual risk taking .                                     |
+| **`pcc_eng_26_081.4773_x1301106_07:4-5`**    | It is the __``ever shrinking``__ minority of negative voices like Roy Exum and Rhonda Thurman who , as last Thursday 's election shows , no longer represent the majority of Hamilton County voters on education issues .                                                                    |
+| **`pcc_eng_05_021.5118_x0332291_02:7-8`**    | Rapidly developing technology coupled with an __``ever shrinking``__ world have pitted the moral and ethical dilemma of privacy versus security against one another in increasingly volatile confrontations .                                                                                |
+| **`pcc_eng_12_059.5441_x0946505_25:39-40`**  | The 20th century and into the 21st century has been a time of significantly accelerating change and a fair degree of turmoil , with two World Wars , industrial expansion , space exploration and rampant communication in an __``ever shrinking``__ world .                                 |
+| **`pcc_eng_04_020.9327_x0321866_06:18-19`**  | Enzo Ferrari readily embraced this tradition and the racecars that bear his name today belong to an __``ever shrinking``__ number of Italian teams that continue the tradition of painting its cars Rosso Corsa , reinforcing an association with the color red that continues to this day . |
+| **`pcc_eng_01_038.6831_x0609052_33:27-28`**  | Portions of those who support small houses would be excluded each time , so those who want larger houses become an ever increasing portion of an __``ever shrinking``__ network .                                                                                                            |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_shrinking_ex.md`
+
+
+### 9. _ever closer_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                     |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_042.6513_x0672407_12:13-14`**  | We look forward to the New Church Year , hopefully to growing __``ever closer``__ to Christ Our King .                                                                                                                                                                                          |
+| **`pcc_eng_02_022.8318_x0353320_03:17-18`**  | It 's a lesson everyone in Detroit city government might reconsider as the city itself careens __``ever closer``__ to running out of cash .                                                                                                                                                     |
+| **`pcc_eng_04_026.0141_x0404272_2:27-28`**   | As we approach Max Reboot - that point at which we have effectively run out of popular or cult franchises to contemporize - we are marching __``ever closer``__ to our own time period .                                                                                                        |
+| **`pcc_eng_00_046.9728_x0743059_29:10-11`**  | And I 've obviously lost some youth , creeping __``ever closer``__ to the point at which I can no longer consider myself young at all .                                                                                                                                                         |
+| **`pcc_eng_21_088.0644_x1407100_05:14-15`**  | Mc Connell 's bullish talk about Trump comes as the Republican nominee pulls __``ever closer``__ to Hillary Clinton in the polls , a development that increases the chances that Republicans can hold the Senate and Mc Connell can stay majority leader .                                      |
+| **`pcc_eng_02_080.7119_x1288873_09:18-19`**  | The light stretched across the splintered wood floor in long narrow columns , blocky flat fingers sliding __``ever closer``__ to Andrea 's corner of the attic .                                                                                                                                |
+| **`pcc_eng_12_087.8113_x1402849_12:35-36`**  | The gap between the bridge and the riverbank -- left by Russia 's failure to build its own , much shorter share of the project -- exposes the reality behind the pledges of an __``ever closer``__ Russian - Chinese partnership made at more and more frequent meetings at the highest level . |
+| **`pcc_eng_24_006.6410_x0090905_019:24-25`** | Combined with the raiding of food stocks during the Siege of Falador , this now means that the Empire of Asgarnia are edging __``ever closer``__ to a famine .                                                                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_closer_ex.md`
+
+
+### 10. _ever vigilant_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                          |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_05_096.9965_x1553132_50:22-23`** | The best bet is to come to New Orleans prepared for the weather conditions , and once on the course stay __``ever vigilant``__ about hydration .                                                                                                                     |
+| **`pcc_eng_16_086.1455_x1378150_25:22-23`** | 4 . Spend time around the river or at a waterhole to watch the skittish animals drink from the shores , __``ever vigilant``__ of Nile crocodiles waiting in ambush .                                                                                                 |
+| **`pcc_eng_24_064.9195_x1034038_17:5-6`**   | But we must be __``ever vigilant``__ to keep them healthy .                                                                                                                                                                                                          |
+| **`pcc_eng_13_046.5832_x0737002_37:21-22`** | The Holy Spirit challenges me ( us ) to be a light , and He instructs my heart to be __``ever vigilant``__ to preach the Gospel , no matter the arena .                                                                                                              |
+| **`pcc_eng_12_019.1522_x0293653_24:8-9`**   | If we have a program that is __``ever vigilant``__ , that knows to hit the brake , the thing that we 'll see is a large drop in the number of people who are dying .                                                                                                 |
+| **`pcc_eng_05_036.6786_x0577813_13:24-25`** | See , I 've been trying to squash this before it reached the hardcore aural receptors of Kingye Best , but even my __``ever vigilant``__ crusade to assure the universe that Kanye West was not Hitler could not keep the man from having to address it personally . |
+| **`pcc_eng_04_011.4345_x0168806_24:26-27`** | It 's something to be endured and while I 've been holding up pretty well this year , all things considered , I must remain __``ever vigilant``__ .                                                                                                                  |
+| **`pcc_eng_08_055.0941_x0875907_24:1-2`**   | __``Ever vigilant``__ , these protectors of capitalism fight the good fight against the socialist unions that would turn their city , and the world , into a bastion of redistribution .                                                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_vigilant_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/`...
+* Renaming existing version of `ever_watchful_80ex~80.csv`
+* Renaming existing version of `ever_closer_80ex~80.csv`
+* Renaming existing version of `ever_vigilant_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_quarterly_80ex~37.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_olympic_80ex~66.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_watchful_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_diminishing_80ex~23.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_nearer_80ex~71.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_scarcer_80ex~22.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_joint_80ex~53.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_shrinking_80ex~37.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_closer_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/ever/ever_vigilant_80ex~80.csv`
+
+## *immediately*
+
+
+|                                         |    `f` | `dP1` | `LRC` | `P1` |       `G2` | `l1`        | `l2`         |   `f1` |    `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |    `t` | `MI` | `dataset` |
+|:----------------------------------------|-------:|------:|------:|-----:|-----------:|:------------|:-------------|-------:|--------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|-------:|-----:|:----------|
+| **[_direct_] immediately~appealable**   |     77 |  0.57 |  8.59 | 0.57 |     842.13 | immediately | appealable   | 91,746 |     135 | 71,961,373 |    0.17 |     76.83 |      1.00 |  0.00 | 0.00 |         0.57 |          0.28 |          3.02 |   8.76 | 2.65 | direct    |
+| **[_direct_] immediately~accretive**    |    237 |  0.45 |  8.59 | 0.45 |   2,435.26 | immediately | accretive    | 91,746 |     527 | 71,961,373 |    0.67 |    236.33 |      1.00 |  0.00 | 0.00 |         0.45 |          0.23 |          2.81 |  15.35 | 2.55 | direct    |
+| **[_direct_] immediately~adjacent**     |  1,572 |  0.33 |  8.36 | 0.33 |  14,989.71 | immediately | adjacent     | 91,746 |   4,711 | 71,961,373 |    6.01 |  1,565.99 |      1.00 |  0.02 | 0.02 |         0.33 |          0.17 |          2.60 |  39.50 | 2.42 | direct    |
+| **[_direct_] immediately~apparent**     |  4,864 |  0.09 |  6.17 | 0.09 |  32,633.82 | immediately | apparent     | 91,746 |  53,415 | 71,961,373 |   68.10 |  4,795.90 |      0.99 |  0.05 | 0.05 |         0.09 |          0.07 |          1.92 |  68.77 | 1.85 | direct    |
+| **[_mirror_] immediately~recognizable** |     56 |  0.09 |  5.94 | 0.09 |     439.81 | immediately | recognizable |  1,183 |     623 |  1,680,633 |    0.44 |     55.56 |      0.99 |  0.05 | 0.05 |         0.09 |          0.07 |          2.17 |   7.42 | 2.11 | mirror    |
+| **[_direct_] immediately~actionable**   |    172 |  0.09 |  5.53 | 0.09 |   1,130.86 | immediately | actionable   | 91,746 |   1,967 | 71,961,373 |    2.51 |    169.49 |      0.99 |  0.00 | 0.00 |         0.09 |          0.04 |          1.88 |  12.92 | 1.84 | direct    |
+| **[_direct_] immediately~subsequent**   |     58 |  0.08 |  4.87 | 0.08 |     374.49 | immediately | subsequent   | 91,746 |     702 | 71,961,373 |    0.90 |     57.10 |      0.98 |  0.00 | 0.00 |         0.08 |          0.04 |          1.85 |   7.50 | 1.81 | direct    |
+| **[_direct_] immediately~clear**        | 26,002 |  0.07 |  5.94 | 0.08 | 170,699.86 | immediately | clear        | 91,746 | 346,404 | 71,961,373 |  441.64 | 25,560.36 |      0.98 |  0.28 | 0.28 |         0.28 |          0.18 |          1.95 | 158.51 | 1.77 | direct    |
+| **[_direct_] immediately~prior**        |     63 |  0.06 |  4.35 | 0.06 |     357.73 | immediately | prior        | 91,746 |   1,118 | 71,961,373 |    1.43 |     61.57 |      0.98 |  0.00 | 0.00 |         0.06 |          0.03 |          1.67 |   7.76 | 1.65 | direct    |
+| **[_direct_] immediately~recognizable** |  1,716 |  0.05 |  5.22 | 0.05 |   9,499.61 | immediately | recognizable | 91,746 |  32,970 | 71,961,373 |   42.03 |  1,673.97 |      0.98 |  0.02 | 0.02 |         0.05 |          0.03 |          1.64 |  40.41 | 1.61 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/ALL-immediately_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _immediately appealable_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19960221_0286_124:35-36`**       | as we have said , an order denying qualified immunity , to the extent it turns on an `` issue of law , '' Mitchell , 472 U. S. , at 530 , is __``immediately appealable``__ .                                                                                                                                                                                                                                                 |
+| **`pcc_eng_29_097.0613_x1551859_18:14-15`** | " Denial of a motion to dismiss asserting a double jeopardy violation is __``immediately appealable``__ , " Sandefer and attorney Tim Newcomb wrote .                                                                                                                                                                                                                                                                         |
+| **`nyt_eng_19960221_0284_73:18-19`**        | but , the Court 's decision in Mitchell -LRB- that district court orders denying qualified immunity are __``immediately appealable``__ -RRB- was concerned primarily with preserving defendants ' immunity from trial , not discovery .                                                                                                                                                                                       |
+| **`pcc_eng_13_099.9402_x1598816_2:13-14`**  | An order imposing a discovery sanction of more than $ 5,000 is __``immediately appealable``__ ; an order imposing a sanction below that amount is not .                                                                                                                                                                                                                                                                       |
+| **`nyt_eng_19960221_0288_20:27-28`**        | in Mitchell v. Forsyth , 472 U. S. 511 , 530 , this Court held that a district court 's denial of qualified immunity is an __``immediately appealable``__ `` final decision '' within the meaning of 28 U. S. C. s1291 .                                                                                                                                                                                                      |
+| **`pcc_eng_28_022.8038_x0352157_05:39-40`** | One case-- Macaluso v. Superior Court , 219 Cal. App. 4th 1042 ( 2013 ) -- says that an order related to a judgment debtor exam is , literally , an order after final judgment , which is __``immediately appealable``__ under Code of Civil Procedure SS 904.1 ( a ) ( 2 ) .                                                                                                                                                 |
+| **`pcc_eng_01_028.6926_x0447774_03:24-25`** | In my post , I wrote that the panel was likely to conclude that the denial of an anti-SLAPP motion to dismiss was __``immediately appealable``__ ( having already held , in Burke v. Doe I , that the denial of a special motion to quash under the DC anti-SLAPP statute was __``immediately appealable``__ ) , and that the tougher question would be how to apply the " likely to succeed " standard at the motion stage . |
+| **`pcc_eng_01_103.0835_x1649758_12:14-15`** | Witham wrote in his notice that " this is an error and is __``immediately appealable``__ by law . "                                                                                                                                                                                                                                                                                                                           |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_appealable_ex.md`
+
+
+### 2. _immediately accretive_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                          |
+|:--------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_20_007.9912_x0112746_15:25-26`** | We also further enhanced our financial flexibility by paying down $ 2.5 billion in debt , which will reduce our interest expense and be __``immediately accretive``__ .                                                                                                                              |
+| **`pcc_eng_06_097.2319_x1556511_12:3-4`**   | That 's __``immediately accretive``__ to per-share book value , and I love to see that kind of capital allocation move .                                                                                                                                                                             |
+| **`pcc_eng_22_073.2819_x1168255_11:5-6`**   | This acquisition will be __``immediately accretive``__ to 2018 earnings and will require minimal integration activity . "                                                                                                                                                                            |
+| **`pcc_eng_01_039.2871_x0618704_5:34-35`**  | The addition of Questar Pipeline - which owns and operates Federal Energy Regulatory Commission - regulated natural gas transmission and storage assets in Colorado , Utah and Wyoming - is expected to be __``immediately accretive``__ to Dominion Midstream 's distributable cash flow per unit . |
+| **`pcc_eng_val_2.05206_x24683_11:27-28`**   | The deal is expected to result in cost savings of greater than $ 1.6 billion by the third year following closing , and should be nearly __``immediately accretive``__ to free cash flow and adjusted earnings .                                                                                      |
+| **`pcc_eng_07_060.9881_x0969721_24:7-8`**   | The transaction is expected to be __``immediately accretive``__ to adjusted cash earnings per share and free cash flow .                                                                                                                                                                             |
+| **`pcc_eng_03_088.8732_x1423059_15:6-7`**   | " The acquisition will be __``immediately accretive``__ to cash flow , adding approximately $ 9.0 million annually on the basis of estimated fourth quarter 2011 results .                                                                                                                           |
+| **`pcc_eng_22_016.1110_x0243678_37:18-19`** | It seems LINN would like to trade or sell the asset , which it believes will be __``immediately accretive``__ to cash flow .                                                                                                                                                                         |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_accretive_ex.md`
+
+
+### 3. _immediately adjacent_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                  |
+|:---------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_27_012.6558_x0188441_28:13-14`**  | The property is located on the south shore of Lake Newport , __``immediately adjacent``__ to the west end of Lake Newport dam , bounded to the west by RA 's Lake Newport tennis court complex , and to the east by common area that is part of RA 's Brown 's Chapel Park . |
+| **`pcc_eng_10_020.6553_x0317646_43:21-22`**  | Often , the first new site where a metastatic tumor will develop is in the lymph nodes in the region __``immediately adjacent``__ to the primary tumor .                                                                                                                     |
+| **`pcc_eng_14_001.8172_x0013376_3:24-25`**   | The Bridle Track Solar Project provides the potential for up to 300 MW of photovoltaic ( PV ) solar generation to be located __``immediately adjacent``__ to the Baroota Pumped Hydro Project .                                                                              |
+| **`pcc_eng_14_022.7227_x0350917_03:13-14`**  | Brown Hart Gardens is an elevated public square over a listed substation __``immediately adjacent``__ to Oxford Street .                                                                                                                                                     |
+| **`pcc_eng_29_069.8684_x1112733_8:30-31`**   | In the scene at the zoo after Chris , Marissa and Ty are leaving the penguin enclosure , she and Ty are shown departing the zoo through a gate __``immediately adjacent``__ to the left of the penguin house .                                                               |
+| **`pcc_eng_23_043.8517_x0692482_22:13-14`**  | " What is so iconic about this image and historic is that __``immediately adjacent``__ to him is a senior member of the Muslim Brotherhood , Mohammed el-Beltagy .                                                                                                           |
+| **`pcc_eng_28_010.8617_x0159504_038:13-14`** | This will be in the portion of the L Band that is __``immediately adjacent``__ to the band used by GPS .                                                                                                                                                                     |
+| **`pcc_eng_09_006.9114_x0095724_095:09-10`** | The NAB branch was in a solitary building __``immediately adjacent``__ to the east end of the 3 KZ block .                                                                                                                                                                   |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_adjacent_ex.md`
+
+
+### 4. _immediately apparent_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                    |
+|:-----------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_29_034.5062_x0540793_46:50-51-52`** | The Velvet Underground proved that one need n't be a rock star to make a great album ; with their gritty production , polarizing songs and arty appeal , the VU found a new way to make a mark in the music business , even if the results were n't __``immediately apparent``__ .             |
+| **`apw_eng_20030814_0891_4:3-4-5`**            | it was not __``immediately apparent``__ when the bodies were discovered nor how they were killed .                                                                                                                                                                                             |
+| **`pcc_eng_28_100.5929_x1610939_288:14-15`**   | On first bite , an explosion of chewy dough and crunchy hazelnuts was __``immediately apparent``__ .                                                                                                                                                                                           |
+| **`pcc_eng_00_065.1145_x1036612_31:4-5`**      | One thing is __``immediately apparent``__ from the interviews : although the couples questioned have experienced the disadvantages of confessionalism directly , and although they have often had to fight immense social resistance , only some of them are against the confessional system . |
+| **`pcc_eng_29_071.0669_x1132115_18:3-4`**      | It 's __``immediately apparent``__ when I step into a sea of khakis and button -down blouses that I was the only one who took " suburban mom " to mean " short jean skirt and tall pleather boots . "                                                                                          |
+| **`nyt_eng_20070119_0337_11:4-5-6`**           | if it is not __``immediately apparent``__ what this has to do with this runway season , consider that -- quietly and with an almost puritanical lack of fuss or ostentation -- the designers here seem to have produced one of the finer showings of Italian men 's wear in some time .        |
+| **`pcc_eng_27_064.2259_x1022022_29:14-16-17`** | But the concussion from the blast can have a lingering effect that is not always __``immediately apparent``__ .                                                                                                                                                                                |
+| **`pcc_eng_03_083.8356_x1341452_58:26-28-29`** | The difference between that sort of self - harm which indicates something is wrong with a person , and self-affliction which glorifies God , is not always __``immediately apparent``__ .                                                                                                      |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_apparent_ex.md`
+
+
+### 5. _immediately recognizable_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_15_073.8550_x1177028_05:12-13`**    | Cut to a succession of others , many of whom are __``immediately recognizable``__ -- Cary Grant , Tippi Hedren , Ray Milland , Meg Ryan , Humphrey Bogart -- dialing or stabbing Touch - Tones in various states of expectation .                                                                                                                                                                                                                                                                                                            |
+| **`pcc_eng_18_055.4917_x0882196_13:14-15`**    | His consummate craftsmanship and natural approach created a body of work that is __``immediately recognizable``__ as his .                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **`pcc_eng_val_3.10332_x51233_23:23-24`**      | Since his 1954 debut album , " I Love Paris , " Mr. Legrand has worked in various genres while creating an __``immediately recognizable``__ sound , including his many jazz recordings ; his association with the filmmaker Jacques Demy on movie musicals like " The Young Girls of Rochefort " ; his sophisticated soundtracks , most notably " Summer of ' 42 " and " The Thomas Crown Affair , " which spawned the hit " The Windmills of Your Mind " ; and his Oscar-winning score for Ms. Streisand 's directorial debut , " Yentl . " |
+| **`pcc_eng_27_105.6934_x1693562_11:22-24-25`** | The acting is middling , with Tomei seeming to be an out of place acting choice since the other actors are n't necessarily __``immediately recognizable``__ .                                                                                                                                                                                                                                                                                                                                                                                |
+| **`pcc_eng_15_054.5261_x0865047_20:11-12`**    | But who he was beneath his patrician mien -- that __``immediately recognizable``__ way he carried himself , a factory prototype of the New England man of letters -- remains elusive .                                                                                                                                                                                                                                                                                                                                                       |
+| **`pcc_eng_06_078.1739_x1247964_07:6-7`**      | But for millions he is __``immediately recognizable``__ , even to the president of the United States .                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **`pcc_eng_01_014.6686_x0220600_02:49-50`**    | The villain ( other synonyms include scoundrel , reprobate , cur , miscreant , rogue , louse , brute , renegade , and significantly in our case - devil ) is meant to be someone so diametrically opposite from the hero that he ( or she ) is __``immediately recognizable``__ , yet completely foreign to the protagonist .                                                                                                                                                                                                                |
+| **`pcc_eng_23_088.0682_x1407108_05:4-5`**      | A Partagas is __``immediately recognizable``__ by its deep , earthy flavor .                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_recognizable_ex.md`
+
+
+### 6. _immediately actionable_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                  |
+|:-----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_080.0957_x1280415_26:09-10`**    | The Marketing Roadmap ( tm ) will include __``immediately actionable``__ recommendations for improving your marketing .                                                                                                                      |
+| **`pcc_eng_17_028.8260_x0450266_11:15-16`**    | Passionate and devotee about coding , agile enthusiast , with an extremely clear and __``immediately actionable``__ style , he can managed any software deliverables on -time .                                                              |
+| **`pcc_eng_22_017.6965_x0269266_15:6-7`**      | This keynote presentation focuses on __``immediately actionable``__ paid and organic social tactics marketers can use for enhanced demographic research and data-driven community outreach .                                                 |
+| **`pcc_eng_24_022.3489_x0344875_28:24-25`**    | " With the advent of tablets and mobile , the entire user experience has changed and we have a way to make answers __``immediately actionable``__ . "                                                                                        |
+| **`pcc_eng_08_042.5473_x0672333_23:26-27`**    | Importantly , we will work with your staff on the ' how to ' for tracking so that we can be assured the information is __``immediately actionable``__ .                                                                                      |
+| **`pcc_eng_17_051.8141_x0821004_13:11-12`**    | A compelling case for cultivating intense focus , and offers __``immediately actionable``__ steps for infusing more of it into our lives .                                                                                                   |
+| **`pcc_eng_24_104.0993_x1668074_05:10-12-13`** | And while these may be important , they are not as __``immediately actionable``__ and relevant as the need to push to evolve the process of how ecologically sound water engineering practices are approached and implemented in the basin . |
+| **`pcc_eng_19_073.9809_x1178946_07:22-23`**    | There was a lot to cover in the hour , but Jason is an agency pro that will give you some __``immediately actionable``__ takeaways to start growing your pipeline .                                                                          |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_actionable_ex.md`
+
+
+### 7. _immediately subsequent_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                                                       |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_00_103.0243_x1650133_20:36-37`**  | The scenes early on in the piece with a giant squid dragging a tanker down to the depths look extremely cheap but things improve after that , even if the encounter with a giant crab __``immediately subsequent``__ to that is offset by the laughable image of Patrick Muldoon going bug-eyed and yelling Craaaaab .                                                            |
+| **`pcc_eng_04_027.6216_x0430208_12:16-17`**  | Mostly , Boll 's reputation emerged out of a string of videogame adaptations he made __``immediately subsequent``__ to Heart of America , with House of the Dead ( 2003 ) , Alone in the Dark ( 2005 ) , Bloodrayne ( 2005 ) ,                                                                                                                                                    |
+| **`pcc_eng_04_026.4512_x0411425_03:36-37`**  | Retail consultancy Customer Growth Partners has issued highlights from a major new study analyzing the effects of 20 years of major disasters on retail spending , and the analysis shows that retail spending in the __``immediately subsequent``__ Christmas shopping season actually rose -- even in the year of Sept. 11 .                                                    |
+| **`pcc_eng_08_031.1414_x0488068_125:25-26`** | Unfortunately for the latter , that story of Godfrey 's offer and acceptance had been communicated to Isabella , as had of course the __``immediately subsequent``__ story of their separation .                                                                                                                                                                                  |
+| **`pcc_eng_18_062.0383_x0988160_03:32-33`**  | At issue , as FHQ has discussed , is the discrepancy between the longstanding New Hampshire election law that requires seven days between the primary in the Granite state and the __``immediately subsequent``__ primary or caucus and a newly -enacted Nevada Republican Party resolution tethering the party 's caucuses to the Saturday following the New Hampshire primary . |
+| **`pcc_eng_01_012.9535_x0192993_12:24-25`**  | Raven and Dani are here in place of Emily and Gar joins in later on as we discuss the undeniably predictable un-betrayal and __``immediately subsequent``__ death of Katsuragi Shinobu , Kairi and Tsukasa have a weird adopted mommy moment , and Cluster ......                                                                                                                 |
+| **`pcc_eng_05_105.1589_x1684711_19:12-13`**  | The only other man accused of their murder by contemporary or __``immediately subsequent``__ accounts - Mancini , Lopes de Chaves , More , Vergil , Holinshed - was Gloucester 's creature Buckingham .                                                                                                                                                                           |
+| **`pcc_eng_10_012.8489_x0191449_05:18-19`**  | Because even the normal contusions and wear from one MMA fight can be a detriment to an __``immediately subsequent``__ one ?                                                                                                                                                                                                                                                      |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_subsequent_ex.md`
+
+
+### 8. _immediately clear_
+
+
+|                                                | `token_str`                                                                                                                                                                                                           |
+|:-----------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_12_033.7263_x0529640_06:13-14-15`** | Firefighters reported that some buildings had been engulfed , but it was not __``immediately clear``__ whether they were homes , outbuildings or garages , said Nathan Judy , a spokesman for the U.S. Fire Service . |
+| **`pcc_eng_05_031.9762_x0501867_2:3-4-5`**     | It was not __``immediately clear``__ to me whether it would fit , but after some research , it appeared to be the right size .                                                                                        |
+| **`apw_eng_20030320_0205_3:3-4-5`**            | it was not __``immediately clear``__ whether the Iraqi missile was destroyed in the air before hitting the ground .                                                                                                   |
+| **`apw_eng_20090423_1211_8:3-4-5`**            | it was not __``immediately clear``__ what charges they might face .                                                                                                                                                   |
+| **`apw_eng_20020310_0307_10:5-6-7`**           | however , it was not __``immediately clear``__ when the primary election will be held , although a government official , speaking on the condition of anonymity , said they could be held as early as Wednesday .     |
+| **`apw_eng_20090408_0632_2:3-4-5`**            | it is not __``immediately clear``__ who will replace him .                                                                                                                                                            |
+| **`nyt_eng_19960722_0287_2:3-4-5`**            | it was not __``immediately clear``__ whether the planned announcement , which comes on the eve of the deadline for Docks to present an alternative bid , meant management had come up with a plan to repel Auchan .   |
+| **`apw_eng_20030111_0447_11:3-4-5`**           | it was not __``immediately clear``__ what Mezquia had been previously convicted of or whether he had obtained a lawyer .                                                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_clear_ex.md`
+
+
+### 9. _immediately prior_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_04_072.4855_x1154648_19:13-14`**  | During the period , Pulse Asia said various issues preoccupied Filipinos " __``immediately prior``__ to and during the conduct of the field interviews , " including the filing of graft and plunder charges against three senators and other public officials for alleged misuse of pork barrel funds , the decision by the Supreme Court declaring certain actions and provisions of the Disbursement Acceleration Program ( DAP ) as unconstitutional , and the controversial decision of Aquino to reject the nomination of movie star Nora Aunor as National Artist for Film .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **`pcc_eng_13_019.2128_x0294352_14:2-3`**    | The __``immediately prior``__ posting , " a Sunday visit to Campus " , has photos of both of the Visitors '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **`pcc_eng_28_021.2713_x0327549_005:21-22`** | " It looks at how well responsible investment funds have performed , and for the financial crisis and the period __``immediately prior``__ , it has shown that the average responsible investment fund has beaten the benchmark across all of the categories chosen .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **`pcc_eng_11_069.6589_x1111399_08:19-20`**  | Meade served as Secretary of Finance ( Treasury ) and Secretary of Energy towards the end of the __``immediately prior``__ presidency of Felipe Calderon Hinojosa of the right- wing National Action Party ( PAN ) , where he was a proponent of the energy reform adopted early in Pena Nieto 's subsequent administration .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **`pcc_eng_01_065.7107_x1046709_10:12-13`**  | This also reduces the ability of an injury replacement in the __``immediately prior``__ or ovulation , the more risky than in the period after the warning was published .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **`pcc_eng_09_105.2393_x1687013_011:82-83`** | ( b ) The stockholders of the Company approve and the Company consummates a reorganization , merger or consolidation of the Company or the Company sells , or otherwise disposes of , all or substantially all of the Company 's property and assets , or the Company liquidates or dissolves ( other than a reorganization , merger , consolidation or sale which would result in all or substantially all of the beneficial owners of the Voting Stock of the Company outstanding __``immediately prior``__ thereto continuing to beneficially own , directly or indirectly ( either by remaining outstanding or by being converted into voting securities of the resulting entity ) , more than fifty percent ( 50 % ) of the combined voting power of the voting securities of the Company or such entity resulting from the transaction ( including , without limitation , an entity which as a result of such transaction owns the Company or all or substantially all of the Company 's property or assets , directly or indirectly ) outstanding immediately after such transaction in substantially the same proportions relative to each other as their ownership __``immediately prior``__ to such transaction ) ; or |
+| **`pcc_eng_27_033.6476_x0527284_07:24-25`**  | The Rolling Thunder included Alexey Tyukalov and Mark Felix going head - to - head in a matchup featuring the current and the __``immediately prior``__ world record holder : both succeeded with 123 kg ( 270 lb. ) , but neither one could complete 128 kg ( 281 lb . ) .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **`pcc_eng_26_015.4703_x0234007_5:41-42`**   | Throughout the book , he wanders frequently : to France , Italy , the Netherlands , and the U.S. Second , Zagajewski insists on the importance of history , a touchstone pulling him ever backward to WWII and the period __``immediately prior``__ .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_prior_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/`...
+* Renaming existing version of `immediately_adjacent_80ex~80.csv`
+* Renaming existing version of `immediately_apparent_80ex~80.csv`
+* Renaming existing version of `immediately_recognizable_80ex~80.csv`
+* Renaming existing version of `immediately_clear_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_appealable_80ex~33.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_accretive_80ex~68.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_adjacent_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_apparent_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_recognizable_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_actionable_80ex~50.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_subsequent_80ex~22.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_clear_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/immediately/immediately_prior_80ex~16.csv`
+
+## *yet*
+
+
+|                                 | `f` | `dP1` | `LRC` | `P1` |     `G2` | `l1` | `l2`         |   `f1` |  `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:--------------------------------|----:|------:|------:|-----:|---------:|:-----|:-------------|-------:|------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] yet~unborn**       | 359 |  0.72 | 10.12 | 0.72 | 4,166.57 | yet  | unborn       | 94,755 |   501 | 71,961,373 |    0.66 |    358.34 |      1.00 |  0.00 | 0.00 |         0.72 |          0.36 |          3.28 | 18.91 | 2.74 | direct    |
+| **[_direct_] yet~unnamed**      | 737 |  0.35 |  8.31 | 0.35 | 7,068.31 | yet  | unnamed      | 94,755 | 2,095 | 71,961,373 |    2.76 |    734.24 |      1.00 |  0.01 | 0.01 |         0.35 |          0.18 |          2.62 | 27.05 | 2.43 | direct    |
+| **[_direct_] yet~unspecified**  | 202 |  0.33 |  7.84 | 0.33 | 1,910.41 | yet  | unspecified  | 94,755 |   605 | 71,961,373 |    0.80 |    201.20 |      1.00 |  0.00 | 0.00 |         0.33 |          0.17 |          2.58 | 14.16 | 2.40 | direct    |
+| **[_direct_] yet~untitled**     | 122 |  0.30 |  7.41 | 0.30 | 1,121.48 | yet  | untitled     | 94,755 |   408 | 71,961,373 |    0.54 |    121.46 |      1.00 |  0.00 | 0.00 |         0.30 |          0.15 |          2.51 | 11.00 | 2.36 | direct    |
+| **[_direct_] yet~undetermined** | 295 |  0.27 |  7.55 | 0.27 | 2,639.58 | yet  | undetermined | 94,755 | 1,096 | 71,961,373 |    1.44 |    293.56 |      1.00 |  0.00 | 0.00 |         0.27 |          0.14 |          2.45 | 17.09 | 2.31 | direct    |
+| **[_direct_] yet~unformed**     |  52 |  0.21 |  6.25 | 0.21 |   437.04 | yet  | unformed     | 94,755 |   245 | 71,961,373 |    0.32 |     51.68 |      0.99 |  0.00 | 0.00 |         0.21 |          0.11 |          2.31 |  7.17 | 2.21 | direct    |
+| **[_direct_] yet~unidentified** | 336 |  0.18 |  6.86 | 0.18 | 2,698.77 | yet  | unidentified | 94,755 | 1,876 | 71,961,373 |    2.47 |    333.53 |      0.99 |  0.00 | 0.00 |         0.18 |          0.09 |          2.22 | 18.20 | 2.13 | direct    |
+| **[_direct_] yet~unannounced**  | 127 |  0.14 |  6.17 | 0.15 |   962.29 | yet  | unannounced  | 94,755 |   874 | 71,961,373 |    1.15 |    125.85 |      0.99 |  0.00 | 0.00 |         0.14 |          0.07 |          2.11 | 11.17 | 2.04 | direct    |
+| **[_direct_] yet~unconfirmed**  | 146 |  0.14 |  6.14 | 0.14 | 1,088.70 | yet  | unconfirmed  | 94,755 | 1,063 | 71,961,373 |    1.40 |    144.60 |      0.99 |  0.00 | 0.00 |         0.14 |          0.07 |          2.08 | 11.97 | 2.02 | direct    |
+| **[_direct_] yet~unwritten**    |  71 |  0.13 |  5.73 | 0.13 |   526.47 | yet  | unwritten    | 94,755 |   527 | 71,961,373 |    0.69 |     70.31 |      0.99 |  0.00 | 0.00 |         0.13 |          0.07 |          2.08 |  8.34 | 2.01 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/ALL-yet_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _yet unborn_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                       |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_03_035.2962_x0555555_56:20-21`**  | While imprisoned by the Shi'ar Empire , Katherine was brutally murdered by the tyrannical D'ken , who ripped a __``yet unborn``__ child from her womb .                                                                                                           |
+| **`pcc_eng_10_026.4963_x0412005_15:15-16`**  | The shadow may also represent positive elements within ourselves - " everything that is __``yet unborn``__ or not yet conscious within us " ( Bolen ) .                                                                                                           |
+| **`pcc_eng_16_003.4869_x0040548_076:21-22`** | They applied themselves to it in a way that told on their genera-tion and formed in its womb a generation __``yet unborn``__ for God .                                                                                                                            |
+| **`pcc_eng_23_003.5744_x0041391_10:24-25`**  | Our story opens with Hyakkimaru 's father , quite the power - hungry guy , offering up fourty - eight parts of his __``yet unborn``__ son to fourty - eight demons in exchange for control of the region .                                                        |
+| **`pcc_eng_25_002.1712_x0019074_15:44-45`**  | They will creep in opalescent mists ; -- they will whiten in frost and hail and snow ; -- they will reflect again the forms and the colours of the macrocosm ; they will throb to the ruby pulsing of hearts that are __``yet unborn``__ .                        |
+| **`pcc_eng_01_009.7426_x0141270_17:25-26`**  | Phillippe 's fascination with laundromat dryers translates into fantastic delusions about a space capsule departing for the moon ; later , he sees his __``yet unborn``__ brother as an astronaut tethered to his craft rather than a child bound to his mother . |
+| **`pcc_eng_20_108.04743_x1738493_69:30-31`** | How was it possible that a small number of men , in the span of a few hours or minutes , could decide the fate of millions of people __``yet unborn``__ ?                                                                                                         |
+| **`pcc_eng_19_079.2407_x1263954_052:15-16`** | This impregnates you with His life - begets you as His child , actually __``yet unborn``__ .                                                                                                                                                                      |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unborn_ex.md`
+
+
+### 2. _yet unnamed_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                                                                                                           |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_28_027.6383_x0430273_38:25-26`** | Walmart , has had an office in Moscow for several years , and there is speculation about their being in talks with an as __``yet unnamed``__ retailer .                                                                                                                                                                                                                               |
+| **`nyt_eng_19960331_0259_3:29-30`**         | Woo was in Europe on vacation in late February when the paper 's publisher , Nicholas Penniman IV , told the newsroom staff that a new editor , __``yet unnamed``__ , would be brought in .                                                                                                                                                                                           |
+| **`apw_eng_20020507_0601_4:38-39`**         | Vivendi Environment plans to pay 420 million British pounds -LRB- dlrs 616 million -RRB- in cash for a 20-percent controlling stake in First Aqua , with the balance to be made up by equity contributed by as __``yet unnamed``__ financial partners .                                                                                                                               |
+| **`nyt_eng_20050912_0278_2:15-16`**         | the Kansas Lottery Commission on Monday unanimously approved a new instant-win game , as __``yet unnamed``__ , that will be played on electronic slot machines the size of a credit card but a little thicker .                                                                                                                                                                       |
+| **`pcc_eng_15_024.5281_x0380099_52:7-8`**   | Goldberg has also started up a __``yet unnamed``__ rock band , in which he plays the guitar and sings , and has cut a jazz album , " Changes , " with his friend Phil Maturano .                                                                                                                                                                                                      |
+| **`pcc_eng_26_056.5825_x0898660_15:14-15`** | The first track conceived by the new , more formal ( but as __``yet unnamed``__ ) pairing eventually turned into " Flicks " from Details , perhaps Frou Frou 's most Bjork - reminiscent number .                                                                                                                                                                                     |
+| **`pcc_eng_14_044.2791_x0699303_7:18-19`**  | The criminal complaint relies heavily on phone wiretaps -- some recorded by a cooperating witness , as __``yet unnamed``__ , who is said to be a former Galleon employee -- which show Rajaratnam and his alleged accomplices operating under a high degree of secrecy : " I 'm dead if this leaks , " says co-defendant Danielle Chiesi in one recording , " and my career is over . |
+| **`pcc_eng_18_077.6573_x1241418_42:21-22`** | Last month , Orbital Recovery announced that it signed a reservation for a 2008 launch for its first , as __``yet unnamed``__ , client .                                                                                                                                                                                                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unnamed_ex.md`
+
+
+### 3. _yet unspecified_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                 |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`apw_eng_19980928_0794_12:10-11`**        | the two sides agreed to set up an as __``yet unspecified``__ framework for rescuing weakened banks by allowing them to replenish capital reserves with government funds .                                                                                   |
+| **`nyt_eng_19950809_0676_35:24-25`**        | however , the Regents have promised him a $ 25,000 bonus after one year on the job if he meets certain , as __``yet unspecified``__ , goals .                                                                                                               |
+| **`apw_eng_19970607_0342_8:09-10`**         | violators face fines or jail terms , as __``yet unspecified``__ , or could have the station closed down for three days .                                                                                                                                    |
+| **`nyt_eng_20000909_0109_20:4-5`**          | beyond the as __``yet unspecified``__ performance-pay innovation , the state , city and school district are also challenging current seniority protections by allowing principals and supervisors a stronger say in where teachers are assigned .           |
+| **`pcc_eng_06_090.4996_x1447561_88:13-14`** | That would certainly discourage speculation , depending on the amount ( as __``yet unspecified``__ ) but would be tough for BC families who sell their homes for whatever reason within five years and are not allowed to keep a windfall of profits made . |
+| **`nyt_eng_20010926_0326_7:15-16`**         | at the same time , as U.S. military forces continue to prepare for as __``yet unspecified``__ military operations , some European leaders press for a showing of evidence that will justify any attack on Osama Bin Laden 's network .                      |
+| **`pcc_eng_25_086.5923_x1385240_28:8-9`**   | The reform proposal provides for some as __``yet unspecified``__ kind of power sharing at the metropolitan ( smaller than province , greater than city ) level .                                                                                            |
+| **`pcc_eng_12_088.3235_x1411046_4:17-18`**  | However , the coalition government 's ' plans ' are predicated on a large , as __``yet unspecified``__ , spending cut .                                                                                                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unspecified_ex.md`
+
+
+### 4. _yet untitled_
+
+
+|                                             | `token_str`                                                                                                                                                                                                           |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`apw_eng_20010725_0858_12:7-8`**          | Sigler 's debut album , as __``yet untitled``__ , is scheduled for release by BAB\/Edel Records in October .                                                                                                          |
+| **`pcc_eng_09_012.1132_x0180075_168:7-8`**  | The band 's third ( as __``yet untitled``__ ) album will be released later this year .                                                                                                                                |
+| **`pcc_eng_25_036.3289_x0571888_08:2-3`**   | The __``yet untitled``__ album was originally also planned for last year and while Kiseki was all about the Japanese language , with each track featuring prominent local MCs , this one will be fully instrumental . |
+| **`pcc_eng_21_099.3877_x1589594_4:2-3`**    | The __``yet untitled``__ movie and the cast is not yet known .                                                                                                                                                        |
+| **`pcc_eng_28_005.9248_x0079530_13:2-3`**   | The __``yet untitled``__ project also stars Shah Rukh Khan in a pivotal role .                                                                                                                                        |
+| **`pcc_eng_29_050.6094_x0801162_04:3-4`**   | Perry 's __``yet untitled``__ project will follow his character Madea on her comedic trials and tribulations , and will teach ' children about family values , in a way that only Madea could ! '                     |
+| **`pcc_eng_15_096.5566_x1544437_03:17-18`** | David Floyd is currently in the process of writing original music for a new and as __``yet untitled``__ album .                                                                                                       |
+| **`apw_eng_20060508_1139_2:28-29`**         | Beacon Pictures has signed Josh Lucas for the starring role and Kip Williams , who directed `` Door in the Floor , '' to helm the as __``yet untitled``__ movie .                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_untitled_ex.md`
+
+
+### 5. _yet undetermined_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                         |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_05_090.5334_x1448308_17:13-14`**  | This is presumably some form of encryption that includes some ( as __``yet undetermined``__ ) mechanism by means of which lawful access is provided to the encrypted data .                                                         |
+| **`pcc_eng_25_023.0144_x0355931_11:35-36`**  | Right now , Khodadadian is working out of an executive suite rental at 400 Park Avenue but expects to move to bigger , more permanent space when he brings on employees -- at a __``yet undetermined``__ time .                     |
+| **`pcc_eng_12_102.3338_x1637674_057:10-11`** | Burkard says his company plans to share an as __``yet undetermined``__ number of Edmund products with three SK catalogs that mail to teachers .                                                                                     |
+| **`pcc_eng_00_103.1761_x1652574_30:09-10`**  | While Ryan 's effect on 2012 is as __``yet undetermined``__ -- it depends on the success or failure of Mediscare -- there is less doubt about the meaning of Ryan 's selection for beyond 2012 .                                    |
+| **`nyt_eng_19961216_0428_15:34-35`**         | Siegel said that Continental expects to exercise its option to purchase additional planes and expects to take delivery of 18 planes per year in 1998 , continuing at that rate for an as __``yet undetermined``__ number of years . |
+| **`apw_eng_19990609_1021_2:13-14`**          | spanish companies will receive tax incentives and subsidies if an as - __``yet undetermined``__ percentage of their Web site is written in the language of Cervantes , the newspaper ABC reported Wednesday .                       |
+| **`pcc_eng_07_062.1395_x0988161_06:14-15`**  | Landlords failing to comply would , it was said , face an as __``yet undetermined``__ fine .                                                                                                                                        |
+| **`pcc_eng_29_024.2871_x0375868_08:4-5`**    | Price is as __``yet undetermined``__ but I am told that it will be affordable .                                                                                                                                                     |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_undetermined_ex.md`
+
+
+### 6. _yet unformed_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                      |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_10_041.9021_x0661828_51:38-39`**  | Recent changes , Saval argues , suggest that " the career path that defined the white - collar worker for generations ... is coming to a close , and that a new sort of work , as __``yet unformed``__ , is taking its place . " |
+| **`pcc_eng_16_008.4899_x0121643_08:18-19`**  | It is the chaos of metamorphosis and transformation ; of the disintegration prerequisite for evolution ; the __``yet unformed``__ and forming that will eventually emerge into the vivid Colors of Creation .                    |
+| **`pcc_eng_01_002.8993_x0030626_151:19-20`** | It peeps into man , into each manifest being inert and alive , right since it all was __``yet unformed``__ and unexpressed .                                                                                                     |
+| **`pcc_eng_29_062.8609_x0999474_26:21-22`**  | Some of this good feeling is the traditional , optimistic attempt of partisans to impute their own priorities to a __``yet unformed``__ papacy .                                                                                 |
+| **`pcc_eng_15_083.5671_x1334345_038:10-11`** | In both disciplines , models give shape to the __``yet unformed``__ , and climate specifically is known only through modeling .                                                                                                  |
+| **`pcc_eng_01_107.02293_x1716886_003:5-6`**  | When the universe was __``yet unformed``__ , all which existed would be called sorcery .                                                                                                                                         |
+| **`pcc_eng_00_039.7588_x0626087_148:8-9`**   | Your eyes saw my substance , being __``yet unformed``__ .                                                                                                                                                                        |
+| **`pcc_eng_28_074.6371_x1191028_277:10-11`** | The Almighty Supreme is " the form of the __``yet unformed``__ , the pattern of the yet uncreated . "                                                                                                                            |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unformed_ex.md`
+
+
+### 7. _yet unidentified_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                               |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_16_048.2387_x0764520_07:8-9`**    | He was then flown to an as __``yet unidentified``__ location in the Balkans , and driven to the Albanian border , after the US authorities apparently realized they had the wrong man .                                                                                                                   |
+| **`pcc_eng_09_031.3718_x0491638_11:16-17`**  | It is uncertain whether this inflammation is a response to a single agent , as __``yet unidentified``__ , or a focal and selective hypersensitivity reaction of connective tissue to a number of different factors .                                                                                      |
+| **`pcc_eng_05_031.4260_x0492904_6:18-19`**   | Deland Steelman , 32 , has been charged with first and second degree murder of an as __``yet unidentified``__ man .                                                                                                                                                                                       |
+| **`apw_eng_20060525_0372_6:32-33`**          | four eyewitnesses identified Golifardo as one of the men who fired at Batul , Santos said , adding that the accused policeman was driving the motorcycle and that a second as __``yet unidentified``__ man was riding on the back .                                                                       |
+| **`pcc_eng_18_044.2775_x0700424_09:33-34`**  | In this standard model , around 75 % of the Universe is made up by dark energy , while among 85 % of the rest is made up of some , as __``yet unidentified``__ , weakly interacting , non-baryonic particle ( dark matter ) and the baryons only occupy around 4 % of the total Universe .                |
+| **`pcc_eng_29_013.6597_x0204574_14:13-14`**  | I also think it 's possible that there are other , as __``yet unidentified``__ , factors .                                                                                                                                                                                                                |
+| **`pcc_eng_22_069.7526_x1111174_52:24-25`**  | Furthermore , the relative inefficiency of Acr proteins in protecting the phage that encode them makes me wonder whether there might be other __``yet unidentified``__ Acr proteins that are more potent and might be able to protect a phage that infects a cell with a fully functional CRISPR system . |
+| **`pcc_eng_20_055.5868_x0881861_147:14-15`** | Late on a typical recent afternoon , Fatimah and a boy , as __``yet unidentified``__ , had been hauled in .                                                                                                                                                                                               |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unidentified_ex.md`
+
+
+### 8. _yet unannounced_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                                    |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_003.2018_x0035443_5:17-18`**  | Tabata 's next press stop is in London , where he 'll be participating in a __``yet unannounced``__ event .                                                                                                                                                                                                    |
+| **`pcc_eng_15_069.3449_x1104141_24:5-6`**   | We also have as __``yet unannounced``__ events specifically designed to educate health professionals much like our recent masterclass with Rosemary Mazanet of Columbia Care .                                                                                                                                 |
+| **`pcc_eng_24_005.8800_x0078638_02:7-8`**   | CAMPAIGNERS hope to halt an as __``yet unannounced``__ visit to Britain by US President George W Bush this autumn , by giving him the bum 's rush .                                                                                                                                                            |
+| **`pcc_eng_13_002.7613_x0028283_7:11-12`**  | Any future titles from the newly formed studio are as __``yet unannounced``__ , though we 'll be sure to bring you news of when anything breaks .                                                                                                                                                              |
+| **`pcc_eng_29_058.8299_x0934390_05:23-24`** | On the downside , the charmingly situated Iford Opera sadly shut up shop at its long-term address and its future is as __``yet unannounced``__ .                                                                                                                                                               |
+| **`pcc_eng_03_049.2273_x0781143_01:21-22`** | In addition Osipova will dance Nutcracker with POB in January and Tsiskaridze in December , both with French partners as __``yet unannounced``__ .                                                                                                                                                             |
+| **`pcc_eng_07_076.0738_x1213224_3:11-12`**  | Although the release date for the Blu-ray 1982 film is __``yet unannounced``__ this picture taken from a Conan fan forum , proves that there will be a special first look at the new Conan the Barbarian orignaltl titled Conan 3D , keep stay tuned for an announcement to when the Blu-ray will be realsed . |
+| **`pcc_eng_12_104.3061_x1669687_42:21-22`** | He pointed out that , as the third part of the trilogy - the release date of which is as __``yet unannounced``__ -- the story takes place before the New 52 relaunch of the company 's entire main superhero line of books that set a new continuity .                                                         |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unannounced_ex.md`
+
+
+### 9. _yet unconfirmed_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                                   |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_051.7414_x0820449_20:28-29`**  | It is believed the Jackson family members including the family dogs , were all rescued by a gentleman from the area , these details are as of __``yet unconfirmed``__ .                                                                                                                                                                                       |
+| **`pcc_eng_07_040.3760_x0636682_16:16-17`**  | Captive State will star John Goodman and Ashton Sanders , with a release date as __``yet unconfirmed``__ .                                                                                                                                                                                                                                                    |
+| **`pcc_eng_04_061.2145_x0972865_22:19-20`**  | The UN High Commissioner for Human Rights ( OHCHR ) said today it had received reports , as __``yet unconfirmed``__ , that an additional 200 nationals of the Economic Community of West African States ( ECOWAS ) , including people from Mali , Burkina Faso , Senegal , Guinea and Togo , had been killed in the Guiglo area in western Cote d'Ivoire .    |
+| **`pcc_eng_27_033.2224_x0520343_31:7-8`**    | One such story is the as __``yet unconfirmed``__ report of a certain Fear of Success , apparently lurking in the densely packed trees between Base Camp 2 and 3 .                                                                                                                                                                                             |
+| **`pcc_eng_12_102.7745_x1644814_07:19-20`**  | She mentioned that " a couple of other councilors are thinking about going , " but are as __``yet unconfirmed``__ .                                                                                                                                                                                                                                           |
+| **`pcc_eng_19_082.4679_x1316210_109:15-16`** | The department store Bloomingdales likely got its name from here , and although as __``yet unconfirmed``__ , we believe this is the connection to this Upper West Side Tulip Festival .                                                                                                                                                                       |
+| **`pcc_eng_29_068.3845_x1088674_49:7-8`**    | " I have been receiving as __``yet unconfirmed``__ reports of atrocities , including extra-judicial killings and shooting of civilians by snipers , that took place during the recent fighting in various suburbs of Damascus .                                                                                                                               |
+| **`pcc_eng_00_041.5754_x0655538_03:10-11`**  | Though that her marriage to Philip is crumbled is __``yet unconfirmed``__ as it was reported recently that she 's facing a hard time with her marriage from her in - laws due to childlessness , while another report has it that she just got a new wonder - on - wheels from the husband as a gift when she visited him in America a couple of weeks back . |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unconfirmed_ex.md`
+
+
+### 10. _yet unwritten_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_00_034.6761_x0544095_35:09-10`**  | However since all texts , even those as __``yet unwritten``__ , must be considered as seminal to ' Pataphysics , we must ask ourselves if this book is an exception to that rule ( and more pertinently should one buy it ? ) .                                                                                                                                                                                                                                                                        |
+| **`pcc_eng_08_031.4622_x0493211_07:09-10`**  | And there are the pregnant questions , stories __``yet unwritten``__ : what 's possible in a city that looks like this ?                                                                                                                                                                                                                                                                                                                                                                               |
+| **`pcc_eng_23_004.6944_x0059481_19:20-21`**  | On June 30 , 2009 , I wrote an article just for him on how to market his as __``yet unwritten``__ book .                                                                                                                                                                                                                                                                                                                                                                                               |
+| **`pcc_eng_07_103.3891_x1655040_10:6-7`**    | ( Especially when it is __``yet unwritten``__ )                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **`pcc_eng_05_079.6204_x1272589_020:86-87`** | Written in a long- form prose poem in the press release , Perta describes the programming as " ... a shifting constellation of art actions that generates questions , revelations , risks , fissures , sutures , slips around the practices , problems , pleasures , politics of being bodies -- of being bodies written , of being bodies written out , of being bodies writing , of being bodies writing bodies , of being bodies that are unread , read , of being bodies __``yet unwritten``__ . " |
+| **`pcc_eng_23_002.6135_x0025829_08:48-49`**  | All these rules will need to comply with the regulations currently in effect around data privacy -- the GDPR for those doing business in the EU and soon the CCPA in California - - while adapting to the new law and anticipating what laws should become when __``yet unwritten``__ .                                                                                                                                                                                                                |
+| **`pcc_eng_22_016.0114_x0242076_02:20-21`**  | Gai is the setting for my book , Warrior 's Legacy , and possibly some other stories ( as __``yet unwritten``__ ) also .                                                                                                                                                                                                                                                                                                                                                                               |
+| **`pcc_eng_12_086.5447_x1382318_04:31-32`**  | Appraising who we are , where we 've come from and where we'd like to head to next are thoughts that occupy some of us as we step into the __``yet unwritten``__ chapter of another year .                                                                                                                                                                                                                                                                                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unwritten_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/`...
+* Renaming existing version of `yet_unborn_80ex~80.csv`
+* Renaming existing version of `yet_unnamed_80ex~80.csv`
+* Renaming existing version of `yet_unidentified_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unborn_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unnamed_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unspecified_80ex~61.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_untitled_80ex~39.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_undetermined_80ex~75.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unformed_80ex~11.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unidentified_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unannounced_80ex~40.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unconfirmed_80ex~45.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/yet/yet_unwritten_80ex~27.csv`
+
+## *particularly*
+
+
+|                                         |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1`         | `l2`        |    `f1` |   `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:----------------------------------------|------:|------:|------:|-----:|----------:|:-------------|:------------|--------:|-------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] particularly~hard-hit**    |   153 |  0.39 |  5.64 | 0.40 |    998.46 | particularly | hard-hit    | 511,734 |    386 | 71,961,373 |    2.74 |    150.26 |      0.98 |  0.00 | 0.00 |         0.39 |          0.19 |          1.96 | 12.15 | 1.75 | direct    |
+| **[_direct_] particularly~well-suited** |    62 |  0.36 |  4.92 | 0.36 |    390.91 | particularly | well-suited | 511,734 |    171 | 71,961,373 |    1.22 |     60.78 |      0.98 |  0.00 | 0.00 |         0.36 |          0.18 |          1.90 |  7.72 | 1.71 | direct    |
+| **[_direct_] particularly~galling**     |   537 |  0.24 |  5.11 | 0.25 |  2,912.00 | particularly | galling     | 511,734 |  2,162 | 71,961,373 |   15.37 |    521.63 |      0.97 |  0.00 | 0.00 |         0.24 |          0.12 |          1.66 | 22.51 | 1.54 | direct    |
+| **[_direct_] particularly~nettlesome**  |    62 |  0.21 |  4.00 | 0.22 |    318.91 | particularly | nettlesome  | 511,734 |    283 | 71,961,373 |    2.01 |     59.99 |      0.97 |  0.00 | 0.00 |         0.21 |          0.11 |          1.60 |  7.62 | 1.49 | direct    |
+| **[_mirror_] particularly~noteworthy**  |    99 |  0.21 |  4.24 | 0.22 |    492.55 | particularly | noteworthy  |  12,946 |    456 |  1,680,633 |    3.51 |     95.49 |      0.96 |  0.01 | 0.01 |         0.21 |          0.11 |          1.56 |  9.60 | 1.45 | mirror    |
+| **[_direct_] particularly~acute**       | 2,804 |  0.18 |  4.79 | 0.18 | 13,325.91 | particularly | acute       | 511,734 | 15,375 | 71,961,373 |  109.34 |  2,694.66 |      0.96 |  0.01 | 0.01 |         0.18 |          0.09 |          1.50 | 50.89 | 1.41 | direct    |
+| **[_direct_] particularly~thorny**      |   308 |  0.17 |  4.38 | 0.18 |  1,443.57 | particularly | thorny      | 511,734 |  1,738 | 71,961,373 |   12.36 |    295.64 |      0.96 |  0.00 | 0.00 |         0.17 |          0.09 |          1.48 | 16.85 | 1.40 | direct    |
+| **[_mirror_] particularly~novel**       |    54 |  0.16 |  3.46 | 0.17 |    239.72 | particularly | novel       |  12,946 |    319 |  1,680,633 |    2.46 |     51.54 |      0.95 |  0.00 | 0.00 |         0.16 |          0.08 |          1.42 |  7.01 | 1.34 | mirror    |
+| **[_direct_] particularly~irksome**     |   155 |  0.15 |  3.90 | 0.15 |    679.93 | particularly | irksome     | 511,734 |  1,009 | 71,961,373 |    7.18 |    147.82 |      0.95 |  0.00 | 0.00 |         0.15 |          0.07 |          1.41 | 11.87 | 1.33 | direct    |
+| **[_direct_] particularly~noteworthy**  | 2,284 |  0.14 |  4.36 | 0.14 |  9,711.55 | particularly | noteworthy  | 511,734 | 15,897 | 71,961,373 |  113.05 |  2,170.95 |      0.95 |  0.00 | 0.00 |         0.14 |          0.07 |          1.37 | 45.43 | 1.31 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/ALL-particularly_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _particularly hard-hit_
+
+
+|                                      | `token_str`                                                                                                                                                                                                                                                                 |
+|:-------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20050919_0224_4:14-15`**  | and some experts warn that heavily developed Galveston and Padre islands could be __``particularly hard-hit``__ by flooding and devastation if a storm the size of Katrina were to strike the Texas coast .                                                                 |
+| **`apw_eng_20010917_0772_4:4-5`**    | airline stocks were __``particularly hard-hit``__ .                                                                                                                                                                                                                         |
+| **`nyt_eng_19980220_0268_49:16-17`** | if schools do factor IRAs into their aid formulas , children 's IRAs may be __``particularly hard-hit``__ .                                                                                                                                                                 |
+| **`apw_eng_20090119_0581_4:13-14`**  | analysts said shares in Allied Irish and Bank of Ireland were being __``particularly hard-hit``__ because of growing investor fears that the banks ' existing stock will be heavily diluted when both banks formally accept billions in government investment this spring . |
+| **`nyt_eng_19951022_0030_20:2-3`**   | employees __``particularly hard-hit``__ continue to be middle managers , as increased technology threatens their traditional role as gatherers and dispensers of information , Greenberg said .                                                                             |
+| **`nyt_eng_19980123_0677_20:4-5`**   | the industry is __``particularly hard-hit``__ by the railroad 's service problems because of the complex nature of chemicals manufacturing , where starting and stopping production requires precise , carefully timed procedures .                                         |
+| **`nyt_eng_19971027_0630_27:1-2`**   | __``particularly hard-hit``__ has been Singapore , a hub for travel in the region , where tourism generates $ 7.2 billion a year .                                                                                                                                          |
+| **`apw_eng_20020624_0705_3:5-6`**    | technology stocks have been __``particularly hard-hit``__ by the continuing market malaise .                                                                                                                                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_hard-hit_ex.md`
+
+
+### 2. _particularly well-suited_
+
+
+|                                         | `token_str`                                                                                                                                                                                                                                           |
+|:----------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20000119_0274_1:12-13`**     | with his large hands and sun-leathered skin , Takuna Higashionna seems __``particularly well-suited``__ for the kind of living he earns , fishing and farming the land near the shore on the outskirts of this modest town on the island of Okinawa . |
+| **`nyt_eng_20010928_0474_19:32-33`**    | Corixa 's experience in stimulating the immune system and developing drugs to protect against infectious diseases , said Thomas Dietz , an analyst with Pacific Growth Equities , make the company __``particularly well-suited``__ for the project . |
+| **`nyt_eng_19951101_0159_299:17-18`**   | indeed , that is a major reason that , she said , women and computers are __``particularly well-suited``__ .                                                                                                                                          |
+| **`nyt_eng_20000131_0160_40:26-27-28`** | a journey up the Inside Passage probably would n't be complete without at least some glimpses of marine wildlife , and 50,000-ton cruise ships are not __``particularly well-suited``__ to provide them .                                             |
+| **`nyt_eng_19970210_0449_9:5-6`**       | these are energy bars __``particularly well-suited``__ for those who participate in endurance sports and activities and those who try to avoid fat in their diet .                                                                                    |
+| **`apw_eng_20080114_0773_10:21-22`**    | but they fear only Brazil can supply enough of the intestines , which come from Zebu cattle , which are __``particularly well-suited``__ to the Swiss sausage and the different ways it can be prepared and consumed , he said .                      |
+| **`apw_eng_20030325_0741_9:23-24`**     | the Pentagon experience , coupled with an impressive Army resume and an academic and personal background in the region , make him __``particularly well-suited``__ for the Iraq campaign , analysts say .                                             |
+| **`nyt_eng_20060922_0092_20:14-15-16`** | `` I do n't think he liked being president , and he was n't __``particularly well-suited``__ to the job , '' Seligman said .                                                                                                                          |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_well-suited_ex.md`
+
+
+### 3. _particularly galling_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                       |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19960519_0415_10:1-2`**          | __``particularly galling``__ to many New York politicians has been the Port Authority 's recent investments in the more modern Newark International Airport , which has threatened to eclipse Kennedy as the New York region 's premier airport . |
+| **`pcc_eng_02_045.6929_x0722973_24:1-2`**   | __``Particularly galling``__ , says Winters , is denying funeral rites to people in same-sex marriages .                                                                                                                                          |
+| **`nyt_eng_19950201_0224_31:1-2`**          | __``particularly galling``__ to the unionists was a provision that members of the Northern Ireland Assembly could not boycott the authority but would have to participate as a `` duty of service . ''                                            |
+| **`pcc_eng_20_016.3914_x0248597_08:12-13`** | The media shills kissing Christie 's keister at the end is __``particularly galling``__ - this is shameless self-promotion at a level that would make Newt Gingrich blush .                                                                       |
+| **`nyt_eng_20080627_0013_26:3-4`**          | it 's __``particularly galling``__ to Southcott because the Thousand Oaks city library has a $ 35 million expansion project planned to house the Pacific Pioneer Broadcasters radio collection .                                                  |
+| **`pcc_eng_14_097.0604_x1552989_35:12-13`** | Being a US resident , I found this narrow formatting fiat __``particularly galling``__ and try as I might , could not complete the task .                                                                                                         |
+| **`pcc_eng_20_018.2212_x0278155_21:1-2`**   | __``Particularly galling``__ for lawmakers was a detail that emerged in a closed - door briefing Monday night with administration officials that 80 to 90 members of the U.S. government knew of the swap but not a single member of Congress .   |
+| **`nyt_eng_20050501_0065_23:13-14`**        | this approach to urban planning is doomed to failure -- and is __``particularly galling``__ at a site once spoken of as sacred ground .                                                                                                           |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_galling_ex.md`
+
+
+### 4. _particularly nettlesome_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                        |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19940804_0354_10:35-36`**         | a person close to Diller said this missed opportunity , while relatively minor compared with the profit of some $ 100 million that Diller will take away from the QVC buyout , had been __``particularly nettlesome``__ to the QVC chairman .                      |
+| **`nyt_eng_19951115_0304_3:23-24`**          | the proposal , which will come before a task force appointed by the board this afternoon for a vote , could be __``particularly nettlesome``__ for banks that own as much as $ 50 billion of derivatives called indexed-amortizing swaps .                         |
+| **`pcc_eng_00_063.8264_x1015809_30:15-16`**  | What if they could apply the amazing predictive power of fuzzy logic to a __``particularly nettlesome``__ medical problem ?                                                                                                                                        |
+| **`nyt_eng_19951115_0533_3:22-23`**          | the proposal , which will come before a task force appointed by the board for a vote tomorrow , could be __``particularly nettlesome``__ for banks that own as much as $ 50 billion of derivatives called indexed-amortizing swaps .                               |
+| **`pcc_eng_22_005.2607_x0068818_028:11-12`** | The Trump administration 's immigration and visa dictates have been __``particularly nettlesome``__ .                                                                                                                                                              |
+| **`pcc_eng_29_083.5037_x1332580_39:19-20`**  | HAC also anticipates that the mounting volumes of electronic documentation and communication among government agencies will " pose __``particularly nettlesome``__ challenges " to HO in producing the FRUS volumes .                                              |
+| **`pcc_eng_09_089.0468_x1424678_45:19-20`**  | Carter 's scientific background was especially handy recently when Panetta needed to determine what to do about a __``particularly nettlesome``__ design problem in the Air Force 's newest fighter jet , the F-22 Raptor , which was depriving pilots of oxygen . |
+| **`nyt_eng_19970225_0722_7:27-28-29`**       | Love affairs between stars _ or between anyone on the set , for that matter _ are so commonplace , said Craven , that they 're not __``particularly nettlesome``__ unless `` they go awry while you 're shooting . ''                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_nettlesome_ex.md`
+
+
+### 5. _particularly noteworthy_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                                           |
+|:-----------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_087.0522_x1392889_267:4-5`**     | The editing is __``particularly noteworthy``__ since it has to find the right beats without the characters providing any dialogue .                                                                                                                                                   |
+| **`pcc_eng_test_1.5238_x08394_01:14-15-16`**   | Without any context , the fact that I went to a club is n't __``particularly noteworthy``__ .                                                                                                                                                                                         |
+| **`pcc_eng_17_106.4305_x1704474_47:01-09-10`** | None of the animation in this short is __``particularly noteworthy``__ , although the animation of the cat thinking up an invention looks quite good .                                                                                                                                |
+| **`apw_eng_20010718_0966_6:1-2`**              | __``particularly noteworthy``__ , the official said , was the Lukashenko regime 's reaction to a request made last November by the then head of the Prosecutor General 's office for equipment and personnel to conduct a sweep of an area in or near a cemetery .                    |
+| **`nyt_eng_19960508_0062_9:13-14-15`**         | while economists voiced surprise at the deficit , they said it was n't __``particularly noteworthy``__ because it merely confirms Japan 's trade surplus is continuing to shrink .                                                                                                    |
+| **`pcc_eng_02_078.9220_x1260177_39:14-15`**    | The following years My World was a return to form , and was __``particularly noteworthy``__ for Charles cover versions of Paul Simons Still Crazy After All These Years and Leon Russells A Song For You , which the singer made his own through the power of his outstanding voice . |
+| **`pcc_eng_00_057.4171_x0912078_06:4-5`**      | These result are __``particularly noteworthy``__ given that primary candidates running Clean are limited to a single disbursement , unlike in general election races where they can collect more $ 5 checks from district voters to qualify for additional public funds .             |
+| **`pcc_eng_19_049.0464_x0775534_06:05-10-11`** | Under normal circumstances , none of this would be __``particularly noteworthy``__ .                                                                                                                                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_noteworthy_ex.md`
+
+
+### 6. _particularly acute_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                                                                                                                                        |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_29_103.0130_x1648460_08:4-5`**   | The issue is __``particularly acute``__ in Indonesia , a major producer of wood pulp .                                                                                                                                                                                                                                                                                                             |
+| **`pcc_eng_09_069.8887_x1114407_11:7-8`**   | The effects are likely to be __``particularly acute``__ because of the high dependency on agriculture , a sector that accounts for more than 40 % of gross domestic product across the region .                                                                                                                                                                                                    |
+| **`pcc_eng_11_095.0114_x1521950_10:18-19`** | We all know there are significant shortages across a number of sectors , and the issue is __``particularly acute``__ within social work .                                                                                                                                                                                                                                                          |
+| **`pcc_eng_17_045.8848_x0725027_09:28-29`** | A whole account of Lawrence , starting from his expertise as a tender author to the continued genius of his later paintings , and focusing on his __``particularly acute``__ powers of remark , either human and natural .                                                                                                                                                                         |
+| **`pcc_eng_24_022.2793_x0343737_035:4-5`**  | He became a __``particularly acute``__ analyst of the financialization of the U.S. economy , and the growth in inequality that has accompanied it .                                                                                                                                                                                                                                                |
+| **`pcc_eng_14_034.8845_x0547376_43:19-20`** | It is required where the argument is of heightened difficulty , where the interests of the office are __``particularly acute``__ , or where the issues involve new or hotly contested legal issues , or recurring issues of constitutional or statutory interpretation that increase the likelihood that the court of appeals will issue precedential rulings of importance to the United States . |
+| **`nyt_eng_20001110_0035_35:13-14`**        | at first sight , the challenge looks as if it would be __``particularly acute``__ for Bush , because he would have finished behind in the popular vote .                                                                                                                                                                                                                                           |
+| **`nyt_eng_20051223_0154_12:18-19`**        | the human hunger for ritual - to be anchored by tradition in a tumultuous world - is __``particularly acute``__ now .                                                                                                                                                                                                                                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_acute_ex.md`
+
+
+### 7. _particularly thorny_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                      |
+|:--------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_23_007.7928_x0109723_02:11-12`** | According to Matt Damon , he stumbled backwards into that __``particularly thorny``__ scenario in his own reality show , the prestige filmmaking docuseries Project Greenlight , when discussing diversity in casting the film at the center of the new season . |
+| **`pcc_eng_05_032.1737_x0505002_07:6-7`**   | The issue of refunds is __``particularly thorny``__ when it boils down to kids making purchases accidentally on various app stores .                                                                                                                             |
+| **`pcc_eng_00_090.3292_x1444329_04:2-3`**   | A __``particularly thorny``__ business to reopen are gyms given their confined spaces and high- chances of spreading the virus .                                                                                                                                 |
+| **`pcc_eng_05_053.2538_x0845670_21:3-4`**   | On the __``particularly thorny``__ question of US troop levels , options are being floated both for an increase and a decrease .                                                                                                                                 |
+| **`pcc_eng_16_087.0589_x1393029_23:35-36`** | I have witnessed how , too often for my taste , faith is undermined , which is why I particularly appreciated how Olivia 's faith in both her daughter and humanity helps resolve a __``particularly thorny``__ situation .                                      |
+| **`pcc_eng_02_072.1164_x1150160_02:22-23`** | Of all the industries facing serious challenges around regulatory compliance , the medical device sector appears to be caught in a __``particularly thorny``__ trap .                                                                                            |
+| **`pcc_eng_06_024.9484_x0387567_17:12-13`** | Funding the reconstruction of the Ocean Grove area proved to be __``particularly thorny``__ .                                                                                                                                                                    |
+| **`nyt_eng_20070308_0173_14:22-23`**        | for American officials , Sadr City 's calls for an amusement park , job training programs and other projects raise a __``particularly thorny``__ question of trust .                                                                                             |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_thorny_ex.md`
+
+
+### 8. _particularly novel_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                                                  |
+|:-----------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_086.3735_x1381926_10:12-13-14`** | First , a definition : while our definition of productivity is n't __``particularly novel``__ , it does describe its fundamental nature : based on our study , productivity is ' work that is produced on time and to specification ' .                      |
+| **`pcc_eng_14_089.8059_x1435498_09:34-35-36`** | The OVA series , which has a total runtime of about 3 hours , easily could have told the same story in a span of 15 minutes , and the story itself is n't __``particularly novel``__ or groundbreaking .                                                     |
+| **`pcc_eng_22_052.8876_x0838249_40:5-6-7`**    | While the puzzles were n't __``particularly novel``__ to me , I appreciated the way some of them had been implemented .                                                                                                                                      |
+| **`pcc_eng_04_071.1741_x1133418_182:1-2-3`**   | Not __``particularly novel``__ .                                                                                                                                                                                                                             |
+| **`pcc_eng_23_020.5156_x0315122_2:38-39`**     | When every other beloved series is being rebooted , revived or remade , when every mediocre movie spawns a sequel or -- heaven forbid -- a poorly - made franchise , very little of pop culture feels __``particularly novel``__ or exciting at the moment . |
+| **`pcc_eng_22_009.5582_x0138004_209:4-5-6`**   | The story is n't __``particularly novel``__ in having the environment be the protagonist , but it is novel in the emotional texture they were able to impart to that environment .                                                                           |
+| **`pcc_eng_14_005.0563_x0065702_009:4-5-6`**   | While there is nothing __``particularly novel``__ here , Gennaro 's presentation puts a different spin on the marginal revenue of winning .                                                                                                                  |
+| **`pcc_eng_18_040.3934_x0637463_42:5-6`**      | Mr. Jirovec has a __``particularly novel``__ way of identifying with his victims after the fact .                                                                                                                                                            |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_novel_ex.md`
+
+
+### 9. _particularly irksome_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                   |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20060508_0294_6:31-32`**         | so one day , as he walked back toward the starting blocks after his warmup , he put two fingers to his lips and ever-so discreetly planted them on that __``particularly irksome``__ obstacle .                                                                               |
+| **`pcc_eng_22_038.1904_x0600862_21:11-12`** | Stereogum 's Claire Lobenfeld found " Stop Pretending , " __``particularly irksome``__ , calling it " mansplaining " ( when a man , intentionally or otherwise , uses a condescending tone to explain something to a woman that she already knows ) at its most egregious . " |
+| **`pcc_eng_27_024.8028_x0384626_15:4-5`**   | But it 's __``particularly irksome``__ when you encounter some of the opinions offered by members of Bayit Yehudi , the Jewish Home Party , ostensibly representing the dati ( translation : let 's just go with the barely serviceable " Modern Orthodox " ) perspective .   |
+| **`pcc_eng_27_038.4066_x0604606_25:3-4`**   | This is __``particularly irksome``__ when , after three hours spent setting up some incredibly tweaky phono unit , comes the last sentence of the instructions : " Thread the belt around the uppermost drive- shaft pulley and the perimeter of the platter . "              |
+| **`pcc_eng_03_068.7974_x1097825_121:7-8`**  | In Miami , he sees a __``particularly irksome``__ paralysis of justice :                                                                                                                                                                                                      |
+| **`pcc_eng_12_012.8634_x0191966_14:3-4`**   | If a __``particularly irksome``__ one pops up when you 're away from an iron , gently dabbing the area with a damp ( not soaking wet ! ) cloth or paper towel and then drying it with a hair dryer or hand dryer should smooth it out .                                       |
+| **`pcc_eng_12_038.8661_x0612568_230:5-6`**  | The informal economy is __``particularly irksome``__ because its works outside state ( and taxation ) structures .                                                                                                                                                            |
+| **`nyt_eng_19961020_0003_26:5-6`**          | the Democratic Party proved __``particularly irksome``__ to Symington in 1994 by asking for calendars and telephone and computer records from his office .                                                                                                                    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_irksome_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/`...
+* Renaming existing version of `particularly_galling_80ex~80.csv`
+* Renaming existing version of `particularly_noteworthy_80ex~80.csv`
+* Renaming existing version of `particularly_acute_80ex~80.csv`
+* Renaming existing version of `particularly_thorny_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_hard-hit_80ex~37.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_well-suited_80ex~19.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_galling_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_nettlesome_80ex~21.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_noteworthy_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_acute_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_thorny_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_novel_80ex~50.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/particularly/particularly_irksome_80ex~41.csv`
+
+## *terribly*
+
+
+|                                      |   `f` | `dP1` | `LRC` | `P1` |      `G2` | `l1`     | `l2`         |   `f1` |    `f2` |        `N` | `exp_f` | `unexp_f` | `unexp_r` | `dP2` | `P2` | `deltaP_max` | `deltaP_mean` | `odds_r_disc` |   `t` | `MI` | `dataset` |
+|:-------------------------------------|------:|------:|------:|-----:|----------:|:---------|:-------------|-------:|--------:|-----------:|--------:|----------:|----------:|------:|-----:|-------------:|--------------:|--------------:|------:|-----:|:----------|
+| **[_direct_] terribly~awry**         |   176 |  0.26 |  7.99 | 0.26 |  1,726.73 | terribly | awry         | 58,529 |     682 | 71,961,373 |    0.55 |    175.45 |      1.00 |  0.00 | 0.00 |         0.26 |          0.13 |          2.63 | 13.22 | 2.50 | direct    |
+| **[_mirror_] terribly~amiss**        |    52 |  0.09 |  3.94 | 0.09 |    268.23 | terribly | amiss        |  4,583 |     576 |  1,680,633 |    1.57 |     50.43 |      0.97 |  0.01 | 0.01 |         0.09 |          0.05 |          1.57 |  6.99 | 1.52 | mirror    |
+| **[_mirror_] terribly~wrong**        | 1,707 |  0.08 |  4.84 | 0.08 |  9,162.78 | terribly | wrong        |  4,583 |  20,727 |  1,680,633 |   56.52 |  1,650.48 |      0.97 |  0.36 | 0.37 |         0.36 |          0.22 |          1.71 | 39.95 | 1.48 | mirror    |
+| **[_direct_] terribly~amiss**        |    62 |  0.07 |  5.31 | 0.07 |    433.95 | terribly | amiss        | 58,529 |     888 | 71,961,373 |    0.72 |     61.28 |      0.99 |  0.00 | 0.00 |         0.07 |          0.04 |          1.97 |  7.78 | 1.93 | direct    |
+| **[_direct_] terribly~wrong**        | 6,285 |  0.04 |  5.68 | 0.04 | 38,459.16 | terribly | wrong        | 58,529 | 146,437 | 71,961,373 |  119.10 |  6,165.90 |      0.98 |  0.11 | 0.11 |         0.11 |          0.07 |          1.79 | 77.78 | 1.72 | direct    |
+| **[_direct_] terribly~misguided**    |   101 |  0.02 |  4.10 | 0.03 |    503.33 | terribly | misguided    | 58,529 |   3,954 | 71,961,373 |    3.22 |     97.78 |      0.97 |  0.00 | 0.00 |         0.02 |          0.01 |          1.51 |  9.73 | 1.50 | direct    |
+| **[_mirror_] terribly~surprising**   |    67 |  0.02 |  2.20 | 0.03 |    181.10 | terribly | surprising   |  4,583 |   2,648 |  1,680,633 |    7.22 |     59.78 |      0.89 |  0.01 | 0.01 |         0.02 |          0.02 |          0.99 |  7.30 | 0.97 | mirror    |
+| **[_direct_] terribly~inefficient**  |   198 |  0.02 |  4.05 | 0.02 |    901.07 | terribly | inefficient  | 58,529 |   9,682 | 71,961,373 |    7.87 |    190.13 |      0.96 |  0.00 | 0.00 |         0.02 |          0.01 |          1.41 | 13.51 | 1.40 | direct    |
+| **[_direct_] terribly~sorry**        | 1,251 |  0.02 |  4.42 | 0.02 |  5,674.54 | terribly | sorry        | 58,529 |  62,177 | 71,961,373 |   50.57 |  1,200.43 |      0.96 |  0.02 | 0.02 |         0.02 |          0.02 |          1.41 | 33.94 | 1.39 | direct    |
+| **[_direct_] terribly~inconvenient** |   134 |  0.02 |  3.67 | 0.02 |    567.35 | terribly | inconvenient | 58,529 |   7,716 | 71,961,373 |    6.28 |    127.72 |      0.95 |  0.00 | 0.00 |         0.02 |          0.01 |          1.34 | 11.03 | 1.33 | direct    |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/ALL-terribly_top10-bigrams-50_AMscores_2024-08-06.md`
+
+
+### 1. _terribly awry_
+
+
+|                                              | `token_str`                                                                                                                                                                                                |
+|:---------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`apw_eng_20011004_1073_3:11-12`**          | `` This looks to be a military training exercise gone __``terribly awry``__ , '' said one U.S. offical , speaking on the condition of anonymity .                                                          |
+| **`pcc_eng_05_084.0012_x1343262_201:15-16`** | It has all the signs of a cover-your - ass policy gone terribly , __``terribly awry``__ during a brainstorm by committee and wandering deep into asinine territory .                                       |
+| **`pcc_eng_26_009.1984_x0132410_04:35-36`**  | The opening scene , set in the early nineties , gives us the back-story : Matthew Scudder ( Liam Neeson ) is an alcoholic NYC cop who drunkenly stumbles into a shootout that goes __``terribly awry``__ . |
+| **`pcc_eng_22_003.9397_x0047690_18:09-10`**  | The story unfolds after a religious ritual goes __``terribly awry``__ and Siddharth , the child protagonist , loses his mother to devouring flames that also leave his father grievously injured .         |
+| **`pcc_eng_11_003.4212_x0039270_44:09-10`**  | As tends to happen , the experiment goes __``terribly awry``__ .                                                                                                                                           |
+| **`pcc_eng_10_092.5089_x1479429_20:6-7`**    | One , there 's something __``terribly awry``__ between the public message and the actual reality , and two , coordination among Congress , Do D and VA does matter .                                       |
+| **`apw_eng_19980613_0474_5:26-27`**          | for South Africa , its first appearance in the global soccer showcase after being banned from international soccer for 28 years because of apartheid went __``terribly awry``__ .                          |
+| **`pcc_eng_04_006.4908_x0088904_17:8-9`**    | Within seconds the viewer knows something is __``terribly awry``__ in the seemingly idyllic relationship at the center of the proceedings .                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_awry_ex.md`
+
+
+### 2. _terribly amiss_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                       |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_01_106.0305_x1697469_102:10-11`** | Your compadres here look like they 'd take it __``terribly amiss``__ if your fur got ruffled . "                                                                                                                                  |
+| **`pcc_eng_10_027.0264_x0420608_16:10-11`**  | As a general rule , unless there is something __``terribly amiss``__ with a candidate , I generally support the right of a President - even one with whom I disagree - to choose whomever he wants for the Court .                |
+| **`pcc_eng_27_032.0986_x0502061_70:13-14`**  | I know that there are Christians who recognize that there is something __``terribly amiss``__ in the Christianity that is being presented but they either ca n't put their finger on it or they do not know what to do about it . |
+| **`nyt_eng_19950114_0219_1:3-4`**            | something is __``terribly amiss``__ here .                                                                                                                                                                                        |
+| **`nyt_eng_20050726_0335_4:10-11`**          | such a mistake was proof positive that something was __``terribly amiss``__ , leaving my wife and me to ask , `` What kind of a Mickey Mouse operation is this ? ''                                                               |
+| **`pcc_eng_20_050.0319_x0792049_1105:5-6`**  | " There is something __``terribly amiss``__ , " said Rocky .                                                                                                                                                                      |
+| **`pcc_eng_27_001.0101_x0000157_10:4-5`**    | " Something is __``terribly amiss``__ in our traffic safety culture when , in the safest year since 1949 , on average there is still one needless death every 16 minutes in motor vehicle crashes . "                             |
+| **`pcc_eng_16_042.0607_x0664538_02:5-6`**    | Something seems to be __``terribly amiss``__ in some of the most backward districts in the country .                                                                                                                              |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_amiss_ex.md`
+
+
+### 3. _terribly wrong_
+
+
+|                                              | `token_str`                                                                                                                                                                                                                                                        |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_13_012.2880_x0182076_154:13-14`** | On the other , he knows how quickly a fight can go __``terribly wrong``__ .                                                                                                                                                                                        |
+| **`pcc_eng_16_026.9194_x0419494_09:35-36`**  | Nowadays we might have grocery stores full of food , but if you deprive your body of carbohydrates or fat , it will still go into starvation mode , feeling that something is going __``terribly wrong``__ .                                                       |
+| **`nyt_eng_20001228_0268_39:31-32`**         | presented as a monologue , like McPherson 's `` St. Nicholas , '' it is the story of a violent thug whose plan to escape to the Dublin suburbs goes __``terribly wrong``__ .                                                                                       |
+| **`pcc_eng_21_030.0859_x0470174_008:19-20`** | Most films are able to pull this off , but every once in a while , something goes __``terribly wrong``__ .                                                                                                                                                         |
+| **`pcc_eng_17_034.9169_x0548450_064:3-4`**   | Something is __``terribly wrong``__ with African leaders , their decisions and choices .                                                                                                                                                                           |
+| **`pcc_eng_22_013.3479_x0199253_053:15-16`** | As long as we 've broached this subject , another tale of toiletry gone __``terribly wrong``__ took place during the summer of ' 56 .                                                                                                                              |
+| **`pcc_eng_13_100.3231_x1604917_077:30-31`** | Coraline unlocks a mysterious door in her home which takes her to an alternate reality with alternate versions of her mom and neighbours , and of course things go __``terribly wrong``__ and she must find a way out of this mess to get back to the real world . |
+| **`pcc_eng_08_095.3086_x1526938_075:8-9`**   | He talks about when something is so __``terribly wrong``__ that we can do nothing but admit we are outraged by it .                                                                                                                                                |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_wrong_ex.md`
+
+
+### 4. _terribly misguided_
+
+
+|                                              | `token_str`                                                                                                                                                                              |
+|:---------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_10_009.7670_x0141660_19:24-25`**  | Hitler 's attempt to cleanse Europe of its Judeo - Christian elements can , therefore , be seen as a noble , albeit __``terribly misguided``__ effort to make the world a better place . |
+| **`pcc_eng_21_020.5443_x0315711_30:10-11`**  | His new speech given last week in Europe was __``terribly misguided``__ and will upset markets as the Chinese and Germans wo n't ignore his challenges .                                 |
+| **`pcc_eng_20_087.5260_x1397819_055:19-20`** | Those who make her out to be a type stergeon or " exceptionally large beaver " are either __``terribly misguided``__ or are simply wishing to play the devil 's advocate .               |
+| **`pcc_eng_02_037.1177_x0584490_027:2-3`**   | Even __``terribly misguided``__ Tree Swallows do n't take up with Bank Swallows , so the brown female was , in fact , a first year female Tree Swalllow .                                |
+| **`pcc_eng_11_085.1083_x1361433_081:12-13`** | It would be my confrontation with what I now considered a __``terribly misguided``__ decision .                                                                                          |
+| **`nyt_eng_19950311_0188_7:13-14`**          | well , he 's a genius again , though I fear a __``terribly misguided``__ one .                                                                                                           |
+| **`pcc_eng_23_020.9320_x0321909_10:21-22`**  | The think pieces trickling in calling liberals out for losing because of an " elitist attitude " are terribly , __``terribly misguided``__ .                                             |
+| **`pcc_eng_26_009.6211_x0139293_199:16-17`** | Some Southern " Conservatives " ( be they Republican or otherwise ) rejected integration for __``terribly misguided``__ fears about what would happen to their " civilization . "        |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_misguided_ex.md`
+
+
+### 5. _terribly surprising_
+
+
+|                                                | `token_str`                                                                                                                                                                                                                       |
+|:-----------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_20_089.2752_x1426192_19:3-4-5`**    | It 's not __``terribly surprising``__ , then , that Pinterest has thrown its proverbial hat into the ring .                                                                                                                       |
+| **`pcc_eng_27_057.7239_x0916890_13:7-8-9`**    | In one sense , it was n't __``terribly surprising``__ for a historian to recommend to another historian to ditch the article format for the more comfortable confines of a book .                                                 |
+| **`pcc_eng_03_091.3291_x1462629_17:5-6-7`**    | Well , this was n't __``terribly surprising``__ , was it ?                                                                                                                                                                        |
+| **`apw_eng_19981120_1335_21:08-09-10`**        | that O'Meara won the award Friday was not __``terribly surprising``__ _ nor was the manner in which he accepted the award .                                                                                                       |
+| **`pcc_eng_15_001.8990_x0014368_03:3-4-5`**    | There 's nothing __``terribly surprising``__ - Mc Cain needed someone who would bolster the " maverick " credentials of the ticket while at the same time appealing to the Republican base , and Palin appeared to fit the bill . |
+| **`pcc_eng_16_026.4335_x0411759_21:3-4-5`**    | It 's not __``terribly surprising``__ that shareholders , spending large sums of their own money on executive compensation , often pay out multi-million dollar compensation packages .                                           |
+| **`pcc_eng_00_068.6230_x1092868_40:15-20-21`** | Given that this is a Lindsay Lohan movie that went straight to video , none of this should be __``terribly surprising``__ .                                                                                                       |
+| **`pcc_eng_00_071.8072_x1144611_7:15-16-17`**  | The SEC filed civil fraud charges in March , so the criminal complaint is n't __``terribly surprising``__ .                                                                                                                       |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_surprising_ex.md`
+
+
+### 6. _terribly inefficient_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                                                      |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_27_049.6848_x0786746_20:35-36`** | The big take - away from the article is that subsidized alternative and bio fuels are costing the economy a whole lot , are a classic example of rent-seeking and cronyism , and are __``terribly inefficient``__ for dealing with global warming .                              |
+| **`pcc_eng_12_079.9558_x1275762_09:5-6`**   | They were clumsy and __``terribly inefficient``__ .                                                                                                                                                                                                                              |
+| **`pcc_eng_06_016.3635_x0248426_6:21-22`**  | In cases with a large number of arbitration agreement - wielding defendants , such as Alguire , this solution is __``terribly inefficient``__ , but it is , at least until Congress or the Court says otherwise , the only solution that respects both Article III and the FAA . |
+| **`pcc_eng_19_037.2000_x0584286_093:8-9`**  | It 's cheap , if cumbersome and __``terribly inefficient``__ .                                                                                                                                                                                                                   |
+| **`pcc_eng_29_004.8955_x0063042_11:09-10`** | People are playing decks that are filled with __``terribly inefficient``__ spells and around 18 - 20 mana sources .                                                                                                                                                              |
+| **`pcc_eng_28_018.8969_x0289303_23:8-9`**   | My old Coleman Peak 1 stove was __``terribly inefficient``__ and I promised myself to get a replacement at the next REI trip to Seattle ( would turn out to be a MSR Dragon Fly , much better ! ) .                                                                              |
+| **`pcc_eng_26_003.0223_x0032600_12:8-9`**   | The truth is slow aerobic training is __``terribly inefficient``__ when it comes to losing weight .                                                                                                                                                                              |
+| **`pcc_eng_29_030.8773_x0482176_41:1-2`**   | __``Terribly inefficient``__ " Because he is confrontational , people perceive him to be arrogant , but he is able to acknowledge his mistakes and lack of judgement , " said one of the NEC officials .                                                                         |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_inefficient_ex.md`
+
+
+### 7. _terribly sorry_
+
+
+|                                              | `token_str`                                                                                                                                                                             |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_28_025.7897_x0400320_06:3-4`**    | So , __``terribly sorry``__ about this , it wo n't happen with the next release for sure !                                                                                              |
+| **`pcc_eng_21_033.9368_x0532577_06:3-4`**    | We feel __``terribly sorry``__ for any inconvenience caused to you .                                                                                                                    |
+| **`nyt_eng_19950812_0229_40:27-28`**         | the play will be seen on video from several angles , with Stanley and catcher Rich Gedman discussing it at length , the latter still sounding __``terribly sorry``__ nine years later . |
+| **`pcc_eng_21_011.4814_x0169207_041:14-15`** | If they are called on it and they say : " I 'm __``terribly sorry``__ for inconveniencing you , let me see to that right now " and do it , they mean what they say .                    |
+| **`pcc_eng_07_108.06803_x1741796_113:3-4`**  | I am __``terribly sorry``__ for not updating in forever .                                                                                                                               |
+| **`pcc_eng_09_016.5177_x0251427_5121:3-4`**  | I 'm __``terribly sorry``__ for her . "                                                                                                                                                 |
+| **`pcc_eng_24_019.6819_x0301686_138:5-6`**   | 48 " I 'm __``terribly sorry``__ I brought you along ; Nickie , " said his father , all his post-operative exhilaration gone .                                                          |
+| **`pcc_eng_08_070.1701_x1119983_41:4-5`**    | " I feel __``terribly sorry``__ for them [ his two children ] .                                                                                                                         |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_sorry_ex.md`
+
+
+### 8. _terribly inconvenient_
+
+
+|                                             | `token_str`                                                                                                                                                                                                                                           |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_075.8875_x1209776_63:5-6`**   | Cold , damp and __``terribly inconvenient``__ surroundings cause constant depression .                                                                                                                                                                |
+| **`pcc_eng_val_3.10516_x51518_04:6-7`**     | This all strikes me as __``terribly inconvenient``__ , not to say tedious .                                                                                                                                                                           |
+| **`nyt_eng_19990129_0133_45:2-3`**          | how __``terribly inconvenient``__ .                                                                                                                                                                                                                   |
+| **`pcc_eng_23_084.0553_x1342165_035:6-7`**  | " Well , it 's __``terribly inconvenient``__ , " Bob Squeaky grumbled .                                                                                                                                                                               |
+| **`pcc_eng_13_011.8849_x0175583_025:3-4`**  | ( A __``terribly inconvenient``__ truth . )                                                                                                                                                                                                           |
+| **`pcc_eng_21_027.9740_x0436026_27:11-12`** | Of course the proponents of over-unity motors just throw those __``terribly inconvenient``__ laws of physics away , and make claims that are akin to saying that you could power your car forever using the pink flatulence of technicolor unicorns . |
+| **`nyt_eng_19990801_0078_15:8-9`**          | then they stay because it becomes so __``terribly inconvenient``__ to leave .                                                                                                                                                                         |
+| **`pcc_eng_04_032.9924_x0517191_32:5-6`**   | Forcing a restart is __``terribly inconvenient``__ .                                                                                                                                                                                                  |
+
+
+> saved as:  
+> `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_inconvenient_ex.md`
+
+
+Saving Samples in `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/`...
+* Renaming existing version of `terribly_wrong_80ex~80.csv`
+* Renaming existing version of `terribly_surprising_80ex~80.csv`
+* Renaming existing version of `terribly_sorry_80ex~80.csv`
+
+Samples saved as...
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_awry_80ex~54.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_amiss_80ex~23.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_wrong_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_misguided_80ex~26.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_surprising_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_inefficient_80ex~56.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_sorry_80ex~80.csv`
++ `/share/compling/projects/sanpi/results/top_AM/ALL/any_bigram_examples/terribly/terribly_inconvenient_80ex~33.csv`
+
