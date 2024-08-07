@@ -1,0 +1,5 @@
+|                                             | `token_str`                                                                                                                                                              |
+|:--------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_20_001.4811_x0007612_39:11-12`** | Show creator , producer , and writer Brannon Braga is __``particularly forthcoming``__ about his frustrations .                                                          |
+| **`pcc_eng_08_033.7463_x0530242_185:4-5`**  | So Wenzel was __``particularly forthcoming``__ in reporting all of the ideological arguments that he would present to Gratzik .                                          |
+| **`nyt_eng_19990524_0476_11:14-15`**        | during his recent visit to Damascus , he said , Syria was `` __``particularly forthcoming``__ '' in its desire to move forward with Israel , as were other Arab states . |

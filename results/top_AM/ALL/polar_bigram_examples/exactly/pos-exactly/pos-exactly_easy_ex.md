@@ -1,0 +1,3 @@
+|                                             | `token_str`                                                                                                                                                              |
+|:--------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_16_066.1204_x1054086_49:27-28`** | Despite his sunny smile and outlook , Cooper admits the watching and knowing he is headed for a third reconstructive knee surgery and rehab it 's __``exactly easy``__ . |

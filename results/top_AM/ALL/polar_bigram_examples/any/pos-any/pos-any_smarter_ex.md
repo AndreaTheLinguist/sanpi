@@ -1,0 +1,10 @@
+|                                             | `token_str`                                                                                                                                         |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_010.8316_x0159095_29:17-18`** | The question I keep asking myself is will Malawians will come out of all these events __``any smarter``__ ?                                         |
+| **`pcc_eng_20_095.6409_x1528941_21:6-7`**   | Can your current smartphone be __``any smarter``__ ?                                                                                                |
+| **`pcc_eng_21_023.7623_x0367724_22:4-5`**   | And am I __``any smarter``__ than I was yesterday ?                                                                                                 |
+| **`pcc_eng_09_055.9921_x0889665_1:22-23`**  | Smart TVs - or , rather , their makers - have yet to put all the pieces together to make them __``any smarter``__ than a precocious 10 - year-old . |
+| **`pcc_eng_29_096.4782_x1542511_17:4-5`**   | If she was __``any smarter``__ or have anything else to do , she 'd probably say no ... but she says yes , and we set sail .                        |
+| **`pcc_eng_14_080.7932_x1290157_5:09-10`**  | I wonder if eating his brain made them __``any smarter``__ ?                                                                                        |
+| **`pcc_eng_11_073.7029_x1176766_169:7-8`**  | Why would anyone think we are __``any smarter``__ now than we were then ?                                                                           |
+| **`pcc_eng_04_080.0616_x1277222_35:5-6`**   | " Statistics cannot be __``any smarter``__ than the people who use them .                                                                           |

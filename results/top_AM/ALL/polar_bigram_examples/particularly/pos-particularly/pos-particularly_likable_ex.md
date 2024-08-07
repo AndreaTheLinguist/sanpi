@@ -1,0 +1,6 @@
+|                                              | `token_str`                                                                                                                                                                    |
+|:---------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_07_108.08856_x1745153_044:6-7`**  | The Rock and Mackie are __``particularly likable``__ and strong in this movie .                                                                                                |
+| **`pcc_eng_18_001.5327_x0008722_06:11-12`**  | This quartet of well - designed board books introduces a __``particularly likable``__ sister and brother who star in mild but affectionately rendered vignettes .              |
+| **`pcc_eng_27_089.7553_x1435542_11:16-17`**  | But despite a screenplay from Re-Animator scribe Dennis Paoli , there 's little humour or __``particularly likable``__ characters .                                            |
+| **`pcc_eng_13_108.04400_x1737109_18:25-26`** | This critical treatment of the authorities gives the film a very nihilistic feel , as it makes the film devoid of positive or indeed __``particularly likable``__ characters . |

@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                                                    |
+|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_093.1074_x1489636_57:14-15-16`**  | That said , the user interface is hardly an aesthetic feat and its not __``immediately intuitive``__ .                                                         |
+| **`nyt_eng_19990113_0234_39:3-5-6`**            | it may not seem __``immediately intuitive``__ , but that means plasma displays can not render the color black .                                                |
+| **`pcc_eng_04_108.03993_x1735741_27:14-15-16`** | There is n't much of it yet and the project 's architecture is n't __``immediately intuitive``__ .                                                             |
+| **`pcc_eng_04_044.1133_x0696674_19:4-5-6`**     | Though it 's not __``immediately intuitive``__ that both teams are below 50 per cent in each zone , remember that there are three results in any puck battle . |
+| **`pcc_eng_20_006.2838_x0085088_035:4-5-6`**    | Natural selection is not __``immediately intuitive``__ .                                                                                                       |
+| **`pcc_eng_14_034.8898_x0547460_49:12-14-15`**  | There 's a secret that designers know , and it 's not always __``immediately intuitive``__ to left-brained folks : not all colors are created equal .          |
+| **`pcc_eng_02_009.8674_x0143229_70:3-4-5`**     | It was not __``immediately intuitive``__ this represented healthcare                                                                                           |
+| **`pcc_eng_05_014.4654_x0218251_4:4-5-6`**      | The insight was not __``immediately intuitive``__ , as care delivery remained largely specialty - based .                                                      |

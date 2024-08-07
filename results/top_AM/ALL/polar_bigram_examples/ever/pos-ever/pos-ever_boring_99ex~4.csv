@@ -1,0 +1,5 @@
+hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
+pcc_eng_00_086.4678_x1381823_55:4-5,ever_boring,boring,(+)_ever_boring,ever,is modern art ever boring ?,Is modern art ever boring ?
+pcc_eng_25_078.0799_x1247998_087:26-27,ever_boring,boring,(+)_ever_boring,ever,brian also having a half of the ever boring old brewery bitter so he could,"The lovely Lisa skipped on the beer here and the rest of us had the stout , with Brian also having a half of the ever boring Old Brewery Bitter so he could tick off having had beer served from a wooden cask ."
+pcc_eng_19_043.3105_x0683123_08:10-11,ever_boring,boring,(+)_ever_boring,ever,would be wrong to suggest it was ever boring .,And it would be wrong to suggest it was ever boring .
+pcc_eng_11_017.1010_x0260535_21:6-7,ever_boring,boring,(+)_ever_boring,ever,"and oh , is he ever boring .","And oh , is he ever boring ."

@@ -1,0 +1,10 @@
+|                                              | `token_str`                                                                                                                                    |
+|:---------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_21_019.6136_x0300564_063:19-20`** | To him it is like your willingness to eat breakfast , almost a non-event , his murders are __``that common``__ .                               |
+| **`pcc_eng_29_035.7074_x0560128_065:3-4`**   | Peters has __``that common``__ as muck attitude that many working class women have .                                                           |
+| **`pcc_eng_03_062.1765_x0990511_55:4-5`**    | Were payphones really __``that common``__ in 2009 ???                                                                                          |
+| **`pcc_eng_24_012.9473_x0192619_03:4-5`**    | Clogs are just __``that common``__ .                                                                                                           |
+| **`pcc_eng_14_024.9854_x0387449_03:16-17`**  | Fine with me but it 's a bit sad , too - if things get __``that common``__ , we wo n't able to experience them in a very intense way anymore . |
+| **`pcc_eng_17_065.8638_x1047853_02:3-4`**    | Are they __``that common``__ in the front range ?                                                                                              |
+| **`pcc_eng_28_059.5312_x0947019_86:4-5`**    | Is it really __``THAT common``__ ?                                                                                                             |
+| **`apw_eng_19980513_1696_6:3-4`**            | to remain __``that common``__ , a potentially lethal gene must provide some kind of advantage to such carriers .                               |

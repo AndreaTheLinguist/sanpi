@@ -1,0 +1,6 @@
+|                                             | `token_str`                                                                                                                                                                     |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_02_080.3912_x1283657_22:6-7`**   | If you start lighting it __``any brighter``__ than that , the white background starts to become a large light source and its light will start to wrap around the subject .      |
+| **`pcc_eng_13_071.0864_x1132873_57:4-5`**   | If it glows __``any brighter``__ then this , it                                                                                                                                 |
+| **`pcc_eng_29_085.3283_x1362089_02:10-11`** | It 's debatable whether the Bears ' future looks __``any brighter``__ than the present , which includes a 4 - 7 record and a noon date today with the 1 - 10 Rams .             |
+| **`apw_eng_19990812_1291_15:13-14`**        | asked at a press conference whether his outlook on the economy was __``any brighter``__ because of the revised numbers , Miyazawa said , `` I do n't particularly think so . '' |

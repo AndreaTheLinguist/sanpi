@@ -1,0 +1,10 @@
+|                                             | `token_str`                                                                                                                             |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20001028_0180_38:12-13`**        | Riley 's playbook was 270 pages ; Scott 's is nearly __``that big``__ , two encyclopedia-like reference works for offense and defense . |
+| **`pcc_eng_10_077.6043_x1238169_31:3-4`**   | Are you __``that big``__ of a piece of scum ? " said another woman .                                                                    |
+| **`nyt_eng_19990825_0443_5:10-11`**         | `` He 's really a skilled player who 's __``that big``__ . ''                                                                           |
+| **`pcc_eng_20_085.2797_x1361703_5:16-17`**  | I used to think Tentacruel was that gigantic until I found out why it was __``that big``__ .                                            |
+| **`pcc_eng_02_056.8754_x0903861_28:16-17`** | " It would be naive to think that a couple of PR reps can move __``that big``__ of a company all by themselves . "                      |
+| **`pcc_eng_00_042.0824_x0663821_14:20-21`** | The mogul field reachable by the Traversee chair lift is visible for miles and miles , the moguls are __``that big``__ !                |
+| **`pcc_eng_03_084.3869_x1350312_26:6-7`**   | For a guy to be __``that big``__ and so athletic , he 's just fun to watch . "                                                          |
+| **`pcc_eng_07_074.8878_x1194098_6:18-19`**  | I wonder if I 'll ever be a dad , and if my wallet will ever be __``that big``__ ?                                                      |

@@ -1,0 +1,3 @@
+|                                      | `token_str`                                                                                                  |
+|:-------------------------------------|:-------------------------------------------------------------------------------------------------------------|
+| **`apw_eng_20071002_0032_21:16-17`** | noting that Mullen 's parents worked in show business , Bush said many people find __``that surprising``__ . |

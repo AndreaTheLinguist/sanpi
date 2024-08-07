@@ -1,0 +1,4 @@
+hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
+pcc_eng_04_075.5518_x1204096_009:3-4,necessarily_right,right,(+)_necessarily_right,necessarily,gentleman is necessarily right .,Gentleman is necessarily right .
+pcc_eng_12_101.5777_x1625321_31:30-31,necessarily_right,right,(+)_necessarily_right,necessarily,"and "" that what we believe is necessarily right . ""","The play questions the assumption , Albee says , "" that what makes us comfortable is something we should want , "" and "" that what we believe is necessarily right . """
+pcc_eng_25_101.6086_x1628290_099:11-12,necessarily_right,right,(+)_necessarily_right,necessarily,mistake to suppose that the majority is necessarily right .,It is a mistake to suppose that the majority is necessarily right .

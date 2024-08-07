@@ -1,0 +1,10 @@
+|                                             | `token_str`                                                                                                                                                           |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_08_036.7056_x0578287_26:5-6`**   | Through an online dating __``longer available``__ on these days , does that .                                                                                         |
+| **`pcc_eng_03_088.0926_x1410266_36:18-19`** | You should only consider doing the Bible study after the discussion if you have two hours or __``longer available``__ ( not including refreshment breaks and food ) . |
+| **`pcc_eng_16_027.4833_x0428699_14:5-6`**   | The original video is __``longer available``__ , but shows more cameos of the raccoon , who appears to be tucked inside a man 's sweater .                            |
+| **`pcc_eng_04_038.6979_x0609378_14:8-9`**   | Sadly , Burning Bush IPA is now __``longer available``__ on earth .                                                                                                   |
+| **`pcc_eng_25_065.7258_x1048570_3:7-8`**    | usually find higher grade materials with __``longer available``__ lengths at a slightly higher price .                                                                |
+| **`pcc_eng_24_096.1820_x1539497_44:8-9`**   | You will also find that we have __``longer available``__ hours .                                                                                                      |
+| **`pcc_eng_29_035.8951_x0563153_34:2-3`**   | EXPIREDNo __``longer available``__                                                                                                                                    |
+| **`pcc_eng_29_035.8951_x0563153_20:2-3`**   | EXPIREDNo __``longer available``__ :( Do you love to wear wristbands when you work out ?                                                                              |

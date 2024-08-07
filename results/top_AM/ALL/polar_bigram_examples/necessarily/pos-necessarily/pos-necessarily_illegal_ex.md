@@ -1,0 +1,3 @@
+|                                             | `token_str`                                                                                                                                                 |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_20_067.8393_x1079898_05:23-24`** | At the same time , the President 's critics have erred by assuming that aggressive executive action in the domestic sphere is __``necessarily illegal``__ . |

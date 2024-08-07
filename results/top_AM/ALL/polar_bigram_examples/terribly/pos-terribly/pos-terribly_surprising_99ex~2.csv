@@ -1,0 +1,3 @@
+hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
+pcc_eng_10_076.7482_x1224313_43:6-7,terribly_surprising,surprising,(+)_terribly_surprising,terribly,"little in the book is terribly surprising , but what is remarkable is","Little in the book is terribly surprising , but what is remarkable is that so much dirty ecclesiastical laundry is now being washed publicly , and that consumers are buying the book ."
+pcc_eng_17_042.1464_x0664602_95:5-6,terribly_surprising,surprising,(+)_terribly_surprising,terribly,""" and it 's terribly surprising .",""" And it 's terribly surprising ."

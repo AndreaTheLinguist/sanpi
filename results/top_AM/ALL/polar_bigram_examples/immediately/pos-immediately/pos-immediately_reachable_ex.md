@@ -1,0 +1,4 @@
+|                                             | `token_str`                                                                                                                                                                                 |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_03_033.3339_x0523725_101:4-5`**  | If everyone is __``immediately reachable``__ by two -way television , your boss will always be able to find you - not to mention your wife and your friendly local loan company .           |
+| **`pcc_eng_24_058.2919_x0926772_09:32-33`** | It comes equipped with a rear zippered pocket for those days when you 'll be using it as the main outer layer and you want to have your essentials safe and __``immediately reachable``__ . |

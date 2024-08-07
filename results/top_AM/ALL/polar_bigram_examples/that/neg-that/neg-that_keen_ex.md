@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                                  |
+|:-----------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_14_047.8902_x0757532_16:5-6-7`**    | Seriously , I was n't __``that keen``__ on varmaleen .                                                                                                       |
+| **`pcc_eng_24_070.4941_x1124036_13:1-2-3`**    | Not __``that keen``__ on the 6 line wrasses , they have a habit of killing other wrasses and I really want to do a mystery wrasse at some point ....         |
+| **`pcc_eng_17_050.7766_x0804118_29:4-5-6`**    | PS I am not __``that keen``__ on the auto play and auto repeat on the non Youtube videos .                                                                   |
+| **`pcc_eng_20_033.4249_x0524262_43:06-10-11`** | The only downfall was that neither of us were __``that keen``__ on barbecue ribs and I knew deep down Kerri really wanted to try the Chicken Satay skewers . |
+| **`pcc_eng_24_077.4563_x1236815_34:15-16-17`** | There 's a kid in my neighborhood - a young teenager - who 's not __``that keen``__ on self -propelled transport machines ....                               |
+| **`pcc_eng_26_095.7281_x1531876_06:3-4-5`**    | I 'm not __``that keen``__ on redeveloping them into one report as the business rules are quite complex .                                                    |
+| **`pcc_eng_10_046.4375_x0735165_32:19-20-21`** | Sometimes it 's important for smaller banks to have a particular niche or specialty that other people are n't __``that keen``__ on .                         |
+| **`pcc_eng_21_062.6520_x0996456_10:26-27-28`** | It does taste great but next time I think I will either not use the onion or blend it at the end as I was n't __``that keen``__ on the bits of onion in it . |
