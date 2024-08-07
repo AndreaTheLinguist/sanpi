@@ -61,7 +61,7 @@ if [[ ${PAT_DIR} == 'RBdirect' ]]; then
     C=${C:-"${FRQ_T}/${PAT_DIR}/${TSV_STEM/\*${PAT_SUFF}/not-${PAT_DIR}}${SUFF}"}
 
 
-# TODO adjust the remaining options to run *mirror data
+# [x] TODO adjust the remaining options to run *mirror data
 elif [[ ${COMPARE} == 'polar' && ${PAT_SUFF} == 'mirror' &&  ! ${PAT_DIR} =~ 'ANY' ]]; then
     N_NAME='negmir'
     C_NAME='posmir'
@@ -165,7 +165,8 @@ if [[ ${MIN} != '0' ]]; then
     ( execute_py_script $TSV_STEM $FRQ_FLOOR $SANPI ${N} ${C} ${A} ${N_NAME} ${C_NAME} ${SUFF} ) 1>${LOG} 2>&1
 
 else 
-    for FRQ_FLOOR in 5000 1000 500 300 100 50 25 10 5 3; do
+    # for FRQ_FLOOR in 5000 1000 500 300 100 50 25 10 5 3; do
+    for FRQ_FLOOR in 8000 5000 1000 500 300 100 50 10 5; do
         LOG="${LOG_PREFIX}${FRQ_FLOOR}x.${DAY}-$(date +%H%M).log"
 
         echo "${FRQ_FLOOR}+ log: '${LOG}'" 

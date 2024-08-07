@@ -1,19 +1,31 @@
 import re
+from os import system
 from pathlib import Path
 from pprint import pprint
-from os import system
+
 import pandas as pd
 import pyarrow as pyar
 
-from source.utils.associate import POLAR_DIR, TOP_AM_DIR, adjust_am_names
-from source.utils.dataframes import catify_hit_table as catify, REGNOT
+from source.utils.associate import POLAR_DIR, RESULT_DIR, TOP_AM_DIR, adjust_am_names
 # from source.utils.dataframes import show_sample
+from source.utils.dataframes import REGNOT
+from source.utils.dataframes import catify_hit_table as catify
 from source.utils.dataframes import update_assoc_index as update_index
 from source.utils.dataframes import write_part_parquet as parq_it
-from source.utils.general import (confirm_dir, print_iter,
-                                  snake_to_camel, timestamp_today)
+from source.utils.general import (confirm_dir, print_iter, snake_to_camel,
+                                  timestamp_today)
 from source.utils.sample import sample_pickle as sp
 
+SPELL_OUT = {'pol': 'polarity',
+             'pos': 'positive',
+             'neg': 'negative',
+             'mir': 'mirror',
+             'diff': 'difference',
+             'dep': 'dependency',
+             'am': 'association measure',
+             'adv': 'adverb',
+             'adj': 'adjective',
+             'env': 'environment'}
 BASIC_FOCUS = ['f',
                'am_p1_given2',
                'conservative_log_ratio',
@@ -69,9 +81,9 @@ METRIC_PRIORITY_DICT = _set_priorities()
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-def md_frame_code(code_block: str, 
-                      lang: str = 'python', 
-                      indent: int = 0):
+def md_frame_code(code_block: str,
+                  lang: str = 'python',
+                  indent: int = 0):
     # if `code_block` has multiple lines, run as
     # ```
     # print_framed_code("""CODE_BLOCK""")
@@ -324,7 +336,7 @@ def get_top_vals(df: pd.DataFrame,
 
 def show_top_positive(adv_df,
                       data_tag: str,
-                      save_path:Path, 
+                      save_path: Path,
                       k: int = 15,
                       filter_and_sort: list = None):
 
@@ -400,11 +412,12 @@ def nb_show_table(df, n_dec: int = 2,
     _df.index = [f'**{r}**' for r in _df.index]
     table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
     if outpath:
+        confirm_dir(outpath.parent)
         Path(outpath).write_text(table)
     if not suppress_printing:
         title = title.strip('\n')+'\n\n' if title else ''
         print(f'\n{title}{table}\n')
-    if outpath: 
+    if outpath:
         print(f'\n> saved as:  \n> `{outpath}`\n')
     return (_df if return_df else None)
 
@@ -745,11 +758,13 @@ def pin_top_adv(adv_am,
                 verbose: bool = True):
     if isinstance(select_col, str):
         select_col = [select_col,]
-    sort_vals = adv_am.copy().filter(select_col).round(2 if len(select_col) > 1 else 5)
+    sort_vals = adv_am.copy().filter(select_col).round(
+        2 if len(select_col) > 1 else 5)
     top = (sort_vals.sort_values(select_col, ascending=False).index.to_series())
     sorted_adv_am = adv_am.loc[top, :]
     if verbose:
-        print(f'## Top Adverb Selection, as ranked by descending `{repr(select_col)}`')
+        print(
+            f'## Top Adverb Selection, as ranked by descending `{repr(select_col)}`')
         nb_show_table(sorted_adv_am[select_col].reset_index(), n_dec=3)
     return top.to_list(), sorted_adv_am
 
@@ -844,7 +859,7 @@ def sample_adv_bigrams(adverb: str,
     n_ex = int(n_top_bigrams * 8)
     # examples = collect_examples(this_adv_am, hits_df, adv=adverb, metric='LRC')
     examples = collect_adv_bigram_ex(
-        amdf=this_adv_am, hits_df=hits_df, adv=adverb,
+        amdf=this_adv_am, pol_df=hits_df, adv=adverb,
         metric_selection=METRIC_PRIORITY_DICT[data_tag][:2],
         n_examples=n_ex, n_bigrams=n_top_bigrams,
         verbose=verbose, output_dir=output_dir)
@@ -852,15 +867,16 @@ def sample_adv_bigrams(adverb: str,
     print(f'\nSaving Samples in `{output_dir}/`...')
     paths = []
     for key, df in examples.items():
-        out_path = output_dir.joinpath(f'{key}_{n_ex}ex~{len(df)}.csv')
-        if out_path.is_file() and not len(df) < n_ex:
-            alt_dir = output_dir.joinpath('alt_ex')
-            print(f"* Renaming existing version of `{out_path.name}`")
-            system(f'mkdir -p "{alt_dir}"; '
-                   f'mv --backup=numbered "{out_path}" "{alt_dir}/" ; '
-                   f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r > /dev/null 2>&1')
-        df.to_csv(out_path)
-        paths.append(out_path)
+        if df is not None:
+            out_path = output_dir.joinpath(f'{key}_{n_ex}ex~{len(df)}.csv')
+            if out_path.is_file() and not len(df) < n_ex:
+                alt_dir = output_dir.joinpath('alt_ex')
+                print(f"* Renaming existing version of `{out_path.name}`")
+                system(f'mkdir -p "{alt_dir}"; '
+                       f'mv --backup=numbered "{out_path}" "{alt_dir}/" ; '
+                       f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r > /dev/null 2>&1')
+            df.to_csv(out_path)
+            paths.append(out_path)
     print_iter([f'`{p}`' for p in paths],
                header='\nSamples saved as...', bullet='+')
 
@@ -868,51 +884,104 @@ def sample_adv_bigrams(adverb: str,
 
 
 def collect_adv_bigram_ex(amdf: pd.DataFrame,
-                          hits_df: pd.DataFrame,
-                          adv: str = 'exactly',
+                          adv: str,
+                          pol_df: pd.DataFrame = None,
+                          hits_df_dict: dict[pd.DataFrame] = None,
                           polarity: str = None,
                           n_bigrams: int = 10,
                           n_examples: int = 50,
                           verbose: bool = False,
                           output_dir: Path = None,
                           metric_selection: str | list = ['dP1', 'LRC']) -> dict:
+    if pol_df is None and hits_df_dict is None:
+        raise ValueError(
+            'No hit data passed. Either `hits_df` or `hits_df_dict` must be provided.')
+    bigrams, amdf = _prep_bigram_info(amdf=amdf,
+                                      n_bigrams=n_bigrams,
+                                      metric_selection=metric_selection,
+                                      adv = adv)
+
+    examples = {}
+    if hits_df_dict is None:
+        hits_df_dict = {polarity or 'any': pol_df}
+
+    polar_outdir_dict = set_polar_ex_dirs(
+        adv, list(hits_df_dict.keys()), output_dir)
+    # for poldir in polar_outdir_dict.values():
+    #     confirm_dir(poldir)
+
+    for i, bigram in enumerate(bigrams, start=1):
+        bigram_text = bigram.replace("_", " ")
+        if verbose:
+            print(f'\n### {i}. _{bigram_text}_\n')
+        bigram_in_pol_ex = None
+        bigram_bipolar_ex = {}
+        for pol_i, (pol_cue, pol_df) in enumerate(hits_df_dict.items(), start=1):
+            polarity = SPELL_OUT[pol_cue]
+            if verbose:
+                print(
+                    f'\n#### {i}.{pol_i}. "{bigram_text}" under _{polarity}_ polarity\n')
+            if any(pol_df.bigram_lower == bigram):
+                bigram_in_pol_ex, excerpt = _pull_sample(
+                    hits_df=pol_df,
+                    bigram=bigram,
+                    n_examples=n_examples if polarity != 'pos'
+                    else max(round(n_examples / 2, -1), 10),
+                )
+                #  [x] TODO -> DONE: modify this to save markdown example table as file
+                nb_show_table(
+                    excerpt, suppress_printing=not verbose,
+                    outpath=polar_outdir_dict[pol_cue].joinpath(
+                        f'{pol_cue}-{bigram}_ex.md'))
+                bigram_bipolar_ex[pol_cue] = bigram_in_pol_ex
+            else:
+                print(r'ㄟ( ▔, ▔ )ㄏ No examples of',
+                      f'"*{bigram_text}*" found in **{polarity}** hits.')
+
+        # print('\n   > ', [f'> {}' for i in ex_for_bigram.sample(3).index])
+        examples[bigram] = bigram_bipolar_ex
+    return examples
+
+
+def set_polar_ex_dirs(adv: str, pols: list[str], output_dir: Path or str):
+    polar_outdir_dict = dict.fromkeys(pols)
+    for pol in pols:
+        _polar_dir = Path(output_dir) / f'{pol}-{adv}'
+        confirm_dir(_polar_dir)
+        polar_outdir_dict[pol] = _polar_dir
+    return polar_outdir_dict
+
+
+def _pull_sample(hits_df: pd.DataFrame, n_examples: int, bigram: str) -> tuple:
+    bigram_in_pol_ex = sp(
+        data=hits_df, print_sample=False, quiet=True,
+        sample_size=n_examples,
+        sort_by=hits_df.filter(
+            ['all_forms_lower', 'bigram_lower']).columns.tolist()[0],
+        filters=[f'bigram_lower=={bigram}'],
+        columns=['END::lower', 'text_window', 'token_str'])
+    excerpt = embolden(
+        bigram_in_pol_ex.sample(min(len(bigram_in_pol_ex), 8))[
+            'token_str'],
+        bold_regex=r'\b('+bigram.replace('_', ' ') + r')\b'
+    ).to_frame()
+    excerpt.index = '`'+excerpt.index.astype('string')+'`'
+    return bigram_in_pol_ex, excerpt
+
+
+def _prep_bigram_info(amdf, n_bigrams, metric_selection, adv):
     if not any(amdf.l2.str.contains('_')):
         n_unique_adv = amdf.l1.nunique()
         bigrams = (amdf.l1 + '_' + amdf.l2).unique()
     else:
         n_unique_adv = amdf.adv.nunique()
         bigrams = amdf.l2.unique()
-
     if n_unique_adv > 1:
         amdf = (amdf
                 .filter(like=f'(?<=~|\b){adv}(?=_|~)',
                         axis=0)
                 .nlargest(n_bigrams, columns=metric_selection))
-    examples = {}
-    for i, bigram in enumerate(bigrams, start=1):
-        bigram_text = bigram.replace("_", " ")
-        if verbose:
-            print(f'\n### {i}. _{bigram_text}_\n')
-
-        ex_for_bigram = sp(
-            data=hits_df, print_sample=False, quiet=True,
-            sample_size=n_examples,
-            sort_by=hits_df.filter(
-                ['all_forms_lower', 'bigram_lower']).columns.tolist()[0],
-            filters=[f'bigram_lower=={bigram}'],
-            columns=['END::lower', 'text_window', 'token_str'])
-        excerpt = embolden(
-            ex_for_bigram.sample(min(len(ex_for_bigram), 8))[
-                'token_str'],
-            bold_regex=r'\b('+bigram_text + r')\b'
-        ).to_frame()
-        excerpt.index = '`'+excerpt.index.astype('string')+'`'
-        # TODO: modify this to save markdown example table as file
-        nb_show_table(excerpt, suppress_printing=not verbose,
-                      outpath=output_dir.joinpath(f'{bigram}_ex.md'))
-        # print('\n   > ', [f'> {}' for i in ex_for_bigram.sample(3).index])
-        examples[bigram] = ex_for_bigram
-    return examples
+    return bigrams, amdf
 
 
 def italic(text_vals: pd.Series):
@@ -921,8 +990,9 @@ def italic(text_vals: pd.Series):
 
 def populate_adv_dir(adverb: str,
                      bigram_am: pd.DataFrame,
-                     hits_df: pd.DataFrame,
+                     neg_hits_df: pd.DataFrame,
                      data_dir: Path,
+                     pos_hits_df: pd.DataFrame = None,
                      adv_ex_stem: str = None,
                      n_bigrams: int = 10,
                      n_ex: int = 50,
@@ -947,23 +1017,25 @@ def populate_adv_dir(adverb: str,
     """
 
     data_tag = infer_data_tag_from_l1(bigram_am.l1)
-    adv_ex_dir = data_dir / 'neg_bigram_examples' / adverb
+    adv_ex_dir = data_dir / 'polar_bigram_examples' / adverb
     confirm_dir(adv_ex_dir)
     if adv_ex_stem is None:
         adv_ex_stem = f'{data_tag}-{adverb}_{n_bigrams}mostNEG-bigrams_AMscores'
     table_csv_path = cobble_dated_path(
-        timestamp_today, adv_ex_dir, adv_ex_stem)
+        date_str=timestamp_today(),
+        data_dir=adv_ex_dir,
+        undated_stem=adv_ex_stem)
     this_adv_amdf = bigram_am.filter(
         like=f'~{adverb}_', axis=0).sort_values(rank_by, ascending=False)
     if not all(pd.Series(rank_by).isin(bigram_am.columns)):
         bigram_am = adjust_am_names(bigram_am)
     this_adv_amdf.to_csv(table_csv_path)
 
-    nb_show_table(
-        (this_adv_amdf
-         .filter(regex=r'^([dLGeu]|f2?$|adj_total)' + r'|'.join(rank_by))
-         .round(2)
-         .sort_values(rank_by, ascending=False)),
+    nb_show_table((
+        this_adv_amdf.filter(
+            regex=r'^[dLGeu]|f2?$|adj_total|' + r'|'.join(rank_by))
+        .round(2)
+        .sort_values(rank_by, ascending=False)),
         n_dec=2,
         outpath=table_csv_path.with_suffix('.md'),
         suppress_printing=not verbose)
@@ -975,22 +1047,63 @@ def populate_adv_dir(adverb: str,
                   f'{adverb}_MarginalFreqs_{timestamp_today()}.md',
                   suppress_printing=not verbose)
 
-    examples = collect_adv_bigram_ex(
-        this_adv_amdf, hits_df, metric_selection=rank_by,
-        n_examples=n_ex, verbose=verbose,
+    _collect_text_examples(pol_df_dict={'neg': neg_hits_df,
+                                        'pos': pos_hits_df},
+                           adverb=adverb,
+                           n_ex=n_ex,
+                           rank_by=rank_by,
+                           verbose=verbose,
+                           adv_ex_dir=adv_ex_dir,
+                           amdf=this_adv_amdf)
+
+
+def _collect_text_examples(pol_df_dict: dict[pd.DataFrame],
+                           adverb: str,
+                           n_ex: int,
+                           rank_by: list,
+                           verbose: bool,
+                           adv_ex_dir: Path,
+                           amdf: pd.DataFrame):
+
+    confirm_dir(adv_ex_dir)
+    examples_dict = collect_adv_bigram_ex(
+        adv=adverb,
+        amdf=amdf,
+        # hits_df=pol_df_dict,
+        hits_df_dict=pol_df_dict,
+        # polarity=polarity,
+        metric_selection=rank_by,
+        n_examples=n_ex,
+        verbose=verbose,
         output_dir=adv_ex_dir)
 
-    print(f'\nSaving Samples in {adv_ex_dir}/...')
+    print(f'\n### Saving *`{adverb}`* Samples\n\n',
+          f'> in `{adv_ex_dir}/`\n')
+    for big_i, (bigram, examples) in enumerate(examples_dict.items(), start=1):
+        print(f"{big_i}. *{bigram.replace('_', ' ')}*")
+        paths_dict = set_polar_ex_dirs(adv=adverb, pols=examples.keys(), 
+                                       output_dir=adv_ex_dir)
+        for pol_cue, pol_ex_df in examples.items():
+            if pol_ex_df is None or pol_ex_df.empty:
+                continue
+            out_dir = paths_dict[pol_cue]
+            alt_dir = out_dir/'alt_ex'
+            confirm_dir(alt_dir)
+            
+            out_path = out_dir/f'{out_dir.name}_{bigram.split("_")[1]}_{n_ex}ex~{len(pol_ex_df)}.csv'
+            confirm_dir(out_path.parent)
+            if out_path.is_file() and n_ex == len(pol_ex_df): 
+                system("echo '    > Renaming existing version\n'; " 
+                       + f"echo \"      $(mv -v --backup=t '{out_path}' '{alt_dir}/{out_path.name}')\"")
+            pol_ex_df.to_csv(out_path)
+            paths_dict[pol_cue]=out_path
 
-    paths = []
-    for key, df in examples.items():
-        out_path = adv_ex_dir.joinpath(f'{key}_{n_ex}ex.csv')
-        df.to_csv(out_path)
-        paths.append(out_path)
-
-    if verbose:
-        print_iter((f'`{p.relative_to(adv_ex_dir.parent.parent)}`' for p in paths),
-                   header='\nSamples saved as...', bullet='1.')
+        if verbose:
+            print_iter((f'{x}. **{SPELL_OUT[pol_cue]}**  \n       `"{paths_dict[pol_cue]}"`' 
+                        for x, pol_cue in enumerate(paths_dict.keys(), start=1)),
+                       header=f'\n    Full polarity samples saved as...\n', 
+                       indent=3, bullet='')
+            print()
 
 
 def seek_top_adv_am(date_str: str,
@@ -1045,7 +1158,10 @@ def seek_top_adv_am(date_str: str,
     return adjust_am_names(adv_am).convert_dtypes()
 
 
-def cobble_dated_path(date_str, data_dir, undated_stem, suffix: str = '.csv'):
+def cobble_dated_path(undated_stem: str,
+                      data_dir: Path or str,
+                      date_str: str = timestamp_today(),
+                      suffix: str = '.csv') -> Path:
     """
     Constructs a dated file path based on the input date string, directory, stem, and suffix.
 
@@ -1101,8 +1217,9 @@ def find_most_recent_top_am(date_str: str,
 
     print(f'⚠️ no file found for `{date_str}`')
     print(f'  --> seeking original file matching `{init_date_str}`')
-    print('      full path:',
-          f'`{cobble_dated_path(date_str=init_date_str, data_dir=data_dir, undated_stem=undated_stem, suffix=suffix)}`')
+    sought_path = cobble_dated_path(date_str=init_date_str, data_dir=data_dir,
+                                    undated_stem=undated_stem, suffix=suffix)
+    print(f'      full path: `{sought_path}`')
 
 
 def day_before(date_str: str):
@@ -1137,7 +1254,7 @@ def save_top_bigrams_overall_md(bigram_am: pd.DataFrame,
     outpath = out_dir.joinpath(f'{out_dir.name}_NEG-ADV-{adv_floor}_'
                                + f'top{overall_k}bigrams-overall'
                                + f'.min{bigram_floor}.{timestamp_today()}.md')
-    print(f'> Saving **Top Overall Bigrams** table as  \n>   `{outpath}`')
+    # print(f'> Saving **Top Overall Bigrams** table as  \n>   `{outpath}`')
     nb_show_table(bigram_am.round(2).nlargest(overall_k, columns=metric_columns),
                   outpath=outpath,
                   suppress_printing=suppress)
@@ -1161,3 +1278,39 @@ def clarify_neg_categories(neg_hits, verbose=False):
     # #> drop empty categories if already categorical; make categorical if not already
     # neg_hits.loc[:, word_cols] = neg_hits[word_cols]
     return catify(neg_hits)
+
+
+def seek_errant_negations(pos_hits: pd.DataFrame):
+
+    from source.utils.dataframes import (NEG_REGEX, POS_FEW_REGEX,
+                                         get_preceding_text)
+
+    pos_hits['text_up_to_adj'] = get_preceding_text(pos_hits.token_str)
+    neg_found = pos_hits.text_up_to_adj.str.extract(NEG_REGEX).fillna('')
+    neg_found = neg_found.loc[neg_found.apply(any, axis=1),
+                              neg_found.apply(any)]
+
+    neg_found = neg_found.assign(adv=pos_hits.loc[neg_found.index, 'adv_form_lower'],
+                                 all_forms_lower=pos_hits.loc[neg_found.index,
+                                                              'all_forms_lower'],
+                                 preceding_str=pos_hits.loc[neg_found.index, 'text_up_to_adj'].astype('string'))
+    neg_found = neg_found.loc[~((neg_found.neg == 'few') & (
+        neg_found.preceding_str.str.findall(POS_FEW_REGEX).astype('bool'))), :]
+    if neg_found.empty:
+        print('🎉 No errant negations found! ✨✅')
+    else:
+        print('😱 errant negations found! ⚠️')
+        neg_found['preceding_str'] = embolden(neg_found.preceding_str)
+        nb_show_table(neg_found[['neg', 'adv', 'preceding_str']].head(10))
+        nb_show_table(
+            neg_found,
+            outpath=RESULT_DIR / f'MISSED_NEG-in-COM.{timestamp_today()}.md')
+        show_sample(neg_found)
+
+        print(neg_found.iloc[:, :-2].value_counts().to_frame()
+              .reset_index().to_markdown(index=None))
+        neg_few = neg_found.loc[neg_found.neg == 'few', :].index.to_list()
+        neg_few
+
+        nb_show_table(neg_found.loc[neg_few, :].join(pos_hits.loc[neg_few, [
+            'token_str', 'text_window', 'polarity']], on='hit_id', rsuffix='[orig]'), transpose=True)

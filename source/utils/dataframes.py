@@ -418,7 +418,7 @@ def get_preceding_text(tok_str: pd.Series,
         # ! numbers in `hit_id` are conllu object's "id" values:
         # !     word numbering in conllu objects starts at 1, not 0!
         # `adv_index` as stored in dataframes is word indexing starting from 0
-        adv_index = ix_from_id['adv_index'] - 1
+        adv_index = ix_from_id['adv_index'].astype('int') - 1
 
     adv_index = pd.to_numeric(adv_index, downcast='unsigned')
     tok_lists = tok_str.str.lower().str.split()
