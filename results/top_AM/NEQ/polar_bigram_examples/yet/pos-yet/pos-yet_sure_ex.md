@@ -1,0 +1,3 @@
+|                                             | `token_str`                                                                                                                               |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_18_017.3700_x0265218_14:17-18`** | WITHIN THE HOUR WE'VE LEARNED TEN APD OFFICERS ARE NOW ON LEAVE , THOUGH POLICE AREN'T __``YET SURE``__ IF ALL OF THEM FIRED THEIR GUNS . |

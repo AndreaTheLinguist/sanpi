@@ -1,0 +1,10 @@
+|                                            | `token_str`                                                                                                                                         |
+|:-------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_02_016.2849_x0247508_6:11-12`** | As mentioned in the interview , the average price is __``that high``__ for a game that is n't even going to be show in primetime .                  |
+| **`pcc_eng_13_064.3426_x1023609_17:4-5`**  | Mine was certainly __``that high``__ when I opened .                                                                                                |
+| **`nyt_eng_19990622_0113_82:10-11`**       | LEAD-STUDIES -LRB- Undated -RRB- _ One new study suggests __``that high``__ levels                                                                  |
+| **`apw_eng_20050922_1109_14:13-14`**       | but some forecasters said Rita could pound the barrier with waves twice __``that high``__ .                                                         |
+| **`nyt_eng_20080328_0149_19:3-4`**         | anyone with __``that high``__ a political profile must also be prepared to face the toughest scrutiny .                                             |
+| **`nyt_eng_20091001_0175_13:6-7`**         | moreover , unemployment that remains __``that high``__ , that long , will cast long shadows over America 's future .                                |
+| **`pcc_eng_27_077.9347_x1243983_10:3-4`**  | Mussina is __``that high``__ because of consistent excellence .                                                                                     |
+| **`apw_eng_19980911_1198_27:24-25`**       | growth will likely be a scrawny 1 percent , while unemployment officially is 8 percent _ labor union statistics say it 's twice __``that high``__ . |

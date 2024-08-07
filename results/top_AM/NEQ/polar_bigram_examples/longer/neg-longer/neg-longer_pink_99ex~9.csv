@@ -1,0 +1,10 @@
+hit_id,adv_form_lower,adj_form_lower,bigram_lower,neg_form_lower,all_forms_lower,text_window,token_str
+nyt_eng_19990214_0151_65:7-8-9,longer,pink,longer_pink,no,no_longer_pink,cook just until the middle is no longer pink .,Cook just until the middle is no longer pink .
+nyt_eng_19990609_0159_39:14-15-16,longer,pink,longer_pink,no,no_longer_pink,or until chicken is tender and no longer pink .,bake in 325-degree oven about 45 minutes or until chicken is tender and no longer pink .
+nyt_eng_20050810_0048_12:21-22-23,longer,pink,longer_pink,no,no_longer_pink,beef until it crumbles and is no longer pink .,"while crust bakes , in a large skillet over medium heat , cook the beef until it crumbles and is no longer pink ."
+nyt_eng_19991020_0189_2:11-12-13,longer,pink,longer_pink,no,no_longer_pink,"and stir-fry 3 minutes , until no longer pink .","add half the pork and stir-fry 3 minutes , until no longer pink ."
+nyt_eng_20000815_0227_55:13-14-15,longer,pink,longer_pink,no,no_longer_pink,", or until the pork is no longer pink .","stir-fry for 1 to 2 minutes , or until the pork is no longer pink ."
+nyt_eng_19990623_0145_82:09-10-11,longer,pink,longer_pink,no,no_longer_pink,4 minutes or until chicken is no longer pink .,Simmer about 4 minutes or until chicken is no longer pink .
+nyt_eng_19990825_0071_74:10-11-12,longer,pink,longer_pink,no,no_longer_pink,"and cook , stirring , until no longer pink , about 5 minutes .","add ground beef and cook , stirring , until no longer pink , about 5 minutes ."
+pcc_eng_29_098.1553_x1569691_029:10-11-12,longer,pink,longer_pink,not,not_longer_pink,"preheated oven until the chicken is not longer pink in the center , and crispy","Bake in the preheated oven until the chicken is not longer pink in the center , and crispy on the outside , about 45 minutes ."
+pcc_eng_03_033.7772_x0530908_13:25-26-27,longer,pink,longer_pink,not,not_longer_pink,continue cooking until the chicken is not longer pink and registers 160 degrees .,"When you flip the chicken for the last time , brush with the reserved barbecue sauce mixture and continue cooking until the chicken is not longer pink and registers 160 degrees ."

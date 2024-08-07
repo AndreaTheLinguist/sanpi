@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                                                |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_22_006.0149_x0081010_09:11-12-13`**  | Pear Jam's August 1991 released album " Ten " though not __``immediately successful``__ , by late 1992 had reached number two on the Billboard 200 chart . |
+| **`pcc_eng_23_009.0502_x0129932_252:10-11-12`** | Hunter tried contacting someone at the center but was not __``immediately successful``__ .                                                                 |
+| **`pcc_eng_05_092.0968_x1473834_06:09-10-11`**  | Efforts to reach AZ Patriots for comment were not __``immediately successful``__ .                                                                         |
+| **`pcc_eng_01_044.4283_x0701611_18:6-7-8`**     | Efforts to contact him were not __``immediately successful``__ Wednesday .                                                                                 |
+| **`pcc_eng_13_096.6423_x1545606_13:15-16-17`**  | Attempts to contact Mayhew , 69 , for comment - or roar - were not __``immediately successful``__ .                                                        |
+| **`apw_eng_20090619_1275_21:12-13-14`**         | an attempt to find a listed phone number for Easton was n't __``immediately successful``__ .                                                               |
+| **`pcc_eng_27_027.5533_x0428933_25:7-8-9`**     | Attempts to reach town officials were not __``immediately successful``__ Tuesday .                                                                         |
+| **`pcc_eng_18_002.8745_x0030500_20:15-16-17`**  | An attempt to reach an EPA spokesman for reaction to Mead 's comments was not __``immediately successful``__ on Friday .                                   |

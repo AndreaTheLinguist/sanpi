@@ -1,0 +1,10 @@
+|                                              | `token_str`                                                                                                                                                    |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_13_085.8305_x1371157_170:4-5`**   | " That ainit __``necessarily true``__ .                                                                                                                        |
+| **`pcc_eng_02_058.1432_x0924332_097:8-9`**   | Some people have argued that it is __``necessarily true``__ that anybody who acts sufficiently like a normal human being must also have conscious experience . |
+| **`pcc_eng_25_093.4729_x1496556_034:26-27`** | For example , ye might say it was a mistake for a club tae buy such an ' such a player but that is nae __``necessarily true``__ .                              |
+| **`pcc_eng_04_022.4879_x0347027_52:6-7`**    | I took this as a __``necessarily true``__ starting point ; as an axiom , if you wish .                                                                         |
+| **`pcc_eng_25_049.3712_x0783107_08:21-22`**  | Right now Donald Trump is being looked at as the most divisive personality in politics today , but is that __``necessarily true``__ ?                          |
+| **`pcc_eng_07_050.3684_x0798080_3:8-9`**     | Colonel Muammar Gaddafi proves that this is __``necessarily true``__ .                                                                                         |
+| **`pcc_eng_25_047.8675_x0758685_060:3-4`**   | This is __``necessarily true``__ , for since all gifts are made nontaxable , there can be no such thing under the statute as a taxable gift .                  |
+| **`pcc_eng_09_014.9779_x0226569_27:3-4`**    | Is that __``necessarily true``__ ?                                                                                                                             |

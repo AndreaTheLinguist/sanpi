@@ -1,0 +1,6 @@
+|                                            | `token_str`                                                                                                                                    |
+|:-------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_052.9605_x0840597_384:4-5`** | Is your family __``particularly religious``__ ?                                                                                                |
+| **`pcc_eng_18_079.5602_x1272095_08:6-7`**  | It appears to be a __``particularly religious``__ community .                                                                                  |
+| **`pcc_eng_19_059.4744_x0943839_07:3-4`**  | As one __``particularly religious``__ zealot ( a close relative ) said , " We must not allow Clinton to appoint liberal Supreme Court judges . |
+| **`pcc_eng_18_011.9826_x0177810_19:1-2`**  | __``Particularly religious``__ institutions that think they will be compromised . "                                                            |

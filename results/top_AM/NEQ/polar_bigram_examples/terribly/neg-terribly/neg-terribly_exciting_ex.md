@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                           |
+|:-----------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_012.5989_x0187456_62:07-10-11`** | Other than that my year has n't been too __``terribly exciting``__ , which is probably an OK thing .                                  |
+| **`pcc_eng_12_002.9577_x0031639_79:6-7-8`**    | It 's rather repetitive , not __``terribly exciting``__ , but makes for a good transition song during live performances .             |
+| **`pcc_eng_15_098.8682_x1581771_112:1-3-4`**   | None is __``terribly exciting``__ .                                                                                                   |
+| **`pcc_eng_05_099.1957_x1588393_08:08-09-10`** | Our culinary adventure for the week was not __``terribly exciting``__ .                                                               |
+| **`pcc_eng_11_087.9274_x1406989_25:25-26-27`** | I made a new entry about Tray 30 , so feel free to pop on over and check it out ( though it 's not __``terribly exciting``__ , haha ) |
+| **`pcc_eng_10_028.8858_x0450776_07:09-10-11`** | It 's not awful , it 's just not __``terribly exciting``__ .                                                                          |
+| **`pcc_eng_21_097.4945_x1558969_06:1-4-5`**    | Nor is it __``terribly exciting``__ .                                                                                                 |
+| **`pcc_eng_14_007.4135_x0103643_11:4-5-6`**    | ( It is not __``terribly exciting``__ , but it gets the job done . )                                                                  |

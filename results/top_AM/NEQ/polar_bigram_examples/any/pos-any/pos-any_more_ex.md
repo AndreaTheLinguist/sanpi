@@ -1,0 +1,10 @@
+|                                             | `token_str`                                                                                                                                            |
+|:--------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19970707_0558_17:09-10`**        | he added , `` Are they helping us __``any more``__ than financially ? No way . ''                                                                      |
+| **`pcc_eng_27_080.0571_x1278460_160:1-2`**  | __``Any more``__ than that and I 'd be cheating . "                                                                                                    |
+| **`pcc_eng_29_032.6339_x0510582_05:26-27`** | -- NASA Even S. Fred Singer , famous for his stretching of data to deny global warming , is having a hard time using 1998 __``any more``__ ; he has to |
+| **`pcc_eng_29_090.7140_x1449010_17:6-7`**   | And if that analogy were __``any more``__ on -point , Tommy Chong would be Trump 's running mate .                                                     |
+| **`pcc_eng_07_076.8048_x1224907_37:1-2`**   | __``Any more``__ than that , and you 've got an identity crisis on your hands .                                                                        |
+| **`pcc_eng_28_039.4873_x0622464_12:14-15`** | That was the score when I left and really who needs to know __``any more``__ than that .                                                               |
+| **`pcc_eng_14_003.3017_x0037236_28:1-2`**   | __``Any more``__ than this and you will end up damaging the potential yield of your pear crop , or even damage the tree itself .                       |
+| **`pcc_eng_21_053.1786_x0843490_50:1-2`**   | __``Any more``__ than that , I 'm too scared to talk about . "                                                                                         |

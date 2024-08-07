@@ -1,0 +1,6 @@
+|                                             | `token_str`                                                                                                                                                    |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19980629_0183_70:21-22`**        | `` Over the years I 've sung everything from Monteverdi to Stravinsky , with everything in between ; I feel __``particularly comfortable``__ in French roles . |
+| **`pcc_eng_13_058.2834_x0925713_04:24-25`** | Plug it into the headphone jack of the phone and it 'll provide crystal clear audio on both ends and the earpiece is __``particularly comfortable``__ .        |
+| **`pcc_eng_15_047.4650_x0751121_15:15-16`** | Jupp Heynckes ' charges were utterly dominant , with Swiss midfielder Xherdan Shaqiri looking __``particularly comfortable``__ in the No. 10 role .            |
+| **`pcc_eng_06_068.4326_x1091103_06:6-7`**   | The orange jumpsuit is therefore __``particularly comfortable``__ to wear made of a soft fabric and .                                                          |

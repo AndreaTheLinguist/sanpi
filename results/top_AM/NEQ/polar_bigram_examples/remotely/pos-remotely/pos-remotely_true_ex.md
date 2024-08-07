@@ -1,0 +1,5 @@
+|                                             | `token_str`                                                                                                                                                           |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_18_012.9535_x0193592_15:5-6`**   | If that trend is __``remotely true``__ , that 's terrible . "                                                                                                         |
+| **`pcc_eng_02_097.3407_x1557565_54:11-12`** | You can use facts to prove anything that 's even __``remotely true``__ ! " )                                                                                          |
+| **`pcc_eng_16_088.6554_x1418960_07:8-9`**   | But is this assessment fair or even __``remotely true``__ when it comes to The Duchess of Cornwall 's two children from her first marriage to Andrew Parker -Bowles ? |

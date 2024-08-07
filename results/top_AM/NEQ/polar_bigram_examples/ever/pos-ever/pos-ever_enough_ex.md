@@ -1,0 +1,8 @@
+|                                             | `token_str`                                                                                                                                                             |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_24_064.9585_x1034643_195:3-4`**  | Is there __``ever enough``__ time to see it all .                                                                                                                       |
+| **`pcc_eng_17_037.1871_x0584795_07:27-28`** | Just looking at pictures of this stupendous rope bridge is enough to make you feel distinctly uncomfortable ; it might be moored down but is that __``ever enough``__ ? |
+| **`pcc_eng_00_080.9536_x1292556_14:4-5`**   | But is that __``ever enough``__ recompense ?                                                                                                                            |
+| **`pcc_eng_27_076.2549_x1216767_67:4-5`**   | How much is __``ever enough``__ for decision makers .                                                                                                                   |
+| **`pcc_eng_19_050.7883_x0803660_32:4-5`**   | But is it __``ever enough``__ ?                                                                                                                                         |
+| **`pcc_eng_29_059.7325_x0948904_86:3-4`**   | Is one __``ever enough``__ ?                                                                                                                                            |

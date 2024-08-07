@@ -1,0 +1,5 @@
+|                                             | `token_str`                                                                                                                                                                          |
+|:--------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_12_051.5735_x0817481_128:3-4`**  | we arent __``exactly sure``__ how it happened , the trailer was not damaged at all so we think that he some how kicked his own hoof with his opposite foot , so hard that it spilt . |
+| **`pcc_eng_01_054.9333_x0872024_50:12-13`** | Dowling said , " unlike in China , where they are __``exactly sure``__ what they 're doing . "                                                                                       |
+| **`pcc_eng_21_010.6826_x0156293_04:1-2`**   | __``Exactly sure``__ , it is very important go with a design which you exceedingly are certain to get connected to , and this may end in mentioning your favorite attitude .         |

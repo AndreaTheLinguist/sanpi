@@ -1,0 +1,7 @@
+|                                              | `token_str`                                                                                                                            |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_21_020.4234_x0313691_17:4-5`**    | I find it __``terribly interesting``__ that Arie decided to have a 1:1 date with pretty much every woman that was left on the show .   |
+| **`pcc_eng_01_032.8653_x0515030_17:6-7`**    | Anyways , it 's a __``terribly interesting``__ read : New Yorker 's A Man of Tastes                                                    |
+| **`pcc_eng_06_015.1055_x0228065_126:5-6`**   | I found it all __``terribly interesting``__ .                                                                                          |
+| **`pcc_eng_06_021.1478_x0325957_16:16-17`**  | They have the world at their fingertips -- a fun , frivolous , and yet __``terribly interesting``__ world in the palm of their hands . |
+| **`pcc_eng_16_081.4178_x1301557_096:20-21`** | He had suddenly gone deaf , it appeared , and had found something in the far distance that was __``terribly interesting``__ .          |
