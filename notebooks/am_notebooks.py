@@ -25,6 +25,7 @@ SPELL_OUT = {'pol': 'polarity',
              'am': 'association measure',
              'adv': 'adverb',
              'adj': 'adjective',
+             'any': 'any',
              'env': 'environment'}
 BASIC_FOCUS = ['f',
                'am_p1_given2',
@@ -418,7 +419,7 @@ def nb_show_table(df, n_dec: int = 2,
         title = title.strip('\n')+'\n\n' if title else ''
         print(f'\n{title}{table}\n')
     if outpath:
-        print(f'\n> saved as:  \n> `{outpath}`\n')
+        print(f'\n> saved as:  \n> `"{outpath}"`\n')
     return (_df if return_df else None)
 
 
@@ -856,6 +857,7 @@ def sample_adv_bigrams(adverb: str,
 
     nb_show_table(this_adv_am, n_dec=2,
                   outpath=table_csv_path.with_suffix('.md'))
+    
     n_ex = int(n_top_bigrams * 8)
     # examples = collect_examples(this_adv_am, hits_df, adv=adverb, metric='LRC')
     examples = collect_adv_bigram_ex(
@@ -865,20 +867,28 @@ def sample_adv_bigrams(adverb: str,
         verbose=verbose, output_dir=output_dir)
 
     print(f'\nSaving Samples in `{output_dir}/`...')
-    paths = []
-    for key, df in examples.items():
-        if df is not None:
-            out_path = output_dir.joinpath(f'{key}_{n_ex}ex~{len(df)}.csv')
-            if out_path.is_file() and not len(df) < n_ex:
+    # paths = []
+    for key, ex_data in examples.items():
+        if ex_data is not None:
+            
+            if isinstance(ex_data, dict):
+                context_cue = list(ex_data.keys())[0]
+                ex_data = ex_data[context_cue]
+                #// print(ex_data)
+            embedding = output_dir/f'any-{adverb}'
+            confirm_dir(embedding)
+            out_path = embedding / f'any-{key}_{n_ex}ex~{len(ex_data)}.csv'
+            if out_path.is_file() and not len(ex_data) < n_ex:
                 alt_dir = output_dir.joinpath('alt_ex')
                 print(f"* Renaming existing version of `{out_path.name}`")
                 system(f'mkdir -p "{alt_dir}"; '
                        f'mv --backup=numbered "{out_path}" "{alt_dir}/" ; '
                        f'bash /share/compling/projects/tools/datefile.sh "{alt_dir}/{out_path.name}" -r > /dev/null 2>&1')
-            df.to_csv(out_path)
-            paths.append(out_path)
-    print_iter([f'`{p}`' for p in paths],
-               header='\nSamples saved as...', bullet='+')
+            ex_data.to_csv(out_path)
+            print(f'+ `{key}` examples saved as:  \n  `"{out_path}"`')
+            # paths.append(out_path)
+    # print_iter([f'`{p}`' for p in paths],
+    #            header='\nSamples saved as...', bullet='+')
 
 # * bigram-polarity
 
@@ -900,11 +910,11 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
                                       n_bigrams=n_bigrams,
                                       metric_selection=metric_selection,
                                       adv = adv)
-
+    polarity = polarity or 'any'
     examples = {}
     if hits_df_dict is None:
-        hits_df_dict = {polarity or 'any': pol_df}
-
+        hits_df_dict = {polarity: pol_df}
+    blind_ex = polarity == 'any'
     polar_outdir_dict = set_polar_ex_dirs(
         adv, list(hits_df_dict.keys()), output_dir)
     # for poldir in polar_outdir_dict.values():
@@ -913,12 +923,17 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
     for i, bigram in enumerate(bigrams, start=1):
         bigram_text = bigram.replace("_", " ")
         if verbose:
-            print(f'\n### {i}. _{bigram_text}_\n')
+            bigram_header = f'\n### {i}.'
+            if blind_ex: 
+                bigram_header = f'{bigram_header} "_{bigram_text}_" under **{polarity}** polarity\n'
+            else: 
+                f'{bigram_header} _{bigram_text}_\n'
+            print(bigram_header)
         bigram_in_pol_ex = None
         bigram_bipolar_ex = {}
         for pol_i, (pol_cue, pol_df) in enumerate(hits_df_dict.items(), start=1):
             polarity = SPELL_OUT[pol_cue]
-            if verbose:
+            if verbose and not blind_ex:
                 print(
                     f'\n#### {i}.{pol_i}. "{bigram_text}" under _{polarity}_ polarity\n')
             if any(pol_df.bigram_lower == bigram):
