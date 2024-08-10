@@ -388,7 +388,8 @@ def nb_show_table(df, n_dec: int = 2,
                   suppress_printing: bool = False,
                   transpose: bool = False,
                   italics: bool = True,
-                  title: str = None
+                  title: str = None, 
+                #   multi_am:bool=False
                   ) -> None or pd.DataFrame:
     _df = df.copy()
     try:
@@ -403,6 +404,8 @@ def nb_show_table(df, n_dec: int = 2,
         _df.filter(['text_window', 'token_str',
                     'bigram_lower', 'all_forms_lower'])):
         _df = adjust_am_names(_df)
+    # if multi_am: 
+    #     _df.index = _df.index.str.replace(r'\b', ' ')
 
     _df = italicize_df_for_md(_df)
     if transpose:
@@ -413,8 +416,10 @@ def nb_show_table(df, n_dec: int = 2,
     _df.index = [f'**{r}**' for r in _df.index]
     table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
     if outpath:
+        outpath=Path(outpath)
         confirm_dir(outpath.parent)
-        Path(outpath).write_text(table)
+        outpath.write_text(
+            '<!-- markdownlint-disable-file first-line-heading-->\n{table}')
     if not suppress_printing:
         title = title.strip('\n')+'\n\n' if title else ''
         print(f'\n{title}{table}\n')
@@ -1120,6 +1125,20 @@ def _collect_text_examples(pol_df_dict: dict[pd.DataFrame],
                        indent=3, bullet='')
             print()
 
+def assign_polarity(amdf): 
+    if 'l1' in amdf.columns and any(amdf.l1.str.startswith(('COM', 'NEG', 'POS'))):
+        is_neg = amdf.l1.str.startswith('NE')
+        is_pos = amdf.l1.str.contains('O', regex=False)
+    else: 
+        is_neg = amdf.index.str.contains('NEG', regex=False)
+        is_pos = amdf.index.str.contains(r'[CP]O[MS]')
+    #> sanity check
+    print(is_neg.to_frame('negated').assign(positive=is_pos).value_counts())
+    if any(is_neg != ~is_pos): 
+        raise ValueError('Polarity could not be assigned---bad values? or not a polar table?')
+    amdf = amdf.assign(polarity='neg')
+    amdf.loc[is_pos, 'polarity'] = 'pos'
+    return amdf
 
 def seek_top_adv_am(date_str: str,
                     adv_floor: int,

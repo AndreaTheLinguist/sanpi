@@ -67,7 +67,7 @@ def display_message(message: str,
             message = '\n' + message
         logger.log(level=level, msg=message)
     else:
-        print(message)
+        print(message, end='\n\n')
 
 
 def view_doc(expr):
