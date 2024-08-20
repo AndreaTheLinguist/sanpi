@@ -1,0 +1,10 @@
+|                                              | `token_str`                                                                                                                                          |
+|:---------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_15_048.4548_x0767170_072:5-6`**   | How could it be __``any simpler``__ ?                                                                                                                |
+| **`pcc_eng_15_055.8785_x0886929_50:11-12`**  | 9 ) Has this accolade made braving a blank page __``any simpler``__ ?                                                                                |
+| **`pcc_eng_10_008.7486_x0125083_3:4-5`**     | This doesnt receive __``any simpler``__ than in which !                                                                                              |
+| **`pcc_eng_09_024.0749_x0373640_06:4-5`**    | Could it be __``any simpler``__ ?                                                                                                                    |
+| **`pcc_eng_17_090.0417_x1438878_12:10-11`**  | Let 's see if we can make the process __``any simpler``__ .                                                                                          |
+| **`pcc_eng_13_045.2146_x0714882_39:14-15`**  | And where is the justification that systems modernized by " replacement " are __``any simpler``__ to maintain , and any less expensive to maintain ? |
+| **`pcc_eng_14_053.4502_x0847801_071:14-15`** | JC : Tortillas and beans -- could there be two foods that are __``any simpler``__ to make that people somehow think are hard to make ?               |
+| **`pcc_eng_04_078.8026_x1256822_08:6-7`**    | It 's hard to get __``any simpler``__ than that !                                                                                                    |

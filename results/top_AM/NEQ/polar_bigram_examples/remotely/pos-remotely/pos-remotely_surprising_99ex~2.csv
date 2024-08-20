@@ -1,0 +1,3 @@
+hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
+pcc_eng_07_089.5566_x1431152_10:14-15,remotely_surprising,surprising,(+)_remotely_surprising,remotely,is that any of this would be remotely surprising by now .,"The joke , of course , is that any of this would be remotely surprising by now ."
+pcc_eng_02_099.2627_x1588779_018:4-5,remotely_surprising,surprising,(+)_remotely_surprising,remotely,but was it remotely surprising ?,But was it remotely surprising ?

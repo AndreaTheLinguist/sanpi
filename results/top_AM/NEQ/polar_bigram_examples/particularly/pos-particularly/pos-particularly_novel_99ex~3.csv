@@ -1,0 +1,4 @@
+hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
+pcc_eng_13_053.5796_x0849951_44:5-6,particularly_novel,novel,(+)_particularly_novel,particularly,the serving method is particularly novel : the cooked lamb breast is,"The serving method is particularly novel : the cooked lamb breast is heaped to one side of a tray used for tea ceremonies , surrounded by petite steamed breads ( called mantou ) and a spicy , savory dipping sauce ."
+pcc_eng_03_038.0558_x0600129_068:4-5,particularly_novel,novel,(+)_particularly_novel,particularly,"mirror provides a particularly novel take on poe's "" the tell","MIRROR provides a particularly novel take on Poe's "" The Tell - Tale Heart . """
+pcc_eng_11_003.0853_x0033856_05:2-3,particularly_novel,novel,(+)_particularly_novel,particularly,one particularly novel tribute is mgo view .,One particularly novel tribute is MGo View .

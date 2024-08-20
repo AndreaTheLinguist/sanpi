@@ -1,0 +1,7 @@
+|                                               | `token_str`                                                                                                                                                    |
+|:----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_08_011.5819_x0171144_10:4-5`**     | When was I __``ever alone``__ ?!?!                                                                                                                             |
+| **`pcc_eng_12_089.2977_x1426661_23:4-5`**     | If you 're __``ever alone``__ and down , there is always somebody else in the same boat between the two of you , you can get out of that tight spot together . |
+| **`pcc_eng_11_026.8852_x0418686_28:5-6`**     | Understand that you are __``ever alone``__ .                                                                                                                   |
+| **`pcc_eng_14_024.4064_x0378143_29:6-7`**     | The only time he was __``ever alone``__ , he recalls , was when he got to take a shower at a drop- in center .                                                 |
+| **`pcc_eng_25_017.6187_x0268639_1536:23-24`** | Is there anything in that exchange that would cause us to move toward impeachment because the president said , " Were we __``ever alone``__ ?                  |

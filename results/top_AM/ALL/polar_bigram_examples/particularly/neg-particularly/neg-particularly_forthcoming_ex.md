@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                                                       |
+|:------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_02_007.8482_x0110528_18:15-17-18`**  | Matthew tells me he 's always been enamored with stomach hair , but has n't been __``particularly forthcoming``__ about it .                                      |
+| **`pcc_eng_11_098.2159_x1573678_117:14-16-17`** | It 's just a little bit slower , and the Trump camp has not been __``particularly forthcoming``__ in terms of providing witnesses and at least some information . |
+| **`pcc_eng_08_078.5072_x1255064_26:08-09-10`**  | If value growth in your property is n't __``particularly forthcoming``__ , you can add value manually with some renovations .                                     |
+| **`pcc_eng_01_066.5389_x1060145_10:3-4-5`**     | Tenet is not __``particularly forthcoming``__ with promises of assistance .                                                                                       |
+| **`pcc_eng_02_002.5441_x0025004_15:5-6-7`**     | Predictably , they were n't __``particularly forthcoming``__ .                                                                                                    |
+| **`pcc_eng_10_083.0525_x1325961_21:5-6-7`**     | Trump administration officials were not __``particularly forthcoming``__ on what led them to their interpretation of the law .                                    |
+| **`nyt_eng_20001125_0013_19:1-7-8`**            | none of the four candidates were __``particularly forthcoming``__ during the campaign , and the public deserves a fuller medical accounting from each one .       |
+| **`pcc_eng_00_001.9491_x0015310_20:17-18-19`**  | They put him on a plane home later that week , but of course management was not __``particularly forthcoming``__ with details .                                   |

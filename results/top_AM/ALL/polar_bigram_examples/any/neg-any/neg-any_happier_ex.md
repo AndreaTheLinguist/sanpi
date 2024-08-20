@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                                         |
+|:-----------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_022.0107_x0340093_90:10-12-13`** | You 've done an amazing job and I could n't be __``any happier``__ to be in such an amazing community .                                                             |
+| **`pcc_eng_06_100.0971_x1602931_67:09-11-12`** | My problem was completely solved and I could n't be __``any happier``__ .                                                                                           |
+| **`pcc_eng_10_023.4356_x0362404_29:3-4-5`**    | I 'm not __``any happier``__ about it than you are , " Mulvaney told Quigley .                                                                                      |
+| **`pcc_eng_04_078.0825_x1245140_03:09-11-12`** | Christmas is now upon us and I could not be __``any happier``__ .                                                                                                   |
+| **`pcc_eng_06_081.0294_x1294149_09:6-8-9`**    | Schmiemeier said that he could not be __``any happier``__ with how his career has played out here at Western .                                                      |
+| **`pcc_eng_24_103.6696_x1661166_43:07-09-10`** | We got 3 bags and could n't be __``any happier``__ .                                                                                                                |
+| **`pcc_eng_23_038.8509_x0611502_27:3-4-5`**    | I 'm not __``any happier``__ with Cruz than Gail Collins is , but the idea that Republicans have lost track of the problem of entitlements just wo n't hold water . |
+| **`pcc_eng_10_050.5254_x0800960_2:3-5-6`**     | She could n't be __``any happier``__ with two long boners in her hands .                                                                                            |

@@ -1,0 +1,3 @@
+|                                            | `token_str`                                                                                                                          |
+|:-------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_106.0546_x1699477_007:6-7`** | The newly promoted clubs were __``exactly new``__ : Tatran ( Presov ) and Dukla ( Banska Bystrica ) often played in First Division . |

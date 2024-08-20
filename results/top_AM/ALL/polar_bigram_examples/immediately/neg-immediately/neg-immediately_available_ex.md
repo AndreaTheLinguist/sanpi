@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                                      |
+|:-----------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`apw_eng_20020503_0853_2:5-6-7`**            | a vote total was not __``immediately available``__ , but TRW Chairman Philip Odeen said , `` I would characterize it as a clear cut victory . ''                 |
+| **`apw_eng_20020322_0874_8:12-13-14`**         | the session lasted more than three hours , but participants were not __``immediately available``__ for comment afterwards .                                      |
+| **`apw_eng_20021126_0509_15:6-7-8`**           | rebel officials in Gbadolite were not __``immediately available``__ to comment .                                                                                 |
+| **`apw_eng_19970907_0075_2:3-4-5`**            | details were not __``immediately available``__ but the two groups have been fighting for supremacy in central and southern regions of impoverished Bihar state . |
+| **`pcc_eng_03_007.4272_x0103878_12:10-11-12`** | Details about what was discussed on the call were n't __``immediately available``__ .                                                                            |
+| **`pcc_eng_04_077.8488_x1241395_21:21-22-23`** | You 're a fan of incorporating data into your decision making process and will actively seek out data which is n't __``immediately available``__                 |
+| **`pcc_eng_15_095.1312_x1521462_07:6-7-8`**    | Family Dollar Inc. officials were n't __``immediately available``__ to comment late Friday .                                                                     |
+| **`nyt_eng_19961119_0603_6:4-5-6`**            | the company was n't __``immediately available``__ for comment .                                                                                                  |

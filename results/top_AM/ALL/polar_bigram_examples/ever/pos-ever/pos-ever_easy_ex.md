@@ -1,0 +1,10 @@
+|                                            | `token_str`                                                                                                                                         |
+|:-------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_11_014.8704_x0224379_38:8-9`**  | A : The assumption that writing is __``ever easy``__ .                                                                                              |
+| **`pcc_eng_17_045.3028_x0715586_031:4-5`** | And this is __``ever easy``__ for Allah .                                                                                                           |
+| **`nyt_eng_19950906_0599_30:28-29`**       | Lora Brody , author of `` Pizza , Focaccia , Flat and Filled Breads From Your Machine , '' shared this recipe with me and is it __``ever easy``__ . |
+| **`pcc_eng_13_106.4483_x1703926_014:5-6`** | And life is only __``ever easy``__ when it 's finished -                                                                                            |
+| **`pcc_eng_25_102.3210_x1639655_09:3-4`**  | Were they __``ever easy``__ ?                                                                                                                       |
+| **`pcc_eng_07_019.6632_x0301858_05:5-6`**  | Boy , was this __``ever easy``__ !                                                                                                                  |
+| **`pcc_eng_17_048.5805_x0768673_192:3-4`** | Is it __``ever easy``__ ?                                                                                                                           |
+| **`pcc_eng_09_007.1603_x0099784_231:4-5`** | Is a cross __``ever easy``__ ?                                                                                                                      |

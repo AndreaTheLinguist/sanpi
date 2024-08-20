@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                             |
+|:-----------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_05_003.0388_x0033137_06:7-8-9`**    | We in the solar industry are not __``any nicer``__ or better - behaved than professionals in the wind power industry .                  |
+| **`pcc_eng_24_033.1236_x0519651_80:3-4-5`**    | They are n't __``any nicer``__ than the cabins we 've seen on other ships .                                                             |
+| **`pcc_eng_07_023.8043_x0368677_36:08-10-11`** | When I visit my Mom they could not be __``any nicer``__ and I feel welcome .                                                            |
+| **`pcc_eng_29_010.5889_x0155042_15:3-4-5`**    | Nick was n't __``any nicer``__ when he left the eatery .                                                                                |
+| **`pcc_eng_00_037.5574_x0590595_81:5-8-9`**    | English paper one could n't have been __``any nicer``__ !                                                                               |
+| **`nyt_eng_19990709_0395_77:04-10-11`**        | `` There 's nobody in this world that 's __``any nicer``__ than those people -LRB- the Wildermuths -RRB- , '' Rosie Breen said Friday . |
+| **`pcc_eng_08_071.0142_x1133635_29:07-10-11`** | The owner and management company could not have been __``any nicer``__ or more helpful .                                                |
+| **`pcc_eng_16_036.4489_x0573735_48:4-5-6`**    | The house was n't __``any nicer``__ than ours , but it did have an indoor toilet .                                                      |

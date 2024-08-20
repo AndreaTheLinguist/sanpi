@@ -1,0 +1,10 @@
+|                                                | `token_str`                                                                                                                                             |
+|:-----------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`apw_eng_20090713_1063_7:4-6-7`**            | `` It 's not all __``that surprising``__ to see the metals come back a little bit , '' said Stephen Platt , an analyst with Archer Financial Services . |
+| **`pcc_eng_22_054.8573_x0870273_3:4-5-6`**     | interesting , but not __``that surprising``__ as we know yu -na was n't spending much time in LA the past year .                                        |
+| **`pcc_eng_26_006.5883_x0090126_35:7-8-9`**    | For us , the result was not __``that surprising``__ .                                                                                                   |
+| **`pcc_eng_12_063.0044_x1002602_10:21-22-23`** | Mind you , I am a soup eater spring , summer , fall and winter , so maybe that 's not __``that surprising``__ .                                         |
+| **`pcc_eng_15_011.9645_x0176968_21:6-7-8`**    | The poll results are probably not __``that surprising``__ to loyal Panthers fans .                                                                      |
+| **`pcc_eng_28_048.2843_x0765068_10:5-6-7`**    | The next also was n't __``that surprising``__ : Celebration of the Arts as Sacred .                                                                     |
+| **`pcc_eng_24_083.4750_x1334041_049:5-7-8`**   | Areas of strength are not all __``that surprising``__ .                                                                                                 |
+| **`pcc_eng_20_034.6392_x0543869_12:5-6-7`**    | " These findings are n't __``that surprising``__ , " said Society CEO Clyde " Bud " Chumbley , MD , MBA .                                               |

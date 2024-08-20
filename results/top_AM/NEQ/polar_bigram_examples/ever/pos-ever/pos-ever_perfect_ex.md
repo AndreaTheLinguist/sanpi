@@ -1,0 +1,4 @@
+|                                             | `token_str`                                                                                                                                                                             |
+|:--------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_25_062.9469_x1003371_09:14-15`** | That final dive sealed perfect 10s across the board , matching the first __``ever perfect``__ 10 which he had clinched during the Red Bull Cliff Diving World Series event in Lebanon . |
+| **`pcc_eng_06_084.7299_x1354048_165:5-6`**  | As his wife can __``ever perfect``__ be ; Nor he who owns the least of things , nor he Whom anger chains , can ever pass thro ' Maya 's gates .                                         |

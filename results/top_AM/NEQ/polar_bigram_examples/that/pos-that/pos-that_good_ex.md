@@ -1,0 +1,10 @@
+|                                              | `token_str`                                                                                                                                 |
+|:---------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_20000110_0180_22:8-9`**           | if plastic surgery can make her look __``that good``__ , I figure it could make me look like Cindy Crawford or Kathie Lee , at least .      |
+| **`nyt_eng_19960219_0276_27:5-6`**           | `` When you 're __``that good``__ , you always think that you can do it .                                                                   |
+| **`pcc_eng_25_065.2953_x1041585_02:16-17`**  | Some people wait up to three hours to eat their delicious pizza ; it is __``that good``__ !                                                 |
+| **`nyt_eng_20060502_0101_52:3-4`**           | it 's __``that good``__ .                                                                                                                   |
+| **`pcc_eng_17_045.8002_x0723668_015:20-21`** | Unfortunately , conspiracy theories are best served shadowy and far-reaching -- this is too targeted a conspiracy to be __``that good``__ . |
+| **`pcc_eng_07_015.5828_x0236011_48:4-5`**    | He should be __``that good``__ .                                                                                                            |
+| **`nyt_eng_20100906_0077_11:24-25`**         | `` Of all the shows we 've done , the thing I hear the most is , ` Were those vegan cupcakes really __``that good``__ ? '' ' Nelson said .  |
+| **`pcc_eng_14_108.08563_x1744925_10:4-5`**   | The Rizzo is __``that good``__ !                                                                                                            |

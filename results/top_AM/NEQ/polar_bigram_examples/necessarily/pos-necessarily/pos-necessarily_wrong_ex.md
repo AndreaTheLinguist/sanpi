@@ -1,0 +1,3 @@
+|                                    | `token_str`                                                                                                   |
+|:-----------------------------------|:--------------------------------------------------------------------------------------------------------------|
+| **`nyt_eng_19951006_0083_33:4-5`** | `` Is that __``necessarily wrong``__ ? You can argue both points in terms of employees and Italian industry . |

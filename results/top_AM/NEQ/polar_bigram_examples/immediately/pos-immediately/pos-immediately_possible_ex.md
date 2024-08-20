@@ -1,0 +1,3 @@
+|                                             | `token_str`                                                                                                                                                                                 |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_014.1126_x0211876_33:29-30`** | But we still need political dreams to drive the national debate , to spur engagement , and these dreams must celebrate ideals that are always beyond what is __``immediately possible``__ . |

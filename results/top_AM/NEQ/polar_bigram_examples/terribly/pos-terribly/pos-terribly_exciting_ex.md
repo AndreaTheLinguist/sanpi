@@ -1,0 +1,10 @@
+|                                             | `token_str`                                                                                                                                                       |
+|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_049.6472_x0786571_029:6-7`**  | I realize this must be __``terribly exciting``__ for you , but , this is n't a race , remember ? "                                                                |
+| **`pcc_eng_22_084.1527_x1344137_23:4-5`**   | It all sounds __``terribly exciting``__ .                                                                                                                         |
+| **`pcc_eng_12_063.8691_x1016536_60:5-6`**   | It all sounds like __``terribly exciting``__ mathematics , if everything works out .                                                                              |
+| **`pcc_eng_21_057.4585_x0912762_05:5-6`**   | The whole thing is __``terribly exciting``__ ; and it gives Mickey an idea .                                                                                      |
+| **`pcc_eng_25_099.7887_x1598711_12:17-18`** | And , late in the week another long-sought demolition wrapped up , as seen in this __``terribly exciting``__ before- and - after :                                |
+| **`apw_eng_19950909_0814_55:4-5`**          | `` It was __``terribly exciting``__ ; I was fairly flying , '' the pianist says .                                                                                 |
+| **`nyt_eng_20071116_0057_36:27-28`**        | `` People can look at their own genomes and find where your and your family fit into human population history , so I think this is __``terribly exciting``__ . '' |
+| **`pcc_eng_15_063.6369_x1011812_07:3-4`**   | It 's __``terribly exciting``__ for me , " said Linda , who has been writing , illuminating and painting ketubot ( Jewish marriage contracts ) for many years .   |

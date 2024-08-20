@@ -1,0 +1,5 @@
+|                                              | `token_str`                                                                                                                                                                   |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_12_101.5777_x1625321_31:30-31`**  | The play questions the assumption , Albee says , " that what makes us comfortable is something we should want , " and " that what we believe is __``necessarily right``__ . " |
+| **`pcc_eng_25_101.6086_x1628290_099:11-12`** | It is a mistake to suppose that the majority is __``necessarily right``__ .                                                                                                   |
+| **`pcc_eng_04_075.5518_x1204096_009:3-4`**   | Gentleman is __``necessarily right``__ .                                                                                                                                      |

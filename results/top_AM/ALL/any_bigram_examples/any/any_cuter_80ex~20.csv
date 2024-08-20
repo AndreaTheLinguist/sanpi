@@ -1,21 +1,21 @@
-hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
-pcc_eng_16_081.8422_x1308370_11:6-7,any_cuter,cuter,(+)_any_cuter,any,does a kid even get any cuter than that ?,Does a kid even get any cuter than that ?
-pcc_eng_11_053.0655_x0842287_39:16-17,any_cuter,cuter,(+)_any_cuter,any,suit and headpiece -- it doesnt get any cuter than this !,This costume includes a BB - 8 body suit and headpiece -- it doesnt get any cuter than this !
-pcc_eng_11_022.6833_x0350833_03:3-4,any_cuter,cuter,(+)_any_cuter,any,doesnt get any cuter than this !,Doesnt get any cuter than this !
-pcc_eng_27_033.0828_x0518065_37:6-7,any_cuter,cuter,(+)_any_cuter,any,"seriously , could it get any cuter than this ?","Seriously , could it get any cuter than this ?"
-pcc_eng_25_016.2714_x0246829_39:5-6,any_cuter,cuter,(+)_any_cuter,any,could those booties be any cuter ?!,Could those booties be any cuter ?!
-pcc_eng_06_039.9737_x0630262_15:4-5,any_cuter,cuter,(+)_any_cuter,any,does it get any cuter than this ?,Does it get any cuter than this ?
-pcc_eng_17_106.6303_x1707640_15:4-6-7,any_cuter,cuter,n't_any_cuter,any,"their faces are n't even any cuter when they 're babies , which","Their faces are n't even any cuter when they 're babies , which is normally a rule of the animal kingdom ."
-pcc_eng_03_080.5114_x1287564_3:5-7-8,any_cuter,cuter,n't_any_cuter,any,"the wonda jacket could n't be any cuter : it 's cropped , made","The Wonda Jacket could n't be ANY cuter : it 's cropped , made of our fabulous Neon Pink Metallic Boucle fabric , AND has scalloped details that are just gorgeous ."
-pcc_eng_27_026.1855_x0406999_5:23-25-26,any_cuter,cuter,n't_any_cuter,any,", and the results could n't be any cuter .","She 's stayed true to her word , keeping her posh tot consistently decked in traditional duds , and the results could n't be any cuter ."
-pcc_eng_06_020.7268_x0319136_209:4-6-7,any_cuter,cuter,n't_any_cuter,any,The pair could n't be any cuter !,The pair could n't be any cuter !
-pcc_eng_24_075.5254_x1205471_13:11-13-14,any_cuter,cuter,n't_any_cuter,any,"that , you just could n't be any cuter or nicer !","On top of all of that , you just could n't be any cuter or nicer !"
-pcc_eng_21_022.4017_x0345646_26:3-5-6,any_cuter,cuter,n't_any_cuter,any,It could n't be any cuter .,It could n't be any cuter .
-pcc_eng_06_021.6343_x0333837_010:5-6-7,any_cuter,cuter,n't_any_cuter,any,but this behavior is n't any cuter when theologians do it .,But this behavior is n't any cuter when theologians do it .
-pcc_eng_03_083.3598_x1333741_01:07-10-11,any_cuter,cuter,n't_any_cuter,any,and benedict cumberbatch could n't have been any cuter alongside their other halves at the,"Johnny Depp and Benedict Cumberbatch could n't have been any cuter alongside their other halves at the London screening of their new film , Black Mass , on Sunday ."
-pcc_eng_21_096.2884_x1539570_055:10-12-13,any_cuter,cuter,n't_any_cuter,any,"taylor says grande "" could n't be any cuter . ""","But for now , Taylor says Grande "" could n't be any cuter . """
-pcc_eng_11_096.9181_x1552709_05:07-09-10,any_cuter,cuter,n't_any_cuter,any,", honestly , it could n't be any cuter .","And , honestly , it could n't be any cuter ."
-pcc_eng_13_009.5277_x0137537_2:12-14-15,any_cuter,cuter,n't_any_cuter,any,decorated as ornaments and could n't be any cuter !,These white chocolate dipped Oreos are decorated as ornaments and could n't be any cuter !
-pcc_eng_28_073.9748_x1180309_51:14-16-17,any_cuter,cuter,not_any_cuter,any,", jacob tremblay , could not be any cuter , there he is , standing","Just when you think the kid from Room , Jacob Tremblay , could not be any cuter , there he is , standing on his chair to cheer Globe-winning costar , Brie Larson ."
-pcc_eng_03_094.7903_x1518636_087:4-6-7,any_cuter,cuter,not_any_cuter,any,""" You could not be any cuter ! """,""" You could not be any cuter ! """
-pcc_eng_06_070.2572_x1120687_18:14-16-17,any_cuter,cuter,not_any_cuter,any,"of brown hair , could not be any cuter from what serratos has showed .","The new baby , with its full head of brown hair , could not be any cuter from what Serratos has showed ."
+hit_id,bigram_lower,adv_form_lower,adj_form_lower,all_forms_lower,text_window,token_str
+pcc_eng_25_016.2714_x0246829_39:5-6,any_cuter,any,cuter,(+)_any_cuter,could those booties be any cuter ?!,Could those booties be any cuter ?!
+pcc_eng_11_022.6833_x0350833_03:3-4,any_cuter,any,cuter,(+)_any_cuter,doesnt get any cuter than this !,Doesnt get any cuter than this !
+pcc_eng_06_039.9737_x0630262_15:4-5,any_cuter,any,cuter,(+)_any_cuter,does it get any cuter than this ?,Does it get any cuter than this ?
+pcc_eng_11_053.0655_x0842287_39:16-17,any_cuter,any,cuter,(+)_any_cuter,suit and headpiece -- it doesnt get any cuter than this !,This costume includes a BB - 8 body suit and headpiece -- it doesnt get any cuter than this !
+pcc_eng_16_081.8422_x1308370_11:6-7,any_cuter,any,cuter,(+)_any_cuter,does a kid even get any cuter than that ?,Does a kid even get any cuter than that ?
+pcc_eng_27_033.0828_x0518065_37:6-7,any_cuter,any,cuter,(+)_any_cuter,"seriously , could it get any cuter than this ?","Seriously , could it get any cuter than this ?"
+pcc_eng_27_026.1855_x0406999_5:23-25-26,any_cuter,any,cuter,n't_any_cuter,", and the results could n't be any cuter .","She 's stayed true to her word , keeping her posh tot consistently decked in traditional duds , and the results could n't be any cuter ."
+pcc_eng_03_083.3598_x1333741_01:07-10-11,any_cuter,any,cuter,n't_any_cuter,and benedict cumberbatch could n't have been any cuter alongside their other halves at the,"Johnny Depp and Benedict Cumberbatch could n't have been any cuter alongside their other halves at the London screening of their new film , Black Mass , on Sunday ."
+pcc_eng_13_009.5277_x0137537_2:12-14-15,any_cuter,any,cuter,n't_any_cuter,decorated as ornaments and could n't be any cuter !,These white chocolate dipped Oreos are decorated as ornaments and could n't be any cuter !
+pcc_eng_21_096.2884_x1539570_055:10-12-13,any_cuter,any,cuter,n't_any_cuter,"taylor says grande "" could n't be any cuter . ""","But for now , Taylor says Grande "" could n't be any cuter . """
+pcc_eng_21_022.4017_x0345646_26:3-5-6,any_cuter,any,cuter,n't_any_cuter,It could n't be any cuter .,It could n't be any cuter .
+pcc_eng_03_080.5114_x1287564_3:5-7-8,any_cuter,any,cuter,n't_any_cuter,"the wonda jacket could n't be any cuter : it 's cropped , made","The Wonda Jacket could n't be ANY cuter : it 's cropped , made of our fabulous Neon Pink Metallic Boucle fabric , AND has scalloped details that are just gorgeous ."
+pcc_eng_17_106.6303_x1707640_15:4-6-7,any_cuter,any,cuter,n't_any_cuter,"their faces are n't even any cuter when they 're babies , which","Their faces are n't even any cuter when they 're babies , which is normally a rule of the animal kingdom ."
+pcc_eng_06_020.7268_x0319136_209:4-6-7,any_cuter,any,cuter,n't_any_cuter,The pair could n't be any cuter !,The pair could n't be any cuter !
+pcc_eng_06_021.6343_x0333837_010:5-6-7,any_cuter,any,cuter,n't_any_cuter,but this behavior is n't any cuter when theologians do it .,But this behavior is n't any cuter when theologians do it .
+pcc_eng_11_096.9181_x1552709_05:07-09-10,any_cuter,any,cuter,n't_any_cuter,", honestly , it could n't be any cuter .","And , honestly , it could n't be any cuter ."
+pcc_eng_24_075.5254_x1205471_13:11-13-14,any_cuter,any,cuter,n't_any_cuter,"that , you just could n't be any cuter or nicer !","On top of all of that , you just could n't be any cuter or nicer !"
+pcc_eng_28_073.9748_x1180309_51:14-16-17,any_cuter,any,cuter,not_any_cuter,", jacob tremblay , could not be any cuter , there he is , standing","Just when you think the kid from Room , Jacob Tremblay , could not be any cuter , there he is , standing on his chair to cheer Globe-winning costar , Brie Larson ."
+pcc_eng_06_070.2572_x1120687_18:14-16-17,any_cuter,any,cuter,not_any_cuter,"of brown hair , could not be any cuter from what serratos has showed .","The new baby , with its full head of brown hair , could not be any cuter from what Serratos has showed ."
+pcc_eng_03_094.7903_x1518636_087:4-6-7,any_cuter,any,cuter,not_any_cuter,""" You could not be any cuter ! """,""" You could not be any cuter ! """

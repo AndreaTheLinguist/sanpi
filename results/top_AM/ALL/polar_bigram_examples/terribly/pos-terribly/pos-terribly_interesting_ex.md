@@ -1,0 +1,10 @@
+|                                              | `token_str`                                                                                                                                                          |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_28_020.5141_x0315450_028:14-15`** | It got worse during conversations with friends who are amazingly talented and doing __``terribly interesting``__ and awesome and impactful things with their lives . |
+| **`pcc_eng_28_107.04099_x1720843_16:12-13`** | and she has a poet 's ability to say things in __``terribly interesting``__ ways .                                                                                   |
+| **`pcc_eng_06_015.1055_x0228065_126:5-6`**   | I found it all __``terribly interesting``__ .                                                                                                                        |
+| **`pcc_eng_11_003.3759_x0038561_5:3-4`**     | It 's __``terribly interesting``__ , particularly , the short video presentation embedded in the page .                                                              |
+| **`pcc_eng_21_020.4234_x0313691_17:4-5`**    | I find it __``terribly interesting``__ that Arie decided to have a 1:1 date with pretty much every woman that was left on the show .                                 |
+| **`pcc_eng_26_020.5884_x0316630_05:4-5`**    | I find this __``terribly interesting``__ because of the conclusion that making mistakes on tests leads the learner to revise their understanding :                   |
+| **`pcc_eng_00_088.2126_x1410008_96:4-5`**    | It 's a __``terribly interesting``__ journey to sit back and watch , but why would I just want to watch when I can be an active participant ?                        |
+| **`pcc_eng_06_078.7345_x1257039_49:5-6`**    | " It was a __``terribly interesting``__ time to be there but it was a bit difficult for me to do my work .                                                           |

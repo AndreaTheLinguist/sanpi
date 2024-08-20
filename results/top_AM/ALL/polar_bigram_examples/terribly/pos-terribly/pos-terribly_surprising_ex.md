@@ -1,0 +1,4 @@
+|                                           | `token_str`                                                                                                                                                                                     |
+|:------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_10_076.7482_x1224313_43:6-7`** | Little in the book is __``terribly surprising``__ , but what is remarkable is that so much dirty ecclesiastical laundry is now being washed publicly , and that consumers are buying the book . |
+| **`pcc_eng_17_042.1464_x0664602_95:5-6`** | " And it 's __``terribly surprising``__ .                                                                                                                                                       |

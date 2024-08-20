@@ -1,0 +1,7 @@
+hit_id,bigram_lower,adj_form_lower,all_forms_lower,adv_form_lower,text_window,token_str
+pcc_eng_00_051.3396_x0813519_61:3-4,ever_wrong,wrong,(+)_ever_wrong,ever,what was ever wrong with i 'll know it when,What was ever wrong with I 'll know it when I see it and if it 's sound action it 'll produce something worthwhile .
+pcc_eng_14_079.0967_x1262726_73:5-6,ever_wrong,wrong,(+)_ever_wrong,ever,"boy , was i ever wrong .","Boy , was I ever wrong ."
+pcc_eng_19_075.9128_x1210148_04:3-4,ever_wrong,wrong,(+)_ever_wrong,ever,was he ever wrong .,Was he ever wrong .
+pcc_eng_08_093.8709_x1503504_35:5-6,ever_wrong,wrong,(+)_ever_wrong,ever,"damn , was he ever wrong .","Damn , was he ever wrong ."
+pcc_eng_15_055.9439_x0887989_14:3-4,ever_wrong,wrong,(+)_ever_wrong,ever,was i ever wrong .,Was I ever wrong .
+pcc_eng_23_053.2278_x0843930_20:5-6,ever_wrong,wrong,(+)_ever_wrong,ever,"if the bettor is ever wrong on 9 consecutive coin flips ,","If the bettor is ever wrong on 9 consecutive coin flips , it will always break him ."

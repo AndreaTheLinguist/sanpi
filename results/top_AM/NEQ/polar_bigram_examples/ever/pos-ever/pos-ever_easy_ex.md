@@ -1,0 +1,6 @@
+|                                              | `token_str`                                                                                                                                                                |
+|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_26_098.8606_x1582054_121:11-12`** | Although it is absurd to say that discovering blockbusters is __``ever easy``__ , it is certainly true that by then drugmakers had plucked much of the low-hanging fruit . |
+| **`nyt_eng_19980807_0103_42:1-2`**           | __``ever easy``__ _ and that 's what makes `` Billy 's Hollywood Screen Kiss '' such a smart romantic comedy .                                                             |
+| **`pcc_eng_17_053.3523_x0845793_015:10-11`** | When , exactly , is the career of writing __``ever easy``__ ?                                                                                                              |
+| **`pcc_eng_06_085.1946_x1361633_41:4-5`**    | But it is __``ever easy``__ to find the genuine option for tons of them in the market .                                                                                    |

@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                                            |
+|:------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_19_050.1809_x0793929_120:5-6-7`**    | Invercargill has housing problems not __``that dissimilar``__ from Auckland , relative to our population .                                             |
+| **`pcc_eng_13_047.0036_x0743771_45:4-5-6`**     | This is actually not __``that dissimilar``__ from what the Europeans have done .                                                                       |
+| **`nyt_eng_20051027_0415_12:14-16-17`**         | while his life certainly has had its ups and downs , they are n't all __``that dissimilar``__ from those of countless other self-destructive artists . |
+| **`pcc_eng_07_054.1593_x0859256_074:13-14-15`** | Yes - it 's abhorrent and morally unjustifiable , but it 's not __``that dissimilar``__ to robbing a bank . "                                          |
+| **`pcc_eng_00_005.3021_x0069479_18:3-4-5`**     | It 's not __``that dissimilar``__ from dating someone who only wants to sleep with you .                                                               |
+| **`pcc_eng_24_074.1082_x1182628_057:16-17-18`** | While flying here the other day , I began to think that our challenge is not __``that dissimilar``__ from other industries that have deregulated .     |
+| **`pcc_eng_15_014.6660_x0220574_21:3-4-5`**     | Governments are not __``that dissimilar``__ to businesses .                                                                                            |
+| **`pcc_eng_10_044.9891_x0711754_175:4-5-6`**    | Ironically it is not __``that dissimilar``__ to what I do now .                                                                                        |

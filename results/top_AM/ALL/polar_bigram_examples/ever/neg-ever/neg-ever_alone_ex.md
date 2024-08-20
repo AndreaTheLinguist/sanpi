@@ -1,0 +1,10 @@
+|                                                 | `token_str`                                                                                                                        |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_06_027.4859_x0428455_09:20-21-22`**  | Single parenting - taking care of yourself you might be a single or lone parent , but you are not __``ever alone``__ .             |
+| **`pcc_eng_15_045.6889_x0722646_25:07-09-10`**  | Of course , the royals are never really __``ever alone``__ , even when they travel individually .                                  |
+| **`pcc_eng_05_041.3942_x0653859_57:7-8-9`**     | And , yes , you are never __``ever alone``__ .                                                                                     |
+| **`pcc_eng_18_083.7518_x1340055_070:18-19-20`** | I now never leave children home alone and I also make sure my own two children are never __``ever alone``__ with the 16 year old . |
+| **`pcc_eng_13_094.4497_x1510283_36:3-4-5`**     | You are not __``ever alone``__ .                                                                                                   |
+| **`pcc_eng_11_094.6156_x1515523_20:1-5-6`**     | None of us is __``EVER alone``__ .                                                                                                 |
+| **`pcc_eng_18_019.6060_x0301237_39:1-5-6`**     | none of us is __``ever alone``__ .                                                                                                 |
+| **`pcc_eng_20_017.0066_x0258527_59:3-4-5`**     | You 're rarely __``ever alone``__ .                                                                                                |

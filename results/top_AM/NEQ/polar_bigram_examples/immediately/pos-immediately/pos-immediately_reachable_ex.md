@@ -1,0 +1,3 @@
+|                                             | `token_str`                                                                                                                                                                                 |
+|:--------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`pcc_eng_24_058.2919_x0926772_09:32-33`** | It comes equipped with a rear zippered pocket for those days when you 'll be using it as the main outer layer and you want to have your essentials safe and __``immediately reachable``__ . |
