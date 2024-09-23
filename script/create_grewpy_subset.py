@@ -311,7 +311,7 @@ def _parse_args():
 
     parser.add_argument(
         '-p', '--pat_path',
-        type=Path, default='/share/compling/projects/sanpi/Pat/advadj/all-RB-JJs.pat',
+        type=Path, default='/share/compling/projects/sanpi/Pat/RBXadj/rb-bigram.pat',
         help=('path to `.pat` file for pattern to match')
     )
 
@@ -324,6 +324,9 @@ def _parse_args():
     )
 
     args = parser.parse_args()
+    for name, path in [('.pat file', args.pat_path), ('.conllu file', args.conllu_path)]:
+        if not path.is_file():
+            raise FileNotFoundError(f'Specified {name}, "{args.pat_path}", not found')
     return args.conllu_path, args.pat_path, args.subset_name
 
 
