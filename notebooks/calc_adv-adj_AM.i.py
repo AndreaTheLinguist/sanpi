@@ -1,7 +1,7 @@
 # %%
 import pandas as pd
 
-from source.utils import FREQ_DIR, RESULT_DIR, UCS_DIR, confirm_dir
+from source.utils import SANPI_HOME, FREQ_DIR, RESULT_DIR, UCS_DIR, confirm_dir
 from source.utils.associate import (BINARY_ASSOC_ARGS, add_extra_am,
                                     associate_ucs, confirm_basic_ucs)
 from source.utils.associate import convert_ucs_to_csv as ucs2csv
@@ -10,12 +10,15 @@ from source.utils.associate import manipulate_ucs, seek_readable_ucs, adjust_am_
 pd.set_option('display.float_format', '{:,.2f}'.format)
 
 # %% [markdown]
-# set parameters
+# 🧮 set parameters
+
+# %%
 UNIT = 'Adj'
+TAG = 'ALL'
 # PAT_DIR = 'POSmirror'
 # PAT_DIR = 'NEGmirror'
-PAT_DIR = 'ANYmirror'
-# PAT_DIR = 'RBdirect'
+# PAT_DIR = 'ANYmirror'
+PAT_DIR_NAME = 'RBdirect'
 # PAT_DIR = 'RBXadj'
 # FRQ_FLOOR = 3
 # FRQ_FLOOR = 10
@@ -23,7 +26,8 @@ PAT_DIR = 'ANYmirror'
 # FRQ_FLOOR = 50
 FRQ_FLOOR = 100  # BUG 100 will be used regardless, so set it to this to at least keep the naming accurate
 ADVADJ_TSV = FREQ_DIR.joinpath(
-    f'{PAT_DIR}/ucs_format/Adv{UNIT}_frq-thrMIN-7.35f.tsv')
+    # // f'{PAT_DIR}/ucs_format/Adv{UNIT}_frq-thrMIN-7.35f.tsv')
+    f'{PAT_DIR_NAME}/Adv{UNIT}_{TAG}_{PAT_DIR_NAME}_final-freq.tsv')
 FOCUS = ['f', 'unexpected_f',
          'conservative_log_ratio',
          'am_p1_given2', 'am_p2_given1',
@@ -34,14 +38,14 @@ FOCUS = ['f', 'unexpected_f',
          'l1', 'l2']
 
 # %%
-
-
 def invert_set_dict(d: dict):
     return {v: k for k in d for v in d[k]}
 
 
 # %% [markdown]
 # 1. Run `seek_readable_ucs()` to generate consistent output path
+
+# %%
 readable = seek_readable_ucs(min_freq=FRQ_FLOOR,
                              ucs_subdir='adv_adj',
                              contained_counts_path=ADVADJ_TSV)
@@ -49,7 +53,9 @@ print(readable.relative_to(RESULT_DIR))
 
 # %% [markdown]
 # Snippet of starting frequency data (`ADVADJ_TSV`)
-! head - 5 {ADVADJ_TSV} | column - t
+
+# %%
+! head '-5' "{ADVADJ_TSV}" | column '-t'
 
 # %% [markdown]
 # 2. Run `confirm_basic_ucs()` (if needed)
@@ -67,9 +73,9 @@ if not readable.is_file():
 # %% [markdown]
 # Excerpt of initial UCS table
 init_readable = UCS_DIR.joinpath(
-    f'adv_adj/{PAT_DIR}/readable'
+    f'adv_adj/{PAT_DIR_NAME}/readable'
 ).joinpath(f'{ADVADJ_TSV.name.replace(".tsv","")}_min{FRQ_FLOOR}x.init.txt')
-! head - 7 {init_readable}
+! head '-7' "{init_readable}"
 
 
 # %% [markdown]
@@ -77,16 +83,19 @@ init_readable = UCS_DIR.joinpath(
 
 if not readable.is_file():
     associate_ucs(basic_ucs_path)
-
-transform_ucs_log = f'/share/compling/projects/sanpi/logs/associate/ucs//ucs-{PAT_DIR}_Adv{UNIT}_frq-thrMIN-7-35f_min{FRQ_FLOOR}x*.log'
-! head - 15 `ls - t1 {transform_ucs_log} | head - 1`
-! echo '...'
-! tail - 2 `ls - t1 {transform_ucs_log} | head - 1`
+# /ucs-RBdirect_AdvAdj_ALL_RBdirect_final-freq_min100x-ds.2024-08-11_2314.log
+transform_ucs_log = f'/share/compling/projects/sanpi/logs/associate/ucs/ucs-{PAT_DIR_NAME}_Adv{UNIT}_{TAG}_{PAT_DIR_NAME}_final-freq_min{FRQ_FLOOR}x*.log'
+print(transform_ucs_log)
+# %%
+#// ! head '-15' `ls '-t1' {transform_ucs_log} | head '-1'`
+#// ! echo '...'
+#// ! tail '-2' `ls '-t1' {transform_ucs_log} | head '-1'`
+! grep '# Sample size' {transform_ucs_log} | tail '-1'
 
 # %% [markdown]
 # 4. Run `ucs_to_csv()` to convert `ucs/[PAT_DIR]/readable/*.txt` to format that `pandas` can parse as a dataframe
 
-! head - 5 {readable}
+! head '-5' "{readable}"
 csv_path = ucs2csv(readable)
 print(f'CSV: `{csv_path.relative_to(RESULT_DIR)}`')
 
@@ -125,15 +134,25 @@ if not df_pkl_path.is_file():
 
 
 VOCABS = {
-    'NEGmirror': {'Adj': 40004},
-    'POSmirror': {'Adj': 178159},
-    'ANYmirror': {'Adj': 195059},
-    'RBdirect':  {'Adj': 61860},
-    'RBXadj':  {'Adj': 1940305}
+    'old!NEGmirror': {'Adj': 40004}, #! old
+    'old!POSmirror': {'Adj': 178159}, #! old
+    'old!ANYmirror': {'Adj': 195059}, #! old
+    'RBdirect':  {'Adj': 187831}, # updated! ✅
+    'old!RBXadj':  {'Adj': 1940305} #! old
 }  # ! #HACK
-VOCAB = VOCABS[PAT_DIR][UNIT]
+VOCAB = VOCABS[PAT_DIR_NAME][UNIT]
 
 print(pd.DataFrame(VOCABS).convert_dtypes().to_markdown(intfmt=','))
+
+# %%
+# import association_measures as assom
+# # %%
+# assom.measures.list_measures()
+# # %%
+
+# assom.measures.conservative_log_ratio(assom.frequencies.observed_frequencies(adx_amdf), vocab=VOCAB)
+
+
 VOCAB = None
 ex_adx_amdf = add_extra_am(df=adx_amdf,
                            verbose=True,

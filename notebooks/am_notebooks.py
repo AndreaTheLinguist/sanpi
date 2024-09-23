@@ -38,21 +38,31 @@ BASIC_FOCUS = ['f',
                'E11', 'unexpected_f',
                'unexpected_ratio',
                ]
-MISC_AM = ['am_odds_ratio_disc',
-           't_score',
-           'mutual_information',]
+MISC_AM = [
+    # 'am_odds_ratio_disc',
+    # 't_score',
+    # 'mutual_information',
+]
 FREQ_COLS = ['f', 'f1', 'f2']
 ADX_COLS = ['adv', 'adv_total', 'adj', 'adj_total']
+SQRT_F_COLS = [f'{f}_sqrt' for f in FREQ_COLS]
 P2_COLS = ['am_p2_given1', 'am_p2_given1_simple']
-DELTA_COLS = ['deltaP_max', 'deltaP_mean']
+DELTA_COLS = [  # 'deltaP_max',
+    'deltaP_mean']
 FOCUS_DICT = {
     'ALL': {
-        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS + MISC_AM,
-        'polar': BASIC_FOCUS + ADX_COLS + MISC_AM},
+        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS,
+        'adv_adj+sqrt': BASIC_FOCUS + P2_COLS + DELTA_COLS + SQRT_F_COLS,
+        'polar': BASIC_FOCUS + ADX_COLS + MISC_AM,
+        'polar+sqrt': BASIC_FOCUS + ADX_COLS + SQRT_F_COLS
+    },
     'NEQ': {
-        'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS + MISC_AM,
-        'polar': BASIC_FOCUS + P2_COLS + ADX_COLS + MISC_AM
-    }}
+        'adv_adj+sqrt': BASIC_FOCUS + P2_COLS + DELTA_COLS + MISC_AM,
+        'adv_adj+sqrt': BASIC_FOCUS + P2_COLS + DELTA_COLS + SQRT_F_COLS,
+        'polar': BASIC_FOCUS + P2_COLS + ADX_COLS + MISC_AM,
+        'polar+sqrt': BASIC_FOCUS + P2_COLS + ADX_COLS + SQRT_F_COLS
+    }
+}
 
 NEG_WORDS = ("n't", 'not', 'seldom', 'barely', 'hardly', 'scarcely', 'rarely', 'rare', 'scarce', 'seldomly',
              'without', 'nowhere', 'nothing', 'nor', 'non', 'never', 'no', 'none')
@@ -70,9 +80,9 @@ def _set_priorities():
         cols = _priority_dict[tag]
         _priority_dict[f'{tag}_init'] = cols
         _priority_dict[f'{tag}'] = adjust_am_names(cols)
-        blind_cols = ['conservative_log_ratio',
+        blind_cols = ['conservative_log_ratio', 'deltaP_mean',
                       'am_log_likelihood',
-                      'deltaP_max', 'deltaP_mean']
+                      'deltaP_max']
         _priority_dict[f'{tag}_blind'] = adjust_am_names(blind_cols)
     return _priority_dict
 
@@ -387,39 +397,48 @@ def nb_show_table(df, n_dec: int = 2,
                   return_df: bool = False,
                   suppress_printing: bool = False,
                   transpose: bool = False,
+                  show_index: bool = True,
                   italics: bool = True,
-                  title: str = None, 
-                #   multi_am:bool=False
+                  title: str = None,
+                  #   multi_am:bool=False
                   ) -> None or pd.DataFrame:
-    _df = df.copy()
-    try:
-        start_0 = _df.index.start == 0
-    except AttributeError:
-        pass
-    else:
-        _df.index.name = 'rank'
-        if start_0:
-            _df.index = _df.index + 1
+    _df = df.copy().convert_dtypes()
+    if len(_df.index.names) > 1:
+        _df = _df.reset_index()
+        show_index = False
+    if show_index:
+        try:
+            start_0 = _df.index.start == 0
+        except AttributeError:
+            pass
+        else:
+            _df.index.name = 'rank'
+            if start_0:
+                _df.index = _df.index + 1
     if adjust_columns and not any(
         _df.filter(['text_window', 'token_str',
                     'bigram_lower', 'all_forms_lower'])):
         _df = adjust_am_names(_df)
-    # if multi_am: 
+    # if multi_am:
     #     _df.index = _df.index.str.replace(r'\b', ' ')
-
-    _df = italicize_df_for_md(_df)
+    if italics: 
+        _df = italicize_df_for_md(_df)
     if transpose:
         _df = _df.T
         _df.index = [f'`{i}`' for i in _df.index]
 
     _df.columns = [f'`{c}`' for c in _df.columns]
     _df.index = [f'**{r}**' for r in _df.index]
-    table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
+    if show_index:
+        table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',')
+    else:
+        table = _df.to_markdown(floatfmt=f',.{n_dec}f', intfmt=',', index=None)
+
     if outpath:
-        outpath=Path(outpath)
+        outpath = Path(outpath)
         confirm_dir(outpath.parent)
         outpath.write_text(
-            '<!-- markdownlint-disable-file first-line-heading-->\n{table}')
+            f'<!-- markdownlint-disable-file first-line-heading-->\n{table}')
     if not suppress_printing:
         title = title.strip('\n')+'\n\n' if title else ''
         print(f'\n{title}{table}\n')
@@ -862,7 +881,7 @@ def sample_adv_bigrams(adverb: str,
 
     nb_show_table(this_adv_am, n_dec=2,
                   outpath=table_csv_path.with_suffix('.md'))
-    
+
     n_ex = int(n_top_bigrams * 8)
     # examples = collect_examples(this_adv_am, hits_df, adv=adverb, metric='LRC')
     examples = collect_adv_bigram_ex(
@@ -875,11 +894,11 @@ def sample_adv_bigrams(adverb: str,
     # paths = []
     for key, ex_data in examples.items():
         if ex_data is not None:
-            
+
             if isinstance(ex_data, dict):
                 context_cue = list(ex_data.keys())[0]
                 ex_data = ex_data[context_cue]
-                #// print(ex_data)
+                # // print(ex_data)
             embedding = output_dir/f'any-{adverb}'
             confirm_dir(embedding)
             out_path = embedding / f'any-{key}_{n_ex}ex~{len(ex_data)}.csv'
@@ -914,7 +933,7 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
     bigrams, amdf = _prep_bigram_info(amdf=amdf,
                                       n_bigrams=n_bigrams,
                                       metric_selection=metric_selection,
-                                      adv = adv)
+                                      adv=adv)
     polarity = polarity or 'any'
     examples = {}
     if hits_df_dict is None:
@@ -929,9 +948,9 @@ def collect_adv_bigram_ex(amdf: pd.DataFrame,
         bigram_text = bigram.replace("_", " ")
         if verbose:
             bigram_header = f'\n### {i}.'
-            if blind_ex: 
+            if blind_ex:
                 bigram_header = f'{bigram_header} "_{bigram_text}_" under **{polarity}** polarity\n'
-            else: 
+            else:
                 f'{bigram_header} _{bigram_text}_\n'
             print(bigram_header)
         bigram_in_pol_ex = None
@@ -1101,7 +1120,7 @@ def _collect_text_examples(pol_df_dict: dict[pd.DataFrame],
           f'> in `{adv_ex_dir}/`\n')
     for big_i, (bigram, examples) in enumerate(examples_dict.items(), start=1):
         print(f"{big_i}. *{bigram.replace('_', ' ')}*")
-        paths_dict = set_polar_ex_dirs(adv=adverb, pols=examples.keys(), 
+        paths_dict = set_polar_ex_dirs(adv=adverb, pols=examples.keys(),
                                        output_dir=adv_ex_dir)
         for pol_cue, pol_ex_df in examples.items():
             if pol_ex_df is None or pol_ex_df.empty:
@@ -1109,36 +1128,44 @@ def _collect_text_examples(pol_df_dict: dict[pd.DataFrame],
             out_dir = paths_dict[pol_cue]
             alt_dir = out_dir/'alt_ex'
             confirm_dir(alt_dir)
-            
-            out_path = out_dir/f'{out_dir.name}_{bigram.split("_")[1]}_{n_ex}ex~{len(pol_ex_df)}.csv'
+
+            out_path = out_dir / \
+                f'{out_dir.name}_{bigram.split("_")[1]}_{n_ex}ex~{len(pol_ex_df)}.csv'
             confirm_dir(out_path.parent)
-            if out_path.is_file() and n_ex == len(pol_ex_df): 
-                system("echo '    > Renaming existing version\n'; " 
+            if out_path.is_file() and n_ex == len(pol_ex_df):
+                system("echo '    > Renaming existing version\n'; "
                        + f"echo \"      $(mv -v --backup=t '{out_path}' '{alt_dir}/{out_path.name}')\"")
             pol_ex_df.to_csv(out_path)
-            paths_dict[pol_cue]=out_path
+            paths_dict[pol_cue] = out_path
 
         if verbose:
-            print_iter((f'{x}. **{SPELL_OUT[pol_cue]}**  \n       `"{paths_dict[pol_cue]}"`' 
+            print_iter((f'{x}. **{SPELL_OUT[pol_cue]}**  \n       `"{paths_dict[pol_cue]}"`'
                         for x, pol_cue in enumerate(paths_dict.keys(), start=1)),
-                       header=f'\n    Full polarity samples saved as...\n', 
+                       header=f'\n    Full polarity samples saved as...\n',
                        indent=3, bullet='')
             print()
 
-def assign_polarity(amdf): 
+
+def assign_polarity(amdf):
     if 'l1' in amdf.columns and any(amdf.l1.str.startswith(('COM', 'NEG', 'POS'))):
         is_neg = amdf.l1.str.startswith('NE')
         is_pos = amdf.l1.str.contains('O', regex=False)
-    else: 
+    else:
         is_neg = amdf.index.str.contains('NEG', regex=False)
         is_pos = amdf.index.str.contains(r'[CP]O[MS]')
-    #> sanity check
-    print(is_neg.to_frame('negated').assign(positive=is_pos).value_counts())
-    if any(is_neg != ~is_pos): 
-        raise ValueError('Polarity could not be assigned---bad values? or not a polar table?')
-    amdf = amdf.assign(polarity='neg')
+    # > sanity check
+    # pol_counts = is_neg.to_frame('negated').assign(positive=is_pos).value_counts()
+    amdf.loc[is_neg, 'polarity'] = 'neg'
     amdf.loc[is_pos, 'polarity'] = 'pos'
+    # if pol_counts < 2:
+    #     pass
+    if any(is_neg != ~is_pos):
+        raise ValueError(
+            'Polarity could not be assigned---bad values? or not a polar table?')
+    # amdf = amdf.assign(polarity='neg')
+    # amdf.loc[is_pos, 'polarity'] = 'pos'
     return amdf
+
 
 def seek_top_adv_am(date_str: str,
                     adv_floor: int,
