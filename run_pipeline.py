@@ -68,7 +68,7 @@ def _main():
 
                 if not grew_json_dir.is_dir():
                     if tab_only:
-                        print('ERROR: "tabulate_only" option specificed, but no hit files',
+                        print('ERROR: "tabulate_only" option specified, but no hit files',
                               'exist for given pattern and corpus. Run full pipeline.')
                     else:
                         grew_json_dir.mkdir(parents=True)

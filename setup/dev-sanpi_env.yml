@@ -8,8 +8,7 @@ dependencies:
   - autopep8
   - ipykernel
   - ipython
-  - jupyter_client
-  - jupyter_core
+  - jupyter
   - matplotlib
   - more-itertools
   - opam
