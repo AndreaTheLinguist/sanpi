@@ -229,6 +229,10 @@ The full pipeline of `sanpi` processing as of August 15, 2024 is described below
    and the `hit_id` (i.e. `bigram_id` implicitly for these data) values are recorded 
    in a text file: `RBXadj/cleaned/clean*[PART]*index.txt`
 
+---
+
+## PBR Methods
+
 6. After the baseline has been cleaned, each corpus part's hit_id `clean*index.txt` file filter serves as 
    a filter for the superset environments.
 

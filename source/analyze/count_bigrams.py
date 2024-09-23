@@ -15,7 +15,7 @@ except ModuleNotFoundError:
                                   get_proc_time, print_md_table, save_table,
                                   select_pickle_paths, sort_by_margins,
                                   unpack_dict)
-    from utils.general import (PKL_SUFF, confirm_dir,
+    from utils.general import (PKL_SUFF, confirm_dir, POST_PROC_DIR,
                                find_glob_in_dir, percent_to_count, print_iter)
     from utils.visualize import heatmap
 else:
@@ -920,7 +920,8 @@ def _print_uniq_cols_count(df: pd.DataFrame,
 def _get_clean_data(df: pd.DataFrame,  # clean_index_path
                     ) -> pd.DataFrame:
     # MARK:clean TOP
-    # **** CLEANING #TODO move to `clean_hits.py` & import here
+    # **** CLEANING 
+    #TODO move to `clean_hits.py` & import here
     dirty = pd.Timestamp.now()
 
     # > print overview of initial data
@@ -1026,9 +1027,12 @@ def _drop_odd_orth(df: pd.DataFrame,
 
     def odd_lemma_orth(lemmas: pd.Series) -> pd.Series:
         return pd.Series(
-            lemmas.str.startswith(('-', '&', '.'))
-            | lemmas.str.endswith(('-', '&'))
-            | lemmas.str.contains(r"[^-&\w\.][a-zA-Z]", regex=True))
+            # lemmas.str.startswith(('-', '&', '.'))
+            # | lemmas.str.endswith(('-', '&'))
+            # | lemmas.str.contains(r"[^-&\w\.][a-zA-Z]"))
+            lemmas.str.contains(r"(?:^[&\.\[-])"
+                                r"|(?:[^&\w\.-][a-zA-Z])"
+                                r"|(?:[\]_&-]$)"))
 
     print('\nRemoving lemmas with abnormal orthography...')
     J = df.adj_lemma

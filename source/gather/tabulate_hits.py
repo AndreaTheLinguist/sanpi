@@ -11,9 +11,9 @@ from pathlib import Path
 import pandas as pd
 
 try: 
-    from source.utils import get_proc_time, print_md_table
+    from source.utils.dataframes import get_proc_time, print_md_table
 except ModuleNotFoundError: 
-    from utils import get_proc_time, print_md_table
+    from utils.dataframes import get_proc_time, print_md_table
 pd.set_option('display.max_columns', 10)
 pd.set_option('display.width', 120)
 DATA_DIR = Path.cwd().joinpath('data')
