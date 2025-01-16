@@ -19,14 +19,43 @@ FREQ_DIR, DEMO_FREQ_DIR = [
     R / 'freq_tsv' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
 
 
-def timestamp_now() -> str:
+def hour_num(use_24):
+    return ('%H', '') if use_24 else ('%I', '%P')
+
+
+def timestamp_now(use_24: bool = True) -> str:
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return datetime.now().strftime("%Y-%m-%d_%H%M")
+    h, p = hour_num(use_24)
+    return datetime.now().strftime(
+        f"%Y-%m-%d_{h}%M{p}").strip('m')
+
+
+def timestamp_now_trim(use_24: bool = True) -> str:
+    h, p = hour_num(use_24)
+    tstr = datetime.now().strftime(
+        f"%y-%m-%d_{h}%M{p}")
+    return tstr[:-3]+tstr[-2]
+
+
+def timestamp_hour(use_24: bool = True) -> str:
+    h, p = hour_num(use_24)
+    return datetime.now().strftime(
+        f"%Y-%m-%d_{h}{p}")
 
 
 def timestamp_today() -> str:
     # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return datetime.now().strftime("%Y-%m-%d")
+
+
+def timestamp_month() -> str:
+    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime("%Y-%m")
+
+
+def timestamp_year() -> str:
+    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime("%Y")
 
 
 def camel_to_snake(camel: str):
@@ -245,12 +274,12 @@ def print_iter(iter_obj,
         iter_str = bullet_str.join(f'{i}' for i in iter_obj)
 
     msg_str = f'\n{header}{bullet_str}{iter_str}'
-    msg_str = msg_str.replace('\n\n', '\n').strip(f'{bullet} ')
+    msg_str = msg_str.replace('\n\n', '\n').replace('\t','\n\t').strip(f'{bullet} ')
 
     display_message(msg_str, logger, level)
 
 
-def run_shell_command(command_str: str, 
+def run_shell_command(command_str: str,
                       verbose: bool = False):
     verbose_command = f'\n$ {command_str}\n' if verbose else ''
     print(f'\n```shell\n{verbose_command}')

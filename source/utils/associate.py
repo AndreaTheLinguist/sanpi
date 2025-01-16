@@ -27,7 +27,8 @@ else:
 
 ADDITIONAL_METRICS = ['t_score', 'dice', 'log_ratio',  # 'liddell',
                       'mutual_information', 'hypergeometric_likelihood', 'binomial_likelihood']
-ALPHA = 0.005
+# ALPHA = 0.005
+ALPHA = 0.001
 READ_TAG = 'rsort-view_am-only'
 _UCS_HEADER_WRD_BRK = re.compile(r'\.([a-zA-Z])')
 # ! Error: this causes any adverbs containing numbers to mess up the formatting and cause errors
@@ -195,8 +196,7 @@ def add_extra_am(df: pd.DataFrame,
                  verbose: bool = False,
                  vocab: int = None,
                  ndigits: int = 9,
-                 metrics: list = None,
-                 disc=1):
+                 metrics: list = None):
     """
     ['z_score', 't_score', 'log_likelihood', 'simple_ll', 
     'liddell', 'dice', 'log_ratio', 'conservative_log_ratio', 
@@ -277,9 +277,49 @@ def adjust_expectations(df, square_root: bool = False):
         df['unexpected_abs_sqrt'] = unexpect.abs().apply(sqrt)
     return df
 
+def deltaP(row: pd.Series, 
+           given: int = 2, 
+           ratio: bool = False,  # , minus_others:bool=True,
+           verbose: bool = False
+           ):
+    #> 3 - 1 = 2 : given 1 --> focus 2
+    #> 3 - 2 = 1 : given 2 --> focus 1
+    focus_ix = 3 - given 
+    given_margin = f'f{given}'
+    focus_margin = 'f1' if given_margin == 'f2' else 'f2'
+    # deltaP1_given2 = (f / f2) - ((f2 - f) / (N - f2))
+    # deltaP2_given1 = (f / f1) - ((f2 - f) / (N - f1))
+    try:
+        focus_w = row[f'l{focus_ix}'] 
+    except KeyError:
+        focus_w = row.name.split('~')[0 if given == 2 else 1]
+    try: 
+        given_w = row[f'l{given}']
+    except KeyError:
+        given_w = row.name.replace(focus_w, '').strip('~')
+    if verbose:
+        print(row.filter(items=['f', 'f1', 'f2', 'N']
+                     ).to_frame().T.to_markdown(intfmt=','))
+    f = row.f  # > a
+    fp = row[focus_margin]
+    # print(f'given: {given_margin}')
+    fg = row[given_margin]
+    # print(f'f given => {fx:,}')
+    cond_p = f / fg
+    if verbose:
+        print(f'\nP({focus_w}|{given_w}) => {f:,} / {fg:,} = {round(cond_p, 3):.3f}')
+    adjust_num = fp - f  # > c or b
+    adjust_denom = row.N - fg
+    adjust = adjust_num / adjust_denom
+    # if minus_others else f'adjustment: P()')
+    deltaP = cond_p / adjust if ratio else cond_p - adjust
+    if verbose:
+        print(f'  {"/" if ratio else "-"} P({focus_w}|~{given_w}) => {adjust_num:,} / {adjust_denom:,} = {round(adjust, 3):.3f}')
+        print(f'= {round(deltaP, 3):,.3f}\n')
+    return deltaP
 
 def extend_deltaP(df):
-    deltaP_df = df.copy().filter(regex=r'given[12]$')
+    deltaP_df = df.copy().filter(regex=r'(given|dP)[12]$')
     for e in ('min', 'max', 'abs_max', 'mean'):
         df[f'deltaP_{e}'] = symmetric_deltaP(deltaP_df, eval=e)
 
@@ -321,18 +361,25 @@ def get_vocab_size(all_bigrams: Path or pd.DataFrame,
         all_df.columns = ['f', 'l1', 'l2']
     else:
         all_df = all_bigrams
-
+    print(f'Calculating Vocab Values: N = {all_df.f.sum():,}')
     unique_l1 = all_df.l1.nunique()
+    print(f'{unique_l1:,} unique "adv_form_lower" values (observed)')
     unique_l2 = all_df.l2.nunique()
+    print(f'{unique_l2:,} unique "adj_form_lower" values (observed)')
     unique_words = unique_l1 + unique_l2
-    # > all possible combinations, not just *occuring* combinations
+    print(f'{unique_words:,} unique words (observed) == "ad*_form_lower" values combined')
+    # * all possible combinations, not just *occurring* combinations
     unique_bigrams = unique_l1 * unique_l2
+    print(f'{unique_bigrams:,} unique POSSIBLE bigram combinations')
     vocabs = {'adv': unique_l1,
               'adj': unique_l2,
-              'bigram': unique_words}
+              'bigram': unique_bigrams}
     if polarized:
         vocabs = {k: v*2 for k, v in vocabs.items()}
-    vocabs['adv~adj'] = unique_words
+    # vocabs['adv~adj'] = unique_words
+    vocabs['adv~adj'] = unique_bigrams
+    print_md_table(pd.Series(vocabs).convert_dtypes().to_frame('Vocab Sizes'), 
+                   format='rounded_grid')
     return vocabs
 
 
@@ -568,13 +615,13 @@ def build_ucs_table(min_count: int,
     # > sourcery suggests:
     primary_cmd = ['ucs-make-tables', '--types']
     sort_cmd = ['ucs-sort', f'{ucs_save_path}',
-                'BY', 'f2-', 'f1-', 'INTO', f'{ucs_save_path}']
+                'BY', 'f2-', 'f1-', 'INTO', str(ucs_save_path)]
     if verbose:
         primary_cmd, sort_cmd = [_make_verbose(
             c) for c in [primary_cmd, sort_cmd]]
     ucs_save_path = Path(str(ucs_save_path).replace('/readable', ''))
-    cmd_with_args = primary_cmd + \
-        [f'--threshold={min_count}', f'{ucs_save_path}']
+    cmd_with_args = primary_cmd + [f'--threshold={min_count}', 
+                                   str(ucs_save_path)]
     full_cmd_str = f'( {cat_tsv_str} | {" ".join(cmd_with_args)} ) && {" ".join(sort_cmd)}'
 
     print('\n## Creating initial UCS table...')

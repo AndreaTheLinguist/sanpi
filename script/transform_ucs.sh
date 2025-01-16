@@ -38,7 +38,7 @@ echo -e "> log will be saved to: ${LOG_PATH}\n..."
 exec 1>${LOG_PATH} 2>&1
 TMP_DIR=${UCS_DIR}/tmp
 mkdir -p ${TMP_DIR}
-TMP=${TMP_DIR}/tmp_${SUBDIR_NAME}-$(date +"%Y%m%d-%H%M%S").${DATA_SET}
+TMP=${TMP_DIR}/tmp_${SUBDIR_NAME}-$(date +"%Y%m%d-%H%M%S").${DATA_SET/-ds/.ds.gz}
 
 echo "# Manipulating ${DATA_SET} ucs table"
 echo "path to this script: $0"

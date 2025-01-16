@@ -1,21 +1,47 @@
+from functools import lru_cache
+import itertools as it
 import re
 from os import system
 from pathlib import Path
 from pprint import pprint
+from typing import Union, Optional
 
+import more_itertools as more_it
+import numpy as np
 import pandas as pd
 import pyarrow as pyar
-
-from source.utils.associate import POLAR_DIR, RESULT_DIR, TOP_AM_DIR, adjust_am_names
+import source.utils.colors as colors
+from matplotlib import pyplot as plt
+from source.utils.associate import (POLAR_DIR, RESULT_DIR, TOP_AM_DIR, AM_DF_DIR,
+                                    adjust_am_names, deltaP, extend_deltaP, TRANSPARENT_O_NAMES)
 # from source.utils.dataframes import show_sample
 from source.utils.dataframes import REGNOT
 from source.utils.dataframes import catify_hit_table as catify
+from source.utils.dataframes import transform_counts
 from source.utils.dataframes import update_assoc_index as update_index
 from source.utils.dataframes import write_part_parquet as parq_it
-from source.utils.general import (confirm_dir, print_iter, snake_to_camel,
-                                  timestamp_today)
+from source.utils.general import (SANPI_HOME, confirm_dir, print_iter,
+                                  snake_to_camel, timestamp_hour,
+                                  timestamp_month, timestamp_now,
+                                  timestamp_now_trim, timestamp_today,
+                                  timestamp_year)
 from source.utils.sample import sample_pickle as sp
+from association_measures import frequencies as am_fq, measures as am_ms
 
+INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
+                           'pos_sample', 'dataset', 'adj', 'adj_total',
+                           'dP1', 'dP1m', 'LRC', 'LRCm',
+                           'P1', 'P1m', 'G2',
+                           'f1', 'f2', 'N',
+                           'f', 'exp_f', 'unexp_f',
+                           'f_sqrt', 'f2_sqrt', 'unexp_f_sqrt',
+                           'N_sqrt',
+                           'unexp_r', 'unexp_r_m',
+                           'unexp_f_sqrt_m', 'f_sqrt_m', 'f2_sqrt_m',
+                           'polar_l2', 'space_l2']
+WRITING_LINKS = SANPI_HOME.joinpath('info/writing_links')
+TABLE_DIR = WRITING_LINKS.joinpath('imports/tables')
+IMAGE_DIR = WRITING_LINKS.joinpath('imports/images')
 SPELL_OUT = {'pol': 'polarity',
              'pos': 'positive',
              'neg': 'negative',
@@ -122,7 +148,7 @@ def md_frame_code(code_block: str,
 def set_col_widths(df, override: dict = None):
     """
     **To be used with `tabulate`**
-    e.g.: 
+    e.g.:
     ```python
     df.to_markdown(tablefmt='rounded_grid', maxcolwidths=set_col_widths(df))
 
@@ -296,7 +322,7 @@ def filter_load_adx_am(am_path: Path, column_list: list = None) -> pd.DataFrame:
 
 def get_top_vals(df: pd.DataFrame,
                  index_like: str = 'NEG',
-                 metric_filter: str or list = None,
+                 metric_filter: str or list = None,  # type: ignore
                  data_tag: str = 'ALL',
                  k: int = 10,
                  eval_type: str = 'polar',
@@ -308,14 +334,14 @@ def get_top_vals(df: pd.DataFrame,
     elif isinstance(metric_filter, str):
         metric_filter = [metric_filter]
 
-    # > get filter list and columns on the same page ---> adjust everything
+    # > get filter list and columns on the same page --> adjust everything
     metric_filter = adjust_am_names(metric_filter)
     env_df = adjust_am_names(df.copy())
     if index_like:
         env_df = env_df.filter(like=index_like, axis=0)
 
-    # > filter to only "significant" association, based on LRC
-    env_df = env_df.loc[env_df.LRC >= 1, :]
+    # * filter to only "significant" association, based on LRC
+    env_df = env_df.loc[env_df.LRC.round(0) >= 1, :]
 
     if ignore_neg_adv:
 
@@ -324,10 +350,9 @@ def get_top_vals(df: pd.DataFrame,
                 env_df = env_df.loc[~env_df.l2.isin(NEG_WORDS), :]
             else:
                 l2_has_neg = ((env_df.l2.str.startswith(NEG_WORDS))
-                              |
-                              (env_df.l2.str.endswith(NEG_WORDS)))
-
+                              | (env_df.l2.str.endswith(NEG_WORDS)))
                 env_df = env_df.loc[~l2_has_neg, :]
+
         elif any(env_df.filter(['adv', 'adj'])):
             adx_has_neg = any(
                 env_df.filter(['adv', 'adj'])
@@ -395,6 +420,7 @@ def nb_show_table(df, n_dec: int = 2,
                   adjust_columns: bool = True,
                   outpath: Path or str = None,
                   return_df: bool = False,
+                  return_table: bool = False,
                   suppress_printing: bool = False,
                   transpose: bool = False,
                   show_index: bool = True,
@@ -421,7 +447,7 @@ def nb_show_table(df, n_dec: int = 2,
         _df = adjust_am_names(_df)
     # if multi_am:
     #     _df.index = _df.index.str.replace(r'\b', ' ')
-    if italics: 
+    if italics:
         _df = italicize_df_for_md(_df)
     if transpose:
         _df = _df.T
@@ -444,7 +470,10 @@ def nb_show_table(df, n_dec: int = 2,
         print(f'\n{title}{table}\n')
     if outpath:
         print(f'\n> saved as:  \n> `"{outpath}"`\n')
-    return (_df if return_df else None)
+    if return_df or return_table:
+        return _df if return_df else table
+    else:
+        return
 
 
 def italicize_df_for_md(_df):
@@ -1147,6 +1176,7 @@ def _collect_text_examples(pol_df_dict: dict[pd.DataFrame],
 
 
 def assign_polarity(amdf):
+    amdf = amdf.convert_dtypes()
     if 'l1' in amdf.columns and any(amdf.l1.str.startswith(('COM', 'NEG', 'POS'))):
         is_neg = amdf.l1.str.startswith('NE')
         is_pos = amdf.l1.str.contains('O', regex=False)
@@ -1164,7 +1194,7 @@ def assign_polarity(amdf):
             'Polarity could not be assigned---bad values? or not a polar table?')
     # amdf = amdf.assign(polarity='neg')
     # amdf.loc[is_pos, 'polarity'] = 'pos'
-    return amdf
+    return amdf.convert_dtypes()
 
 
 def seek_top_adv_am(date_str: str,
@@ -1375,3 +1405,1573 @@ def seek_errant_negations(pos_hits: pd.DataFrame):
 
         nb_show_table(neg_found.loc[neg_few, :].join(pos_hits.loc[neg_few, [
             'token_str', 'text_window', 'polarity']], on='hit_id', rsuffix='[orig]'), transpose=True)
+
+# * style table
+
+
+# def set_my_style(data: pd.DataFrame | pd.DataFrame.style,
+#                  precision: int = 2,
+#                  na_rep=' ',
+#                  index_font: str = None,
+#                  index_weight: int | str = 500,
+#                  index_size: int | float = 9,
+#                  col_font: str = 'iosevka fixed',
+#                  col_size: int | float = 10,
+#                  names_font: str = 'iosevka aile',
+#                  data_font: str = 'iosevka aile',
+#                  data_size: int | float = 8.5,
+#                  caption: str = None
+#                  ):
+#     index_font = 'CMU classical serif' if index_font is None else ''
+#     if isinstance(data, pd.DataFrame):
+#         data = data.style
+#     if caption:
+#         data = data.set_caption(caption)
+#     return data.format(
+#         precision=precision, thousands=',', na_rep=na_rep
+#     ).set_table_styles(
+#         [
+#             {'selector': 'th.index_name',
+#              'props': f'font-size:8pt; font-family: {names_font}; font-style:italic; color:darkgrey'},
+#             {'selector': 'th.col_heading',
+#              'props': (f'font-family: {col_font}; font-size:{col_size}pt; text-align:center; '
+#                        'border-bottom: 1px dotted darkgrey; border-right: 1px dotted darkgrey')},
+#             {'selector': 'th.row_heading',
+#              'props': (f'font-weight: {index_weight}; text-align: right; font-family: '
+#                        + (index_font or (data_font +"; font-style: italic"))
+#                        + f'; font-size: {index_size}pt; border-bottom: 1px dotted darkgrey; border-right: 1px dotted darkgrey')},
+#             {'selector': 'caption',
+#              'props': 'caption-side: top; font-size:1.2em; font-family: serif'
+#              }
+#         ],
+#         overwrite=False).set_properties(**{'text-align': 'right', 'font-family': data_font,
+#                                            'font-size': f'{data_size}pt'})
+
+DEFAULT_FONTS = {
+    'names': 'iosevka aile',
+    'columns': 'iosevka fixed',
+    'index': 'CMU classical serif',
+    'data': 'iosevka aile'
+}
+
+DEFAULT_STYLES = {
+    'index_name': {
+        'font_size': '8pt',
+        'font_style': 'italic',
+        'color': 'darkgrey'
+    },
+    'column_heading': {
+        'text_align': 'center',
+        'border_bottom': '1px dotted darkgrey',
+        'border_right': '1px dotted darkgrey'
+    },
+    'row_heading': {
+        'text_align': 'right',
+        'font_style': 'italic',
+        'border_bottom': '1px dotted darkgrey',
+        'border_right': '1px dotted darkgrey'
+    },
+    'caption': {
+        'caption_side': 'top',
+        'font_size': '1.2em',
+        'font_family': 'serif'
+    }
+}
+
+
+def set_my_style(
+    data,
+    caption_align: str = 'center',
+    caption_side: str = 'top',
+    precision: int = 2,
+    na_rep: str = '&nbsp;',
+    index_font: Optional[str] = '',
+    index_weight: Union[int, str] = 500,
+    index_size: Union[int, float] = 9,
+    col_font: str = DEFAULT_FONTS['columns'],
+    col_size: Union[int, float] = 10,
+    names_font: str = DEFAULT_FONTS['names'],
+    data_font: str = DEFAULT_FONTS['data'],
+    data_size: Union[int, float] = 8.5,
+    caption: Optional[str] = None
+):
+    """
+    Apply consistent styling to pandas DataFrame or Styler.
+
+    Args:
+        data: DataFrame or Styler to style
+        precision: Number of decimal places
+        na_rep: Representation for NA values
+        index_font: Font for index
+        index_weight: Font weight for index
+        index_size: Font size for index
+        col_font: Font for column headings
+        col_size: Font size for column headings
+        names_font: Font for names
+        data_font: Font for data cells
+        data_size: Font size for data cells
+        caption: Optional table caption
+
+    Returns:
+        Styled DataFrame
+
+    ---
+
+    # Basic usage
+    styled_df = set_my_style(df)
+
+    # Custom styling
+    styled_df = set_my_style(
+        df, 
+        precision=3, 
+        caption='My Custom Table',
+        index_font='serif',
+        data_size=9
+    )
+
+    """
+    # Convert DataFrame to Styler if needed
+    if isinstance(data, pd.DataFrame):
+        data = data.style
+
+    # Add optional caption
+    if caption:
+        data = data.set_caption(caption)
+
+    # Prepare style configurations
+    table_styles = [
+        {
+            'selector': 'th.index_name',
+            'props': _create_style_string(
+                font_family=names_font,
+                font_size='8pt',
+                font_style='italic',
+                color='darkgrey'
+            )
+        },
+        {
+            'selector': 'th.col_heading',
+            'props': _create_style_string(
+                font_family=col_font,
+                font_size=f'{col_size}pt',
+                text_align='center',
+                border_bottom='1px dotted darkgrey',
+                border_right='1px dotted darkgrey'
+            )
+        },
+        {
+            'selector': 'th.row_heading',
+            'props': _create_style_string(
+                font_weight=str(index_weight),
+                text_align='right',
+                font_family=index_font or (
+                    DEFAULT_FONTS['index'] if index_font is None else data_font),
+                font_style='italic',
+                font_size=f'{index_size}pt',
+                border_bottom='1px dotted darkgrey',
+                border_right='1px dotted darkgrey'
+            )
+        },
+        {
+            'selector': 'caption',
+            'props': _create_style_string(
+                caption_side=caption_side, 
+                text_align=caption_align,
+                font_size='1.2em',
+                font_family='serif'
+            )
+        }
+    ]
+    table = (data
+            .format(precision=precision, thousands=',', na_rep=na_rep)
+            .set_table_styles(table_styles, overwrite=False)
+            .set_properties(**{
+                'text-align': 'right',
+                'font-family': data_font,
+                'font-size': f'{data_size}pt'}
+                # font_family=data_font,
+                # font_size=f'{data_size}pt'
+            )
+            )
+    
+    for dec1_col in ['G2', 'G2m', 'tpm_f', 'tpm_f2', 'f2_m', 'f_m', 'adj_total_m']:
+        try:
+            table = table.format(subset=dec1_col, precision=1, thousands=',')
+        except Exception: 
+            pass
+    for dec2_col in ['LRC', 'LRCm']:
+        try:
+            table = table.format(subset=dec2_col, precision=2)
+        except Exception: 
+            pass
+    
+    return table
+
+
+def _create_style_string(**kwargs) -> str:
+    """
+    Convert style dictionary to CSS-like string.
+
+    Args:
+        **kwargs: Style properties
+
+    Returns:
+        Formatted style string
+    """
+    return '; '.join(
+        f'{k.replace("_", "-")}: {v}'
+        for k, v in kwargs.items()
+        if v is not None
+    )
+
+
+def style_str_vals(df,
+                   pos_pol_style: str = 'underline',
+                   neq_color: str = 'darkgreen',
+                   mirror_color: str = 'slateblue'):
+    return set_my_style(
+        df.style
+        # .format(props='background-color:black; color:white;')
+        .map(lambda s: f'font-style: {pos_pol_style};'
+             if (s.startswith(('pos', '(+)')) or s.endswith(('pos', '(+)')))
+             else None)
+        .map(lambda s: f'color: {neq_color};'
+             if (s.startswith('NEQ') or s.endswith('NEQ'))
+             else None)
+        .map(lambda s: f'background-color: {mirror_color};'
+             if (s.startswith(('mirror', 'mir', 'present')) or s.endswith(('mirror', 'mir')))
+             else None)
+    )
+
+
+def style_neg_vals(df, neg_color: str = 'red',
+                   neg_weight: str = 'normal',
+                   opacity='35%',
+                   index_font='CMU classical serif',
+                   zero_min=-0.025,
+                   zero_max=0.025):
+
+    def id_neg_val(v, props=''):
+        return props if ((not isinstance(v, str)) and v < 0) else None
+
+    if neg_color:
+        neg_color = f'color:{neg_color}'
+    if neg_weight:
+        neg_weight = f'font-weight:{neg_weight}'
+    return set_my_style(
+        df.style.map(id_neg_val,
+                     props='; '.join([neg_color, neg_weight]))
+        .map(lambda v: f'opacity: {opacity};'
+             if (v < zero_max) and (v > zero_min) else None)
+        .map(lambda v: f'opacity: {opacity};'
+             if (v < zero_max) and (v > zero_min) else None),
+        index_font=index_font
+    )
+
+
+def highlight_max(s, text: str = 'white', background: str = 'indigo', weight: str = 'normal'):
+    props = f'color:{text}; background-color:{background}; font-weight:{weight}'
+    # return np.where(s == np.nanmax(s.values), props, '')
+    return s.highlight_max(axis=0, props=props)
+
+
+def magnify():
+    return [dict(selector="th",
+                 props=[("font-size", "4pt")]),
+            dict(selector="td",
+                 props=[('padding', "0em 0em")]),
+            dict(selector="th:hover",
+                 props=[("font-size", "12pt")]),
+            dict(selector="tr:hover td:hover",
+                 props=[('max-width', '200px'),
+                        ('font-size', '12pt')])
+            ]
+
+
+def add_space_info(amdf):
+    if 'space_l2' not in amdf.columns:
+        amdf['space_l2'] = amdf.space + ':' + amdf.l2
+    if 'approx_meth' not in amdf.columns:
+        amdf['approx_meth'] = (amdf.space.str.split('+').str.get(1)
+                               .map({'mir': 'present(+)', 'sup': 'absent(-)'}))
+    if 'dataset' not in amdf.columns:
+        amdf['dataset'] = (amdf.space.str.split('+').str.get(1)
+                           .map({'mir': 'mirror', 'sup': 'super'}))
+    if 'pos_sample' not in amdf.columns:
+        amdf['pos_sample'] = amdf.space.str.split('+').str.get(0)
+    return amdf
+
+
+def load_all_relevant_ams(_target_set, f_min=1, unit='adv',
+                          _extra_dirs: list = None,
+                          label: str = None,
+                          reprocess: bool = False):
+    polar = unit in ('adv', 'adj', 'bigram')
+    _extra_dirs = _extra_dirs or [
+        a / 'extra' for a
+        in (POLAR_DIR.rglob(unit)
+            if polar
+            else AM_DF_DIR.joinpath('adv_adj').glob('ANY*'))
+    ]
+    # print_iter(f'{p.relative_to(POLAR_DIR)}/' for p in adv_extra_dirs)
+    # all_adv_parqs = [**p for p in [list(d.glob('*min5x_extra.parq')) for d in adv_extra_dirs]]
+    uploads = []
+    for parqs_pair in (d.glob(f'*min{f_min}x_extra.parq') for d in _extra_dirs):
+        # print_iter([p.relative_to(POLAR_DIR) for p in parqs_pair], indent=4)
+        for parq in parqs_pair:
+            space = parq.stem.replace('_any', '').split('_')[1].replace(
+                '-direct', '+sup').replace('-mirror', '+mir')
+            print('\n+', space)
+            print(' ', parq.relative_to(AM_DF_DIR))
+
+            if f_min in (0, 1) and unit in ('adv', 'adj', 'bigram'):
+                label = label or (snake_to_camel("_".join(tuple(_target_set)[:4]))
+                                  + "Etc" if len(tuple(_target_set)) > 4 else "")
+                exhaustive_path = parq.with_name(
+                    parq.name.replace(f'min{f_min}x', f'min0x-{label}'))
+                print('  > exhaustive path (for target set)\n'
+                      f'    "{exhaustive_path.relative_to(AM_DF_DIR)}"')
+            else:
+                exhaustive_path = None
+
+            if not exhaustive_path or not exhaustive_path.exists() or reprocess:
+                sdf = load_filtered_parq(_target_set, unit, parq)
+                if exhaustive_path is not None:
+                    if polar:
+                        exhaustive = (add_nonattested_pairs(
+                            unit, sdf, polar=(unit in ('adv', 'adj', 'bigram'))))
+                    else:
+                        exhaustive = sdf
+
+                    # if 'polar' in parq.parts:
+
+                    partition_by = ['l1']
+
+                    # else:
+                    #     partition_by = ['first_char']
+                    #     exhaustive['first_char'] = (
+                    #         # exhaustive['l1'].str[0].astype('string')
+                    #         # + '_' +
+                    #         exhaustive['l2'].str[0].astype('string'))
+
+                    exhaustive.to_parquet(str(exhaustive_path),
+                                          engine='pyarrow',
+                                          use_threads=True,
+                                          partition_cols=partition_by,
+                                          basename_template='group-{i}.parquet',
+                                          existing_data_behavior='delete_matching',
+                                          row_group_size=5000,
+                                          max_rows_per_file=10000,
+                                          )
+                    uploads.append(adjust_am_names(
+                        add_space_info(exhaustive.assign(space=space))))
+
+                else:
+                    uploads.append(adjust_am_names(add_space_info(
+                        sdf.assign(space=space).convert_dtypes())))
+            else:
+                print(
+                    f'  loading from prior exhaustive processing in "{exhaustive_path.relative_to(AM_DF_DIR)}"')
+                uploads.append(adjust_am_names(add_space_info(load_filtered_parq(_target_set, unit, exhaustive_path)
+                               .assign(space=space).convert_dtypes())))
+
+    all_rel_df = pd.concat(uploads)
+    if unit in ('adv', 'adj', 'bigram'):
+        all_rel_df = assign_polarity(all_rel_df)
+        all_rel_df['polar_l2'] = all_rel_df.polarity + '~' + all_rel_df.l2
+    all_rel_df = all_rel_df.assign(
+        space_key=(all_rel_df.space + ':'
+                   + ((all_rel_df.l1 + '~' + all_rel_df.l2)
+                      if unit in ('adv_adj', 'AdvAdj', '')
+                      else
+                      (all_rel_df.polarity.str.upper()
+                       + '~' + all_rel_df.index.str.split('~').str.get(1)))))
+    if 'dP1' not in all_rel_df.columns:
+        all_rel_df = adjust_am_names(all_rel_df)
+    return all_rel_df.reset_index().set_index('space_key').sort_values(
+        ['dP1', 'LRC'], ascending=False)
+
+
+def load_filtered_parq(_target_set, unit, parq):
+    sdf = pd.read_parquet(
+        parq, engine='pyarrow',
+        filters=[('l2' if unit in ('adv', 'adj')
+                  else ('adv' if unit == 'bigram'
+                        else 'l1'),
+                  'in', _target_set)]
+    )
+
+    return sdf
+
+
+def add_nonattested_pairs(unit: str, sdf: pd.DataFrame, polar: bool = True):
+    all_possible = pd.DataFrame(
+        {f'{l1[:3] if polar else l1}~{l2}': {'l1': l1, 'l2': l2}
+         for l1, l2 in it.product(sdf.l1.astype('string').unique(),
+                                  sdf.l2.astype('string').unique())},
+        index=sdf.columns).transpose()
+    all_possible.index.set_names('key', inplace=True)
+    all_possible.update(sdf, overwrite=True)
+    if any(all_possible.apply(lambda c: any(c.isna()))):
+        all_possible = all_possible.assign(
+            f=all_possible.f.fillna(0),
+            N=sdf.N.iloc[0],
+            f1=all_possible.l1.map(
+                sdf[['l1', 'f1']].drop_duplicates('l1')
+                .set_index('l1')['f1']),
+            f2=all_possible.l2.map(
+                sdf[['l2', 'f2']]
+                .drop_duplicates('l2').set_index('l2')['f2'])
+        )
+        if unit == 'bigram':
+            all_possible.update(
+                all_possible.l2.str.extract(
+                    r'^(?P<adv>\S+)_(?P<adj>\S+)$',
+                    expand=True), overwrite=True)
+            adv_totals, adj_totals = [sdf.copy()[[a, f'{a}_total']].drop_duplicates(a)
+                                      .set_index(a)[f'{a}_total'] for a in ('adv', 'adj')]
+
+            all_possible = all_possible.assign(
+                adv_total=all_possible.adv.map(adv_totals),
+                adj_total=all_possible.adj.map(adj_totals)
+            )
+            all_possible = all_possible.join(transform_counts(
+                all_possible.filter(['adv_total', 'adj_total'])).add_suffix('_sqrt'))
+        all_possible = fill_ams_for_zeros(all_possible)
+
+    return all_possible
+
+
+def fill_ams_for_zeros(amdf):
+    # todo
+    # + expected = exp_f
+    # + unexpected = unexp_f
+    # + unexpected/observed = unexp_r
+    # + sqrt of {adv,adj}_total
+    # + conditional probabiliity: P1, P2
+    # + delta P values = dP1, dP2, (+ min, max, mean?)
+    # + conservative log ratio = LRC
+    # + log-likelihood = G2
+    # ?? versatility?
+    def conditional_prob(row: pd.Series, given: int = 2):
+        return row.loc['f']/row.loc[f'f{given}']
+
+    _amdf = amdf.copy().convert_dtypes()
+    freqs = am_fq.observed_frequencies(
+        _amdf.filter(['f', 'f1', 'f2', 'N']),
+        marginals=True)
+    freqs = freqs.join(am_fq.expected_frequencies(freqs))
+    scores = am_ms.score(
+        #! bug in association_measures/scipy makes conservative_log_ratio measure crash if frequency dtypes are int*
+        freqs.astype('float'),
+        digits=9,
+        measures=['conservative_log_ratio',
+                  'log_likelihood',
+                  't_score',
+                  'mutual_information',
+                  'dice',
+                  'log_ratio'])
+
+    scores = extend_deltaP(scores.assign(
+        dP1=_amdf.apply(deltaP, given=2, axis=1),
+        dP2=_amdf.apply(deltaP, given=1, axis=1),
+        P1=_amdf.apply(conditional_prob, given=2, axis=1),
+        P2=_amdf.apply(conditional_prob, given=1, axis=1)))
+
+    freqs['unexp_f'] = freqs.O11 - freqs.E11
+    unexp_r = (freqs.unexp_f / freqs.O11)
+    freqs['unexp_r'] = unexp_r.apply(lambda r: max(r, -1))
+    _amdf.update(freqs)
+    _amdf.update(freqs.rename(columns=TRANSPARENT_O_NAMES))
+    _amdf.update(scores)
+    _amdf = adjust_am_names(_amdf)
+    _amdf.update(adjust_am_names(freqs))
+    _amdf.update(adjust_am_names(scores))
+    _amdf.update(transform_counts(
+        amdf.filter(['f', 'f1', 'f2', 'exp_f', 'N'])
+    ).add_suffix('_sqrt'))
+
+    return _amdf
+
+# * "manual" AM table adjustments
+
+
+def extend_freq_cols(amdf):
+    for fc in amdf.filter(regex=r'(f\d?|exp_f|ad._total)$').columns:
+        tpm_name = f'tpm_{fc}'
+        if tpm_name not in amdf:
+            amdf[tpm_name] = tok_per_mill(fc, amdf)
+
+    # amdf['tpm_f'] = tok_per_mill('f', amdf)
+    # amdf['tpm_f1'] = tok_per_mill('f1', amdf)
+    # amdf['tpm_f2'] = tok_per_mill('f2', amdf)
+    # amdf['tpm_exp_f'] = tok_per_mill('exp_f', amdf)
+    # amdf['tpm_unexp_f'] = tok_per_mill('unexp_f', amdf)
+
+    sqrts = transform_counts(
+        amdf.filter(['exp_f', 'f', 'f1', 'N', 'f2', 'tpm_f',
+                    'tpm_f1', 'tpm_f2', 'tpm_exp_f', 'adv_total', 'adj_total'])
+    ).add_suffix('_sqrt')
+    amdf.update(sqrts)
+    amdf = amdf.join(sqrts.loc[:, ~sqrts.columns.isin(amdf)])
+
+    amdf['tpm_unexp_f'] = amdf.tpm_f - amdf.tpm_exp_f
+    amdf['tpm_unexp_f_sqrt'] = amdf.tpm_f_sqrt - amdf.tpm_exp_f_sqrt
+    amdf['unexp_f_sqrt'] = amdf.f_sqrt - amdf.exp_f_sqrt
+
+    amdf['unexp_r'] = amdf.unexp_r.apply(lambda r: max(r, -1))
+
+    return amdf
+
+
+def tok_per_mill(freq_col: str, _df: pd.DataFrame) -> pd.Series:
+    return ((_df[freq_col]+0.000001) / _df.N).multiply(1000000)
+
+
+def force_am_mean(amdf: pd.DataFrame, metric: str,
+                  polar: bool = True, grouper: str = None):
+    grouper = grouper or ('polar_l2' if polar else 'key')
+    expected_length = 8 if grouper.endswith('_total') else 4
+    return amdf.groupby(grouper).apply(
+        lambda x: x[metric].sum() / expected_length)
+
+
+def update_amdf(amdf, polar: bool = True, frequencies: bool = True, mean_cols=None):
+
+    # > there are 4 *possible* evaluations, for each combination of {ALL, NEQ} ✕ {superset, subset}
+    # > even with values split by polarity as well as adverb
+    #   (if polarity were not separated, there would be 8 possible for each adverb)
+    #   these "means" are hard-coded to vector length 4 to account for adverbs that are missing values for one of the 4 spaces
+    if frequencies:
+        amdf = extend_freq_cols(amdf)
+
+    # f2_sqrt_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.f2_sqrt.sum()/4).sort_values()
+    # tpm_f2_sqrt_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.tpm_f2_sqrt.sum()/4).sort_values()
+    # tpm_f2_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.tpm_f2.sum()/4).sort_values()
+
+    # uf_sqrt_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.unexp_f_sqrt.sum()/4).sort_values()
+    # tpm_uf_sqrt_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.tpm_unexp_f_sqrt.sum()/4).sort_values()
+    # tpm_uf_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.tpm_unexp_f.sum()/4).sort_values()
+
+    # ufr_mean_est = amdf.groupby(grouper).apply(
+    #     lambda x: x.unexp_r.sum()/4).sort_values()
+    if polar:
+        if 'polarity' not in amdf.columns:
+            amdf = assign_polarity(amdf)
+        if 'polar_l2' not in amdf.columns:
+            amdf = amdf.assign(polar_l2=amdf.polarity + '~' + amdf.l2)
+        grouper = 'polar_l2'
+    else:
+        grouper = 'key'
+        if 'key' not in amdf.columns:
+            amdf['key'] = amdf.l1 + '~' + amdf.l2
+
+    # def _force_mean(amdf: pd.DataFrame, metric: str,
+    #                 polar: bool = True):
+    #     grouper = 'polar_l2' if polar else 'key'
+
+    #     return amdf.groupby(grouper).apply(
+    #         lambda x: x[metric].sum()/4)
+
+    # if 'dP2' in amdf.columns:
+    #     amdf['dP2m'] = amdf[grouper].map(
+    #         force_am_mean(amdf, 'dP2', grouper))
+
+    for mc in (amdf.filter(mean_cols) if mean_cols
+               else amdf.filter(regex=r'd?P\d|G2|LRC|unexp|((tpm_f|f)[\d_sqrt]*$)')
+               ).columns:
+        m_suff = '_m' if ('_' in mc or mc in ['f', 'f1', 'f2']) else 'm'
+        amdf[mc+m_suff] = amdf[grouper].map(
+            force_am_mean(amdf, metric=mc, grouper=grouper, polar=polar))
+    # amdf = amdf.assign(
+    #     dP1m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'dP1', grouper)),
+    #     P1m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'P1', grouper)),
+    #     LRCm=amdf[grouper].map(
+    #         force_am_mean(amdf, 'LRC', grouper)),
+
+    #     f_sqrt_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'f_sqrt', grouper)),
+    #     tpm_f_sqrt_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'tpm_f_sqrt', grouper)),
+    #     tpm_f_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'tpm_f', grouper)),
+
+    #     f2_sqrt_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'f2_sqrt', grouper)),
+    #     tpm_f2_sqrt_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'tpm_f2_sqrt', grouper)),
+    #     tpm_f2_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'tpm_f2', grouper)),
+
+    #     unexp_f_sqrt_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'unexp_f_sqrt', grouper)),
+    #     tpm_unexp_f_sqrt_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'tpm_unexp_f_sqrt', grouper)),
+    #     tpm_unexp_f_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'tpm_unexp_f', grouper)),
+
+    #     unexp_r_m=amdf[grouper].map(
+    #         force_am_mean(amdf, 'unexp_r', grouper))
+    # )
+    return amdf
+
+
+def plot_sequential_margins(df, pos_sample='ALL', dataset='super', size=(6, 3),
+                            filter_lex: str = 'exactly',
+                            l2_units: str = 'bigrams'):
+    unique_vals = df.l2.nunique()
+    if df.index.names != ['pos_sample', 'dataset', 'polarity', 'l2']:
+        df = df.reset_index().set_index(
+            ['pos_sample', 'dataset', 'polarity', 'l2'])
+
+    def filter_plot_df(_df, column='f2'):
+        _df = _df.filter([column])
+        if not any(_df):
+            return _df
+        return (_df.reset_index()
+                .drop_duplicates(_df.index.name)
+                .sort_values(column)
+                .reset_index(drop=True)[[column]])
+
+    df = df.copy().xs(pos_sample).xs(dataset).droplevel(0)
+    _N = df.N.iloc[0]
+
+    dataset += ' subset' if dataset == 'mirror' else 'set'
+    adj_total_plot_df = filter_plot_df(df, 'adj_total')
+    if any(adj_total_plot_df):
+        adj_total_plot_df.cumsum().plot(figsize=size,
+                                        title=f'Cumulative Sum of Tokens by Adjective\n(in {pos_sample}+ {dataset})\nN={_N:,}'.title(
+                                        ),
+                                        xlabel=f'sequential order of unique adjectives\n({unique_vals:,} unique)',
+                                        legend=False)
+
+        # adj_total_plot_df.cumsum().plot( figsize=size,
+        #     title=f'Cumulative Sum of Tokens by Adjective\n(in {pos_sample}+ {dataset})\nN={_N:,}'.title(),
+        #     xlabel=f'sequential order of unique adjectives\n({unique_vals:,} unique)',
+        #     legend=False, logy=True)
+
+        adj_total_plot_df.plot(
+            kind='line', cmap='easter', legend=False, figsize=size,
+            xlabel=f'sequential order of unique adjectives\n({unique_vals:,} unique)',
+            ylabel='observed tokens', logy=False,
+            title=f'Increasing Adjective Marginal Frequencies\n(in {pos_sample}+ {dataset})\nN={_N:,}'.title())
+
+        # transform_counts(adj_total_plot_df).plot(
+        #     kind='line', cmap='easter_r', legend=False, figsize=size,
+        #     xlabel=f'sequential order of unique adjectives\n({unique_vals:,} unique)',
+        #     ylabel='square root of observed tokens', logy=False,
+        #     title=f'Increasing Adjective Marginal Frequencies\n(square root transformed {pos_sample}+ {dataset})\nN={_N:,}'.title())
+
+        adj_total_plot_df.plot(
+            kind='line', cmap='purple_rain_r', legend=False, figsize=size,
+            xlabel=f'sequential order of unique adjectives\n({unique_vals:,} unique)',
+            ylabel='observed tokens (log)', logy=True,
+            title=f'Increasing Adjective Marginal Frequencies\n(log transformed {pos_sample}+ {dataset})\nN={_N:,}'.title())
+
+    filter_plot_df(df).cumsum().plot(figsize=size,
+                                     title=f'Cumulative Sum of Tokens by "{filter_lex} *" {l2_units}\n(in {pos_sample}+ {dataset})\nN={_N:,}'.title(
+                                     ),
+                                     xlabel=f'sequential order of unique "{filter_lex} *" {l2_units}\n({unique_vals:,} unique)',
+                                     legend=False)
+
+    filter_plot_df(df).plot(
+        kind='line', cmap='bwr', legend=False, figsize=size,
+        xlabel=f'sequential order of unique "{filter_lex} *" {l2_units}\n({unique_vals:,} unique)',
+        ylabel='observed tokens', logy=False,
+        title=f'Increasing "{filter_lex} *" Bigram Marginal Frequencies\n(in {pos_sample}+ {dataset})\nN={_N:,}')
+
+    filter_plot_df(df).plot(
+        kind='line', cmap='seismic', legend=False, figsize=size,
+        xlabel=f'sequential order of unique "{filter_lex} *" {l2_units}\n({unique_vals:,} unique)',
+        ylabel='observed tokens (log)', logy=True,
+        title=f'Increasing "{filter_lex} *" Bigram Marginal Frequencies\n(log transfromed {pos_sample}+ {dataset})\nN={_N:,}'.title())
+
+    # filter_plot_df(df, 'f2_sqrt').plot(
+    #     kind='line', cmap='lisa_frank', legend=False, figsize=size,
+    #     xlabel=f'sequential order of unique "{filter_lex} *" {l2_unit}\n({unique_vals:,} unique)',
+    #     ylabel='square root of observed tokens', logy=False,
+    #     title=f'Increasing "{filter_lex} *" Bigram Marginal Frequencies\n(square root transformed {pos_sample}+ {dataset})\nN={_N:,}'.title())
+
+    # filter_plot_df(df, 'tpm_f2').plot(
+    #     kind='line', cmap='purple_teal_r', legend=False, figsize=size,
+    #     xlabel=f'sequential order of unique "{filter_lex} *" {l2_unit}\n({unique_vals:,} unique)',
+    #     ylabel='observed tokens (tokens/mill)', logy=False,
+    #     title=f'Increasing "{filter_lex} *" Bigram Marginal Frequencies\n(tokens per million in {pos_sample}+ {dataset})\nN={_N:,}'.title())
+
+
+def show_example_l2(combined_amdf, example_l2: str = None, cmap: str = None,
+                    polarity=None, dataset=None, pos_sample=None, l1=None, precision: int = 3,
+                    index_order=None, transpose: bool = False, columns: list = None):
+
+    index_order = index_order or ['l2', 'dataset',
+                                  'pos_sample', 'direction', 'polarity']
+    example_l2 = example_l2 or combined_amdf.sample(1).l2.squeeze()
+    ex_l2_amdf = combined_amdf.reset_index()
+    addons = []
+    if 'polarity' in ex_l2_amdf.columns:
+        column_label = f'ENV~{example_l2}'
+        comparison = 'Polarity Sensitivity'
+        if '_' not in example_l2:
+            comparison = 'Independent ' + comparison
+        else:
+            addons.append('adj_total')
+    else:
+        cmap = cmap or 'RdPu'
+        if 'polarity' in index_order:
+            index_order.pop(index_order.index('polarity'))
+        if 'l1' not in index_order:
+            index_order.insert(1, 'l1')
+        addons.extend(['dP2', 'P2'])
+        column_label = f'ADV~{example_l2}'
+        comparison = 'Context-Blind Bigram-Internal Cohesion'
+
+    cmap = cmap or ('PRGn' if '_' in example_l2 else 'BrBG')
+    index_order = combined_amdf.filter(index_order).columns.to_list()
+    index_dict = dict.fromkeys(index_order)
+    index_dict['l2'] = example_l2
+    if l1:
+        index_dict['l1'] = l1
+    if polarity:
+        index_dict['polarity'] = polarity
+    if dataset:
+        index_dict['dataset'] = dataset
+    if pos_sample:
+        index_dict['pos_sample'] = pos_sample
+    index_by = combined_amdf.filter(
+        items=list(index_dict.keys())).columns.to_list()
+
+    columns = columns or INVESTIGATE_COLUMN_LIST
+    index_by = ['l2'] + index_by
+    columns = index_by + ['direction'] + columns + addons
+
+    ex_l2_amdf = combined_amdf.reset_index().filter(items=columns)
+
+    ex_l2_amdf = ex_l2_amdf.set_index(index_by).sort_index()
+    ex_l2_amdf.drop(
+        columns=(ex_l2_amdf.filter(regex=r'm$|_sqrt|l2|space|adj$|f1|N|^exp_f')
+                 .columns.to_list()),
+        inplace=True)
+
+    ex_l2_amdf = ex_l2_amdf.xs(
+        tuple(pd.Series(index_dict.values())
+              .drop_duplicates().dropna()))
+    while ex_l2_amdf.index.levshape[0] == 1:
+        level_val = ex_l2_amdf.index.get_level_values(0)[0]
+        if ex_l2_amdf.index.names[0] == 'l1':
+            column_label = f"{level_val}~{column_label.split('~')[1]}"
+        else:
+            column_label = f'{level_val.upper()} {column_label}'
+        ex_l2_amdf = ex_l2_amdf.droplevel(0)
+
+    ex_l2_amdf.columns.set_names(column_label, inplace=True)
+    columns_tag = ex_l2_amdf.columns.name.replace(' ', '-')
+    if transpose:
+        ex_l2_amdf = ex_l2_amdf.transpose().convert_dtypes()
+
+    sty = set_my_style(
+        ex_l2_amdf,
+        caption=(f"{comparison} of <b><i>"
+                 + (column_label.replace('ENV~', '')
+                    .replace('_', ' ').replace('~', ' '))
+                 + "</i></b>"
+                 ).capitalize(),
+        precision=precision
+    ).background_gradient(cmap, axis=1 if transpose else 0)
+    return save_html(format_negatives(format_zeros(sty, zeros_opacity=35)), 
+        subdir=f"env~l2_examples/{example_l2}",
+        stem=f"{columns_tag}_example-table")
+
+
+def eval_sig(_df):
+    _df['direction'] = _df.LRC.apply(lambda r: 'attract' if r > 0 else (
+        'repel' if r < 0 else 'insignif')).astype('category')
+    _df['LRC!=0'] = _df.LRC != 0
+    return _df
+
+
+def rank_rows(df):
+    return (df
+            .assign(rank=range(1, len(df)+1))
+            .reset_index()
+            .set_index(['rank'] + df.index.names))
+
+
+def save_html(sty, stem: str,
+              subdir: str = None):
+    subdir = subdir or 'exactly'
+    html_path = TABLE_DIR.joinpath(f'{subdir}/{stem}.{timestamp_today()}.html')
+    confirm_dir(html_path.parent)
+    print(
+        f'html table saved as\n  "{html_path.relative_to(WRITING_LINKS)}"')
+    sty.to_html(html_path)
+    return sty
+
+# def style_crosstab(df,
+#                    rows: list,
+#                    columns: list,
+#                    value_col: str,
+#                    aggfunc: str = 'sum',
+#                    normalize=None,
+#                    mark_zeros: bool = None,
+#                    cmap: str = None,
+#                    cmap2: str = None,
+#                    cmap3: str = None,
+#                    precision: int = None,
+#                    index_font: str = None,
+#                    group: bool = True,
+#                    group_col: str = None,
+#                    sort: bool = True,
+#                    sort_col_vals: tuple = None,
+#                    prefilter_label: str = '',
+#                    return_cross_df: bool = False,
+#                    axis=0):  # sourcery skip: simplify-boolean-comparison
+#     cmap = cmap or colors.random_colormap_selection()
+#     print('colormap selected:', cmap if isinstance(cmap, str) else cmap.name)
+#     ctdf = pd.crosstab(
+#         [df[r] for r in rows],
+#         [df[c] for c in columns],
+#         values=df[value_col].squeeze(),
+#         aggfunc=aggfunc,
+#         normalize=normalize or False
+#     )
+#     if aggfunc in ('sum','count'):
+#         ctdf = ctdf.astype('Int64')
+#     if sort:
+#         ctdf = ctdf.sort_values(
+#             sort_col_vals or ctdf.columns[0], ascending=False)
+
+#     if return_cross_df:
+#         return ctdf
+
+#     if not precision:
+#         if 'f' in value_col or 'G2' in value_col:
+#             precision = 1 if 'sqrt' in value_col else 0
+#         elif 'P' in value_col or 'p_r' in value_col:
+#             precision = 3
+#         else:
+#             precision = 2
+
+#     subsets = None
+#     if (group and axis != 0
+#         # and 'tpm' in value_col
+#         and ((len(columns) > 1)
+#              or (len(rows) > 1 and axis != 1))):
+#         subsets = [
+#             ctdf.filter(like=x).columns.to_list()
+#             for x in ctdf.columns.get_level_values(group_col or columns[0])
+#         ]
+#         print_iter(subsets, header='gradient subsets:')
+
+#     gradient_by = 'row' if axis == 1 else (
+#         'column' if axis == 0
+#         else ('whole group' if group
+#               else 'whole table'))
+
+#     # if mark_neg:
+#     #     # sty = style_neg_vals(ctdf.fillna(-0.5), neg_color='maroon', neg_weight='bold')
+#     #     sty = style_neg_vals(ctdf.fillna(-0.5), neg_color='maroon', neg_weight='bold')
+#     # else:
+#     #     sty = ctdf.style
+#     ctdf.index.name = None
+#     sty = ctdf.style.set_caption(
+#         f'Crosstabulated <code>{value_col}</code> (as {aggfunc})<br/>color gradient set by <u>{gradient_by}</u>')
+#     if mark_zeros != False:
+#         if value_col.startswith(('LRC', 'dP1', 'P1', 'unexp_r', 'tpm_unexp_r')):
+#             negligible = pd.DataFrame(
+#                 {'LRC': {'left': -0.05,
+#                         'right': 0.05},
+#                 'LRCm': {'left': -0.1,
+#                         'right': 0.1},
+#                 'dP1': {'left': -0.05,
+#                         'right': 0.05},
+#                 'dP1m': {'left': -0.1,
+#                         'right': 0.1},
+#                 'tpm_unexp_r': {'left': -0.15,
+#                                 'right': 0.15},
+#                 'unexp_r': {'left': -0.1,
+#                             'right': 0.1},
+#                 'unexp_r_sqrt': {'left': -0.15,
+#                                 'right': 0.15},
+#                 'P1': {'left': 0.45,
+#                         'right': 0.55},
+#                 'P1m': {'left': 0.45,
+#                         'right': 0.55}}
+#             )
+#             sty = sty.highlight_between(
+#                 left=negligible.loc['left', value_col], right=negligible.loc['right', value_col], axis=1, props='opacity: 75%;')
+#         else:
+#             sty = sty.highlight_between(
+#                     left=-0.045, right=0.045, axis=1, props='opacity: 75%;')
+#     if subsets:
+#         cmap2=cmap2 or cmap
+#         cmap3=cmap3 or cmap
+#         for s, c in zip(subsets, [cmap,cmap2,cmap3][:len(subsets)]):
+#             sty = sty.background_gradient(cmap=c, subset=s, axis=axis)
+#     else:
+#         sty.background_gradient(cmap=cmap, axis=axis)
+#
+#     sty = set_my_style(sty, precision, index_font=index_font)
+#     out_dir = SANPI_HOME.joinpath(f'info/writing_links/imports/tables/{prefilter_label}')
+#     confirm_dir(out_dir)
+#     html_path = out_dir.joinpath(
+#         f'{"-".join(rows)}_{value_col}-{aggfunc}_{"-".join(columns)}_color-table{"-grouped" if subsets else ""}.{timestamp_hour()}.html')
+#     print(
+#         f'formatted table saved as html: {html_path.relative_to(WRITING_LINKS)}')
+#     sty.to_html(html_path)
+#     return sty
+
+# > sourcery suggestion 👇
+
+
+@lru_cache(maxsize=32)
+def _get_negligible_ranges(value_col):
+    negligible_ranges = {
+        'LRC': (-0.0049, 0.0049),
+        'LRCm': (-0.1, 0.1),
+        'dP1': (-0.0149, 0.0149),
+        'dP1m': (-0.1, 0.1),
+        'tpm_unexp_r': (-0.15, 0.15),
+        'unexp_r': (-0.1, 0.1),
+        'unexp_r_sqrt': (-0.15, 0.15),
+        'P1': (0.475, 0.525),
+        'P1m': (0.45, 0.55)
+    }
+    return negligible_ranges.get(value_col, (-0.045, 0.045))
+
+
+def _infer_precision(value_col):
+    if 'f' in value_col or 'G2' in value_col:
+        return 1 if 'sqrt' in value_col else 0
+    elif 'P' in value_col or 'p_r' in value_col:
+        return 3
+    return 2
+
+
+def style_crosstab(df, rows, columns, value_col,
+                   aggfunc='sum', normalize: str = None,
+                   mark_zeros: bool = None,
+                   zeros_opacity: int = None,
+                   cmap=None,
+                   cmap2='random', cmap3='random',
+                   precision=None, index_font=None,
+                   group=True, group_col=None,
+                   sort=True, sort_col_vals=None,
+                   prefilter_label='',
+                   return_cross_df=False,
+                   vmax=None,
+                   vmin=None,
+                   axis=0):
+    """Create a styled crosstab with customizable visualization and formatting.
+
+    This function generates a styled cross-tabulation of data with advanced visualization options, including color gradients, zero highlighting, and precision control.
+
+    Args:
+        df: Input DataFrame to be cross-tabulated.
+        rows: Columns to use for row indexing in the crosstab.
+        columns: Columns to use for column indexing in the crosstab.
+        value_col: Column containing values to aggregate.
+        aggfunc: Aggregation function to use. Defaults to 'sum'.
+        normalize: Whether to normalize the crosstab values. Defaults to None.
+        mark_zeros: Whether to highlight near-zero values. Defaults to None.
+        cmap: Primary colormap for gradient. Defaults to None.
+        cmap2: Secondary colormap. Defaults to None. Use 'random' to select random gradient colormap.
+        cmap3: Tertiary colormap. Defaults to None. Use 'random' to select random gradient colormap.
+          **note** None will use cmap value, 
+                   but setting cmap3 (None or a string) will only apply to a third group if cmap2 != 'random'
+        precision: Number of decimal places to display. Defaults to None.
+        index_font: Font for index labels. Defaults to None.
+        group: Whether to group gradient coloring. Defaults to True.
+        group_col: Column to use for grouping. Defaults to None.
+        sort: Whether to sort the crosstab. Defaults to True.
+        sort_col_vals: Columns to use for sorting. Defaults to None.
+        prefilter_label: Label for output directory. Defaults to ''.
+        return_cross_df: Whether to return the crosstab DataFrame. Defaults to False.
+        axis: Axis for gradient coloring. Defaults to 0.
+
+    Returns:
+        Styled DataFrame with applied visualization and formatting.
+
+    Examples:
+        >>> style_crosstab(df, ['adj'], ['dataset', 'pos_sample', 'polarity'], 'LRC', aggfunc='mean')
+        >>> style_crosstab(df, ['direction'], ['polarity', 'dataset', 'pos_sample'], 'adj', 
+            aggfunc='count', axis=None, cmap='viridis', cmap2='random')
+    """
+
+    # Efficient crosstab computation
+    ctdf = pd.crosstab(
+        [df[r] for r in rows],
+        [df[c] for c in columns],
+        values=df[value_col].squeeze(),
+        aggfunc=aggfunc,
+        normalize=normalize or False
+    )
+
+    # Optimize type conversion and sorting
+    if aggfunc in ('sum', 'count'):
+        ctdf = ctdf.astype('Int64')
+
+    if sort:
+        ctdf = ctdf.sort_values(
+            sort_col_vals or ctdf.columns[0],
+            ascending=False
+        )
+
+    if return_cross_df:
+        return ctdf
+
+    # Precompute colormap and precision
+    precision = precision or _infer_precision(value_col)
+
+    # print(pd.Series({str(i): (c if isinstance(c, str) else c.name)
+    #                  for i, c in enumerate((cmap, cmap2, cmap3), start=1)
+    #                  }).drop_duplicates()
+    #       .to_frame('Selected Colormap(s)').to_markdown(tablefmt='plain'))
+
+    # Efficient subset generation
+    gradient_by, cmaps, subsets = determine_subsets(columns, cmap, cmap2, cmap3,
+                                                    group, group_col, axis, ctdf)
+
+    # Styling with optimized path generation
+    # ctdf.index.name = None
+
+    sty = set_my_style(ctdf, precision=precision, index_font=index_font,
+                       caption=(
+                           f'Crosstabulated <code>{value_col}</code> (as {aggfunc})<br/>'
+                           f'color gradient set by <u>{gradient_by}</u>'))
+    
+    sty = _highlight_values(sty, 
+                            min_val = ctdf.min().min(), 
+                            value_col=value_col, 
+                            mark_zeros=mark_zeros,
+                            zeros_opacity=zeros_opacity)
+    
+    sty = _apply_background_gradient(sty,
+                                     subsets=subsets, cmaps=cmaps,
+                                     axis=axis, vmin=vmin, vmax=vmax)
+
+
+    # Efficient path generation
+    out_dir = (TABLE_DIR / prefilter_label)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    html_filename = (
+        f'{"-".join(rows)}_{value_col}-{aggfunc}_'
+        f'{"-".join(columns)}_color-table'
+        f'{"_grouped" if subsets else ""}'
+        f'.{timestamp_hour()}.html'
+    )
+    html_path = out_dir / html_filename
+
+    print(
+        f'formatted table saved as html: {html_path.relative_to(WRITING_LINKS)}')
+    sty.to_html(html_path)
+
+    return sty
+
+
+def determine_subsets(columns, cmap, cmap2, cmap3, group, group_col, axis, ctdf):
+    gradient_by = 'row' if axis == 1 else (
+        'column' if axis == 0
+        else ('whole group' if group
+              else 'whole table'))
+    cmap = cmap or colors.random_colormap_selection().name
+    cmaps = [cmap]
+    subsets = None
+    if (group
+        and gradient_by == 'whole group'
+        # and (len(columns) > 1
+                #      or (len(rows) > 1 and axis != 1))
+        ):
+        cmaps.extend([c for c in [cmap2 or cmap, cmap3 or cmap]
+                      if (c and c != 'random')])
+        rand_cmaps = colors.random_colormap_selection(5)
+        cmaps.extend([c.name for c in rand_cmaps])
+
+        subsets = [
+            ctdf.filter(like=x).columns.to_list()
+            for x in ctdf.columns.get_level_values(group_col or columns[0]).unique()
+        ]
+
+    return gradient_by, cmaps, subsets
+
+
+def _apply_background_gradient(sty, subsets, cmaps, axis, vmin, vmax):
+    if not subsets:
+        return sty.background_gradient(cmap=cmaps[0], axis=axis)
+
+    colored_subsets = {(i, c): s for i, (s, c)
+                       in enumerate(zip(subsets, cmaps), start=1)}
+    # print_iter(colored_subsets, header='gradient subsets:')
+    for (__, c_sub), subset in colored_subsets.items():
+        if vmin and vmax:
+            sty = sty.background_gradient(
+                cmap=c_sub, subset=subset, axis=axis, vmin=vmin, vmax=vmax)
+        elif vmin:
+            sty = sty.background_gradient(
+                cmap=c_sub, subset=subset, axis=axis, vmin=vmin)
+        elif vmax:
+            sty = sty.background_gradient(
+                cmap=c_sub, subset=subset, axis=axis, vmax=vmax)
+        else:
+            sty = sty.background_gradient(cmap=c_sub, subset=subset, axis=axis)
+
+    return sty
+
+def format_negatives(sty, min_val=-10*6):
+    return _apply_neg_highlighting(min_val=min_val, sty=sty)
+
+def format_zeros(sty, 
+                 value_col:str='LRC', 
+                 zeros_opacity: int = None):
+    
+    return _apply_zero_highlighting(sty=sty,
+                             value_col=value_col,
+                             zeros_opacity=zeros_opacity)
+
+def _highlight_values(sty, min_val, value_col, mark_zeros, zeros_opacity):
+    if mark_zeros is not False:
+        sty = _apply_zero_highlighting(
+            sty, value_col, zeros_opacity=zeros_opacity)
+    return _apply_neg_highlighting(min_val, sty)
+
+
+def _apply_neg_highlighting(min_val, sty):
+    return sty.highlight_between(
+        left=min(-1, min_val),
+        right=0,
+        inclusive='left',
+        props='font-weight:bold; text-decoration: underline')
+
+def _apply_zero_highlighting(sty,
+                             value_col: str,
+                             zeros_opacity: int = None):
+
+    left, right = _get_negligible_ranges(value_col)
+    return sty.highlight_between(
+        left=left, right=right,
+        # axis=1,
+        props=f'opacity: {zeros_opacity or 60}%;'
+    )
+
+def color_compiled_adv(_amdf: pd.DataFrame,
+                       adverb: str,
+                       index_cols: list = None,
+                       freq_only: bool = False):
+    index_cols = index_cols or ['l2', 'Polar', 'Sample', 'Set']
+    index_cols = [i.replace('Polarity', 'Polar') for i in index_cols]
+    _amdf = (_amdf.copy()
+             .assign(polarity=_amdf.polarity.map({'neg': '(-)',
+                                                  'pos': '(+)'}))
+             .reset_index()
+             .rename(columns={'dataset': 'Set',
+                              'pos_sample': 'Sample',
+                              'polarity': 'Polar'})
+             .set_index(index_cols)
+             #   .xs(adverb)
+             .filter(regex=r'([fN]|f.*[^t])$' if freq_only else r'(LRC|G2|P1|tpm_(f\d?|unexp_f)|^[Nf])$')
+             )
+    # if 'l2' not in _amdf.columns:
+    #     _amdf = _amdf.assign(l2=adverb)
+    #     if 'l2' not in index_cols:
+    #         index_cols.append('l2')
+    if 'l2' in index_cols:
+        _amdf.xs(adverb)
+    # else assume passed frame only contains indicated adverb
+    # _amdf['N (mill)'] = _amdf.N / (1000000)
+    # _amdf.drop(columns=['N'], inplace=True)
+    if freq_only:
+        _amdf = _amdf.filter(regex=r'[Nf]').drop(
+            columns=_amdf.filter(regex=r'(^exp)|(_exp)').columns)
+    _amdf.columns = _amdf.columns.str.replace('unexp_f', 'fu')
+    adv_sty = (
+        set_my_style(_amdf.sort_index(axis=0).style, index_font='',
+                     index_size=8)
+        .set_caption(
+            f'Compiled {"Frequencies" if freq_only else "Association Values"}'
+            f' for <i><b>{adverb}</b></i><br/>(<code>tpm</code>="tokens per million"; rounded)')
+        .background_gradient(cmap='purple_rain', axis=0, subset=_amdf.filter(like='tpm_f').columns.to_list())
+        # .background_gradient(cmap='Blues', axis=0, subset=_amdf.filter(like='exp_f').columns.to_list())
+        .background_gradient(cmap='purple_teal', subset=_amdf.filter(like='fu').columns.to_list())
+        # .background_gradient(cmap='coolwarm', subset=_amdf.filter(like='unexp_r').columns.to_list())
+        # .background_gradient(cmap='purple_rain', axis=0, subset=_amdf.filter(like='N (mill)').columns.to_list(), vmax=_amdf['N (mill)'].quantile(0.75) #  vmin=500000, vmax=10000000
+        #                      )
+        .background_gradient(cmap='purple_rain', subset=['f'], axis=0, vmax=_amdf.f.quantile(0.75))
+        .background_gradient(cmap='purple_rain', subset=['N'], axis=0, vmax=_amdf.N.quantile(0.75))
+        # .background_gradient(cmap='Spectral', subset=['unexp_r'], axis=None, vmin=-1, vmax=1)
+    )
+    if freq_only:
+        adv_sty = (adv_sty
+                   .background_gradient(cmap='purple_rain', subset=['f1'], axis=0,
+                                        vmax=_amdf.f1.quantile(0.95),
+                                        vmin=_amdf.f1.quantile(0.05))
+                   .background_gradient(cmap='purple_rain', subset=['f2'], axis=0,
+                                        vmax=_amdf.f2.quantile(0.95),
+                                        vmin=_amdf.f2.quantile(0.05))
+                   )
+    else:
+        adv_sty = (adv_sty
+                   .background_gradient(cmap='anastasia', axis=None, subset=['dP1'], vmin=-0.83, vmax=0.83)
+                   .background_gradient(cmap='anastasia', axis=None, subset=['LRC'], vmin=-7, vmax=7)
+                   .background_gradient(cmap='anastasia', axis=None, subset=['P1'], vmin=0, vmax=1)
+                   .background_gradient(cmap='lilac_rose', axis=0, subset=['G2']))
+    adv_sty = adv_sty.format(subset=_amdf.filter(
+        regex=r'[fG]').columns.to_list(), precision=0, thousands=',')
+    adv_dir = TABLE_DIR.joinpath(adverb)
+    confirm_dir(adv_dir)
+    html_path = adv_dir.joinpath(
+        f'{adverb}_{"".join(index_cols)}_{"f" if freq_only else "am+f"}.{timestamp_hour()}.html')
+
+    print(
+        f'Stylized table for {adverb} saved as "{html_path.relative_to(WRITING_LINKS)}"')
+    adv_sty.to_html(html_path)
+    return adv_sty
+
+
+def color_polar_table(_polar_df, indexer: str = 'l2',
+                      html_stem=None):
+    indexer_str = indexer
+    if indexer == 'space_l2':
+        indexer = ['l2', 'dataset', 'pos_sample']
+    elif indexer == 'space':
+        indexer = ['dataset', 'pos_sample']
+    try:
+        _index = _polar_df[[indexer] if isinstance(indexer, str) else indexer]
+    except KeyError:
+        _polar_df = _polar_df.reset_index()
+        _index = _polar_df[[indexer] if isinstance(indexer, str) else indexer]
+    re_metrics = r'[1C]m' if indexer == 'l2' else r'P1|LRC'
+    re_freq = r'[tpm_]*f.*m' if indexer == 'l2' else r'f|N'
+    if html_stem:
+        outpath = SANPI_HOME.joinpath(
+            f'info/writing_links/imports/tables/{html_stem}.by-{indexer}.{timestamp_now_trim()}.html')
+        print(f'html formatted table saved as: "{outpath}"')
+    if _polar_df.index.name and _polar_df.index.name == indexer:
+        _polar_df = _polar_df.reset_index()
+    # padfm = _polar_df.filter(regex=re_metrics).join(_index).drop_duplicates(indexer).set_index(indexer).join(
+    #     _polar_df.filter(regex=re_freq).join(_index).drop_duplicates(indexer).set_index(indexer)
+    # )
+    padfm = _polar_df.set_index(indexer)
+    padfm = padfm[padfm.filter(regex=re_metrics).columns.to_list(
+    ) + padfm.filter(regex=re_freq).columns.to_list()]
+    if indexer != 'l2':
+        padfm = padfm.filter(['dP1(+)', 'dP1(-)', 'LRC(+)', 'LRC(-)',
+                              'P1(+)', 'P1(-)', 'tpm_unexp_f(+)', 'tpm_unexp_f(-)',
+                             'tpm_f(+)', 'tpm_f(-)', 'tpm_f2', 'N'])
+    padfm.columns = padfm.columns.str.replace('unexp_f', 'fu')
+    if indexer_str.startswith('space'):
+        padfm = padfm.sort_index(ascending=False)
+
+    stylized = (padfm.style
+                .background_gradient(subset=padfm.filter(like='dP').columns, cmap="anastasia", axis=None, vmin=-0.83, vmax=0.83)
+                .background_gradient(subset=padfm.filter(regex=r'^P').columns, cmap="anastasia", axis=None,  vmin=0, vmax=1)
+                .background_gradient(subset=padfm.filter(like='LRC').columns, cmap="anastasia", axis=None, vmin=-7, vmax=7)
+                .background_gradient(subset=padfm.filter(like='f').columns, cmap='purple_rain', axis=0)
+                .background_gradient(subset=padfm.filter(like='fu').columns, cmap='cerulean_royalty_r')
+                .background_gradient(subset=padfm.filter(like='N').columns, cmap='Blues', low=0.65)
+                .format(thousands=',').set_table_styles([
+                    {'selector': 'th.index_name',
+                     'props': 'font-size:8pt; font-family: iosevka aile; font-style:italic; color:darkgrey'},
+                    {'selector': 'th.col_heading',
+                     'props': 'font-family: iosevka fixed; font-size:10.5pt; text-align:center'},
+                    {'selector': 'th.row_heading',
+                     'props': 'font-weight: 600; font-family: CMU classical serif; font-size: 11pt'}])
+                .set_properties(**{'text-align': 'right', 'font-family': 'iosevka aile', 'font-weight': '400', 'font-size': '8.5pt'}))
+
+    if html_stem:
+        stylized.to_html(outpath)
+    else:
+        return stylized
+
+
+def viz_adv_polar(adverb: str, _adv_df: pd.DataFrame,
+                  colormap_name='lilac_rose',
+                  size_tuple=(6, 2.5)):
+    polar_adv_df = plot_polar_grouped(
+        _adv_df.filter(regex=r'~('+adverb+r')$', axis=0),
+        # .filter(regex=r'P1|LRC|unexp_f_sqrt|polar_l2|polarity|l2|space|m$')
+        indexer='space_l2', size_tuple=size_tuple,
+        colormap_name=colormap_name,
+        image_label=adverb, save_png=True)
+    color_polar_table(polar_adv_df, indexer='space_l2',
+                      html_stem=f'polar-{adverb}_AM')
+    return color_polar_table(polar_adv_df, indexer='space_l2')
+
+
+# * plotting AMs
+
+
+def plot_mean_delta(flat_df, size_tuple=(8, 10), colormap_name='purple_teal',
+                    plot_kind='barh', stacked=True,
+                    image_dir=None, image_label=None):
+    _title = 'delta P(env|adv)'
+    _df = flat_df.filter(like='dP1').sort_index(axis=1)
+    _fig = _df.plot(
+        kind=plot_kind, grid=True, figsize=size_tuple, stacked=stacked,
+        colormap=colormap_name, title=_title, width=0.7,
+        xlim=(-1, 1), ylabel='adverb', xlabel='divergence from probability of other contingencies'
+        #   xticks=[-0.6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,],
+    )
+    col_names = _get_col_names(_df)
+    plt.savefig(compose_png_path('-'.join(col_names),
+                                 dirpath=image_dir, label_str=image_label),
+                dpi=300, bbox_inches='tight', pad_inches=0.2)
+    plt.show()
+
+
+def plot_mean_lrc(flat_df, size_tuple, colormap_name='lilac_rose',
+                  plot_kind='barh', stacked=True,
+                  image_dir=None, image_label=None):
+    _title = 'Conservative Log Ratio'
+    # _lrc_ticks = [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+    _lrc_ticks = [-7, -5, -3, -1, 0, 1, 3, 5, 7]
+    _df = flat_df.filter(like='LRC').sort_index(axis=1)
+    if plot_kind == 'barh':
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple, stacked=stacked,
+            xticks=_lrc_ticks, ylabel='adverb', width=0.7,
+            colormap=colormap_name, title=_title)
+    else:
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple, stacked=stacked,
+            yticks=_lrc_ticks, xlabel='adverb', width=0.7,
+            colormap=colormap_name, title=_title)
+    col_names = _get_col_names(_df)
+    plt.savefig(compose_png_path('-'.join(col_names),
+                                 dirpath=image_dir, label_str=image_label),
+                dpi=300, bbox_inches='tight', pad_inches=0.2)
+    plt.show()
+
+
+def _get_col_names(_df):
+    return _df.columns.get_level_values(0).to_series().drop_duplicates().apply(snake_to_camel)
+
+
+def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
+                 image_dir=None, image_label=None):
+
+    if any(flat_df.filter(regex=r'^f_sqrt')):
+        _title = 'Joint Frequency (sqrt)'
+        _df = flat_df.filter(regex=r'^f_sqrt').sort_index(axis=1)
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple,
+            colormap=colormap_name, stacked=True, ylabel='+'.join(_df.index.names),
+            xlabel='square root of joint frequency',
+            title=_title,
+        )
+        col_names = _get_col_names(_df)
+        plt.savefig(compose_png_path('-'.join(col_names),
+                                     dirpath=image_dir, label_str=image_label),
+                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+
+    if any(flat_df.filter(regex=r'^tpm_f_sqrt')):
+        _title = 'Joint Frequency (tokens per million; sqrt)'
+        _df = flat_df.filter(regex=r'^tpm_f_sqrt').sort_index(axis=1)
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple,
+            colormap=colormap_name, stacked=True,
+            xlabel='square root of tokens per million',
+            title=_title, ylabel='+'.join(_df.index.names)
+        )
+        col_names = _get_col_names(_df)
+        plt.savefig(compose_png_path('-'.join(col_names),
+                                     dirpath=image_dir, label_str=image_label),
+                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+
+    if any(flat_df.filter(regex=r'^unexp_f_sqrt')):
+        _title = 'Joint Frequency Divergence (sqrt)'
+        _df = flat_df.filter(regex=r'^unexp_f_sqrt').sort_index(axis=1)
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple,
+            stacked=(_df < 0).value_counts().nunique() == 1,
+            xlabel='square root of unexpected frequency',
+            colormap=colormap_name, title=_title, ylabel='+'.join(
+                _df.index.names)
+        )
+        col_names = _get_col_names(_df)
+        plt.savefig(compose_png_path('-'.join(col_names),
+                                     dirpath=image_dir, label_str=image_label),
+                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+        plt.show()
+    if any(flat_df.filter(regex=r'^tpm_unexp_f_sqrt')):
+        _title = 'Joint Frequency Divergence (tokens per million; sqrt)'
+        _df = flat_df.filter(regex=r'^tpm_unexp_f_sqrt').sort_index(axis=1)
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple,
+            stacked=(_df < 0).value_counts().nunique() == 1,
+            xlabel='square root of tokens per million',
+            colormap=colormap_name, title=_title, ylabel='+'.join(
+                _df.index.names)
+        )
+        col_names = _get_col_names(_df)
+        plt.savefig(compose_png_path('-'.join(col_names),
+                                     dirpath=image_dir, label_str=image_label),
+                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+        plt.show()
+
+    if any(flat_df.filter(like='tpm_f_sqrt')):
+        _title = 'Joint Frequency Comparison (sqrt)'
+        _df = flat_df.filter(
+            ['tpm_unexp_f_sqrt_m(+)', 'tpm_unexp_f_sqrt(+)',
+                'tpm_f_sqrt_m(+)', 'tpm_f_sqrt(+)',
+                'tpm_f_sqrt_m(-)', 'tpm_f_sqrt(-)',
+                'tpm_unexp_f_sqrt_m(-)', 'tpm_unexp_f_sqrt(-)'
+             ]
+        )
+        if _df.empty:
+            _df = flat_df.filter(regex=r'tpm_(unexp_f|f)_sqrt')
+
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, width=0.75,
+            figsize=(size_tuple[0], size_tuple[1]+3),
+            # xlim=(-150,550),
+            colormap=colormap_name, title=_title, ylabel='+'.join(
+                _df.index.names),
+            xlabel='square root of tokens per million'
+        )
+        col_names = _get_col_names(_df)
+        plt.savefig(compose_png_path('-'.join(col_names),
+                                     dirpath=image_dir, label_str=image_label),
+                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+        plt.show()
+
+    if any(flat_df.filter(like='unexp_r')):
+        _title = 'Joint Frequency Divergence Ratio\n(expected - observed) / observed'
+        _df = flat_df.filter(like='unexp_r').sort_index(axis=1)
+        _fig = _df.plot(
+            kind=plot_kind, grid=True, figsize=size_tuple,
+            stacked=(_df < 0).value_counts().nunique() == 1,
+            xlim=(-1, 1), width=0.7,
+            colormap=colormap_name, title=_title, ylabel='+'.join(
+                _df.index.names),
+            xlabel='unexpected tokens / observed tokens (floor = -1)'
+        )
+        col_names = _get_col_names(_df)
+        plt.savefig(compose_png_path('-'.join(col_names),
+                                     dirpath=image_dir, label_str=image_label),
+                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+        plt.show()
+
+
+def join_polar_vals(adv_amdf, indexer):
+    one_word = adv_amdf.l2.nunique() == 1
+    nonpolar = adv_amdf.copy().filter(regex=r'N|f2|space|pos_sample|dataset|^l2')
+    grouped = {k: g.set_index(indexer) for k, g
+               in (adv_amdf[
+                   (adv_amdf.columns[
+                       (~adv_amdf.columns.isin(nonpolar.columns))
+                   ].to_list() + [indexer]
+                   )]
+                   .groupby('polarity'))}
+
+    jdf = grouped['neg'].join(
+        grouped['pos'],
+        rsuffix='(+)', lsuffix='(-)',
+        how='outer').convert_dtypes()
+    jdf = jdf.loc[:, ~jdf.columns.str.startswith('polar')]
+    jdf = jdf.join(nonpolar.drop_duplicates().set_index(indexer)
+                   ).convert_dtypes().drop_duplicates()
+    if indexer == 'l2':
+        jdf = jdf.filter(like='m').round(6).drop_duplicates()
+    elif indexer == 'space' or one_word:
+        jdf = jdf.loc[:, ~jdf.columns.str.endswith(('m', 'm(-)', 'm(+)'))]
+
+    # HACK
+    if indexer.startswith('space'):
+        jdf = jdf.reset_index().set_index((['pos_sample', 'dataset'])
+                                          if indexer == 'space'
+                                          else ['l2', 'pos_sample', 'dataset'])
+
+    return jdf.sort_values(
+        jdf.filter(['dP1m(-)', 'dP1(-)', 'LRC(-)', 'LRCm(-)'])
+        .columns.to_list()
+    )
+
+
+def compose_png_path(plot_name: str,
+                     dirpath: Path,
+                     label_str: str = '',
+                     suffix: str = '.png'):
+    if label_str:
+        dirpath = dirpath.joinpath(label_str)
+    confirm_dir(dirpath)
+    _path = dirpath.joinpath(
+        '_'.join([label_str, plot_name, timestamp_hour().replace('-', '')])
+    ).with_suffix(suffix)
+    print(f'Output Path: "{_path}"')
+    return _path
+
+
+def plot_polar_grouped(adv_amdf, indexer: str = 'l2',
+                       size_tuple: tuple = (6, 10.5),
+                       colormap_name: str = 'coolwarm',
+                       plot_kind='barh',
+                       image_dir=Path(SANPI_HOME.joinpath(
+                           'info/writing_links/imports/images')),
+                       image_label='',
+                       save_png: bool = False):
+
+    # sourcery skip: identity-comprehension
+    one_word = adv_amdf.l2.nunique() == 1
+    # print(adv_amdf.sample(2).T.to_markdown(floatfmt=',.0f'))
+    if not one_word and size_tuple[1] < 4:
+        size_tuple = (size_tuple[0], adv_amdf.l2.nunique() * 2.5)
+
+    # print(grouped['neg'].sample(2).T.to_markdown(floatfmt=',.0f'))
+    # print(grouped['pos'].sample(2).T.to_markdown(floatfmt=',.0f'))
+    flat_df = join_polar_vals(
+        adv_amdf, indexer=indexer
+    ).select_dtypes(include='number').convert_dtypes().round(5).drop_duplicates()
+
+    # nb_show_table(flat_df.describe())
+    # plots
+    if not one_word:
+        try:
+            for filt_regex in [r'LRCm',  r'dP1m|unexp_r.*m', r'^P1m',  r'f_']:
+                (flat_df.filter(regex=filt_regex)
+                 .sort_index(axis=1).reset_index(drop=True)
+                 .plot(
+                    subplots=True, layout=(3, 2),
+                    figsize=(8, 11) if min(size_tuple) > 4 else (5, 9),
+                    kind='barh', colormap=colormap_name,
+                    sharex=True, sharey=True,
+                    legend=False))
+        except ValueError:
+            pass
+    # print(flat_df.index.to_series().describe())
+    try:
+        flat_df.index.name = flat_df.index.name.replace('l2', 'adverb')
+    except AttributeError:
+        pass
+
+    if any(flat_df.filter(regex=r'f_|unexp')):
+        plot_polar_f(flat_df, size_tuple, colormap_name,
+                     image_dir=image_dir, image_label=image_label)
+
+    if not one_word and indexer == 'l2':
+        flat_df.filter(regex=r'^P1').sort_index(axis=1).plot(
+            kind=plot_kind, grid=True, xlim=(0, 1), figsize=size_tuple,
+            colormap=colormap_name, stacked=True,
+            title='Conditional Probability, P(env|adv)')
+
+    plot_mean_delta(size_tuple=size_tuple, colormap_name=colormap_name,
+                    plot_kind=plot_kind, flat_df=flat_df,
+                    image_dir=image_dir, image_label=image_label)
+
+    plot_mean_lrc(size_tuple=size_tuple, colormap_name=colormap_name,
+                  plot_kind=plot_kind, flat_df=flat_df,
+                  image_dir=image_dir, image_label=image_label)
+    try:
+        polar_df = join_polar_vals(adv_amdf, indexer='space_l2')
+    except KeyError:
+        polar_df = flat_df
+
+    # > using the (+) columns means it's ranked by descending (-) without the `ascending=False` arg
+    return polar_df.sort_values(polar_df.filter(['dP1m(+)', 'dP1(+)', 'LRC(+)', 'LRCm(+)']).columns.to_list())

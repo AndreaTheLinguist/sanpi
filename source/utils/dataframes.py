@@ -23,7 +23,6 @@ REGNOT = re.compile(
 NEG_REGEX = re.compile(
     (r"\b(?P<neg>nor?|n[o'](?:t|ne|body|thing|where)"
         r"|(?:rare|scarce|seldom)l?y?|(?:hard|bare)ly"
-        # r"|question|whether|if"
         r"|ain'?t|neither|without|never|few|doubt)\b"),
     flags=re.I)
 # QUES_REGEX = re.compile(
@@ -43,6 +42,10 @@ MISC_REGEX = re.compile(r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
 NAME_REGEX = re.compile(r'(?<=bigram-)\w+(?=_rb)')
 INDEX_FROM_ID_REGEX = r'(?P<adv_index>\d+)-(?P<adj_index>\d+)$'
 PYARROW = True
+
+# *newly added 24-09-28, NOT used in prior processing
+# EMPH_DUP_CHAR_REGEX = re.compile(r'(?P<C>)\C{2,}')
+THAT_REGEX = re.compile(r'^t+h+a+t+$')
 
 try:
     from source.utils.general import (PKL_SUFF, confirm_dir, find_files, 
@@ -1042,6 +1045,8 @@ def quarantine_deps(df,
     init_len = len(df)
     df = df.assign(
         dep_distance=pd.to_numeric(
+            # second term excludes `adv_index` and `adj_index`:
+            # selects whichever of the `mir_index` or `neg_index` column is present
             df.adv_index - df.filter(regex=r'^[^a].*index').squeeze(),
             downcast='unsigned'),
         window_len=pd.to_numeric(

@@ -1,3 +1,53 @@
+SPECIAL_ADV = {
+    'ever', 'yet', 'anymore', 'any', 'anyway',
+    'necessarily', 'still',
+    'pretty', 'rather', 'somewhat', 'fairly', 'kinda',  # 'sorta',
+    'insanely', 'absurdly', 'ridiculously', 'insanely',
+    'marginally', 'moderately', 'minimally',
+    # 'maximally',
+    'perfectly', 'completely', 'totally', 'fully', 'especially',
+    'absolutely', 'utterly', 'downright',  # 'positively',# 'hugely',
+    'allegedly', 'supposedly',  # 'easily',
+    # 'certifiably',
+    'definitely', 'nearly',  # 'decreasingly','lowkey',
+    'slightly', 'perfectly', 'almost', 'mostly', 'largely',  # 'very',
+    # 'now', 'soon', 'previously',
+    'remotely', 'that', 'exactly', 'precisely', 'quite'
+}
+TOP_NEG_ADV = {
+    "ever",
+    "longer",
+    "particularly",
+    "inherently",
+    "especially",
+    "necessarily",
+    "that",
+    "exactly",
+    "immediately",
+    "yet",
+    "any",
+    "remotely",
+    "terribly",
+    "only",
+    "overly",
+}
+TOP_POS_ADV = {
+    "maybe",
+    "downright",
+    "largely",
+    "pretty",
+    "plain",
+    "rather",
+    "somewhat",
+    "otherwise",
+    "increasingly",
+    "relatively",
+    "almost",
+    "mostly",
+    "seemingly",
+    "fairly",
+}
+
 SAMPLE_ADJ = {
     'open': (
         'large', 'small',

@@ -9,14 +9,19 @@ from matplotlib import pyplot as plt
 from tabulate import tabulate
 
 from utils.associate import (AM_DF_DIR, BINARY_ASSOC_ARGS, READ_TAG,
-                                    RESULT_DIR, UCS_DIR, add_extra_am,
-                                    adjust_am_names, get_associations_csv,
-                                    get_vocab_size)
+                             RESULT_DIR, UCS_DIR, add_extra_am,
+                             adjust_am_names, get_associations_csv,
+                             get_vocab_size)
 from utils.dataframes import (Timer, beef_up_dtypes, corners, save_table,
-                                     print_md_table)
+                              print_md_table)
 from utils.general import (FREQ_DIR, PKL_SUFF, SANPI_HOME, confirm_dir,
-                                  run_shell_command, snake_to_camel)
+                           run_shell_command, snake_to_camel)
 
+#HACK #! manually control units compared
+# COMPARISON_UNITS = None
+# COMPARISON_UNITS = ('adv', 'adj')
+# COMPARISON_UNITS = ('adv', 'adj', 'bigram')
+COMPARISON_UNITS = ('adv', 'adj', 'bigram', '')
 RATIO_CEIL = 0.7
 OUTLIER_MARGIN_IQR_FACTOR = 4
 # > set defaults
@@ -33,7 +38,6 @@ pd.set_option("display.precision", 3)
 pd.set_option("styler.format.precision", 3)
 pd.set_option("styler.format.thousands", ",")
 pd.set_option("display.float_format", '{:,.3f}'.format)
-
 
 def _main():
 
@@ -64,7 +68,7 @@ def _main():
                 idf, ex_data.unit.iat[i],
                 sort_by=set_selector_column(
                     idf.columns,
-                    ['conservative_log_ratio', 'conserv_log_r',
+                    ['conservative_log_ratio', 'am_p1_given2', 'conserv_log_r',
                         'am_odds_ratio_disc', 'odds_r_disc'])
             )
 
@@ -303,7 +307,8 @@ def gen_init_ucs_tables(args):
               f'* comparison = {comp_path.relative_to(FREQ_DIR)}',
               '....................',
               sep='\n')
-        for i, unit in enumerate(('', 'bigram', 'adv', 'adj'), start=1):
+        units = COMPARISON_UNITS or ('', 'bigram', 'adv', 'adj')
+        for i, unit in enumerate(units, start=1):
             print(f'{i}. {unit or "adv ~ adj"} table')
             csv_path = get_associations_csv(
                 unit, args, is_polar=polarity_approx)
@@ -327,13 +332,20 @@ def gen_init_ucs_tables(args):
             input_path=csv_path, added_measures=True)
         stage = 'initial'
 
-        if df_extra_path.is_file():
-            df = load_from_pickle(unit, df_extra_path, extra=True)
+        if df_extra_path.exists():
+            if df_extra_path.is_dir() and df_extra_path.suffix.startswith('.parq'):
+                df = pd.read_parquet(df_extra_path, engine='pyarrow')
+            else:
+                df = load_from_pickle(unit, df_extra_path, extra=True)
             df_path = df_extra_path
             stage = 'extra'
         else:
             if df_init_path.is_file():
                 df = load_from_pickle(unit, df_init_path)
+            elif df_init_path.is_dir() and df_init_path.suffix.startswith('.par'):
+                print(
+                    f'Loading from parquet: "{df_init_path.relative_to(RESULT_DIR)}"... ⏳')
+                df = pd.read_parquet(df_init_path, engine='pyarrow')
             else:
                 df = load_from_csv(csv_path)
 
@@ -366,8 +378,8 @@ def gen_init_ucs_tables(args):
     for unit in csv_paths.index:
         df, df_path, stage = _load_assoc_data(
             csv_path=csv_paths[unit], unit=unit)
-        if not df_path.is_file():
-            # > save initial dataframe conversions as optimized pickle
+        if not df_path.exists():
+            # > save initial dataframe conversions as optimized parquet
             _save_optimized(df, df_path)
         if not unit:
             unit = 'adv~adj'
@@ -501,16 +513,16 @@ def _extend_assoc_data(data: pd.DataFrame,
     """
 
     init_data = data.copy().loc[data.stage != stage_name]
-
+    
     new_extend = process_extensions(
         init_data, stage_name, verbose, vocab_size)
 
     extended = pd.concat([data.loc[data.stage == stage_name], new_extend])
     if (f'bigram_{stage_name}' in extended.index
-        and any(adx_col not in
-                        extended.at[f'bigram_{stage_name}', 'frame'].columns
-                        for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
-        ):
+            and any(adx_col not in
+                    extended.at[f'bigram_{stage_name}', 'frame'].columns
+                    for adx_col in ['adv', 'adj', 'adv_total', 'adj_total'])
+            ):
 
         if all(adx in extended.unit.unique() for adx in ('adv', 'adj', 'bigram')):
 
@@ -635,6 +647,234 @@ def set_selector_column(df_columns: pd.Index,
              ),
             [0],
         )
+
+
+def _save_optimized(_df: pd.DataFrame,
+                    path: Path,
+                    added_measures: bool = False,
+                    verbose: bool = False):
+
+    out_path = get_am_df_path(path, added_measures)
+    _save_am_dataframe(out_path, _optimize(_df, verbose))
+    return out_path
+
+
+def _optimize(df: pd.DataFrame,
+              verbose: bool = False) -> pd.DataFrame:
+    # _df = df.copy()
+
+    # def _show_memory_usage(arg0, arg1):
+    #     print(arg0)
+    #     arg1.info(memory_usage='deep')
+    #     print()
+
+    # if verbose:
+    #     _show_memory_usage('>> Unoptimized <<', df)
+
+    # str_cols = _df.select_dtypes(exclude='number').columns.to_list()
+    # _df[str_cols] = _df[str_cols].astype('string')
+    # count_cols = _df.columns[_df.columns.str.startswith(
+    #     ('r_', 'C', 'R', 'N', 'f', 'index'))].to_list()
+    # is_float = ~_df.columns.isin(count_cols + str_cols)
+    # _df[count_cols] = _df[count_cols].apply(pd.to_numeric, downcast='integer')
+    # _df[_df.columns[is_float]] = _df[_df.columns[is_float]].apply(
+    #     pd.to_numeric, downcast='float')
+    # _df[str_cols] = _df[str_cols].apply(
+    #     lambda c: c.astype('category')
+    #     if c.nunique() <= (len(_df) // 3)
+    #     else c)
+
+    # if not all(_df.astype('string') == df.astype('string')):
+    #     # ! make sure the values have not changed!
+    #     raise ValueError(
+    #         'DataFrame optimization failed: Values have been changed in the process.')
+
+    # if verbose:
+    #     _show_memory_usage('\n--------\n>> Optimized DataFrame', _df)
+    #     mem = df.memory_usage('deep').to_frame('init').join(
+    #         _df.memory_usage('deep').to_frame('adjust'))
+    #     print(tabulate(mem.assign(REDUCTION=mem.iloc[:, 0].subtract(mem.iloc[:, 1])), floatfmt=',.0f', tablefmt='rounded_grid', headers=[
+    #           'Memory Usage:', '...Initial', '...Adjusted', '*reduction*']))
+    #     print('\n\n============\n\n')
+    # pd.set_option("display.float_format", '{:,.3f}'.format)
+    
+    return df.convert_dtypes()
+
+
+def load_from_csv(csv_path):
+    print(f'\n> Loading from *.csv: {csv_path.relative_to(UCS_DIR)}')
+    return pd.read_csv(csv_path)
+
+
+def get_am_df_path(input_path: Path | str,
+                   added_measures: bool = False,
+                   metric_name: str = None):
+    """
+    Determines the path for the DataFrame based on the input path and additional measures flag.
+
+    Args:
+        input_path (Path or str): The input path for the DataFrame.
+        added_measures (bool, optional): Flag indicating if additional measures are included. Defaults to False.
+        metric_name (str, optional): The name of the metric. Defaults to None.
+
+    Returns:
+        Path: The path for the DataFrame based on the input and settings.
+    """
+
+    input_path = Path(input_path)
+    input_dir = input_path.parent
+    input_dir_nesting = (input_dir.relative_to(UCS_DIR)
+                         if input_dir.is_relative_to(UCS_DIR)
+                         else input_dir.relative_to(RESULT_DIR))
+    # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
+    #       nesting == `polar/RBdirect/bigram/readable`
+    #       change to --> `polar/RBdirect/bigram`
+    if input_dir_nesting.name == 'readable':
+        input_dir_nesting = input_dir_nesting.parent
+
+    # append `assoc_df` to directory path if nesting does not already include it
+    out_dir = (AM_DF_DIR
+               if AM_DF_DIR.name not in input_dir_nesting.parts
+               else RESULT_DIR)
+
+    out_dir = out_dir.joinpath(input_dir_nesting)
+    confirm_dir(out_dir)
+    #! manually set stem, bc `.stem` attribute yields "STEM.pkl" for "STEM.pkl.gz" paths
+    output_stem = (
+        input_path.name.replace('.csv', '').replace(
+            PKL_SUFF, '').replace('.parq', '')
+        .replace(READ_TAG, '').strip('.'))
+
+    if 'SKEW' in output_stem.upper():
+        out_dir = out_dir / 'skewed'
+        if metric_name:
+            out_dir = out_dir / metric_name
+        out_dir = out_dir / re.search(r'min\d+x', output_stem).group()
+
+    elif added_measures:
+        out_dir = out_dir / 'extra'
+        output_stem += '_extra'
+    confirm_dir(out_dir)
+    # return out_dir.joinpath(output_stem + PKL_SUFF)
+    return out_dir.joinpath(output_stem + '.parq')
+
+# def downcast_number(numerical: pd.Series, n_dec: int = 5,
+#                     downcast: str = 'float'):
+#     n_dec = n_dec if downcast == 'float' else 0
+#     return pd.to_numeric(numerical.apply(np.around, decimals=n_dec), downcast=downcast)
+
+
+def _save_am_dataframe(out_path: Path,
+                       _df: pd.DataFrame,
+                       force: bool = False):
+
+    def _write_df(out_path: Path, _df):
+        csv_too = ''
+        out_dir = out_path.parent
+        as_pickle = False
+        confirm_dir(out_dir)
+        if '.pkl' in out_path.suffixes:
+            as_pickle = True
+            _df.to_pickle(out_path)
+        elif out_path.suffix.startswith('.par'):
+            if 'polar' in out_path.parts:
+
+                partition_by = ['l1']
+
+            else:
+                partition_by = ['first_char']
+                _df['first_char'] = _df['l1'].str[0].astype(
+                    'string').astype('category')
+            _df.to_parquet(str(out_path),
+                           engine='pyarrow',
+                           use_threads=True,
+                           partition_cols=partition_by,
+                           basename_template='group-{i}.parquet',
+                           existing_data_behavior='delete_matching',
+                           row_group_size=5000,
+                           max_rows_per_file=10000,
+                           )
+        if len(_df) <= 5000 and _df.size <= 250000:
+            csv_too = " (+ `.csv`)"
+            _df.to_csv(str(out_path).replace(PKL_SUFF, '.csv')
+                       if as_pickle
+                       else out_path.with_suffix('.csv'))
+        print(
+            f'* Dataframe saved: `{out_path.relative_to(RESULT_DIR)}`{csv_too}')
+
+    if _df.empty:
+        print(
+            f'* ‼️ Dataframe designated for {out_path.relative_to(UCS_DIR)} is empty 🪹. No file created.')
+        return
+    if out_path.is_file():
+        if force:
+            print('* Force applied!',
+                  f'  Existing `{out_path.relative_to(UCS_DIR)}` will be overwritten.',
+                  sep='\n  ')
+        else:
+            print('* Dataframe already saved:',
+                  f'`{out_path.relative_to(SANPI_HOME)}` ',
+                  '(not overwritten)',
+                  sep='\n  ')
+            return
+
+    _write_df(out_path, _df)
+
+
+def print_ex_assoc(df: pd.DataFrame,
+                   count_type: str = None,
+                   example_key: str = None,
+                   round_level: int = 2,
+                   sort_by: str = 'am_p1_given2',
+                   columns_like=r'^([^ECORr_]|E11)',
+                   max_examples: int = 8,
+                   regex=False) -> None:
+    """
+    Prints examples of associated words from a DataFrame based on specified criteria.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the data.
+        count_type (str, optional): The type of count to use for selecting examples. Defaults to None.
+        example_key (str, optional): The key to use for selecting examples. Defaults to None.
+        round_level (int, optional): The level of rounding to apply. Defaults to 2.
+        sort_by (str, optional): The column to sort the examples by. Defaults to 'am_p1_given2'.
+        columns_like: (str, optional): Regular expression pattern to match column names. Defaults to r'^([^ECORr_]|E11)'.
+        max_examples (int, optional): The maximum number of examples to display. Defaults to 8.
+        regex (bool, optional): Whether to use regex pattern matching. Defaults to False.
+
+    Returns:
+        None
+
+    Examples:
+        print_ex_assoc(df, count_type='bigram', example_key='that_', round_level=2, sort_by='am_p1_given2', columns_like=r'^([^ECORr_]|E11)', max_examples=8, regex=False)
+    """
+
+    if not example_key:
+        example_keys = {'bigram': 'that_',
+                        'adv': 'exactly',
+                        'adj': 'better',
+                        'adv~adj': 'slightly',
+                        '': 'slightly'}
+        example_key = example_keys[count_type]
+    if regex:
+        example = df.round(round_level).filter(axis=0, regex=example_key)
+    else:
+        example = df.round(round_level).filter(axis=0, like=example_key)
+    if sort_by not in example.columns:
+        sort_by = example.columns.iloc[0]
+    example = example.sort_values(
+        sort_by, ascending=sort_by.startswith(('r_', 'l')))
+    example = example.filter(regex=columns_like).sort_index(
+        axis=1).head(max_examples)
+    if example.empty:
+        print(f'🤷 No {count_type} match {example_key}')
+    else:
+        transpose = example.shape[0] < example.shape[1] * .75
+        print_md_table(
+            example.select_dtypes(include='number'),
+            transpose=transpose, n_dec=round_level,
+            title=f'\n### {count_type.capitalize()} "{example_key}" examples sorted by `{sort_by}` column\n')
+    print('\n---')
 
 
 def get_skews(data: pd.DataFrame, verbose: bool = False):
@@ -909,233 +1149,6 @@ def _set_skew_path(row):
     updated_path = skew_dir / skew_name
 
     return get_am_df_path(updated_path, metric_name=metric_label)
-
-
-def _save_optimized(_df: pd.DataFrame,
-                    path: Path,
-                    added_measures: bool = False,
-                    verbose: bool = False):
-
-    out_path = get_am_df_path(path, added_measures)
-    _save_am_dataframe(out_path, _optimize(_df, verbose))
-    return out_path
-
-
-def _optimize(df: pd.DataFrame,
-              verbose: bool = False) -> pd.DataFrame:
-    _df = df.copy()
-
-    def _show_memory_usage(arg0, arg1):
-        print(arg0)
-        arg1.info(memory_usage='deep')
-        print()
-
-    if verbose:
-        _show_memory_usage('>> Unoptimized <<', df)
-
-    str_cols = _df.select_dtypes(exclude='number').columns.to_list()
-    _df[str_cols] = _df[str_cols].astype('string')
-    count_cols = _df.columns[_df.columns.str.startswith(
-        ('r_', 'C', 'R', 'N', 'f', 'index'))].to_list()
-    is_float = ~_df.columns.isin(count_cols + str_cols)
-    _df[count_cols] = _df[count_cols].apply(pd.to_numeric, downcast='integer')
-    _df[_df.columns[is_float]] = _df[_df.columns[is_float]].apply(
-        pd.to_numeric, downcast='float')
-    _df[str_cols] = _df[str_cols].apply(
-        lambda c: c.astype('category')
-        if c.nunique() <= (len(_df) // 3)
-        else c)
-
-    if not all(_df.astype('string') == df.astype('string')):
-        # ! make sure the values have not changed!
-        raise ValueError(
-            'DataFrame optimization failed: Values have been changed in the process.')
-
-    if verbose:
-        _show_memory_usage('\n--------\n>> Optimized DataFrame', _df)
-        mem = df.memory_usage('deep').to_frame('init').join(
-            _df.memory_usage('deep').to_frame('adjust'))
-        print(tabulate(mem.assign(REDUCTION=mem.iloc[:, 0].subtract(mem.iloc[:, 1])), floatfmt=',.0f', tablefmt='rounded_grid', headers=[
-              'Memory Usage:', '...Initial', '...Adjusted', '*reduction*']))
-        print('\n\n============\n\n')
-    # pd.set_option("display.float_format", '{:,.3f}'.format)
-
-    return _df
-
-
-def load_from_csv(csv_path):
-    print(f'\n> Loading from *.csv: {csv_path.relative_to(UCS_DIR)}')
-    return pd.read_csv(csv_path)
-
-
-def get_am_df_path(input_path: Path | str,
-                   added_measures: bool = False,
-                   metric_name: str = None):
-    """
-    Determines the path for the DataFrame based on the input path and additional measures flag.
-
-    Args:
-        input_path (Path or str): The input path for the DataFrame.
-        added_measures (bool, optional): Flag indicating if additional measures are included. Defaults to False.
-        metric_name (str, optional): The name of the metric. Defaults to None.
-
-    Returns:
-        Path: The path for the DataFrame based on the input and settings.
-    """
-
-    input_path = Path(input_path)
-    input_dir = input_path.parent
-    input_dir_nesting = (input_dir.relative_to(UCS_DIR)
-                         if input_dir.is_relative_to(UCS_DIR)
-                         else input_dir.relative_to(RESULT_DIR))
-    # e.g. for `ucs/polar/RBdirect/bigram/readable/*`,
-    #       nesting == `polar/RBdirect/bigram/readable`
-    #       change to --> `polar/RBdirect/bigram`
-    if input_dir_nesting.name == 'readable':
-        input_dir_nesting = input_dir_nesting.parent
-
-    # append `assoc_df` to directory path if nesting does not already include it
-    out_dir = (AM_DF_DIR
-               if AM_DF_DIR.name not in input_dir_nesting.parts
-               else RESULT_DIR)
-
-    out_dir = out_dir.joinpath(input_dir_nesting)
-    confirm_dir(out_dir)
-    #! manually set stem, bc `.stem` attribute yields "STEM.pkl" for "STEM.pkl.gz" paths
-    output_stem = (
-        input_path.name.replace('.csv', '').replace(
-            PKL_SUFF, '').replace('.parq', '')
-        .replace(READ_TAG, '').strip('.'))
-
-    if 'SKEW' in output_stem.upper():
-        out_dir = out_dir / 'skewed'
-        if metric_name:
-            out_dir = out_dir / metric_name
-        out_dir = out_dir / re.search(r'min\d+x', output_stem).group()
-
-    elif added_measures:
-        out_dir = out_dir / 'extra'
-        output_stem += '_extra'
-    confirm_dir(out_dir)
-    # return out_dir.joinpath(output_stem + PKL_SUFF)
-    return out_dir.joinpath(output_stem + '.parq')
-
-# def downcast_number(numerical: pd.Series, n_dec: int = 5,
-#                     downcast: str = 'float'):
-#     n_dec = n_dec if downcast == 'float' else 0
-#     return pd.to_numeric(numerical.apply(np.around, decimals=n_dec), downcast=downcast)
-
-
-def _save_am_dataframe(out_path: Path,
-                       _df: pd.DataFrame,
-                       force: bool = False):
-
-    def _write_df(out_path: Path, _df):
-        csv_too = ''
-        out_dir = out_path.parent
-        as_pickle = False
-        confirm_dir(out_dir)
-        if '.pkl' in out_path.suffixes:
-            as_pickle = True
-            _df.to_pickle(out_path)
-        elif out_path.suffix.startswith('.par'):
-            if 'polar' in out_path.parts:
-
-                partition_by = ['l1']
-                                        
-            else: 
-                partition_by = ['first_char']
-                _df['first_char'] = _df['l1'].str[0].astype('string').astype('category')
-            _df.to_parquet(str(out_path),
-                           engine='pyarrow', 
-                           use_threads=True,
-                           partition_cols=partition_by,
-                           basename_template='group-{i}.parquet',
-                           existing_data_behavior='delete_matching',
-                           row_group_size=500,
-                           max_rows_per_file=1000, 
-                           )
-        if len(_df) <= 5000 and _df.size <= 250000:
-            csv_too = " (+ `.csv`)"
-            _df.to_csv(str(out_path).replace(PKL_SUFF, '.csv')
-                       if as_pickle
-                       else out_path.with_suffix('.csv'))
-        print(
-            f'* Dataframe saved: `{out_path.relative_to(RESULT_DIR)}`{csv_too}')
-
-    if _df.empty:
-        print(
-            f'* ‼️ Dataframe designated for {out_path.relative_to(UCS_DIR)} is empty 🪹. No file created.')
-        return
-    if out_path.is_file():
-        if force:
-            print('* Force applied!',
-                  f'  Existing `{out_path.relative_to(UCS_DIR)}` will be overwritten.',
-                  sep='\n  ')
-        else:
-            print('* Dataframe already saved:',
-                  f'`{out_path.relative_to(SANPI_HOME)}` ',
-                  '(not overwritten)',
-                  sep='\n  ')
-            return
-
-    _write_df(out_path, _df)
-
-
-def print_ex_assoc(df: pd.DataFrame,
-                   count_type: str = None,
-                   example_key: str = None,
-                   round_level: int = 2,
-                   sort_by: str = 'am_p1_given2',
-                   columns_like=r'^([^ECORr_]|E11)',
-                   max_examples: int = 8,
-                   regex=False) -> None:
-    """
-    Prints examples of associated words from a DataFrame based on specified criteria.
-
-    Args:
-        df (pd.DataFrame): The DataFrame containing the data.
-        count_type (str, optional): The type of count to use for selecting examples. Defaults to None.
-        example_key (str, optional): The key to use for selecting examples. Defaults to None.
-        round_level (int, optional): The level of rounding to apply. Defaults to 2.
-        sort_by (str, optional): The column to sort the examples by. Defaults to 'am_p1_given2'.
-        columns_like: (str, optional): Regular expression pattern to match column names. Defaults to r'^([^ECORr_]|E11)'.
-        max_examples (int, optional): The maximum number of examples to display. Defaults to 8.
-        regex (bool, optional): Whether to use regex pattern matching. Defaults to False.
-
-    Returns:
-        None
-
-    Examples:
-        print_ex_assoc(df, count_type='bigram', example_key='that_', round_level=2, sort_by='am_p1_given2', columns_like=r'^([^ECORr_]|E11)', max_examples=8, regex=False)
-    """
-
-    if not example_key:
-        example_keys = {'bigram': 'that_',
-                        'adv': 'exactly',
-                        'adj': 'better',
-                        'adv~adj': 'slightly',
-                        '': 'slightly'}
-        example_key = example_keys[count_type]
-    if regex:
-        example = df.round(round_level).filter(axis=0, regex=example_key)
-    else:
-        example = df.round(round_level).filter(axis=0, like=example_key)
-    if sort_by not in example.columns:
-        sort_by = example.columns.iloc[0]
-    example = example.sort_values(
-        sort_by, ascending=sort_by.startswith(('r_', 'l')))
-    example = example.filter(regex=columns_like).sort_index(
-        axis=1).head(max_examples)
-    if example.empty:
-        print(f'🤷 No {count_type} match {example_key}')
-    else:
-        transpose = example.shape[0] < example.shape[1] * .75
-        print_md_table(
-            example.select_dtypes(include='number'),
-            transpose=transpose, n_dec=round_level,
-            title=f'\n### {count_type.capitalize()} "{example_key}" examples sorted by `{sort_by}` column\n')
-    print('\n---')
 
 
 if __name__ == '__main__':
