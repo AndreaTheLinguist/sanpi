@@ -40,6 +40,8 @@ INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
                            'unexp_f_sqrt_m', 'f_sqrt_m', 'f2_sqrt_m',
                            'polar_l2', 'space_l2']
 WRITING_LINKS = SANPI_HOME.joinpath('info/writing_links')
+LATEX_DIR = WRITING_LINKS.joinpath('latex')
+LATEX_TABLES = LATEX_DIR.joinpath('tables')
 TABLE_DIR = WRITING_LINKS.joinpath('imports/tables')
 IMAGE_DIR = WRITING_LINKS.joinpath('imports/images')
 SPELL_OUT = {'pol': 'polarity',
@@ -1575,7 +1577,7 @@ def set_my_style(
         {
             'selector': 'caption',
             'props': _create_style_string(
-                caption_side=caption_side, 
+                caption_side=caption_side,
                 text_align=caption_align,
                 font_size='1.2em',
                 font_family='serif'
@@ -1583,28 +1585,28 @@ def set_my_style(
         }
     ]
     table = (data
-            .format(precision=precision, thousands=',', na_rep=na_rep)
-            .set_table_styles(table_styles, overwrite=False)
-            .set_properties(**{
-                'text-align': 'right',
-                'font-family': data_font,
-                'font-size': f'{data_size}pt'}
-                # font_family=data_font,
-                # font_size=f'{data_size}pt'
-            )
-            )
-    
+             .format(precision=precision, thousands=',', na_rep=na_rep)
+             .set_table_styles(table_styles, overwrite=False)
+             .set_properties(**{
+                 'text-align': 'right',
+                 'font-family': data_font,
+                 'font-size': f'{data_size}pt'}
+                 # font_family=data_font,
+                 # font_size=f'{data_size}pt'
+             )
+             )
+
     for dec1_col in ['G2', 'G2m', 'tpm_f', 'tpm_f2', 'f2_m', 'f_m', 'adj_total_m']:
         try:
             table = table.format(subset=dec1_col, precision=1, thousands=',')
-        except Exception: 
+        except Exception:
             pass
     for dec2_col in ['LRC', 'LRCm']:
         try:
             table = table.format(subset=dec2_col, precision=2)
-        except Exception: 
+        except Exception:
             pass
-    
+
     return table
 
 
@@ -2038,7 +2040,7 @@ def plot_sequential_margins(df, pos_sample='ALL', dataset='super', size=(6, 3),
             return _df
         return (_df.reset_index()
                 .drop_duplicates(_df.index.name)
-                .sort_values(column)
+                .sort_values(column, ascending=False)
                 .reset_index(drop=True)[[column]])
 
     df = df.copy().xs(pos_sample).xs(dataset).droplevel(0)
@@ -2185,9 +2187,9 @@ def show_example_l2(combined_amdf, example_l2: str = None, cmap: str = None,
                  ).capitalize(),
         precision=precision
     ).background_gradient(cmap, axis=1 if transpose else 0)
-    return save_html(format_negatives(format_zeros(sty, zeros_opacity=35)), 
-        subdir=f"env~l2_examples/{example_l2}",
-        stem=f"{columns_tag}_example-table")
+    return save_html(format_negatives(format_zeros(sty, zeros_opacity=35)),
+                     subdir=f"env~l2_examples/{example_l2}",
+                     stem=f"{columns_tag}_example-table")
 
 
 def eval_sig(_df):
@@ -2446,17 +2448,16 @@ def style_crosstab(df, rows, columns, value_col,
                        caption=(
                            f'Crosstabulated <code>{value_col}</code> (as {aggfunc})<br/>'
                            f'color gradient set by <u>{gradient_by}</u>'))
-    
-    sty = _highlight_values(sty, 
-                            min_val = ctdf.min().min(), 
-                            value_col=value_col, 
+
+    sty = _highlight_values(sty,
+                            min_val=ctdf.min().min(),
+                            value_col=value_col,
                             mark_zeros=mark_zeros,
                             zeros_opacity=zeros_opacity)
-    
+
     sty = _apply_background_gradient(sty,
                                      subsets=subsets, cmaps=cmaps,
                                      axis=axis, vmin=vmin, vmax=vmax)
-
 
     # Efficient path generation
     out_dir = (TABLE_DIR / prefilter_label)
@@ -2486,10 +2487,10 @@ def determine_subsets(columns, cmap, cmap2, cmap3, group, group_col, axis, ctdf)
     cmaps = [cmap]
     subsets = None
     if (group
-        and gradient_by == 'whole group'
-        # and (len(columns) > 1
-                #      or (len(rows) > 1 and axis != 1))
-        ):
+            and gradient_by == 'whole group'
+            # and (len(columns) > 1
+            #      or (len(rows) > 1 and axis != 1))
+            ):
         cmaps.extend([c for c in [cmap2 or cmap, cmap3 or cmap]
                       if (c and c != 'random')])
         rand_cmaps = colors.random_colormap_selection(5)
@@ -2525,16 +2526,19 @@ def _apply_background_gradient(sty, subsets, cmaps, axis, vmin, vmax):
 
     return sty
 
+
 def format_negatives(sty, min_val=-10*6):
     return _apply_neg_highlighting(min_val=min_val, sty=sty)
 
-def format_zeros(sty, 
-                 value_col:str='LRC', 
+
+def format_zeros(sty,
+                 value_col: str = 'LRC',
                  zeros_opacity: int = None):
-    
+
     return _apply_zero_highlighting(sty=sty,
-                             value_col=value_col,
-                             zeros_opacity=zeros_opacity)
+                                    value_col=value_col,
+                                    zeros_opacity=zeros_opacity)
+
 
 def _highlight_values(sty, min_val, value_col, mark_zeros, zeros_opacity):
     if mark_zeros is not False:
@@ -2550,6 +2554,7 @@ def _apply_neg_highlighting(min_val, sty):
         inclusive='left',
         props='font-weight:bold; text-decoration: underline')
 
+
 def _apply_zero_highlighting(sty,
                              value_col: str,
                              zeros_opacity: int = None):
@@ -2561,10 +2566,25 @@ def _apply_zero_highlighting(sty,
         props=f'opacity: {zeros_opacity or 60}%;'
     )
 
+
 def color_compiled_adv(_amdf: pd.DataFrame,
                        adverb: str,
                        index_cols: list = None,
-                       freq_only: bool = False):
+                       freq_only: bool = False,
+                       save_html: bool = True
+                       ):
+    _amdf = prep_compiled_adv(_amdf, adverb=adverb,
+                              index_cols=index_cols,
+                              freq_only=freq_only)
+    return style_compiled_adv(_amdf, adverb=adverb,
+                              freq_only=freq_only,
+                              save_html=save_html)
+
+
+def prep_compiled_adv(_amdf: pd.DataFrame,
+                      adverb: str = 'exactly',
+                      index_cols: list = None,
+                      freq_only: bool = False):
     index_cols = index_cols or ['l2', 'Polar', 'Sample', 'Set']
     index_cols = [i.replace('Polarity', 'Polar') for i in index_cols]
     _amdf = (_amdf.copy()
@@ -2591,47 +2611,66 @@ def color_compiled_adv(_amdf: pd.DataFrame,
         _amdf = _amdf.filter(regex=r'[Nf]').drop(
             columns=_amdf.filter(regex=r'(^exp)|(_exp)').columns)
     _amdf.columns = _amdf.columns.str.replace('unexp_f', 'fu')
+    return _amdf.sort_index(axis=0)
+
+
+def style_compiled_adv(_amdf: pd.DataFrame,
+                       adverb: str,
+                       freq_only: bool = False,
+                       save_html: bool = True):
     adv_sty = (
-        set_my_style(_amdf.sort_index(axis=0).style, index_font='',
-                     index_size=8)
-        .set_caption(
-            f'Compiled {"Frequencies" if freq_only else "Association Values"}'
-            f' for <i><b>{adverb}</b></i><br/>(<code>tpm</code>="tokens per million"; rounded)')
-        .background_gradient(cmap='purple_rain', axis=0, subset=_amdf.filter(like='tpm_f').columns.to_list())
+        _amdf
+        .style
+        .background_gradient(cmap='purple_rain', axis=0, subset=_amdf.filter(like='tpm').columns.to_list())
         # .background_gradient(cmap='Blues', axis=0, subset=_amdf.filter(like='exp_f').columns.to_list())
-        .background_gradient(cmap='purple_teal', subset=_amdf.filter(like='fu').columns.to_list())
+        .background_gradient(cmap='purple_teal', subset=_amdf.filter(regex=r'[uU]').columns.to_list())
         # .background_gradient(cmap='coolwarm', subset=_amdf.filter(like='unexp_r').columns.to_list())
         # .background_gradient(cmap='purple_rain', axis=0, subset=_amdf.filter(like='N (mill)').columns.to_list(), vmax=_amdf['N (mill)'].quantile(0.75) #  vmin=500000, vmax=10000000
         #                      )
-        .background_gradient(cmap='purple_rain', subset=['f'], axis=0, vmax=_amdf.f.quantile(0.75))
-        .background_gradient(cmap='purple_rain', subset=['N'], axis=0, vmax=_amdf.N.quantile(0.75))
         # .background_gradient(cmap='Spectral', subset=['unexp_r'], axis=None, vmin=-1, vmax=1)
     )
+    if any(_amdf.filter(regex=r'\$?f\$?')):
+        adv_sty = adv_sty.background_gradient(cmap='purple_rain',
+                                              subset=['f'],
+                                              axis=0, vmax=_amdf.f.quantile(0.75))
+    if any(_amdf.filter(regex=r'\$?N\$?')):
+        adv_sty = adv_sty.background_gradient(cmap='purple_rain',
+                                              subset=_amdf.filter(
+                                                  like='N').columns.to_list(),
+                                              axis=0, vmax=_amdf.N.quantile(0.75))
     if freq_only:
         adv_sty = (adv_sty
                    .background_gradient(cmap='purple_rain', subset=['f1'], axis=0,
                                         vmax=_amdf.f1.quantile(0.95),
-                                        vmin=_amdf.f1.quantile(0.05))
+                                        vmin=_amdf.f1.quantile(0.05)
+                                        )
                    .background_gradient(cmap='purple_rain', subset=['f2'], axis=0,
                                         vmax=_amdf.f2.quantile(0.95),
-                                        vmin=_amdf.f2.quantile(0.05))
+                                        vmin=_amdf.f2.quantile(0.05)
+                                        )
                    )
     else:
         adv_sty = (adv_sty
-                   .background_gradient(cmap='anastasia', axis=None, subset=['dP1'], vmin=-0.83, vmax=0.83)
-                   .background_gradient(cmap='anastasia', axis=None, subset=['LRC'], vmin=-7, vmax=7)
-                   .background_gradient(cmap='anastasia', axis=None, subset=['P1'], vmin=0, vmax=1)
-                   .background_gradient(cmap='lilac_rose', axis=0, subset=['G2']))
+                   .background_gradient(cmap='anastasia', axis=None, subset=_amdf.filter(regex=r'^[dD].*P').columns.to_list(), vmin=-0.83, vmax=0.83)
+                   .background_gradient(cmap='anastasia', axis=None, subset=_amdf.filter(like='LRC').columns.to_list(), vmin=-7, vmax=7)
+                   .background_gradient(cmap='anastasia', axis=None, subset=_amdf.filter(regex=r'^[^dD]*P').columns.to_list(), vmin=0, vmax=1)
+                   .background_gradient(cmap='lilac_rose', axis=0, subset=_amdf.filter(regex=r'G\^?2').columns.to_list()))
     adv_sty = adv_sty.format(subset=_amdf.filter(
         regex=r'[fG]').columns.to_list(), precision=0, thousands=',')
-    adv_dir = TABLE_DIR.joinpath(adverb)
-    confirm_dir(adv_dir)
-    html_path = adv_dir.joinpath(
-        f'{adverb}_{"".join(index_cols)}_{"f" if freq_only else "am+f"}.{timestamp_hour()}.html')
+    if save_html:
+        adv_dir = TABLE_DIR.joinpath(adverb)
+        confirm_dir(adv_dir)
+        html_path = adv_dir.joinpath(
+            f'{adverb}_{"".join(_amdf.index.names)}_{"f" if freq_only else "am+f"}.{timestamp_hour()}.html')
 
-    print(
-        f'Stylized table for {adverb} saved as "{html_path.relative_to(WRITING_LINKS)}"')
-    adv_sty.to_html(html_path)
+        print(
+            f'Stylized table for {adverb} saved as "{html_path.relative_to(WRITING_LINKS)}"')
+        set_my_style(adv_sty, index_font='',
+                     index_size=8,
+                     caption=(
+                         f'Compiled {"Frequencies" if freq_only else "Association Values"}'
+                         f' for <i><b>{adverb}</b></i><br/>(<code>tpm</code>="tokens per million"; rounded)')
+                     ).to_html(html_path)
     return adv_sty
 
 
@@ -2975,3 +3014,93 @@ def plot_polar_grouped(adv_amdf, indexer: str = 'l2',
 
     # > using the (+) columns means it's ranked by descending (-) without the `ascending=False` arg
     return polar_df.sort_values(polar_df.filter(['dP1m(+)', 'dP1(+)', 'LRC(+)', 'LRCm(+)']).columns.to_list())
+
+
+#* for latex output
+
+def rename_cols_for_latex(sty):
+    col_rename_dict = {
+        'f1': 'f_1',
+        'f2': 'f_2',
+        'N': 'N',
+        'f': 'f',
+        'fu': 'f_U',
+        'unexp_f': 'f_U',
+        'unexp_r': 'r_U',
+        'tpm_f': 'f(tpm)',
+        'tpm_f1': 'f_1(tpm)',
+        'tpm_f2': 'f_2(tpm)',
+        'tpm_fu': 'f_U(tpm)',
+        'LRC': 'LRC',
+        'dP1': '$\Delta P(env|<i>exactly</i>)$',
+        'P1': '$P(env|<i>exactly</i>)$',
+        'G2': '$G^2$'}
+    
+    return sty.relabel_index(
+        sty.columns.to_series().map(col_rename_dict).to_list(), 
+                             axis='columns')
+
+def save_latex_table(sty,
+                     caption: str = None,
+                     latex_path: Path = None,
+                     latex_stem: str = None,
+                     latex_subdir: str = None,
+                     label='[table-X]',
+                     longtable: bool = False,
+                     multicol_align: str = 'c',
+                     clines: str = 'skip-last;data',
+                     hrules: str = '\midrule'):
+
+    caption = (caption or '[REPLACE WITH TABLE NAME]')
+    print(caption)
+    
+    latex_stem = (
+        latex_stem or
+        '-'.join(sty.index.names) + '_x_' + '-'.join(
+            sty.columns
+            # .str.replace(r'\\text\w+\{(\w+)\}', r'\1', regex=True)
+            # .str.replace(r'[$\\\^ ]', '', regex=True)
+            )
+    ).replace(' ', '_')
+    latex_dir = LATEX_TABLES.joinpath(
+        latex_subdir) if latex_subdir else LATEX_TABLES
+    confirm_dir(latex_dir)
+    latex_path = (latex_path
+                  or latex_dir.joinpath(latex_stem)
+                  ).with_suffix(f'.{timestamp_today()}.tex')
+    print(latex_path)
+    
+    package_req_warnings = [r'%! Requires following packages:',
+                            r' \usepackage{multirow}',
+                            r' \usepackage[table]{xcolor}',
+                            r' \usepackage{booktabs}',
+                            ]
+    if longtable:
+        package_req_warnings.extend(
+            [r'& if `environment=="longtable"`',
+             r'   \usepackage{longtable}'])
+    display(sty)
+    latex_table_str = sty.to_latex(
+        position='h!',
+        convert_css=True,
+        multicol_align=multicol_align,
+        sparse_index=True,
+        sparse_columns=True,
+        environment='longtable' if longtable else 'table',
+        clines=clines,
+        hrules=hrules,
+        label=label,
+        caption=caption
+    )
+    latex_table_str = (latex_table_str
+                       .replace('<b>', '\\textbf{')
+                       .replace('</b>', '}')
+                       .replace('<i>', '\\textit{')
+                       .replace('</i>', '}')
+                       .replace('env', '\\textsc{env}'))
+    latex_path.write_text('\n% '.join(package_req_warnings)
+                          + '\n\n'
+                          + latex_table_str,
+                          encoding='utf8')
+    print('Stylized latex table saved as:\n ',
+          latex_path.relative_to(WRITING_LINKS), end='\n\n')
