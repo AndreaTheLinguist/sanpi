@@ -71,11 +71,11 @@ MISC_AM = [
     # 't_score',
     # 'mutual_information',
 ]
-FREQ_COLS = ['f', 'f1', 'f2']
+FREQ_COLS = ['f', 'f1', 'f2', 'N']
 ADX_COLS = ['adv', 'adv_total', 'adj', 'adj_total']
 SQRT_F_COLS = [f'{f}_sqrt' for f in FREQ_COLS]
 P2_COLS = ['am_p2_given1', 'am_p2_given1_simple']
-DELTA_COLS = [  # 'deltaP_max',
+DELTA_COLS = [  'deltaP_max',
     'deltaP_mean']
 FOCUS_DICT = {
     'ALL': {
@@ -2417,7 +2417,8 @@ def style_crosstab(df, rows, columns, value_col,
     )
 
     # Optimize type conversion and sorting
-    if aggfunc in ('sum', 'count'):
+    if (aggfunc in ('sum', 'count') 
+        and not value_col.endswith(('_sqrt', '_tpm'))):
         ctdf = ctdf.astype('Int64')
 
     if sort:
@@ -3049,27 +3050,26 @@ def save_latex_table(sty,
                      longtable: bool = False,
                      multicol_align: str = 'c',
                      clines: str = 'skip-last;data',
-                     hrules: str = '\midrule'):
+                     hrules: str = '\midrule', 
+                     position='ht'):
 
     caption = (caption or '[REPLACE WITH TABLE NAME]')
     print(caption)
-    
-    latex_stem = (
-        latex_stem or
-        '-'.join(sty.index.names) + '_x_' + '-'.join(
-            sty.columns
-            # .str.replace(r'\\text\w+\{(\w+)\}', r'\1', regex=True)
-            # .str.replace(r'[$\\\^ ]', '', regex=True)
-            )
-    ).replace(' ', '_')
-    latex_dir = LATEX_TABLES.joinpath(
-        latex_subdir) if latex_subdir else LATEX_TABLES
-    confirm_dir(latex_dir)
-    latex_path = (latex_path
-                  or latex_dir.joinpath(latex_stem)
-                  ).with_suffix(f'.{timestamp_today()}.tex')
+    if latex_path is None: 
+        latex_stem = (
+            latex_stem or
+            '-'.join(sty.index.names) + '_x_' + '-'.join(
+                sty.columns
+                # .str.replace(r'\\text\w+\{(\w+)\}', r'\1', regex=True)
+                # .str.replace(r'[$\\\^ ]', '', regex=True)
+                )
+        ).replace(' ', '_')
+        latex_dir = LATEX_TABLES.joinpath(
+            latex_subdir) if latex_subdir else LATEX_TABLES
+        confirm_dir(latex_dir)
+        latex_path = latex_dir.joinpath(latex_stem).with_suffix(
+            f'.{timestamp_today()}.tex')
     print(latex_path)
-    
     package_req_warnings = [r'%! Requires following packages:',
                             r' \usepackage{multirow}',
                             r' \usepackage[table]{xcolor}',
@@ -3079,9 +3079,26 @@ def save_latex_table(sty,
         package_req_warnings.extend(
             [r'& if `environment=="longtable"`',
              r'   \usepackage{longtable}'])
+    try:
+        sty.index.set_names(
+            [n.replace('_', ' ').title() 
+                         for n in sty.index.names], 
+                        inplace=True)
+    except AttributeError:
+        pass       
+    try: 
+        sty.columns.set_names(
+            [n.replace('_', ' ').title() 
+                           for n in sty.columns.names], 
+                          inplace=True)
+    except AttributeError:
+        pass           
+    
     display(sty)
+    
+    sty = sty.format_index(escape='latex')
     latex_table_str = sty.to_latex(
-        position='h!',
+        position=position,
         convert_css=True,
         multicol_align=multicol_align,
         sparse_index=True,
@@ -3097,6 +3114,8 @@ def save_latex_table(sty,
                        .replace('</b>', '}')
                        .replace('<i>', '\\textit{')
                        .replace('</i>', '}')
+                       .replace('<u>', '\\underline{')
+                       .replace('</u>', '}')
                        .replace('env', '\\textsc{env}'))
     latex_path.write_text('\n% '.join(package_req_warnings)
                           + '\n\n'
