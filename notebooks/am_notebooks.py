@@ -3126,6 +3126,7 @@ def save_latex_table(sty,
 
     sty = sty.format(escape='latex', na_rep='')
     sty = sty.format_index(escape='latex')
+    sty = sty.format_index(escape='latex', axis=1)
     display(sty)
 
     latex_table_str = sty.to_latex(
