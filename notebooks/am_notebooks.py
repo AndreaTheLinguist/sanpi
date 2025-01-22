@@ -75,8 +75,7 @@ FREQ_COLS = ['f', 'f1', 'f2', 'N']
 ADX_COLS = ['adv', 'adv_total', 'adj', 'adj_total']
 SQRT_F_COLS = [f'{f}_sqrt' for f in FREQ_COLS]
 P2_COLS = ['am_p2_given1', 'am_p2_given1_simple']
-DELTA_COLS = [  'deltaP_max',
-    'deltaP_mean']
+DELTA_COLS = ['deltaP_max', 'deltaP_mean']
 FOCUS_DICT = {
     'ALL': {
         'adv_adj': BASIC_FOCUS + P2_COLS + DELTA_COLS,
@@ -2109,9 +2108,18 @@ def plot_sequential_margins(df, pos_sample='ALL', dataset='super', size=(6, 3),
     #     title=f'Increasing "{filter_lex} *" Bigram Marginal Frequencies\n(tokens per million in {pos_sample}+ {dataset})\nN={_N:,}'.title())
 
 
-def show_example_l2(combined_amdf, example_l2: str = None, cmap: str = None,
-                    polarity=None, dataset=None, pos_sample=None, l1=None, precision: int = 3,
-                    index_order=None, transpose: bool = False, columns: list = None):
+def show_example_l2(combined_amdf,
+                    example_l2: str = None,
+                    cmap: str = None,
+                    polarity=None,
+                    dataset=None,
+                    pos_sample=None,
+                    l1=None,
+                    precision: int = 3,
+                    index_order=None,
+                    transpose: bool = False,
+                    columns: list = None,
+                    latex: bool = False):
 
     index_order = index_order or ['l2', 'dataset',
                                   'pos_sample', 'direction', 'polarity']
@@ -2178,18 +2186,32 @@ def show_example_l2(combined_amdf, example_l2: str = None, cmap: str = None,
     if transpose:
         ex_l2_amdf = ex_l2_amdf.transpose().convert_dtypes()
 
-    sty = set_my_style(
-        ex_l2_amdf,
-        caption=(f"{comparison} of <b><i>"
-                 + (column_label.replace('ENV~', '')
-                    .replace('_', ' ').replace('~', ' '))
-                 + "</i></b>"
-                 ).capitalize(),
-        precision=precision
-    ).background_gradient(cmap, axis=1 if transpose else 0)
-    return save_html(format_negatives(format_zeros(sty, zeros_opacity=35)),
-                     subdir=f"env~l2_examples/{example_l2}",
-                     stem=f"{columns_tag}_example-table")
+    sty = ex_l2_amdf.style.background_gradient(
+        cmap, axis=(1 if transpose else 0))
+
+    caption = (f"{comparison} of <b><i>"
+               + (column_label.replace('ENV~', '')
+                  .replace('_', ' ').replace('~', ' '))
+               + "</i></b>"
+               ).capitalize()
+    # print(caption)
+
+    if latex:
+        sty = sty.format(thousands=',', na_rep='',
+                         escape='latex', precision=precision)
+        sty = format_negatives(format_zeros(sty, zeros_opacity=35))
+        save_latex_table(sty, caption=caption,
+                         label=f'example-{snake_to_camel(example_l2)}',
+                         latex_subdir=f"env~l2_examples/{example_l2}",
+                         latex_stem=f"{columns_tag}_example-table")
+    else:
+        sty = set_my_style(
+            ex_l2_amdf, caption=caption,
+            precision=precision)
+        sty = format_negatives(format_zeros(sty, zeros_opacity=35))
+        return save_html(sty,
+                         subdir=f"env~l2_examples/{example_l2}",
+                         stem=f"{columns_tag}_example-table")
 
 
 def eval_sig(_df):
@@ -2370,7 +2392,8 @@ def style_crosstab(df, rows, columns, value_col,
                    return_cross_df=False,
                    vmax=None,
                    vmin=None,
-                   axis=0):
+                   axis=0,
+                   latex: bool = False):
     """Create a styled crosstab with customizable visualization and formatting.
 
     This function generates a styled cross-tabulation of data with advanced visualization options, including color gradients, zero highlighting, and precision control.
@@ -2417,8 +2440,8 @@ def style_crosstab(df, rows, columns, value_col,
     )
 
     # Optimize type conversion and sorting
-    if (aggfunc in ('sum', 'count') 
-        and not value_col.endswith(('_sqrt', '_tpm'))):
+    if (aggfunc in ('sum', 'count')
+            and not value_col.endswith(('_sqrt', '_tpm'))):
         ctdf = ctdf.astype('Int64')
 
     if sort:
@@ -2444,12 +2467,15 @@ def style_crosstab(df, rows, columns, value_col,
 
     # Styling with optimized path generation
     # ctdf.index.name = None
-
-    sty = set_my_style(ctdf, precision=precision, index_font=index_font,
-                       caption=(
-                           f'Crosstabulated <code>{value_col}</code> (as {aggfunc})<br/>'
-                           f'color gradient set by <u>{gradient_by}</u>'))
-
+    caption = (f'Crosstabulated <code>{value_col}</code> (as {aggfunc})<br/>'
+               f'color gradient set by <u>{gradient_by}</u>')
+    if latex:
+        sty = ctdf.style.format(precision=precision, thousands=',',
+                                na_rep='', escape='latex')
+    else:
+        sty = set_my_style(ctdf, precision=precision, index_font=index_font,
+                           caption=caption
+                           )
     sty = _highlight_values(sty,
                             min_val=ctdf.min().min(),
                             value_col=value_col,
@@ -2463,18 +2489,21 @@ def style_crosstab(df, rows, columns, value_col,
     # Efficient path generation
     out_dir = (TABLE_DIR / prefilter_label)
     out_dir.mkdir(parents=True, exist_ok=True)
-
+    file_stem = (f'{"-".join(rows)}_{value_col}-{aggfunc}_'
+                 f'{"-".join(columns)}_color-table'
+                 f'{"_grouped" if subsets else ""}')
     html_filename = (
-        f'{"-".join(rows)}_{value_col}-{aggfunc}_'
-        f'{"-".join(columns)}_color-table'
-        f'{"_grouped" if subsets else ""}'
-        f'.{timestamp_hour()}.html'
+        f'{file_stem}.{timestamp_hour()}.html'
     )
-    html_path = out_dir / html_filename
+    if latex:
+        save_latex_table(sty, caption=caption, latex_stem=file_stem, latex_subdir=prefilter_label,
+                         label=file_stem, longtable=(len(ctdf) > 15))
+    else:
+        html_path = out_dir / html_filename
 
-    print(
-        f'formatted table saved as html: {html_path.relative_to(WRITING_LINKS)}')
-    sty.to_html(html_path)
+        print(
+            f'formatted table saved as html: {html_path.relative_to(WRITING_LINKS)}')
+        sty.to_html(html_path)
 
     return sty
 
@@ -2488,10 +2517,10 @@ def determine_subsets(columns, cmap, cmap2, cmap3, group, group_col, axis, ctdf)
     cmaps = [cmap]
     subsets = None
     if (group
-            and gradient_by == 'whole group'
-            # and (len(columns) > 1
-            #      or (len(rows) > 1 and axis != 1))
-            ):
+        and gradient_by == 'whole group'
+        # and (len(columns) > 1
+                #      or (len(rows) > 1 and axis != 1))
+        ):
         cmaps.extend([c for c in [cmap2 or cmap, cmap3 or cmap]
                       if (c and c != 'random')])
         rand_cmaps = colors.random_colormap_selection(5)
@@ -3017,7 +3046,7 @@ def plot_polar_grouped(adv_amdf, indexer: str = 'l2',
     return polar_df.sort_values(polar_df.filter(['dP1m(+)', 'dP1(+)', 'LRC(+)', 'LRCm(+)']).columns.to_list())
 
 
-#* for latex output
+# * for latex output
 
 def rename_cols_for_latex(sty):
     col_rename_dict = {
@@ -3036,33 +3065,34 @@ def rename_cols_for_latex(sty):
         'dP1': '$\Delta P(env|<i>exactly</i>)$',
         'P1': '$P(env|<i>exactly</i>)$',
         'G2': '$G^2$'}
-    
+
     return sty.relabel_index(
-        sty.columns.to_series().map(col_rename_dict).to_list(), 
-                             axis='columns')
+        sty.columns.to_series().map(col_rename_dict).to_list(),
+        axis='columns')
+
 
 def save_latex_table(sty,
                      caption: str = None,
                      latex_path: Path = None,
                      latex_stem: str = None,
                      latex_subdir: str = None,
-                     label='[table-X]',
+                     label='table-X',
                      longtable: bool = False,
-                     multicol_align: str = 'c',
-                     clines: str = 'skip-last;data',
-                     hrules: str = '\midrule', 
+                     multicol_align: str = '|c|',
+                     clines: str = 'skip-last;data',#'all;data',
+                     hrules: str = '\midrule',
                      position='ht'):
 
     caption = (caption or '[REPLACE WITH TABLE NAME]')
     print(caption)
-    if latex_path is None: 
+    if latex_path is None:
         latex_stem = (
             latex_stem or
             '-'.join(sty.index.names) + '_x_' + '-'.join(
                 sty.columns
                 # .str.replace(r'\\text\w+\{(\w+)\}', r'\1', regex=True)
                 # .str.replace(r'[$\\\^ ]', '', regex=True)
-                )
+            )
         ).replace(' ', '_')
         latex_dir = LATEX_TABLES.joinpath(
             latex_subdir) if latex_subdir else LATEX_TABLES
@@ -3081,22 +3111,23 @@ def save_latex_table(sty,
              r'   \usepackage{longtable}'])
     try:
         sty.index.set_names(
-            [n.replace('_', ' ').title() 
-                         for n in sty.index.names], 
-                        inplace=True)
+            [(n.replace('_', ' ').title() if n else '')
+             for n in sty.index.names],
+            inplace=True)
     except AttributeError:
-        pass       
-    try: 
+        pass
+    try:
         sty.columns.set_names(
-            [n.replace('_', ' ').title() 
-                           for n in sty.columns.names], 
-                          inplace=True)
+            [(n.replace('_', ' ').title() if n else '')
+             for n in sty.columns.names],
+            inplace=True)
     except AttributeError:
-        pass           
-    
-    display(sty)
-    
+        pass
+
+    sty = sty.format(escape='latex', na_rep='')
     sty = sty.format_index(escape='latex')
+    display(sty)
+
     latex_table_str = sty.to_latex(
         position=position,
         convert_css=True,
@@ -3116,7 +3147,15 @@ def save_latex_table(sty,
                        .replace('</i>', '}')
                        .replace('<u>', '\\underline{')
                        .replace('</u>', '}')
-                       .replace('env', '\\textsc{env}'))
+                       .replace('<br/>', '\\\\')
+                       .replace('->', '$\\rightarrow$')
+                       .replace('env', '\\textsc{env}')
+                       .replace('<code>', '\\mintinline{python}|')
+                       .replace('</code>', '|')
+                       .replace('exactly_', 'exactly '))
+    latex_table_str = re.sub(r'"(\S)', r'``\1', latex_table_str)
+    #! attempting to force thousands separators post-hoc will break any color codes
+    # // latex_table_str = re.sub(r'(?<=\d)(\d{3})(?=\D)', r'\1,', latex_table_str)
     latex_path.write_text('\n% '.join(package_req_warnings)
                           + '\n\n'
                           + latex_table_str,
