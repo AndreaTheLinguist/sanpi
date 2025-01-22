@@ -1,0 +1,42 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor}
+%  \usepackage{booktabs}
+% & if `environment=="longtable"`
+%    \usepackage{longtable}
+
+\begin{longtable}[ht]{llrr}
+\caption{Mirror Subset Negative Trigger Lemma Frequencies By Dependency Head} \label{trig-lemma-head-mir-neg} \\
+\toprule
+ &  & \multicolumn{2}{|c|}{count} \\
+ & Trigger Head & ADJ & NEG \\
+Polarity & Trigger Lemma &  &  \\
+\midrule
+\endfirsthead
+\caption[]{Mirror Subset Negative Trigger Lemma Frequencies By Dependency Head} \\
+\toprule
+ &  & \multicolumn{2}{|c|}{count} \\
+ & Trigger Head & ADJ & NEG \\
+Polarity & Trigger Lemma &  &  \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{Continued on next page} \\
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+\multirow[c]{12}{*}{neg} & barely & {\cellcolor[HTML]{FEFFD8}} \color[HTML]{000000} 1245 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 0 \\
+ & hardly & {\cellcolor[HTML]{F9FDCC}} \color[HTML]{000000} 5519 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 8 \\
+ & neither & {\cellcolor[HTML]{F8FCC9}} \color[HTML]{000000} 6400 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 91 \\
+ & never & {\cellcolor[HTML]{081D58}} \color[HTML]{F1F1F1} 111039 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 63 \\
+ & no & {\cellcolor[HTML]{F4FBC1}} \color[HTML]{000000} 9081 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 94 \\
+ & nobody & {\cellcolor[HTML]{F9FDCB}} \color[HTML]{000000} 5823 & {\cellcolor[HTML]{FEFFD6}} \color[HTML]{000000} 538 \\
+ & none & {\cellcolor[HTML]{DBF1B2}} \color[HTML]{000000} 21319 & {\cellcolor[HTML]{E6F5B2}} \color[HTML]{000000} 9929 \\
+ & nor & {\cellcolor[HTML]{E9F7B1}} \color[HTML]{000000} 15944 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 0 \\
+ & nothing & {\cellcolor[HTML]{ABDEB7}} \color[HTML]{000000} 33760 & {\cellcolor[HTML]{081D58}} \color[HTML]{F1F1F1} 66284 \\
+ & rarely & {\cellcolor[HTML]{FAFDCF}} \color[HTML]{000000} 4470 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 10 \\
+ & scarcely & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 796 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 1 \\
+ & seldom & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 1037 & {\cellcolor[HTML]{FFFFD9}} \color[HTML]{000000} 5 \\
+\cline{1-4}
+\end{longtable}
