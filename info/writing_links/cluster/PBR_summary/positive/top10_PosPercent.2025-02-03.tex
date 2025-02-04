@@ -1,26 +1,42 @@
 %! Requires following packages:
 %  \usepackage{multirow}
-%  \usepackage[table]{xcolor}
-%  \usepackage{booktabs}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
 
-\begin{table}[ht]
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
 \caption{Top 10 Bigrams with Highest \textit{Positive} Percentage (100+ tokens)}
-\label{top10_PosPercent}
-\begin{tabular}{lrrrrr}
+\label{tab:top10PosPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
 \toprule
- & All\_tokens & Pos\_tokens & Neg\_tokens & \%\_Neg & \%\_Pos \\
-Bigram Lower &  &  &  &  &  \\
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Bigram Lower} & {} & {} & {} & {} & {} \\
 \midrule
-increasingly\_difficult & 18107 & 18107 & 0 & 0 & 100 \\
-most\_incredible & 10137 & 10137 & 0 & 0 & 100 \\
-relatively\_minor & 8679 & 8679 & 0 & 0 & 100 \\
-now\_defunct & 7390 & 7390 & 0 & 0 & 100 \\
-pretty\_little & 7021 & 7021 & 0 & 0 & 100 \\
-most\_remote & 7007 & 7007 & 0 & 0 & 100 \\
-almost\_daily & 6372 & 6372 & 0 & 0 & 100 \\
-relatively\_modest & 6089 & 6089 & 0 & 0 & 100 \\
-more\_holistic & 6016 & 6016 & 0 & 0 & 100 \\
-forever\_grateful & 5911 & 5911 & 0 & 0 & 100 \\
+increasinglyDifficult & 18107 & 18107 & 0 & 0 & 100 \\
+mostIncredible & 10137 & 10137 & 0 & 0 & 100 \\
+relativelyMinor & 8679 & 8679 & 0 & 0 & 100 \\
+nowDefunct & 7390 & 7390 & 0 & 0 & 100 \\
+prettyLittle & 7021 & 7021 & 0 & 0 & 100 \\
+mostRemote & 7007 & 7007 & 0 & 0 & 100 \\
+almostDaily & 6372 & 6372 & 0 & 0 & 100 \\
+relativelyModest & 6089 & 6089 & 0 & 0 & 100 \\
+moreHolistic & 6016 & 6016 & 0 & 0 & 100 \\
+foreverGrateful & 5911 & 5911 & 0 & 0 & 100 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\normalsize
+\normalspacing

@@ -1,0 +1,52 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
+
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % AllTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % PosTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % NegTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
+\caption{Top 20 Adjectives with Highest \underline{Negative Polarity} Percentage (250+ tokens)}
+\label{tab:top-adj-NegPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
+\toprule
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Adj Form Lower} & {} & {} & {} & {} & {} \\
+\midrule
+shabby & {\cellcolor[HTML]{F4F0F7}} \color[HTML]{000000} 7069 & {\cellcolor[HTML]{F6F3F8}} \color[HTML]{000000} 1540 & {\cellcolor[HTML]{F2EEF6}} \color[HTML]{000000} 5529 & {\cellcolor[HTML]{67001F}} \color[HTML]{F1F1F1} 78.215000 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 21.785000 \\
+dissimilar & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 4598 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 2087 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 2511 & {\cellcolor[HTML]{E34A9F}} \color[HTML]{F1F1F1} 54.611000 & {\cellcolor[HTML]{D57ABA}} \color[HTML]{F1F1F1} 45.389000 \\
+sure & {\cellcolor[HTML]{67001F}} \color[HTML]{F1F1F1} 256817 & {\cellcolor[HTML]{67001F}} \color[HTML]{F1F1F1} 128755 & {\cellcolor[HTML]{67001F}} \color[HTML]{F1F1F1} 128062 & {\cellcolor[HTML]{D972B6}} \color[HTML]{F1F1F1} 49.865000 & {\cellcolor[HTML]{E155A6}} \color[HTML]{F1F1F1} 50.135000 \\
+farfetched & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 1296 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 732 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 564 & {\cellcolor[HTML]{CC9DCC}} \color[HTML]{000000} 43.519000 & {\cellcolor[HTML]{E1237E}} \color[HTML]{F1F1F1} 56.481000 \\
+rosy & {\cellcolor[HTML]{F4F1F7}} \color[HTML]{000000} 5355 & {\cellcolor[HTML]{F4F0F7}} \color[HTML]{000000} 3282 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 2073 & {\cellcolor[HTML]{D4B8D9}} \color[HTML]{000000} 38.711000 & {\cellcolor[HTML]{CF1358}} \color[HTML]{F1F1F1} 61.289000 \\
+far-fetched & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 5056 & {\cellcolor[HTML]{F4F1F7}} \color[HTML]{000000} 3101 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 1955 & {\cellcolor[HTML]{D4B8D9}} \color[HTML]{000000} 38.667000 & {\cellcolor[HTML]{CF1358}} \color[HTML]{F1F1F1} 61.333000 \\
+clear-cut & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 3574 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 2212 & {\cellcolor[HTML]{F6F3F8}} \color[HTML]{000000} 1362 & {\cellcolor[HTML]{D5BBDB}} \color[HTML]{000000} 38.109000 & {\cellcolor[HTML]{CB1155}} \color[HTML]{F1F1F1} 61.891000 \\
+flashy & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 4470 & {\cellcolor[HTML]{F4F1F7}} \color[HTML]{000000} 2862 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 1608 & {\cellcolor[HTML]{DBC8E2}} \color[HTML]{000000} 35.973000 & {\cellcolor[HTML]{BA0B4F}} \color[HTML]{F1F1F1} 64.027000 \\
+reducible & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 298 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 195 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 103 & {\cellcolor[HTML]{DFD1E6}} \color[HTML]{000000} 34.564000 & {\cellcolor[HTML]{AE074B}} \color[HTML]{F1F1F1} 65.436000 \\
+separable & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 356 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 252 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 104 & {\cellcolor[HTML]{EDE9F3}} \color[HTML]{000000} 29.213000 & {\cellcolor[HTML]{840034}} \color[HTML]{F1F1F1} 70.787000 \\
+binding & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 2293 & {\cellcolor[HTML]{F6F3F8}} \color[HTML]{000000} 1639 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 654 & {\cellcolor[HTML]{EFEAF4}} \color[HTML]{000000} 28.522000 & {\cellcolor[HTML]{800031}} \color[HTML]{F1F1F1} 71.478000 \\
+hasty & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 2125 & {\cellcolor[HTML]{F6F3F8}} \color[HTML]{000000} 1541 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 584 & {\cellcolor[HTML]{F1EDF6}} \color[HTML]{000000} 27.482000 & {\cellcolor[HTML]{78002B}} \color[HTML]{F1F1F1} 72.518000 \\
+forthcoming & {\cellcolor[HTML]{F4F0F7}} \color[HTML]{000000} 7257 & {\cellcolor[HTML]{F2EEF6}} \color[HTML]{000000} 5265 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 1992 & {\cellcolor[HTML]{F2EEF6}} \color[HTML]{000000} 27.449000 & {\cellcolor[HTML]{76002A}} \color[HTML]{F1F1F1} 72.551000 \\
+cut & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 1423 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 1039 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 384 & {\cellcolor[HTML]{F3EFF6}} \color[HTML]{000000} 26.985000 & {\cellcolor[HTML]{730028}} \color[HTML]{F1F1F1} 73.015000 \\
+blameless & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 734 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 536 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 198 & {\cellcolor[HTML]{F3EFF6}} \color[HTML]{000000} 26.975000 & {\cellcolor[HTML]{730028}} \color[HTML]{F1F1F1} 73.025000 \\
+privy & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 984 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 727 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 257 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 26.118000 & {\cellcolor[HTML]{6D0024}} \color[HTML]{F1F1F1} 73.882000 \\
+kosher & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 541 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 403 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 138 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 25.508000 & {\cellcolor[HTML]{690020}} \color[HTML]{F1F1F1} 74.492000 \\
+indicative & {\cellcolor[HTML]{F3F0F7}} \color[HTML]{000000} 8068 & {\cellcolor[HTML]{F1EDF6}} \color[HTML]{000000} 6016 & {\cellcolor[HTML]{F5F2F8}} \color[HTML]{000000} 2052 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 25.434000 & {\cellcolor[HTML]{690020}} \color[HTML]{F1F1F1} 74.566000 \\
+translatable & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 421 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 314 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 107 & {\cellcolor[HTML]{F6F3F9}} \color[HTML]{000000} 25.416000 & {\cellcolor[HTML]{690020}} \color[HTML]{F1F1F1} 74.584000 \\
+uncommon & {\cellcolor[HTML]{F2EEF6}} \color[HTML]{000000} 11144 & {\cellcolor[HTML]{EFEAF4}} \color[HTML]{000000} 8336 & {\cellcolor[HTML]{F4F1F7}} \color[HTML]{000000} 2808 & {\cellcolor[HTML]{F7F4F9}} \color[HTML]{000000} 25.197000 & {\cellcolor[HTML]{67001F}} \color[HTML]{F1F1F1} 74.803000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\normalsize
+\normalspacing

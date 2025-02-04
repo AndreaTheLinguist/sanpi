@@ -1,0 +1,52 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
+
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % AllTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % PosTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % NegTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
+\caption{Top 20 Bigrams with Highest \underline{Negative Polarity} Percentage (50+ tokens)\textit{Note: Negative trigger bigrams excluded}}
+\label{tab:top10NegPercent50+}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
+\toprule
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Bigram Lower} & {} & {} & {} & {} & {} \\
+\midrule
+yet final & {\cellcolor[HTML]{023858}} \color[HTML]{F1F1F1} 640 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{023858}} \color[HTML]{F1F1F1} 640 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+yet eligible & {\cellcolor[HTML]{2D8ABD}} \color[HTML]{F1F1F1} 448 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{2D8ABD}} \color[HTML]{F1F1F1} 448 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+yet official & {\cellcolor[HTML]{81AED2}} \color[HTML]{F1F1F1} 352 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{81AED2}} \color[HTML]{F1F1F1} 352 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly conducive & {\cellcolor[HTML]{DBDAEB}} \color[HTML]{000000} 208 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{DBDAEB}} \color[HTML]{000000} 208 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+yet convinced & {\cellcolor[HTML]{EBE6F2}} \color[HTML]{000000} 169 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{EBE6F2}} \color[HTML]{000000} 169 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly friendly & {\cellcolor[HTML]{ECE7F2}} \color[HTML]{000000} 167 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{ECE7F2}} \color[HTML]{000000} 167 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+yet over & {\cellcolor[HTML]{EDE8F3}} \color[HTML]{000000} 162 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{EDE8F3}} \color[HTML]{000000} 162 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly shocking & {\cellcolor[HTML]{F0EAF4}} \color[HTML]{000000} 151 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F0EAF4}} \color[HTML]{000000} 151 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly pleasant & {\cellcolor[HTML]{F3EDF5}} \color[HTML]{000000} 142 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F3EDF5}} \color[HTML]{000000} 142 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+necessarily appropriate & {\cellcolor[HTML]{F5EEF6}} \color[HTML]{000000} 136 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F5EEF6}} \color[HTML]{000000} 136 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly famous & {\cellcolor[HTML]{F6EFF7}} \color[HTML]{000000} 130 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F6EFF7}} \color[HTML]{000000} 130 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly difficult & {\cellcolor[HTML]{F7F0F7}} \color[HTML]{000000} 126 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7F0F7}} \color[HTML]{000000} 126 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly shy & {\cellcolor[HTML]{F8F1F8}} \color[HTML]{000000} 124 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F8F1F8}} \color[HTML]{000000} 124 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly revolutionary & {\cellcolor[HTML]{F9F2F8}} \color[HTML]{000000} 120 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F9F2F8}} \color[HTML]{000000} 120 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly safe & {\cellcolor[HTML]{FAF3F9}} \color[HTML]{000000} 117 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FAF3F9}} \color[HTML]{000000} 117 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly forthcoming & {\cellcolor[HTML]{FDF5FA}} \color[HTML]{000000} 106 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FDF5FA}} \color[HTML]{000000} 106 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly practical & {\cellcolor[HTML]{FEF6FA}} \color[HTML]{000000} 104 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FEF6FA}} \color[HTML]{000000} 104 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+necessarily useful & {\cellcolor[HTML]{FEF6FA}} \color[HTML]{000000} 104 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FEF6FA}} \color[HTML]{000000} 104 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+exactly impressive & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 98 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 98 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+yet online & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 98 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 98 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 100 & {\cellcolor[HTML]{FFF7FB}} \color[HTML]{000000} 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\normalsize
+\normalspacing

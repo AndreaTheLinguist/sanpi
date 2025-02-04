@@ -1,0 +1,42 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
+
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % AllTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % PosTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % NegTokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
+\caption{Top 10 Adjectives with Highest \underline{Positive Polarity} Percentage (250+ tokens)}
+\label{tab:top10-adj-PosPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
+\toprule
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Adj Form Lower} & {} & {} & {} & {} & {} \\
+\midrule
+evolving & {\cellcolor[HTML]{49006A}} \color[HTML]{F1F1F1} 2953 & {\cellcolor[HTML]{49006A}} \color[HTML]{F1F1F1} 2953 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+earliest & {\cellcolor[HTML]{F05A9E}} \color[HTML]{F1F1F1} 1929 & {\cellcolor[HTML]{F05A9E}} \color[HTML]{F1F1F1} 1929 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+northerly & {\cellcolor[HTML]{F875A6}} \color[HTML]{F1F1F1} 1792 & {\cellcolor[HTML]{F875A6}} \color[HTML]{F1F1F1} 1792 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+chopped & {\cellcolor[HTML]{FAA3B6}} \color[HTML]{000000} 1553 & {\cellcolor[HTML]{FAA3B6}} \color[HTML]{000000} 1553 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+southerly & {\cellcolor[HTML]{FCC1BF}} \color[HTML]{000000} 1339 & {\cellcolor[HTML]{FCC1BF}} \color[HTML]{000000} 1339 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+away & {\cellcolor[HTML]{FDD5D1}} \color[HTML]{000000} 1157 & {\cellcolor[HTML]{FDD5D1}} \color[HTML]{000000} 1157 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+marrow & {\cellcolor[HTML]{FDE2DF}} \color[HTML]{000000} 1017 & {\cellcolor[HTML]{FDE2DF}} \color[HTML]{000000} 1017 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+worldwide & {\cellcolor[HTML]{FEE9E5}} \color[HTML]{000000} 942 & {\cellcolor[HTML]{FEE9E5}} \color[HTML]{000000} 942 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+asymmetrical & {\cellcolor[HTML]{FEEBE8}} \color[HTML]{000000} 911 & {\cellcolor[HTML]{FEEBE8}} \color[HTML]{000000} 911 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+murkier & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 766 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 766 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{FFF7F3}} \color[HTML]{000000} 100 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\normalsize
+\normalspacing

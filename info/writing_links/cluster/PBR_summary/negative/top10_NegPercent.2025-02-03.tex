@@ -1,26 +1,42 @@
 %! Requires following packages:
 %  \usepackage{multirow}
-%  \usepackage[table]{xcolor}
-%  \usepackage{booktabs}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
 
-\begin{table}[ht]
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
 \caption{Top 10 Bigrams with Highest \textit{Negative Polarity} Percentage (100+ tokens)ootnote{Negative trigger bigrams excluded}}
-\label{top10_NegPercent}
-\begin{tabular}{lrrrrr}
+\label{tab:top10NegPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
 \toprule
- & All\_tokens & Pos\_tokens & Neg\_tokens & \%\_Neg & \%\_Pos \\
-Bigram Lower &  &  &  &  &  \\
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Bigram Lower} & {} & {} & {} & {} & {} \\
 \midrule
-yet\_final & 640 & 0 & 640 & 100 & 0 \\
-yet\_eligible & 448 & 0 & 448 & 100 & 0 \\
-yet\_official & 352 & 0 & 352 & 100 & 0 \\
-exactly\_conducive & 208 & 0 & 208 & 100 & 0 \\
-yet\_convinced & 169 & 0 & 169 & 100 & 0 \\
-exactly\_friendly & 167 & 0 & 167 & 100 & 0 \\
-yet\_over & 162 & 0 & 162 & 100 & 0 \\
-exactly\_shocking & 151 & 0 & 151 & 100 & 0 \\
-exactly\_pleasant & 142 & 0 & 142 & 100 & 0 \\
-necessarily\_appropriate & 136 & 0 & 136 & 100 & 0 \\
+yetFinal & 640 & 0 & 640 & 100 & 0 \\
+yetEligible & 448 & 0 & 448 & 100 & 0 \\
+yetOfficial & 352 & 0 & 352 & 100 & 0 \\
+exactlyConducive & 208 & 0 & 208 & 100 & 0 \\
+yetConvinced & 169 & 0 & 169 & 100 & 0 \\
+exactlyFriendly & 167 & 0 & 167 & 100 & 0 \\
+yetOver & 162 & 0 & 162 & 100 & 0 \\
+exactlyShocking & 151 & 0 & 151 & 100 & 0 \\
+exactlyPleasant & 142 & 0 & 142 & 100 & 0 \\
+necessarilyAppropriate & 136 & 0 & 136 & 100 & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\normalsize
+\normalspacing

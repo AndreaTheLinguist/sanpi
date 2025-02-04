@@ -1,0 +1,34 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
+
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % trivial
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % strict2
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % strict3
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % strict4
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % strict5
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
+\caption{Unique Values by Minimum Frequency Floor}
+\label{tab:pbr-adx-unique-by-f-floor}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
+\toprule
+{} & {trivial} & {strict2} & {strict3} & {strict4} & {strict5} \\
+{} & {} & {} & {} & {} & {} \\
+\midrule
+adv & \color[HTML]{20B2AA} 56449 & \color[HTML]{330161} 10357 & \color[HTML]{43006A} 6404 & \color[HTML]{48006D} 5041 & \color[HTML]{4B006E} 4307 \\
+adj & \color[HTML]{20B2AA} 241550 & \color[HTML]{2C015D} 53775 & \color[HTML]{400068} 33096 & \color[HTML]{48006C} 25652 & \color[HTML]{4B006E} 21704 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\normalsize
+\normalspacing

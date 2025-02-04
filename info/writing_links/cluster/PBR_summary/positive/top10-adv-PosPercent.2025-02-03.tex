@@ -1,15 +1,28 @@
 %! Requires following packages:
 %  \usepackage{multirow}
-%  \usepackage[table]{xcolor}
-%  \usepackage{booktabs}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
 
-\begin{table}[ht]
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
 \caption{Top 10 Adverbs with Highest \textit{Positive} Percentage (1,000+ tokens)}
-\label{top10-adv-PosPercent}
-\begin{tabular}{lrrrrr}
+\label{tab:top10-adv-PosPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
 \toprule
- & All\_tokens & Pos\_tokens & Neg\_tokens & \%\_Neg & \%\_Pos \\
-Adv Form Lower &  &  &  &  &  \\
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Adv Form Lower} & {} & {} & {} & {} & {} \\
 \midrule
 yearly & 2474 & 2474 & 0 & 0.000000 & 100.000000 \\
 legendarily & 1007 & 1007 & 0 & 0.000000 & 100.000000 \\
@@ -24,3 +37,6 @@ relatively & 582383 & 582065 & 318 & 0.055000 & 99.945000 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\normalsize
+\normalspacing

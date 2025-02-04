@@ -1,0 +1,42 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
+
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
+\caption{Top 10 Adverbs with Highest \textit{Negative Polarity} Percentage (400+ tokens)}
+\label{tab:top10-adv-NegPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
+\toprule
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Adv Form Lower} & {} & {} & {} & {} & {} \\
+\midrule
+necessarily & {\cellcolor[HTML]{CFECC8}} \color[HTML]{000000} 48641 & {\cellcolor[HTML]{DFF2DA}} \color[HTML]{000000} 6046 & {\cellcolor[HTML]{CBEAC4}} \color[HTML]{000000} 42595 & {\cellcolor[HTML]{084081}} \color[HTML]{F1F1F1} 87.570000 & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 12.430000 \\
+that & {\cellcolor[HTML]{084081}} \color[HTML]{F1F1F1} 206801 & {\cellcolor[HTML]{084688}} \color[HTML]{F1F1F1} 42033 & {\cellcolor[HTML]{084081}} \color[HTML]{F1F1F1} 164768 & {\cellcolor[HTML]{0B6CAE}} \color[HTML]{F1F1F1} 79.675000 & {\cellcolor[HTML]{DEF2D9}} \color[HTML]{000000} 20.325000 \\
+exactly & {\cellcolor[HTML]{C7E9C3}} \color[HTML]{000000} 56109 & {\cellcolor[HTML]{C4E8C1}} \color[HTML]{000000} 12296 & {\cellcolor[HTML]{C8EAC3}} \color[HTML]{000000} 43813 & {\cellcolor[HTML]{1373B2}} \color[HTML]{F1F1F1} 78.086000 & {\cellcolor[HTML]{DAF0D4}} \color[HTML]{000000} 21.914000 \\
+immediately & {\cellcolor[HTML]{8FD4BD}} \color[HTML]{000000} 91746 & {\cellcolor[HTML]{1475B2}} \color[HTML]{F1F1F1} 35647 & {\cellcolor[HTML]{B3E1BA}} \color[HTML]{000000} 56099 & {\cellcolor[HTML]{6EC5C8}} \color[HTML]{000000} 61.146000 & {\cellcolor[HTML]{88D1C0}} \color[HTML]{000000} 38.854000 \\
+yet & {\cellcolor[HTML]{8BD2BF}} \color[HTML]{000000} 94755 & {\cellcolor[HTML]{084081}} \color[HTML]{F1F1F1} 42888 & {\cellcolor[HTML]{BAE4BD}} \color[HTML]{000000} 51867 & {\cellcolor[HTML]{97D6BB}} \color[HTML]{000000} 54.738000 & {\cellcolor[HTML]{5FBDCD}} \color[HTML]{000000} 45.262000 \\
+any & {\cellcolor[HTML]{DCF1D6}} \color[HTML]{000000} 32161 & {\cellcolor[HTML]{A5DCB6}} \color[HTML]{000000} 16777 & {\cellcolor[HTML]{E6F6E1}} \color[HTML]{000000} 15384 & {\cellcolor[HTML]{BDE5BE}} \color[HTML]{000000} 47.834000 & {\cellcolor[HTML]{3A9CC7}} \color[HTML]{F1F1F1} 52.166000 \\
+before & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 668 & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 360 & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 308 & {\cellcolor[HTML]{C6E9C2}} \color[HTML]{000000} 46.108000 & {\cellcolor[HTML]{3192C1}} \color[HTML]{F1F1F1} 53.892000 \\
+anymore & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 922 & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 500 & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 422 & {\cellcolor[HTML]{C8EAC3}} \color[HTML]{000000} 45.770000 & {\cellcolor[HTML]{2F90C0}} \color[HTML]{F1F1F1} 54.230000 \\
+remotely & {\cellcolor[HTML]{EAF7E4}} \color[HTML]{000000} 15394 & {\cellcolor[HTML]{D1EDCA}} \color[HTML]{000000} 9733 & {\cellcolor[HTML]{F1FAEB}} \color[HTML]{000000} 5661 & {\cellcolor[HTML]{E4F4DE}} \color[HTML]{000000} 36.774000 & {\cellcolor[HTML]{0862A5}} \color[HTML]{F1F1F1} 63.226000 \\
+terribly & {\cellcolor[HTML]{C4E8C1}} \color[HTML]{000000} 58529 & {\cellcolor[HTML]{085093}} \color[HTML]{F1F1F1} 40580 & {\cellcolor[HTML]{E4F4DE}} \color[HTML]{000000} 17949 & {\cellcolor[HTML]{F7FCF0}} \color[HTML]{000000} 30.667000 & {\cellcolor[HTML]{084081}} \color[HTML]{F1F1F1} 69.333000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\normalsize
+\normalspacing

@@ -1,0 +1,42 @@
+%! Requires following packages:
+%  \usepackage{multirow}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
+
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
+\caption{Top 10 Bigrams with Highest \underline{Positive Polarity} Percentage (100+ tokens)}
+\label{tab:top10PosPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
+\toprule
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Bigram Lower} & {} & {} & {} & {} & {} \\
+\midrule
+increasinglyDifficult & {\cellcolor[HTML]{4D004B}} \color[HTML]{F1F1F1} 18107 & {\cellcolor[HTML]{4D004B}} \color[HTML]{F1F1F1} 18107 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+mostIncredible & {\cellcolor[HTML]{A6C2DD}} \color[HTML]{000000} 10137 & {\cellcolor[HTML]{A6C2DD}} \color[HTML]{000000} 10137 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+relativelyMinor & {\cellcolor[HTML]{C5D8E9}} \color[HTML]{000000} 8679 & {\cellcolor[HTML]{C5D8E9}} \color[HTML]{000000} 8679 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+nowDefunct & {\cellcolor[HTML]{E1ECF4}} \color[HTML]{000000} 7390 & {\cellcolor[HTML]{E1ECF4}} \color[HTML]{000000} 7390 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+prettyLittle & {\cellcolor[HTML]{E6F0F7}} \color[HTML]{000000} 7021 & {\cellcolor[HTML]{E6F0F7}} \color[HTML]{000000} 7021 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+mostRemote & {\cellcolor[HTML]{E6F0F7}} \color[HTML]{000000} 7007 & {\cellcolor[HTML]{E6F0F7}} \color[HTML]{000000} 7007 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+almostDaily & {\cellcolor[HTML]{F1F7FA}} \color[HTML]{000000} 6372 & {\cellcolor[HTML]{F1F7FA}} \color[HTML]{000000} 6372 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+relativelyModest & {\cellcolor[HTML]{F5FAFC}} \color[HTML]{000000} 6089 & {\cellcolor[HTML]{F5FAFC}} \color[HTML]{000000} 6089 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+moreHolistic & {\cellcolor[HTML]{F6FBFC}} \color[HTML]{000000} 6016 & {\cellcolor[HTML]{F6FBFC}} \color[HTML]{000000} 6016 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+foreverGrateful & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 5911 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 5911 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 0 & {\cellcolor[HTML]{F7FCFD}} \color[HTML]{000000} 100 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\normalsize
+\normalspacing

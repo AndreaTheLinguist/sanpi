@@ -1,15 +1,28 @@
 %! Requires following packages:
 %  \usepackage{multirow}
-%  \usepackage[table]{xcolor}
-%  \usepackage{booktabs}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
 
-\begin{table}[ht]
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
 \caption{Top 10 Adjectives with Highest \textit{Negative Polarity} Percentage (200+ tokens)}
-\label{top10-adv-NegPercent}
-\begin{tabular}{lrrrrr}
+\label{tab:top10-adv-NegPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
 \toprule
- & All\_tokens & Pos\_tokens & Neg\_tokens & \%\_Neg & \%\_Pos \\
-Adj Form Lower &  &  &  &  &  \\
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Adj Form Lower} & {} & {} & {} & {} & {} \\
 \midrule
 shabby & 7069 & 1540 & 5529 & 78.215000 & 21.785000 \\
 dissimilar & 4598 & 2087 & 2511 & 54.611000 & 45.389000 \\
@@ -24,3 +37,6 @@ hyperbole & 212 & 143 & 69 & 32.547000 & 67.453000 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\normalsize
+\normalspacing

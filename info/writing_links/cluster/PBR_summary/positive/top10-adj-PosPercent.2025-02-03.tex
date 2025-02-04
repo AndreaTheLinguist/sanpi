@@ -1,15 +1,28 @@
 %! Requires following packages:
 %  \usepackage{multirow}
-%  \usepackage[table]{xcolor}
-%  \usepackage{booktabs}
+%  \usepackage[table]{xcolor} % for colored cells
+%  \usepackage{booktabs} % for \midrule, etc.
 
-\begin{table}[ht]
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % All_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Pos_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % Neg_tokens
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Neg
+% S[table-auto-round, table-format=7.2, drop-zero-decimal] % %_Pos
+
+\singlespacing
+\scriptsize\noindent
+\begin{table}
+\centering
 \caption{Top 10 Adjectives with Highest \textit{Positive} Percentage (200+ tokens)}
-\label{top10-adj-PosPercent}
-\begin{tabular}{lrrrrr}
+\label{tab:top10-adj-PosPercent}
+\begin{tabular}{*{1}{l}S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]
+    S[table-auto-round, table-format=7.2, drop-zero-decimal]}
 \toprule
- & All\_tokens & Pos\_tokens & Neg\_tokens & \%\_Neg & \%\_Pos \\
-Adj Form Lower &  &  &  &  &  \\
+{} & {AllTokens} & {PosTokens} & {NegTokens} & {\%Neg} & {\%Pos} \\
+{Adj Form Lower} & {} & {} & {} & {} & {} \\
 \midrule
 evolving & 2953 & 2953 & 0 & 0 & 100 \\
 earliest & 1929 & 1929 & 0 & 0 & 100 \\
@@ -24,3 +37,6 @@ murkier & 766 & 766 & 0 & 0 & 100 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\normalsize
+\normalspacing
