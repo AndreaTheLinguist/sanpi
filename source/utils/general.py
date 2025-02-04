@@ -17,7 +17,7 @@ RESULT_DIR, DEMO_RESULT_DIR = [W / 'results' for W in (SANPI_HOME, DEMO_DIR)]
 
 FREQ_DIR, DEMO_FREQ_DIR = [
     R / 'freq_tsv' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
-
+TEX_ASSETS = Path.home().joinpath('WinHome/Documents/OverleafDissertex/assets')
 
 def hour_num(use_24):
     return ('%H', '') if use_24 else ('%I', '%P')
@@ -288,4 +288,14 @@ def run_shell_command(command_str: str,
 
 
 def snake_to_camel(snake: str):
-    return ''.join([w.capitalize() if i != 0 else w for i, w in enumerate(snake.split('_'))])
+    """Convert a snake_case string to camelCase.
+
+    Args:
+        snake (str): The snake_case string to convert.
+
+    Returns:
+        str: The camelCase version of the input string.
+    """
+    # return re.sub(r'_(\w)',r'\1'.upper(), snake)
+    return ''.join([w[0].upper()+w[1:] if i != 0 else w for 
+                    i, w in enumerate(snake.split('_'))])
