@@ -1,9 +1,47 @@
+# %%
 from sys import argv
 
 import stanza
+import pyconll
 
-_DOC2CONLL_TEXT = stanza.utils.conll.CoNLL.doc2conll_text
+_DOC2CONLL = stanza.utils.conll.CoNLL.doc2conll_text
+stz_conll = stanza.utils.conll
+# _DOC2CONLL_TEXT = stanza.utils.conll.CoNLL.doc2conll_text
 
+
+def get_nlp_pipeline():
+    """
+    Returns a stanza NLP pipeline for English.
+
+    Args:
+        None
+
+    Returns:
+        NLP (stanza.Pipeline): The stanza NLP pipeline.
+
+    Raises:
+        stanza.pipeline.core.ResourcesFileNotFoundError: If the language model is not found.
+
+    Examples:
+        >>> get_nlp_pipeline()
+        <stanza.pipeline.core.Pipeline object at 0x7f9e3e7e6a90>
+
+    """
+    try:
+        nlp = stanza.Pipeline(
+            lang='en',
+            processors='tokenize,pos,lemma,depparse',
+            verbose=False)
+    except stanza.pipeline.core.ResourcesFileNotFoundError:
+        stanza.download('en', verbose=False)
+        nlp = stanza.Pipeline(
+            lang='en',
+            processors='tokenize,pos,lemma,depparse',
+            verbose=False)
+    return nlp
+
+
+# %%
 def _parse_sent():
     """
     Parses a sentence using the stanza NLP pipeline and prints the CoNLL-U formatted output.
@@ -31,46 +69,36 @@ def _parse_sent():
     NLP = get_nlp_pipeline()
 
     # [ ] update to use `argparse` module
-    sentence = argv[1]
+    try:
+        sentence = argv[1]
+    except IndexError:
+        sentence = 'You must provide the text of the sentence you wish to parse.'
+    else:
+        if sentence.find(' ') < 0:
+            sentence = 'You must provide the text of the sentence you wish to parse.'
+    try:
+        sent_id = argv[2]
+    except IndexError:
+        sent_id = 'Sentence_0'
+        # sent_id = None
 
     # [ ] update to parse multiple sentences with single model load
-        #^ as `while` loop with stdin input
-        #^ or from text file of sentences
-        #^ or just as `list` of strings instead of single string input
+        # ^ as `while` loop with stdin input
+        # ^ or from text file of sentences
+        # ^ or just as `list` of strings instead of single string input
     doc = NLP(sentence)
-    conllu = _DOC2CONLL_TEXT(doc)
-    
+    conllu_doc = _DOC2CONLL(doc)
+    if sent_id:
+        conllu_sent = pyconll.load_from_string(conllu_doc)._sentences[0]
+        conllu_sent.set_meta(key=conllu_sent.SENTENCE_ID_KEY,
+                             value=sent_id)
+        print(conllu_sent.conll(),end='\n\n')
+    else:
+        print(conllu_doc[:-1],end='\n\n')
+
     # [ ] update to write to file (path designated by argument)
-    print(conllu[:-1])
+# %%
 
-def get_nlp_pipeline():
-    """
-    Returns a stanza NLP pipeline for English.
-
-    Args:
-        None
-
-    Returns:
-        NLP (stanza.Pipeline): The stanza NLP pipeline.
-
-    Raises:
-        stanza.pipeline.core.ResourcesFileNotFoundError: If the language model is not found.
-
-    Examples:
-        >>> get_nlp_pipeline()
-        <stanza.pipeline.core.Pipeline object at 0x7f9e3e7e6a90>
-
-    """
-    try:
-        NLP = stanza.Pipeline(
-            lang='en',
-            processors='tokenize,pos,lemma,depparse')
-    except stanza.pipeline.core.ResourcesFileNotFoundError:
-        stanza.download('en')
-        NLP = stanza.Pipeline(
-            lang='en',
-            processors='tokenize,pos,lemma,depparse')
-    return NLP
 
 if __name__ == '__main__':
     _parse_sent()

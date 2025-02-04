@@ -1,32 +1,36 @@
-from functools import lru_cache
 import itertools as it
 import re
+import textwrap
+from functools import lru_cache
 from os import system
 from pathlib import Path
 from pprint import pprint
-from typing import Union, Optional
+from typing import Optional, Union
 
 import more_itertools as more_it
 import numpy as np
 import pandas as pd
 import pyarrow as pyar
-import source.utils.colors as colors
+from association_measures import frequencies as am_fq
+from association_measures import measures as am_ms
 from matplotlib import pyplot as plt
-from source.utils.associate import (POLAR_DIR, RESULT_DIR, TOP_AM_DIR, AM_DF_DIR,
-                                    adjust_am_names, deltaP, extend_deltaP, TRANSPARENT_O_NAMES)
+
+import source.utils.colors as colors
+from source.utils.associate import (AM_DF_DIR, POLAR_DIR, RESULT_DIR,
+                                    TOP_AM_DIR, TRANSPARENT_O_NAMES,
+                                    adjust_am_names, deltaP, extend_deltaP)
 # from source.utils.dataframes import show_sample
 from source.utils.dataframes import REGNOT
 from source.utils.dataframes import catify_hit_table as catify
 from source.utils.dataframes import transform_counts
 from source.utils.dataframes import update_assoc_index as update_index
 from source.utils.dataframes import write_part_parquet as parq_it
-from source.utils.general import (SANPI_HOME, confirm_dir, print_iter,
-                                  snake_to_camel, timestamp_hour,
+from source.utils.general import (SANPI_HOME, TEX_ASSETS, confirm_dir,
+                                  print_iter, snake_to_camel, timestamp_hour,
                                   timestamp_month, timestamp_now,
                                   timestamp_now_trim, timestamp_today,
                                   timestamp_year)
 from source.utils.sample import sample_pickle as sp
-from association_measures import frequencies as am_fq, measures as am_ms
 
 INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
                            'pos_sample', 'dataset', 'adj', 'adj_total',
@@ -41,9 +45,13 @@ INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
                            'polar_l2', 'space_l2']
 WRITING_LINKS = SANPI_HOME.joinpath('info/writing_links')
 LATEX_DIR = WRITING_LINKS.joinpath('latex')
-LATEX_TABLES = LATEX_DIR.joinpath('tables')
+# TEX_ASSETS = Path('/mnt/c/Users/Andrea/Documents/OverleafDissertex/assets')
+LATEX_TABLES = TEX_ASSETS/'tables'
+confirm_dir(LATEX_TABLES)
+# LATEX_TABLES = LATEX_DIR.joinpath('tables')
 TABLE_DIR = WRITING_LINKS.joinpath('imports/tables')
-IMAGE_DIR = WRITING_LINKS.joinpath('imports/images')
+# IMAGE_DIR = WRITING_LINKS.joinpath('imports/images')
+IMAGE_DIR = TEX_ASSETS/'images'
 SPELL_OUT = {'pol': 'polarity',
              'pos': 'positive',
              'neg': 'negative',
@@ -2517,10 +2525,10 @@ def determine_subsets(columns, cmap, cmap2, cmap3, group, group_col, axis, ctdf)
     cmaps = [cmap]
     subsets = None
     if (group
-        and gradient_by == 'whole group'
-        # and (len(columns) > 1
+                and gradient_by == 'whole group'
+                # and (len(columns) > 1
                 #      or (len(rows) > 1 and axis != 1))
-        ):
+            ):
         cmaps.extend([c for c in [cmap2 or cmap, cmap3 or cmap]
                       if (c and c != 'random')])
         rand_cmaps = colors.random_colormap_selection(5)
@@ -2557,7 +2565,7 @@ def _apply_background_gradient(sty, subsets, cmaps, axis, vmin, vmax):
     return sty
 
 
-def format_negatives(sty, min_val=-10*6):
+def format_negatives(sty, min_val=-10*10):
     return _apply_neg_highlighting(min_val=min_val, sty=sty)
 
 
@@ -2982,8 +2990,7 @@ def plot_polar_grouped(adv_amdf, indexer: str = 'l2',
                        size_tuple: tuple = (6, 10.5),
                        colormap_name: str = 'coolwarm',
                        plot_kind='barh',
-                       image_dir=Path(SANPI_HOME.joinpath(
-                           'info/writing_links/imports/images')),
+                       image_dir=IMAGE_DIR,
                        image_label='',
                        save_png: bool = False):
 
@@ -3076,39 +3083,42 @@ def save_latex_table(sty,
                      latex_path: Path = None,
                      latex_stem: str = None,
                      latex_subdir: str = None,
-                     label='table-X',
+                     label: str = '%TODO-label_tab:XXX',
+                     #  precision: int = None,
                      longtable: bool = False,
                      multicol_align: str = '|c|',
-                     clines: str = 'skip-last;data',#'all;data',
-                     hrules: str = '\midrule',
-                     position='ht'):
+                     clines: str = 'skip-last;data',  # 'all;data',
+                     hrules: str = '\hline',
+                     position='',
+                     verbose: bool = False):
 
-    caption = (caption or '[REPLACE WITH TABLE NAME]')
-    print(caption)
+    caption = (caption or '\draft{REPLACE WITH TABLE NAME}')
+    if not label.startswith('tab'):
+        label = f'tab:{label}'
+    print('Caption:', caption)
     if latex_path is None:
         latex_stem = (
             latex_stem or
-            '-'.join(sty.index.names) + '_x_' + '-'.join(
-                sty.columns
+            '-'.join(sty.index.names) + '_x_' + snake_to_camel(
+                '_'.join(sty.columns)
                 # .str.replace(r'\\text\w+\{(\w+)\}', r'\1', regex=True)
                 # .str.replace(r'[$\\\^ ]', '', regex=True)
             )
         ).replace(' ', '_')
         latex_dir = LATEX_TABLES.joinpath(
             latex_subdir) if latex_subdir else LATEX_TABLES
-        confirm_dir(latex_dir)
         latex_path = latex_dir.joinpath(latex_stem).with_suffix(
             f'.{timestamp_today()}.tex')
-    print(latex_path)
+    confirm_dir(latex_path.parent)
+    # print(latex_path)
     package_req_warnings = [r'%! Requires following packages:',
                             r' \usepackage{multirow}',
-                            r' \usepackage[table]{xcolor}',
-                            r' \usepackage{booktabs}',
+                            r' \usepackage[table]{xcolor} % for colored cells',
+                            r' \usepackage{booktabs} % for \midrule, etc.',
                             ]
     if longtable:
         package_req_warnings.extend(
-            [r'& if `environment=="longtable"`',
-             r'   \usepackage{longtable}'])
+            [r' \usepackage{longtable}'])
     try:
         sty.index.set_names(
             [(n.replace('_', ' ').title() if n else '')
@@ -3123,43 +3133,126 @@ def save_latex_table(sty,
             inplace=True)
     except AttributeError:
         pass
+    # ! remove precision and thousands so that `siunitx` can deal with the raw numbers intelligently
+    sty = sty.format(  # escape='latex',
+        na_rep='', thousands='',
+        #  precision=precision or 2
+    )
 
-    sty = sty.format(escape='latex', na_rep='')
     sty = sty.format_index(escape='latex')
     sty = sty.format_index(escape='latex', axis=1)
-    display(sty)
+    si_formats = sty.columns.to_series().map({
+        'f': 'S[table-format=7.0]',
+        'f1': 'S[table-format=7.0]',
+        'f2': 'S[table-format=7.0]',
+        'adv_total': 'S[table-format=7.0]',
+        'adj_total': 'S[table-format=7.0]',
+        'N': 'S[table-format=8.0]',
+        'LRC': 'S[table-format=-2.1, table-auto-round]',
+        'dP1': 'S[table-format=-1.2, table-auto-round]',
+        'dP2': 'S[table-format=-1.2, table-auto-round]',
+        'P1': 'S[table-format=1.2, table-auto-round]',
+        'P2': 'S[table-format=1.2, table-auto-round]',
+        'deltaP_mean': 'S[table-format=1.2, table-auto-round]',
+        'deltaP_max': 'S[table-format=1.2, table-auto-round]',
+        'exp_f': 'S[table-format=-7.0, table-auto-round]',
+        'unexp_f': 'S[table-format=-7.0, table-auto-round]',
+        'unexp_%': 'S[table-format=-2.1, table-auto-round]',
+        'dP2%': 'S[table-format=2.1, table-auto-round]',
+        'P2%': 'S[table-format=2.1, table-auto-round]',
+        'dP1%': 'S[table-format=-2.1, table-auto-round]',
+        'P1%': 'S[table-format=-2.1, table-auto-round]',
+        'unexp_\%': 'S[table-format=-2.1, table-auto-round]',
+        'dP2\%': 'S[table-format=2.1, table-auto-round]',
+        'P2\%': 'S[table-format=2.1, table-auto-round]',
+        'dP1\%': 'S[table-format=-2.1, table-auto-round]',
+        'P1\%': 'S[table-format=-2.1, table-auto-round]',
+        'G2': 'S[table-format=7, table-auto-round]'
+    }).fillna('S[table-auto-round, table-format=7.2, drop-zero-decimal]')
+    # print(si_formats)
+
+    try:
+        index_depth = len(sty.index.levels)
+    except AttributeError:
+        index_depth = 1
+
+    str_col_types = ('*{'+str(index_depth)
+                     +'}{'
+                     +'l'
+                    # + '>{\\raggedright\\arraybackslash}m{1.75cm}'
+                     +'}')
+    col_formats_str = str_col_types + '\n    '.join(si_formats.to_list())
+    # print(col_formats_str)
+    col_format_comment = '% ' + \
+        '\n% '.join((si_formats+' % '+si_formats.index).to_list())
 
     latex_table_str = sty.to_latex(
         position=position,
         convert_css=True,
         multicol_align=multicol_align,
+        position_float='centering' if not longtable else None,
         sparse_index=True,
         sparse_columns=True,
+        siunitx=True,
+        column_format=col_formats_str,
         environment='longtable' if longtable else 'table',
         clines=clines,
         hrules=hrules,
         label=label,
         caption=caption
     )
-    latex_table_str = (latex_table_str
-                       .replace('<b>', '\\textbf{')
-                       .replace('</b>', '}')
-                       .replace('<i>', '\\textit{')
-                       .replace('</i>', '}')
-                       .replace('<u>', '\\underline{')
-                       .replace('</u>', '}')
-                       .replace('<br/>', '\\\\')
-                       .replace('->', '$\\rightarrow$')
-                       .replace('env', '\\textsc{env}')
-                       .replace('<code>', '\\mintinline{python}|')
-                       .replace('</code>', '|')
-                       .replace('exactly_', 'exactly '))
+    latex_table_str = (
+        snake_to_camel(latex_table_str
+                       .replace('deltaP_mean', 'dPavg')
+                       .replace('deltaP\_mean', 'dPavg')
+                       .replace('exactly_', 'exactly ')
+                       .replace('\_', '_'))
+        #    .replace('\caption', '\caption')
+        .replace('<b>', '\\textbf{')
+        .replace('</b>', '}')
+        .replace('<i>', '\\textit{')
+        .replace('</i>', '}')
+        #    .replace('; ', '\\newline ')
+        .replace('<u>', '\\underline{')
+        .replace('</u>', '}')
+        #    .replace('<br/>', '\\newline')
+        .replace('->', '$\\rightarrow$')
+        .replace('env', '\\textsc{env}')
+        .replace('<Code>', '\\cmtt{')
+        .replace('</Code>', '}')
+        .replace('<code>', '\\cmtt')
+        .replace('</code>', '}')
+        .replace('{#}', '{\#}')
+    )
     latex_table_str = re.sub(r'"(\S)', r'``\1', latex_table_str)
+    latex_table_str = re.sub(r'(\([\+\-]\))', '$'+r'\1'+'$', latex_table_str)
+    latex_table_str = re.sub(r'\\th\..*\n', '', latex_table_str)
+    # latex_table_str = re.sub(r'(?<!\\)([%#])', '\\'+r'\1', latex_table_str)
+    latex_table_str = latex_table_str.replace(
+        '\\\\', '\\').replace('\\\n', '\\\\\n')
+    # # > force precision
+    # latex_table_str =   re.sub(r'(\.\d{'+str(precision)+'})0+',
+    #     r'\1', latex_table_str),
+    latex_table_str = '\n'.join(
+        ['\\singlespacing\n\\scriptsize\\noindent',
+         latex_table_str,
+         '\\normalsize\n\\normalspacing'
+         ])
     #! attempting to force thousands separators post-hoc will break any color codes
     # // latex_table_str = re.sub(r'(?<=\d)(\d{3})(?=\D)', r'\1,', latex_table_str)
-    latex_path.write_text('\n% '.join(package_req_warnings)
-                          + '\n\n'
-                          + latex_table_str,
-                          encoding='utf8')
+    if verbose:
+        try:
+            display(set_my_style(sty))
+
+        except Exception:
+            print(textwrap.indent(latex_table_str, ' '*4))
+    with latex_path.open(mode='w',
+                         encoding='utf8') as out:
+        out.write('\n% '.join(package_req_warnings)
+                  + '\n\n'
+                  + col_format_comment
+                  + '\n\n'
+                  + latex_table_str)
     print('Stylized latex table saved as:\n ',
-          latex_path.relative_to(WRITING_LINKS), end='\n\n')
+          latex_path.relative_to(TEX_ASSETS.parent.parent), end='\n\n')
+    return (latex_path)
