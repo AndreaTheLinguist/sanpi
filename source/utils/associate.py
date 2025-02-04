@@ -318,9 +318,9 @@ def deltaP(row: pd.Series,
         print(f'= {round(deltaP, 3):,.3f}\n')
     return deltaP
 
-def extend_deltaP(df):
+def extend_deltaP(df, extensions=None):
     deltaP_df = df.copy().filter(regex=r'(given|dP)[12]$')
-    for e in ('min', 'max', 'abs_max', 'mean'):
+    for e in extensions or ('min', 'max', 'abs_max', 'mean'):
         df[f'deltaP_{e}'] = symmetric_deltaP(deltaP_df, eval=e)
 
     return df

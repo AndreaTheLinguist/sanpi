@@ -14,6 +14,7 @@ import pyarrow as pyar
 from association_measures import frequencies as am_fq
 from association_measures import measures as am_ms
 from matplotlib import pyplot as plt
+import matplotlib as mpl
 
 import source.utils.colors as colors
 from source.utils.associate import (AM_DF_DIR, POLAR_DIR, RESULT_DIR,
@@ -3139,6 +3140,9 @@ def save_latex_table(sty,
         #  precision=precision or 2
     )
 
+        
+    sty.index = sty.index.str.replace('\\', '').str.replace('_', ' ')
+    sty.columns = sty.columns.str.replace('\\', '')#.to_series().apply(snake_to_camel).to_list()
     sty = sty.format_index(escape='latex')
     sty = sty.format_index(escape='latex', axis=1)
     si_formats = sty.columns.to_series().map({

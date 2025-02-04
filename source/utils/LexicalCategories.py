@@ -14,6 +14,51 @@ SPECIAL_ADV = {
     # 'now', 'soon', 'previously',
     'remotely', 'that', 'exactly', 'precisely', 'quite'
 }
+
+EXACTLY_RELEVANT_ADJ = ['sure',
+                        'forthcoming',
+                        'uncommon',
+                        'same',
+                        'surprising',
+                        'clear',
+                        'conducive',
+                        'thrilled',
+                        'zero',
+                        'comparable',
+                        'friendly',
+                        'easy',
+                        'opposite',
+                        'equivalent',
+                        'unexpected',
+                        'fair',
+                        'reassuring',
+                        'correct',
+                        'right',
+                        'famous',
+                        'novel',
+                        'equal',
+                        'subtle',
+                        'true',
+                        'revolutionary',
+                        'great',
+                        'stellar',
+                        'ideal',
+                        'analogous',
+                        'pleasant',
+                        'straightforward',
+                        'alike',
+                        'happy',
+                        'cheap',
+                        'difficult',
+                        'shocking',
+                        'perpendicular',
+                        'welcome',
+                        'parallel',
+                        'shy',
+                        'impressive',
+                        'new'
+                        ]
+
 TOP_NEG_ADV = {
     "ever",
     "longer",
@@ -197,8 +242,8 @@ ADV_OF_INTEREST = {
         'immensely',
         'grossly',
         'increasingly',
-        'purely', 
-        'tremendously', 
+        'purely',
+        'tremendously',
         'monumentally'
     },
 
@@ -231,9 +276,9 @@ ADV_OF_INTEREST = {
     },
 
     'bad_intense': {
-        'badly', 
+        'badly',
         'dismally',
-        'disappointingly', 
+        'disappointingly',
         'unfortunately'
     },
 
@@ -298,16 +343,16 @@ ADV_OF_INTEREST = {
         'eternally',
         'always',
         'infinitely',
-        'forever', 
-        'already', 
+        'forever',
+        'already',
         'eventually',
-        'now', 
-        'still', 
-        'soon', 
-        'previously', 
-        'formerly', 
-        'yet', 
-        'recently', 
+        'now',
+        'still',
+        'soon',
+        'previously',
+        'formerly',
+        'yet',
+        'recently',
         'instantly'
     },
     'observable': {
@@ -322,9 +367,9 @@ ADV_OF_INTEREST = {
         'deliberately',
         'distinctly',
         'intentionally',
-        'decidedly', 
-        'uniquely', 
-        'significantly',  #not sure this is where this goes
+        'decidedly',
+        'uniquely',
+        'significantly',  # not sure this is where this goes
     },
 
     'fear_intense': {
@@ -340,7 +385,7 @@ ADV_OF_INTEREST = {
         'alarmingly',
         'suspiciously',
         'awfully',
-        'fiercely', 
+        'fiercely',
         'competitively'
     },
     'consume_intense': {
