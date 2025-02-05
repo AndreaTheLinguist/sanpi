@@ -54,7 +54,7 @@ def seek_prior_counting(dir_name: str,
                 path_tup[0], engine='c', low_memory=True,
                 index_col=col,
                 dtype={col: 'string', 'count': 'int'})
-            print(f'Reading {unit.upper()} Counts from {path_tup[0]}')
+            print(f'Reading {unit.upper()} Counts from:\n  "{path_tup[0]}"')
             # ! Needed to deal with how pandas.read_csv treats the string "null"
             loaded_counts.index = loaded_counts.index.fillna('null')
             counts_dict[unit] = loaded_counts
@@ -239,9 +239,9 @@ def plot_totals(_unit_counts=all_adj, unit_name='adjective', size=(5, 3), pad_in
     plt.savefig(RESULT_DIR.joinpath(f'freq_out/images/{unit_name[:(3 if unit_name.lower().startswith("a") else 4)]}-hist_ALL-PBR_{timestamp_today()}.png'),
                 dpi=300, bbox_inches='tight', pad_inches=pad_inches)
 
-# plot_totals(all_adj, 'adjective')
-# plot_totals(all_adv, 'adverb')
-# plot_totals(all_bigram, 'bigram')
+plot_totals(all_adj, 'adjective')
+plot_totals(all_adv, 'adverb')
+plot_totals(all_bigram, 'bigram')
 
 
 # %%

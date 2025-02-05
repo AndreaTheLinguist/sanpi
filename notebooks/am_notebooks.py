@@ -45,8 +45,8 @@ INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
                            'unexp_f_sqrt_m', 'f_sqrt_m', 'f2_sqrt_m',
                            'polar_l2', 'space_l2']
 WRITING_LINKS = SANPI_HOME.joinpath('info/writing_links')
-LATEX_DIR = WRITING_LINKS.joinpath('latex')
-# TEX_ASSETS = Path('/mnt/c/Users/Andrea/Documents/OverleafDissertex/assets')
+# LATEX_DIR = WRITING_LINKS.joinpath('latex')
+#// TEX_ASSETS = Path('/mnt/c/Users/Andrea/Documents/OverleafDissertex/assets')
 LATEX_TABLES = TEX_ASSETS/'tables'
 confirm_dir(LATEX_TABLES)
 # LATEX_TABLES = LATEX_DIR.joinpath('tables')
@@ -3106,9 +3106,9 @@ def save_latex_table(sty,
                 # .str.replace(r'[$\\\^ ]', '', regex=True)
             )
         ).replace(' ', '_')
-        latex_dir = LATEX_TABLES.joinpath(
+        latex_table_dir = LATEX_TABLES.joinpath(
             latex_subdir) if latex_subdir else LATEX_TABLES
-        latex_path = latex_dir.joinpath(latex_stem).with_suffix(
+        latex_path = latex_table_dir.joinpath(latex_stem).with_suffix(
             f'.{timestamp_today()}.tex')
     confirm_dir(latex_path.parent)
     # print(latex_path)
