@@ -19,8 +19,8 @@ FREQ_DIR, DEMO_FREQ_DIR = [
     R / 'freq_tsv' for R in (RESULT_DIR, DEMO_RESULT_DIR)]
 
 TEX_ASSETS = Path('/share/compling/projects/arh234/OverleafDissertex/assets')
-#! Do not use on cluster!!
-#   TEX_ASSETS = Path.home().joinpath('WinHome/Documents/OverleafDissertex/assets')
+#! Do not use following on cluster!!
+#//   TEX_ASSETS = Path.home().joinpath('WinHome/Documents/OverleafDissertex/assets')
 
 def hour_num(use_24):
     return ('%H', '') if use_24 else ('%I', '%P')

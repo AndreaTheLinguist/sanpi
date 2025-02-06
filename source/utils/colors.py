@@ -23,15 +23,15 @@ except ModuleNotFoundError:
         from general import gen_random_array
 
 
-
 def safe_register(cmap: (mpc.ListedColormap | mpc.LinearSegmentedColormap)
                   ) -> None:
     with contextlib.suppress(ValueError):
         mcm.register(cmap=cmap)
 
 
-def partition_gradient(cmap: gradient_cmap, n_parts:int=4):
+def partition_gradient(cmap: gradient_cmap, n_parts: int = 4):
     return [cmap(x) for x in np.linspace(0.05, 0.95, n_parts)]
+
 
 def _reverse_and_register(cmaps: Iterable,
                           verbose: bool = False) -> tuple:
@@ -254,6 +254,9 @@ def _make_cmaps(colormaps: Iterable = None,
 
     elif gradient:
         _cmaps = (
+            gradient_cmap.from_list('RdPuBu',
+                                    np.vstack((mcm['PuRd_r'](np.linspace(0, 1, 256)),
+                                               mcm['PuBu'](np.linspace(0, 1, 256))))),
             gradient_cmap.from_list(
                 "lavender_teal",
                 ["lavender", "purple", "xkcd:bright teal"]),
@@ -432,10 +435,11 @@ GRADIENT_COLORS.update(SMOOTHIES)
 
 
 def random_colormap_selection(selection_size: int = 1,
-                              color_dict: dict = None, 
+                              color_dict: dict = None,
                               categories: bool = False
                               ) -> list | gradient_cmap | categorical_cmap:
-    color_set = color_dict or (CATEGORICAL_COLORS if categories else GRADIENT_COLORS)
+    color_set = color_dict or (
+        CATEGORICAL_COLORS if categories else GRADIENT_COLORS)
     options = list(color_set.values())
     random_indexer = []
     while len(random_indexer) < selection_size:
