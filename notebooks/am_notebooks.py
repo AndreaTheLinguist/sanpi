@@ -46,7 +46,7 @@ INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
                            'polar_l2', 'space_l2']
 WRITING_LINKS = SANPI_HOME.joinpath('info/writing_links')
 # LATEX_DIR = WRITING_LINKS.joinpath('latex')
-#// TEX_ASSETS = Path('/mnt/c/Users/Andrea/Documents/OverleafDissertex/assets')
+# // TEX_ASSETS = Path('/mnt/c/Users/Andrea/Documents/OverleafDissertex/assets')
 LATEX_TABLES = TEX_ASSETS/'tables'
 confirm_dir(LATEX_TABLES)
 # LATEX_TABLES = LATEX_DIR.joinpath('tables')
@@ -127,6 +127,17 @@ METRIC_PRIORITY_DICT = _set_priorities()
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+def nb_display(obj):
+    try:
+        display(set_my_style(obj))
+    except Exception:
+        if is_instance(obj, pd.DataFrame):
+            print(obj.head(min(len(obj)//2, 5))
+                  .to_markdown(floatfmt=',.2f', intfmt=',', 
+                               tablefmt='rounded_outline'))
+        else: 
+            pass
 
 def md_frame_code(code_block: str,
                   lang: str = 'python',
@@ -2526,9 +2537,9 @@ def determine_subsets(columns, cmap, cmap2, cmap3, group, group_col, axis, ctdf)
     cmaps = [cmap]
     subsets = None
     if (group
-                and gradient_by == 'whole group'
-                # and (len(columns) > 1
-                #      or (len(rows) > 1 and axis != 1))
+            and gradient_by == 'whole group'
+            # and (len(columns) > 1
+            #      or (len(rows) > 1 and axis != 1))
             ):
         cmaps.extend([c for c in [cmap2 or cmap, cmap3 or cmap]
                       if (c and c != 'random')])
@@ -3084,7 +3095,7 @@ def save_latex_table(sty,
                      latex_path: Path = None,
                      latex_stem: str = None,
                      latex_subdir: str = None,
-                     label: str = '%TODO-label_tab:XXX',
+                     label: str = '',
                      #  precision: int = None,
                      longtable: bool = False,
                      multicol_align: str = '|c|',
@@ -3092,8 +3103,10 @@ def save_latex_table(sty,
                      hrules: str = '\hline',
                      position='',
                      verbose: bool = False):
-
+    # > force longtable for long tables 🙃
+    longtable = longtable or len(sty.index) > 15
     caption = (caption or '\draft{REPLACE WITH TABLE NAME}')
+    label = label or caption.replace(' ', '-').replace('{', '-').strip('\\}{ -')
     if not label.startswith('tab'):
         label = f'tab:{label}'
     print('Caption:', caption)
@@ -3127,6 +3140,7 @@ def save_latex_table(sty,
             inplace=True)
     except AttributeError:
         pass
+    sty.columns = sty.columns.astype('string')
     try:
         sty.columns.set_names(
             [(n.replace('_', ' ').title() if n else '')
@@ -3140,9 +3154,13 @@ def save_latex_table(sty,
         #  precision=precision or 2
     )
 
-        
-    sty.index = sty.index.str.replace('\\', '').str.replace('_', ' ')
-    sty.columns = sty.columns.str.replace('\\', '')#.to_series().apply(snake_to_camel).to_list()
+    try:
+        sty.index = sty.index.str.replace('\\', '').str.replace('_', ' ')
+    except AttributeError:
+        pass
+
+    # .to_series().apply(snake_to_camel).to_list()
+    sty.columns = sty.columns.str.replace('\\', '')
     sty = sty.format_index(escape='latex')
     sty = sty.format_index(escape='latex', axis=1)
     si_formats = sty.columns.to_series().map({
@@ -3181,10 +3199,10 @@ def save_latex_table(sty,
         index_depth = 1
 
     str_col_types = ('*{'+str(index_depth)
-                     +'}{'
-                     +'l'
-                    # + '>{\\raggedright\\arraybackslash}m{1.75cm}'
-                     +'}')
+                     + '}{'
+                     + 'l'
+                     # + '>{\\raggedright\\arraybackslash}m{1.75cm}'
+                     + '}')
     col_formats_str = str_col_types + '\n    '.join(si_formats.to_list())
     # print(col_formats_str)
     col_format_comment = '% ' + \
@@ -3246,7 +3264,7 @@ def save_latex_table(sty,
     # // latex_table_str = re.sub(r'(?<=\d)(\d{3})(?=\D)', r'\1,', latex_table_str)
     if verbose:
         try:
-            display(set_my_style(sty))
+            nb_display(sty)
 
         except Exception:
             print(textwrap.indent(latex_table_str, ' '*4))
