@@ -3100,7 +3100,7 @@ def save_latex_table(sty,
                      longtable: bool = False,
                      multicol_align: str = '|c|',
                      clines: str = 'skip-last;data',  # 'all;data',
-                     hrules: str = '\hline',
+                     hrules: str = '\midrule',
                      position='',
                      verbose: bool = False):
     # > force longtable for long tables 🙃
