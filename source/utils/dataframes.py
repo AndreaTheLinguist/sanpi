@@ -15,18 +15,34 @@ from more_itertools import batched
 HITS_DF_PATH_REGEX = re.compile(r'_hits.*$')
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
 WS_REGEX = re.compile(r'[^\S\n]')
+# > currently, `REGNOT` is only used for applying bold formatting
 REGNOT = re.compile(
-    r"\b(n[o'][tr]|none|no(?! ?\. \d)|never|neither|nothing|nowhere|(?:[br]are|scarce|seldom)l?y?|hardly|without)\b",
-    flags=re.I)
-#// NEG_REGEX = re.compile(
-#//     r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
+    (r"\b("
+     r"n[o'][tr]|none|no(?! ?\. \d)|never|neither|nothing|nowhere"
+     r"|without|hardly|(?:[br]are|scarce|seldom)l?y?"
+     r")\b"),
+    flags=re.IGNORECASE)
+# // NEG_REGEX = re.compile(
+# //     r"\bn[o'](?:[tr]|body|thing|where|ne?)\b|\baint\b|\bneither\b|\b(?<!\w a|the|[oe]se) few\b|\b(?:[br]are|scarce|hard|seldom)l?y?\b|\bwithout\b|\bnever\b")
 NEG_REGEX = re.compile(
-    (r"\b(?P<neg>nor?|n[o'](?:t|ne|body|thing|where)"
-        r"|(?:rare|scarce|seldom)l?y?|(?:hard|bare)ly"
-        r"|ain'?t|neither|without|never|few|doubt)\b"),
-    flags=re.I)
+    # between word boundaries, `\b`, and case-insensitive
+    (r"\b(?P<neg>"
+     # no, nor
+     r"nor?"
+     # not, n't, none, nobody, nothing, nowhere
+     # ([and technically:] n'ne, n'body, etc.)
+     r"|n[o'](?P<no_endings>t|ne|body|thing|where)"
+     # rare, scarce, seldom, rarely, scarcely, seldomly
+     # ([and technically:] rarel, rarey, etc.)
+     r"|(?P<optional_ly>rare|scarce|seldom)l?y?"
+     # hardly, barely
+     r"|(?P<obligatory_ly>hard|bare)ly"
+     # ain't, aint, neither, without, never, few, doubt
+     r"|ain'?t|neither|without|never|few|doubt"
+     r")\b"),
+    flags=re.IGNORECASE)
 # QUES_REGEX = re.compile(
-#     (r"(?P<Q>\b(?:question|wonder|ask(?:s|ed|ing| ?)|whether|if|what|when|why|where|how)\b|^do\b)"))    
+#     (r"(?P<Q>\b(?:question|wonder|ask(?:s|ed|ing| ?)|whether|if|what|when|why|where|how)\b|^do\b)"))
 
 POS_FEW_REGEX = re.compile(
     r'\b(?:th[oe](?:s?e?|i?r?)|a|h[ie][rs]|their|my|y?our)\b ?[a-z]* few\b')
@@ -38,7 +54,11 @@ ESP_REGEX = re.compile(r'^esp\.?$')
 EDGE_PUNCT = re.compile(r'^[\W_]+|[\W_]+$')
 BRACSLASHDOT_REGEX = re.compile(r'[\[\\\/)]|\.{2,}')
 ANY_ALPHA_REGEX = re.compile(r'[a-z]')
-MISC_REGEX = re.compile(r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
+# ! This is a very broad regex, but it is intended to catch any non-word characters
+MISC_ORTH_REGEX = re.compile((r"(?P<irregular_char>[^a-z0-9_'\-])"
+                             r"|(?P<medial_numeral>[^\d_]+\d[^\d_]+)"
+                             r"|(?P<multi_hyphen>-(?:[^-]+-){3,})"),
+                             re.IGNORECASE)
 NAME_REGEX = re.compile(r'(?<=bigram-)\w+(?=_rb)')
 INDEX_FROM_ID_REGEX = r'(?P<adv_index>\d+)-(?P<adj_index>\d+)$'
 PYARROW = True
@@ -48,7 +68,7 @@ PYARROW = True
 THAT_REGEX = re.compile(r'^t+h+a+t+$')
 
 try:
-    from source.utils.general import (PKL_SUFF, confirm_dir, find_files, 
+    from source.utils.general import (PKL_SUFF, confirm_dir, find_files,
                                       run_shell_command)
 except ModuleNotFoundError:
     try:
@@ -58,7 +78,7 @@ except ModuleNotFoundError:
         from general import (PKL_SUFF, confirm_dir, find_files,
                              run_shell_command)
 
-#     else: 
+#     else:
 #         from utils import adjust_am_names
 # else:
 #     from source.utils import adjust_am_names
@@ -400,7 +420,6 @@ def drop_margins(_df, margin_name='SUM'):
     return _df.loc[_df.index != margin_name, _df.columns != margin_name]
 
 
-
 def drop_underscores(df):
     if any(df.bigram_lower.str.count('_') > 1):
         print('\nWARNING: Some underscores slipped through. Dropping the following hits...')
@@ -408,9 +427,8 @@ def drop_underscores(df):
                     .filter(regex=r'ad.*lower|_window'), format='simple_grid')
         df = df.loc[
             df.bigram_lower.str.count('_') == 1, :]
-            
-    return df
 
+    return df
 
 
 def get_preceding_text(tok_str: pd.Series,
@@ -550,7 +568,7 @@ def fix_orth(df: pd.DataFrame,
                 .to_markdown(floatfmt=',.0f', intfmt=','))
         df = df.loc[~either_one_char, :]
 
-    odd_remnant = df.bigram_lower.str.contains(MISC_REGEX, regex=True)
+    odd_remnant = df.bigram_lower.str.contains(MISC_ORTH_REGEX, regex=True)
     if any(odd_remnant):
         print('\nMiscellaneous Remaining Oddities Dropped\n')
         if using_prior:
@@ -832,7 +850,7 @@ def extend_window(df: pd.DataFrame,
         adv_indices = df.adv_index.tolist()
 
         yield from (
-            ' '.join(tok_list[max(0, idx - tokens_before)                     :(idx + 1 + tokens_after)])
+            ' '.join(tok_list[max(0, idx - tokens_before):(idx + 1 + tokens_after)])
             for tok_list, idx in zip(tok_lists, adv_indices)
         )
 

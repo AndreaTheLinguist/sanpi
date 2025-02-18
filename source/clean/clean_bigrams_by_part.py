@@ -5,9 +5,10 @@ from sys import argv
 import pandas as pd
 from more_itertools import batched
 
-from source.utils.dataframes import (Timer, add_lower_cols, catify_hit_table,
-                          extend_window, remove_duplicates, save_index_txt,
-                          select_id_prefixes, write_part_parquet)
+from source.utils.dataframes import (MISC_ORTH_REGEX, Timer, add_lower_cols,
+                                     catify_hit_table, extend_window,
+                                     remove_duplicates, save_index_txt,
+                                     select_id_prefixes, write_part_parquet)
 from source.utils.general import (HIT_TABLES_DIR, PKL_SUFF, POST_PROC_DIR,
                                   SANPI_HOME, confirm_dir)
 
@@ -30,7 +31,8 @@ ESP_REGEX = re.compile(r'^esp\.?$')
 EDGE_PUNCT = re.compile(r'^[\W_]+|[\W_]+$')
 BRACSLASHDOT_REGEX = re.compile(r'[\[\\\/)]|\.{2,}')
 ANY_ALPHA_REGEX = re.compile(r'[a-z]')
-MISC_REGEX = re.compile(r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
+MISC_ORTH_REGEX = re.compile(
+    r'[^a-z0-9_\-\']|[^\d_]+\d[^\d_]+|-[^-]+-[^-]+-[^-]+-')
 WS_REGEX = re.compile(r'[^\S\n]')
 NAME_REGEX = re.compile(r'(?<=bigram-)\w+(?=_rb)')
 _LOAD_COLS = ['hit_id', 'adv_form', 'adj_form', 'text_window',
@@ -127,15 +129,15 @@ def _main():
         if index_changed:
             with Timer() as txt_t:
                 save_index_txt(hit_ids=df.index.to_list(),
-                            part=part,
-                            index_path=new_index_path)
+                               part=part,
+                               index_path=new_index_path)
                 print('\n*******',
-              f'-> 🫧  Final clean "hit_id" index for "{part}" bigram tokens saved as',
-              f'   🏷️  "{index_path}"',
-              f'   ⏱️  {txt_t.elapsed()}',
-              '*******\n',
-              sep='\n', end='\n\n')
-                
+                      f'-> 🫧  Final clean "hit_id" index for "{part}" bigram tokens saved as',
+                      f'   🏷️  "{index_path}"',
+                      f'   ⏱️  {txt_t.elapsed()}',
+                      '*******\n',
+                      sep='\n', end='\n\n')
+
         # (Not used unless code above is changed)
         if '.csv' in out_path.suffixes:
             df.to_csv(out_path)
@@ -392,7 +394,7 @@ def fix_orth(df: pd.DataFrame,
                 .to_markdown(floatfmt=',.0f', intfmt=','))
     df = df.loc[~either_one_char, :]
 
-    odd_remnant = df.bigram_lower.str.contains(MISC_REGEX, regex=True)
+    odd_remnant = df.bigram_lower.str.contains(MISC_ORTH_REGEX, regex=True)
     if any(odd_remnant):
         print('\nMiscellaneous Remaining Oddities Dropped\n')
         if using_prior:
