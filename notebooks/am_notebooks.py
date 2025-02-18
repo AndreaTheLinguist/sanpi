@@ -132,7 +132,7 @@ def nb_display(obj):
     try:
         display(set_my_style(obj))
     except Exception:
-        if is_instance(obj, pd.DataFrame):
+        if isinstance(obj, pd.DataFrame):
             print(obj.head(min(len(obj)//2, 5))
                   .to_markdown(floatfmt=',.2f', intfmt=',', 
                                tablefmt='rounded_outline'))
@@ -3102,11 +3102,14 @@ def save_latex_table(sty,
                      clines: str = 'skip-last;data',  # 'all;data',
                      hrules: str = '\midrule',
                      position='',
+                     text:bool=False,
                      verbose: bool = False):
     # > force longtable for long tables 🙃
+    if isinstance(sty, pd.DataFrame): 
+        sty = sty.style
     longtable = longtable or len(sty.index) > 15
     caption = (caption or '\draft{REPLACE WITH TABLE NAME}')
-    label = label or caption.replace(' ', '-').replace('{', '-').strip('\\}{ -')
+    label = (label or latex_stem) or caption.replace(' ', '-').replace('{', '-').strip('\\}{ -')
     if not label.startswith('tab'):
         label = f'tab:{label}'
     print('Caption:', caption)
@@ -3133,80 +3136,102 @@ def save_latex_table(sty,
     if longtable:
         package_req_warnings.extend(
             [r' \usepackage{longtable}'])
-    try:
-        sty.index.set_names(
-            [(n.replace('_', ' ').title() if n else '')
-             for n in sty.index.names],
-            inplace=True)
-    except AttributeError:
-        pass
-    sty.columns = sty.columns.astype('string')
-    try:
-        sty.columns.set_names(
-            [(n.replace('_', ' ').title() if n else '')
-             for n in sty.columns.names],
-            inplace=True)
-    except AttributeError:
-        pass
-    # ! remove precision and thousands so that `siunitx` can deal with the raw numbers intelligently
-    sty = sty.format(  # escape='latex',
-        na_rep='', thousands='',
-        #  precision=precision or 2
-    )
+    if text:
+        sty = sty.format(escape='latex')
+    else:
+        try:
+            sty.index.set_names(
+                [(n.replace('_', ' ').title() if n else '')
+                for n in sty.index.names],
+                inplace=True)
+        except AttributeError:
+            pass
+        try:
+            sty.columns = sty.columns.astype('string')
+        except TypeError:
+            pass
+        try:
+            sty.columns.set_names(
+                [(n.replace('_', ' ').title() if n else '')
+                for n in sty.columns.names],
+                inplace=True)
+        except AttributeError:
+            pass
+        # ! remove precision and thousands so that `siunitx` can deal with the raw numbers intelligently
+        sty = sty.format(  # escape='latex',
+            na_rep='', thousands='',
+            #  precision=precision or 2
+        )
 
-    try:
-        sty.index = sty.index.str.replace('\\', '').str.replace('_', ' ')
-    except AttributeError:
-        pass
+        try:
+            sty.index = sty.index.str.replace('\\', '').str.replace('_', ' ')
+        except Exception:
+            pass
 
+        try:
+            sty.columns = sty.columns.str.replace('\\', '')
+        except Exception:
+            pass
+            
     # .to_series().apply(snake_to_camel).to_list()
-    sty.columns = sty.columns.str.replace('\\', '')
     sty = sty.format_index(escape='latex')
     sty = sty.format_index(escape='latex', axis=1)
-    si_formats = sty.columns.to_series().map({
-        'f': 'S[table-format=7.0]',
-        'f1': 'S[table-format=7.0]',
-        'f2': 'S[table-format=7.0]',
-        'adv_total': 'S[table-format=7.0]',
-        'adj_total': 'S[table-format=7.0]',
-        'N': 'S[table-format=8.0]',
-        'LRC': 'S[table-format=-2.1, table-auto-round]',
-        'dP1': 'S[table-format=-1.2, table-auto-round]',
-        'dP2': 'S[table-format=-1.2, table-auto-round]',
-        'P1': 'S[table-format=1.2, table-auto-round]',
-        'P2': 'S[table-format=1.2, table-auto-round]',
-        'deltaP_mean': 'S[table-format=1.2, table-auto-round]',
-        'deltaP_max': 'S[table-format=1.2, table-auto-round]',
-        'exp_f': 'S[table-format=-7.0, table-auto-round]',
-        'unexp_f': 'S[table-format=-7.0, table-auto-round]',
-        'unexp_%': 'S[table-format=-2.1, table-auto-round]',
-        'dP2%': 'S[table-format=2.1, table-auto-round]',
-        'P2%': 'S[table-format=2.1, table-auto-round]',
-        'dP1%': 'S[table-format=-2.1, table-auto-round]',
-        'P1%': 'S[table-format=-2.1, table-auto-round]',
-        'unexp_\%': 'S[table-format=-2.1, table-auto-round]',
-        'dP2\%': 'S[table-format=2.1, table-auto-round]',
-        'P2\%': 'S[table-format=2.1, table-auto-round]',
-        'dP1\%': 'S[table-format=-2.1, table-auto-round]',
-        'P1\%': 'S[table-format=-2.1, table-auto-round]',
-        'G2': 'S[table-format=7, table-auto-round]'
-    }).fillna('S[table-auto-round, table-format=7.2, drop-zero-decimal]')
-    # print(si_formats)
+    if text: 
+        col_formats_str = '*{' + str(len(sty.columns)+1) + '}{l}'
+        col_format_comment = '%TODO columns not adjusted---text expected. Adjustments probably needed'
+    else:
+        si_formats = sty.columns.to_series().map({
+            'f': 'S[table-format=7.0]',
+            'f1': 'S[table-format=7.0]',
+            'f2': 'S[table-format=7.0]',
+            'adv_total': 'S[table-format=7.0]',
+            'adj_total': 'S[table-format=7.0]',
+            'N': 'S[table-format=8.0]',
+            'LRC': 'S[table-format=-2.1, table-auto-round]',
+            'dP1': 'S[table-format=-1.2, table-auto-round]',
+            'dP2': 'S[table-format=-1.2, table-auto-round]',
+            'P1': 'S[table-format=1.2, table-auto-round]',
+            'P2': 'S[table-format=1.2, table-auto-round]',
+            'deltaP_mean': 'S[table-format=1.2, table-auto-round]',
+            'deltaP_max': 'S[table-format=1.2, table-auto-round]',
+            'exp_f': 'S[table-format=-7.0, table-auto-round]',
+            'unexp_f': 'S[table-format=-7.0, table-auto-round]',
+            'unexp_%': 'S[table-format=-2.1, table-auto-round]',
+            'dP2%': 'S[table-format=2.1, table-auto-round]',
+            'P2%': 'S[table-format=2.1, table-auto-round]',
+            'dP1%': 'S[table-format=-2.1, table-auto-round]',
+            'P1%': 'S[table-format=-2.1, table-auto-round]',
+            'unexp_\%': 'S[table-format=-2.1, table-auto-round]',
+            'dP2\%': 'S[table-format=2.1, table-auto-round]',
+            'P2\%': 'S[table-format=2.1, table-auto-round]',
+            'dP1\%': 'S[table-format=-2.1, table-auto-round]',
+            'P1\%': 'S[table-format=-2.1, table-auto-round]',
+            'G2': 'S[table-format=7, table-auto-round]'
+        }).fillna('S[table-auto-round, table-format=7.2, drop-zero-decimal]')
+        # print(si_formats)
 
-    try:
-        index_depth = len(sty.index.levels)
-    except AttributeError:
-        index_depth = 1
+        try:
+            index_depth = len(sty.index.levels)
+        except AttributeError:
+            index_depth = 1
 
-    str_col_types = ('*{'+str(index_depth)
-                     + '}{'
-                     + 'l'
-                     # + '>{\\raggedright\\arraybackslash}m{1.75cm}'
-                     + '}')
-    col_formats_str = str_col_types + '\n    '.join(si_formats.to_list())
-    # print(col_formats_str)
-    col_format_comment = '% ' + \
-        '\n% '.join((si_formats+' % '+si_formats.index).to_list())
+        str_col_types = ('*{'+str(index_depth)
+                        + '}{'
+                        + 'l'
+                        # + '>{\\raggedright\\arraybackslash}m{1.75cm}'
+                        + '}')
+        col_formats_str = str_col_types + '\n    '.join(si_formats.to_list())
+        print(col_formats_str)
+        try:
+            col_format_comment = (
+                '% ' + 
+                '\n% '.join((si_formats+' % '+si_formats.index).to_list()))
+        except TypeError: 
+            si_index = si_formats.index.to_series().apply(repr)
+            col_format_comment = (
+                '% ' + 
+                '\n% '.join((si_formats+' % '+si_index).to_list()))
+        
 
     latex_table_str = sty.to_latex(
         position=position,
@@ -3223,12 +3248,13 @@ def save_latex_table(sty,
         label=label,
         caption=caption
     )
-    latex_table_str = (
-        snake_to_camel(latex_table_str
-                       .replace('deltaP_mean', 'dPavg')
-                       .replace('deltaP\_mean', 'dPavg')
-                       .replace('exactly_', 'exactly ')
-                       .replace('\_', '_'))
+    if not text:
+        latex_table_str = snake_to_camel(latex_table_str
+                        .replace('deltaP_mean', 'dPavg')
+                        .replace('deltaP\_mean', 'dPavg')
+                        .replace('exactly_', 'exactly ')
+                        .replace('\_', '_'))
+    latex_table_str = (latex_table_str
         #    .replace('\caption', '\caption')
         .replace('<b>', '\\textbf{')
         .replace('</b>', '}')
@@ -3239,7 +3265,7 @@ def save_latex_table(sty,
         .replace('</u>', '}')
         #    .replace('<br/>', '\\newline')
         .replace('->', '$\\rightarrow$')
-        .replace('env', '\\textsc{env}')
+        # .replace('env', '\\textsc{env}')
         .replace('<Code>', '\\cmtt{')
         .replace('</Code>', '}')
         .replace('<code>', '\\cmtt')
