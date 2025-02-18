@@ -3098,15 +3098,29 @@ def save_latex_table(sty,
                      label: str = '',
                      #  precision: int = None,
                      longtable: bool = False,
-                     multicol_align: str = '|c|',
+                     multicol_align: str = 'c',
                      clines: str = 'skip-last;data',  # 'all;data',
                      hrules: str = '\midrule',
-                     position='',
+                     position:str='htbp',
+                     neg_color:str=None,
+                     camel_case: bool = False,
+                     default_SI:float=7.2,
                      text:bool=False,
                      verbose: bool = False):
-    # > force longtable for long tables 🙃
+    # make sure it's a style object
     if isinstance(sty, pd.DataFrame): 
         sty = sty.style
+    # vet length before saving to file
+    if len(sty.index) > 50: 
+        print('! Error: Table has more than 50 rows---too long. Reconsider what you want to include.\n  NO TABLE SAVED.')
+        nb_display(sty)
+        return
+    if len(sty.columns) > 30: 
+        print('! Error: Table has more than 30 columns---too wide. Reconsider what you want to include.\n  NO TABLE SAVED.')
+        nb_display(sty)
+        return
+    
+    # > force longtable for long tables 🙃
     longtable = longtable or len(sty.index) > 15
     caption = (caption or '\draft{REPLACE WITH TABLE NAME}')
     label = (label or latex_stem) or caption.replace(' ', '-').replace('{', '-').strip('\\}{ -')
@@ -3207,9 +3221,10 @@ def save_latex_table(sty,
             'dP1\%': 'S[table-format=-2.1, table-auto-round]',
             'P1\%': 'S[table-format=-2.1, table-auto-round]',
             'G2': 'S[table-format=7, table-auto-round]'
-        }).fillna('S[table-auto-round, table-format=7.2, drop-zero-decimal]')
+        }).fillna(f'S[table-auto-round, table-format={default_SI}, drop-zero-decimal]')
         # print(si_formats)
-
+        if neg_color:
+            si_formats = si_formats.str.replace(']', ', negative-color={'+neg_color+'}]')
         try:
             index_depth = len(sty.index.levels)
         except AttributeError:
@@ -3249,11 +3264,14 @@ def save_latex_table(sty,
         caption=caption
     )
     if not text:
-        latex_table_str = snake_to_camel(latex_table_str
+        latex_table_str = (latex_table_str
                         .replace('deltaP_mean', 'dPavg')
                         .replace('deltaP\_mean', 'dPavg')
                         .replace('exactly_', 'exactly ')
                         .replace('\_', '_'))
+    if camel_case:
+        latex_table_str = snake_to_camel(latex_table_str)
+        
     latex_table_str = (latex_table_str
         #    .replace('\caption', '\caption')
         .replace('<b>', '\\textbf{')
