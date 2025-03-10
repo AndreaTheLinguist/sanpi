@@ -1,5 +1,13 @@
 {
     "configurations": [
+        {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": "${command:pickArgs}"
+        },
         // run current file
         {
             "name": "Python: Current File",
@@ -11,6 +19,63 @@
                 "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"
             },
             "justMyCode": true
+        },
+        // * update_env_hits
+        {
+            "name": "update_env_hits Pcc13",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/arh234/.conda/envs/sanpi/bin/python",
+            "program": "script/update_env_hits.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "12"
+            },
+            "justMyCode": true,
+            "args": [
+                "-p",
+                "Pcc13", 
+                // "--force"
+            ]
+        },
+        // * update_env_hits DEMO Apw
+        {
+            "name": "update_env_hits DEMO",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/arh234/.conda/envs/sanpi/bin/python",
+            "program": "script/update_env_hits.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "12"
+            },
+            "justMyCode": true,
+            "args": [
+                "-p",
+                "Apw", 
+                "-d", 
+                "/share/compling/data/sanpi/DEMO/2_hit_tables/RBdirect",
+                "--force"
+            ]
+        },
+        // * compile_com_from_parts
+        {
+            "name": "compile_com_from_parts test DEMO",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/arh234/.conda/envs/sanpi/bin/python",
+            "program": "script/compile_com_from_parts.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "12"
+            },
+            "justMyCode": true,
+            "args": [
+                "-d",
+                "/share/compling/data/sanpi/DEMO/2_hit_tables/not-RBdirect", 
+                // "--force"
+                // "-C"
+            ]
         },
         //*MARK:sample_pickle
         {
@@ -76,6 +141,24 @@
                 "-m",
                 "-f",
                 "adj_form_lower==good"
+            ]
+        },
+        // MARK:complement
+        {
+            "name": "get_complement NEGmirror MIN-7",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "script/get_complement.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"
+            },
+            "justMyCode": true,
+            "args": [
+                "-p",
+                "NEGmirror",
+                "-t",
+                "MIN-7"
             ]
         },
         //*MARK:format freq for UCS
@@ -211,7 +294,7 @@
                 "500",
                 "--data_suffix",
                 ".MIRROR_polar.35f-868c.tsv",
-                "-v", 
+                "-v",
                 "-a",
                 "/share/compling/projects/sanpi/results/freq_out/ANYmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv"
             ]
@@ -591,7 +674,7 @@
             "justMyCode": true,
             "args": [
                 "-f",
-                "5", 
+                "5",
                 "-t",
                 "0.0025"
             ]

@@ -87,12 +87,18 @@
             "**/CVS": true,
             "**/.DS_Store": true,
             "**/Thumbs.db": true,
+            "**/.trunk/*plugins/": true,
+            "**/.trunk/*out/": true,
+            "**/.trunk/*notifications/": true,
+            "**/.trunk/*logs/": true,
+            "**/.trunk/*actions/": true,
             "**/*conda3": true,
             "**/*kaldi*": true,
             "**/.[^b]*": true,
             "**/.bash_[hl]*": true,
             "**/stanza_resources": true,
-            "**/prior_version": true
+            "**/prior_version": true,
+            "*.code-workspace": true
         },
         "files.watcherExclude": {
             "/share/compling/data/puddin": true,
@@ -142,7 +148,9 @@
             "titleBar.inactiveBackground": "#8ca3f9",
             "titleBar.inactiveForeground": "#0b1434"
         },
-        "sourcery.codeLens": true
+        "sourcery.codeLens": true,
+        "editor.fontFamily": "iosevka,Consolas, 'Courier New', monospace",
+        "indentRainbow.errorColor": "rgb(189, 230, 233)"
     },
     "extensions": {
         "recommendations": [

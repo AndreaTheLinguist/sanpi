@@ -404,7 +404,16 @@ sanpi-data.link
 **/*debug*
 
 ## logs
-logs/
+logs/pre*
+logs/*/failed
+logs/*/Clean3f
+logs/[ua_tdmtL]*
+logs/bigram-*
+logs/count*
+logs/corr*
+logs/*deps
+logs/screens
+logs/*/prior_version*
 *.out
 *.err
 *.screen*
@@ -442,19 +451,18 @@ Pat/negated
 
 
 ## "priors" exclusions
-**/prior_version
+**/prior_version*
 
 ## `results/` exclusions
 results/**/*.*py*
 results/freq_out/*/*bigram-x-prev*.csv
 results/freq_out/JxR
-results/**/images
+# results/**/images
 results/**/partials
 results/**/*[.12]?f.*
 results/**/descriptive_stats
 results/freq_out/spearman
 results/**/heatmaps
-results/**/ucs_format/*.tsv
 
 ### `ucs_tables/` exclusions
 **/ucs_tables/.ucs_tmp.tsv
@@ -469,10 +477,17 @@ results/**/ucs_format/*.tsv
 **/ucs_tables/RBXadj/readable/all_adj-x-adv_*35f*_min[123]*x.rsort-view*
 results/**/ucs_logs
 results/ucs_tables/dataframes/**/prior_extra/*
+results/freq_out/**/images/*sample-heatmap*png
+results/transformed
+
+DEMO
 
 ## `slurm/` exclusions
 slurm/lsc_35JxR.slurm.sh
 slurm/train-lsc.slurm.sh
+slurm/*hack*
+slurm/pbzip_glob.slurm.sh
+slurm/make-ucs-tsv.slurm.sh
 
 ## `source/` exclusions
 source/LSC
@@ -482,7 +497,17 @@ source/**/*comments*
 source/**/*edit*
 # softlinks to `source/` from subdirectories
 */source 
+analyze/utils
 
+setup
 .vscode/launch.json
 results/ucs_tables/**/readable/*
 results/ucs_tables/misc/*/*.txt
+setup/-cluster.23-03-25.yml
+results/top_AM/top9adv_sample-9-hit-tables_2024-05-15.pkl.gz
+results/top_AM/top6adv_sample-6-hit-tables_2024-05-15.pkl.gz
+script/alternate/*
+notebooks/inspect-exactly-hits.2024-02-13.ipynb
+Pat/Modal/*pat
+script/transform_raw_freq.py
+source/analyze/utils
