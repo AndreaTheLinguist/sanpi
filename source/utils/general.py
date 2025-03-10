@@ -3,10 +3,11 @@ import errno
 import logging
 import re
 from datetime import datetime
-from os import system, strerror
+from os import strerror, system
 from pathlib import Path
-from scipy import constants as sc
+
 import numpy as np
+from scipy import constants as sc
 
 PKL_SUFF = '.pkl.gz'
 POST_PROC_DIR = Path('/share/compling/data/sanpi/4_post-processed')
@@ -68,7 +69,6 @@ def camel_to_snake(camel: str):
 def confirm_dir(dir_path: Path):
     if not dir_path.is_dir():
         dir_path.mkdir(parents=True)
-
 
 # def build_ucs_table(min_count: int, ucs_save_path: Path, cat_tsv_command: str):
 #     threshold_arg = f'--threshold={min_count}'

@@ -25,8 +25,6 @@ TEST_CAP = None
 # else:
 PYARROW = True
 
-# NEG_REGEX = re.compile(
-#     r"\bno\b|\bn[o']t\b|\bnobody\b|\bno one\b|\bnothing\b|\bnowhere\b|\brarel?y?\b|\bscarcely\b|\bbarely\b|\bhardly\b|\bseldoml?y?\b|\bwithout\b|\bnever\b")
 PART_LABEL_REGEX = re.compile(r'[NAP][pwytcVaTe\d]{2,4}')
 NUM_ID_TAG_REGEX = re.compile(r'^((?<=pcc_eng_)\d{2}|(?<=nyt_eng_)\d)')
 RBX_CLEAN = HIT_TABLES_DIR.joinpath('RBXadj/cleaned')

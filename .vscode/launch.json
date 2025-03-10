@@ -208,7 +208,7 @@
             ]
         },
         {
-            "name": "🫏💈300 polar_assoc",
+            "name": "🫏💈50 polar_assoc",
             "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -219,12 +219,12 @@
             "justMyCode": true,
             "args": [
                 "-m",
-                "300",
+                "50",
                 // "-v"
             ]
         },
         {
-            "name": "🫏💈100 polar_assoc",
+            "name": "🫏💈1️⃣ polar_assoc",
             "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -235,12 +235,24 @@
             "justMyCode": true,
             "args": [
                 "-m",
-                "100",
-                // "-v"
+                "1",
+                // "-v",
+                "--comp_label",
+                "complement",
+                "--compare_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/RBdirect/AdvAdj_ALL_not-RBdirect_final-freq.tsv",
+                "--targ_label",
+                "negated",
+                "--target_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/RBdirect/AdvAdj_ALL_RBdirect_final-freq.tsv",
+                "--all_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/ANYdirect/AdvAdj_ALL_any-direct_final-freq.tsv",
+                "--data_suffix",
+                "ALL-direct.tsv"
             ]
         },
         {
-            "name": "🫏💈3k polar_assoc",
+            "name": "🫏💈🥈 polar_assoc",
             "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -251,8 +263,48 @@
             "justMyCode": true,
             "args": [
                 "-m",
-                "3000",
-                // "-v"
+                "2",
+                "-v",
+                "--comp_label",
+                "complement",
+                "--compare_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/RBdirect/AdvAdj_ALL_not-RBdirect_final-freq.tsv",
+                "--targ_label",
+                "negated",
+                "--target_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/RBdirect/AdvAdj_ALL_RBdirect_final-freq.tsv",
+                "--all_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/ANYdirect/AdvAdj_ALL_any-direct_final-freq.tsv",
+                "--data_suffix",
+                "ALL-direct.tsv"
+            ]
+        },
+        {
+            "name": "🌅🆕💈2.5k polar_assoc",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "script/polar_assoc.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"
+            },
+            "justMyCode": true,
+            "args": [
+                "-m",
+                "2500",
+                "-v",
+                "--comp_label",
+                "complement",
+                "--compare_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/RBdirect/AdvAdj_ALL_not-RBdirect-final-freq.tsv",
+                "--targ_label",
+                "negated",
+                "--target_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/RBdirect/AdvAdj_ALL_RBdirect-final-freq.tsv ",
+                "--all_counts",
+                "/share/compling/projects/sanpi/results/freq_tsv/ANYdirect/AdvAdj_ALL_any-direct_final-freq.tsv ",
+                "--data_suffix",
+                "final-direct.tsv",
             ]
         },
         {
@@ -272,7 +324,7 @@
             ]
         },
         {
-            "name": "🫏💈🪞500 MIRROR polar_assoc",
+            "name": "🫏💈🪞20 MIRROR polar_assoc",
             "type": "python",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -283,20 +335,21 @@
             "justMyCode": true,
             "args": [
                 "-c",
-                "/share/compling/projects/sanpi/results/freq_out/POSmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv",
+                "/share/compling/projects/sanpi/results/freq_out/POSmirror/ucs_format/AdvAdj_frq-thrMIN-7.35f.tsv",
                 "-C",
                 "posmir",
                 "-n",
-                "/share/compling/projects/sanpi/results/freq_out/NEGmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv",
+                // /home/arh234/projects/sanpi/results/freq_out/NEGmirror/ucs_format/AdvAdj_frq-thrMIN-7.35f.tsv
+                "/share/compling/projects/sanpi/results/freq_out/NEGmirror/ucs_format/AdvAdj_frq-thrMIN-7.35f.tsv",
                 "-N",
                 "negmir",
                 "--min_freq",
-                "500",
+                "20",
                 "--data_suffix",
-                ".MIRROR_polar.35f-868c.tsv",
+                ".MIRROR_35f-7c.tsv",
                 "-v",
                 "-a",
-                "/share/compling/projects/sanpi/results/freq_out/ANYmirror/ucs_format/ALL-WORDS_adj-x-adv_thr0-001p.35f.tsv"
+                "/share/compling/projects/sanpi/results/freq_out/ANYmirror/ucs_format/AdvAdj_frq-thrMIN-7.35f.tsv"
             ]
         },
         {
@@ -328,7 +381,7 @@
             ]
         },
         {
-            "name": "🫏💈🪞1k MIRROR polar_assoc",
+            "name": "🫏💈🪞2k MIRROR polar_assoc",
             "type": "debugpy",
             "request": "launch",
             "program": "script/polar_assoc.py",
@@ -347,7 +400,7 @@
                 "-N",
                 "negmir",
                 "--min_freq",
-                "1000",
+                "2000",
                 "--data_suffix",
                 ".MIRROR_polar.35f-868c.tsv",
                 "-v",

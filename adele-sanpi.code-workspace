@@ -1,173 +1,304 @@
 {
-    "settings": {
-        // "workbench.preferredDarkColorTheme": "Solarized Sharp Darker",
-        // "workbench.preferredDarkColorTheme": "Boundless",
-        // "workbench.preferredDarkColorTheme": "Dainty – Panda Theme (chroma 3, lightness 0)",
-        // "workbench.preferredLightColorTheme": "Learn with Sumit - Simple as light",
-        // "workbench.preferredLightColorTheme": "Nord Light Brighter",
-        // "workbench.preferredLightColorTheme": "Light Pink",
-        // "workbench.preferredLightColorTheme": "Boundless Flamingo",
-        // "workbench.preferredLightColorTheme": "Ysgrifennwr",
-        // "workbench.preferredLightColorTheme": "Noctis Lux",
-        // "workbench.preferredLightColorTheme": "Gruvbox Light Soft",
-        // "workbench.preferredDarkColorTheme": "Shades of Purple",
-        // "workbench.preferredDarkColorTheme": "Electric Indigo",
-        // "workbench.preferredDarkColorTheme": "vscode carbon theme",
-        "workbench.colorCustomizations": {
-            "titleBar.inactiveForeground": "#0d8b7ce8",
-            "titleBar.inactiveBackground": "#0f1615",
-            "titleBar.activeForeground": "#5ff5e4db",
-            "titleBar.activeBackground": "#023d36fd",
-            "tab.activeBackground": "#2bf8e05e",
-            "activityBar.inactiveForeground": "#1e998be8",
-            "activityBar.foreground": "#5ff5e4db",
-            "activityBar.background": "#023d36fd"
-        },
-        "todo-tree.tree.showBadges": false,
-        "todo-tree.tree.scanMode": "current file",
-        "markdown.updateLinksOnFileMove.enableForDirectories": false,
-        "files.watcherExclude": {
-            "./setup/**": true,
-            "./demo/data/corpora/**": true,
-            "./*data_samples*/**": true,
-            "./*/.vscode/**": true,
-            "./**/.history/**": true,
-            "./.untracked/**": true,
-            "./.git/**": true
-        },
-        "files.exclude": {
-            "**/tmp": true,
-            "**/Thumbs.db": false,
-            "**/slurm": true,
-            "**/setup": true,
-            "**/prior_version": false,
-            "**/LSC": true,
-            "**/CVS": false,
-            "**/*.tex": false,
-            "**/*.tar*": true,
-            "**/*.Identifier": true,
-            "**/.trunk/*plugins/": true,
-            "**/.trunk/*out/": true,
-            "**/.trunk/*notifications/": true,
-            "**/.trunk/*logs/": true,
-            "**/.trunk/*actions/": true,
-            "**/.trunk": true,
-            "**/.svn": true,
-            "**/.hg": true,
-            "**/.git": false,
-            "**/.DS_Store": true,
-            "**/.*": true,
-            ".sourcery.yaml": true
-        },
-        "files.autoSave": "afterDelay",
-        "files.associations": {
-            "lsc.C": "cpp",
-            "lsc-print.C": "cpp",
-            "*screenlog.[0-9]": "Log",
-            "*.pat": "OCaml",
-            "*.out": "Log",
-            "*.log": "Log",
-            "*.err": "Log"
-        },
-        "explorerExclude.backup": {},
-        "explorer.autoReveal": false
-    },
-    "launch": {
-        "version": "0.2.0",
-        "configurations": [
-            // * LSC
-            // > view_LSC
-            {
-                "type": "python",
-                "request": "launch",
-                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-                "name": "view_LSC 35f",
-                "justMyCode": true,
-                "console": "integratedTerminal",
-                "args": [
-                    "-f",
-                    "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv",
-                    "-"
-                ]
-            },
-            {
-                "type": "python",
-                "request": "launch",
-                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-                "name": "view_LSC 35f sqrt",
-                "justMyCode": true,
-                "console": "integratedTerminal",
-                "args": [
-                    "-f",
-                    "/share/compling/projects/sanpi/results/transformed/sqrt_all-frq_thresh877.35f.csv"
-                ]
-            },
-            {
-                "type": "python",
-                "request": "launch",
-                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-                "name": "view_LSC 35f log2",
-                "justMyCode": true,
-                "console": "integratedTerminal",
-                "args": [
-                    "-f",
-                    "/share/compling/projects/sanpi/results/transformed/log2_all-frq_thresh877.35f.csv"
-                ]
-            },
-            {
-                "type": "python",
-                "request": "launch",
-                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-                "name": "view_LSC 35f ADV mean-std",
-                "justMyCode": true,
-                "console": "integratedTerminal",
-                "args": [
-                    "-f",
-                    "/share/compling/projects/sanpi/results/mean_standardized/all-frq_thresh877.35f_ADV-mn-std.csv"
-                ]
-            },
-            {
-                "type": "python",
-                "request": "launch",
-                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-                "name": "view_LSC 20f",
-                "justMyCode": true,
-                "console": "integratedTerminal",
-                "args": [
-                    "-f",
-                    "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh478.20f.csv"
-                ]
-            },
-            {
-                "type": "python",
-                "request": "launch",
-                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
-                "name": "view_LSC 15f",
-                "justMyCode": true,
-                "console": "integratedTerminal",
-                "args": [
-                    "-f",
-                    "all-frq_thresh478.20f.csv"
-                ]
-            }
-        ]
-    },
-    "folders": [
-        {
-            "path": "."
-        },
-        {
-            "path": "../../data"
-        }
-        // {
-        //     "path": "../../UCS-0.6/doc",
-        //     "name": "UCS-doc"
-        // }
-    ],
     "extensions": {
         "recommendations": [
             "ibm.output-colorizer"
             // "rainbow_csv"
         ]
+    },
+    "folders": [
+        {
+            "name": "projects/sanpi",
+            "path": "/share/compling/projects/sanpi"
+        },
+        {
+            "name": "data/sanpi",
+            "path": "/share/compling/data/sanpi"
+        },
+        {
+            "path": "../../../../share/compling/data/new_york_times"
+        },
+        {
+            "path": "../../../../share/compling/data/assoc_press"
+        }
+    ],
+    "launch": {
+        "configurations": [
+        
+            // {
+            //     "type": "bashdb",
+            //     "request": "launch",
+            //     "name": "Bash-Debug (select script from list of sh files)",
+            //     "cwd": "${workspaceFolder}",
+            //     "program": "${command:SelectScriptName}",
+            //     "args": []
+            // },
+            //*MARK:puddin-current file
+            {
+                "console": "integratedTerminal",
+                "env": {
+                    "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "2"
+                },
+                "justMyCode": true,
+                "name": "adele: 🍮 puddin current file",
+                "program": "${file}",
+                "python": "/home/arh234/anaconda3/envs/puddin/bin/python",
+                "request": "launch",
+                "type": "debugpy"
+            },
+            // * LSC
+            // > view_LSC
+            {
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh877.35f.csv",
+                    "-"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "view_LSC 35f",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "request": "launch",
+                "type": "debugpy"
+            },
+            {
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/transformed/sqrt_all-frq_thresh877.35f.csv"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "view_LSC 35f sqrt",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "request": "launch",
+                "type": "debugpy"
+            },
+            {
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/transformed/log2_all-frq_thresh877.35f.csv"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "view_LSC 35f log2",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "request": "launch",
+                "type": "debugpy"
+            },
+            {
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/mean_standardized/all-frq_thresh877.35f_ADV-mn-std.csv"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "view_LSC 35f ADV mean-std",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "request": "launch",
+                "type": "debugpy"
+            },
+            {
+                "args": [
+                    "-f",
+                    "/share/compling/projects/sanpi/results/freq_out/all-frq_thresh478.20f.csv"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "view_LSC 20f",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "request": "launch",
+                "type": "debugpy"
+            },
+            {
+                "args": [
+                    "-f",
+                    "all-frq_thresh478.20f.csv"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "name": "view_LSC 15f",
+                "program": "/share/compling/projects/sanpi/source/view_LSC.py",
+                "request": "launch",
+                "type": "debugpy"
+            }
+        ],
+        "version": "0.2.0"
+    },
+    "settings": {
+        "explorer.autoReveal": false,
+        "explorerExclude.backup": {
+            "**/.git": false,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": false,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": false,
+            "**/.trunk/*plugins/": true,
+            "**/.trunk/*out/": true,
+            "**/.trunk/*notifications/": true,
+            "**/.trunk/*logs/": true,
+            "**/.trunk/*actions/": true,
+            ".sourcery.yaml": true,
+            "**/.*": true,
+            "**/.trunk": true,
+            "**/*.Identifier": true,
+            "**/*.tar*": true,
+            "**/*.tex": false,
+            "**/LSC": true,
+            "**/prior_version": false,
+            "**/setup": true,
+            "**/slurm": true,
+            "**/tmp": true
+        },
+        "files.associations": {
+            "*.err": "Log",
+            "*.log": "Log",
+            "*.out": "Log",
+            "*.pat": "OCaml",
+            "*screenlog.[0-9]": "Log",
+            "lsc-print.C": "cpp",
+            "lsc.C": "cpp"
+        },
+        "files.autoSave": "afterDelay",
+        "files.exclude": {
+            "**/.git": false,
+            "**/.svn": false,
+            "**/.hg": false,
+            "**/CVS": false,
+            "**/.DS_Store": false,
+            "**/Thumbs.db": false,
+            "**/.trunk/*plugins/": false,
+            "**/.trunk/*out/": false,
+            "**/.trunk/*notifications/": false,
+            "**/.trunk/*logs/": false,
+            "**/.trunk/*actions/": false,
+            ".sourcery.yaml": false,
+            "**/.*": false,
+            "**/.trunk": false,
+            "**/*.Identifier": false,
+            "**/*.tar*": false,
+            "**/*.tex": false,
+            "**/LSC": false,
+            "**/prior_version": false,
+            "**/setup": false,
+            "**/slurm": false,
+            "**/tmp": false
+        },
+        "files.watcherExclude": {
+            "./.git/**": true,
+            "./.untracked/**": true,
+            "./**/.history/**": true,
+            "./*/.vscode/**": true,
+            "./*data_samples*/**": true,
+            "./demo/data/corpora/**": true,
+            "./setup/**": true
+        },
+        "better-comments.tags": [
+            {
+                "underline": false,
+                // warning
+                "tag": "!",
+                "strikethrough": false,
+                "italic": false,
+                "color": "#FF2D00",
+                "bold": true,
+                "backgroundColor": "transparent"
+            },
+            {
+                "underline": false,
+                // query
+                "tag": "?",
+                "strikethrough": false,
+                "italic": true,
+                "color": "#3498DB",
+                "bold": false,
+                "backgroundColor": "transparent"
+            },
+            {
+                "underline": false,
+                // remove / wrong
+                "tag": "//",
+                "strikethrough": true,
+                "italic": false,
+                "color": "#8e7f8e",
+                "bold": false,
+                "backgroundColor": "transparent"
+            },
+            {
+                "underline": false,
+                "tag": "todo",
+                "strikethrough": false,
+                "italic": false,
+                "color": "#FF8C00",
+                "bold": false,
+                "backgroundColor": "transparent"
+            },
+            {
+                "underline": false,
+                // info
+                "tag": ">",
+                "strikethrough": false,
+                "italic": false,
+                "color": "#d8829a",
+                "bold": false,
+                "backgroundColor": "transparent"
+            },
+            {
+                "underline": false,
+                // idea / maybe?
+                "tag": "^",
+                "strikethrough": false,
+                "italic": false,
+                "color": "#6517c4",
+                "bold": false,
+                "backgroundColor": "transparent"
+            },
+            {
+                "underline": false,
+                // highlight
+                "tag": "*",
+                "strikethrough": false,
+                "italic": false,
+                "color": "#1ecc2a",
+                "bold": true,
+                "backgroundColor": "#041905"
+            }
+        ],
+        "markdown.updateLinksOnFileMove.enableForDirectories": false,
+        "todo-tree.tree.scanMode": "current file",
+        "todo-tree.tree.showBadges": false,
+        // "window.titleSeparator": " Ϟ ⋅ Ϟ ",
+        // "window.titleSeparator": " Ϟ ",
+        "window.titleSeparator": " ⋅ ϟ ⋅ ",
+        // "workbench.preferredDarkColorTheme": "Solarized Sharp Darker",
+        // "workbench.preferredDarkColorTheme": "Boundless",
+        // "workbench.preferredDarkColorTheme": "Dainty – Panda Theme (chroma 3, lightness 0)",
+        "workbench.colorCustomizations": {
+            "activityBar.background": "#023d36fd",
+            "activityBar.foreground": "#5ff5e4db",
+            // "activityBar.foreground": "#f7deffe1",
+            "activityBar.inactiveForeground": "#10c7b1e8",
+            // "activityBar.inactiveForeground": "#1e998be8",
+            // "activityBar.inactiveForeground": "#a0eae1e8",
+            "tab.activeBackground": "#2bf8e05e",
+            "titleBar.activeBackground": "#023d36fd",
+            "titleBar.activeForeground": "#5ff5e4db",
+            "titleBar.inactiveBackground": "#0f1615",
+            "titleBar.inactiveForeground": "#0d8b7ce8"
+        },
+        // "workbench.preferredLightColorTheme": "Ysgrifennwr",
+        // "workbench.preferredLightColorTheme": "Learn with Sumit - Simple as light",
+        // "workbench.preferredLightColorTheme": "Light Pink",
+        // "workbench.preferredLightColorTheme": "Boundless Flamingo",
+        // "workbench.preferredLightColorTheme": "Gruvbox Light Soft",
+        // "workbench.preferredDarkColorTheme": "semantic-rainbow",
+        // "workbench.preferredDarkColorTheme": "Gruvbox Dark Hard",
+        // "workbench.preferredDarkColorTheme": "Shades of Purple (Super Dark)",
+        // "workbench.preferredDarkColorTheme": "Storm (rainglow)",
+        // "workbench.preferredDarkColorTheme": "Electric Indigo",
+        "workbench.preferredDarkColorTheme": "Gruvbox Dark Soft",
+        "workbench.preferredLightColorTheme": "Kay Light",
+        "editor.colorDecorators": true,
+        "editor.fontFamily": "iosevka ss02, Consolas, 'Courier New', monospace",
+        "window.autoDetectColorScheme": true
     }
 }

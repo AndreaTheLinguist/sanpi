@@ -465,16 +465,15 @@ results/freq_out/spearman
 results/**/heatmaps
 
 ### `ucs_tables/` exclusions
-**/ucs_tables/.ucs_tmp.tsv
-**/ucs_tables/*.ll*
-**/ucs_tables/*.ranks.*
+**/ucs/.ucs_tmp.tsv
+**/ucs/*.ll*
+**/ucs/*.ranks.*
 # don't commit any of the `..view_r-only..` files
-**/ucs_tables/**/*r-only.txt
-**/ucs_tables/**/*view.txt
-**/ucs_tables/**/*init.txt
-**/ucs_tables/**/readable/*0x*
-**/ucs_tables/[!d]*/**/*.gz
-**/ucs_tables/RBXadj/readable/all_adj-x-adv_*35f*_min[123]*x.rsort-view*
+**/ucs/**/*r-only.txt
+**/ucs/**/*view.txt
+**/ucs/**/*init.txt
+**/ucs/**/readable/*0x*
+**/ucs/[!d]*/**/*.gz
 results/**/ucs_logs
 results/ucs_tables/dataframes/**/prior_extra/*
 results/freq_out/**/images/*sample-heatmap*png
@@ -501,8 +500,28 @@ analyze/utils
 
 setup
 .vscode/launch.json
-results/ucs_tables/**/readable/*
-results/ucs_tables/misc/*/*.txt
+
+info/samples/freq_3x3.with-sum.*csv
+info/md_import_images
+info/md_import_logs
+info/md_import_tables
+info/set-diff_COM*-bigram_non0LRC-*.md
+
+results/assoc_df/**/*.parq
+results/ucs/**/*gz
+results/ucs/env_prepped_tsv/com*direct.tsv
+results/transformed
+info/*
+results/freq_out
+results/assoc_df/**/*_min[0-9]*x.csv
+# results/assoc_df/**/*_min[0-9]*x.parq
+results/assoc_df/meta-info
+results/top_AM/*/*bigram_ex*/*/alt_ex
+source/utils/am_notebooks.py
+notebooks/jw
+source/analyze/utils
+writing_assets.link
+
 setup/-cluster.23-03-25.yml
 results/top_AM/top9adv_sample-9-hit-tables_2024-05-15.pkl.gz
 results/top_AM/top6adv_sample-6-hit-tables_2024-05-15.pkl.gz
