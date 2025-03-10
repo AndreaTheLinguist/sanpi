@@ -2,19 +2,20 @@ import itertools as it
 import re
 import textwrap
 from functools import lru_cache
+from inspect import currentframe as icf
+from inspect import stack as ist
 from os import system
 from pathlib import Path
 from pprint import pprint
 from typing import Optional, Union
 
+import matplotlib as mpl
 import more_itertools as more_it
 import numpy as np
 import pandas as pd
 import pyarrow as pyar
 from association_measures import frequencies as am_fq
 from association_measures import measures as am_ms
-from matplotlib import pyplot as plt
-import matplotlib as mpl
 
 import source.utils.colors as colors
 from source.utils.associate import (AM_DF_DIR, POLAR_DIR, RESULT_DIR,
@@ -33,10 +34,25 @@ from source.utils.general import (SANPI_HOME, TEX_ASSETS, confirm_dir,
                                   timestamp_year)
 from source.utils.sample import sample_pickle as sp
 
+plt = mpl.pyplot
+plt.rcParams['font.family'] = ['cmr10', 'serif']
+# plt.rcParams['font.sans-serif'] = ['cmss10','Computer Modern Sans Serif']
+# plt.rcParams['font.serif'] = ['cmr10', 'cm', 'cmex10', 'cmsy10', 'Computer Modern Roman',]
+# plt.rcParams['font.monospace'] = ['cmtt10', 'Computer Modern Typewriter']
+# plt.rcParams['mathtext.fontset'] = 'cm'  # Use custom font for math text
+# plt.rcParams['mathtext.rm'] = 'cmr10' # Replace with your desired font name
+# plt.rcParams['mathtext.it'] = 'cmi10'  # Italic font
+# plt.rcParams['mathtext.bf'] = 'cmb10'  # Bold font
+plt.style.use('seaborn-v0_8-paper')
+
 INVESTIGATE_COLUMN_LIST = ['l2', 'polarity', 'direction', 'space',
                            'pos_sample', 'dataset', 'adj', 'adj_total',
-                           'dP1', 'dP1m', 'LRC', 'LRCm',
-                           'P1', 'P1m', 'G2',
+                           'LRC', 'LRCm',
+                           'dP1', 'dP1m', 
+                           'P1', 'P1m', 
+                           'G2',
+                           'dP2','dP2m', 
+                           'P2','P2m', 
                            'f1', 'f2', 'N',
                            'f', 'exp_f', 'unexp_f',
                            'f_sqrt', 'f2_sqrt', 'unexp_f_sqrt',
@@ -53,6 +69,8 @@ confirm_dir(LATEX_TABLES)
 TABLE_DIR = WRITING_LINKS.joinpath('imports/tables')
 # IMAGE_DIR = WRITING_LINKS.joinpath('imports/images')
 IMAGE_DIR = TEX_ASSETS/'images'
+EXACTLY_IMAGES = IMAGE_DIR.joinpath('exactly')
+confirm_dir(EXACTLY_IMAGES)
 SPELL_OUT = {'pol': 'polarity',
              'pos': 'positive',
              'neg': 'negative',
@@ -116,9 +134,11 @@ def _set_priorities():
         cols = _priority_dict[tag]
         _priority_dict[f'{tag}_init'] = cols
         _priority_dict[f'{tag}'] = adjust_am_names(cols)
-        blind_cols = ['conservative_log_ratio', 'deltaP_mean',
+        blind_cols = ['conservative_log_ratio', 
+                      'deltaP_mean',
+                    #   'deltaP_max',
                       'am_log_likelihood',
-                      'deltaP_max']
+                      ]
         _priority_dict[f'{tag}_blind'] = adjust_am_names(blind_cols)
     return _priority_dict
 
@@ -1514,8 +1534,7 @@ def set_my_style(
     names_font: str = DEFAULT_FONTS['names'],
     data_font: str = DEFAULT_FONTS['data'],
     data_size: Union[int, float] = 8.5,
-    caption: Optional[str] = None
-):
+    caption: Optional[str] = None):
     """
     Apply consistent styling to pandas DataFrame or Styler.
 
@@ -1722,7 +1741,6 @@ def add_space_info(amdf):
         amdf['pos_sample'] = amdf.space.str.split('+').str.get(0)
     return amdf
 
-
 def load_all_relevant_ams(_target_set, f_min=1, unit='adv',
                           _extra_dirs: list = None,
                           label: str = None,
@@ -1734,11 +1752,12 @@ def load_all_relevant_ams(_target_set, f_min=1, unit='adv',
             if polar
             else AM_DF_DIR.joinpath('adv_adj').glob('ANY*'))
     ]
-    # print_iter(f'{p.relative_to(POLAR_DIR)}/' for p in adv_extra_dirs)
+    print_iter(f'{p.relative_to(POLAR_DIR)}/' for p in _extra_dirs)
     # all_adv_parqs = [**p for p in [list(d.glob('*min5x_extra.parq')) for d in adv_extra_dirs]]
     uploads = []
-    for parqs_pair in (d.glob(f'*min{f_min}x_extra.parq') for d in _extra_dirs):
-        # print_iter([p.relative_to(POLAR_DIR) for p in parqs_pair], indent=4)
+    for parqs_pair in (tuple(d.glob(f'*min{f_min}x_extra.parq')) for d in _extra_dirs):
+        print('\n%%%%%%%%%%%%%%%%%')
+        print_iter([p.relative_to(POLAR_DIR) for p in parqs_pair], indent=0)
         for parq in parqs_pair:
             space = parq.stem.replace('_any', '').split('_')[1].replace(
                 '-direct', '+sup').replace('-mirror', '+mir')
@@ -1812,17 +1831,27 @@ def load_all_relevant_ams(_target_set, f_min=1, unit='adv',
     return all_rel_df.reset_index().set_index('space_key').sort_values(
         ['dP1', 'LRC'], ascending=False)
 
-
 def load_filtered_parq(_target_set, unit, parq):
-    sdf = pd.read_parquet(
+    """
+    Loads a filtered parquet file.
+
+    This function reads a parquet file using pyarrow, filtering rows based on the specified unit.
+
+    Args:
+        _target_set: The set of target values to filter by.
+        unit (str): The unit to filter on ('adv', 'adj', 'bigram', or other).
+        parq (str or Path): Path to the parquet file.
+
+    Returns:
+        pd.DataFrame: The filtered DataFrame.
+    """
+    return pd.read_parquet(
         parq, engine='pyarrow',
         filters=[('l2' if unit in ('adv', 'adj')
                   else ('adv' if unit == 'bigram'
                         else 'l1'),
                   'in', _target_set)]
     )
-
-    return sdf
 
 
 def add_nonattested_pairs(unit: str, sdf: pd.DataFrame, polar: bool = True):
@@ -1874,8 +1903,7 @@ def fill_ams_for_zeros(amdf):
     # + conservative log ratio = LRC
     # + log-likelihood = G2
     # ?? versatility?
-    def conditional_prob(row: pd.Series, given: int = 2):
-        return row.loc['f']/row.loc[f'f{given}']
+
 
     _amdf = amdf.copy().convert_dtypes()
     freqs = am_fq.observed_frequencies(
@@ -1915,7 +1943,8 @@ def fill_ams_for_zeros(amdf):
     return _amdf
 
 # * "manual" AM table adjustments
-
+def conditional_prob(row: pd.Series, given: int = 2):
+    return row.loc['f']/row.loc[f'f{given}']
 
 def extend_freq_cols(amdf):
     for fc in amdf.filter(regex=r'(f\d?|exp_f|ad._total)$').columns:
@@ -2135,18 +2164,22 @@ def show_example_l2(combined_amdf,
                     dataset=None,
                     pos_sample=None,
                     l1=None,
-                    precision: int = 3,
+                    adv:str='ADV',
+                    call_from:str='',
+                    precision: int = 5,
                     index_order=None,
                     transpose: bool = False,
                     columns: list = None,
-                    latex: bool = False):
-
+                    latex_advsubdir="env-l2-examples",
+                    latex: bool = True):
+    latex_subdir = str(Path(adv) / latex_advsubdir)
+    print('outdir:', latex_subdir)
     index_order = index_order or ['l2', 'dataset',
                                   'pos_sample', 'direction', 'polarity']
     example_l2 = example_l2 or combined_amdf.sample(1).l2.squeeze()
     ex_l2_amdf = combined_amdf.reset_index()
     addons = []
-    if 'polarity' in ex_l2_amdf.columns:
+    if 'polarity' in ex_l2_amdf.columns and not latex_subdir.count('blind'):
         column_label = f'ENV~{example_l2}'
         comparison = 'Polarity Sensitivity'
         if '_' not in example_l2:
@@ -2155,12 +2188,12 @@ def show_example_l2(combined_amdf,
             addons.append('adj_total')
     else:
         cmap = cmap or 'RdPu'
-        if 'polarity' in index_order:
+        if 'polarity' in index_order and not latex_advsubdir.count('polar'):
             index_order.pop(index_order.index('polarity'))
         if 'l1' not in index_order:
             index_order.insert(1, 'l1')
         addons.extend(['dP2', 'P2'])
-        column_label = f'ADV~{example_l2}'
+        column_label = f'{adv}~{example_l2}'
         comparison = 'Context-Blind Bigram-Internal Cohesion'
 
     cmap = cmap or ('PRGn' if '_' in example_l2 else 'BrBG')
@@ -2203,27 +2236,43 @@ def show_example_l2(combined_amdf,
 
     ex_l2_amdf.columns.set_names(column_label, inplace=True)
     columns_tag = ex_l2_amdf.columns.name.replace(' ', '-')
+
+    if column_label.startswith(adv):
+        try:
+            ex_l2_amdf = ex_l2_amdf.sort_index(level='polarity', ascending=False)
+        except Exception:
+            ex_l2_amdf = ex_l2_amdf.sort_index(level=1, ascending=False)
+    else:
+        ex_l2_amdf = ex_l2_amdf.sort_index(ascending=False)
+
     if transpose:
         ex_l2_amdf = ex_l2_amdf.transpose().convert_dtypes()
-
+    # print('minimum value:',min(0,ex_l2_amdf.min().min()))
+    # print('maximum value:',max(1,ex_l2_amdf.max().max()))
     sty = ex_l2_amdf.style.background_gradient(
-        cmap, axis=(1 if transpose else 0))
+        cmap, axis=(1 if transpose else 0), 
+        # vmin=min(0,ex_l2_amdf.min().min())
+        )
 
-    caption = (f"{comparison} of <b><i>"
+    caption = (comparison + " of \\textit{\\textbf{"
                + (column_label.replace('ENV~', '')
-                  .replace('_', ' ').replace('~', ' '))
-               + "</i></b>"
+                  .replace('_', ' ').replace('~', '$\\sim$'))
+               + "}}"
                ).capitalize()
-    # print(caption)
 
     if latex:
         sty = sty.format(thousands=',', na_rep='',
-                         escape='latex', precision=precision)
-        sty = format_negatives(format_zeros(sty, zeros_opacity=35))
-        save_latex_table(sty, caption=caption,
-                         label=f'example-{snake_to_camel(example_l2)}',
-                         latex_subdir=f"env~l2_examples/{example_l2}",
+                        #  escape='latex', precision=precision
+                         )
+        sty = format_zeros(sty, grey_out=True)
+        save_latex_table(
+            sty, caption=caption, verbose=True,
+                         label=f'l2ex-{latex_subdir.split("/")[-1]}.{snake_to_camel(example_l2)}',
+                         latex_subdir=latex_subdir,
+                         neg_color='Violet', 
+                         call_comment = f'% origin: {call_from} > {__name__}.{icf().f_code.co_name}:{icf().f_lineno}',
                          latex_stem=f"{columns_tag}_example-table")
+        return ex_l2_amdf
     else:
         sty = set_my_style(
             ex_l2_amdf, caption=caption,
@@ -2372,8 +2421,11 @@ def save_html(sty, stem: str,
 #     sty.to_html(html_path)
 #     return sty
 
-# > sourcery suggestion 👇
 
+def get_call_comment(_call):
+    # >>> get_call_comment(ist()[0])
+    call_info = [str(x) for x in [_call.filename, _call.lineno, _call.function, _call.code_context, _call.index]]
+    return textwrap.indent('\n'.join([f"timestamp: {timestamp_now()}", "origin: " + '; '.join(call_info)]),'% ')
 
 @lru_cache(maxsize=32)
 def _get_negligible_ranges(value_col):
@@ -2397,6 +2449,7 @@ def _infer_precision(value_col):
     elif 'P' in value_col or 'p_r' in value_col:
         return 3
     return 2
+
 
 
 def style_crosstab(df, rows, columns, value_col,
@@ -2517,6 +2570,7 @@ def style_crosstab(df, rows, columns, value_col,
     )
     if latex:
         save_latex_table(sty, caption=caption, latex_stem=file_stem, latex_subdir=prefilter_label,
+                         call_comment=get_call_comment(ist()[0]),
                          label=file_stem, longtable=(len(ctdf) > 15))
     else:
         html_path = out_dir / html_filename
@@ -2583,10 +2637,12 @@ def format_negatives(sty, min_val=-10*10):
 
 def format_zeros(sty,
                  value_col: str = 'LRC',
+                 grey_out:bool = False,
                  zeros_opacity: int = None):
 
     return _apply_zero_highlighting(sty=sty,
                                     value_col=value_col,
+                                    background=grey_out,
                                     zeros_opacity=zeros_opacity)
 
 
@@ -2607,28 +2663,32 @@ def _apply_neg_highlighting(min_val, sty):
 
 def _apply_zero_highlighting(sty,
                              value_col: str,
+                             background: bool = False,
                              zeros_opacity: int = None):
-
+        
     left, right = _get_negligible_ranges(value_col)
     return sty.highlight_between(
         left=left, right=right,
         # axis=1,
-        props=f'opacity: {zeros_opacity or 60}%;'
+        props=(
+            'background-color: Gray!30; color:Black!70' if background else
+            f'opacity: {zeros_opacity or 60}%;'
+            )
     )
 
 
 def color_compiled_adv(_amdf: pd.DataFrame,
-                       adverb: str,
+                       adverb: str='exactly',
                        index_cols: list = None,
                        freq_only: bool = False,
-                       save_html: bool = True
+                       save_table: bool = True
                        ):
     _amdf = prep_compiled_adv(_amdf, adverb=adverb,
                               index_cols=index_cols,
                               freq_only=freq_only)
     return style_compiled_adv(_amdf, adverb=adverb,
                               freq_only=freq_only,
-                              save_html=save_html)
+                              save_table=save_table)
 
 
 def prep_compiled_adv(_amdf: pd.DataFrame,
@@ -2667,7 +2727,7 @@ def prep_compiled_adv(_amdf: pd.DataFrame,
 def style_compiled_adv(_amdf: pd.DataFrame,
                        adverb: str,
                        freq_only: bool = False,
-                       save_html: bool = True):
+                       save_table: bool = True):
     adv_sty = (
         _amdf
         .style
@@ -2705,24 +2765,27 @@ def style_compiled_adv(_amdf: pd.DataFrame,
                    .background_gradient(cmap='anastasia', axis=None, subset=_amdf.filter(like='LRC').columns.to_list(), vmin=-7, vmax=7)
                    .background_gradient(cmap='anastasia', axis=None, subset=_amdf.filter(regex=r'^[^dD]*P').columns.to_list(), vmin=0, vmax=1)
                    .background_gradient(cmap='lilac_rose', axis=0, subset=_amdf.filter(regex=r'G\^?2').columns.to_list()))
-    adv_sty = adv_sty.format(subset=_amdf.filter(
-        regex=r'[fG]').columns.to_list(), precision=0, thousands=',')
-    if save_html:
-        adv_dir = TABLE_DIR.joinpath(adverb)
-        confirm_dir(adv_dir)
-        html_path = adv_dir.joinpath(
-            f'{adverb}_{"".join(_amdf.index.names)}_{"f" if freq_only else "am+f"}.{timestamp_hour()}.html')
-
+    # adv_sty = adv_sty.format(subset=_amdf.filter(
+    #     regex=r'[fG]').columns.to_list(), precision=0, thousands=',')
+    if save_table:
+        adv_sty = sty_escape_tex(adv_sty)
+        stem='-'.join([adverb, snake_to_camel("_".join(_amdf.index.names)),
+            "f" if freq_only else "am+f"])
+            # .{timestamp_today()}.tex']))
         print(
-            f'Stylized table for {adverb} saved as "{html_path.relative_to(WRITING_LINKS)}"')
-        set_my_style(adv_sty, index_font='',
-                     index_size=8,
+            f'Stylized table for {adverb} saved as "{adverb}/{stem}"')
+        save_latex_table(format_negatives(adv_sty), verbose=True,
                      caption=(
-                         f'Compiled {"Frequencies" if freq_only else "Association Values"}'
-                         f' for <i><b>{adverb}</b></i><br/>(<code>tpm</code>="tokens per million"; rounded)')
-                     ).to_html(html_path)
+                         'Compiled '
+                         + ("Frequencies" if freq_only else "Association Values")
+                         +" for \\textit{\\textbf{"+adverb+"}}\\\\(tpm=``tokens per million'')"),
+                    #  latex_path = save_path
+                    latex_subdir=adverb, latex_stem = stem
+                     )
     return adv_sty
 
+def sty_escape_tex(sty):
+    return sty.format(escape='latex', na_rep='').format_index(escape='latex', axis=0).format_index(escape='latex', axis=1)
 
 def color_polar_table(_polar_df, indexer: str = 'l2',
                       html_stem=None):
@@ -2809,7 +2872,7 @@ def plot_mean_delta(flat_df, size_tuple=(8, 10), colormap_name='purple_teal',
         #   xticks=[-0.6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,],
     )
     col_names = _get_col_names(_df)
-    plt.savefig(compose_png_path('-'.join(col_names),
+    plt.savefig(compose_img_path('-'.join(col_names),
                                  dirpath=image_dir, label_str=image_label),
                 dpi=300, bbox_inches='tight', pad_inches=0.2)
     plt.show()
@@ -2833,7 +2896,7 @@ def plot_mean_lrc(flat_df, size_tuple, colormap_name='lilac_rose',
             yticks=_lrc_ticks, xlabel='adverb', width=0.7,
             colormap=colormap_name, title=_title)
     col_names = _get_col_names(_df)
-    plt.savefig(compose_png_path('-'.join(col_names),
+    plt.savefig(compose_img_path('-'.join(col_names),
                                  dirpath=image_dir, label_str=image_label),
                 dpi=300, bbox_inches='tight', pad_inches=0.2)
     plt.show()
@@ -2856,7 +2919,7 @@ def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
             title=_title,
         )
         col_names = _get_col_names(_df)
-        plt.savefig(compose_png_path('-'.join(col_names),
+        plt.savefig(compose_img_path('-'.join(col_names),
                                      dirpath=image_dir, label_str=image_label),
                     dpi=300, bbox_inches='tight', pad_inches=0.2)
 
@@ -2870,7 +2933,7 @@ def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
             title=_title, ylabel='+'.join(_df.index.names)
         )
         col_names = _get_col_names(_df)
-        plt.savefig(compose_png_path('-'.join(col_names),
+        plt.savefig(compose_img_path('-'.join(col_names),
                                      dirpath=image_dir, label_str=image_label),
                     dpi=300, bbox_inches='tight', pad_inches=0.2)
 
@@ -2885,7 +2948,7 @@ def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
                 _df.index.names)
         )
         col_names = _get_col_names(_df)
-        plt.savefig(compose_png_path('-'.join(col_names),
+        plt.savefig(compose_img_path('-'.join(col_names),
                                      dirpath=image_dir, label_str=image_label),
                     dpi=300, bbox_inches='tight', pad_inches=0.2)
         plt.show()
@@ -2900,7 +2963,7 @@ def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
                 _df.index.names)
         )
         col_names = _get_col_names(_df)
-        plt.savefig(compose_png_path('-'.join(col_names),
+        plt.savefig(compose_img_path('-'.join(col_names),
                                      dirpath=image_dir, label_str=image_label),
                     dpi=300, bbox_inches='tight', pad_inches=0.2)
         plt.show()
@@ -2926,7 +2989,7 @@ def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
             xlabel='square root of tokens per million'
         )
         col_names = _get_col_names(_df)
-        plt.savefig(compose_png_path('-'.join(col_names),
+        plt.savefig(compose_img_path('-'.join(col_names),
                                      dirpath=image_dir, label_str=image_label),
                     dpi=300, bbox_inches='tight', pad_inches=0.2)
         plt.show()
@@ -2943,7 +3006,7 @@ def plot_polar_f(flat_df, size_tuple, colormap_name, plot_kind='barh',
             xlabel='unexpected tokens / observed tokens (floor = -1)'
         )
         col_names = _get_col_names(_df)
-        plt.savefig(compose_png_path('-'.join(col_names),
+        plt.savefig(compose_img_path('-'.join(col_names),
                                      dirpath=image_dir, label_str=image_label),
                     dpi=300, bbox_inches='tight', pad_inches=0.2)
         plt.show()
@@ -2984,10 +3047,10 @@ def join_polar_vals(adv_amdf, indexer):
     )
 
 
-def compose_png_path(plot_name: str,
+def compose_img_path(plot_name: str,
                      dirpath: Path,
                      label_str: str = '',
-                     suffix: str = '.png'):
+                     suffix: str = '.pgf'):
     if label_str:
         dirpath = dirpath.joinpath(label_str)
     confirm_dir(dirpath)
@@ -3069,25 +3132,31 @@ def plot_polar_grouped(adv_amdf, indexer: str = 'l2',
 
 def rename_cols_for_latex(sty):
     col_rename_dict = {
-        'f1': 'f_1',
-        'f2': 'f_2',
+        'f1': 'f1',
+        'f2': 'f2',
         'N': 'N',
         'f': 'f',
-        'fu': 'f_U',
-        'unexp_f': 'f_U',
-        'unexp_r': 'r_U',
-        'tpm_f': 'f(tpm)',
-        'tpm_f1': 'f_1(tpm)',
-        'tpm_f2': 'f_2(tpm)',
-        'tpm_fu': 'f_U(tpm)',
+        'fu': 'fU',
+        'unexp_f': 'fU',
+        'unexp_r': 'rU',
+        'tpm_f': 'f (tpm)',
+        'tpm_f1': 'f1 (tpm)',
+        'tpm_f2': 'f2 (tpm)',
+        'tpm_fu': 'fU (tpm)',
+        'unexp\\_f': 'fU',
+        'unexp\\_r': 'rU',
+        'tpm\\_f': 'f (tpm)',
+        'tpm\\_f1': 'f1 (tpm)',
+        'tpm\\_f2': 'f2 (tpm)',
+        'tpm\\_fu': 'fU (tpm)',
         'LRC': 'LRC',
-        'dP1': '$\Delta P(env|<i>exactly</i>)$',
-        'P1': '$P(env|<i>exactly</i>)$',
-        'G2': '$G^2$'}
-
-    return sty.relabel_index(
-        sty.columns.to_series().map(col_rename_dict).to_list(),
-        axis='columns')
+        'dP1': 'Delta P(env|exactly)',
+        'P1': 'P(env|exactly)',
+        'G2': 'G2'}
+    new_cols = [col_rename_dict[c] 
+                if c in col_rename_dict.keys() 
+                else c for c in sty.columns]
+    return sty.relabel_index(new_cols, axis='columns').format_index(axis=1,escape='latex')
 
 
 def save_latex_table(sty,
@@ -3096,6 +3165,7 @@ def save_latex_table(sty,
                      latex_stem: str = None,
                      latex_subdir: str = None,
                      label: str = '',
+                     call_comment:str='',
                      #  precision: int = None,
                      longtable: bool = False,
                      multicol_align: str = 'c',
@@ -3107,12 +3177,20 @@ def save_latex_table(sty,
                      default_SI:float=7.2,
                      text:bool=False,
                      verbose: bool = False):
+    if not call_comment: 
+        call= ist()[1]
+        call_comment = f"% origin: ({icf().f_code.co_name})\n% called from {call.filename}:{call.lineno} (function: {call.function})"
+    call_comment += f'\n% {repr(ist()[0].frame)}'
     # make sure it's a style object
     if isinstance(sty, pd.DataFrame): 
         sty = sty.style
     # vet length before saving to file
-    if len(sty.index) > 50: 
-        print('! Error: Table has more than 50 rows---too long. Reconsider what you want to include.\n  NO TABLE SAVED.')
+    if len(sty.index) > 40 and len(sty.columns) > 8:
+        print('! Error: Table has more than 40 rows X more than 8 columns---too large. Reconsider what you want to include.\n  NO TABLE SAVED.')
+        nb_display(sty)
+        return
+    if (len(sty.index) > 70): 
+        print('! Error: Table has more than 70 rows---too long. Reconsider what you want to include.\n  NO TABLE SAVED.')
         nb_display(sty)
         return
     if len(sty.columns) > 30: 
@@ -3172,9 +3250,7 @@ def save_latex_table(sty,
         except AttributeError:
             pass
         # ! remove precision and thousands so that `siunitx` can deal with the raw numbers intelligently
-        sty = sty.format(  # escape='latex',
-            na_rep='', thousands='',
-            #  precision=precision or 2
+        sty = sty.format(thousands=''  #, escape='latex',na_rep='', #  precision=precision or 2
         )
 
         try:
@@ -3187,13 +3263,11 @@ def save_latex_table(sty,
         except Exception:
             pass
             
-    # .to_series().apply(snake_to_camel).to_list()
-    sty = sty.format_index(escape='latex')
-    sty = sty.format_index(escape='latex', axis=1)
     if text: 
         col_formats_str = '*{' + str(len(sty.columns)+1) + '}{l}'
         col_format_comment = '%TODO columns not adjusted---text expected. Adjustments probably needed'
     else:
+        sty = format_zeros(sty, grey_out=True)
         si_formats = sty.columns.to_series().map({
             'f': 'S[table-format=7.0]',
             'f1': 'S[table-format=7.0]',
@@ -3236,7 +3310,7 @@ def save_latex_table(sty,
                         # + '>{\\raggedright\\arraybackslash}m{1.75cm}'
                         + '}')
         col_formats_str = str_col_types + '\n    '.join(si_formats.to_list())
-        print(col_formats_str)
+        # print(col_formats_str)
         try:
             col_format_comment = (
                 '% ' + 
@@ -3247,8 +3321,9 @@ def save_latex_table(sty,
                 '% ' + 
                 '\n% '.join((si_formats+' % '+si_index).to_list()))
         
-
-    latex_table_str = sty.to_latex(
+    
+    latex_table_str = sty_escape_tex(
+        sty).to_latex(
         position=position,
         convert_css=True,
         multicol_align=multicol_align,
@@ -3267,13 +3342,13 @@ def save_latex_table(sty,
         latex_table_str = (latex_table_str
                         .replace('deltaP_mean', 'dPavg')
                         .replace('deltaP\_mean', 'dPavg')
-                        .replace('exactly_', 'exactly ')
-                        .replace('\_', '_'))
+                        )
     if camel_case:
-        latex_table_str = snake_to_camel(latex_table_str)
+        latex_table_str = snake_to_camel(latex_table_str.replace('\_', '_').replace('exactly_', 'exactly '))
         
     latex_table_str = (latex_table_str
         #    .replace('\caption', '\caption')
+        .replace('exactly\_', 'exactly ')
         .replace('<b>', '\\textbf{')
         .replace('</b>', '}')
         .replace('<i>', '\\textit{')
@@ -3281,44 +3356,44 @@ def save_latex_table(sty,
         #    .replace('; ', '\\newline ')
         .replace('<u>', '\\underline{')
         .replace('</u>', '}')
-        #    .replace('<br/>', '\\newline')
+        .replace('~', '$\sim$')
+           .replace('<br/>', '\\\\')
         .replace('->', '$\\rightarrow$')
         # .replace('env', '\\textsc{env}')
         .replace('<Code>', '\\cmtt{')
         .replace('</Code>', '}')
-        .replace('<code>', '\\cmtt')
+        .replace('<code>', '\\cmtt{')
         .replace('</code>', '}')
         .replace('{#}', '{\#}')
     )
     latex_table_str = re.sub(r'"(\S)', r'``\1', latex_table_str)
+    latex_table_str = re.sub(r'tpm\\?_(\w+)', r'\1'+' (tpm)', latex_table_str)
     latex_table_str = re.sub(r'(\([\+\-]\))', '$'+r'\1'+'$', latex_table_str)
     latex_table_str = re.sub(r'\\th\..*\n', '', latex_table_str)
     # latex_table_str = re.sub(r'(?<!\\)([%#])', '\\'+r'\1', latex_table_str)
-    latex_table_str = latex_table_str.replace(
-        '\\\\', '\\').replace('\\\n', '\\\\\n')
+    latex_table_str = re.sub(r'(?<!\\)\\(?=\n)','\\\\',latex_table_str)
+    latex_table_str = re.sub(r'(?<!\\)\\\\(\w+\{)',r'\\\1',latex_table_str)
+    # latex_table_str = latex_table_str.replace('\\\n', '\\\\\n')#.replace('\\\\', '\\')
     # # > force precision
     # latex_table_str =   re.sub(r'(\.\d{'+str(precision)+'})0+',
     #     r'\1', latex_table_str),
-    latex_table_str = '\n'.join(
-        ['\\singlespacing\n\\scriptsize\\noindent',
+    sections=['\\singlespacing\n\\scriptsize' if longtable else '\\tofix{\\autoref{'+label+'} fontsize }',
          latex_table_str,
-         '\\normalsize\n\\normalspacing'
-         ])
+         '\\normalsize\n\\normalspacing' if longtable else ''
+         ]
+    latex_table_str = '\n'.join(sections)
     #! attempting to force thousands separators post-hoc will break any color codes
     # // latex_table_str = re.sub(r'(?<=\d)(\d{3})(?=\D)', r'\1,', latex_table_str)
     if verbose:
         try:
-            nb_display(sty)
+            nb_display(sty.format(thousands=',', precision='2'))
 
         except Exception:
             print(textwrap.indent(latex_table_str, ' '*4))
-    with latex_path.open(mode='w',
-                         encoding='utf8') as out:
-        out.write('\n% '.join(package_req_warnings)
-                  + '\n\n'
-                  + col_format_comment
-                  + '\n\n'
-                  + latex_table_str)
+    latex_path.write_text('\n\n'.join([call_comment,
+                                       '\n% '.join(package_req_warnings),
+                                       col_format_comment, 
+                                       latex_table_str]))
     print('Stylized latex table saved as:\n ',
           latex_path.relative_to(TEX_ASSETS.parent.parent), end='\n\n')
     return (latex_path)

@@ -9,14 +9,15 @@ from sys import argv
 
 import matplotlib.pyplot as plt
 from am_notebooks import (IMAGE_DIR, LATEX_TABLES, SANPI_HOME, TABLE_DIR,
-                          WRITING_LINKS, Path, colors, 
-                          compose_png_path, format_negatives, format_zeros,
+                          WRITING_LINKS, Path, colors,
+                          compose_img_path, format_negatives, format_zeros,
                           confirm_dir, pd, save_latex_table, set_my_style,
                           snake_to_camel, timestamp_today)
 
 from source.utils.general import camel_to_snake
 
 VERBOSE = True
+
 
 def tex_path_from_md(md_path):
     print(
@@ -64,7 +65,7 @@ def plot_barh(png_stem, df):
         xlabel=', '.join(df.columns), grid=True, subplots=True)
     # print(col_names)
     _fig = plt.savefig(
-        compose_png_path('-'.join([snake_to_camel(c.strip().replace(' ', '_'))
+        compose_img_path('-'.join([snake_to_camel(c.strip().replace(' ', '_'))
                                    for c in col_names]),
                          dirpath=IMAGE_DIR, label_str=png_stem),
         dpi=400, bbox_inches='tight', pad_inches=0.2)
@@ -159,13 +160,13 @@ def process_csv_input(abs_path, verbose: bool = False):
     sty = format_zeros(format_negatives(
         df.style.background_gradient(cmap)
     ))
-    if verbose: 
+    if verbose:
         with contextlib.suppress(Exception):
             display(set_my_style(sty))
     save_latex_table(
         sty,
         longtable=len(df) > 10,
-        verbose=verbose, 
+        verbose=verbose,
         position='ht',
         label=f'tab:{latex_path.stem}',
         latex_path=latex_path)
@@ -198,4 +199,3 @@ for arg in args:
 #           .replace('deltaP_mean', 'dPavg')).replace('%', '\%'),
 #       '\\normalsize', '\\normalspacing',
 #       sep='\n')
-

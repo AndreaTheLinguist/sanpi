@@ -310,25 +310,54 @@ nb_display(set_my_style(orig_counts_df.filter(
 nb_display(set_my_style(birc_counts_df.filter(
     like='per').loc[samix, :].T, caption='"Rate" columns for BiRC Counts'))
 # %%
-save_latex_table(orig_counts_df.describe().T.iloc[:, 1:].assign(Total=orig_counts_df.sum()).convert_dtypes(),
-                 caption='Original Corpora Counts & Rates: Descriptive Stats', verbose=True,
-                 latex_subdir=REL_BIRC_TEX_DIR,
-                 latex_stem='plus-rates-descrip-stats-orig')
 
-save_latex_table(birc_counts_df.describe().T.iloc[:, 1:].assign(Total=birc_counts_df.sum()).convert_dtypes(),
-                 caption='BiRC Counts & Rates: Descriptive Stats', verbose=True,
-                 latex_subdir=REL_BIRC_TEX_DIR,
-                 latex_stem='plus-rates-descrip-stats-birc')
+save_latex_table(
+    orig_counts_df
+    .describe().T
+    .filter(['mean', '50%', 'min', 'max'])
+    .assign(
+        Total=orig_counts_df.sum(),
+        CVx100=(orig_counts_df.std()/orig_counts_df.mean()) * 100
+    ).convert_dtypes(),
+    caption='Original Corpora Counts & Rates: Descriptive Stats', verbose=True,
+    latex_subdir=REL_BIRC_TEX_DIR, default_SI=10.1,
+    latex_stem='plus-rates-main-stats-orig')
 
-save_latex_table(orig_counts_df.filter(like='per').describe().T.iloc[:, 1:].assign(Total=orig_counts_df.sum()).convert_dtypes(),
-                 caption='Original Corpora Rates: Descriptive Stats', verbose=True,
-                 latex_subdir=REL_BIRC_TEX_DIR,
-                 latex_stem='only-rates-descrip-stats-orig')
+save_latex_table(
+    birc_counts_df
+    .describe().T
+    .filter(['mean', '50%', 'min', 'max'])
+    .assign(
+        Total=birc_counts_df.sum(),
+        CVx100=(birc_counts_df.std()/birc_counts_df.mean()) * 100
+    ).convert_dtypes(),
+    caption='BiRC Counts & Rates: Descriptive Stats', verbose=True,
+    latex_subdir=REL_BIRC_TEX_DIR, default_SI=10.1,
+    latex_stem='plus-rates-main-stats-birc')
 
-save_latex_table(birc_counts_df.filter(like='per').describe().T.iloc[:, 1:].assign(Total=birc_counts_df.sum()).convert_dtypes(),
-                 caption='BiRC Rates: Descriptive Stats', verbose=True,
-                 latex_subdir=REL_BIRC_TEX_DIR,
-                 latex_stem='only-rates-descrip-stats-birc')
+save_latex_table(
+    orig_counts_df.filter(like='per')
+    .describe().T
+    .filter(['mean', '50%', 'min', 'max'])
+    .assign(
+        Total=orig_counts_df.sum(),
+        CVx100=(orig_counts_df.std()/orig_counts_df.mean()) * 100
+    ).convert_dtypes(),
+    caption='Original Corpora Rates: Descriptive Stats', verbose=True,
+    latex_subdir=REL_BIRC_TEX_DIR, default_SI=10.1,
+    latex_stem='only-rates-main-stats-orig')
+
+save_latex_table(
+    birc_counts_df.filter(like='per')
+    .describe().T
+    .filter(['mean', '50%', 'min', 'max'])
+    .assign(
+        Total=birc_counts_df.sum(),
+        CVx100=(birc_counts_df.std()/birc_counts_df.mean()) * 100
+    ).convert_dtypes(),
+    caption='BiRC Rates: Descriptive Stats', verbose=True,
+    latex_subdir=REL_BIRC_TEX_DIR, default_SI=10.1,
+    latex_stem='only-rates-main-stats-birc')
 # %% [markdown]
 # ## *Calculate **Reduction*** (<code>BiRC - Full</code>)
 reduction_df = birc_counts_df - orig_counts_df
@@ -455,9 +484,9 @@ save_latex_table(
 
 
 # %%
-for cue in ['ADV_tok', 'ADJ_tok', 
-            'ADV_lemma', 'ADJ_lemma', 
-            'ADV_form', 'ADJ_form', 
+for cue in ['ADV_tok', 'ADJ_tok',
+            'ADV_lemma', 'ADJ_lemma',
+            'ADV_form', 'ADJ_form',
             'NEG_tok']:
     save_latex_table(by_corpus_descrip.filter(like=cue, axis=0),
                      caption=f'BiRC {cue} Comparisons: By Corpus', verbose=True,

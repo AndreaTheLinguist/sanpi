@@ -11,7 +11,9 @@ from association_measures import frequencies as amfq, measures as amms
 
 L1 = 'trigger_lemma'
 L2 = 'adv_form_lower'
-
+pd.set_option('display.max_colwidth', 15)
+pd.set_option('display.max_columns', 6)
+pd.set_option('display.width', 120)
 HIT_DATA_DIR = Path('/share/compling/data/sanpi/2_hit_tables')
 NEG_SUPER_PARQ = HIT_DATA_DIR.joinpath('RBdirect/ALL-RBdirect_final.parq')
 POS_SUPER_PARQ = HIT_DATA_DIR.joinpath(
@@ -61,12 +63,12 @@ def load_trigger_info(parq_paths):
             polarity = 'pos'
         _df = pd.read_parquet(
             path, engine='pyarrow',
-            columns=pd.Series(
+            columns=(pd.Series(
                 [L1, L2] +
                 ['trigger_lemma', 'trigger_lower', 'bigram_lower',
                  f'{trig_node}_head', f'{trig_node}_deprel',
                  'adv_form_lower', 'adj_form_lower', 'bigram_id']
-            ).drop_duplicates().to_list())
+            ).drop_duplicates().to_list()))
         _df = rename_trigger_dep_info(_df)
         _df = _df.assign(polarity=polarity).convert_dtypes()
         sources.append(_df)
@@ -84,7 +86,7 @@ def load_trigger_info(parq_paths):
 
 # %%
 df_super_neg = load_trigger_info([NEG_SUPER_PARQ])
-df_super_neg.describe().T.iloc[:, 1:].convert_dtypes()
+print(df_super_neg.describe().T.iloc[:, 1:].convert_dtypes())
 #%%
 def display_trigger_totals(_df, dataset = 'superset', polar ='negative', cross='lower'):
     x = f'trigger_{cross}'
@@ -92,7 +94,7 @@ def display_trigger_totals(_df, dataset = 'superset', polar ='negative', cross='
                           ).value_counts([x,]).to_frame()
     if cross == 'head': 
         if _df[x].nunique() > 2: 
-            _df[x] = _df[x].map({'ADJ':'ADJ', 'MIR':'TRIGGER', 'NEG': 'TRIGGER'})
+            _df[x] = _df[x].map({'ADJ':'BIGRAM', 'MIR':'TRIGGER', 'NEG': 'TRIGGER'})
         cross_name = 'dependency head'  
         for_sty = for_sty.unstack().fillna(0).convert_dtypes()
     else: 
