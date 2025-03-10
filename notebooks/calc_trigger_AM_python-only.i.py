@@ -20,6 +20,7 @@ POS_SUPER_PARQ = HIT_DATA_DIR.joinpath(
     'not-RBdirect/ALL_not-RBdirect_final.parq')
 NEG_MIRROR_PARQ = HIT_DATA_DIR.joinpath('NEGmirror/ALL-NEGmirror_final.parq')
 POS_MIRROR_PARQ = HIT_DATA_DIR.joinpath('POSmirror/ALL-POSmirror_final.parq')
+print(timestamp_today())
 
 
 def rename_trigger_dep_info(df):
@@ -87,37 +88,94 @@ def load_trigger_info(parq_paths):
 # %%
 df_super_neg = load_trigger_info([NEG_SUPER_PARQ])
 print(df_super_neg.describe().T.iloc[:, 1:].convert_dtypes())
-#%%
-def display_trigger_totals(_df, dataset = 'superset', polar ='negative', cross='lower'):
+# %%
+
+
+def display_trigger_totals(_df, dataset='superset',
+                           polar='negative',
+                           cross='lower',
+                           cmap='YlGnBu'):
     x = f'trigger_{cross}'
-    for_sty = _df.groupby(['polarity','trigger_lemma']
-                          ).value_counts([x,]).to_frame()
-    if cross == 'head': 
-        if _df[x].nunique() > 2: 
-            _df[x] = _df[x].map({'ADJ':'BIGRAM', 'MIR':'TRIGGER', 'NEG': 'TRIGGER'})
-        cross_name = 'dependency head'  
-        for_sty = for_sty.unstack().fillna(0).convert_dtypes()
-    else: 
-        cross_name = 'case-normalized form'
-    save_latex_table(
-        sty=format_zeros(for_sty
-            .style
-            .background_gradient(axis=0, cmap='YlGnBu')
-            .format(precision=1, thousands=',', escape='latex')),
-        caption=(f'{dataset} {polar} Trigger Lemma Frequencies by {cross_name}'.title()),
+    cross_count_label = f"{x} total".replace('_', ' ')
+    total_name = 'lemma total'
+    _df[total_name] = _df.trigger_lemma.map(_df.trigger_lemma.value_counts())
+    indexers = ['polarity', 'rigger_lemma', total_name] if _df.polarity.nunique() > 1 else [
+        'trigger_lemma', total_name]
+    for_sty = _df.groupby(indexers).value_counts(
+        [x,]).to_frame(cross_count_label)
+    if cross == 'head':
+        if _df[x].nunique() > 2:
+            _df[x] = _df[x].map(
+                {'ADJ': 'BIGRAM', 'MIR': 'TRIGGER', 'NEG': 'TRIGGER'})
+        cross_name = 'dependency head'
+        for_sty = for_sty.unstack().fillna(0).droplevel(
+            0, axis=1).reset_index(level=total_name).sort_index(axis=1)
+        # head_totals = _df.value_counts(x).to_frame(cross_count_label).T
+        print(_df.value_counts(x)
+              .to_frame(cross_count_label).T
+              .style.background_gradient(cmap, axis=1)
+              .to_latex(siunitx=True, convert_css=True).replace('_', ' '))
+        for_sty = (
+            for_sty  # .assign(Total=q.sum(axis=1))
+            .sort_values(total_name, ascending=False)
+            .convert_dtypes())
+    else:
+        cross_name = 'lowercase form'
+        for_sty = (
+            for_sty.reset_index(level=total_name)
+            .sort_values([total_name, cross_count_label], ascending=False)
+            # .reset_index(level=x)
+            # .filter([total_name, x, cross_count_label])
+            .filter([total_name, cross_count_label])
+        )
+    for_sty['lemma % N'] = (for_sty[total_name] / for_sty[total_name].sum()) * 100
+    _sty = (for_sty.sort_index(axis=1).style
+            .background_gradient(
+                axis=0, cmap=cmap))
+    # nb_display(_sty)
+    tex_table = save_latex_table(
+        sty=_sty, 
+        longtable=cross=='lower',
+        caption=(
+            f'{dataset} {polar} Trigger Lemma Frequencies by {cross_name}'.title()),
         label=f'trig-lemma-{cross}-{dataset[:3]}-{polar[:3]}',
-        longtable=True,
-        latex_subdir='triggers',
+        verbose=True,
+        latex_subdir='ch2/triggers',
         latex_stem=f'trigger_lemma-{cross}_counts_{dataset[:3]}-{polar[:3]}')
 
-display_trigger_totals(df_super_neg, cross='head')
-# %%
 
 display_trigger_totals(df_super_neg)
-
 # %%
-df_mirror = load_trigger_info([NEG_MIRROR_PARQ, POS_MIRROR_PARQ])
-df_mirror.describe().T.iloc[:, 1:].convert_dtypes()
+display_trigger_totals(df_super_neg, cross='head', cmap='YlOrRd')
+#%%
+
+N_dict = {'super':  71961373,
+          'mirror':  1680633}
+def describe_triggers(_df):
+    lemma_counts = _df.value_counts('trigger_lemma')
+    form_counts = _df.value_counts('trigger_lower')
+    trig_stats = lemma_counts.describe().to_frame('lemma').join(
+        form_counts.describe().to_frame('lowercase form')
+    ).convert_dtypes()
+    trig_stats.columns.name = 'Trigger'
+    trig_stats = trig_stats.rename(index={'count': 'unique'})
+    trig_stats.loc['CV%'] = [(v.std()/v.mean()) * 100
+                             for v in (lemma_counts, form_counts)]
+    return trig_stats  # .iloc[1:, :]
+
+
+# nb_display(describe_triggers(df_super_neg))
+save_latex_table(
+    describe_triggers(df_super_neg), default_SI=7.0,
+    caption='Descriptive Statistics for Negative Superset Trigger Frequencies', 
+    latex_subdir= 'ch2/freq/neg-super/', position='ht', verbose=True,
+    latex_stem='neg-super-trigger-freq-descrip')
+
+# %% [markdown]
+#  Mirror Overall
+# %%
+# df_mirror = load_trigger_info([NEG_MIRROR_PARQ, POS_MIRROR_PARQ])
+# df_mirror.describe().T.iloc[:, 1:].convert_dtypes()
 
 # save_latex_table(
 #     sty=(df_mirror.groupby(['polarity', 'trigger_lemma']).value_counts(
@@ -146,8 +204,29 @@ df_mirror_neg.describe().T.iloc[:, 1:].convert_dtypes()
 #     latex_subdir='triggers',
 #     latex_stem='mirror-neg-trigger_lemma-form_counts')
 # %%
+
+save_latex_table(
+    describe_triggers(df_mirror_neg), default_SI=6.0,
+    caption='Descriptive Statistics for Negative Mirror Subset Trigger Frequencies', 
+    latex_subdir= 'ch2/freq/neg-mirror/', position='ht', verbose=True,
+    latex_stem='neg-mirror-trigger-freq-descrip')
+
+display_trigger_totals(df_mirror_neg, dataset='mirror')
+display_trigger_totals(df_mirror_neg, dataset='mirror', cross='head', cmap='YlOrRd')
+# %%
 df_mirror_pos = load_trigger_info([POS_MIRROR_PARQ])
 df_mirror_pos.describe().T.iloc[:, 1:].convert_dtypes()
+
+#%%
+save_latex_table(
+    describe_triggers(df_mirror_pos), default_SI=6.0,
+    caption='Descriptive Statistics for Positive Mirror Subset Trigger Frequencies', 
+    latex_subdir= 'ch2/freq/pos-mirror/', position='ht', verbose=True,
+    latex_stem='pos-mirror-trigger-freq-descrip')
+
+display_trigger_totals(df_mirror_pos, dataset='mirror', polar='positive', cmap='PuBu')
+display_trigger_totals(df_mirror_pos, dataset='mirror', polar='positive',  cross='head', cmap='PuBuGn')
+
 # save_latex_table(
 #     sty=(df_mirror_pos.groupby(['polarity', 'trigger_lemma']).value_counts(
 #         ['trigger_lower']).to_frame()
@@ -175,15 +254,17 @@ all_trigger_info = pd.concat(
 all_trigger_info
 # %%
 for tdf, pol, dat in [
-    (df_mirror, 'any polarity', 'mirror subset'), 
-    (df_mirror_neg, 'negative', 'mirror subset'), 
-    (df_mirror_pos, 'positive', 'mirror subset'), 
+    (df_mirror, 'any polarity', 'mirror subset'),
+    (df_mirror_neg, 'negative', 'mirror subset'),
+    (df_mirror_pos, 'positive', 'mirror subset'),
     (all_trigger_info, 'any polarity', 'any triggered data')
-    ]: 
+]:
     display_trigger_totals(tdf, polar=pol, dataset=dat, cross='head')
     display_trigger_totals(tdf, polar=pol, dataset=dat)
 
 # %%
+
+
 def add_assoc_key(_df,
                   l1: str = L1,
                   l2: str = L2):  # sourcery skip: use-fstring-for-concatenation
@@ -274,11 +355,11 @@ negmir_am_trig_adv = limit_am_df(am_trig_adv_negmir)
 posmir_am_trig_adv = limit_am_df(am_trig_adv_posmir)
 ALL_am_trig_adv = limit_am_df(am_trig_adv_ALL)
 
-for view, am_df in {'NEG Superset (-)': am_trig_adv, 
+for view, am_df in {'NEG Superset (-)': am_trig_adv,
                     'Mirror Subset (+/-)': mir_am_trig_adv,
                     'Any Triggered (+/-)': ALL_am_trig_adv,
-                    'NEG Mirror Subset (-)': negmir_am_trig_adv, 
-                    'POS Mirror Subset (-)': posmir_am_trig_adv, 
+                    'NEG Mirror Subset (-)': negmir_am_trig_adv,
+                    'POS Mirror Subset (-)': posmir_am_trig_adv,
                     }.items():
     caption = f'<b>{view}</b><br/>Trigger~Adverb Association<br/>Top LRC values'
     sty = (am_df.filter(regex=r'^[^lNe]')
@@ -343,6 +424,8 @@ display(set_my_style(conflict.sort_values('f_diff'))
         .background_gradient('PRGn',
                              subset=conflict.filter(like='diff').columns))
 # %%
+
+
 def exactly_only(_df):
     _df['l2_exactly'] = _df.l2 == 'exactly'
     exactly_df = _df.loc[_df.l2_exactly].reset_index().set_index('l1')
@@ -368,8 +451,8 @@ ALL_trig_exactly = exactly_only(am_trig_adv_ALL)
 #     labels=['with <i>exactly</i>', 'with<u>out</u> <i>exactly</i>', 'Total'],
 #     axis=1)
 # %%
-for name, am_df in [('neg-super', am_trig_exactly), 
-                    ('any-mirror', mir_am_trig_exactly), 
+for name, am_df in [('neg-super', am_trig_exactly),
+                    ('any-mirror', mir_am_trig_exactly),
                     ('any-trigger', ALL_trig_exactly)]:
     display(save_html(set_my_style(
         (transform_counts(am_df.filter(['f', 'OTHERS_f', 'f1']))
@@ -401,7 +484,7 @@ for name, am_df in [('neg-super', am_trig_exactly),
         latex_path=WRITING_LINKS.joinpath(
             f'cluster/triggers/{name}-trigger_x_exactly-vs-others_freq.{timestamp_today()}.tex')
     )
-    
+
     save_latex_table(
         format_zeros(
             am_df
