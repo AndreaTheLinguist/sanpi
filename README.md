@@ -1,5 +1,7 @@
 # SANPI 
 **_Scalar Ambiguity of Negative Polarity Inferences_**
+This repository presents the source code and demos for the analysis of ADV ADJ bigram tokens (two consecutive words where the first is an adverb and the second an adjective the adverb modifies) retrieved from large-scale^[original text data exceeds 1TB storage size] linguistic corpora structurally annotated in the [Universal Dependencies](https://universaldependencies.org/) framework.
+This work accounts for a portion of the data processing and analysis work performed for and presented in my dissertation, [*"Nothing Too Serious": Corpus Resouces and Methods for Data--Driven Approaches to Polarity Sensitivity*](reformatted-FINAL_Dissert_25-05-06.pdf). 
 
 ## Environment Set Up
 
